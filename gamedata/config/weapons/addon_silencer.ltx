@@ -1,0 +1,202 @@
+[wpn_sil]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+class			= W_SILENC
+cform           = skeleton
+$prefetch 		= 32
+inv_weight		= 0.2
+
+[wpn_addon_sil_1143_p]:wpn_sil
+$spawn			= "weapons\upgrade\sil_1143_p" ; option for Level Editor
+visual          = weapons\upgrade\sil_1143_p.ogf
+description		= enc_arsenal_sil_1143_p
+
+cost			= 750
+
+inv_name		= ars-sil_1143_p
+inv_name_short	= ars-sil_1143_p
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x		= 32
+inv_grid_y		= 37
+
+bullet_hit_power_k	= 0.8
+bullet_speed_k	 	= 0.8
+fire_dispersion_base_k = 1.25
+cam_dispersion_k	= 0.8
+
+[wpn_addon_sil_556_ar]:wpn_sil
+$spawn			= "weapons\upgrade\sil_556_ar" ; option for Level Editor
+visual          = weapons\upgrade\sil_556_ar.ogf
+description		= enc_arsenal_sil_556_ar
+
+cost			= 750
+
+inv_name		= ars-sil_556_ar
+inv_name_short	= ars-sil_556_ar
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 35
+inv_grid_y		= 37
+
+bullet_hit_power_k	= 0.8
+bullet_speed_k	 	= 0.8
+fire_dispersion_base_k = 1.25
+cam_dispersion_k	= 0.8
+
+[wpn_9mm_nato_silencer]:wpn_sil
+$spawn			= "weapons\addons\9mm_nato_silencer" 
+visual         	= weapons\upgrade\wpn_silencer_9mm_nato.ogf
+description		= enc_weapons1_wpn-9mm_nato-silencer
+cost			= 450
+
+inv_name		= wpn-9mm_nato-silencer
+inv_name_short	= wpn-9mm_nato-silencer
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x		= 18
+inv_grid_y		= 4
+
+bullet_hit_power_k	= 0.8
+bullet_speed_k	 	= 0.8
+fire_dispersion_base_k = 1.25
+cam_dispersion_k	= 0.8
+
+
+
+
+
+
+[wpn_addon_silencer]:wpn_sil
+$spawn			= "weapons\addons\silencer" ; option for Level Editor
+visual          = weapons\upgrade\wpn_silencer.ogf
+description		= enc_weapons1_wpn-addon-silencer
+
+cost			= 1700
+
+inv_name		= wpn-addon-silencer
+inv_name_short	= wpn-addon-silencer
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x		= 18
+inv_grid_y		= 1
+
+bullet_hit_power_k	= 0.8
+bullet_speed_k	 	= 0.8
+fire_dispersion_base_k = 1.4
+cam_dispersion_k	= 0.8
+
+
+;;;;;;;;;;;;;;;;;;;
+;;; АКМ АДДОН-ТЕСТ
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;Прибор беззвучной и беспламенной стрельбы ПБС-1 (6Ч12)
+[wpn_addon_sil_762_pbs1]:wpn_sil
+$spawn			= "weapons\addons\sil_762_pbs1" ; option for Level Editor
+visual          = weapons\upgrade\pbs-1.ogf
+description		= enc_weapons_wpn-addon-silencer_pbs1
+;При использовании необходимо применять патроны 7,62УС с дозвуковой начальной скоростью пули. Для прицеливания при стрельбе патронами УС с ПБС-1 на оружие вместо штатной устанавливается специальная прицельная планка, с помощью которой обеспечивается также наведение автомата в цель и при стрельбе обыкновенными 7,62-мм патронами обр. 1943 г. без прибора.
+;сменный обтюратор 6Ч7 рассчитан на 400 выстрелов. Соответственно, в цинк на 1200 патронов УС на заводе укладываются 6 запасных обтюраторов.
+cost			= 750
+inv_weight		= 0.64
+
+inv_name		= wpn-addon-silencer_pbs1
+inv_name_short	= wpn-addon-silencer_pbs1_s
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x		= 71
+inv_grid_y		= 10
+
+bullet_hit_power_k	= 0.8
+bullet_speed_k	 	= 0.8
+fire_dispersion_base_k = 1.25
+cam_dispersion_k	= 0.8
+
+;;;;;;;;;;;;;;;;;;;Прибор беззвучной и беспламенной стрельбы ПБС-4 для АКС74УБ - комплекс АКС74У+ПБС-4 (6П27)
+[wpn_addon_sil_545_pbs4]:wpn_sil
+$spawn			= "weapons\addons\sil_545_pbs4" ; option for Level Editor
+visual          = weapons\upgrade\pbs-4.ogf
+description		= enc_weapons_wpn-addon-silencer_pbs4
+
+cost			= 750
+inv_weight		= 0.61
+
+inv_name		= wpn-addon-silencer_pbs4
+inv_name_short	= wpn-addon-silencer_pbs4_s
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x		= 69
+inv_grid_y		= 10
+
+bullet_hit_power_k	= 0.8
+bullet_speed_k	 	= 0.8
+fire_dispersion_base_k = 1.25
+cam_dispersion_k	= 0.8
+
+;;;;;;;;;;;;;;;;;;;Прибор малошумной стрельбы "Глушитель-пламягаситель тактический" ТГП-А 
+;варианты под 5 и 7
+[wpn_addon_sil_545_tgp-a]:wpn_sil
+$spawn			= "weapons\addons\sil_545_tgp-a" ; option for Level Editor
+visual          = weapons\upgrade\tgp-a.ogf
+description		= enc_weapons_wpn-addon-silencer_tgp-a
+
+cost			= 750
+inv_weight		= 0.7
+
+inv_name		= wpn-addon-silencer_tgp-a
+inv_name_short	= wpn-addon-silencer_tgp-a_s
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x		= 68
+inv_grid_y		= 10
+
+bullet_hit_power_k	= 0.8
+bullet_speed_k	 	= 0.8
+fire_dispersion_base_k = 1.25
+cam_dispersion_k	= 0.8
+
+;;;;;;;;;;;;;;;;;;;Прибор малошумной стрельбы "Глушитель-пламягаситель тактический" ТГП-В 
+;для СВД
+[wpn_addon_sil_762_tgp-v]:wpn_sil
+$spawn			= "weapons\addons\sil_762_tgp-v" ; option for Level Editor
+visual          = weapons\upgrade\tgp-v.ogf
+description		= enc_weapons_wpn-addon-silencer_tgp-v
+
+cost			= 850
+inv_weight		= 1.2
+
+inv_name		= wpn-addon-silencer_tgp-v
+inv_name_short	= wpn-addon-silencer_tgp-v_s
+inv_grid_width	= 2			;ТГП-А 1
+inv_grid_height	= 1
+inv_grid_x		= 72
+inv_grid_y		= 10
+
+bullet_hit_power_k	= 0.8
+bullet_speed_k	 	= 0.8
+fire_dispersion_base_k = 1.25
+cam_dispersion_k	= 0.8
+
+;;;;;;;;;;;;;;;;;;;Прибор малошумной стрельбы "Глушитель тактический автоматный" АТГ 
+;?универсал (под 5,7 и 5 НАТО)
+;(при использовании обтюратора 6Ч7, возможно ведение беззвучной и беспламенной стрельбы 7,62-мм патронами «УС»)
+
+[wpn_addon_sil_545_atg]:wpn_sil
+$spawn			= "weapons\addons\sil_545_atg" ; option for Level Editor
+visual          = weapons\upgrade\atg.ogf
+description		= enc_weapons_wpn-addon-silencer_atg
+
+cost			= 750
+inv_weight		= 0.7
+
+inv_name		= wpn-addon-silencer_atg
+inv_name_short	= wpn-addon-silencer_atg_s
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x		= 70
+inv_grid_y		= 10
+
+bullet_hit_power_k	= 0.8
+bullet_speed_k	 	= 0.8
+fire_dispersion_base_k = 1.25
+cam_dispersion_k	= 0.8

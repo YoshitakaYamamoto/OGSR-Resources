@@ -1,0 +1,640 @@
+local total_debug = false
+
+function write_log(str)
+	if total_debug then
+		log1(str)
+	end
+end
+
+local deferred_release = {}
+--' Ключем является группировка персонажа. Значением является таблица, содержашая имена секций предметов.
+local item_by_community = {}
+
+--' Зависимости в спауне предметов. Предмет спауниться только если есть хотя бы один из зависимых.
+local item_dependence = {}
+
+--' Множители и минимаксы для выпадения вещей в зависимости от уровня
+local mul_by_level = {}
+local count_by_level = {}
+
+--' Предметы, которые нельзя удалять (квестовые например)
+local always_keep_item = {}
+
+--' Предметы, которые нельзя сильно портить
+rare_item = {}
+
+--' Предметы, относящиеся к патронам. Их надо спаунить другим методом.
+local ammo_sections = {}
+
+--' Табличка дубликатов - незачем спавнить километр одинаковых стволов и артов
+local duplicates = {}
+
+--' Нижний/Верхний уровень износа редких стволов
+local low_damage_rar,high_damage_rar = 65, 95
+
+local death_ini = ini_file("misc\\death_generic.ltx")
+
+local suit_prob = system_ini():r_s32("options","suit_probability")
+local exo_prob = system_ini():r_s32("options","exo_probability")
+
+local rank_to_mult = {
+	novice      = {0, 15}, -- {<for low boundary>, <for upper boundary>}
+	experienced = {5, 10},
+	veteran     = {10, 5},
+	master      = {15, 0},
+}
+local comm_to_par = {
+	stalker  = {{35, 1}, {60, 1}}, -- {{<base val. for low b.>, <add. val. for low b.>}, {<base val. for u.b.>, <add. val. for u.b.>}}
+	bandit   = {{5,  2}, {60, 1}},
+	military = {{40, 1}, {70, 1}},
+	freedom  = {{40, 1}, {70, 1}},
+	monolith = {{45, 1}, {80, 1}},
+	csky     = {{45, 1}, {80, 1}},
+	dolg     = {{50, 1}, {85, 1}},
+	killer   = {{50, 1}, {85, 1}},
+	mil_stalker = {{50, 1}, {85, 1}},
+	zombied  = {{5,  0}, {35, 0}},
+}
+--' Возвращает нижний/верхний уровень износа стволов в зависимости от коммьюнити
+function damage_boundaries(npc)
+	if not npc then
+		return 35, 70
+	end
+	local community = npc:character_community()
+	local npc_rank = ranks.get_obj_rank_name(npc)
+	local mult1 = rank_to_mult[npc_rank][1] or 0
+	local mult2 = rank_to_mult[npc_rank][2] or 0
+	local params = comm_to_par[community]
+	if params then
+		return (params[1][1] + mult1 * params[1][2]), (params[2][1] - mult2 * params[2][2])
+	end
+	return 35, 70
+end
+
+function set_weapon_drop_condition(item,npc)
+	if math.random(1,100) > 25 then item:unload_magazine() end
+	local l,h = low_damage_rar, high_damage_rar
+	if not rare_item[section] then
+		l,h = damage_boundaries(npc)
+	end
+	item:set_condition(math.random(l,h)/100.)
+end
+
+function init_drop_settings()
+	local community_list = {"trader", "stalker", "dolg", "freedom", "bandit", "military", "zombied", "ecolog", "killer", "monolith", "arena_enemy", "actor_dolg", "actor_zombied", "actor_freedom", "actor_prebandit", "csky", "quest_stalker", "kulg_band", "bratstvo_9", "kulg_band_2", "neutral_military", "iskatel", "neutral_killer", "mil_stalker"  }	
+
+    for k,v in pairs(community_list) do
+        --' Необходимо заполнить таблицу
+        item_by_community[v] = {}
+        if death_ini:section_exist(v) then
+		    local n = death_ini:line_count(v)
+		    local id, value = "", ""
+		    for i=0,n-1 do
+			    result, id, value	= death_ini:r_line(v,i,"","")
+                item_by_community[v][id] = 100*tonumber(value)
+		    end
+        end
+    end
+
+    --' Заполняем таблицу зависимостей
+	local n = death_ini:line_count("item_dependence")
+	local id, value = "", ""
+	for i=0,n-1 do
+		result, id, value	= death_ini:r_line("item_dependence",i,"","")
+		item_dependence[id] = {}
+		local vvv = parse_names(value)
+		for k,v in pairs(vvv) do
+			item_dependence[id][v] = true
+		end
+	end
+
+	--' Множители и минимаксы для выпадения вещей в зависимости от уровня
+    local level_name = level.name()
+	
+	if not death_ini:section_exist(level_name) then
+		level_name = "default"
+	end
+
+    local n = death_ini:line_count(level_name)
+	local id, value = "", ""
+	for i=0,n-1 do
+		result, id, value	= death_ini:r_line(level_name,i,"","")
+        mul_by_level[id] = tonumber(value)
+	end        
+
+    local item_count_section = "item_count_" .. level.get_game_difficulty()
+    local n = death_ini:line_count(item_count_section)
+	for i=0,n-1 do
+		result, id, value	= death_ini:r_line(item_count_section,i,"","")
+        --' Нужно распарсить value в два значения
+        local t = parse_nums(value)
+		if t[1] == nil then
+            abort("Error on [death_ini] declaration. Section [%s], line [%s]", item_count_section, tostring(id))
+        end
+        local min = t[1]
+        local max = t[2] or min
+        
+        mul_by_level[id] = mul_by_level[id] or 0
+
+        min = tonumber(min) * mul_by_level[id]
+        max = tonumber(max) * mul_by_level[id]
+
+        count_by_level[id] = {min = min, max = max}
+	end        
+
+ 	--' Предметы, которые нельзя удалять (квестовые например)
+    local n = death_ini:line_count("keep_items")
+	for i=0,n-1 do
+		result, id, value	= death_ini:r_line("keep_items",i,"","")
+        if value == "true" then
+            always_keep_item[id] = true
+        end
+    end
+	
+ 	--' Предметы, которые нельзя сильно портить
+    local n = death_ini:line_count("rare_items")
+	for i=0,n-1 do
+		result, id, value	= death_ini:r_line("rare_items",i,"","")
+        if value == "true" then
+            rare_item[id] = true
+        end
+    end
+
+	--' Предметы, относящиеся к патронам. Их надо спаунить другим методом.
+    ammo_sections = {}
+    local n = death_ini:line_count("ammo_sections")
+	local id, value = "", ""
+	for i=0,n-1 do
+		result, id, value	= death_ini:r_line("ammo_sections",i,"","")
+        ammo_sections[id] = true
+	end
+end
+
+-- Добавление в таблицу
+function insert_to_table(tbl, section)
+	if tbl[section] == nil then
+		tbl[section] = 1
+	else
+		tbl[section] = tbl[section] + 1
+	end
+end
+
+local quest_needed = {}
+
+function offline_dead_quest_check(npc)
+	npc:iterate_inventory(keep_offline_item, npc)
+	if quest_needed[npc:id()] == true then
+		quest_needed = {}
+		return true
+	else	
+		quest_needed = {}
+		return false
+	end
+	quest_needed = {}
+end
+
+function keep_offline_item(npc, item)
+	if item == nil or alife():object(item:id())==nil then return end
+    local section = item:section()
+    if always_keep_item[section] == true then
+        quest_needed[npc:id()] = true
+    end	
+end
+
+class "drop_manager"
+function drop_manager:__init(npc, backup)
+	self.npc = npc
+	self.backup = backup
+end
+
+function drop_manager:create_release_item()
+
+	local otf
+	local sect
+
+	if not self.npc or not IsStalker(self.npc) then
+		if self.backup and IsStalker(self.backup) then
+			self.npc = level.object_by_id(self.backup:id())
+		else
+			return
+		end
+	end
+
+	--' Спрашиваем у серверного объекта генерились ли предметы
+	local se_obj = alife():object(self.npc:id())
+	if se_obj and se_obj.death_droped then
+		if se_obj.death_droped == true then
+			return
+		else	
+			se_obj.death_droped = true
+		end
+	end
+
+	--// xr_companion
+	if xr_companion.is_companion(self.npc:id()) then
+		self.npc:iterate_inventory(companion_item, self.npc)
+		return
+	end	
+	--// xr_companion
+
+
+    --' Запускаем итератор на удаление предметов
+    self.npc:iterate_inventory(keep_item, self.npc)
+
+    --' Проверка на отсутствие спауна лута
+    local ini = self.npc:spawn_ini()
+
+    if ini and ini:section_exist("dont_spawn_loot") then
+        return
+    end
+
+    --' Доспавниваем необходимое количество итемов:
+    --' Необходимо составить список объектов которые могут быть заспавнены для персонажа
+	
+    local spawn_items = item_by_community[self.npc:character_community()]    
+    for k,v in pairs(spawn_items) do
+        --' По каждому объекту необходимо получить зависимости		
+        if check_item_dependence(self.npc, k) == true then
+            --' По каждому объекту необходимо получить количество
+            local number = math.ceil(math.random(count_by_level[k].min, count_by_level[k].max))
+            --' Необходимо заспавнить нужное количество.
+
+			if not string.find(self.npc:section(),"arena") 
+			and not string.find(self.npc:section(),"aem") 
+			and self.npc:character_community()~="arena_enemy" then 
+				if not duplicates[k] then 
+					create_items(self.npc, k, number, v)
+				end
+			end
+		end
+    end
+	
+	duplicates = {}
+
+	-- RealArmor by KamikaZze
+	sect = ogse_real_armor.vis_to_armor(self.npc)
+
+	if sect~=nil and not string.find(self.npc:section(),"arena") and 
+		not string.find(self.npc:section(),"aem") and 
+		self.npc:character_community()~="arena_enemy" and 
+		self.npc:name()~="esc_novice_attacker1" and
+		self.npc:name()~="esc_blokpost_commander" and
+		self.npc:name()~="agr_ratcatcher" and
+		self.npc:name()~="val_lager_bandits_borov" and
+		not string.find(self.npc:name(),"gar_dm_bandit") and
+		self.npc:name()~="gar_wounded_bandit" and
+		self.npc:name()~="bar_dolg_leader" and
+		self.npc:name()~="bar_dolg_petrenko" and
+		self.npc:name()~="mil_freedom_member0012" and
+		self.npc:name()~="mil_freedom_member0018" and
+		self.npc:name()~="mil_stalker0012" and
+		self.npc:name()~="mil_stalker0023" and
+		self.npc:name()~="mil_ara" and
+		self.npc:name()~="mil_blockpost_freedomstalker001" and
+		self.npc:name()~="bar_ecolog_professor" and
+		self.npc:name()~="yan_scientist_help" and
+		self.npc:name()~="yan_specnaz_dead" and
+		self.npc:name()~="x16_stalker_ghost" and
+		self.npc:name()~="yantar_semenov" then 
+		local rnd = suit_prob
+		if sect == "exo1" then rnd = exo_prob end
+		otf = create_items(self.npc, sect, 1, rnd)
+		if otf~= nil then 
+			ogse.start_timer("otf",1,otf.id) 
+		end
+	end
+
+	if has_alife_info("pri_trader_arny_task") and string.find(self.npc:name(), "aem_arny") then 
+		ogse.spawn_item_in_inv("zapiska", self.npc) 
+	end
+
+	if has_alife_info("pri_trader_dolg_task") and self.npc:name()=="bar_dolg_leader" then 
+		ogse.spawn_item_in_inv("zapiska_m1", self.npc) 
+	end
+
+	if has_alife_info("pri_trader_freedom_task") and self.npc:name()=="mil_freedom_member0012" then 
+		ogse.spawn_item_in_inv("zapiska_m2", self.npc) 
+	end
+	
+end
+
+
+function shedule_release(item)
+	if item then
+		if not deferred_release[item:id()] then
+			deferred_release[item:id()] = time_global()
+		end
+	end
+end
+
+local remove_this_shit_immediately = {
+	["fake_grenades_base"] = true,
+	["grenade_f1_fake"] = true,
+	["grenade_rgd5_fake"] = true,
+	["grenade_gd-05_fake"] = true,
+	["grenade_light_fake"] = true,
+	["grenade_f1_test"] = true,
+	["grenade_rgd5_test"] = true,
+	["grenade_gd-05_test"] = true,
+	["grenade_light_test"] = true,
+	["gl_test_shell"] = true,
+	["wpn_fake_missile"] = true,
+	["gl_test_shell_ammo_vog-25"] = true,
+	["gl_test_shell_ammo_vog-25p"] = true,
+	["gl_test_shell_ammo_m209"] = true,
+	["gl_test_shell_ammo_m208a"] = true,
+	["gl_fake_missile"] = true,
+	["gl_fake_missile_ammo_vog-25"] = true,
+	["gl_fake_missile_ammo_vog-25p"] = true,
+	["gl_fake_missile_ammo_m209"] = true,
+	["gl_fake_missile_ammo_m208a"] = true,
+	
+	-- надо удалять темные арты из трупа Радиста
+	["af_polter"] = true,
+	["af_resine"] = true,
+	["af_sparks"] = true,
+}
+
+--' Функция вызывается для каждого предмета, если вернет false то предмет удалится.
+function keep_item(npc, item)
+
+	if item == nil then return end
+	local srv_obj = alife():object(item:id())
+	if not srv_obj then return end
+	
+    local section = srv_obj:section_name()
+	
+	if remove_this_shit_immediately[section] then
+		local s_obj = alife():object(item:id())
+		if s_obj then
+			alife():release(s_obj, true)
+		end
+		return false	
+	end	
+	
+	if string.find(section,"wpn_binoc") 
+	or string.find(section,"binocular") 
+	or string.find(section,"hand_radio") 
+	or string.find(section,"device_pda") 
+	or string.find(section,"kolbasa_a") 
+	or string.find(section,"vodka_a") 
+	or string.find(section,"psy_helmet_a")
+	or string.find(section,"bread_a") 
+	or string.find(section,"guitar") 
+	or string.find(section,"yad") 
+	or string.find(section,"device_torch") 
+	or string.find(section,"wpn_knife") then
+		local s_obj = alife():object(item:id())
+		if s_obj then
+			alife():release(s_obj, true)
+		end
+		return false	
+	end
+	
+    if always_keep_item[section] == true then
+        return true
+    end	
+	
+	if string.find(section,"grenade_f1") 
+	or string.find(section,"grenade_rgd5") 
+	or string.find(section,"grenade_light") 
+	or string.find(section,"medkit") 	
+	or string.find(section,"bandage") then
+		if not duplicates[section] then
+			insert_to_table(duplicates, section)
+			if math.random() > 0.7 then 
+				return true
+			else
+				local s_obj = alife():object(item:id())
+				if s_obj then
+					alife():release(s_obj, true)
+				end
+				return false
+			end
+		else	
+			local s_obj = alife():object(item:id())
+			if s_obj then
+				alife():release(s_obj, true)
+			end
+			return false			
+		end
+	end
+	
+	if string.find(section,"wpn_") then
+		if string.find(section,"scope") 
+		or string.find(section,"addon") 
+		or string.find(section,"zf4")
+		or string.find(section,"_sil")
+		or string.find(section,"grenade_launcher") then
+			if not duplicates[section] then
+				insert_to_table(duplicates, section)
+				return true
+			else	
+				local s_obj = alife():object(item:id())
+				if s_obj then
+					alife():release(s_obj, true)
+				end
+				return false			
+			end
+		else
+			if not duplicates[section] then
+				insert_to_table(duplicates, section)
+				set_weapon_drop_condition(item,npc)
+				return true				
+			else	
+				local s_obj = alife():object(item:id())
+				if s_obj then
+					alife():release(s_obj, true)
+				end
+				return false			
+			end
+		end	
+	end	
+	
+	local community = npc:character_community()
+	if string.find(section,"af_") then
+		if not ogse.art_accesible(item) then
+			if community == "bandit" and math.random() < 0.4 then
+				return true
+			else	
+				local s_obj = alife():object(item:id())
+				if s_obj then
+					alife():release(s_obj, true)
+				end
+				return false					
+			end
+		else
+			if not duplicates[section] and math.random() > 0.5 then
+				insert_to_table(duplicates, section)
+				return true
+			else	
+				local s_obj = alife():object(item:id())
+				if s_obj then
+					alife():release(s_obj, true)
+				end
+				return false			
+			end
+		end
+	end
+	-- Удаляем водку из инвентаря вояк. FEAR93 11.03.11
+	if (section == "vodka" or section == "vodka_a") and community == "military" then
+		local s_obj = alife():object(item:id())
+		if s_obj then
+			alife():release(s_obj, true)
+		end
+		return false
+	end
+		
+    if section == "bolt" then
+        return false
+    end
+	
+    local item_id = item:id()
+    local item_in_slot = npc:item_in_slot(1)
+	
+    if item_in_slot ~= nil and
+       item_in_slot:id() == item_id
+    then
+		set_weapon_drop_condition(item,npc)
+        return true
+    end
+    item_in_slot = npc:item_in_slot(2)
+	
+    if item_in_slot ~= nil and
+       item_in_slot:id() == item_id
+    then
+		set_weapon_drop_condition(item,npc)
+        return true
+    end
+	
+	if string.find(section,"ammo_") then
+		shedule_release(item)
+		return true
+	end
+	
+	local s_obj = alife():object(item:id())
+	if s_obj then
+		alife():release(s_obj, true)
+	end
+end
+
+function release_deferred_ammo()
+	local ini = system_ini()
+	for k, v in pairs(deferred_release) do
+		local game_object = level.object_by_id(k)
+		local s_obj = alife():object(k)
+		if not s_obj and not game_object then
+			-- если нет ни геймобъекта ни серверного - удалилось как надо
+			deferred_release[k] = nil
+		elseif s_obj and game_object then
+			-- если есть и то и другое - все ок, удаляем
+			local parent = game_object:parent()
+			if v < time_global() then
+				if not parent then
+					write_log("!!DEFFERED_DEBUG DEBUG_DELETING_NORMAL "..tostring(s_obj.id))
+					alife():release(s_obj, true)
+					deferred_release[k] = nil
+				else	
+					write_log("!!DEFFERED_DEBUG DEBUG_TELEPORT "..tostring(s_obj.id))
+					parent:drop_item(game_object)
+				end
+			end
+		elseif s_obj then	
+			-- если только серверный - срочно убиваем
+			write_log("!!DEFFERED_DEBUG DEBUG_DELETING_SRV "..tostring(s_obj.id))
+			alife():release(s_obj, true)
+			deferred_release[k] = nil
+		elseif game_object then
+			-- если только геймобъект - он ещё не успел сдохнуть, сцуко, не трогаем его
+			write_log("!!DEFFERED_DEBUG DEBUG_DELETING_ONLY_GAMEOBJ")
+		end		
+	end
+end
+
+function get_ammo_size(obj)
+	local se_obj = alife():object(obj:id())
+	local packet = net_packet()
+	cse_alife_item_ammo.STATE_Write(se_obj, packet)
+	packet:r_seek(packet:w_tell() - 2)
+	return packet:r_u16()
+end
+
+--' Функция вызывается для каждого предмета, если вернет false то предмет удалится.
+function companion_item(npc, item)
+
+	if item == nil then return end
+	local srv_obj = alife():object(item:id())
+	if not srv_obj then return end
+	
+    local section = srv_obj:section_name()
+	
+    if section == "bolt" then
+        return false
+    end	
+
+	if remove_this_shit_immediately[section] then
+		local s_obj = alife():object(item:id())
+		if s_obj then
+			alife():release(s_obj, true)
+		end
+		return false	
+	end	
+	
+	if string.find(section,"wpn_binoc") 
+	or string.find(section,"wpn_knife") 	
+	or string.find(section,"binocular") 
+	or string.find(section,"hand_radio") 
+	or string.find(section,"device_pda") 
+	or string.find(section,"guitar") 
+	or string.find(section,"yad") 
+	or string.find(section,"device_torch") then
+		local s_obj = alife():object(item:id())
+		if s_obj then
+			alife():release(s_obj, true)
+		end
+		return false	
+	end
+end
+
+--' Функция спавнит необходимое число предметов
+function create_items(npc, section, number, rnd)
+local obj
+--'    printf("create %s of %s", tostring(number), tostring(section))
+    if ammo_sections[section] == true then
+        if number > 0 then
+            se_respawn.create_ammo(section,	
+				    npc:position(),
+				    npc:level_vertex_id(),	
+				    npc:game_vertex_id(),
+				    npc:id(),
+                    number)
+        end
+    else
+        for i=1,number do
+			--' Проверяем вероятность появить каждый объект в отдельности
+			if math.random(100) <=  rnd and not string.find(section,"wpn_") then 
+				obj = alife():create(section, npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id()) 
+			end
+        end
+    end    
+	if obj then return obj end
+end
+
+
+--' Функция проверяет есть ли хоть один из зависимых объектов у персонажа
+function check_item_dependence(npc, section)
+	if item_dependence[section] == nil then
+		return true
+	end
+
+    local d_flag = true
+    for k,v in pairs(item_dependence[section]) do
+        local obj = npc:object(k)
+        if obj ~= nil and npc:marked_dropped(obj) ~= true then
+            return true
+        end
+        d_flag = false
+    end
+
+    return d_flag
+end

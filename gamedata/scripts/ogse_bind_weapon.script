@@ -1,0 +1,278 @@
+prefetch("ogse_wpn_utils")
+
+
+function attach(sm) -- для менеджера сигналов
+	sm:subscribe({signal = "on_item_to_slot", fun = this.on_item_to_slot})
+end
+local need_initialize_hud = nil
+function on_item_to_slot(item, sitem)
+	if item:is_weapon_magazined() then
+		local bnd = item:binded_object()
+		if bnd and bnd.wpn_binder then
+			need_initialize_hud = true
+		end
+	end
+end
+local write_debug_log = false
+function init(obj)
+	obj:bind_object(wpn_binder(obj))
+end
+
+local function aux_read_bones(addon_sect)
+	return split_comma_separated_list(get_string(addon_sect, "bones", ""))
+end
+local function aux_read_bones_hide(addon_sect)
+	return split_comma_separated_list(get_string(addon_sect, "bones_hide", ""))
+end
+local addon_templates = {
+	{
+		descname = "scope_desc",
+		section_param = "scope",
+		params = {
+			use_texture = function(addon_sect) return not get_bool(addon_sect, "force_remove_texture") end,
+			offset      = function(addon_sect) return get_numbers(addon_sect, "zoom_offset") end,
+			rotation    = function(addon_sect) return get_numbers(addon_sect, "zoom_rotation") end,
+			bones       = aux_read_bones,
+			bones_hide  = aux_read_bones_hide,
+		},
+		addon_attached_fun = ogse_wpn_utils.get_scope_flag,
+		extra_actions = function(obj, desc)
+			local force_use_tex = desc.hud_attached and not desc.use_texture
+			ogse_wpn_utils.set_forced_notex_scope(obj, force_use_tex)
+			ogse_wpn_utils.set_hud_offset(obj, desc.hud_attached and desc.offset or desc.default_hud_offset)
+			ogse_wpn_utils.set_hud_rotate(obj, desc.hud_attached and desc.rotation or desc.default_hud_rotate)
+		end,
+	},
+	{
+		descname = "ubd_desc",         
+		section_param = "underbarrel_device", 
+		params = {bones = aux_read_bones,}, 
+		addon_attached_fun = ogse_wpn_utils.get_grenade_launcher_flag,
+	},
+	{
+		descname = "silencer_desc",    
+		section_param = "silencer",           
+		params = {bones = aux_read_bones,}, 
+		addon_attached_fun = ogse_wpn_utils.get_silencer_flag,
+	},
+	{
+		descname = "grip_desc",        
+		section_param = "grip",               
+		params = {bones = aux_read_bones,}, 
+		addon_attached_fun = ogse_wpn_utils.get_grip_flag,
+	},
+	{
+		descname = "magazine_desc",        
+		section_param = "magazine",               
+		params = {bones = aux_read_bones,}, 
+		addon_attached_fun = ogse_wpn_utils.get_magazine_flag,
+	},
+	{
+		descname = "scope_mount_desc", 
+		section_param = "scope_mount",        
+		params = {bones = aux_read_bones,}, 
+		addon_attached_fun = ogse_wpn_utils.get_scope_mount_flag,
+	},
+}
+
+----------------------------------------------------------------------------------------------------------------------
+class "wpn_binder" (object_binder)
+----------------------------------------------------------------------------------------------------------------------
+
+function wpn_binder:dbg_log(f,...)
+	if not write_debug_log then return end
+	self.aux_log_counter = aux_log_counter or 0
+	if not self.fdbglog then
+		local log_path = getFS():update_path(
+			"$logs$", 
+			string.format("wpn_log_%d_%s_%d.txt", get_game_id(), self.object:section(), self.object:id())
+		)
+		self.fdbglog = io.open(log_path, "a")
+	end
+	local time_str = time2string(game.get_game_time(), "%04d/%02d/%02d %02d:%02d:%02d.%03d", {'y','m','d','h','min','s','ms'})
+	local cntr_str = string.format(" %03d] ", self.aux_log_counter)
+	self.fdbglog:write('['..time_str..cntr_str..f:format(...)..'\n')
+	self.fdbglog:flush()
+	self.aux_log_counter = self.aux_log_counter + 1
+end
+
+function wpn_binder:__init (obj) super(obj)
+	--self:dbg_log("wpn_binder:__init: sec = '%s', name = '%s', id = %d", self.object:section(), self.object:name(), self.object:id())
+	--self.spawned = false
+	self.wpn_binder = true
+end
+----------------------------------------------------------------------------------------------------------------------
+function wpn_binder:reinit()
+	--self.object:set_callback(callback_ex.update_addons_visibility,     self.update_addons_visibility,    self)
+	--self:dbg_log("wpn_binder:reinit")
+end
+----------------------------------------------------------------------------------------------------------------------
+function wpn_binder:initialize()
+	--self:dbg_log("wpn_binder:initialize")
+	--self.initialized = true
+	self.is_gl = self.object:is_weapon_gl()
+	local obj_section = self.object:section()
+	if get_string(obj_section, "scope_mount_name") then
+		ogse_wpn_utils.add_addon_flags(self.object, ogse_wpn_utils.addons_flags.scope_mount)
+	end
+	if get_string(obj_section, "grip_name") then
+		ogse_wpn_utils.add_addon_flags(self.object, ogse_wpn_utils.addons_flags.grip)
+	end
+	if get_string(obj_section, "magazine_name") then
+		ogse_wpn_utils.add_addon_flags(self.object, ogse_wpn_utils.addons_flags.magazine)
+	end
+	--
+	self.change_safe_cntr = get_u32(obj_section, "change_safe_cntr", 15) -- сколько раз включаем кости, максимальное число поверхностей, навешанных на управляемые кости
+	self.managed_bones = split_comma_separated_list(get_string(obj_section, "managed_bones", ""))
+	self.addon_descriptors = {}
+	for _,desc_info in ipairs(addon_templates) do
+		if system_ini():line_exist(obj_section, desc_info.section_param) then
+			local addon_sect = get_string(obj_section, desc_info.section_param)
+			ASSERT(system_ini():section_exist(addon_sect), "[wpn_binder:net_spawn] section does not exist '%s'", addon_sect)
+			local addon_desc = {}
+			self.addon_descriptors[desc_info.descname] = addon_desc
+			for param_name,reader_func in pairs(desc_info.params) do
+				addon_desc[param_name] = reader_func(addon_sect)
+			end
+			addon_desc.hud_set_cntr = 0
+			addon_desc.set_cntr = 0
+			addon_desc.addon_attached_fun = desc_info.addon_attached_fun
+			addon_desc.extra_actions = desc_info.extra_actions
+		end
+	end
+	local sd = self.addon_descriptors.scope_desc
+	if sd then
+		local hud_section = get_string(obj_section, "hud")
+		sd.default_hud_offset = get_numbers(hud_section, "zoom_offset")
+		local def_zrx = get_float(hud_section, "zoom_rotate_x")
+		local def_zry = get_float(hud_section, "zoom_rotate_y")
+		sd.default_hud_rotate = {def_zrx, def_zry}
+		--sd.ironsight_desc = {}
+	end
+	self.object:set_callback(callback_ex.update_hud_addons_visibility, self.update_hud_addons_visibility, self)
+	ogse_wpn_utils.activate_visibility_updates(self.object, true)
+	--self:dbg_log("wpn_binder:initialize - end")
+end
+
+function wpn_binder:net_spawn(data)
+	--self:dbg_log("wpn_binder:net_spawn")
+	return true
+end
+----------------------------------------------------------------------------------------------------------------------
+function wpn_binder:net_destroy()
+	--self:dbg_log("wpn_binder:net_destroy")
+	self.object:set_callback(callback_ex.update_hud_addons_visibility, nil)
+end
+
+function wpn_binder:update()
+	if not self.initialized then
+		--self:dbg_log("wpn_binder:update - first")
+		self:initialize()
+		self.initialized = true
+	end
+	--self:dbg_log("wpn_binder:update: %s, %s", tostring(ogse_wpn_utils.get_visibility_updates_activated(self.object)), type(self.managed_bones))
+	
+	local p = self.object:parent()
+	if not p or p:is_stalker() then -- валяется на земле или у сталкера в инвентаре
+		self:update_addons_visibility()
+		--self:dbg_log("wpn_binder:update")
+	end
+end
+
+function wpn_binder:set_hud_bones_visibility(bones_list, vis)
+	--self:dbg_log("wpn_binder:set_hud_bones_visibility")
+	ASSERT(bones_list, "wpn_binder:set_hud_bones_visibility: %s", type(bones_list))
+	local vis_val = vis and 1 or 0
+	for i,bone in ipairs(bones_list) do
+		self.object:set_hud_bone_visible(bone, vis_val)
+	end
+end
+
+function wpn_binder:set_bones_visibility(bones_list, vis)
+	--self:dbg_log("wpn_binder:set_bones_visibility")
+	ASSERT(bones_list, "wpn_binder:set_bones_visibility")
+	local vis_val = vis and 1 or 0
+	for _,bone in ipairs(bones_list) do
+		self.object:set_bone_visible(bone, vis_val)
+	end
+end
+
+function wpn_binder:update_addons_visibility(arg1, arg2)
+	--self:dbg_log("wpn_binder:update_addons_visibility")
+	if not self.wm_initialized then
+		--self:dbg_log("wpn_binder:update_addons_visibility - the very first")
+		-- гасим по умолчанию все управляемые скриптами кости
+		self:set_bones_visibility(self.managed_bones, false)
+		self.wm_initialized = true
+	end
+	for des_name,desc in pairs(self.addon_descriptors) do	
+		--self:dbg_log("wpn_binder:update_addons_visibility - set addons")
+		local addon_attached = desc.addon_attached_fun(self.object)
+		if desc.wm_attached ~= addon_attached then
+			desc.wm_attached = addon_attached
+			desc.set_cntr = self.change_safe_cntr
+			--self:dbg_log("wpn_binder:update_addons_visibility - desc.set_cntr = %d", desc.set_cntr)
+		end
+		if desc.set_cntr > 0 then
+			self:set_bones_visibility(desc.bones, desc.wm_attached)
+			if desc.bones_hide then
+				self:set_bones_visibility(desc.bones_hide, not desc.wm_attached)
+			end
+			desc.set_cntr = desc.set_cntr - 1
+		end
+	end
+end
+
+function wpn_binder:update_hud_addons_visibility(arg1, arg2)
+	--self:dbg_log("wpn_binder:update_hud_addons_visibility")
+	
+	--self:dbg_log("forced_notex_scope: %s", tostring(ogse_wpn_utils.get_forced_notex_scope(self.object)))
+	--self:dbg_log("hud_offset: %7.2f, %7.2f, %7.2f", unpack(ogse_wpn_utils.get_hud_offset(self.object)))
+	--self:dbg_log("hud_rotate: %7.2f, %7.2f", unpack(ogse_wpn_utils.get_hud_rotate(self.object)))
+
+	if need_initialize_hud then
+		--self:dbg_log("wpn_binder:update_hud_addons_visibility - the very first")
+		-- гасим по умолчанию все управляемые скриптами кости
+		self:set_hud_bones_visibility(self.managed_bones, false)
+	end
+	for des_name,desc in pairs(self.addon_descriptors) do
+		if self.is_gl and desc.extra_actions then -- восстанавливаем смещение худа после выхода из режима подствольника
+			local gl_mode = ogse_wpn_utils.get_gl_mode(self.object)
+			-- на первом апдейте после перехода в обычный режим
+			if not gl_mode and self.gl_mode ~= gl_mode then
+				desc.extra_actions(self.object, desc)
+			end
+			self.gl_mode = gl_mode
+		end
+		local addon_attached = desc.addon_attached_fun(self.object)
+		if desc.hud_attached ~= addon_attached or need_initialize_hud then
+			--print_table_inlog(desc)
+			desc.hud_attached = addon_attached
+			if desc.extra_actions then desc.extra_actions(self.object, desc) end
+			desc.hud_set_cntr = self.change_safe_cntr
+			if addon_attached then
+				if desc.bones_hide then
+					--self:dbg_log("hide_bones: hide, %d", desc.hud_set_cntr)
+					self:set_hud_bones_visibility(desc.bones_hide, false)
+				end
+			else
+				self:set_hud_bones_visibility(desc.bones, false)
+			end
+		end
+		if desc.hud_set_cntr > 0 then
+			if addon_attached then
+				self:set_hud_bones_visibility(desc.bones, true)
+			else
+				if desc.bones_hide then
+					--self:dbg_log("hide_bones: show, %d", desc.hud_set_cntr)
+					--print_table_inlog(desc.bones_hide)
+					self:set_hud_bones_visibility(desc.bones_hide, true)
+					--self:dbg_log("done")
+				end
+			end
+			desc.hud_set_cntr = desc.hud_set_cntr - 1
+		end
+	end
+	need_initialize_hud = false
+	--self:dbg_log("wpn_binder:update_hud_addons_visibility - end")
+end

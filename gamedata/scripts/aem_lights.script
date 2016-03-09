@@ -1,0 +1,256 @@
+
+local aem_lamp_table = {}
+
+-------
+-- задание вектора
+-------
+function v3f(x,y,z)
+	return vector():set(x,y,z)
+end
+
+---------------------------------------------------------------------------------------------------
+-- освещение в боях на время
+---------------------------------------------------------------------------------------------------
+	
+-------
+-- освещение при фоле
+-------
+function foul()
+	remove_all_aem_lamps()
+	create_lamp(v3f(151.78, -13.28,  93.0), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 1.0, true, -8454144)
+	create_lamp(v3f(151.78, -13.28, 104.0), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 1.0, true, -8454144)
+	create_lamp(v3f(151.78, -13.28, 120.5), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 1.0, true, -8454144)
+end
+
+-------
+-- освещение при ничьей
+-------
+function draw()
+	remove_all_aem_lamps()
+	create_lamp(v3f(151.78, -13.28,  93.0), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 1.0, true, -96238)
+	create_lamp(v3f(151.78, -13.28, 104.0), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 1.0, true, -96238)
+	create_lamp(v3f(151.78, -13.28, 120.5), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 1.0, true, -96238)
+end
+
+-------
+-- освещение при победе
+-------
+function win()
+	remove_all_aem_lamps()
+	create_lamp(v3f(151.78, -13.28,  93.0), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 1.0, true, -15435776)
+	create_lamp(v3f(151.78, -13.28, 104.0), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 1.0, true, -15435776)
+	create_lamp(v3f(151.78, -13.28, 120.5), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 1.0, true, -15435776)
+end
+
+---------------------------------------------------------------------------------------------------
+-- освещение в тотализаторе
+---------------------------------------------------------------------------------------------------
+
+-------
+-- победа  team1
+-------
+function win_team1()
+	create_lamp(v3f(151.78, -13.28,  93.0), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 0.8, true, -8454144)
+	create_lamp(v3f(151.78, -13.28, 120.5), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 0.8, true, -15435776)
+end
+
+-------
+-- победа  team2
+-------
+function win_team2()
+	create_lamp(v3f(151.78, -13.28,  93.0), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 0.8, true, -15435776)
+	create_lamp(v3f(151.78, -13.28, 120.5), v3f(0,0,3.14), "physics\\light\\new_light\\light_alarm_1", 0.8, true, -8454144)
+end
+
+---------------------------------------------------------------------------------------------------
+-- вспомогательные функции
+---------------------------------------------------------------------------------------------------
+
+-------
+-- включить все аренные лампы
+-------
+-- K.D.: тут можно не трогать, все равно никогда не вызывается
+function turn_arena_lamps_on()
+	local id, obj
+	for id=0, 65535 do
+		obj = level.object_by_id(id)
+		local sobj = alife():object(id)
+		if sobj and obj ~= nil and
+		   obj:section() == "lights_hanging_lamp" and
+		   string.find(obj:name(), "light_big_glass_000")
+		then
+			local hl = obj:get_hanging_lamp()
+			if hl ~= nil then
+				hl:turn_on()
+			end
+		end
+	end
+end
+
+-------
+-- удаляет все онлайновые лампы мода ("aem_lamp")
+-------
+function remove_all_aem_lamps()
+	for k,v in pairs(aem_lamp_table) do
+		local sobj = alife():object(v)
+		if sobj then
+			alife():release(sobj, true)
+		end
+	end
+	aem_lamp_table = {}
+end
+
+-------
+-- создание лампы
+-------
+function create_lamp(pos, dir, visual, brightness, shadow, color)
+--SPAWN_V1
+	--local lvid = 76465
+	--local gvid = 1168
+--SPAWN_V2
+	local lvid = ogse_spawn_db.script_spawn_registry.aem_lights.lamp.lvid
+	local gvid = ogse_spawn_db.script_spawn_registry.aem_lights.lamp.gvid
+	
+	local light_flags = 56				-- 0x38==56, 0x1c==28
+	if shadow then light_flags = light_flags + 2 end
+
+	local packet = net_packet()
+	packet:w_u16(gvid)
+	packet:w_float(0.0)
+	packet:w_s32(1)
+	packet:w_s32(lvid)
+	packet:w_s32(-70)				-- 0xffffffba
+	packet:w_stringZ("")
+	packet:w_s32(-1)
+	packet:w_s32(-1)
+	packet:w_stringZ(visual)
+	packet:w_u8(0)
+	packet:w_stringZ("$editor")
+	packet:w_u8(0)
+	packet:w_u16(-1)
+	if color ~= nil then
+		packet:w_s32(color)
+		packet:w_float(brightness)
+		packet:w_stringZ("")
+	else
+		packet:w_s32(-1)
+		packet:w_float(brightness)
+		packet:w_stringZ("light\\light_omni_white_idle")
+	end
+	packet:w_float(14.0)
+	packet:w_u16(light_flags)
+	packet:w_stringZ("$editor")
+	packet:w_stringZ("link")
+	packet:w_float(100.0)
+	packet:w_float(0.1)
+	packet:w_float(4.0)
+	packet:w_float(0.3)
+	packet:w_stringZ("")
+	packet:w_stringZ("")
+	packet:w_stringZ("bone_lamp")
+	packet:w_float(1.0)			-- сделаем луч пошире, чем у стандартных
+	packet:w_stringZ("")
+	packet:w_float(0.7)
+	packet:w_stringZ("bone_omni")
+
+	local se_obj = alife():create("aem_lamp", pos, lvid, gvid)
+	se_obj:STATE_Read(packet, packet:w_tell())
+
+	if dir ~= nil then
+		se_obj.direction = vector():set(dir)
+	end
+	
+	if not aem_lamp_table then
+		aem_lamp_table = {}
+	end
+	table.insert(aem_lamp_table, se_obj.id)
+end
+
+---------------------------------------------------------------------------------------------------
+-- серверный класс лампы
+---------------------------------------------------------------------------------------------------
+
+class "se_lamp" (cse_alife_object_hanging_lamp)
+function se_lamp:__init(section) super(section)
+	--printf("se_lamp:__init")
+end
+
+-- для задания нужного направления достаточно перепаковать один первый вызов
+--
+function se_lamp:STATE_Write(packet)
+	if self.direction ~= nil then
+		repack_abstract(packet, self.direction)
+		self.direction = nil
+	end
+	cse_alife_object_hanging_lamp.STATE_Write(self, packet)
+end
+
+-- переупаковка cse_abstract
+--
+function repack_abstract(packet, dir)
+	--printf("repack_abstract(dir=%f,%f,%f)", dir.x, dir.y, dir.z)
+	local r_tell = packet:r_tell()
+
+	--printf("tell=%d,%d", packet:w_tell(), packet:r_tell())
+	--printf("unpack se_abstract:")
+
+	packet:r_seek(0)
+	local dummy16		= packet:r_u16()
+	local section_name	= packet:r_stringZ()
+	local name		= packet:r_stringZ()
+	local s_gameid		= packet:r_u8()
+	local s_rp		= packet:r_u8()
+	local position		= packet:r_vec3()
+	local direction		= packet:r_vec3()
+	local respawn_time	= packet:r_u16()
+	local unknown_id	= packet:r_u16()
+	local parent_id		= packet:r_u16()
+	local phantom_id	= packet:r_u16()
+	local s_flags		= packet:r_u16()
+	local version		= packet:r_u16()
+	local script_version	= packet:r_u16()
+	local unused_pad	= packet:r_u16()
+	local unused_ext	= {}			-- ещё одна непонятность
+	if unused_pad > 0 then				-- возможно, что иногда это не верно
+		local num
+		for num=1, unused_pad do
+			unused_ext[num] = packet:r_u8()
+		end
+	end
+	local spawn_id		= packet:r_u16()
+	local extended_size	= packet:r_u16()
+
+	--printf("tell=%d,%d", packet:w_tell(), packet:r_tell())
+	--printf("pack se_abstract:")
+
+	direction = dir
+
+	packet:w_begin(dummy16)
+	packet:w_stringZ(section_name)
+	packet:w_stringZ(name)
+	packet:w_u8(s_gameid)
+	packet:w_u8(s_rp)
+	packet:w_vec3(position)
+	packet:w_vec3(direction)
+	packet:w_u16(respawn_time)
+	packet:w_u16(unknown_id)
+	packet:w_u16(parent_id)
+	packet:w_u16(phantom_id)
+	packet:w_u16(s_flags)
+	packet:w_u16(version)
+	packet:w_u16(script_version)
+	packet:w_u16(unused_pad)
+	if unused_pad > 0 then
+		local num
+		for num=1, unused_pad do
+			 packet:w_u8(unused_ext[num])
+		end
+	end
+	packet:w_u16(spawn_id)
+	packet:w_u16(extended_size)
+
+	--printf("tell=%d,%d", packet:w_tell(), packet:r_tell())
+	packet:r_seek(r_tell)
+	--printf("tell=%d,%d", packet:w_tell(), packet:r_tell())
+end
+

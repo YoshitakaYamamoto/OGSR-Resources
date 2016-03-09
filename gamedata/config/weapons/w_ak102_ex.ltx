@@ -1,0 +1,1060 @@
+;-----------------------------------------------------------------------------------
+;Сменные аддоны ОГСЕ
+;-----------------------------------------------------------------------------------
+;управляемые В СЕКЦИЯХ АДДОНОВ кости (64=54+b+5s+2m+2d) АК102 с привязкой by k01jan:
+;wpn_body		патрон в стволе
+;  wpn_grenade_launcher ГП-25 (+ затыльник только на сток)
+;	wpn_grenade			?поменять на ПС
+;  wpn_silencer	АТГ
+;  wpn_scope	- (движковая, д/б пустая)
+;  mag			- пустая, анимированная
+;  	ammo		2 патрона в магазине (скрытА при разряжании, виднА при заряжании)
+;  	mag: m1		рог 30 АК101
+;  	mag: m2		яйца 100 Betta C-Mag
+;  m3			~ сток (штатные приклад и пистолетная рукоять АК102)							(на wpn_body)
+;  d2			~ custom (телескопический приклад +пистолетная рукоять и цевьё с рельсой)		(на wpn_body)
+;  muzzle		~ тактическая рукоять																(только на custom)
+;  s1			1П29 (УСП-1 "Тюльпан") х4
+;  s3			ЭКП-8М-01 "Кобра" х1
+;  s2			1ПН51 (НСПУ-3 "Казуар") х3,46
+;  d1			планка МТК-83 (кронштейн-переходник "ласточкин хвост"/Picatinny rail)
+;  s4			ACOG TA31-CH х4
+;  s5			EOTech  552.A65 х1
+;-----------------------------------------------------------------------------------
+;материал: МИР объект-large_weapon
+;-----------------------------------------------------------------------------------
+;шейдеры:
+;collimator_metka0 первая линза Кобры - прозрачная с меткой (сменная) ХУД худ-reddotsight1 / МИР 
+;collimator_lens01 вторая линза Кобры - полупрозрачная круглая зелёная ХУД модель-transparent / МИР 
+;lens_eotech первая линза EOTech - прозрачная с меткой ХУД худ-reddotsight1 / МИР 
+;collimator_linza0 вторая линза EOTech - полупрозрачная квадратная серая ХУД модель-transparent / МИР 
+;-----------------------------------------------------------------------------------
+
+
+;-----------------------------------------------------------------------------------
+; базовая секция со штатными прикладом и цевьём (m3)
+[wpn_ak102_stok]:wpn_ak102
+silencer_status			= 2
+grenade_launcher_status	= 2
+scope_status			= 2
+scope_mount_status		= 2
+grip_status				= 0
+magazine_status			= 2
+script_binding  = ogse_bind_weapon.init
+;скрытые (управляемые) кости: d2, d1, s1, s2, s3, s4, s5, m1, m2, m3, muzzle
+;АК102 нет (апгрейд ремонтника?) custom-приклада - d2 надо ВСЕГДА скрывать
+;АК102 установлен stock-приклад - m3 надо ВСЕГДА показывать
+managed_bones = d2, d1, s1, s2, s3, s4, s5, m1, m2, muzzle
+;не надо своего описания description				= enc_weapons1_wpn-ak102
+;inv_name	        	= wpn-ak102
+;inv_name_short			= wpn-ak102_s
+cost					= 4000
+hud = wpn_ak102_stok_hud
+
+[wpn_ak102_stok_hud]:wpn_ak102_hud
+
+
+;-----------------------------------------------------------------------------------
+; базовая секция +custom (телескопический приклад +пистолетная рукоять и цевьё с рельсой) (d2)
+[wpn_ak102_custom]:wpn_ak102_stok
+grenade_launcher_status	= 0
+grip_status				= 2
+;скрытые (управляемые) кости: d2, d1, s1, s2, s3, s4, s5, m1, m2, m3, muzzle
+;АК102 нет (апгрейд ремонтника?) stock-приклада - m3 надо ВСЕГДА скрывать
+;АК102 установлен custom-приклад (d2 надо ВСЕГДА показывать)
+managed_bones = d1, s1, s2, s3, s4, s5, m1, m2, m3, muzzle
+description				= enc_weapons1_wpn-ak102_custom
+inv_name	        	= wpn-ak102_custom
+inv_name_short			= wpn-ak102_custom_s
+cost					= 5000
+hud = wpn_ak102_custom_hud
+
+[wpn_ak102_custom_hud]:wpn_ak102_stok_hud
+
+
+
+;-----------------------------------------------------------------------------------
+;без магазина
+[wpn_ak102_nomag_hud]:wpn_ak102_stok_hud
+anim_reload					= idle
+anim_reload_gl				= idle_w_gl
+
+;-----------------------------------------------------------------------------------
+;АК102 яйца C-Mag
+[wpn_ak102_buben_hud]:wpn_ak102_stok_hud
+; тест jumbo5337
+anim_reload					= reload_c_mag
+anim_reload_gl				= reload_c_mag_w_gl
+
+;-----------------------------------------------------------------------------------
+; служебные секции описателей прицелов
+
+; штатный механический прицел (пока не задействован)
+[ak102_ironsight]
+;force_remove_texture = true
+;показываемые кости, был пустой, залочен (здесь НЕ работает?) bones = 
+;смещение ствола при прицеливании: лево/право,верх/низ,от/к себя(е)
+;zoom_offset			= -0.112840,0.039250,-0.158000
+;-вверх/+вниз zoom_rotate_x		= 0.054800
+;-лево/+право zoom_rotate_y		= 0.043280
+
+; тест sto1en
+zoom_offset			= -0.168800,0.067450,-0.223100
+zoom_rotation		= 0.043400,0.030280
+
+
+[ak102_ironsight_p] ; имитация движкового параметра для прицела
+scope_name = 
+; донастройка модели прицела
+scope                    = ak102_ironsight
+
+;+при одетом прицеле кости bones показываются, bones_hide скрываются
+; 1П29 (УСП-1 "Тюльпан") х4
+[ak102_1p29]
+;тест мех.прицела force_remove_texture = true
+;показываемые кости
+bones         = s1
+;штатный механический прицел (не настроен)
+;zoom_offset			= -0.112840,0.039250,0.038000
+;zoom_rotation		= 0.054800,0.043280
+
+; тест sto1en
+zoom_offset			= -0.168800,0.067450,-0.223100
+zoom_rotation		= 0.043400,0.030280
+
+
+; кусок секции для наследования
+[ak102_1p29_p] ; имитация движкового параметра
+; движковый прицел
+scope_name               = wpn_addon_scope_1p29
+; донастройка модели прицела
+scope                    = ak102_1p29
+
+; ЭКП-8М-01 "Кобра" х1
+[ak102_kobra]
+force_remove_texture = true
+bones         = s3
+
+;штатный механический прицел (со сдвигом)
+;zoom_offset			= -0.112840,-0.012750,-0.119000
+;zoom_rotation		= 0.036800,0.043280
+
+; тест sto1en
+zoom_offset			= -0.166240,0.026150,-0.229100
+zoom_rotation		= 0.038600,0.030480
+
+[ak102_kobra_p] ; имитация движкового параметра
+; движковый прицел
+scope_name               = wpn_addon_scope_kobra
+scope                    = ak102_kobra
+
+; 1ПН51 (НСПУ-3 "Казуар") х3,46
+[ak102_1pn51]
+;тест мех.прицела force_remove_texture = true
+bones         = s2
+;+скрываем кость bones_hide = 
+;штатный механический прицел (не настроен)
+;zoom_offset			= -0.112840,0.037250,-0.021000
+;zoom_rotation		= 0.054800,0.043280
+
+; тест sto1en
+zoom_offset			= -0.168800,0.067450,-0.223100
+zoom_rotation		= 0.043400,0.030280
+shell_point			= 0.90, 0.03, -0.045
+
+[ak102_1pn51_p] ; имитация движкового параметра
+; движковый прицел
+scope_name               = wpn_addon_scope_1pn51
+scope                    = ak102_1pn51
+;иконка прицела
+scope_x		= 50
+scope_y		= -3
+
+; ACOG TA31-CH х4
+[ak102_acog]
+;тест мех.прицела force_remove_texture = true
+bones         = s4
+;штатный механический прицел ACOG (не настроен)
+;zoom_offset			= -0.112840,0.027250,0.128000
+;zoom_rotation		= 0.064800,0.043280
+
+; тест sto1en
+zoom_offset			= -0.168800,0.067450,-0.223100
+zoom_rotation		= 0.043400,0.030280
+
+[ak102_acog_p] ; имитация движкового параметра
+; движковый прицел
+scope_name               = wpn_addon_acog
+scope                    = ak102_acog
+
+; EOTech 552.A65 х1
+[ak102_eotech]
+force_remove_texture = true
+bones         = s5
+;штатный механический прицел (со сдвигом)
+;zoom_offset			= -0.168800,0.067450,-0.223100
+;zoom_rotation		= 0.043400,0.030280
+
+; тест sto1en
+zoom_offset			= -0.164540,0.013750,-0.181000
+zoom_rotation		= 0.033600,0.024780
+
+[ak102_eotech_p] ; имитация движкового параметра
+; движковый прицел
+scope_name               = wpn_addon_scope_eotech
+scope                    = ak102_eotech
+
+
+;-----------------------------------------------------------------------------------
+; служебные секции описателей магазинов
+;+при одетом аддоне показываются только соответствующие bones кости
+
+[ak102_ak10230]
+bones = m1
+[ak102_ak10230_p] ; имитация движкового параметра для магазина АК-101
+magazine_name            = wpn_addon_mag_ak10230
+magazine                 = ak102_ak10230
+ammo_mag_size			= 30
+inv_grid_x			= 59
+inv_grid_y			= 12
+;inv_weight				= 3.63		;АКМ 3.48 = 3.15 + 0.33 ;АКМС (+0,15) 3,63=3,3+0,33
+;cost					= 5100
+
+;------------------------------------------------------------------------------------
+;Яйца
+[ak102_cmag100]
+bones = m2
+[ak102_cmag100_p] ; имитация движкового параметра для магазина Beta C-Mag
+magazine_name            = wpn_addon_mag_cmag100
+magazine                 = ak102_cmag100
+ammo_mag_size            = 100
+inv_grid_x			= 59
+inv_grid_y			= 14
+;inv_weight				= 3.75		;АКМ 3.5 = 3.15 + 0.45 ;АКМС (+0,15) 3,75=3,3+0,45
+;cost					= 5200
+hud                     = wpn_ak102_buben_hud
+;------------------------------------------------------------------------------------
+
+[ak102_nomag]
+;bones = 
+[ak102_nomag_p] ; имитация движкового параметра для магазинов
+ammo_class               = ammo_5.56x45_dummy, ammo_5.56x45_dummy	;патрон-залушка
+ammo_mag_size            = 0					; не во что заряжать
+rpm                      = 0					; нечем стрелять
+snd_reload               = $no_sound
+snd_empty                = $no_sound
+hud                      = wpn_ak102_nomag_hud
+
+
+
+;-----------------------------------------------------------------------------------
+; служебные секции описателей аддонов
+
+;кронштейн-переходник "ласточкин хвост"/Picatinny rail
+[ak102_mtk83]
+bones = d1
+[ak102_mtk83_p] ; имитация движкового параметра
+scope_mount_name         = wpn_addon_mtk83
+scope_mount              = ak102_mtk83
+
+;боковая планка "ласточкин хвост"
+;[akm_side_rail]
+;[akm_side_rail_p] ; имитация движкового параметра для боковой планки
+
+
+;АК102 - ТЕСТ stok (штатный приклад)
+[ak102_stok]
+bones = m3											;штатные приклад и пистолетная рукоять АК102-2
+;bones_hide = d2				 					;custom (телескопический приклад +пистолетная рукоять)
+[ak102_stok_p] ; имитация движкового параметра
+
+
+;АК102 - ТЕСТ custom (телескоп)
+[ak102_custom]
+bones = d2											;custom (телескопический приклад +пистолетная рукоять)
+;bones_hide = m3 									;штатные приклад и пистолетная рукоять АК102-2
+[ak102_custom_p] ; имитация движкового параметра
+
+;+ТЕСТ точности LR-300
+fire_dispersion_base	= 0.16	;ОГСЕ 0.15
+disp_rate 				= 1.5
+
+control_inertion_factor	= 1.25f		;ОГСЕ 1.1f АК, АК74 1.25f ;Эмка 1.25, LR-300 1.2		;удобность
+cam_dispersion_inc		= 0.29		;ОГСЕ 0.25 АК74 0.3		;увеличениe cam_dispersion с каждым выстрелом
+;-cam_dispertion_frac	= 1			;ОГСЕ 1 АК74 0.3		;ствол будет подыматься на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+;cam_max_angle			= 9			;ОГСЕ 9 АК74 10		;максимальный угол отдачи
+;cam_max_angle_horz		= 15		;ОГСЕ 15 АК74 10, Эмка 20.0, LR-300 10		;(degree) maximum shot horizontal degree 
+;cam_step_angle_horz	= 0.5		;ОГСЕ 0.5 АК74 1.1, LR-300 0.5				;(degree) size of step camera moved in horizontal position while shooting
+
+;cam_relax_speed         = 5		;ОГСЕ АК74 5, Эмка, LR-300 6			;скорость возврата в исходное положение
+PDM_disp_vel_factor 	= 1.2		;ОГСЕ АК74 1.3, Эмка, LR-300 0.8
+PDM_disp_accel_factor 	= 1.2		;ОГСЕ АК74 1.3, Эмка, LR-300 0.8
+
+
+
+;рукоятка
+[ak102_grip]
+bones = muzzle
+[ak102_grip_p]
+grip_name				= wpn_addon_grip
+grip					= ak102_grip
+
+;+ТЕСТ точности (LR-300)
+fire_dispersion_base	= 0.155		;102 0.17
+;control_inertion_factor= 1.25f		;ОГСЕ АК, АК74 1.25f ;Эмка 1.25, LR-300 1.2		;удобность
+cam_dispersion_inc		= 0.25		;ОГСЕ АК74 0.3		;увеличениe cam_dispersion с каждым выстрелом
+;-cam_dispertion_frac	= 1			;102 0.9	ОГСЕ АК74 0.3		;ствол будет подыматься на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+cam_max_angle			= 9			;102 10		ОГСЕ АК74 10		;максимальный угол отдачи
+cam_max_angle_horz		= 15		;102 18		ОГСЕ АК74 10, Эмка 20.0, LR-300 10		;(degree) maximum shot horizontal degree 
+cam_step_angle_horz		= 0.5		;102 1.1	ОГСЕ 0.4 АК74 1.1, LR-300 0.5			;(degree) size of step camera moved in horizontal position while shooting
+
+;cam_relax_speed        = 6			;102 5		ОГСЕ АК74 5, Эмка, LR-300 6			;скорость возврата в исходное положение
+;-PDM_disp_vel_factor 	= 1.0		;102 1.15	ОГСЕ АК74 1.3, Эмка, LR-300 0.8
+;-PDM_disp_accel_factor = 1.0		;102 1.3	ОГСЕ АК74 1.3, Эмка, LR-300 0.8
+
+;-----------------------------------------------------------------------------------
+;ремонт ОГСЕ
+[wpn_ak1022_repair]
+tech_complication = 300
+repair_compatibility = ak
+
+;-----------------------------------------------------------------------------------
+; секции оружия с аддонами
+;-----------------------------------------------------------------------------------
+
+; АК102 сток -----------------------------------------------------------------------
+;++++++++++++++++++++++++++++++++++++ ласточкин хвост
+; УСП-1, магазин АК101
+[wpn_ak102_ak10230_stok_1p29]:wpn_ak102_stok,ak102_1p29_p,ak102_stok_p,ak102_ak10230_p
+;ТЕСТ цены
+;?не нужно брать из ak102_1p29_p -работает, даже если НЕ одет прицел!
+;можно взять из ak102_ak10230_p
+;или перекрыть тут
+cost 			= 4050
+inv_weight 		= 3.63
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_ak102_ak10230_stok_kobra
+wpn_addon_scope_1pn51    = wpn_ak102_ak10230_stok_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_ak10230_stok_mtk83_acog
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_stok_1p29
+magazine_removed_section = wpn_ak102_nomag_stok_1p29
+[wpn_ak102_ak10230_stok_1p29_repair]:wpn_ak1022_repair
+
+; Кобра, магазин АК101
+[wpn_ak102_ak10230_stok_kobra]:wpn_ak102_stok,ak102_kobra_p,ak102_stok_p,ak102_ak10230_p
+cost 			= 4050
+inv_weight 		= 3.63
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_ak10230_stok_1p29
+wpn_addon_scope_1pn51    = wpn_ak102_ak10230_stok_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_ak10230_stok_mtk83_acog
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_stok_kobra
+magazine_removed_section = wpn_ak102_nomag_stok_kobra
+[wpn_ak102_ak10230_stok_kobra_repair]:wpn_ak1022_repair
+
+; Казуар, магазин АК101
+[wpn_ak102_ak10230_stok_1pn51]:wpn_ak102_stok,ak102_1pn51_p,ak102_stok_p,ak102_ak10230_p
+cost 			= 4050
+inv_weight 		= 3.63
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_ak10230_stok_1p29
+wpn_addon_scope_kobra    = wpn_ak102_ak10230_stok_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_ak10230_stok_mtk83_acog
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_stok_1pn51
+magazine_removed_section = wpn_ak102_nomag_stok_1pn51
+[wpn_ak102_ak10230_stok_1pn51_repair]:wpn_ak1022_repair
+
+;------------------------------------
+; УСП-1, магазин Beta C-Mag 100
+[wpn_ak102_cmag100_stok_1p29]:wpn_ak102_stok,ak102_1p29_p,ak102_stok_p,ak102_cmag100_p
+cost 			= 4500
+inv_weight 		= 4.30
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_ak102_cmag100_stok_kobra
+wpn_addon_scope_1pn51    = wpn_ak102_cmag100_stok_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_cmag100_stok_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_stok_1p29
+magazine_removed_section = wpn_ak102_nomag_stok_1p29
+[wpn_ak102_cmag100_stok_1p29_repair]:wpn_ak1022_repair
+
+; Кобра, магазин Beta C-Mag 100
+[wpn_ak102_cmag100_stok_kobra]:wpn_ak102_stok,ak102_kobra_p,ak102_stok_p,ak102_cmag100_p
+cost 			= 4500
+inv_weight 		= 4.30
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_cmag100_stok_1p29
+wpn_addon_scope_1pn51    = wpn_ak102_cmag100_stok_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_cmag100_stok_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_stok_kobra
+magazine_removed_section = wpn_ak102_nomag_stok_kobra
+[wpn_ak102_cmag100_stok_kobra_repair]:wpn_ak1022_repair
+
+; Казуар, магазин Beta C-Mag 100
+[wpn_ak102_cmag100_stok_1pn51]:wpn_ak102_stok,ak102_1pn51_p,ak102_stok_p,ak102_cmag100_p
+cost 			= 4500
+inv_weight 		= 4.30
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_cmag100_stok_1p29
+wpn_addon_scope_kobra    = wpn_ak102_cmag100_stok_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_cmag100_stok_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_stok_1pn51
+magazine_removed_section = wpn_ak102_nomag_stok_1pn51
+[wpn_ak102_cmag100_stok_1pn51_repair]:wpn_ak1022_repair
+;------------------------------------
+
+; УСП-1, нет магазина
+[wpn_ak102_nomag_stok_1p29]:wpn_ak102_stok,ak102_1p29_p,ak102_stok_p,ak102_nomag_p
+cost 			= 3900
+inv_weight 		= 3.30
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_ak102_nomag_stok_kobra
+wpn_addon_scope_1pn51    = wpn_ak102_nomag_stok_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_nomag_stok_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_stok_1p29
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_stok_1p29
+[wpn_ak102_nomag_stok_1p29_repair]:wpn_ak1022_repair
+
+; Кобра, нет магазина
+[wpn_ak102_nomag_stok_kobra]:wpn_ak102_stok,ak102_kobra_p,ak102_stok_p,ak102_nomag_p
+cost 			= 3900
+inv_weight 		= 3.30
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_nomag_stok_1p29
+wpn_addon_scope_1pn51    = wpn_ak102_nomag_stok_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_nomag_stok_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_stok_kobra
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_stok_kobra
+[wpn_ak102_nomag_stok_kobra_repair]:wpn_ak1022_repair
+
+; Казуар, нет магазина
+[wpn_ak102_nomag_stok_1pn51]:wpn_ak102_stok,ak102_1pn51_p,ak102_stok_p,ak102_nomag_p
+cost 			= 3900
+inv_weight 		= 3.30
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_nomag_stok_1p29
+wpn_addon_scope_kobra    = wpn_ak102_nomag_stok_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_nomag_stok_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_stok_1pn51
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_stok_1pn51
+[wpn_ak102_nomag_stok_1pn51_repair]:wpn_ak1022_repair
+
+;++++++++++++++++++++++++++++++++++++ Пикатинни
+; Пикатинни, ACOG, магазин АК101
+[wpn_ak102_ak10230_stok_mtk83_acog]:wpn_ak102_stok,ak102_acog_p,ak102_stok_p,ak102_mtk83_p,ak102_ak10230_p
+cost 			= 5050
+inv_weight 		= 3.94
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_ak102_ak10230_stok_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_ak10230_stok_1p29
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_stok_mtk83_acog
+magazine_removed_section = wpn_ak102_nomag_stok_mtk83_acog
+[wpn_ak102_ak10230_stok_mtk83_acog_repair]:wpn_ak1022_repair
+
+; Пикатинни, EOTech, магазин АК101
+[wpn_ak102_ak10230_stok_mtk83_eotech]:wpn_ak102_stok,ak102_eotech_p,ak102_stok_p,ak102_mtk83_p,ak102_ak10230_p
+cost 			= 5050
+inv_weight 		= 3.94
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_ak102_ak10230_stok_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_ak10230_stok_1p29
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_stok_mtk83_eotech
+magazine_removed_section = wpn_ak102_nomag_stok_mtk83_eotech
+[wpn_ak102_ak10230_stok_mtk83_eotech_repair]:wpn_ak1022_repair
+
+;------------------------------------
+; Пикатинни, ACOG, магазин Beta C-Mag 100
+[wpn_ak102_cmag100_stok_mtk83_acog]:wpn_ak102_stok,ak102_acog_p,ak102_stok_p,ak102_mtk83_p,ak102_cmag100_p
+cost 			= 5500
+inv_weight 		= 4.61
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_ak102_cmag100_stok_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_cmag100_stok_1p29
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_stok_mtk83_acog
+magazine_removed_section = wpn_ak102_nomag_stok_mtk83_acog
+[wpn_ak102_cmag100_stok_mtk83_acog_repair]:wpn_ak1022_repair
+
+; Пикатинни, EOTech, магазин Beta C-Mag 100
+[wpn_ak102_cmag100_stok_mtk83_eotech]:wpn_ak102_stok,ak102_eotech_p,ak102_stok_p,ak102_mtk83_p,ak102_cmag100_p
+cost 			= 5500
+inv_weight 		= 4.61
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_ak102_cmag100_stok_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_cmag100_stok_1p29
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_stok_mtk83_eotech
+magazine_removed_section = wpn_ak102_nomag_stok_mtk83_eotech
+[wpn_ak102_cmag100_stok_mtk83_eotech_repair]:wpn_ak1022_repair
+;------------------------------------
+
+; Пикатинни, ACOG, нет магазина
+[wpn_ak102_nomag_stok_mtk83_acog]:wpn_ak102_stok,ak102_acog_p,ak102_stok_p,ak102_mtk83_p,ak102_nomag_p
+cost 			= 4900
+inv_weight 		= 3.61
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_ak102_nomag_stok_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_nomag_stok_1p29
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_stok_mtk83_acog
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_stok_mtk83_acog
+[wpn_ak102_nomag_stok_mtk83_acog_repair]:wpn_ak1022_repair
+
+; Пикатинни, EOTech, нет магазина
+[wpn_ak102_nomag_stok_mtk83_eotech]:wpn_ak102_stok,ak102_eotech_p,ak102_stok_p,ak102_mtk83_p,ak102_nomag_p
+cost 			= 4900
+inv_weight 		= 3.61
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_ak102_nomag_stok_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_nomag_stok_1p29
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_stok_mtk83_eotech
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_stok_mtk83_eotech
+[wpn_ak102_nomag_stok_mtk83_eotech_repair]:wpn_ak1022_repair
+
+
+
+
+
+
+
+
+
+
+
+;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+; АК102 c custom-прикладом и цевьём с рельсой --------------------------------------
+;++++++++++++++++++++++++++++++++++++ ласточкин хвост
+; УСП-1, магазин АК101
+[wpn_ak102_ak10230_custom_1p29]:wpn_ak102_custom,ak102_1p29_p,ak102_custom_p,ak102_ak10230_p
+;ТЕСТ цены
+;?не нужно брать из ak102_1p29_p -работает, даже если НЕ одет прицел!
+;можно взять из ak102_ak10230_p
+;или перекрыть тут 
+cost 			= 6050
+inv_weight 		= 4.63
+inv_grid_x			= 64
+inv_grid_y			= 12
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_ak102_ak10230_custom_kobra
+wpn_addon_scope_1pn51    = wpn_ak102_ak10230_custom_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_ak10230_custom_mtk83_acog
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_1p29
+magazine_removed_section = wpn_ak102_nomag_custom_1p29
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_ak10230_custom_grip_1p29
+[wpn_ak102_ak10230_custom_1p29_repair]:wpn_ak1022_repair
+[wpn_ak102_ak10230_custom_grip_1p29]:wpn_ak102_custom,ak102_1p29_p,ak102_custom_p,ak102_ak10230_p,ak102_grip_p
+;grip_status				= 2
+grip_removed_section = wpn_ak102_ak10230_custom_1p29
+cost 			= 7350
+inv_weight 		= 5.63
+inv_grid_x			= 69
+inv_grid_y			= 12
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_ak102_ak10230_custom_grip_kobra
+wpn_addon_scope_1pn51    = wpn_ak102_ak10230_custom_grip_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_ak10230_custom_grip_mtk83_acog
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_grip_1p29
+magazine_removed_section = wpn_ak102_nomag_custom_grip_1p29
+[wpn_ak102_ak10230_custom_grip_1p29_repair]:wpn_ak1022_repair
+
+; Кобра, магазин АК101
+[wpn_ak102_ak10230_custom_kobra]:wpn_ak102_custom,ak102_kobra_p,ak102_custom_p,ak102_ak10230_p
+cost 			= 6050
+inv_weight 		= 4.63
+inv_grid_x			= 64
+inv_grid_y			= 12
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_ak10230_custom_1p29
+wpn_addon_scope_1pn51    = wpn_ak102_ak10230_custom_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_ak10230_custom_mtk83_acog
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_kobra
+magazine_removed_section = wpn_ak102_nomag_custom_kobra
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_ak10230_custom_grip_kobra
+[wpn_ak102_ak10230_custom_kobra_repair]:wpn_ak1022_repair
+[wpn_ak102_ak10230_custom_grip_kobra]:wpn_ak102_custom,ak102_kobra_p,ak102_custom_p,ak102_ak10230_p,ak102_grip_p
+cost 			= 7350
+inv_weight 		= 5.63
+;grip_status				= 2
+grip_removed_section = wpn_ak102_ak10230_custom_kobra
+inv_grid_x			= 69
+inv_grid_y			= 12
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_ak10230_custom_grip_1p29
+wpn_addon_scope_1pn51    = wpn_ak102_ak10230_custom_grip_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_ak10230_custom_grip_mtk83_acog
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_grip_kobra
+magazine_removed_section = wpn_ak102_nomag_custom_grip_kobra
+[wpn_ak102_ak10230_custom_grip_kobra_repair]:wpn_ak1022_repair
+
+; Казуар, магазин АК101
+[wpn_ak102_ak10230_custom_1pn51]:wpn_ak102_custom,ak102_1pn51_p,ak102_custom_p,ak102_ak10230_p
+cost 			= 6050
+inv_weight 		= 4.63
+inv_grid_x			= 64
+inv_grid_y			= 12
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_ak10230_custom_1p29
+wpn_addon_scope_kobra    = wpn_ak102_ak10230_custom_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_ak10230_custom_mtk83_acog
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_1pn51
+magazine_removed_section = wpn_ak102_nomag_custom_1pn51
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_ak10230_custom_grip_1pn51
+[wpn_ak102_ak10230_custom_1pn51_repair]:wpn_ak1022_repair
+[wpn_ak102_ak10230_custom_grip_1pn51]:wpn_ak102_custom,ak102_1pn51_p,ak102_custom_p,ak102_ak10230_p,ak102_grip_p
+cost 			= 7350
+inv_weight 		= 5.63
+;grip_status				= 2
+grip_removed_section = wpn_ak102_ak10230_custom_1pn51
+inv_grid_x			= 69
+inv_grid_y			= 12
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_ak10230_custom_grip_1p29
+wpn_addon_scope_kobra    = wpn_ak102_ak10230_custom_grip_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_ak10230_custom_grip_mtk83_acog
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_grip_1pn51
+magazine_removed_section = wpn_ak102_nomag_custom_grip_1pn51
+[wpn_ak102_ak10230_custom_grip_1pn51_repair]:wpn_ak1022_repair
+
+;------------------------------------
+; УСП-1, магазин Beta C-Mag 100
+[wpn_ak102_cmag100_custom_1p29]:wpn_ak102_custom,ak102_1p29_p,ak102_custom_p,ak102_cmag100_p
+cost 			= 6500
+inv_weight 		= 5.30
+inv_grid_x			= 64
+inv_grid_y			= 14
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_ak102_cmag100_custom_kobra
+wpn_addon_scope_1pn51    = wpn_ak102_cmag100_custom_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_cmag100_custom_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_1p29
+magazine_removed_section = wpn_ak102_nomag_custom_1p29
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_cmag100_custom_grip_1p29
+[wpn_ak102_cmag100_custom_1p29_repair]:wpn_ak1022_repair
+[wpn_ak102_cmag100_custom_grip_1p29]:wpn_ak102_custom,ak102_1p29_p,ak102_custom_p,ak102_cmag100_p,ak102_grip_p
+cost 			= 7800
+inv_weight 		= 6.30
+;grip_status				= 2
+grip_removed_section = wpn_ak102_cmag100_custom_1p29
+inv_grid_x			= 69
+inv_grid_y			= 14
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_ak102_cmag100_custom_grip_kobra
+wpn_addon_scope_1pn51    = wpn_ak102_cmag100_custom_grip_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_cmag100_custom_grip_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_grip_1p29
+magazine_removed_section = wpn_ak102_nomag_custom_grip_1p29
+[wpn_ak102_cmag100_custom_grip_1p29_repair]:wpn_ak1022_repair
+
+; Кобра, магазин Beta C-Mag 100
+[wpn_ak102_cmag100_custom_kobra]:wpn_ak102_custom,ak102_kobra_p,ak102_custom_p,ak102_cmag100_p
+cost 			= 6500
+inv_weight 		= 5.30
+inv_grid_x			= 64
+inv_grid_y			= 14
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_cmag100_custom_1p29
+wpn_addon_scope_1pn51    = wpn_ak102_cmag100_custom_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_cmag100_custom_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_kobra
+magazine_removed_section = wpn_ak102_nomag_custom_kobra
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_cmag100_custom_grip_kobra
+[wpn_ak102_cmag100_custom_kobra_repair]:wpn_ak1022_repair
+[wpn_ak102_cmag100_custom_grip_kobra]:wpn_ak102_custom,ak102_kobra_p,ak102_custom_p,ak102_cmag100_p,ak102_grip_p
+cost 			= 7800
+inv_weight 		= 6.30
+;grip_status				= 2
+grip_removed_section = wpn_ak102_cmag100_custom_kobra
+inv_grid_x			= 69
+inv_grid_y			= 14
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_cmag100_custom_grip_1p29
+wpn_addon_scope_1pn51    = wpn_ak102_cmag100_custom_grip_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_cmag100_custom_grip_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_grip_kobra
+magazine_removed_section = wpn_ak102_nomag_custom_grip_kobra
+[wpn_ak102_cmag100_custom_grip_kobra_repair]:wpn_ak1022_repair
+
+; Казуар, магазин Beta C-Mag 100
+[wpn_ak102_cmag100_custom_1pn51]:wpn_ak102_custom,ak102_1pn51_p,ak102_custom_p,ak102_cmag100_p
+cost 			= 6500
+inv_weight 		= 5.30
+inv_grid_x			= 64
+inv_grid_y			= 14
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_cmag100_custom_1p29
+wpn_addon_scope_kobra    = wpn_ak102_cmag100_custom_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_cmag100_custom_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_1pn51
+magazine_removed_section = wpn_ak102_nomag_custom_1pn51
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_cmag100_custom_grip_1pn51
+[wpn_ak102_cmag100_custom_1pn51_repair]:wpn_ak1022_repair
+[wpn_ak102_cmag100_custom_grip_1pn51]:wpn_ak102_custom,ak102_1pn51_p,ak102_custom_p,ak102_cmag100_p,ak102_grip_p
+cost 			= 7800
+inv_weight 		= 6.30
+;grip_status				= 2
+grip_removed_section = wpn_ak102_cmag100_custom_1pn51
+inv_grid_x			= 69
+inv_grid_y			= 14
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_cmag100_custom_grip_1p29
+wpn_addon_scope_kobra    = wpn_ak102_cmag100_custom_grip_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_cmag100_custom_grip_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_grip_1pn51
+magazine_removed_section = wpn_ak102_nomag_custom_grip_1pn51
+[wpn_ak102_cmag100_custom_grip_1pn51_repair]:wpn_ak1022_repair
+;------------------------------------
+
+
+; УСП-1, нет магазина
+[wpn_ak102_nomag_custom_1p29]:wpn_ak102_custom,ak102_1p29_p,ak102_custom_p,ak102_nomag_p
+cost 			= 5900
+inv_weight 		= 4.30
+inv_grid_x				= 64
+inv_grid_y				= 16
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_ak102_nomag_custom_kobra
+wpn_addon_scope_1pn51    = wpn_ak102_nomag_custom_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_nomag_custom_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_1p29
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_1p29
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_nomag_custom_grip_1p29
+[wpn_ak102_nomag_custom_1p29_repair]:wpn_ak1022_repair
+[wpn_ak102_nomag_custom_grip_1p29]:wpn_ak102_custom,ak102_1p29_p,ak102_custom_p,ak102_nomag_p,ak102_grip_p
+cost 			= 7200
+inv_weight 		= 5.30
+;grip_status				= 2
+grip_removed_section = wpn_ak102_nomag_custom_1p29
+inv_grid_x				= 69
+inv_grid_y				= 16
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_ak102_nomag_custom_grip_kobra
+wpn_addon_scope_1pn51    = wpn_ak102_nomag_custom_grip_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_nomag_custom_grip_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_grip_1p29
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_grip_1p29
+[wpn_ak102_nomag_custom_grip_1p29_repair]:wpn_ak1022_repair
+
+; Кобра, нет магазина
+[wpn_ak102_nomag_custom_kobra]:wpn_ak102_custom,ak102_kobra_p,ak102_custom_p,ak102_nomag_p
+cost 			= 5900
+inv_weight 		= 4.30
+inv_grid_x				= 64
+inv_grid_y				= 16
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_nomag_custom_1p29
+wpn_addon_scope_1pn51    = wpn_ak102_nomag_custom_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_nomag_custom_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_kobra
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_kobra
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_nomag_custom_grip_kobra
+[wpn_ak102_nomag_custom_kobra_repair]:wpn_ak1022_repair
+[wpn_ak102_nomag_custom_grip_kobra]:wpn_ak102_custom,ak102_kobra_p,ak102_custom_p,ak102_nomag_p,ak102_grip_p
+cost 			= 7200
+inv_weight 		= 5.30
+;grip_status				= 2
+grip_removed_section = wpn_ak102_nomag_custom_kobra
+inv_grid_x				= 69
+inv_grid_y				= 16
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_nomag_custom_grip_1p29
+wpn_addon_scope_1pn51    = wpn_ak102_nomag_custom_grip_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_nomag_custom_grip_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_grip_kobra
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_grip_kobra
+[wpn_ak102_nomag_custom_grip_kobra_repair]:wpn_ak1022_repair
+
+; Казуар, нет магазина
+[wpn_ak102_nomag_custom_1pn51]:wpn_ak102_custom,ak102_1pn51_p,ak102_custom_p,ak102_nomag_p
+cost 			= 5900
+inv_weight 		= 4.30
+inv_grid_x				= 64
+inv_grid_y				= 16
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_nomag_custom_1p29
+wpn_addon_scope_kobra    = wpn_ak102_nomag_custom_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_nomag_custom_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_1pn51
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_1pn51
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_nomag_custom_grip_1pn51
+[wpn_ak102_nomag_custom_1pn51_repair]:wpn_ak1022_repair
+[wpn_ak102_nomag_custom_grip_1pn51]:wpn_ak102_custom,ak102_1pn51_p,ak102_custom_p,ak102_nomag_p,ak102_grip_p
+cost 			= 7200
+inv_weight 		= 5.30
+;grip_status				= 2
+grip_removed_section = wpn_ak102_nomag_custom_1pn51
+inv_grid_x				= 69
+inv_grid_y				= 16
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_ak102_nomag_custom_grip_1p29
+wpn_addon_scope_kobra    = wpn_ak102_nomag_custom_grip_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_ak102_nomag_custom_grip_mtk83_acog
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_grip_1pn51
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_grip_1pn51
+[wpn_ak102_nomag_custom_grip_1pn51_repair]:wpn_ak1022_repair
+
+;++++++++++++++++++++++++++++++++++++ Пикатинни
+; Пикатинни, ACOG, магазин АКМ
+[wpn_ak102_ak10230_custom_mtk83_acog]:wpn_ak102_custom,ak102_acog_p,ak102_custom_p,ak102_mtk83_p,ak102_ak10230_p
+cost 			= 7050
+inv_weight 		= 4.94
+inv_grid_x			= 64
+inv_grid_y			= 12
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_ak102_ak10230_custom_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_ak10230_custom_1p29
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_mtk83_acog
+magazine_removed_section = wpn_ak102_nomag_custom_mtk83_acog
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_ak10230_custom_grip_mtk83_acog
+[wpn_ak102_ak10230_custom_mtk83_acog_repair]:wpn_ak1022_repair
+[wpn_ak102_ak10230_custom_grip_mtk83_acog]:wpn_ak102_custom,ak102_acog_p,ak102_custom_p,ak102_mtk83_p,ak102_ak10230_p,ak102_grip_p
+cost 			= 8350
+inv_weight 		= 5.94
+;grip_status				= 2
+grip_removed_section = wpn_ak102_ak10230_custom_mtk83_acog
+inv_grid_x			= 69
+inv_grid_y			= 12
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_ak102_ak10230_custom_grip_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_ak10230_custom_grip_1p29
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_grip_mtk83_acog
+magazine_removed_section = wpn_ak102_nomag_custom_grip_mtk83_acog
+[wpn_ak102_ak10230_custom_grip_mtk83_acog_repair]:wpn_ak1022_repair
+
+; Пикатинни, EOTech, магазин АКМ
+[wpn_ak102_ak10230_custom_mtk83_eotech]:wpn_ak102_custom,ak102_eotech_p,ak102_custom_p,ak102_mtk83_p,ak102_ak10230_p
+cost 			= 7050
+inv_weight 		= 4.94
+inv_grid_x			= 64
+inv_grid_y			= 12
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_ak102_ak10230_custom_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_ak10230_custom_1p29
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_mtk83_eotech
+magazine_removed_section = wpn_ak102_nomag_custom_mtk83_eotech
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_ak10230_custom_grip_mtk83_eotech
+[wpn_ak102_ak10230_custom_mtk83_eotech_repair]:wpn_ak1022_repair
+[wpn_ak102_ak10230_custom_grip_mtk83_eotech]:wpn_ak102_custom,ak102_eotech_p,ak102_custom_p,ak102_mtk83_p,ak102_ak10230_p,ak102_grip_p
+cost 			= 8350
+inv_weight 		= 5.94
+;grip_status				= 2
+grip_removed_section = wpn_ak102_ak10230_custom_mtk83_eotech
+inv_grid_x			= 69
+inv_grid_y			= 12
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_ak102_ak10230_custom_grip_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_ak10230_custom_grip_1p29
+;магазины
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_grip_mtk83_eotech
+magazine_removed_section = wpn_ak102_nomag_custom_grip_mtk83_eotech
+[wpn_ak102_ak10230_custom_grip_mtk83_eotech_repair]:wpn_ak1022_repair
+
+;------------------------------------
+; Пикатинни, ACOG, магазин Beta C-Mag 100
+[wpn_ak102_cmag100_custom_mtk83_acog]:wpn_ak102_custom,ak102_acog_p,ak102_custom_p,ak102_mtk83_p,ak102_cmag100_p
+cost 			= 7500
+inv_weight 		= 5.61
+inv_grid_x			= 64
+inv_grid_y			= 14
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_ak102_cmag100_custom_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_cmag100_custom_1p29
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_mtk83_acog
+magazine_removed_section = wpn_ak102_nomag_custom_mtk83_acog
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_cmag100_custom_grip_mtk83_acog
+[wpn_ak102_cmag100_custom_mtk83_acog_repair]:wpn_ak1022_repair
+[wpn_ak102_cmag100_custom_grip_mtk83_acog]:wpn_ak102_custom,ak102_acog_p,ak102_custom_p,ak102_mtk83_p,ak102_cmag100_p,ak102_grip_p
+cost 			= 8800
+inv_weight 		= 6.61
+;grip_status				= 2
+grip_removed_section = wpn_ak102_cmag100_custom_mtk83_acog
+inv_grid_x			= 69
+inv_grid_y			= 14
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_ak102_cmag100_custom_grip_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_cmag100_custom_grip_1p29
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_grip_mtk83_acog
+magazine_removed_section = wpn_ak102_nomag_custom_grip_mtk83_acog
+[wpn_ak102_cmag100_custom_grip_mtk83_acog_repair]:wpn_ak1022_repair
+
+; Пикатинни, EOTech, магазин Beta C-Mag 100
+[wpn_ak102_cmag100_custom_mtk83_eotech]:wpn_ak102_custom,ak102_eotech_p,ak102_custom_p,ak102_mtk83_p,ak102_cmag100_p
+cost 			= 7500
+inv_weight 		= 5.61
+inv_grid_x			= 64
+inv_grid_y			= 14
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_ak102_cmag100_custom_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_cmag100_custom_1p29
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_mtk83_eotech
+magazine_removed_section = wpn_ak102_nomag_custom_mtk83_eotech
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_cmag100_custom_grip_mtk83_eotech
+[wpn_ak102_cmag100_custom_mtk83_eotech_repair]:wpn_ak1022_repair
+[wpn_ak102_cmag100_custom_grip_mtk83_eotech]:wpn_ak102_custom,ak102_eotech_p,ak102_custom_p,ak102_mtk83_p,ak102_cmag100_p,ak102_grip_p
+cost 			= 8800
+inv_weight 		= 6.61
+;grip_status				= 2
+grip_removed_section = wpn_ak102_cmag100_custom_mtk83_eotech
+inv_grid_x			= 69
+inv_grid_y			= 14
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_ak102_cmag100_custom_grip_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_cmag100_custom_grip_1p29
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_grip_mtk83_eotech
+magazine_removed_section = wpn_ak102_nomag_custom_grip_mtk83_eotech
+[wpn_ak102_cmag100_custom_grip_mtk83_eotech_repair]:wpn_ak1022_repair
+;------------------------------------
+
+; Пикатинни, ACOG, нет магазина
+[wpn_ak102_nomag_custom_mtk83_acog]:wpn_ak102_custom,ak102_acog_p,ak102_custom_p,ak102_mtk83_p,ak102_nomag_p
+cost 			= 6900
+inv_weight 		= 4.61
+inv_grid_x				= 64
+inv_grid_y				= 16
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_ak102_nomag_custom_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_nomag_custom_1p29
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_mtk83_acog
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_mtk83_acog
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_nomag_custom_grip_mtk83_acog
+[wpn_ak102_nomag_custom_mtk83_acog_repair]:wpn_ak1022_repair
+[wpn_ak102_nomag_custom_grip_mtk83_acog]:wpn_ak102_custom,ak102_acog_p,ak102_custom_p,ak102_mtk83_p,ak102_nomag_p,ak102_grip_p
+cost 			= 8200
+inv_weight 		= 5.61
+;grip_status				= 2
+grip_removed_section = wpn_ak102_nomag_custom_mtk83_acog
+inv_grid_x				= 69
+inv_grid_y				= 16
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_ak102_nomag_custom_grip_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_nomag_custom_grip_1p29
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_grip_mtk83_acog
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_grip_mtk83_acog
+[wpn_ak102_nomag_custom_grip_mtk83_acog_repair]:wpn_ak1022_repair
+
+; Пикатинни, EOTech, нет магазина
+[wpn_ak102_nomag_custom_mtk83_eotech]:wpn_ak102_custom,ak102_eotech_p,ak102_custom_p,ak102_mtk83_p,ak102_nomag_p
+cost 			= 6900
+inv_weight 		= 4.61
+inv_grid_x				= 64
+inv_grid_y				= 16
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_ak102_nomag_custom_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_nomag_custom_1p29
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_mtk83_eotech
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_mtk83_eotech
+;+рабочий ТЕСТ ручки
+wpn_addon_grip = wpn_ak102_nomag_custom_grip_mtk83_eotech
+[wpn_ak102_nomag_custom_mtk83_eotech_repair]:wpn_ak1022_repair
+[wpn_ak102_nomag_custom_grip_mtk83_eotech]:wpn_ak102_custom,ak102_eotech_p,ak102_custom_p,ak102_mtk83_p,ak102_nomag_p,ak102_grip_p
+cost 			= 8200
+inv_weight 		= 5.61
+;grip_status				= 2
+grip_removed_section = wpn_ak102_nomag_custom_mtk83_eotech
+inv_grid_x				= 69
+inv_grid_y				= 16
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_ak102_nomag_custom_grip_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_ak102_nomag_custom_grip_1p29
+;магазины
+wpn_addon_mag_ak10230      = wpn_ak102_ak10230_custom_grip_mtk83_eotech
+wpn_addon_mag_cmag100      = wpn_ak102_cmag100_custom_grip_mtk83_eotech
+[wpn_ak102_nomag_custom_grip_mtk83_eotech_repair]:wpn_ak1022_repair

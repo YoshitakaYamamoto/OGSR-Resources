@@ -1,0 +1,975 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<string_table>
+<string id="barman_document_description">
+	<text>Contient des cartes, des photographies et des disquettes</text>
+</string>
+<string id="barman_document">
+	<text>Documents du Barman</text>
+</string>
+<string id="item test1">
+		<text>C'est une ligne test OBJET</text>
+	</string>
+	<string id="item test2">
+		<text>C'est une autre ligne test OBJET</text>
+	</string>
+	<string id="item_case_esc_desc">
+		<text>Mallette résistant au feu contenant des documents.</text>
+	</string>
+	<string id="item_decoder_desc">
+		<text>Un puissant appareil électronique. Contrairement à ce qu'on pourrait croire, ce n'est pas un outil de voleur. Il semble avoir été créé pour un certain type de verrou et ne sert que pour celui-ci.</text>
+	</string>
+	<string id="item_decoder_name">
+		<text>Décodeur</text>
+	</string>
+	<string id="item_detector_yantar_desc">
+		<text>Détecteur d'émissions psi</text>
+	</string>
+	<string id="item_detector_yantar_name">
+		<text>Détecteur PP-4a</text>
+	</string>
+	<string id="item_doc_x16_desc">
+		<text>Dossier en plastique. Il faut avoir un diplôme en biologie pour comprendre un mot de ce qu'il contient.</text>
+	</string>
+	<string id="item_doc_x16_name">
+		<text>Docs du labo X16</text>
+	</string>
+	<string id="item_doc_x18_desc">
+		<text>Une pile épaisse de documents scientifiques. Termes, formules et nombreux diagrammes.</text>
+	</string>
+    <string id="ds_lablog_name">
+		<text>Journal du laboratoire de Darkscape</text>
+	</string>
+	<string id="ds_lablog_desc">
+		<text>Une grosse pile de documents scientifiques. Sur la couverture est écrit "Projet du Laboratoire". Intéressante lecture: il est révélé que le territoire de Darkscape a été un des premiers contaminé par la Zone après son apparition, mais qu'après un certain temps, son influence a cessé. En conséquence de quoi "Darkscape" a des tunnels et des mines qui ont continués d'être entretenues même après que la Zone se soit étendue sur ce territoire.</text>
+	</string>
+	<string id="item_doc_x18p1_name">
+		<text>Docs du labo X18 p.1</text>
+	</string>
+	<string id="item_doc_x18p2_name">
+		<text>Docs du labo X18 p.2</text>
+	</string>
+	<string id="item_doc_x18p3_name">
+		<text>Docs du labo X18 p.3</text>
+	</string>
+	<string id="item_doc_x18p4_name">
+		<text>Docs du labo X18 P.4</text>
+	</string>
+	<string id="item_doc_x18p5_name">
+		<text>Docs du labo X18 p.5</text>
+	</string>
+	<string id="item_docs_hiden_pri_desc">
+		<text>Ancien manuscrit avec une reliure en cuir. Écrit par Strelok lui-même. À en juger par la première page, il pourrait expliquer certains secrets de la Zone.</text>
+	</string>
+	<string id="item_docs_hiden_pri_name">
+		<text>Documents de la planque secrète de Pripyat</text>
+	</string>
+	<string id="item_dynamite_esc_desc">
+		<text>Une lourde caisse en bois comportant l'inscription "Explosifs" en plusieurs langues.</text>
+	</string>
+	<string id="item_dynamite_esc_name">
+		<text>Caisse d'explosifs</text>
+	</string>
+	<string id="item_flash_crazy_mil_desc">
+		<text>Clé USB : moyen pratique de conserver et de transférer des informations.</text>
+	</string>
+	<string id="item_flash_crazy_mil_name">
+		<text>Clé USB du Stalker fou</text>
+	</string>
+	<string id="item_flash_eco_rost_desc">
+		<text>Clé USB : moyen pratique de conserver et de transférer des informations.</text>
+	</string>
+	<string id="item_flash_eco_rost_name">
+		<text>Clé USB du Pr. Kruglov</text>
+	</string>
+	<string id="item_flash_esc_desc">
+		<text>Clé USB : moyen pratique de conserver et de transférer des informations.</text>
+	</string>
+	<string id="item_flash_esc_name">
+		<text>Clé USB du Stalker captif</text>
+	</string>
+	<string id="item_flash_gslinger_agro_desc">
+		<text>Clé USB : moyen pratique de conserver et de transférer des informations.</text>
+	</string>
+	<string id="item_flash_gslinger_agro_name">
+		<text>Clé USB de Strelok</text>
+	</string>
+	<string id="item_key_x18_desc">
+		<text>Clé électronique donnant accès au labo X18 souterrain.</text>
+	</string>
+	<string id="item_key_x18_name">
+		<text>Code de Borov</text>
+	</string>
+	<string id="item_krot_flash">
+		<text>Clé USB de la Taupe</text>
+	</string>
+	<string id="item_pda_lucky_desc">
+		<text>Assistant digital personnel. Indispensable dans la Zone.</text>
+	</string>
+	<string id="item_pda_lucky_name">
+		<text>PDA du Chanceux</text>
+	</string>
+	<string id="item_pda_tiran_desc">
+		<text>Assistant digital personnel. Indispensable dans la Zone.</text>
+	</string>
+	<string id="item_pda_tiran_name">
+		<text>PDA de Tyran</text>
+	</string>
+	<string id="item_quest_case_02_desc">
+		<text>Une mallette résistant au feu contenant des documents.</text>
+	</string>
+	<string id="item_quest_case_02_name">
+		<text>Documents militaires de l'Institut Agroprom</text>
+	</string>
+	<string id="item_case_esc_name">
+		<text>Documents de l'avant-poste</text>
+	</string>
+	<string id="yan_bad_psy_helmet_desc">
+		<text>Prototype développé par les scientifiques pour protéger les gens des émissions psi. Mal réglé.</text>
+	</string>
+	<string id="yan_bad_psy_helmet_name">
+		<text>Casque psi mal réglé</text>
+	</string>
+	<string id="yan_good_psy_helmet_desc">
+		<text>Prototype fonctionnel développé par les scientifiques pour protéger les gens des émissions psi.</text>
+	</string>
+	<string id="yan_good_psy_helmet_name">
+		<text>Casque psi pratique</text>
+	</string>
+<string id="amk_metka">
+	<text>Balise GPS</text>
+</string>
+<string id="amk_metka_s">
+	<text>Balise GPS</text>
+</string>
+<string id="enc_amk_metka">
+	<text>Balise GPS. Un appareil très populaire, bon marché et fiable. On peut le placer dans une cache afin de se souvenir de son emplacement et de son contenu. Grâce à une modification faite par les scientifiques de la Zone, l'appareil se syncronise avec votre PDA sur lequel il transmet toutes les informations nécessaires.</text>
+</string>
+<string id="treasure_detector_name">
+	<text>Détecteurs</text>
+</string>
+<string id="treasure_abundant_artefact_name">
+	<text>Artefacts communs</text>
+</string>
+<string id="treasure_scarce_artefact_name">
+	<text>Artefacts rares</text>
+</string>
+<string id="treasure_rarity_artefact_name">
+	<text>Artefacts rarissimes</text>
+</string>
+<string id="treasure_medecine_name">
+	<text>Médicaments</text>
+</string>
+<string id="treasure_grenade_name">
+	<text>Grenades</text>
+</string>
+<string id="treasure_wpngrenade_name">
+	<text>Grenades pour lance-grenades</text>
+</string>
+<string id="treasure_drink_name">
+	<text>Boissons</text>
+</string>
+<string id="treasure_ammo_name">
+	<text>Munitions</text>
+</string>
+<string id="treasure_mutant_name">
+	<text>Parties de mutants</text>
+</string>
+<string id="treasure_addon_name">
+	<text>Accessoires pour les armes</text>
+</string>
+<string id="treasure_eat_name">
+	<text>Nourriture</text>
+</string>
+<string id="prof_zapiska_desc">
+	<text>Professeur:\n"Borov, je vous envoie cette note pour que vous soyez informé de la présence du chef du Gang des Boîteux à Darkscape. Ce type veut garder tout l'argent pour lui et il devrait être éliminé. Il est actuellement dans un ravin au nord de la ferme avec quatres hommes, dont deux lourdement armés. Assurez-vous que ni lui ni aucun de ses subordonnés n'apprennent mon implication dans cette affaire. Salutations\n\nP.S. Oh, et qu'est-ce qui se passe avec la quatrième clé USB ? L'individu que nous recherchons se serait réfugié chez un forestier ? Nous n'avons pas eu le temps de vérifier ..."</text>
+</string>
+<string id="item_arsenal_key_name">
+	<text>La clé de l'arsenal.</text>
+</string>
+<string id="item_arsenal_key_desc">
+	<text>La clé de l'arsenal de la "Liberté".</text>
+</string>
+<string id="af_blood_tutorial_name">
+	<text>Artefact "Régénérateur de Base"</text>
+</string>
+<string id="mil_svoboda_leader_pda_name">
+	<text>PDA de Lukash</text>
+</string>
+<string id="mil_svoboda_leader_pda_desc">
+	<text>PDA Lukash contenant une foule d'informations importantes sur le groupe "Liberté" et son activité dans la Zone.</text>
+</string>
+<string id="dar_pass_flash_name">
+	<text>Passe des scientifiques crypté.</text>
+</string>
+<string id="dar_pass_document_name">
+	<text>Passe pour le laboratoire X-18</text>
+</string>
+<string id="prof_zapiska_name">
+	<text>Malyava professeurs</text>
+</string>
+<string id="klondaik_flash_1_name">
+	<text>Clé USB n°1</text>
+</string>
+<string id="klondaik_flash_1_desc">
+	<text>Clé USB n°1. Contient une partie de la carte indiquant l'emplacement de la Matrice aux Artefacts</text>
+</string>
+<string id="klondaik_flash_2_name">
+	<text>Clé USB n°2</text>
+</string>
+<string id="klondaik_flash_2_desc">
+	<text>Clé USB n°2. Contient une partie de la carte indiquant l'emplacement de la Matrice aux Artefacts</text>
+</string>
+<string id="klondaik_flash_3_name">
+	<text>Clé USB n°3</text>
+</string>
+<string id="klondaik_flash_3_desc">
+	<text>Clé USB n°3. Contient une partie de la carte indiquant l'emplacement de la Matrice aux Artefacts</text>
+</string>
+<string id="klondaik_flash_4_name">
+	<text>Clé USB n°4</text>
+</string>
+<string id="klondaik_flash_4_desc">
+	<text>Clé USB n°4. Contient une partie de la carte indiquant l'emplacement de la Matrice aux Artefacts</text>
+</string>
+<string id="klondaik_flash_5_name">
+	<text>Clé USB n°5</text>
+</string>
+<string id="klondaik_flash_5_desc">
+	<text>Clé USB n°5. Contient une partie de la carte indiquant l'emplacement de la Matrice aux Artefacts</text>
+</string>
+<string id="af_kolya_name">
+	<text>Un artefact inconnu</text>
+</string>
+<string id="unrecognised_art_desc">
+	<text>L'effet de l'artefact n'a jamais été étudié</text>
+</string>
+<string id="af_light_name">
+	<text>Artefact "Lumière"</text>
+</string>
+<string id="af_dark_name">
+	<text>Artefact "Obscurité"</text>
+</string>
+<string id="second_neutral_zapiska_name">
+	<text>Note du Borgne</text>
+</string>
+<string id="villager_bone_1_name">
+	<text>Le squelette d'une jambe humaine</text>
+</string>
+<string id="villager_bone_2_name">
+	<text>Le squelette d'une main humaine</text>
+</string>
+<string id="villager_bone_3_name">
+	<text>Crâne humain</text>
+</string>
+<string id="villager_bone_4_name">
+	<text>Côtes humaines</text>
+</string>
+<string id="af_puzir_name">
+	<text>Bulle</text>
+</string>
+<string id="af_puzir_desc">
+	<text>Cet artefact est unique car il peut créer pour un court instant une anomalie spatiale en absorbant l'énergie anormale de la Zone.</text>
+</string>
+<string id="af_skull_name">
+	<text>Crâne étrange</text>
+</string>
+<string id="enc_zone_artifact_af_skull">
+	<text>Le crâne d'un super-contrôleur rencontré au Radar. Il brille dans le noir.</text>
+</string>
+<string id="af_container_empt_name">
+	<text>Conteneur</text>
+</string>
+<string id="af_container_empt_desc">
+	<text>Conteneur pour l'artefact "Ruche"</text>
+</string>
+<string id="af_container_full_desc">
+	<text>Conteneur qui détient l'artefact "Ruche"</text>
+</string>
+<string id="af_uley_name">
+	<text>"Ruche"</text>
+</string>
+<string id="af_uley_desc">
+	<text>Artefact qui est la cause d'une infection virale.</text>
+</string>
+<string id="af_mayatnik_name">
+	<text>"Pendule"</text>
+</string>
+<string id="af_mayatnik_desc">
+	<text>Artefact qui est la source du champ invisible formant l'anomalie spatiale.</text>
+</string>
+<string id="mayatnik_part_name">
+	<text>Une fragment de l'artefact "Pendule"</text>
+</string>
+<string id="af_resine_name">
+	<text>"Résine"</text>
+</string>
+<string id="af_resine_desc">
+	<text>Artefact formé à partir de substances huileuses. N'a pas d'utilisation pratique.</text>
+</string>
+<string id="af_sparks_name">
+	<text>"Arc"</text>
+</string>
+<string id="af_sparks_desc">
+	<text>Un artefact qui génère de minuscules décharges d'électricité statique qui font des étincelles. Son nom vient de sa similitude avec un arc électrique.</text>
+</string>
+<string id="af_candle_name">
+	<text>"Bougie"</text>
+</string>
+<string id="af_candle_desc">
+	<text>Artefact qui produit une source constante de lumière.</text>
+</string>
+<string id="af_heart_name">
+	<text>"Coeur"</text>
+</string>
+<string id="af_heart_desc">
+	<text>Artefact qui produit en son sein une lumière pulsante rouge. N'a pas d'utilisation pratique. Il y a une légende qui dit que cet artefact naît à l'endroit où un homme s'est fait tur.</text>
+</string>
+<string id="af_ray_name">
+	<text>"Faisceau"</text>
+</string>
+<string id="af_ray_desc">
+	<text>Le spécimen le plus caractéristique des membres la catégories d'artefacts dits "optiques". Il émet en permanence une sorte de lumière sans source d'énergie visible. Les rayons lumineux de cet artefact peuvent rivaliser même avec les lumières électriques. Protège contre les coupures et blessures par balles.</text>
+</string>
+<string id="af_steam_name">
+	<text>Bouilloire anormale</text>
+</string>
+<string id="af_steam_desc">
+	<text>Vieil ustensile de cuisine qui s'est transformé en une substance incompréhensible qui brille et lévite. Cette chose a certainement de l'intérêt pour les scientifiques.</text>
+</string>
+<string id="af_spoon_name">
+	<text>Cuillère anormale</text>
+</string>
+<string id="af_spoon_desc">
+	<text>Vieil ustensile de cuisine qui s'est transformé en une substance incompréhensible qui brille et lévite. Cette chose a certainement de l'intérêt pour les scientifiques.</text>
+</string>
+<string id="af_plate_name">
+	<text>Assiette anormale</text>
+</string>
+<string id="af_plate_desc">
+	<text>Vieil ustensile de cuisine qui s'est transformé en une substance incompréhensible qui brille et lévite. Cette chose a certainement de l'intérêt pour les scientifiques.</text>
+</string>
+<string id="af_bottle_name">
+	<text>Bouteille anormale</text>
+</string>
+<string id="af_bottle_desc">
+	<text>Vieil ustensile de cuisine qui s'est transformé en une substance incompréhensible qui brille et lévite. Cette chose a certainement de l'intérêt pour les scientifiques.</text>
+</string>
+<string id="af_jar_name">
+	<text>Bol anormal</text>
+</string>
+<string id="af_jar_desc">
+	<text>Vieil ustensile de cuisine qui s'est transformé en une substance incompréhensible qui brille et lévite. Cette chose a certainement de l'intérêt pour les scientifiques.</text>
+</string>
+<string id="af_doll_name">
+	<text>Poupée anormale</text>
+</string>
+<string id="af_doll_desc">
+	<text>Vieux jouet d'enfant transformé en une chose incompréhensible qui brille et lévite. Cette chose est certainement d'intérêt pour les scientifiques.</text>
+</string>
+<string id="af_polter_name">
+	<text>"Esprit frappeur"</text>
+</string>
+<string id="af_polter_desc">
+	<text>La science ne sait pas ce qui est commun dans cet artefact et le mutant du même nom (Poltergeist) sauf leurs caractéristiques. Dans les croyances des stalkers, certains pensent que ces pierres sont tout ce qui reste après la mort naturelle d'un Poltergeist, tandis que d'autres disent qu'elles n'ont rien à voir avec ces monstres.</text>
+</string>
+<string id="cheb_name">
+	<text>Cheburashka</text>
+</string>
+<string id="cheb_descr">
+	<text>Une poupée étrange qui semble être restée longtemps dans une anomalie. Chaude au toucher avec une odeur de peluche. Le dos a été grossièrement raccomodé.</text>
+</string>
+<string id="afscanner_name">
+	<text>Scanner</text>
+</string>
+<string id="afscanner_desc">
+	<text>Scanner à pulsations</text>
+</string>
+<string id="fake_art_name">
+	<text>Artefact invisible</text>
+</string>
+<string id="kommander_map_name">
+	<text>Plans du commandant</text>
+</string>
+<string id="kommander_map_desc">
+	<text>Etui contenant les cartes du commandant de l'expédition</text>
+</string>
+<string id="kommander_key_name">
+	<text>Clé du commandant</text>
+</string>
+<string id="kommander_diplomat_name">
+	<text>Malette diplomatique du commandant</text>
+</string>
+<string id="kommander_diplomat_desc">
+	<text>Malette diplomatique du commandant. Vous pouvez l'ouvrir et fouiller son contenu.</text>
+</string>
+<string id="cheb_fakeart_name">
+	<text>Récipient</text>
+</string>
+<string id="petruha_zapis_name">
+	<text>Faux message de Borov</text>
+</string>
+<string id="petruha_zapis_desc">
+	<text>"Salutations, brothers, j'ai entendu dire que vous aviez un mec dans la cave, mais j'ai personellement besoin de ce keum, alors faites pas les enculers et libérez-le ..."</text>
+</string>
+<string id="magnit_full_name">
+	<text>"Aimant"</text>
+</string>
+<string id="magnit_full_desc">
+	<text>Cet artefact n'a aucun effet sur l'être humain, même placé à la ceinture. Mais si vous divisez cette pierre en deux, chaque moitié acquiert de nouvelles propriétés comme les deux parties d'un aimant - qui sont capables de transporter son porteur dans l'espace sur de courtes distances. Artefact unique.</text>
+</string>
+<string id="af_magnit_part1_name">
+	<text>"Aimant Moins"</text>
+</string>
+<string id="af_magnit_part1_desc">
+	<text>C'est une des moitiés de l'artefact magnétique "Aimant". Si vous l'accrochez à la ceinture, vous pouvez être instantanément être transporté à l'emplacement de la partie manquante. Les deux pièces s'attirent et peuvent fusionner pour restaurer l'artefact d'origine.</text>
+</string>
+<string id="af_magnit_part2_name">
+	<text>"Aimant Plus"</text>
+</string>
+<string id="af_magnit_part2_desc">
+	<text>C'est une des moitiés de l'artefact magnétique "Aimant". Si vous l'accrochez à la ceinture, vous pouvez être instantanément être transporté à l'emplacement de la partie manquante. Les deux pièces s'attirent et peuvent fusionner pour restaurer l'artefact d'origine.</text>
+</string>
+<string id="af_thunderbird_name">
+	<text>Rossignol</text>
+</string>
+<string id="af_thunderbird_desc">
+	<text>Artefact qui "chante" si une émission approche ou en présence de radiations. Fournit également une protection contre les effets psy.</text>
+</string>
+<string id="af_bolt_name">
+	<text>Boulon anormal</text>
+</string>
+<string id="af_bolt_desc">
+	<text>Les Stalkers jettent des boulons dans les anomalies, sans savoir que, parfois, ils acquièrent certaines propriétés.</text>
+</string>
+<string id="plastinka_1_name">
+	<text>Léonid Outiossov</text>
+</string>
+<string id="mbox_track1_1">
+	<text>Sur la mer Noire</text>
+</string>
+<string id="mbox_track1_2">
+	<text>Les fenêtres de Moscou</text>
+</string>
+<string id="mbox_track1_3">
+	<text>Immense est la mer</text>
+</string>
+<string id="mbox_track1_4">
+	<text>Chers Moscovites</text>
+</string>
+<!--  <string id="mbox_track1_5">
+	<text>Odessa Ours</text>
+</string>
+<string id="mbox_track1_6">
+	<text>Cabine chanson</text>
+</string>  -->
+<string id="plastinka_2_name">
+	<text>Garik Sukachev</text>
+</string>
+<string id="mbox_track2_1">
+	<text>Adieu mon ami</text>
+</string>
+<string id="mbox_track2_2">
+	<text>Au moins quelqu'un désire</text>
+</string>
+<string id="mbox_track2_3">
+	<text>Vol de nuit</text>
+</string>
+<string id="mbox_track2_4">
+	<text>Je sais qu'il y a des places</text>
+</string>
+<string id="plastinka_3_name">
+	<text>Pop soviétique</text>
+</string>
+<string id="mbox_track3_1">
+	<text>Lavande</text>
+</string>
+<string id="mbox_track3_2">
+	<text>Des millions de roses rouges</text>
+</string>
+<string id="mbox_track3_3">
+	<text>Le vieil hôtel</text>
+</string>
+<string id="mbox_track3_4">
+	<text>Ce monde</text>
+</string>
+<string id="mbox_track3_5">
+	<text>Il était une fois, moi</text>
+</string>
+<!--  <string id="mbox_track3_6">
+	<text>Winter Garden</text>
+</string>
+<string id="mbox_track3_7">
+	<text>Champ de Russie</text>
+</string>
+<string id="mbox_track3_8">
+	<text>Aéroport</text>
+</string>  -->
+<string id="plastinka_4_name">
+	<text>Rock russe</text>
+</string>
+<string id="mbox_track4_1">
+	<text>Né en URSS</text>
+</string>
+<string id="mbox_track4_2">
+	<text>Coucou</text>
+</string>
+<string id="mbox_track4_3">
+	<text>Lettre d'Adieu</text>
+</string>
+<string id="mbox_track4_4">
+	<text>Ne vous précipitez pas</text>
+</string>
+<string id="mbox_track4_5">
+	<text>Cuba</text>
+</string>
+<string id="plastinka_5_name">
+	<text>Vladimir Vysotsky</text>
+</string>
+<string id="mbox_track5_1">
+	<text>Des chevaux exigeants</text>
+</string>
+<string id="mbox_track5_2">
+	<text>Prépare-moi un bain</text>
+</string>
+<string id="mbox_track5_3">
+	<text>La Ballade de l'enfance</text>
+</string>
+<string id="mbox_track5_4">
+	<text>À propos du grand Karetny</text>
+</string>
+<string id="mbox_track5_5">
+	<text>Deux destins</text>
+</string>
+<string id="mbox_track5_6">
+	<text>Lyrique</text>
+</string>
+<!--  <string id="mbox_track5_7">
+	<text>Charniers</text>
+</string>
+<string id="mbox_track5_8">
+	<text>Autour de cinq cents</text>
+</string>  -->
+<string id="plastinka_6_name">
+	<text>Tubes étrangers</text>
+</string>
+<string id="mbox_track6_1">
+	<text>Humperdinck</text>
+</string>
+<string id="mbox_track6_2">
+	<text>Les Irresistibles</text>
+</string>
+<string id="mbox_track6_3">
+	<text>Marie Laforet</text>
+</string>
+<string id="mbox_track6_4">
+	<text>Andy Williams</text>
+</string>
+<string id="mbox_track6_5">
+	<text>Bill Withers</text>
+</string>
+<string id="mbox_track6_6">
+	<text>Terry Jacks</text>
+</string>
+<string id="mbox_track6_7">
+	<text>Tom Jones</text>
+</string>
+<string id="mbox_track6_8">
+	<text>The Brothers Four</text>
+</string>
+<string id="mbox_track6_9">
+	<text>Mary Hopkin</text>
+</string>
+<string id="plastinka_7_name">
+	<text>Classic Rock</text>
+</string>
+<string id="mbox_track7_1">
+	<text>Christie</text>
+</string>
+<string id="mbox_track7_2">
+	<text>Cream</text>
+</string>
+<string id="mbox_track7_3">
+	<text>David Bowie</text>
+</string>
+<string id="mbox_track7_4">
+	<text>Deep Purple</text>
+</string>
+<string id="mbox_track7_5">
+	<text>Deep Purple</text>
+</string>
+<string id="mbox_track7_6">
+	<text>Eric Burdon</text>
+</string>
+<string id="mbox_track7_7">
+	<text>Golden Earring</text>
+</string>
+<string id="mbox_track7_8">
+	<text>Procol Harum</text>
+</string>
+<string id="mbox_track7_9">
+	<text>Montrose</text>
+</string>
+<string id="plastinka_8_name">
+	<text>Ballades Rock</text>
+</string>
+<string id="mbox_track8_1">
+	<text>Don Fardon</text>
+</string>
+<string id="mbox_track8_2">
+	<text>Eric Burdon</text>
+</string>
+<string id="mbox_track8_3">
+	<text>Uriah Heep</text>
+</string>
+<string id="mbox_track8_4">
+	<text>Renaissance</text>
+</string>
+<string id="mbox_track8_5">
+	<text>Oscar Benton</text>
+</string>
+<string id="mbox_track8_6">
+	<text>Rainbow</text>
+</string>
+<string id="mbox_track8_7">
+	<text>Ozzy Osbourne</text>
+</string>
+<string id="mbox_track8_8">
+	<text>Rolling Stones</text>
+</string>
+<string id="plastinka_9_name">
+	<text>Hits Pop</text>
+</string>
+<string id="mbox_track9_1">
+	<text>Grace Jones</text>
+</string>
+<string id="mbox_track9_2">
+	<text>Status Quo</text>
+</string>
+<string id="mbox_track9_3">
+	<text>Jessica Jay</text>
+</string>
+<string id="mbox_track9_4">
+	<text>Laid Back</text>
+</string>
+<string id="mbox_track9_5">
+	<text>Steve Miller Band</text>
+</string>
+<string id="mbox_track9_6">
+	<text>The Rubettes</text>
+</string>
+<string id="mbox_track9_7">
+	<text>C.C.Catch</text>
+</string>
+<string id="mbox_track9_8">
+	<text>Gloria Gaynor</text>
+</string>
+<string id="mbox_mbox_name_text">
+	<text>Jukebox Fonica M-120-M</text>
+</string>
+<string id="mbox_plates_head_text">
+	<text>Nom du disque:</text>
+</string>
+<string id="mbox_tracks_head_text">
+	<text>Chanson:</text>
+</string>
+<string id="mbox_logo_head_text">
+	<text>Bonne écoute!</text>
+</string>
+<string id="mbox_plate_btn_empty">
+	<text>Vide</text>
+</string>
+<string id="mbox_sys_btn_stop_text">
+	<text>Arrêter</text>
+</string>
+<string id="mbox_sys_btn_play_all_text">
+	<text>Jouer tout</text>
+</string>
+<string id="mbox_sys_btn_exit_text">
+	<text>Quitter</text>
+</string>
+<string id="akumulator_name">
+	<text>Batterie</text>
+</string>
+<string id="akumulator_desc">
+	<text>Batterie de voiture</text>
+</string>
+<string id="compas_name">
+	<text>Boussole</text>
+</string>
+<string id="dynamite_pack_name">
+	<text>Dynamite</text>
+</string>
+<string id="fotocamera_name">
+	<text>Caméra</text>
+</string>
+<string id="wheel_name">
+	<text>Roue</text>
+</string>
+<string id="wheel_desc">
+	<text>roue de voiture</text>
+</string>
+<string id="btr_wheel_name">
+	<text>Roue</text>
+</string>
+<string id="btr_wheel_desc">
+	<text>Roue de BTR</text>
+</string>
+<string id="magnitofon_name">
+	<text>Enregistreur de cassette</text>
+</string>
+<string id="magnitofon_desc">
+	<text>Enregistreur de cassette-404</text>
+</string>
+<string id="lenin_bust_name">
+	<text>Buste de Lénine</text>
+</string>
+<string id="lenin_bust_desc">
+	<text>Buste en marbre de Lénine</text>
+</string>
+<string id="bearing_name">
+	<text>Roulement</text>
+</string>
+<string id="mobile_tank_empty_name">
+	<text>Jerrycan</text>
+</string>
+<string id="mobile_tank_empty_desc">
+	<text>Bidon d'essence vide</text>
+</string>
+<string id="mobile_tank_full_desc">
+	<text>Bidon d'essence plein</text>
+</string>
+<string id="avtomobile_tank_name">
+	<text>Réservoir d'essence</text>
+</string>
+<string id="avtomobile_tank_desc">
+	<text>Réservoir d'essence de BTR</text>
+</string>
+<string id="diggers_weapon_name">
+	<text>Mitrailleuse du mineur</text>
+</string>
+<string id="diggers_weapon_desc">
+	<text>Mitrailleuse modifiée du Mineur. Après les bricolages de l'Epave du Bar, elle ne fonctionne plus.</text>
+</string>
+<string id="first_neutral_planshet_name">
+	<text>Journal du Vétéran</text>
+</string>
+<string id="first_neutral_planshet_desc">
+	<text>Sacoche d'officier élimée contenant le journal personnel du Vétéran. Lire le journal peut faire la lumière sur l'histoire de son propriétaire.</text>
+</string>
+<string id="knyaz_pda_name">
+	<text>PDA de Prince</text>
+</string>
+<string id="knyaz_pda_desc">
+	<text>PDA du pestigieux chef bandit 'Prince'. Les données qu'il contient sont disponibles en téléchargement.</text>
+</string>
+<string id="dar_road_detonator_name">
+	<text>Détonateurs des mercenaires</text>
+</string>
+<string id="dar_road_detonator_desc">
+	<text>Détonateur pour activer la bombe posée sur la route de Darkscape</text>
+</string>
+<string id="dar_merc_planshet_name">
+	<text>PDA de Denard</text>
+</string>
+<string id="dar_merc_planshet_desc">
+	<text>PDA du chef mercenaire Denard. Les données qu'il contient sont disponibles en téléchargement.</text>
+</string>
+<string id="robber_pda_name">
+	<text>PDA de Rogue</text>
+</string>
+<string id="robber_pda_desc">
+	<text>PDA du bandit Rogue. Les données qu'il contient sont disponibles en téléchargement.</text>
+</string>
+<string id="bratstvo_agent_pda_name">
+	<text>PDA de Zheka</text>
+</string>
+<string id="bratstvo_agent_pda_desc">
+	<text>PDA de Zheka. Les données qu'il contient sont disponibles en téléchargement.</text>
+</string>
+<string id="diggers_pda_name">
+	<text>PDA du Mineur</text>
+</string>
+<string id="diggers_pda_desc">
+	<text>PDA du Mineur. Les données qu'il contient sont disponibles en téléchargement.</text>
+</string>
+<string id="ufo_part_name">
+	<text>"Déchet"</text>
+</string>
+<string id="ufo_part_desc">
+	<text>Petite pièce formée d'une substance inconnue et de la taille d'une boîte d'allumettes. Structure métallique, rappellant l'acier, mais qui ne semble pas rouillé. Si vous l'écrasez dans la paume de votre main, vous sentez des palpitements et des picotements sur la peau. Si c'est un artefact, alors il n'a aucune propriété. Parce qu'il est inutile, les stalkers appellent cet objet un "déchet" ou une "ordure".</text>
+</string>
+<string id="loader_box_name">
+	<text>Conteneur à artefacts</text>
+</string>
+<string id="loader_box_desc">
+	<text>Conteneur à artefacts du Barman. Fait de matériaux blindés et verrouillé par une serrure à double combinaison.</text>
+</string>
+<string id="cit_tow_box_keys_name">
+	<text>Clés du sergent</text>
+</string>
+<string id="cit_tow_box_keys_desc">
+	<text>Trousseau de six clés rouillées.</text>
+</string>
+<string id="apparat_name">
+	<text>Alcool de contrebande</text>
+</string>
+<string id="apparat_desc">
+	<text>Cet appareil est assemblé dans une grave pénurie de ville militaire, se compose de boîtes, d'incendie et d'extinction logements rives du réservoir. Pimenter il ne peut forestier Zakharov.ch qui vit à Dingle.</text>
+</string>
+<string id="kordon_samogon_name">
+	<text>"Cognac du Cordon"</text>
+</string>
+<string id="kordon_samogon_desc">
+	<text>"Cognac du Cordon". Un alcool frelaté qui cogne très fort avec pour effet de rendre le cerveau insensible aux ondes-psi.</text>
+</string>
+<string id="glassful_name">
+	<text>Verre du Forestier</text>
+</string>
+<string id="glassful_desc">
+	<text>Verre du Forestier, capacité 300cl.</text>
+</string>
+<string id="book_1_name">
+	<text>Note du Professeur</text>
+</string>
+<string id="book_1_desc">
+	<text>Double-clic pour lire la note</text>
+</string>
+<string id="book_2_name">
+	<text>L'Homme du Marais</text>
+</string>
+<string id="book_2_desc">
+	<text>Ce livre résulte des observations faites par les stalkers sur la Zone et ses habitants parfois étranges.</text>
+</string>
+<string id="book_3_name">
+	<text>La Marque de la Zone</text>
+</string>
+<string id="book_3_desc">
+<text>La Marque de la Zone</text>
+</string>
+<string id="book_4_name">
+	<text>La légende du Stalker Noir</text>
+</string>
+<string id="book_5_name">
+	<text>La Pomme de la discorde</text>
+</string>
+<string id="book_7_name">
+	<text>Tales père Ignat</text>
+</string>
+<string id="book_8_name">
+	<text>Synopsis scientifique</text>
+</string>
+<string id="book_8_desc">
+	<text>Entrées scientifique, explorer l'anomalie inconnue</text>
+</string>
+<string id="book_9_name">
+	<text>Notes sur la Ville Morte</text>
+</string>
+<string id="book_10_name">
+	<text>Projet de rapport</text>
+</string>
+<string id="book_10_desc">
+	<text>Projet de rapport de l'officier ville morte</text>
+</string>
+<string id="book_11_name">
+	<text>Remarque sergent Kuptsevicha</text>
+</string>
+<string id="book_11_desc">
+	<text>Remarque Kuptsevicha sergent qui ont servi avant l'accident de Tchernobyl dans l'unité militaire de la ville secrète.</text>
+</string>
+<string id="book_12_name">
+	<text>Pack Froissé</text>
+</string>
+<string id="book_12_desc">
+	<text>Pack froissé de la mer Canal blanc, où quelque chose est écrit</text>
+</string>
+<string id="turret_pkm_name">
+	<text>Tourelle RMB</text>
+</string>
+<string id="turret_pkm_desc">
+	<text>Mitrailleuse à trépied RMB. Pour utilisation, le trépied doit être installé sur une surface plane.</text>
+</string>
+<string id="dynamite_for_mils_name">
+	<text>Conteneur rempli d'artefacts</text>
+</string>
+<string id="detonator_of_shvid_desc">
+	<text>Détonateur</text>
+</string>
+<string id="petrenko_case_name">
+	<text>Malette de documents du colonel Petrenko</text>
+</string>
+<string id="petrenko_case_desc">
+	<text>Il y a un tas de papiers mélangés dans la malette - factures, certificats, reçus, inventaires. Sur l'un des feuillet il y a un numéro de sécurité No:3156 et un code - 432. Hmm ...</text>
+</string>
+<string id="item_pda_filin_name">
+	<text>PDA du Hibou</text>
+</string>
+<string id="item_pda_filin_desc">
+	<text>Info dans le PDA: ... "Merde, je pense que ces bandits sont au courant de nos plans. Je vais cacher la clé de la Matrice dans un wagon du chemin de fer de la Mine. Je vais accompagner une expédition des gars de Lukash au Radar et ainsi je pourrai planquer la clé là-bas."</text>
+</string>
+<string id="item_filin_note_name">
+	<text>Note du Hibou</text>
+</string>
+<string id="item_filin_note_desc">
+	<text>Note</text>
+</string>
+<string id="item_radist_note_name">
+	<text>Note de l'opérateur-radio</text>
+</string>
+<string id="item_radist_note_desc">
+	<text>Courte note sur l'utilisation du détecteur: les deux boutons rouges servent à sélectionner la fréquence, puis en cliquant sur le bouton vert, l'appareil commence à émettre des impulsions.(appuyez sur'/' pour sélectionner la fréquence et sur 'enter/retour' pour valider) Si la fréquence est correctement réglée, l'artefact dans l'anomalie sera détecté. Cependant toutes les anomalies ont différentes fréquences ... Et il y a autre chose. L'anomalie étrange détériore armes et combinaisons. Il est conseillé de mettre de côté ce qui a de la valeur, ou vous pourriez le regretter plus tard ...\nATTENTION: Vous avez besoin d'être équipé d'un détecteur "veles" pour utiliser le scanner à impulsion.</text>
+</string>
+<string id="yan_sold_generator_name">
+	<text>Scanner à impulsions</text>
+</string>
+<string id="yan_sold_generator_desc">
+	<text>Puissant scanner générateur d'impulsions. S'utilise pour trouver des artefacts dans les "anomalies étranges".</text>
+</string>
+<string id="lenin_book_1_name">
+	<text>Lénine, "L'Etat et la Révolution"</text>
+</string>
+<string id="lenin_book_1_desc">
+	<text>Réédition du livre publié initialement en 1917, imprimé en 1984. Le livre est en très bon état, les pages ne sont même pas jaunies. La couverture est également en excellent état. Il dégage un peu de chaleur au toucher.</text>
+</string>
+<string id="lenin_book_2_name">
+	<text>Lénine, "Thèses d'avril"</text>
+</string>
+<string id="lenin_book_2_desc">
+	<text>Réédition de l'article de Lénine paru dans le no 26 de la Pravda le 7 avril 1917. Le livre est en très bon état, les pages ne sont même pas jaunies. La couverture est également en excellent état. Il dégage un peu de chaleur au toucher.</text>
+</string>
+<string id="lenin_book_3_name">
+	<text>Lénine, "Le développement du capitalisme en Russie"</text>
+</string>
+<string id="lenin_book_3_desc">
+	<text>Ouvrage de Lénine datant de 1899, réimprimé en 1985. Le livre est en très bon état, les pages ne sont même pas jaunies. La couverture est également en excellent état. Il dégage un peu de chaleur au toucher.</text>
+</string>
+<string id="lenin_book_4_name">
+	<text>XXe Congrès du PCUS. Compte rendu. Volume 1.</text>
+</string>
+<string id="lenin_book_4_desc">
+	<text>Transcription du XXe congrès du Parti communiste de l'Union soviétique (PCUS) qui s'est tenu à Moscou du 14 au 25 février 1956. Ce congrès est resté célèbre par la déstalinisation qui y a été officialisée par Khrouchtchev. Le livre est en très bon état, les pages ne sont même pas jaunies. La couverture est également en excellent état. Il dégage un peu de chaleur au toucher. C'est le premier volume, le second doit sûrement être quelque part.</text>
+</string>
+<string id="lenin_book_5_name">
+	<text>XXe Congrès du PCUS. Compte rendu. Volume 2.</text>
+</string>
+<string id="lenin_book_5_desc">
+	<text>Transcription du XXe congrès du Parti communiste de l'Union soviétique (PCUS) qui s'est tenu à Moscou du 14 au 25 février 1956. Ce congrès est resté célèbre par la déstalinisation qui y a été officialisée par Khrouchtchev. Le livre est en très bon état, les pages ne sont même pas jaunies. La couverture est également en excellent état. Il dégage un peu de chaleur au toucher. C'est le second volume, le premier doit sûrement être quelque part.</text>
+</string>
+<string id="lenin_zapiska_name">
+	<text>Règlement de la bibliothèque</text>
+</string>
+<string id="lenin_zapiska_desc">
+	<text>Une note du responsable de la bibliothèque. En très bon état, comme si elle avait été écrite hier. "Camarades, ne mettez pas les archives du parti n'importe où ! Si je ne retrouve pas tous les livres soigneusement rangés dans le coffre, attendez-vous à des sanctions !"\nSigné: Camarade Kozlov</text>
+</string>
+<string id="klondaik_key_name">
+	<text>"Artefact-clé"</text>
+</string>
+<string id="klondaik_key_desc">
+	<text>Artefact de type inconnu. N'a aucun effet notable. Selon les informations trouvées, il peut activer la matrice aux artefacts.</text>
+</string>
+<string id="mil_transponder_name">
+		<text>Transpondeur militaire</text>
+	</string>
+	<string id="mil_transponder_desc">
+		<text>Système de transpondeur portable "ami ou ennemi". Si vous le portez, le transpondeur envoiera un signal à tous les militaires pour les informer que vous êtes un "ami". Il ressemble à un GPS ordinaire, sauf que votre nom "Le Tatoué" est gravé dessus. Il est préférable de ne pas exiber cette inscription.</text>
+	</string>
+</string_table>

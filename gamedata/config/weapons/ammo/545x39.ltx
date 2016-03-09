@@ -1,0 +1,223 @@
+;5,45х39 разработан в начале 1970-х годов группой конструкторов и технологов под руководством В. М. Сабельникова: Л. И. Булавской, Б. В. Семиным, М. Е. Федоровым, П. Ф. Сазоновым, В. И. Волковым, В. А. Николаевым, Е. Е. Зиминым, П. С. Королевым. Принят на вооружение в 1974 году.
+;Для увеличения поражающей способности пули форма и скорость пули выбраны такими, чтобы пуля стабилизировалась в полете «на грани устойчивости», т. е. пуля при попадании в любое препятствие начинает «кувыркаться», нанося более сильное ранение, чем пуля калибра 7,62 мм. Этот эффект достигнут за счет смещения центра тяжести к задней части пули. Передняя часть пули пустотелая, сминается при попадании в цель. Обратной стороной этого эффекта является склонность к рикошетированию (что особенно неудобно в городских условиях, горной местности, замкнутых пространствах) и меньшую бронепробиваемость на дальних дистанциях. За эти особенности во время войны в Афганистане моджахеды называли «пятёрку» «змеиными пулями».
+;Однако, это относится исключительно к первым вариантам патрона с пулей ПС (7Н6/7Н6М). В варианте с пулями ПП (7Н10), БП (7Н22), бронепробиваемость соизмерима с пулям 7,62-мм патрона обр. 1943 года, а в варианте с пулей БС (7Н24) бронепробиваемость выше как пуль 7,62-мм патрона обр. 1943 года, так и 7,62-мм винтовочного патрона обр. 1908 года.
+
+;Вначале патрон выпускался с оболоченной пулей, мягким стальным сердечником и полостью в головке пули (7Н6, 7Н6ВК) массой 3,30-3,55 гр. Для увеличения бронепробиваемости сначала заменили ердечник (патрон 7Н6 с термоупрочненным сердечником выпускаются с 1986 года). Пуля без окраски.
+;Дальнейшие эксперименты показали, что при снимании пустотелой головки пробиваемость резко падает, поэтому полость в головке пули залили свинцом (патрон типа 7Н10). Современные патроны, 5,45 БП (7Н22) и 5,45 БС (7Н24), отличаются от 7Н10 только тяжелым закаленным сердечником.
+
+;5,45х39 БП (7Н22) разработан в 1998 году специалистами ЦНИИТОЧМАШ под руководство Дворянинова В.Н. совместно со специалистами КБ Барнаульского станкостроительного завода, и принят на вооружение в 1998 году.
+
+;В России патроны калибра 5.45мм до сих пор остаются основным штатным боеприпасом индивидуального пехотного оружия (автоматов). Помимо штатных 7Н6 со стальным сердечником, а также ставшего с конца 1980-х годов основным патрона 7Н10 (также со стальным сердечником пули, повышенной пробиваемости), выпускаются бронебойные патроны 7Н22 и 7Н24 (последний - с сердечником пули из карбида вольфрама), трассирующие патроны и патроны с уменьшенной скоростью пули (для использования в автоматах АКС-74УБ с глушителем). Кроме того, на экспорт производятся патроны с пулями со свинцовым сердечником (для использования в гражданском оружии).
+
+
+;Малоимпульсный промежуточный патрон калибра 5,45х39 мм был создан в начале 1970-х годов группой конструкторов и технологов под руководством В. М. Сабельникова и принят на вооружение в 1974 году. При проектировании патрона разработчики учитывали опыт создания и боевого применения американского патрона 5,56х45 мм, поэтому новый патрон получился сопоставимым по эффективности, несмотря на меньшую мощность. Малокалиберная пуля с высокой начальной скоростью, обеспечивает высокую настильность траектории (в сравнении с патроном 7,62х39 мм, дальность прямого выстрела увеличилась с 325 м до 440 м), обладает неплохим пробивным действием и значительной убойной силой. Малый импульс отдачи в момент выстрела благоприятно сказывается на кучности и меткости стрельбы, а уменьшение массы патрона позволяет стрелку увеличить носимый боезапас (200 патронов 7,62х39 мм весят столько же, сколько 300 патронов 5,45х39 мм, для 8 магазинов патрон калибра 5,45 мм дает экономию массы в 1,4 кг). Однако, по сравнению с пулей 7,62х39 мм, недостатком являются низкое останавливающе действие и склонность к рикошетам. С 1992 года с целью экономии свинца и повышения пробивного действия пули, патрон 5,45х39 ПП с пулей повышенной пробиваемости со стальным термоупрочненным сердечником стал стандартным и был принят на вооружение под индексом ГРАУ 7Н10. Пуля без окраски. Лак-герметизатор темно-фиолетового цвета, в отличие от красного в 7Н6.
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[ammo_5.45x39_fmj]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\ammo\ammo_5.45x39_fmj" ; option for Level Editor
+class			= AMMO
+cform                   = skeleton
+visual                  = weapons\ammo\ammo_545x39_fmj.ogf
+description				= enc_weapons_ammo-5.45x39fmj
+$prefetch 		= 64
+
+cost					 = 550
+
+box_size		= 30	;60
+
+inv_name		= ammo-5.45x39fmj
+inv_name_short	= ammo-5.45x39fmj_s
+inv_weight		= 0.315
+
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x			= 16
+inv_grid_y			= 11
+
+k_dist			= 1
+k_disp			= 2.5
+k_hit			= 1.1
+k_impulse		= 1
+k_pierce		= 1.12
+impair			= 1
+buck_shot		= 1
+tracer			= on
+wm_size         = 0.0545
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[ammo_5.45x39_ap]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\ammo\ammo_5.45x39_ap" ; option for Level Editor
+class			= AMMO
+cform                   = skeleton
+visual                  = weapons\ammo\ammo_545x39_ap.ogf
+description				= enc_weapons_ammo-5.45x39ap
+$prefetch 		= 64
+
+cost					 = 600
+
+box_size		= 30	;60
+
+inv_name		= ammo-5.45x39ap
+inv_name_short	= ammo-5.45x39ap_s
+inv_weight		= 0.315
+
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x			= 12
+inv_grid_y			= 11
+
+k_dist			= 1
+k_disp			= 2.5
+k_hit			= 1.15
+k_impulse		= 0.95
+k_pierce		= 1.3
+impair			= 1.02
+buck_shot		= 1
+tracer			= on
+wm_size         = 0.0545
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;фейк-боеприпас для оружия без магазина 
+[ammo_5.45x39_dummy]:ammo_5.45x39_fmj
+;$spawn			= "weapons\ammo\ammo_wpn_dummy" ; option for Level Editor
+;visual          = physics\equipment_cache\equipment_box_01_case.ogf
+cost			= 0
+box_size		= 0
+inv_weight		= 0.001
+inv_name		= ammo-5.45x39-dummy
+inv_name_short	= ammo-5.45x39-dummy_s
+description		= enc_weapons_ammo-5.45x39-dummy
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[mag_30_5.45x39_fmj]:ammo_5.45x39_fmj
+box_size	= 1
+mag_size	= 30
+script_binding  = ammo_manager.init
+wm_section	= wm_5.45x39a30
+inv_name		= mag_30_5.45x39
+description		= desc_load_5.45x39_fmj
+inv_name_short	= mag_30_5.45x39_fmj_s
+inv_weight		= 0.0105
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 60
+inv_grid_y			= 2
+visual	= weapons\magazines\mag_30_545x39.ogf
+cost = 120
+
+[mag_30_5.45x39_ap]:ammo_5.45x39_ap
+box_size	= 1
+mag_size	= 30
+script_binding  = ammo_manager.init
+wm_section	= wm_5.45x39b30
+inv_name		= mag_30_5.45x39
+description		= desc_load_5.45x39_ap
+inv_name_short	= mag_30_5.45x39_ap_s
+inv_weight		= 0.0105
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 60
+inv_grid_y			= 2
+visual	= weapons\magazines\mag_30_545x39.ogf
+cost = 120
+
+[mag_45_5.45x39_fmj]:ammo_5.45x39_fmj
+box_size	= 1
+mag_size	= 45
+script_binding  = ammo_manager.init
+wm_section	= wm_5.45x39a45
+inv_name		= mag_45_5.45x39
+description		= desc_load_5.45x39_fmj
+inv_name_short	= mag_45_5.45x39_fmj_s
+inv_weight		= 0.0105
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 9
+visual	= weapons\magazines\mag_45_545x39.ogf
+cost = 180
+
+[mag_45_5.45x39_ap]:ammo_5.45x39_ap
+box_size	= 1
+mag_size	= 45
+script_binding  = ammo_manager.init
+wm_section	= wm_5.45x39b45
+inv_name		= mag_45_5.45x39
+description		= desc_load_5.45x39_ap
+inv_name_short	= mag_45_5.45x39_ap_s
+inv_weight		= 0.0105
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 9
+visual	= weapons\magazines\mag_45_545x39.ogf
+cost = 180
+
+[mag_75_5.45x39_fmj]:ammo_5.45x39_fmj
+box_size	= 1
+mag_size	= 75
+script_binding  = ammo_manager.init
+wm_section	= wm_5.45x39a75
+inv_name		= mag_75_5.45x39
+description		= desc_load_5.45x39_fmj
+inv_name_short	= mag_75_5.45x39_fmj_s
+inv_weight		= 0.0105
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 7
+visual	= weapons\magazines\mag_75_545x39.ogf
+cost = 250
+
+[mag_75_5.45x39_ap]:ammo_5.45x39_ap
+box_size	= 1
+mag_size	= 75
+script_binding  = ammo_manager.init
+wm_section	= wm_5.45x39b75
+inv_name		= mag_75_5.45x39
+description		= desc_load_5.45x39_ap
+inv_name_short	= mag_75_5.45x39_ap_s
+inv_weight		= 0.0105
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 7
+visual	= weapons\magazines\mag_75_545x39.ogf
+cost = 250
+
+[mag_30_5.45x39_fmj_e]:mag_30_5.45x39_fmj
+description		= desc_mag_e
+inv_weight = 0.203
+
+[mag_30_5.45x39_ap_e]:mag_30_5.45x39_ap
+description		= desc_mag_e
+inv_weight = 0.203
+
+[mag_45_5.45x39_fmj_e]:mag_45_5.45x39_fmj
+description		= desc_mag_e
+inv_weight = 0.3
+
+[mag_45_5.45x39_ap_e]:mag_45_5.45x39_ap
+description		= desc_mag_e
+inv_weight = 0.3
+
+[mag_75_5.45x39_fmj_e]:mag_75_5.45x39_fmj
+description		= desc_mag_e
+inv_weight = 0.9
+
+[mag_75_5.45x39_ap_e]:mag_75_5.45x39_ap
+description		= desc_mag_e
+inv_weight = 0.9
+
+

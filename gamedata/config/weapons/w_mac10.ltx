@@ -1,0 +1,226 @@
+; пистолет-пулемёт Ingram MAC-10
+[wpn_mac10]:identity_immunities,base_wpn_zoom
+GroupControlSection		= spawn_group
+discovery_dependency 		= 
+$spawn                   	= "weapons\mac10"	; option for Level Editor
+$npc			 	= on			; option for Level Editor
+$prefetch 			= 8
+scheduled            		= off              	; option for ALife Simulator
+cform                    	= skeleton
+class                    	= WP_LR300
+min_radius               	= 0
+max_radius                  = 50
+description			        = enc_weapons_wpn-mac10
+														
+ef_main_weapon_type		= 2
+ef_weapon_type			= 6
+
+;-----------------------------------------------------------------------------------
+holder_range_modifier	= 0.9
+holder_fov_modifier		= 1.3
+;-----------------------------------------------------------------------------------
+
+cost				= 3400
+
+ammo_elapsed		= 30
+ammo_mag_size		= 30
+ammo_class		 	= ammo_11.43x23_fmj, ammo_11.43x23_hydro 
+fire_modes			= 1, 2, 3, -1
+weapon_class		= assault_rifle
+
+hand_dependence		= 1
+single_handed		= 1
+
+slot 			 	= 1
+animation_slot		= 1			; type of the animation that will be used
+
+inv_name			= wpn_mac10
+inv_name_short		= wpn_mac10
+inv_weight			= 2.85
+
+inv_grid_width		= 2
+inv_grid_height		= 2
+inv_grid_x			= 29
+inv_grid_y			= 11
+
+kill_msg_x			= 134
+kill_msg_y			= 177
+kill_msg_width			= 31
+kill_msg_height			= 25
+
+;-----------------------------------------------------------------------------------
+;базовая дисперсия
+fire_dispersion_base		= 0.25	 	;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor		= 1.17f
+
+;отдача
+cam_relax_speed        	= 6.5		;скорость возврата в исходное положение
+cam_relax_speed_ai      = 120.75
+cam_dispersion         	= 0.8		;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc		= 0.1		;увеличениe cam_dispersion с каждым выстрелом
+cam_dispertion_frac		= 0.6		;ствол будет подыматься на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+cam_max_angle			= 17.0		;максимальный угол отдачи
+cam_max_angle_horz		= 9.0		;(degree) maximum shot horizontal degree 
+cam_step_angle_horz		= 0.5		;(degree) size of step camera moved in horizontal position while shooting
+
+fire_dispersion_condition_factor = 6		;увеличение дисперсии в процентах при максимальном износе 
+misfire_probability 		= 0.003		;вероятность осечки при максимальном износе 
+misfire_condition_k		= 0.05
+condition_shot_dec 		= 0.0002 	;увеличение износа при каждом выстреле
+;-----------------------------------------------------------------------------------
+
+direction                	= 0, 0, 1
+fire_point               	= 0.0, 0.165, 0.20
+
+flame_particles		   	= weapons\generic_weapon03
+smoke_particles		   	= weapons\generic_shoot_00
+
+shell_point		 	= 0.0, 0.188, 0.082
+shell_dir		 	= 0.0, 1.0, 0.0
+shell_particles	 		= weapons\generic_shells
+
+rpm_empty_click 	 	= 200
+
+PDM_disp_base 			= 1.3
+PDM_disp_vel_factor 		= 0.6
+PDM_disp_accel_factor 		= 0.6
+PDM_crouch	 		= 1.0
+PDM_crouch_no_acc 		= 1.0
+
+;-----------------------------------------------------------------------------------
+; ttc
+hit_power           = 0.56
+hit_impulse		 	= 20
+hit_type 			= fire_wound
+
+fire_distance       = 150
+bullet_speed		= 290	;начальная скорость пули
+rpm                 = 990
+; end ttc
+
+use_aim_bullet			= false		;Поддерживается ли первая супер пуля
+time_to_aim			= 1.0	
+
+silencer_hit_power       	= 0.47
+silencer_hit_impulse	 	= 15
+silencer_fire_distance   	= 100
+silencer_bullet_speed	 	= 20
+
+hud                      	= wpn_mac10_hud
+normal                   	= 0, 1, 0
+position                 	= -0.021, -0.13, 0.0
+orientation              	= 0, 0, 0
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+; под мишкой
+strap_position      = 0.05,-0.2,-0.11 	; position (offset) and orientation of the weapon when it is strapped
+strap_orientation   = -15,9,-80		; (3rd person view in degrees)
+strap_bone0			= bip01_spine1
+strap_bone1			= bip01_spine
+
+visual              = weapons\mac10\wpn_mac10.ogf
+
+light_color		 	= 0.6,0.5,0.3
+light_range		 	= 4.0
+light_var_color		= 0.05
+light_var_range		= 0.5
+light_time 		 	= 0.2
+
+;addons
+scope_status		= 0
+silencer_status		= 2
+grenade_launcher_status		= 0
+
+zoom_enabled		= true
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; silencer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+silencer_name  		= wpn_addon_sil_1143_p	; section name for the attachable silencer
+silencer_x 			= 74			; offset in inventory icon
+silencer_y 			= 10		
+
+;params when silencer is attached 
+;similar to corresponding params without prefix silencer_
+
+;silencer_flame_particles 	= weapons\generic_weapon01
+silencer_smoke_particles 	= weapons\generic_shoot_00
+silencer_light_color		= 0.6,0.5,0.3
+silencer_light_range		= 0.01
+silencer_light_var_color	= 0.05
+silencer_light_var_range	= 0.5
+silencer_light_time 		= 0.2
+
+;------------------------------ O.G.S.E. sound remake -----------------------
+;звуки
+snd_draw			= weapons\usp_draw, 0.5
+snd_holster			= weapons\generic_holster, 0.5 
+snd_shoot			= weapons\generic_45_shot, 0.9
+snd_empty			= weapons\gen_empty, 0.5
+snd_reload			= weapons\mac_reload, 0.7, 0.3
+snd_close			= weapons\generic_close, 0.5
+snd_silncer_shot	= weapons\t_vintorez_shot, 0.6
+;-----------------------------------------------------------------------------
+
+;-----------------------------------------------------------------------------
+;-- HUD DESCRIPTION
+;-----------------------------------------------------------------------------  
+[wpn_mac10_hud]
+
+shell_point			= 0.0,0.0,0.0
+fire_point			= -0.3,0.0,0.02
+fire_bone           = wpn_body
+orientation         = 0,0,0
+position            = 0,-0.02,0
+visual              = weapons\mac10\wpn_mac10_hud.ogf
+
+anim_holster		= holster
+anim_idle			= idle
+anim_empty			= empty
+anim_reload			= reload_full
+anim_reload_empty		= reload
+anim_draw			= draw
+anim_draw_empty			= draw_empty
+anim_shoot			= shoot
+anim_shot_last			= shoot_last
+anim_close			= holster
+anim_idle_aim			= idle_aim
+anim_idle_sprint		= idle_sprint
+
+;смещения HUD для режима приближения
+zoom_offset			= -0.159,0.065,-0.01
+zoom_rotate_x			= 0.0
+zoom_rotate_y			= 0.0
+
+[wpn_mac10_repair]
+tech_complication = 300
+repair_compatibility = mac10
+
+[wpn_mac10_m1]:wpn_mac10
+$spawn                   	= "weapons\mac10_m1"	; option for Level Editor
+description			        = enc_weapons_wpn-mac10
+
+cost				= 3400
+
+ammo_mag_size		 	= 32
+
+inv_name			= wpn_mac10_m1
+inv_name_short		= wpn_mac10_m1
+inv_weight			= 3.1
+
+inv_grid_width			= 3
+inv_grid_height			= 2
+inv_grid_x			= 29
+inv_grid_y			= 13
+
+silencer_status			= 1
+flame_particles		   	= 
+
+;------------------------------ O.G.S.E. sound remake -----------------------
+snd_shoot			= weapons\mac10_m1_shoot, 0.9
+;-----------------------------------------------------------------------------
+
+[wpn_mac10_m1_repair]
+tech_complication = 700
+repair_compatibility = mac10

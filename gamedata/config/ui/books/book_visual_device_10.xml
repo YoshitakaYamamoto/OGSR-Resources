@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+
+<book_visual_device_10>	
+
+	<page1 x="250" y="40" width="310" height="550" stretch="1">
+		<texture x="0" y="0" width="510" height="1000">ui\bookpages\book_10_text_1</texture>
+	</page1>
+
+	<btn_quit x="470" y="630" width="117" height="29">
+		<texture_e>ui_button_ordinary_e</texture_e>
+		<texture_t>ui_button_ordinary_t</texture_t>
+		<texture_h>ui_button_ordinary_h</texture_h>
+		<text>ui_inv_exit</text>
+	</btn_quit>
+</book_visual_device_10>
+
+

@@ -1,0 +1,573 @@
+; Список локаций, на которых разрешён дополнительный спавн
+[level_list]
+l01_escape
+l02_garbage
+l03_agroprom
+l04_darkvalley
+l06_rostok
+l07_military
+l08_yantar
+l10_radar
+k01_darkscape_ogse
+l09_deadcity_ogse
+l13_generators_ogse
+l22_marsh
+
+; Минимальное/максимальное количество людей, которых можно спавнить
+[human_count]
+min = 1
+max = 3
+
+; Минимальное/максимальное количество мутантов, которых можно спавнить
+[mutant_count]
+min = 1
+max = 3 
+
+; Список людей, которые спавнятся на Кордоне
+[l01_escape_human]
+bandits
+
+ 
+; Список мутантов, которые спавнятся на Кордоне
+[l01_escape_mutant]
+dogs
+fleshes
+boars
+zombies
+cats
+
+[l02_garbage_human]
+army
+bandits
+dolg
+
+[l02_garbage_mutant]
+dogs
+fleshes
+boars
+zombies
+izloms
+pseudodogs
+
+[l03_agroprom_human]
+army
+bandits
+mercenary
+zombied
+
+[l03_agroprom_mutant]
+zombies
+pseudodogs
+izloms
+bloodsuckers
+
+[l04_darkvalley_human]
+bandits
+dolg
+monolith
+freedom
+
+[l04_darkvalley_mutant]
+fleshes
+boars
+zombies
+
+[l06_rostok_human]
+dolg
+freedom
+mercenary
+zombied
+
+[l06_rostok_mutant]
+zombies
+
+[l07_military_human]
+freedom
+mercenary
+dolg
+monolith
+bandits
+
+[l07_military_mutant]
+bloodsuckers
+pseudodogs
+pseudogigants
+boars
+
+[l08_yantar_human]
+mercenary
+monolith
+freedom
+
+[l08_yantar_mutant]
+burers
+pseudogigants
+
+[l10_radar_human]
+mercenary
+monolith
+army
+zombied
+
+[l10_radar_mutant]
+zombies
+burers
+izloms
+pseudogigants
+boars
+
+[k01_darkscape_ogse_human]
+bandits
+army
+
+[k01_darkscape_ogse_mutant]
+fleshes
+boars
+zombies
+burers
+cats
+
+[l09_deadcity_ogse_human]
+mercenary
+monolith
+army
+zombied
+
+[l09_deadcity_ogse_mutant]
+zombies
+cats
+snorks
+
+[l13_generators_ogse_human]
+monolith
+
+[l13_generators_ogse_mutant]
+snorks
+pseudogigants
+chimeres
+
+[l22_marsh_human]
+mercenary
+bandits
+zombied
+
+[l22_marsh_mutant]
+fleshes
+boars
+zombies
+bloodsuckers
+
+; минимум/максимум существ каждой группы, которые можно спавнить
+[spawn_count]
+bandits = 3,5
+army = 3,5
+dolg = 3,5
+freedom = 3,5
+mercenary = 3,5
+zombied = 3,5
+monolith = 3,5
+dogs = 3,6
+cats = 3,5
+boars = 3,4
+fleshes = 3,5
+zombies = 2,5
+pseudodogs = 1,3
+izloms = 2,4
+snorks = 3,5
+burers = 2,3
+bloodsuckers = 1,2
+chimeres = 1,2
+pseudogigants = 1,2
+
+; список профилей для каждой группировки
+[human_info_count]
+bandits = 5
+army = 5
+dolg = 3
+freedom = 3
+mercenary = 8
+zombied = 6
+monolith = 6
+
+; x-18 bar_darklab_document_done (сдали документы Бармену)
+; x-16 bar_x16_documents_done (сдали документы Бармену)
+; x-10 bar_deactivate_radar_done (отключили Радар)
+
+; профиль каждой группировки. Задаётся секция спавна, инфопоршень, после которого можно спавнить данный профиль, инфопоршень, после которого нельзя спавнить.
+; то есть спавнить можно в промежутке времени [cond1;cond2]
+; если какой-то инфопоршень не нужен, то ставим nonе
+; Если нужно запретить появление профиля на какой-нибудь локации
+; то ставим nospawn_level и через запятую перечисляем локации
+[bandits_info_1]
+name = agr_bandit_respawn_2
+cond1 = none
+cond2 = bar_x16_documents_done
+nospawn_level = l06_rostok, l07_military, l08_yantar, l10_radar
+
+[bandits_info_2]
+name = val_bandit_respawn_3
+cond1 = bar_darklab_document_done
+cond2 = none
+
+[bandits_info_3]
+name = ds_bandit_respawn_3
+cond1 = bar_darklab_document_done
+cond2 = none
+
+[bandits_info_4]
+name = ros_bandit_respawn_3
+cond1 = bar_darklab_document_done 
+cond2 = none
+
+[bandits_info_5]
+name = ros_bandit_respawn_4
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[army_info_1]
+name = esc_soldier_respawn_1
+cond1 = none
+cond2 = bar_x16_documents_done
+nospawn_level = l06_rostok, l07_military, l08_yantar, l10_radar
+
+[army_info_2]
+name = agr_soldier_regular
+cond1 = none
+cond2 = bar_x16_documents_done
+nospawn_level = l06_rostok, l07_military, l08_yantar, l10_radar
+
+[army_info_3]
+name = agr_soldier_veteran
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[army_info_4]
+name = rad_specnaz_respawn_specnaz
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[army_info_5]
+name = rad_soldier_master
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[dolg_info_1]
+name = bar_dolg_respawn_1
+cond1 = none
+cond2 = none
+
+[dolg_info_2]
+name = bar_dolg_respawn_2
+cond1 = none
+cond2 = none
+
+[dolg_info_3]
+name = bar_dolg_respawn_3
+cond1 = none
+cond2 = none
+
+[freedom_info_1]
+name = mil_freedom_respawn_1
+cond1 = none
+cond2 = none
+
+[freedom_info_2]
+name = mil_freedom_respawn_2
+cond1 = none
+cond2 = none
+
+[freedom_info_3]
+name = mil_freedom_respawn_3
+cond1 = none
+cond2 = none
+
+[mercenary_info_1]
+name = mil_killer_respawn_1
+cond1 = bar_darklab_document_done
+cond2 = none
+
+[mercenary_info_2]
+name = mil_killer_respawn_2
+cond1 = bar_darklab_document_done
+cond2 = none
+
+[mercenary_info_3]
+name = mil_killer_respawn_3
+cond1 = none
+cond2 = none
+
+[mercenary_info_4]
+name = mil_killer_respawn_4
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[mercenary_info_5]
+name = ros_killer_respawn_1
+cond1 = bar_darklab_document_done
+cond2 = none
+
+[mercenary_info_6]
+name = ros_killer_respawn_2
+cond1 = bar_darklab_document_done
+cond2 = none
+
+[mercenary_info_7]
+name = ros_killer_respawn_3
+cond1 = none
+cond2 = none
+
+[mercenary_info_8]
+name = mil_killer_respawn_4
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[zombied_info_1]
+name = yan_zombied_respawn_1
+cond1 = none
+cond2 = none
+
+[zombied_info_2]
+name = yan_zombied_respawn_2
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[zombied_info_3]
+name = yan_zombied_respawn_3
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[zombied_info_4]
+name = rad_zombied_respawn_1
+cond1 = none
+cond2 = none
+
+[zombied_info_5]
+name = rad_zombied_respawn_2
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[zombied_info_6]
+name = rad_zombied_respawn_3
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[monolith_info_1]
+name = rad_monolith_respawn_1
+cond1 = none
+cond2 = none
+
+[monolith_info_2]
+name = rad_monolith_respawn_2
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[monolith_info_3]
+name = rad_monolith_respawn_3
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[monolith_info_4]
+name = pri_monolith_respawn_1
+cond1 = none
+cond2 = none
+
+[monolith_info_5]
+name = pri_monolith_respawn_2
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[monolith_info_6]
+name = rad_monolith_respawn_3
+cond1 = bar_x16_documents_done
+cond2 = none
+
+; Полная аналогия для мутантов
+; но nospawn_level не работает!
+
+[mutant_info_count]
+dogs = 3
+cats = 2
+pseudodogs = 3
+fleshes = 3
+boars = 3
+zombies = 8
+izloms = 1
+burers = 2
+snorks = 2
+bloodsuckers = 4
+chimeres = 1
+pseudogigants = 2
+
+; x-18 bar_darklab_document_done (сдали документы Бармену)
+; x-16 bar_x16_documents_done (сдали документы Бармену)
+; x-10 bar_deactivate_radar_done (отключили Радар)
+
+[dogs_info_1]
+name = dog_normal
+cond1 = none
+cond2 = bar_x16_documents_done
+
+[dogs_info_2]
+name = dog_strong
+cond1 = none
+cond2 = bar_x16_documents_done
+
+[dogs_info_3]
+name = dog_v_strong
+cond1 = bar_darklab_document_done
+cond2 = none
+
+[cats_info_1]
+name = cat_v_normal
+cond1 = none
+cond2 = none
+
+[cats_info_2]
+name = cat_v_strong
+cond1 = bar_darklab_document_done
+cond2 = none
+
+[pseudodogs_info_1]
+name = pseudodog_normal
+cond1 = none
+cond2 = bar_x16_documents_done
+
+[pseudodogs_info_2]
+name = pseudodog_strong
+cond1 = bar_darklab_document_done
+cond2 = none
+
+[pseudodogs_info_3]
+name = pseudodog_v_strong
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[fleshes_info_1]
+name = flesh_normal
+cond1 = none
+cond2 = bar_x16_documents_done
+
+[fleshes_info_2]
+name = flesh_strong
+cond1 = bar_darklab_document_done
+cond2 = none
+
+[fleshes_info_3]
+name = flesh_v_strong
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[boars_info_1]
+name = boar_weak
+cond1 = none
+cond2 = bar_x16_documents_done
+
+[boars_info_2]
+name = boar_normal
+cond1 = bar_darklab_document_done
+cond2 = none
+
+[boars_info_3]
+name = boar_strong
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[zombies_info_1]
+name = zombie_strong
+cond1 = none
+cond2 = none
+
+[zombies_info_2]
+name = zombie_normal
+cond1 = none
+cond2 = none
+
+[zombies_info_3]
+name = zombie_v_strong
+cond1 = none
+cond2 = none
+
+[zombies_info_4]
+name = zombie_v_normal
+cond1 = none
+cond2 = none
+
+[zombies_info_5]
+name = zombie_immortal
+cond1 = none
+cond2 = none
+
+[zombies_info_6]
+name = zombie_ghost
+cond1 = none
+cond2 = none
+
+[zombies_info_7]
+name = zombie_plague
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[zombies_info_8]
+name = zombie_old
+cond1 = none
+cond2 = none
+
+[izloms_info_1]
+name = fracture_weak
+cond1 = none
+cond2 = none
+
+[burers_info_1]
+name = burer_strong
+cond1 = none
+cond2 = none
+
+[burers_info_2]
+name = burer_v_strong
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[snorks_info_1]
+name = snork_normal
+cond1 = none
+cond2 = none
+
+[snorks_info_2]
+name = snork_strong
+cond1 = bar_x16_documents_done 
+cond2 = none
+
+[bloodsuckers_info_1]
+name = bloodsucker_normal
+cond1 = none
+cond2 = bar_x16_documents_done
+
+[bloodsuckers_info_2]
+name = bloodsucker_strong
+cond1 = bar_darklab_document_done
+cond2 = bar_x16_documents_done
+
+[bloodsuckers_info_3]
+name = bloodsucker_v_strong
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[bloodsuckers_info_4]
+name = bloodsucker_v_strong2
+cond1 = bar_x16_documents_done
+cond2 = none
+
+[chimeres_info_1]
+name = chimera_strong
+cond1 = none
+cond2 = none
+
+[pseudogigants_info_1]
+name = gigant_normal
+cond1 = none
+cond2 = bar_deactivate_radar_done
+
+[pseudogigants_info_2]
+name = gigant_strong
+cond1 = bar_deactivate_radar_done
+cond2 = none

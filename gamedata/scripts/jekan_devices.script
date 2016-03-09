@@ -1,0 +1,150 @@
+-- Здесь будут находиться классы ф-ций, предназначенные для отображения визуальных девайсов --------------------------------------------------------------------------------------------------------------------------------------------------
+-- 31.10.2012 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- Табличка сборки\разборки переносной турели ----------------------------------------------------------------------------------------------------------
+
+function use_turret_interface_installing()
+    local spwn = turret_interface1(get_hud())
+    level.start_stop_menu(spwn,true)
+end
+
+class "turret_interface1" (CUIScriptWnd)
+
+function turret_interface1:__init(owner) super()
+    self.dlg = self
+    self.owner = owner
+    self:InitControls()
+    self:InitCallBacks()
+end
+
+function turret_interface1:__finalize() end
+
+function turret_interface1:InitControls()
+    -- здесь определяем координаты левого верхнего угла и ширину-высоту
+    self:Init(0,0,1024,768)
+
+    -- файл-описатель наших элементов
+    local xml = CScriptXmlInit()
+    xml:ParseFile("jekan_turret_interface.xml")
+
+    -- текстура
+    xml:InitStatic("ramka", self)
+    xml:InitStatic("text_on", self)
+
+    -- кнопка
+    self.btn_1 = xml:Init3tButton("btn_1", self)
+    self:Register(self.btn_1, "btn_1")
+    self.btn_1:Enable(false)
+
+    -- определяем доступность кнопки
+    self.btn_1:Enable(true)
+end
+
+
+function turret_interface1:InitCallBacks()
+    -- тут интерактивные элементы, при определенном действии выполняется заданная ф-ия
+    self:AddCallback("btn_1", ui_events.BUTTON_CLICKED,  self.quit, self)
+end
+
+function turret_interface1:quit()
+    self:GetHolder():start_stop_menu (self,true)
+    self.dlg = nil
+    collectgarbage("collect")
+end
+
+----------------------------------------------------------------------------------
+
+function use_turret_interface_uninstalling()
+    local spwn = turret_interface2(get_hud())
+    level.start_stop_menu(spwn,true)
+end
+
+class "turret_interface2" (CUIScriptWnd)
+
+function turret_interface2:__init(owner) super()
+    self.dlg = self
+    self.owner = owner
+    self:InitControls()
+    self:InitCallBacks()
+end
+
+function turret_interface2:__finalize() end
+
+function turret_interface2:InitControls()
+    -- здесь определяем координаты левого верхнего угла и ширину-высоту
+    self:Init(0,0,1024,768)
+
+    -- файл-описатель наших элементов
+    local xml = CScriptXmlInit()
+    xml:ParseFile("jekan_turret_interface.xml")
+
+    -- текстура
+    xml:InitStatic("ramka", self)
+    xml:InitStatic("text_off", self)
+
+    -- кнопка
+    self.btn_1 = xml:Init3tButton("btn_1", self)
+    self:Register(self.btn_1, "btn_1")
+    self.btn_1:Enable(false)
+
+    -- определяем доступность кнопки
+    self.btn_1:Enable(true)
+end
+
+function turret_interface2:InitCallBacks()
+    -- тут интерактивные элементы, при определенном действии выполняется заданная ф-ия
+    self:AddCallback("btn_1", ui_events.BUTTON_CLICKED,  self.quit, self)
+end
+
+function turret_interface2:quit()
+    self:GetHolder():start_stop_menu (self,true)
+    self.dlg = nil
+    collectgarbage("collect")
+end
+
+----------------------------------------------------------------------------
+local jekan_spawn_db = ogse_spawn_db.script_spawn_registry.jekan_quests
+
+--[[
+Аргументы вызовов во всех пяти функциях:
+local spwn = lockedsafe_common(obj, code, sid, tip, info)
+obj  - 'userdata' - объект сейфа. Передаётся из хr_effects.script
+code - 'string'   - строка с кодом от двери. Для всех сейфов я пока поставил '123'. Дальше видно будет
+sid  - 'number'   - story_id сейфа
+tip  - 'string'   - название текстуры с подсказкой
+info - 'string'   - инфопорция, выдаваемая при вскрытии
+]]
+-- Ломаем сейф №1 ----------------------------------------------------------------------------------
+-- Сейф в доме у Лиса
+function unlock_safe_1()
+    local spwn = ui_safe.ui_safe('0693', story_ids.lockedsafe_1, "ui\\safe\\tip_ogse", "safe_1_opened")
+    level.start_stop_menu(spwn,true)
+end
+
+-- Ломаем сейф №2 ----------------------------------------------------------------------------------
+-- Сейф у Петренко
+function unlock_safe_2()
+    local spwn = ui_safe.ui_safe('432', story_ids.lockedsafe_2, nil, "safe_2_opened")
+    level.start_stop_menu(spwn,true)
+end
+
+-- Ломаем сейф №3 ----------------------------------------------------------------------------------
+function unlock_safe_3()
+    local spwn = ui_safe.ui_safe('123', story_ids.lockedsafe_3, nil, "safe_3_opened")
+    level.start_stop_menu(spwn,true)
+end
+
+-- Ломаем сейф №4 ----------------------------------------------------------------------------------
+-- Сейф в лощине на заправке
+function unlock_safe_4()
+    local spwn = ui_safe.ui_safe('7692', story_ids.lockedsafe_4, nil, "safe_4_opened")
+    level.start_stop_menu(spwn,true)
+end
+
+-- Ломаем сейф №5 ----------------------------------------------------------------------------------
+function unlock_safe_5()
+    local spwn = ui_safe.ui_safe('123', story_ids.lockedsafe_5, nil, "safe_5_opened")
+    level.start_stop_menu(spwn,true)
+end
+----------------------------------------------------------------------------------------------------

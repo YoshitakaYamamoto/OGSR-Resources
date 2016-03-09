@@ -1,0 +1,412 @@
+[actor_terrain]
+255,255,000,255
+
+[actor]:common_ph_friction_params_on_npc_death
+GroupControlSection              = spawn_group
+$spawn                           = "actor"
+$ed_icon                         = ed\ed_actor
+$player                          = on
+$prefetch                        = 16
+cform                            = skeleton
+class                            = O_ACTOR
+money                            = 40;
+rank                             = 3;
+script_binding                   = bind_stalker.actor_init
+visual                           = actors\hero\stalker_novice.ogf 
+destroyed_vis_name               = physics\Dead_Body\skelet_crash
+
+terrain                          = actor_terrain
+
+max_item_mass                    = 50.0
+jump_speed                       =8.000000
+crouch_coef                      = 0.45
+climb_coef                       = 0.7
+run_coef                         = 1.8 ;2.1
+sprint_koef                      = 2.2 ;2.6
+run_back_coef                    = 1.8
+walk_back_coef                   = 0.8
+air_control_param                = 0.1
+walk_accel                       = 17
+
+;радиус в котром над предметами выводятся их названия
+pickup_info_radius               = 5 ; 3
+
+ef_creature_type                 = 17 ; option for evaluation functions
+
+; attach params
+attachable_items                 = device_torch,device_torch_bad,attachable_item,hand_radio
+
+ph_box0_center                   = 0.0,  0.9,  0.0
+ph_box0_size                     = 0.35, 0.9,  0.35
+ph_box1_center                   = 0.0,  0.75,  0.0
+ph_box1_size                     = 0.35, 0.75,  0.35
+ph_box2_center                   = 0.0,  0.6,  0.0
+ph_box2_size                     = 0.35, 0.6,  0.35
+
+;ph_box0_center                   = 0.0,  0.2,  0.0
+;ph_box0_size                     = 0.1, 0.2,  0.1
+;ph_box1_center                   = 0.0,  0.2,  0.0
+;ph_box1_size                     = 0.1, 0.2,  0.1
+;ph_box2_center                   = 0.0,  0.2,  0.0
+;ph_box2_size                     = 0.1, 0.2,  0.1
+
+
+stalker_restrictor_radius        = .55;0.55;0.75;0.9
+stalker_small_restrictor_radius  = .55;
+medium_monster_restrictor_radius = 0.1
+ph_crash_speed_min               = 14
+ph_crash_speed_max               = 30
+ph_collision_damage_factor       = 1.0
+ph_mass                          = 80
+
+ph_skeleton_airr_lin_factor      = -0.45
+ph_skeleton_airr_ang_factor      = -0.21
+ph_skeleton_hinger_factor1       = 1.0
+
+ph_skeleton_hinge_vel            = 0.7
+ph_skeleton_ddelay               = 0
+ph_skel_fatal_impulse_factor     = 2
+ph_after_death_velocity_factor   = 0.75
+ph_skel_shot_up_factor           = 0.25
+
+weapon_bone0                     = bip01_r_finger1
+weapon_bone1                     = bip01_l_finger1
+weapon_bone2                     = bip01_r_finger11
+
+damage                           = actor_damage
+
+hit_probability_gd_novice        = 0.20
+hit_probability_gd_stalker       = 0.30
+hit_probability_gd_veteran       = 0.40
+hit_probability_gd_master        = 0.50
+hit_sounds                       = actor_hit_snds
+;actor condition                 
+
+immunities_sect                  = actor_immunities_gd_master
+condition_sect                   = actor_condition
+
+heavy_breath_snd                 = actor\breath_1 ;звук тяжелого дыхания при усталости
+heavy_blood_snd                  = affects\heartbeat; heart\8
+
+material                         = creatures\actor
+camera_height_factor             = 0.92
+
+;дисперсия стрельбы с учетом ходьбы и бега
+disp_base                        = 0.51 ;0.8  ;угол (в градусах) разлета пуль, когда актер стоит на месте
+disp_aim                         = 0.04
+disp_vel_factor                  = 1.0 ;2.0  ;на сколько увеличится дисперсия при скрости в 10 м/с (не обязательно при беге)
+disp_accel_factor                = 2.0   ;еще на сколько увеличится, если актер бежит (+ скорость)
+disp_crouch_factor               = -0.3 ;-0.2  ;уменьшение если актер сидит
+disp_crouch_no_acc_factor        = -0.6 ;-0.4  ;уменьшение если актер сидит + no acceleration
+;disp_jump_factor                 = 2.0
+
+missile_throw_offset             = 0.3, 0.5, 0.5
+
+body_remove_time                 = 60000 ;время уничтожения трупа (с учетом TimeFactor)
+
+; читается, но не используется. Надо его оставить просто как заглушку, иначе будет вылет.
+sleep_time_factor                = 0 ;во сколько раз время идет быстрее, когда актер спит
+;species of monster
+species                          = actor
+
+
+;---STEP MANAGER------------------------------------------------------
+LegsCount               = 2
+step_params             = stalker_step_manager
+foot_bones              = stalker_foot_bones
+
+;memory_update_time      = 100 ; не используется
+
+; visibility parameters
+DynamicObjectsCount     = 32
+min_view_distance       = 1.0 ; коэффициент, который множится на eye_range, в зависимости от угла
+max_view_distance       = 1.0 ; коэффициент, который множится на eye_range, в зависимости от угла
+visibility_threshold    = 1.0 ; значение, при достижении суммой которого объект считается видимым
+always_visible_distance = 1.0
+time_quant              = 0.005
+decrease_value          = 0.1 ; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
+velocity_factor         = 0.5
+luminocity_factor       = 0.5 ;0 ; фактор освещения (только для Актёра)
+transparency_threshold  = 0.4 ; 0.25
+still_visible_time      = 5000 ; время, которое объект всё ещё считается видимым, даже если он уже не во фрустуме
+
+[actor_immunities_gd_novice]
+burn_immunity           = 0.5 ; коэффициенты иммунитета 
+strike_immunity         = 0.5
+shock_immunity          = 0.5
+wound_immunity          = 0.5
+radiation_immunity      = 0.5
+telepatic_immunity      = 0.5
+chemical_burn_immunity  = 0.5
+explosion_immunity      = 0.3
+fire_wound_immunity     = 0.5
+
+;[actor_immunities_gd_novice]
+;burn_immunity           = 0.0 ; коэффициенты иммунитета 
+;strike_immunity         = 0.0
+;shock_immunity          = 0.0
+;wound_immunity          = 0.0
+;radiation_immunity      = 0.0
+;telepatic_immunity      = 0.0
+;chemical_burn_immunity  = 0.0
+;explosion_immunity      = 0.0
+;fire_wound_immunity     = 0.0
+
+
+
+
+[actor_immunities_gd_stalker]
+burn_immunity           = 0.65 ;коэффициенты иммунитета 
+strike_immunity         = 0.65
+shock_immunity          = 0.65
+wound_immunity          = 0.65
+radiation_immunity      = 0.65
+telepatic_immunity      = 0.65
+chemical_burn_immunity  = 0.65
+explosion_immunity      = 0.3
+fire_wound_immunity     = 0.65
+
+[actor_immunities_gd_veteran]
+burn_immunity           = 0.8 ;коэффициенты иммунитета 
+strike_immunity         = 0.8
+shock_immunity          = 0.8
+wound_immunity          = 0.8
+radiation_immunity      = 0.8
+telepatic_immunity      = 0.75
+chemical_burn_immunity  = 0.8
+explosion_immunity      = 0.6
+fire_wound_immunity     = 0.8
+
+[actor_immunities_gd_master]
+burn_immunity           = 1.0 ;коэффициенты иммунитета 
+strike_immunity         = 1.0
+shock_immunity          = 1.0
+wound_immunity          = 1.0
+radiation_immunity      = 1.0
+telepatic_immunity      = 1.0
+chemical_burn_immunity  = 1.0
+explosion_immunity      = 1.0
+fire_wound_immunity     = 1.0
+
+[actor_condition]
+; движковые эффекты, связанные с голодом, отключены полностью
+; введены альтернативные для скриптового управления
+; смотри далее в секции [actor_script_condition]
+; управление появлением и цвета иконок осуществляется в секции
+; main_ingame_indicators_thresholds в файле system.ltx
+
+; обнулять нельзя - на них основан показ свойств артефактов
+; поэтому здесь будут ненулевые, а в скриптах будем делать поправку
+satiety_v               = 6.614e-6; 0.00002    ;скорость уменьшения сытости со временем
+satiety_power_v         = 0.000055    ;увеличение силы при уменьшении сытости 
+satiety_health_v        = 0.0001 ; 0.00001    ;увеличение здоровья при уменьшении сытости
+
+satiety_critical        = 0 ; 0.3     ;критическое значения сытости (в процентах от 0..1) когда здоровье начианает уменьшаться
+; Скорость изменения в движке учитывается в игровом времени. Соответственно, скорость изменения
+; в реальном времени получается с учётом фактора времени. Стандартное значение time_factor = 6
+; скорость уменьшения радиации
+; Даёт выведение полной шкалы (единица) за 10000 секунд игрового времени или 1667 секунд реального времени
+radiation_v             = 0.0001
+; уменьшение здоровья при воздействии радиации
+; скорость снижения здоровья также зависит от уровня радиации. 
+; общий урон здоровья за всё время выведения как:
+; <урон> = 0.5 * <полученная доза>^2 * radiation_health_v /radiation_v
+; урон от полной шкалы имеем: 0.5 * 1^2 * 0.004 / 0.0001 = 20
+; урон от половины шкалы: 0.5 * 0.5^2 * 0.004 / 0.0001 = 5
+radiation_health_v      = 0.004
+morale_v                = 0.0001    ;скорость восстановления морали
+; скорость восстановления psy-здоровья. С нуля полностью восстанавливается за 167 секунд реального времени
+psy_health_v            = 0.001
+; естественная скорость выведения алкоголя. С единицы до нуля снижается за 
+; 1/ (6 * 0.0005) = 333 секунды реального времени
+alcohol_v               = -0.0005
+health_hit_part         = 1.0     ;процент хита, уходящий на отнимание здоровья
+power_hit_part          = 0.1     ;процент хита, уходящий на отнимание силы
+; накопление усталости (макс граница, до которой восстанавливается сила) в секунду игрового времени
+; скорость снижения верхнего предела силы определяется как max_power_leak_speed * k
+; где k - это коэффициент определяемый носимым весом, котороый линейно меняется от 1 до 2 при увеличении веса
+; с нуля до max_walk_weight и затем от 2-х растёт с приростом dw/10, где dw - превышение носимого веса над max_walk_weight
+; примечание: таким образом при превышении допустимого веса этот коэффициент начинает расти в несколько раз быстрее
+; 
+; в игре этот параметр утечки максимальной силы работает плохо, поскольку приводит к постоянному снижению предела накопления силы,
+; причём скорость снижения не зависит ни от каких обстоятельств: скорости перемещения, сытости, сна и т.п.
+; увеличен этот предел может быть только приёмом веществ, в секции которых установлено ненулевое значение eat_max_power
+; лучше оставить этот параметр нулевым (т.е. предел сверху всегда будет единица), а все эффекты свести к снижению и восстановлению
+; собственно энергии (power)
+max_power_leak_speed       = 0.0
+max_walk_weight            =70
+
+bleeding_v                 = 0.001    ;потеря крови при номинальной ране в секунду
+wound_incarnation_v        = 0.002    ;скорость заживления раны
+min_wound_size             = 0.0256   ;минимальный размер раны, после которого она считается зажившей
+
+;;;;;;;;
+;actor_condition only
+
+jump_power                 = 0.01  ;умешьшение силы с прыжком без учета веса ноши
+jump_weight_power          = 0.05  ;0.045  ;умешьшение силы с прыжком с учетом веса ноши, для максимального допустимого веса
+overweight_jump_k          = 5  ;10  ;коэффициент влияние перегрузки прыжок с весом (умножается на jump_weight_power)
+
+stand_power                = -0.005     ; скорость восстановления энергии в состоянии покоя
+walk_power                 = 0.00001    ;умешьшение силы за секунду во время ходьбы без учета веса ноши
+walk_weight_power          = 0.00005;   ;умешьшение силы за секунду во время ходьбы с учетом веса ноши, для максимального допустимого веса
+overweight_walk_k          = 5;9 ;10   ;коэффициент влияние перегрузки ноши (умножается на walk_weight_power)
+accel_k                    = 3;5    ;коэффициент на бег (умножается walk_power, walk_weight_power)
+sprint_k                   = 75;150;185;180;200;         ;коэффициент на "sprint" бег (умножается walk_power, walk_weight_power)
+
+; хромота
+limping_health_begin       = 0.1  ;порог здоровья меньше которого актер начинает хромать
+limping_health_end         = 0.2  ;порог здоровья больше которого актер перестает хромать
+limping_power_begin        = 0.1  ;порог силы меньше которого актер начинает хромать
+limping_power_end          = 0.2  ;порог силы больше которого актер перестает хромать
+use_limping_state          = on
+
+cant_walk_power_begin      = 0.01 ;порог силы меньше которого актер не может двигаться
+cant_walk_power_end        = 0.1  ;порог силы больше которого актер сможет двигаться
+
+cant_sprint_power_begin    = 0.15 ;20 ;порог силы меньше которого актер не может бежать в спринте
+cant_sprint_power_end      = 0.3  ;порог силы больше которого актер сможет бежать в спринте
+
+;can_sleep_callback   = dream.can_sleep_callback
+;sleep_video_name_callback         = dream.sleep_video_name_callback
+
+[actor_script_condition]
+max_sleep_hours   = 12 ; используется в диалоге сна
+;скорость уменьшения сытости со временем, общая идея следующая:
+; имеется несколько стадий: 
+; 1. нормальное состояние
+;       никакого эффекта на здоровье нет. Скорость снижения сытости должна быть рассчитана так
+;       чтобы это состояние достигалось за 6 часов игрового времени. 
+; 2. полуголодное состояние
+;       есть повышенная усталость в зависимости от степени голода. Эта фаза должна быть разумно длительной,
+;       предположительно около 12 часов игрового времени, начиная с перехода от нормального состояния.
+;       В конце этой фазы скорость снижения силы должна уравновесить естественный прирост настолько,
+;       чтобы без дополнительных артефактов или иных источников прироста силы передвигаться было бы невозможно
+;       Этому состоянию будут соответствовать зелёная и салатная иконки индикатора
+; 3. состояние голода
+;       кроме усталости имеется падение здоровья в зависимости от степени голода. 
+;       Длительность этой фазы - 24 часа до предельного оголодания. В конце негативный эффект на здоровье
+;       должен быть достаточен, чтобы убить за примерно 8 часов.
+;       Этому состоянию будут соответствовать жёлтая, оранжевая и красная иконки индикатора
+; Исходя из описанной схемы полный цикл падения сытости от максимально единицы до нуля будет 42 часа
+; скорость снижения сытости за секунду игрового времени: satiety_v = 1.0 / ((6+12+24) * 3600) = 6.613757e-6
+satiety_v             = -6.614e-6 ; даёт общее время полного голодания 42 игровых часа
+light_hunger_limit    = 0.8571    ; начало полуголодного состояния, 6 часов от полной сытости
+critical_hunger_limit = 0.5714    ; начало голодания, 18 часов от полной сытости
+; эффект на энергию вычисляем так:
+; если satiety > light_hunger 
+; то <скорость снижения энергии> = 0
+; иначе скорость снижения энергии вычисляется так, чтобы при максимальном оголодании суммарное восстановление 
+; составляло stand_power * satiety_power_factor
+satiety_power_factor  = 0.1 ; множитель для скорости восстановления энергии при полном оголодании
+; эффект на здоровье вычисляем так:
+; если satiety > critical_hunger 
+; то <скорость прироста здоровья> = <постоянное значение>
+; ранее это значение задавалось параметром satiety_health_v в секции [actor_condition], здесь для этого создаём такой же параметр
+; при полной сытости единица здоровья восстанавливается за 1667 секунд реального времени
+satiety_health_v      = 0.0001
+; при превышении критического значения скорость прироста начинает снижаться и при максимальном
+; значении голода единица должен быть не прирост, а убыль, достаточная, чтобы убить за 8 игровых часов
+; т.е. рассчитываем прирост по формуле
+; <скорость прироста здоровья> = satiety_health_v + (satiety - critical_hunger) * satiety_health_factor
+; чтобы убить за 8 часов надо иметь убыль: 1.0 / (3600 * 8) = 3.47e-5, получаем
+; -3.47e-5 = 0.00001 + (0.0 - 0.5714) * satiety_health_factor, отсюда имеем
+; satiety_health_factor = (-3.47e-5 - 0.0001) / -0.5714 = 0.0001347 / 0.5714 = 2.3574e-4
+satiety_health_factor = 2.3574e-4 ; множитель для скорости снижения здоровья
+
+; скорость изменения параметров состояния во сне
+; в основном уменьшена
+;satiety_v_sleep             = -3.3e-6 ; уменьшена в два раза по сравнению с обычной
+;satiety_health_factor_sleep = ; множитель для скорости снижения здоровья во сне, уменьшен
+;radiation_v_sleep           = 0.0003
+;satiety_power_v_sleep       = 0.0001
+;satiety_health_v_sleep      = 0.00001
+;radiation_health_v_sleep    = 0.001
+;morale_v_sleep              = 0.0
+;psy_health_v_sleep          = 0.0
+;alcohol_v_sleep             = -0.0005
+;bleeding_v_sleep            = 0.0
+;wound_incarnation_v_sleep   = 0.0
+;max_power_leak_speed_sleep  = -0.00001
+;health_restore_v            = 0.0001
+
+
+[actor_damage]
+;bone_name                  = <hit_scale>,<fwd_damage_anim_index>,<wound_scale>
+;<hit_scale> - коэфф. изменения хита (уменьшения здоровья) 
+;<wound_scale> - коэфф. изменения величины открытой раны
+;-1 - нет анимаций, четный номер - спереди, нечетный номер - сзади, УКАЗЫВАЕТСЯ ТОЛЬКО ПЕРЕДНИЙ!!! ЗАДНИЙ НА АВТОМАТЕ
+default              = 1.0, -1, 1.0
+
+bip01_pelvis         = 1.0, 10, 1.5
+bip01_spine          = 1.0, 10, 1.5
+bip01_spine1         = 1.0, 0, 1.5
+bip01_spine2         = 1.0, 0, 1.5
+bip01_neck           = 1.0, 0, 1.5
+bip01_head           = 1.2, 0, 1.5
+eyelid_1             = 1.0, 0, 0.0
+eye_left             = 2.0, 0, 0.0
+eye_right            = 2.0, 0, 0.0
+jaw_1                = 1.0, 0, 0.0
+
+bip01_l_clavicle     = 0.8, 4, 1.5
+bip01_l_upperarm     = 0.6, 4, 1.5
+bip01_l_forearm      = 0.4, 4, 1.5
+bip01_l_hand         = 0.2, 4, 0.5
+bip01_l_finger0      = 0.1, 4, 0.0
+bip01_l_finger01     = 0.1, 4, 0.0
+bip01_l_finger02     = 0.1, 4, 0.0
+bip01_l_finger1      = 0.1, 4, 0.0
+bip01_l_finger11     = 0.1, 4, 0.0
+bip01_l_finger12     = 0.1, 4, 0.0
+bip01_l_finger2      = 0.1, 4, 0.0
+bip01_l_finger21     = 0.1, 4, 0.0
+bip01_l_finger22     = 0.1, 4, 0.0
+
+bip01_r_clavicle     = 0.8, 2, 1.5
+bip01_r_upperarm     = 0.6, 2, 1.5
+bip01_r_forearm      = 0.4, 2, 1.5
+bip01_r_hand         = 0.2, 2, 0.5
+bip01_r_finger0      = 0.1, 2, 0.0
+bip01_r_finger01     = 0.1, 2, 0.0
+bip01_r_finger02     = 0.1, 2, 0.0
+bip01_r_finger1      = 0.1, 2, 0.0
+bip01_r_finger11     = 0.1, 2, 0.0
+bip01_r_finger12     = 0.1, 2, 0.0
+bip01_r_finger2      = 0.1, 2, 0.0
+bip01_r_finger21     = 0.1, 2, 0.0
+bip01_r_finger22     = 0.1, 2, 0.0
+
+bip01_l_thigh        = 0.8, 8, 1.5
+bip01_l_calf         = 0.5, 8, 1.5
+bip01_l_foot         = 0.2, 8, 1.5
+bip01_l_toe0         = 0.1, 8, 1.5
+bip01_r_thigh        = 0.8, 6, 1.5
+bip01_r_calf         = 0.5, 6, 1.5
+bip01_r_foot         = 0.2, 6, 1.5
+bip01_r_toe0         = 0.1, 6, 1.5
+
+[actor_animation]
+;углы  дворота ног актера во время стрейфов (в градусах)
+fwd_l_strafe_yaw     = 45
+back_l_strafe_yaw    = 45
+fwd_r_strafe_yaw     = 45
+back_r_strafe_yaw    = 45
+l_strafe_yaw         = 0
+r_strafe_yaw         = 0
+
+
+[actor_hit_snds]
+burn            = actor\pain1,actor\pain2,actor\pain3; ,actor\hurt4
+shock           = actor\pain1,actor\pain2,actor\pain3; ,actor\hurt4
+strike          = actor\pain1,actor\pain2,actor\pain3; ,actor\hurt4
+wound           = actor\pain1,actor\pain2,actor\pain3; ,actor\hurt4
+radiation       = monsters\biting\def_0; actor\hurt1,actor\hurt2,actor\hurt3,actor\hurt4
+telepatic       = actor\pain1,actor\pain2,actor\pain3; ,actor\hurt4
+fire_wound      = actor\bullet_hit_1,actor\bullet_hit_2,actor\bullet_hit_3,actor\bullet_hit_4
+; actor\pain_1,actor\pain_3,actor\pain_4,actor\pain_5,actor\pain_6,actor\pain_7,actor\pain_8
+chemical_burn   = actor\pain1,actor\pain2,actor\pain3; ,actor\hurt4
+explosion       = affects\tinnitus3a
+wound_2         = actor\hurt1,actor\hurt2,actor\hurt3,actor\hurt4
+physic_strike   = actor\pain1,actor\pain2,actor\pain3; ,actor\hurt4
+fire            = affects\tinnitus3a

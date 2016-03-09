@@ -1,0 +1,419 @@
+[wpn_scope]:identity_immunities,base_wpn_zoom
+GroupControlSection	= spawn_group
+discovery_dependency = 
+class			= WP_SCOPE
+cform           = skeleton
+$prefetch 		= 32
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; остатки ОГСЕ
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Оптический прицел ZF-4 х4 (одевается на МП40)
+[wpn_zf4]:wpn_scope
+$spawn 			= 
+visual          = weapons\upgrade\zf4.ogf
+description		= enc_addon_scope_zf4
+cost			= 1000
+holder_range_modifier	= 1.5
+holder_fov_modifier		= 0.8
+inv_name		= addon_scope_zf4
+inv_name_short	= addon_scope_zf4
+inv_weight		= 0.2
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 38
+inv_grid_y			= 36
+scope_texture		= wpn\scopes\scope_zf4
+scope_zoom_factor	= 4.0
+fake_item_section	= fake_wpn_zf4
+
+[fake_wpn_zf4]:wpn_fake_addon_base
+$spawn 			= 
+visual          = weapons\upgrade\zf4.ogf
+description		= enc_addon_scope_zf4
+inv_name		= addon_scope_zf4
+inv_name_short	= addon_scope_zf4
+cost			= 200
+inv_weight		= 0.2
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 38
+inv_grid_y			= 36
+real_item_section = wpn_zf4
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; правленые под систему АДДОНов
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Оптический прицел ПСО-1
+[wpn_addon_scope]:wpn_scope
+$spawn 			= 
+visual          = weapons\upgrade\wpn_scope.ogf
+description		= enc_addon_scope_pso1
+;разработан для СВД в ЦКБ «Точприбор» под руководством А.И. Овчинникова. Принят на вооружение в 1963 г. Оптическая схема с линзовой оборачивающей системой и механизм ввода углов прицеливания перемещением прицельной сетки стали «классикой».
+;выпускаются в следующих модификациях: ПСО-1(х4), ПСО-2(х6, ПОСП 6х24, 6х24 с большей светосилой), ПСО-3(х8). Гражданский аналог — прицелы ПОСП. Лимб вертикальных поправок «нарезан» не в дистанциях, а имеют просто линейную оцифровку «кликов» с ценой 2,5 см на 100 метров дистанция. Это отличие позволяет использовать прицел под любой боеприпас. ПОСП 8х42Д имеет возможность диоптрической подстройки окуляра. ПОСП 4-8х42, ПОСП 4-8х42Д и ПОСП 3-9х42 имеет возможность увеличения кратности.
+;старые версии ПСО-1, ПСО-1-1 люминесцентный экран
+;ПОСП 4х24 — отсутствует люминесцентный экран или (в сравнении с ПСО-1М2) встроенный светофильтр, иная маркировка, на модели ПОСП 4х42Т сетка схожая с ПСО-М2-01;
+;ПСО-1М2 СВД/СВДС, ПСО-1М2-1 ВСС/АС встроенный светофильтр
+;?ПСО-1 M2-02 предназначен для комплектования снайперских винтовок калибра 12,7х107 мм
+;Для улучшения работы прицела в пасмурную погоду и повышения контрастности изображения прицел оснащен светло-оранжевым светофильтром. Для стрельбы в сумерках в прицелах предусмотрена подсветка сетки. Для обнаружения инфракрасных источников света прицел имеет люминесцентный экран.
+cost			= 1000
+holder_range_modifier	= 1.5
+holder_fov_modifier		= 0.8
+inv_name		= addon_scope_pso1
+inv_name_short	= addon_scope_pso1_s
+inv_weight		= 0.62  				;ПСО-3 0.75
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x			= 74
+inv_grid_y			= 11
+;прицел ОГСЕ crosshair_pso-1 или GeeP_85 scope_pso-1
+scope_texture		= wpn\scopes\scope_pso-1
+scope_zoom_factor	= 4.0
+;тест подсветки прицельной сетки (лампа накаливания с желтоватым светом) wpn\scopes\sights_pso-1
+scope_sights_lighting	= true
+;тест оттенка оптики (линза с желтоватым оттенком)
+scope_color_sect = 1,1,0,0.1
+
+fake_item_section	= fake_wpn_addon_scope
+
+;фейк-Оптический прицел ПСО-1
+[fake_wpn_addon_scope]:wpn_fake_addon_base
+$spawn 			= 
+visual          = weapons\upgrade\wpn_scope.ogf
+description		= enc_addon_scope_pso1
+inv_name		= addon_scope_pso1
+inv_name_short	= addon_scope_pso1_s
+inv_weight		= 0.62  ;ПСО-3 0.75
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x			= 74
+inv_grid_y			= 11
+cost			= 1000
+real_item_section = wpn_addon_scope
+
+
+
+;ACOG 3,5х
+[wpn_addon_acog]:wpn_scope
+$spawn 			= 
+;visual          = weapons\addons\acog.ogf
+visual          = weapons\upgrade\acog.ogf
+description		= enc_addon_scope_acog
+;Имеет запатентованную систему, объединяющую увеличительную оптику и возможность вести прицеливание обоими глазами. 
+;ACOG является стандартным боевым прицелом Армии и Корпуса морской пехоты США. Различные модификации обеспечивают видимое увеличения от 0,5 до 6 крат. Яркость регулируется автоматически. 
+;TA01 4x32 Scope with Full Line Red Illumination 
+;для M4A1 - Trijicon ACOG® TA01NSN 4x32mm Center Illumination. Чёрная сетка с жёлтой подсветкой марки. Модель оснащена дополнительными прицельными приспособлениями для ведения боя на коротких и сверхкоротких дистанциях.
+;TA31-CH: 4x32 Scope, Dual Illuminated Red Crosshair .223 Ballistic Reticle w/ TA51 Mount - официальная боевая оптика корпуса морской пехоты армии США. Постоянно подсвеченная марка – красный треугольник с сеткой выноса (11 MOA).
+;Trijicon BAC ACOG® TA31-CH 4x32mm. Чёрная сетка с красной подсветкой.
+cost			= 2000
+holder_range_modifier	= 1.5
+holder_fov_modifier		= 0.8
+inv_name		= addon_scope_acog
+inv_name_short	= addon_scope_acog_s
+inv_weight		= 0.39
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 64
+inv_grid_y			= 10
+;+ОГСЕ открытый scope_texture		= wpn\scopes\scope_acog
+scope_texture		= wpn\scopes\crosshair_acog
+scope_zoom_factor	= 3.5 ; 32
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;тест механического прицела
+;scope_texture		= wpn\scopes\scope_test.dds 
+;разрешить ПНВ (тест открытой сетки)
+nightvision_lock	= false
+;---тест оттенка ОТКРЫТОЙ оптики (несовместим с nightvision_lock)
+fake_item_section	= fake_wpn_addon_acog
+
+[fake_wpn_addon_acog]:wpn_fake_addon_base
+$spawn 			= 
+visual          = weapons\upgrade\acog.ogf
+description		= enc_addon_scope_acog
+inv_name		= addon_scope_acog
+inv_name_short	= addon_scope_acog_s
+inv_weight		= 0.39
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 64
+inv_grid_y			= 10
+cost			= 2000
+real_item_section = wpn_addon_acog
+
+
+
+;SUSAT
+[wpn_addon_scope_susat]:wpn_scope
+$spawn 			= 
+visual          = weapons\upgrade\wpn_scope_susat.ogf
+description		= enc_addon_scope_susat
+cost			= 1400
+holder_range_modifier	= 1.5
+holder_fov_modifier		= 0.8
+inv_name		= addon_scope_susat
+inv_name_short	= addon_scope_susat_s
+inv_weight		    = 0.41
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 65
+inv_grid_y			= 10
+;ОГСЕ -без подсветки марки, светлый фон +цвет корпуса scope_texture		= wpn\scopes\scope_susat
+scope_texture		= wpn\scopes\crosshair_susat
+scope_zoom_factor	= 4.0
+;тест оттенка оптики (линза с красным оттенком)
+scope_color_sect = 1,0,0,0.075
+fake_item_section	= fake_wpn_addon_scope_susat
+
+[fake_wpn_addon_scope_susat]:wpn_fake_addon_base
+$spawn 			= 
+visual          = weapons\upgrade\wpn_scope_susat.ogf
+description		= enc_addon_scope_susat
+inv_name		= addon_scope_susat
+inv_name_short	= addon_scope_susat_s
+inv_weight		    = 0.41
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 65
+inv_grid_y			= 10
+cost			= 1400
+real_item_section = wpn_addon_scope_susat
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; АКМ АДДОН-ТЕСТ
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;УСП-1 "Тюльпан" (1П29) х4
+[wpn_addon_scope_1p29]:wpn_scope
+$spawn 			= 
+visual          = weapons\upgrade\1p29.ogf
+description		= enc_addon_scope_1p29
+cost			= 1000
+holder_range_modifier	= 1.5
+holder_fov_modifier		= 0.8
+inv_name		= addon_scope_1p29
+inv_name_short	= addon_scope_1p29_s
+inv_weight		= 0.8
+inv_grid_width		= 1		;2
+inv_grid_height		= 1
+inv_grid_x			= 60
+inv_grid_y			= 10
+scope_texture		= wpn\scopes\crosshair_1p29
+scope_zoom_factor	= 4.0
+;тест оттенка оптики (линза с зеленоватым оттенком)
+scope_color_sect = 0,1,0,0.05
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;тест механического прицела
+;scope_texture		= wpn\scopes\scope_test.dds
+fake_item_section	= fake_wpn_addon_scope_1p29
+
+[fake_wpn_addon_scope_1p29]:wpn_fake_addon_base
+$spawn 			= 
+visual          = weapons\upgrade\1p29.ogf
+description		= enc_addon_scope_1p29
+inv_name		= addon_scope_1p29
+inv_name_short	= addon_scope_1p29_s
+inv_weight		= 0.8
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 60
+inv_grid_y			= 10
+cost			= 1000
+real_item_section = wpn_addon_scope_1p29
+
+
+
+;ЭКП-1С-03 "Кобра" х1
+[wpn_addon_scope_kobra]:wpn_scope
+$spawn 			= 
+visual          = weapons\upgrade\kobra.ogf
+description		= enc_addon_scope_kobra
+;Микроэлектронным устройством на оптическом рефлекторе формируется 3 типа прицельной марки: точка, Т-образная с точкой и Т-образная без точки. Характерной особенностью этого прицела является возможность смены прицельной марки. При смещении глаза стрелка от центра оптической оси в пределах смотрового окна, прицельная марка остается на цели.
+cost			= 1000
+holder_range_modifier	= 1.5
+holder_fov_modifier		= 0.8
+inv_name		= addon_scope_kobra
+inv_name_short	= addon_scope_kobra_s
+inv_weight		= 0.15
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 10
+scope_texture		= wpn\scopes\scope_test.dds
+;scope_zoom_factor	= 1.0
+;разрешить ПНВ
+nightvision_lock	= false
+fake_item_section	= fake_wpn_addon_scope_kobra
+
+[fake_wpn_addon_scope_kobra]:wpn_fake_addon_base
+$spawn 			= 
+visual          = weapons\upgrade\kobra.ogf
+description		= enc_addon_scope_kobra
+inv_name		= addon_scope_kobra
+inv_name_short	= addon_scope_kobra_s
+inv_weight		= 0.15
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 10
+cost			= 1000
+real_item_section = wpn_addon_scope_kobra
+
+
+
+;1ПН51 (НСПУ-3 "Казуар") х3,46
+[wpn_addon_scope_1pn51]:wpn_scope
+$spawn 			= 
+visual          = weapons\upgrade\1pn51.ogf
+description		= enc_addon_scope_1pn51
+cost			= 2000
+holder_range_modifier	= 1.5
+holder_fov_modifier		= 0.8
+inv_name		= addon_scope_1pn51
+inv_name_short	= addon_scope_1pn51_s
+inv_weight		= 2.1
+;Масса прицела с источником питания 2.1 кг., комплекта прицела в походном положении 6,45 кг.
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 11
+scope_texture		= wpn\scopes\crosshair_1pn58
+scope_zoom_factor	= 3.46
+;встроенный ПНВ 
+nightvision_sect	= effector_nightvision_bad
+fake_item_section	= fake_wpn_addon_scope_1pn51
+
+[fake_wpn_addon_scope_1pn51]:wpn_fake_addon_base
+$spawn 			= 
+visual          = weapons\upgrade\1pn51.ogf
+description		= enc_addon_scope_1pn51
+inv_name		= addon_scope_1pn51
+inv_name_short	= addon_scope_1pn51_s
+inv_weight		= 2.1
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 11
+cost			= 2000
+real_item_section = wpn_addon_scope_1pn51
+
+
+
+;EOTech х1
+[wpn_addon_scope_eotech]:wpn_scope
+$spawn 			= 
+visual          = weapons\upgrade\eotech.ogf
+description		= enc_addon_scope_eotech
+cost			= 1000
+holder_range_modifier	= 1.5
+holder_fov_modifier		= 0.8
+inv_name		= addon_scope_eotech
+inv_name_short	= addon_scope_eotech_s
+inv_weight		= 0.35
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 63
+inv_grid_y			= 10
+scope_texture		= wpn\scopes\scope_test.dds
+;разрешить ПНВ
+nightvision_lock	= false
+fake_item_section	= fake_wpn_addon_scope_eotech
+
+[fake_wpn_addon_scope_eotech]:wpn_fake_addon_base
+$spawn 			= 
+visual          = weapons\upgrade\eotech.ogf
+description		= enc_addon_scope_eotech
+inv_name		= addon_scope_eotech
+inv_name_short	= addon_scope_eotech_s
+inv_weight		= 0.35
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 63
+inv_grid_y			= 10
+cost			= 1000
+real_item_section = wpn_addon_scope_eotech
+
+; ТЕСТ подсветки прицельной сетки (затычка для скрипта, чисто для количества)
+[wpn_addon_scope_pso1m21]:wpn_addon_scope
+$spawn 			=
+visual          = weapons\upgrade\pso11.ogf
+;Расположение кронштейна прицела на винтовке, в так называемом крайнем заднем положении (в отличии от крайне переднего у ПСО). Традиционно и аналогично с ПСО, присутствует смещёние влево
+description		= enc_addon_scope_pso1-1
+;ПСО-1М2 СВД/СВДС, ПСО-1М2-1 ВСС/АС встроенный светофильтр
+inv_name		= addon_scope_pso1-1
+inv_name_short	= addon_scope_pso1-1
+inv_weight		= 0.62  				;ПСО-3 0.75
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x			= 66
+inv_grid_y			= 10
+cost			= 1000
+;прицел ОГСЕ scope_pso-1_vint
+scope_texture		= wpn\scopes\scope_pso-1-1
+;сетка -подсветка wpn\scopes\sights_pso-1-1
+;сетка +подсветка wpn\scopes\sights_pso-1-1)
+scope_zoom_factor	= 4.0
+;---тест ОТСУТСТВИЯ флага подсветки прицельной сетки (!!!НАСЛЕДУЕТ) 
+;scope_sights_lighting	= true
+;тест оттенка оптики (линза с желтоватым оттенком)
+scope_color_sect = 1,1,0,0.05
+fake_item_section	= fake_wpn_addon_scope_pso1m21
+
+[fake_wpn_addon_scope_pso1m21]:wpn_fake_addon_base
+$spawn 			=
+visual          = weapons\upgrade\pso11.ogf
+description		= enc_addon_scope_pso1-1
+inv_name		= addon_scope_pso1-1
+inv_name_short	= addon_scope_pso1-1_s
+inv_weight		= 0.62  				;ПСО-3 0.75
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x			= 66
+inv_grid_y			= 10
+cost			= 1000
+real_item_section = wpn_addon_scope_pso1m21
+
+
+
+
+
+
+; ТЕСТ "гордости Российской военной оптической индустрии" 1П59 «Гиперон» для 7,62-мм винтовок СВД (6В1) и СВДС (6В3), принят на вооружение в 2001 году.
+;Увеличение – переменное от 3х до 10х, поле зрения – от 7,8 град до 2,5 град. Обеспечивает автоматический ввод угла прицеливания в процессе измерения дальности до цели.
+; http://forum.guns.ru/forum/10/196896.html
+[wpn_addon_scope_1p59]:wpn_addon_scope
+$spawn 			=
+visual          = weapons\upgrade\1p59.ogf
+;Расположение кронштейна прицела на винтовке, в так называемом крайнем заднем положении (в отличии от крайне переднего у ПСО). Традиционно и аналогично с ПСО, присутствует смещёние влево
+description		= enc_addon_scope_1p59
+;ПСО-1М2 СВД/СВДС, ПСО-1М2-1 ВСС/АС встроенный светофильтр
+inv_name		= addon_scope_1p59
+inv_name_short	= addon_scope_1p59_s
+inv_weight		= 1.3
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x		= 72
+inv_grid_y		= 11
+cost			= 4000
+scope_texture		= wpn\scopes\crosshair_1p59
+;Картинка прицела, при сравнению с военными ПСО-1М2 и ПО6х36М, заметно светлее, а линии прицельной сетки на порядок тоньше и чётче. Граница изображения по краю видимой части, чёткая. Сравнивая с сеткой ПО6х36М, сетка 1П59, тоньше почти в 3раза! Причём сам основной прицельный знак, чётко острый, в отличии от немного скруглённых у ПСО и ПО.
+;сетка ПСО-1 wpn\scopes\sights_pso-1
+scope_zoom_factor	= 10.0
+;тест ОТКЛючения подсветки прицельной сетки 
+scope_sights_lighting	= false
+;тест оттенка оптики (линза с янтарным оттенком)
+scope_color_sect = 1,0.5,0,0.025
+fake_item_section	= fake_wpn_addon_scope_1p59
+
+[fake_wpn_addon_scope_1p59]:wpn_fake_addon_base
+$spawn 			=
+visual          = weapons\upgrade\1p59.ogf
+description		= enc_addon_scope_1p59
+inv_name		= addon_scope_1p59
+inv_name_short	= addon_scope_1p59_s
+inv_weight		= 1.3
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x		= 72
+inv_grid_y		= 11
+cost			= 4000
+real_item_section = wpn_addon_scope_1p59

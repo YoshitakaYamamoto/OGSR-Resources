@@ -1,0 +1,60 @@
+local spawn_db = ogse_spawn_db.script_spawn_registry.ogse_spawns
+
+function traders_spawn()
+--SPAWN_V1
+--alife():create("bandit_trader_spawn",vector():set(37.8,1.021,-54.475),221527,1084)
+--alife():create("merc_trader_spawn",vector():set(-380.8,-13.61,390.8),469,1848)
+--alife():create("monolit_trader_spawn",vector():set(-16.9,0.284,-63.73),5204,1960)
+--SPAWN_V2
+	ogse.spawn_objects(spawn_db.traders_spawn)
+end
+
+-- function sidr_guard_spawn()
+--SPAWN_V1
+-- alife():create("sidr_guard",vector():set(-248.257,-19.494,-126.769),10715,db.actor:game_vertex_id())
+--SPAWN_V2
+	--ogse.spawn_object(spawn_db.sidr_guard_1)
+-- end
+
+function sidr_guard_spawn()
+  local sim = alife()
+--SPAWN_V1
+  --local sobj = sim:create("sidr_guard", vector():set(-248.257,-19.494,-126.769),10715,db.actor:game_vertex_id())
+--SPAWN_V2
+	local sobj = ogse.spawn_object(spawn_db.sidr_guard_2)
+    sim:assign_story_id(nil, nil, sobj.id, story_ids.sidr_guard)
+end
+
+-- спавним кровососа в тайнике Стрелка после нахождения флешки
+function agro_undegraund_spawn1()
+--SPAWN_V1
+--alife():create("bloodsucker_normal",vector():set(-68.8,-6.87,-71.345),3550,717)
+--SPAWN_V2
+	ogse.spawn_object(spawn_db.bloodsucker_normal)
+end
+
+-- рандомный спавн контролёров в тонеле
+function agro_undegraund_spawn2()
+    if math.random() >0.5 then
+--SPAWN_V1
+        --alife():create("m_controller_normal_fat",vector():set(-117.934,-3.97,-142.988),143,703)
+--SPAWN_V2
+		ogse.spawn_object(spawn_db.m_controller_normal_fat_1)
+    else
+--SPAWN_V1
+        --alife():create("m_controller_normal_fat",vector():set(-68.569,-4.01,-134.8),3537,800)
+--SPAWN_V2
+		ogse.spawn_object(spawn_db.m_controller_normal_fat_2)
+    end
+end
+
+function spawn_military_trader()
+
+--SPAWN_V1
+--alife():create("military_trader_spawn",vector():set(42.604,7.50,-16.0),280504,664)
+--alife():create("military_trader_guard_1",vector():set(38.025,7.50,-13.40),276158,664)
+--alife():create("military_trader_guard_2",vector():set(32.543,7.50,-11.405),271095,664)
+--SPAWN_V2
+	ogse.spawn_objects(spawn_db.spawn_military_trader)
+
+end

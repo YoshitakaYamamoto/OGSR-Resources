@@ -1,0 +1,102 @@
+--- психованный фов
+
+function attach(sm) -- для менеджера сигналов
+	sm:subscribe({signal = "on_update", fun = this.on_actor_update})
+end
+
+auto_attach = true
+
+local fov_vol = system_ini():r_s32("options","fov_volume")
+local max_alarm_fov_vol = 90
+local min_alarm_fov_vol = 30
+
+local sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror]])
+local sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror]])
+
+local up_or_down = nil
+
+function on_actor_update()
+	-- балуемся с фовом
+	if has_alife_info("fov_play_start") then
+		if not up_or_down then
+			-- начинаем веселямбу
+			up_or_down = 1 -- понижаем, 2 - повышаем
+			local current_fov = db.actor:get_camera_fov()
+			if current_fov > min_alarm_fov_vol then
+				current_fov = current_fov - 1
+				db.actor:set_camera_fov(current_fov)
+			end
+		elseif up_or_down == 1 then
+			local current_fov = db.actor:get_camera_fov()
+			if current_fov > min_alarm_fov_vol then
+				current_fov = current_fov - 1
+				db.actor:set_camera_fov(current_fov)
+			elseif current_fov == min_alarm_fov_vol then	
+				up_or_down = 2
+			end
+		elseif up_or_down == 2 then
+			local current_fov = db.actor:get_camera_fov()
+			if current_fov < max_alarm_fov_vol then
+				current_fov = current_fov + 1
+				db.actor:set_camera_fov(current_fov)
+			elseif current_fov == max_alarm_fov_vol then	
+				up_or_down = 1
+			end		
+		end
+		play_sounds()
+	else
+		if up_or_down ~= nil then
+			local current_fov = db.actor:get_camera_fov()
+			if current_fov < fov_vol then
+				current_fov = current_fov + 1
+				db.actor:set_camera_fov(current_fov)
+			elseif current_fov > fov_vol then	
+				current_fov = current_fov - 1
+				db.actor:set_camera_fov(current_fov)					
+			elseif current_fov == fov_vol then	
+				up_or_down = nil
+			end
+		end	
+	end
+end
+function fov_start()
+	db.actor:give_info_portion("fov_play_start")
+	level.add_cam_effector("camera_effects\\drunk.anm", 7447, true, "")
+end
+function fov_end()
+	db.actor:give_info_portion("fov_play_end")
+	level.remove_cam_effector(7447)
+end
+
+function play_sounds()
+	sound_obj_right.volume = 0.8
+	sound_obj_left.volume = 0.8
+
+	if not sound_obj_left:playing() then 
+		local i=math.random(1,4)
+		if i==1 then 
+			sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
+		elseif i==2 then
+			sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror2]])
+		elseif i==3 then
+			sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror3]])
+		elseif i==4 then
+			sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror4]])
+		end
+		sound_obj_left:play_at_pos (db.actor, vector():set(1, 0, 1), 0, sound_object.s2d) 
+	end
+
+	if not sound_obj_right:playing() then 
+		local j=math.random(1,4)
+		if j==1 then 
+			sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
+		elseif j==2 then
+			sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror2]])
+		elseif j==3 then
+			sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror3]])
+		elseif j==4 then
+			sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror4]])
+		end
+		sound_obj_right:play_at_pos (db.actor, vector():set(-1, 0, 1), 0, sound_object.s2d) 
+	end
+end

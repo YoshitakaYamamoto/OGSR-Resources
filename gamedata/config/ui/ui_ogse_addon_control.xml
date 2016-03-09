@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+
+<ui_ogse_addon_control>
+	<main x="0" y="0" width="1024" height="768">
+		<slot1>
+			<btn_1 x="834" y="450" width="117" height="28" stretch="1">
+				<texture>ui_ogse_addon_attach_btn</texture>
+				<text align="c" font="graffiti22" r="227" g="199" b="178">st_ogse_addons_install_addon</text>
+			</btn_1>
+			<btn_2 x="717" y="450" width="117" height="28" stretch="1">
+				<texture>ui_ogse_addon_attach_btn</texture>
+				<text align="c" font="graffiti22" r="227" g="199" b="178">st_ogse_addons_take_addon</text>
+			</btn_2>
+			<btn_q x="955" y="450" width="28" height="28" stretch="1">
+				<texture>ui_ogse_addon_cancel_btn</texture>
+				<text align="c" font="letterica16" r="227" g="199" b="178"></text>
+			</btn_q>
+			<btn_remove_scope_mount x="870" y="459" width="37" height="19" stretch="1">
+				<texture>ui_ogse_remove_addon</texture>
+				<text align="r" font="letterica16" r="227" g="199" b="178">пл.</text>
+			</btn_remove_scope_mount>
+			<btn_remove_magazine x="908" y="459" width="37" height="19" stretch="1">
+				<texture>ui_ogse_remove_addon</texture>
+				<text align="r" font="letterica16" r="227" g="199" b="178">маг.</text>
+			</btn_remove_magazine>
+			<btn_remove_grip x="946" y="459" width="37" height="19" stretch="1">
+				<texture>ui_ogse_remove_addon</texture>
+				<text align="r" font="letterica16" r="227" g="199" b="178">рук.</text>
+			</btn_remove_grip>
+		</slot1>
+		<slot2>
+			<btn_1 x="834" y="550" width="117" height="28">
+				<texture>ui_ogse_addon_attach_btn</texture>
+				<text align="c" font="graffiti22" r="227" g="199" b="178">st_ogse_addons_install_addon</text>
+			</btn_1>
+			<btn_2 x="717" y="550" width="117" height="28">
+				<texture>ui_ogse_addon_attach_btn</texture>
+				<text align="c" font="graffiti22" r="227" g="199" b="178">st_ogse_addons_take_addon</text>
+			</btn_2>
+			<btn_q x="955" y="550" width="28" height="28">
+				<texture>ui_ogse_addon_cancel_btn</texture>
+				<text align="c" font="letterica16" r="227" g="199" b="178"></text>
+			</btn_q>
+			<btn_remove_scope_mount x="870" y="559" width="37" height="19" stretch="1">
+				<texture>ui_ogse_remove_addon</texture>
+				<text align="r" font="letterica16" r="227" g="199" b="178">пл.</text>
+			</btn_remove_scope_mount>
+			<btn_remove_magazine x="908" y="559" width="37" height="19" stretch="1">
+				<texture>ui_ogse_remove_addon</texture>
+				<text align="r" font="letterica16" r="227" g="199" b="178">маг.</text>
+			</btn_remove_magazine>
+			<btn_remove_grip x="946" y="559" width="37" height="19" stretch="1">
+				<texture>ui_ogse_remove_addon</texture>
+				<text align="r" font="letterica16" r="227" g="199" b="178">рук.</text>
+			</btn_remove_grip>
+		</slot2>
+	</main>
+</ui_ogse_addon_control>

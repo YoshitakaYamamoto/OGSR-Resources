@@ -1,0 +1,339 @@
+; 5,45-мм автомат Калашникова складной укороченный АКС74У (6П26)
+;(C) k01jan. Модель/текстуры Heffy, анимации Holden_McClure/KingFriday, правлены jumbo5337, звуки ARMA, etRussk.
+;--------------------------------------править
+;Прицельная дальность – 500 м. 
+;Темп стрельбы – около 650 выстр./мин.
+;Начальная скорость пули – 735 м/с.
+;Масса АКС74У: неснаряженного – 2,7 кг, снаряженного – 3,0 кг
+;Малоимпульсный патрон – 5,45х39 мм обр. 1974 г. с обыкновенными пулями ПС (7Н6, 7Н6М), повышенной пробиваемости ПП (7Н10), бронебойными БП (7Н22), бронебойными специальными БС (7Н24). Питание – коробчатый магазин на 30 патрон. Экономия массы в 1,4 кг при носимом боекомплекте в 8 магазинов, 200 патронов 7,62х39 мм весят столько же, сколько 300 патронов 5,45х39 мм)
+;АКС74УБ (6П27) – с прибором бесшумной и беспламенной стрельбы ПБС-4 (ПБС-3) и магазином на 20 патронов. Принят в 1980 г. на вооружение подразделений специальной разведки. Прицельная дальность – 400 м. Масса автомата: неснаряженного с ПБС-3 – 3,575 кг, неснаряженного с ПБС-4 – 3,42 кг. Длина: с ПБС-3 – 874 мм, с ПБС-4 – 869 мм. Прибор ПБС-3: масса – 950 г, длина – 225 мм. Прибор ПБС-4: масса – 610 г, длина – 220 мм.
+;АКС74УН3 (6П26Н3) - модификация автомата АКС74У с планкой-креплением типа "ласточкин хвост" с ночным прицелом НСПУ-3 (индекс ГРАУ 1ПН51).
+;--------------------------------------
+[wpn_aks74ub]:identity_immunities,base_wpn_zoom
+GroupControlSection		= spawn_group
+discovery_dependency	= 
+$spawn              	= "weapons\aks74ub"	; name and section in level editor
+$npc					= on				
+$prefetch 				= 8
+scheduled				= off               ;[] option for ALife Simulator
+cform               	= skeleton
+class               	= WP_LR300			; class of the weapon that corresponding to CPP class
+min_radius          	= 0					; [] for AI
+max_radius          	= 100				; [] for AI
+
+ef_main_weapon_type		= 2
+ef_weapon_type			= 6
+
+;-----------------------------------------------------------------------------------
+holder_range_modifier	= 0.9
+holder_fov_modifier		= 1.3
+;-----------------------------------------------------------------------------------
+
+cost					= 4300		;ОГСЕ	; the price of the item
+weapon_class			= assault_rifle		; the type of the box that will be used in buy-menu in multiplayer mode	
+	
+ammo_elapsed			= 30	
+ammo_mag_size			= 30				;1 clip (magazine) size
+fire_modes				= 1, 0, -1
+
+ammo_class				= ammo_5.45x39_fmj, ammo_5.45x39_ap   ; name of the ltx-section of used ammo 
+
+grenade_class			= ammo_vog-25, ammo_vog-25p
+launch_speed			= 0
+
+hand_dependence			= 1									; how many hands (1 or 2) we used to hold weapon in
+single_handed			= 0
+	
+slot 					= 2									; number of slot in inventory we put weapon in (1 - knife slot, 2 - pistol, 3 - rifle, 4 - grenade, 5 - apparatus)
+animation_slot			= 2									; type of the animation that will be used
+
+description				= enc_weapons1_wpn-aks74ub
+inv_name	        	= wpn-aks74ub							; name in inventory	
+inv_name_short			= wpn-aks74ub_s
+inv_weight				= 2.7					; АКС74У 2,7 кг, снаряженный 3,0 кг		; ОГСЕ . ; weight in inventory
+
+inv_grid_width			= 4		; position and size of the icon that will be used to display weapon in the inventory menu
+inv_grid_height			= 2		; all icons are on the texture ui_icon_equipment.dds,   
+inv_grid_x				= 69	;5		; position and size are in terms of 64x64 squares	(след.=73+4ячейки)
+inv_grid_y				= 6		;5
+
+kill_msg_x			= 0
+kill_msg_y			= 123
+kill_msg_width		= 69
+kill_msg_height		= 30
+
+;-----------------------------------------------------------------------------------
+;params of weapon recoil
+fire_dispersion_base		= 0.20		;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor		= 1.09f
+disp_rate 			= 1.65
+
+;--отдача
+cam_relax_speed         = 6.3		;скорость возврата в исходное положение
+cam_relax_speed_ai      = 120.75
+cam_dispersion          = 0.3		;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc		= 0.20;0.15		;увеличениe cam_dispersion с каждым выстрелом
+cam_dispertion_frac		= 0.9		;ствол будет подыматься на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+cam_max_angle			= 9.0		;максимальный угол отдачи
+cam_max_angle_horz		= 30.0		;(degree) maximum shot horizontal degree 
+cam_step_angle_horz		= 1.25;1.1		;(degree) size of step camera moved in horizontal position while shooting
+;износ
+fire_dispersion_condition_factor 	= 5    	;увеличение дисперсии в процентах при максимальном износе 
+misfire_probability 	= 0.0015	;вероятность осечки при максимальном износе 
+misfire_condition_k		= 0.05
+condition_shot_dec 	= 0.00015	;увеличение износа при каждом выстреле
+;-----------------------------------------------------------------------------------
+
+fire_point             	=  0,0.216,0.58			; position (3rd person view) for particles of fire 
+fire_point2            	=  0,0.1650,0.730		; position (3rd person view) for particles of fire (when shooting with secondary fire)
+
+;ДЕФ flame_particles						= weapons\generic_weapon05	; particles for shooting effects
+;ТЕСТ AKС74У 
+flame_particles = amik\weapons\flame_particles\flame_particles_01
+
+;ДЕФ smoke_particles						= weapons\generic_shoot_00
+;Абакан smoke_particles_01
+;АК-74М smoke_particles_03
+;АК-74 smoke_particles_00
+smoke_particles				= amik\weapons\smoke_particles\smoke_particles_00
+
+;grenade_flame_particles					= weapons\generic_weapon01
+grenade_flame_particles		= amik\weapons\grenade_flame_particles\grenade_flame_particles_02
+
+shell_point		 			= 0,0.216,0.154				; position (3rd person view) for shell to throw out
+
+;левые ДЕФ shell_particles = weapons\generic_shells	; name of the particles for shells
+;типы гильз: латунированная (сталь, плакированная латунью - желтоватая) \7_62x39_00
+;красно-жёлтые, золотистые (у Расты были слива +заменил текстуры) shell_particles				= amik\weapons\7_62x39\7_62x39_r_02
+;нет у Расты - вылет ярко-жёлтые, золотые shell_particles = amik\weapons\7_62x39\7_62x39_r_04
+; из биметалла (сталь, плакированная томпаком - красноватая)
+; стальная лакированная (с покрытием лака зелёного цвета) \7_62x39
+;т.зелёные-мелкие shell_particles = weapons\arsenal_shells1
+;св.зелёные shell_particles = amik\weapons\ak_shells_r
+;+++
+shell_particles				= amik\weapons\5_45x39\5_45x39_shells_r_00
+; с полимерным покрытием (водно-полимерным раствором - сероватая) _03 shell_particles = amik\weapons\val_shells_r
+;С 1962 г. дульце гильзы по стыку с пулей и кромке капсюля для повышения влагостойкости покрываются лаком-герметизатором. В 1962-1963 гг. цвет лака был фиолетовый, а с 1964 г. лак на патронах с любым типом пули стал красным.
+
+;параметры качания ствола в руках ГГ при движении в режиме прицеливания (стрельба навскидку)
+PDM_disp_base 			= 1.05		;ОГСЕ 1.2	;множитель, на который умножается базовая дисперсия оружия, когда ГГ стоит на месте в полный рост 
+PDM_disp_vel_factor 	= 1.15		;ОГСЕ 1.3	;множитель, на который умножается базовая дисперсия оружия, когда ГГ крутит оружием или бежит
+PDM_disp_accel_factor 	= 1.3		;ОГСЕ 1.3	;множитель, на который умножается базовая дисперсия оружия, когда ГГ бежит в спринте
+PDM_crouch	 			= 1.01		;ОГСЕ 1.0	;множитель, на который умножается базовая дисперсия оружия, когда ГГ идет пригнувшись
+PDM_crouch_no_acc 		= 1.0		;ОГСЕ 1.0	;множитель, на который умножается базовая дисперсия оружия, когда ГГ стоит на месте, пригнувшись
+
+; ttc
+hit_power                       = 0.61		;size of damage by bullet
+hit_impulse		 	= 25		;size of physic impulse by bullet	
+hit_type 			= fire_wound 	;[] type of the wound
+fire_distance            	= 250		; maximum fire distance that bullet can fly
+bullet_speed				= 820		; starting bullet speed
+hit_rate			= 1.85
+rpm                      	= 700		; max round per minute
+rpm_empty_click 	 	= 350
+use_aim_bullet			= false			;Поддерживается ли первая суппер пуля
+time_to_aim					= 1.0	
+
+;params when silencer is attached 
+;similar to corresponding params without prefix silencer_
+
+silencer_hit_power       	= 0.55
+silencer_hit_impulse	 	= 25
+silencer_fire_distance   	= 150		;ОГСЕ АКС74У 150
+silencer_bullet_speed	 	= 720
+
+hud                      	= wpn_aks74ub_hud				; name of the section of the hud
+
+position         	        = -0.026,-0.172,0			; position (offset) and orientation of the weapon in the hands of character
+orientation      	        = 0,0,0						; (3rd person view)
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+strap_position         		= -0.16,-0.40,0.15			; position (offset) and orientation of the weapon when it is strapped
+strap_orientation      		= -10,-5,10					; (3rd person view in degrees)
+strap_bone0					= bip01_spine2
+strap_bone1					= bip01_spine1
+
+visual         		        = weapons\ak-74u\ak74u.ogf		;??? так у ПЫСов name of the model for 3rd person view
+;РЕЗАТЬ?
+;
+
+light_color					= 0.6,0.5,0.3				; params for light during the fire
+light_range					= 5							; radius
+light_var_color				= 0.05						
+light_var_range				= 0.5
+light_time 					= 0.2						
+
+;addons
+scope_status				= 2							; 0 - no addon
+silencer_status				= 2							; 1 - permanent
+grenade_launcher_status		= 0							; 2 - attachable
+
+zoom_enabled				= true						; (on,off)zoom mode (right mouse button)
+
+scope_name        			= wpn_addon_scope
+scope_x 					= 65						; offset in inventory icon
+scope_y 					= 5
+silencer_name  				= wpn_addon_sil_545_pbs4
+silencer_x 				    = 168
+silencer_y 				    = 18		
+grenade_launcher_name 		= no_grenade_launcher		;wpn_addon_grenade_launcher; section name for the attachable grenade launcher
+grenade_launcher_x 			= 117						; offset in inventory icon
+grenade_launcher_y 			= 22
+
+;------------------------------ O.G.S.E. sound remake ------------------------------
+;sounds (name of the sound, volume (0.0 - 1.0), delay (sec))
+;-------------------------------------------------------------
+;ARMA
+snd_draw					= weapons\arma\draw
+snd_holster					= weapons\arma\holster
+snd_shoot					= weapons\arma\ak74u_shoot							; weapons\ak74u\ak74u_shoot
+snd_shoot1					= weapons\arma\ak74u_shoot1							; weapons\ak74u\ak74u_shoot1
+snd_shoot2					= weapons\arma\ak74u_shoot2							; weapons\ak74u\ak74u_shoot2
+snd_shoot3					= weapons\arma\ak74u_shoot3							; weapons\ak74u\ak74u_shoot3, глушак АКС74УБ ak74u\ak74u_m1_shot		
+;-snd_reload					= weapons\ak74u\ak74u_reload, 0.7
+;-snd_reload					= weapons\arma\ak47_reload    	;, 0.8, 0.8		;weapons\arma\reload	;, 0.8, 0.8
+snd_reload					= weapons\etRussk\ak47_reload
+snd_empty					= weapons\arma\ak_empty, 0.6					;weapons\arma\empty
+snd_silncer_shot			= weapons\arma\silenser\5-45_sil					;weapons\arma\ak74u_shot_sil
+snd_shoot_grenade			= weapons\arma\gp25\gp25_shot					;weapons\gen_grenshoot
+snd_reload_grenade			= weapons\arma\gp25\grenload_ak ;, 1.0, 0.8		;weapons\gen_grenload, 1.0, 0.8
+snd_reload_grenade1			= weapons\arma\gp25\grenload_ak1 ;, 1.0, 0.8	
+snd_switch					= weapons\arma\gp25\switch_ak     ;, 1.0, 0.5	;weapons\groza_switch, 1.0, 0.5
+;-------------------------------------------------------------
+
+;params when silencer is attached 
+;similar to corresponding params without prefix silencer_
+
+;ДЕФ silencer_flame_particles 	= weapons\generic_weapon01
+;ОГСЕ silencer_smoke_particles 	= weapons\generic_shoot_00
+silencer_smoke_particles 	= amik\weapons\smoke_particles\silencer_smoke_particles_00
+
+;Попытки создания ПБС'ов нового поколения провалились. Так, в 1979г. после принятия на вооружение 5,45-мм автомата АКС74У с коротким стволом вроде бы появилась техническая возможность создания такого глушителя. ЦНИИТОЧМАШ разработал два варианта глушителя - ПБС-3 и ПБС-4, отличающихся друг от друга только возможностью или невозможностью стрельбы автоматическим огнём патронами УС. Но это уже не были ПБС в классическом понимании: оба требовали переделки штатного АКС74У. В итоге работ появился АКСБ74У (впоследствии переименованный в АКС74УБ) - образец специального назначения, не получивший широкого распространения.
+
+silencer_light_color		= 0.6,0.5,0.3
+silencer_light_range		= 0.01
+silencer_light_var_color	= 0.05
+silencer_light_var_range	= 0.5
+silencer_light_time 		= 0.2
+
+;-----------------------------------------------------------------------------
+;-- HUD DESCRIPTION
+;-----------------------------------------------------------------------------
+ 
+[wpn_aks74ub_hud]
+allow_inertion				= true
+;similar to corresponding params in weapon section but for 1st person view
+shell_point					= 0.0, 0.00, -0.047 	;sto1en
+shell_dir			     	= 0.0, 1.0, 0.0
+
+fire_point               	= 0.012, 0.023, 0.21 		;sto1en
+fire_point2              	= 0.00,-0.050,0.240			;ОТКЛ ОГСЕ3
+
+fire_bone               	= wpn_body
+
+; тест sto1en
+position 				= 0.171000, -0.072400, -0.072000
+orientation 			= 1.722064, 2.842100, 0.000000
+
+visual                  	= weapons\ak-74u\wpn_ak74u_hud.ogf
+
+grenade_bone            	= wpn_grenade	; name of the bone in the model for grenade launcher
+
+; animation names
+; attached grenade launcher [GRENADE fire mode]
+anim_idle					= idle
+anim_idle_aim				= idle_aim
+anim_reload					= reload
+anim_draw					= draw
+anim_holster				= holster
+anim_shoot					= shoot
+anim_idle_sprint			= idle_sprint		;?idle_sprint_w_gl
+
+anim_idle_g					= idle_grenade
+anim_idle_g_aim				= idle_grenade_aim
+anim_reload_g				= reload_grenade
+anim_shoot_g				= shoot_grenade		;выстрел из ГП
+;работает неправильно. Особенности движка ТЧ, у ГП нету параметра скорострельности, из-за этого иногда максимум проигрывается 1-2 первые кадра, если очень повезет.
+anim_switch_grenade_on		= switch_on
+anim_switch_grenade_off		= switch_off
+anim_draw_g					= draw_grenade
+anim_holster_g				= holster_grenade	;работает неправильно: при убирании с активным подстволом, пригрывается holster (левая рука берётся за цевьё ЧЕРЕЗ подствольник). Не больше 10 кадров?
+
+; attached grenade launcher [NORMAL fire mode]
+anim_idle_gl				= idle_w_gl
+anim_idle_gl_aim			= idle_w_gl_aim
+anim_reload_gl				= reload_w_gl		;-правой
+;+другой хват reload2_w_gl (старое, удалено) или reload_sector_w_gl
+anim_draw_gl				= draw_w_gl
+anim_holster_gl				= holster_w_gl
+anim_shoot_gl				= shoot_w_gl		;ходьба/удержание/бег с ГП
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;HUD offset in zoom mode (to all)
+;(use ОГСЕ CONSOLE: hud_adjust_mode 0,1,2, then keys WSADQE and P to show current value in console)
+;-лево/+право,-низ/+верх,-к/+от себя
+;штатный механический прицел
+;zoom_offset			= -0.112840,0.031250,-0.076000
+;-вверх/+вниз
+;zoom_rotate_x		= 0.054800
+;-лево/+право
+;zoom_rotate_y		= 0.043280
+
+; тест sto1en
+zoom_offset			= -0.168800,0.059450,-0.223100
+zoom_rotate_x		= 0.043400
+zoom_rotate_y		= 0.030280
+
+zoom_hide_crosshair	= true						;to hide crosshair in zoom 
+
+; same as above, but for attached grenade launcher for
+; in NORMAL shoot mode; тест sto1en
+grenade_normal_zoom_offset		= -0.168800,0.059450,-0.223100
+grenade_normal_zoom_rotate_x	= 0.043400
+grenade_normal_zoom_rotate_y	= 0.030280
+
+; same as above, but for attached grenade launcher for
+; in GRENADE mode; тест sto1en
+grenade_zoom_offset			= -0.112860,-0.368469,-0.409998
+grenade_zoom_rotate_x		= -0.410010
+grenade_zoom_rotate_y		= 0.023930
+
+;-----------------------------------------------------------------------------------
+;ремонт ОГСЕ [wpn_ak74u_repair]
+[wpn_aks74ub_repair]
+tech_complication = 200
+repair_compatibility = ak		;ОГСЕ ak74u
+
+;--------------------------------------
+;АК-74УБ спецназ
+;--------------------------------------
+;[wpn_ak74u_m1]:wpn_ak74u	
+;$spawn             	= "weapons\uniq\wpn_ak74u_m1"
+;description			= enc_weapons1_wpn-ak74u_m1
+;inv_name	        = wpn-ak74u_m1
+;inv_name_short		= wpn-ak74u_m1
+;silencer_status		= 1
+;condition_shot_dec 	= 0.0004
+;cost				= 5000
+;[wpn_ak74u_m1_repair]
+;tech_complication = 1000
+;repair_compatibility = ak74u
+;--------------------------------------
+;АК-74У Кобра Штурмовик (c подстволом)
+;--------------------------------------
+;[wpn_aks74u_m1_camo1]:wpn_ak74u
+;$spawn              = "weapons\ak74"
+;description			= enc_arsenal_aks74u_m1_camo1
+;cost				= 4700
+;inv_name	        = ars-aks74u_m1_camo1
+;inv_name_short		= ars-aks74u_m1_camo1
+;visual         		= weapons\ak74u\wpn_aks74u_m1_camo1.ogf
+;[wpn_aks74u_m1_camo1_repair]
+;tech_complication   = 500
+;repair_compatibility = ak74u
+;--------------------------------------
+
+;-----------------------------------------------------------------------------------
+;Сменные аддоны ОГСЕ
+#include "w_aks74ub_ex.ltx"
+;-----------------------------------------------------------------------------------

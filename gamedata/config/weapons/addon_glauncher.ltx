@@ -1,0 +1,170 @@
+[wpn_grenade_launcher]:identity_immunities
+$spawn 			= 
+GroupControlSection	= spawn_group
+discovery_dependency = 
+class			= W_GLAUNC
+cform           = skeleton
+$prefetch 		= 32
+
+
+; ТЕСТ заглушка (нет подствола)
+[no_grenade_launcher]:wpn_grenade_launcher
+
+
+[wpn_addon_grenade_launcher]:wpn_grenade_launcher
+$spawn 			= 
+visual          = weapons\upgrade\wpn_grenade_launcher.ogf
+;description		= enc_weapons1_wpn-addon-grenade-launcher
+description		= enc_weapons1_wpn-addon_gp-25
+;Для стрельбы из АКМ (АКМС), АК-74 (АКС-74) в комплекте ЗИП имеется стержень возвратной пружины с зацепом. Для АК-74М такой стержень стал стандартным. Не рекомендуется оснащать подствольным гранатомётом оружие, на которое установлен глушитель или прицел.
+;?пустотелая пистолетная рукоятка с отверстием под большой палец
+;ГП-25 также может использоваться с АК-101, АК-103, АК-107, АК-108, АН-94, АЕК-971 (АЕК-973).
+;Калиберный осколочный выстрел ВОГ-25 (7П17), ВОГ-25П (7П24 "Подкидыш") разработки ГНПП «Прибор», ВОГ-25М, ВОГ-25ПМ (7П45) с осколочной гранатой, снабженной головным взрывателем мгновенного действия с самоликвидатором
+
+cost			= 1250
+
+;inv_name		= wpn-addon-grenade-launcher
+inv_name		= wpn-addon_gp-25
+;inv_name_short	= wpn-addon-grenade-launcher
+inv_name_short	= wpn-addon_gp-25_s
+inv_weight		= 1.5	;1.3
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x			= 68
+inv_grid_y			= 11
+grenade_vel		= 76
+
+fake_item_section	= fake_wpn_addon_grenade_launcher
+
+;фейк-ГП-25
+[fake_wpn_addon_grenade_launcher]:wpn_fake_addon_base
+$spawn 			= 
+visual          = weapons\upgrade\wpn_grenade_launcher.ogf
+description		= enc_weapons1_wpn-addon_gp-25
+inv_name		= wpn-addon_gp-25
+inv_name_short	= wpn-addon_gp-25_s
+inv_weight		= 1.5	;1.3
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x			= 68
+inv_grid_y			= 11
+cost			= 1250
+real_item_section = wpn_addon_grenade_launcher
+
+
+[wpn_addon_grenade_launcher_m203]:wpn_grenade_launcher
+$spawn 			= 
+visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
+description		= enc_weapons1_wpn-addon-grenade-launcher-m203
+
+cost			= 1500
+
+inv_name		= wpn-addon-grenade-launcher-m203
+inv_name_short	= wpn-addon-grenade-launcher-m203
+inv_weight		= 1.36
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 17
+inv_grid_y		= 3
+grenade_vel		= 71
+
+fake_item_section	= fake_wpn_addon_grenade_launcher_m203
+
+;фейк-M-203
+[fake_wpn_addon_grenade_launcher_m203]:wpn_fake_addon_base
+$spawn 			= 
+visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
+description		= enc_weapons1_wpn-addon-grenade-launcher-m203
+
+cost			= 1500
+
+inv_name		= wpn-addon-grenade-launcher-m203
+inv_name_short	= wpn-addon-grenade-launcher-m203
+inv_weight		= 1.36
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 17
+inv_grid_y		= 3
+
+real_item_section = wpn_addon_grenade_launcher_m203
+
+
+;Гладкоствольное подствольное боевое ружье XM-26 LSS (lightweight shotgunsystem) для М16/М4/XM8 (5 патронов 12 калибра)
+[wpn_addon_xm_26_lss]:wpn_addon_grenade_launcher_m203
+$spawn 			= 
+visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
+description		= XM_26_LSS
+
+cost			= 2500
+
+inv_name		= XM_26_LSS
+inv_name_short	= XM_26_LSS
+inv_weight		= 1.02
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 17
+inv_grid_y		= 3
+
+fake_item_section	= fake_wpn_addon_xm_26_lss
+is_shotgun      = 1
+standalone_shotgun_section = wpn_xm_26_lss
+
+
+;фейк-XM-26 LSS
+[fake_wpn_addon_xm_26_lss]:wpn_fake_addon_base
+$spawn 			= 
+visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
+description		= XM_26_LSS
+
+cost			= 2500
+
+inv_name		= XM_26_LSS
+inv_name_short	= XM_26_LSS
+inv_weight		= 1.02
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 17
+inv_grid_y		= 3
+
+real_item_section = wpn_addon_xm_26_lss
+is_shotgun      = 1
+standalone_shotgun_section = wpn_xm_26_lss
+
+
+;Модульный боевой подствольный дробовик Remington 870MCS (Modular Combat Shotgun) для М16/М4 (3, 5 или 7 патронов 12 калибра)
+[wpn_addon_remington_870mcs]:wpn_addon_grenade_launcher_m203
+$spawn 			= 
+visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
+description		= Remington 870MCS
+
+cost			= 2500
+
+inv_name		= Remington 870MCS
+inv_name_short	= Remington 870MCS
+inv_weight		= 2.5
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 17
+inv_grid_y		= 3
+
+fake_item_section	= fake_wpn_addon_remington_870mcs
+is_shotgun      = 1
+
+;фейк-Remington 870MCS
+[fake_wpn_addon_remington_870mcs]:wpn_fake_addon_base
+$spawn 			= 
+visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
+description		= Remington 870MCS
+
+cost			= 2500
+
+inv_name		= Remington 870MCS
+inv_name_short	= Remington 870MCS
+inv_weight		= 2.5
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 17
+inv_grid_y		= 3
+
+real_item_section = wpn_addon_remington_870mcs
+is_shotgun      = 1

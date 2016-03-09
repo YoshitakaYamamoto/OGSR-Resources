@@ -1,0 +1,59 @@
+
+
+function random_timer_spawn()
+
+	local level_name = level.name()
+	
+	if has_alife_info("walker1") then
+		db.actor:disable_info_portion("walker1")
+	elseif has_alife_info("walker2") then
+		db.actor:disable_info_portion("walker2")
+	elseif has_alife_info("walker3") then
+		db.actor:disable_info_portion("walker3")
+	elseif has_alife_info("walker4") then
+		db.actor:disable_info_portion("walker4")
+	end
+
+	if level_name == "l01_escape" then
+		soundtrack.occusion()
+	elseif level_name == "l05_bar" then
+		soundtrack.occusion()
+	elseif level_name == "l06_rostok" then
+		soundtrack.occusion()
+		rostok_spawn.yantar_dogs1( actor, npc )
+	elseif level_name == "l08_yantar" then
+		soundtrack.occusion()
+	elseif level_name == "l07_military" then
+		soundtrack.occusion()
+		rnd = math.random(1, 3)
+		if rnd == 1 then 
+			military_spawn.zomb1( actor, npc )
+		elseif rnd == 2 then 
+			military_spawn.military_monolith1( actor, npc )
+		else
+			military_spawn.military_monolith2( actor, npc )
+		end
+	elseif level_name == "l02_garbage" or 
+		level_name == "l03_agroprom" or 
+		level_name == "l04_darkvalley" or 
+		level_name == "l10_radar" or 
+		level_name == "l11_pripyat" then
+		soundtrack.occusion()
+	elseif isIndoor(level_name) then
+		soundtrack.underground()
+	end
+	
+	rnd = math.random(1, 4)
+	
+	if rnd == 1 then 
+		db.actor:give_info_portion("walker1")
+	elseif rnd == 2 then 
+		db.actor:give_info_portion("walker2")
+	elseif rnd == 3 then 
+		db.actor:give_info_portion("walker3")
+	elseif rnd == 4 then 
+		db.actor:give_info_portion("walker4")
+	end
+	
+end
+

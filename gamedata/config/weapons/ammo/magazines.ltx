@@ -1,0 +1,1150 @@
+[inv_separator]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+$spawn 			= "food and drugs\antirad"
+class			= II_ATTCH
+cform           = skeleton
+visual          = physics\large_trash\prt\prt_none.ogf ; invisible
+description		= ""
+
+inv_name			= ""
+inv_name_short		= ""
+inv_weight			= 0
+inv_grid_width		= 0
+inv_grid_height		= 0
+inv_grid_x			= 14
+inv_grid_y			= 23
+cost				= 100
+
+attach_angle_offset		= -0.287979, 1.560923, 1.544060
+attach_position_offset	= 0.096910, -0.013594, 0.107925
+attach_bone_name		= bip01_r_hand
+auto_attach				= false
+
+// should be deleted after update
+bone_name				= bip01_r_hand
+position_offset			 = 0.0,0.0,0.0
+angle_offset			 = 1.570790,1.570790,3.92699
+
+
+[wm]:identity_immunities
+GroupControlSection			= spawn_group
+discovery_dependency 		= 
+$spawn                   	= "weapons\spas12"					; option for Level Editor
+$npc			 			= on				; option for Level Editor
+$prefetch 		 			= 8
+scheduled                	= off              ; option for ALife Simulator
+cform                    	= skeleton
+class                    	= WP_SHOTG
+min_radius               	= 0
+max_radius               	= 50
+description					= enc_wm
+
+ef_main_weapon_type			= 1
+ef_weapon_type				= 7
+
+;-----------------------------------------------------------------------------------
+holder_range_modifier	= 1.0               ; во скьJБEБEраБEувеличиваетс€ eye_range 
+holder_fov_modifier		= 0.7              ; во скьJБEБEраБEувеличиваетс€ eye_fov
+;-----------------------------------------------------------------------------------
+
+tri_state_reload			= on
+
+cost					 	= 2000	;1000
+weapon_class			 	= shotgun
+
+
+ammo_limit		 			= 60
+ammo_current		 		= 10
+ammo_elapsed		 		= 0
+
+ammo_mag_size		 		= 8
+ammo_class		 			= ammo_12x70_kart, ammo_12x76_zhekan
+
+;-----------------------------------------------------------------------------------
+;базова€ дисперси€
+fire_dispersion_base		= 100.0 	;угьJ (БEградусах) базовоБEдисперсиБEъAужБE (ъAужБE зажатого БEтисках)
+control_inertion_factor		= 1.0f
+
+;отдача					
+cam_relax_speed         		=	7.151		;скорость возврата в исходное положение
+cam_dispersion          		=	0.001		;увеличени€ угла (в градусах) с каждым выстрелом
+cam_dispersion_inc		=	0.001		;увеличениe cam_dispersion с каждым выстрелом
+cam_dispertion_frac		=	0.050		;ствол будет подыматьс€ на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+cam_max_angle		=	0.253	    	;максимальный угол отдачи
+cam_max_angle_horz		=	0.253		;(degree) maximum shot horizontal degree 
+cam_step_angle_horz		=	0.001		;(degree) size of step camera moved in horizontal position while shooting
+					
+fire_dispersion_condition_factor 		=	5	    	;увеличение дисперсии в процентах при максимальном износе 
+misfire_probability 		=	0.005		;веро€тность осечки при максимальном износе 
+misfire_condition_k		=	0.05		
+condition_shot_dec 		=	0.000000001		;увеличение износа при каждом выстреле
+;-----------------------------------------------------------------------------------					
+					
+PDM_disp_base 		=	0.76		
+PDM_disp_vel_factor 		=	1.0		
+PDM_disp_accel_factor 		=	1.0		
+PDM_crouch	 	=	1.0		
+PDM_crouch_no_acc 		=	1.0		
+
+hand_dependence 	 		= 1
+single_handed				= 0
+
+slot			= 4
+belt			= true
+animation_slot		 		= 9		; type of the animation that will be used
+
+inv_name					= wm
+inv_name_short				= wm
+inv_weight				= 0.1
+
+inv_grid_width				= 1
+inv_grid_height				= 1
+inv_grid_x					= 14
+inv_grid_y					= 3
+
+kill_msg_x			= 91
+kill_msg_y			= 104
+kill_msg_width		= 80
+kill_msg_height		= 20
+
+direction                	= 0, 0, 1
+shell_point				 	= 0.0, 0.138, 0.07
+fire_point               	= 0.0, 0.133, 0.686
+fire_point2              	= 0.0, 0.103, 0.686
+
+;flame_particles		   		= weapons\generic_weapon05
+;smoke_particles		   		= weapons\generic_shoot_00
+rpm_empty_click 	   		= 200
+
+; ttc
+hit_power        		= 0.69
+hit_impulse      		= 4
+hit_type 			= fire_wound
+
+fire_distance           = 1
+bullet_speed			= 1	;ъьчаБEъь€ скъAъBть БEБE
+rpm                     = 46
+; end ttc
+
+hud                      	= wm_hud
+normal                   	= 0, 1, 0
+position                 	= -0.024, -0.081, 0.
+orientation              	= 0, 0, 0      ;значение устаъьвливаетс€ БEградусах
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;БEБEБEшкьH
+strap_position         		= -0.26,-0.10,0.05			; position (offset) and orientation of the weapon when it is strapped
+strap_orientation      		= -15,-9,110				; (3rd person view in degrees)
+strap_bone0					= bip01_spine2
+strap_bone1					= bip01_spine1
+
+startup_ammo             	= 10
+visual                   	= weapons\spas12\wpn_spas12.ogf
+
+light_color		 			= 0.0,0.0,0.0
+light_range		 			= 0.0
+light_var_color		 		= 0.0
+light_var_range		 		= 0.0
+light_time 		 			= 0.0
+
+ph_mass			 			= 3
+;cost			 			= 900
+
+;addons
+scope_status				= 0
+silencer_status				= 0
+grenade_launcher_status		= 0
+
+zoom_enabled				= false
+scope_zoom_factor 			= 1.0; 75;	    	= 55
+ironsight_zoom_factor		= 1.0
+
+;звукБE
+snd_draw					= weapons\generic_draw
+snd_holster					= weapons\generic_holster
+snd_shoot					= material\large-weapon\collide\impact_wpn_large_earth1
+snd_empty					= ambient\silence
+snd_reload					= ambient\silence
+snd_shoot_duplet			= ambient\silence
+
+snd_open_weapon				= ambient\silence
+snd_add_cartridge			= weapons\wm_load	
+snd_close_weapon			= ambient\silence
+ 
+[wm_hud]
+shell_point		 			= 0.0, 0.0, 0.0
+fire_point      			= 0.0,0.0,0.8
+fire_point2				    = 0.0,0.0,0.8
+
+orientation              	= 0, 0, 0
+position                 	= -0.10, 0.1, 0.45
+
+
+fire_bone                	= wpn_body
+visual                   	= weapons\spas12\wpn_spas12_hud.ogf
+
+;anim_idle					= idle
+;anim_reload					= reload
+;anim_draw					= draw
+;anim_holster				= holster
+;anim_shoot					= shoot
+;anim_shoot_both 			= shoot
+;anim_idle_aim				= idle
+;anim_idle_sprint			= idle
+
+anim_idle					= idle
+anim_reload					= reload
+anim_draw					= idle_stop
+anim_holster				= idle_stop
+anim_shoot					= idle_stop
+anim_shoot_both 			= idle_stop
+anim_idle_aim				= idle
+anim_idle_sprint			= idle
+
+anim_open_weapon			= reload_i
+anim_add_cartridge			= reload
+anim_close_weapon			= reload_o
+
+;смещенБE HUD дл€ режиБE БEибБEжеыG€
+zoom_offset			= -0.120200,0.040100,-0.002000
+zoom_rotate_x		= 0.050400
+zoom_rotate_y		= 0.000500
+
+;врем€ БEворота HUD (сеБE
+;zoom_rotate_time			= 0.7
+
+
+;------------------------
+;-------- 9X18 ----------
+;------------------------
+;----- 8 патронов -------
+[wm_9x18a8]:wm	;_clip
+ammo_mag_size	= 8
+ammo_class		= ammo_9x18_fmj, ammo_9x18_pmm
+charged0 = clip_8_9x18_fmj
+charged1 = clip_8_9x18_pmm
+inv_weight = 0.05
+visual	= weapons\magazines\clip_8_900x18.ogf
+hud = clip_8_900x18_hud
+
+[wm_9x18b8]:wm	;_clip
+ammo_mag_size	= 8
+ammo_class		= ammo_9x18_pmm, ammo_9x18_fmj
+charged0 = clip_8_9x18_pmm
+charged1 = clip_8_9x18_fmj
+inv_weight = 0.05
+visual	= weapons\magazines\clip_8_900x18.ogf
+hud = clip_8_900x18_hud
+
+[clip_8_900x18_hud]:wm_hud
+visual = weapons\magazines\clip_8_900x18_hud.ogf
+
+;----- 12 патронов ------
+[wm_9x18a12]:wm	;_clip
+ammo_mag_size	= 12
+ammo_class		= ammo_9x18_fmj, ammo_9x18_pmm
+charged0 = clip_12_9x18_fmj
+charged1 = clip_12_9x18_pmm
+inv_weight = 0.076
+visual	= weapons\magazines\clip_12_900x18.ogf
+hud = clip_12_900x18_hud
+
+[wm_9x18b12]:wm	;_clip
+ammo_mag_size	= 12
+ammo_class		= ammo_9x18_pmm, ammo_9x18_fmj
+charged0 = clip_12_9x18_pmm
+charged1 = clip_12_9x18_fmj
+inv_weight = 0.076
+visual	= weapons\magazines\clip_12_900x18.ogf
+hud = clip_12_900x18_hud
+
+[clip_12_900x18_hud]:wm_hud
+visual = weapons\magazines\clip_12_900x18_hud.ogf
+
+;----- 20 патронов ------
+[wm_9x18a20]:wm	;_clip
+ammo_mag_size	= 20
+ammo_class		= ammo_9x18_fmj, ammo_9x18_pmm
+charged0 = clip_20_9x18_fmj
+charged1 = clip_20_9x18_pmm
+inv_weight = 0.084
+visual	= weapons\magazines\clip_20_900x18.ogf
+hud = clip_20_900x18_hud
+
+[wm_9x18b20]:wm	;_clip
+ammo_mag_size	= 20
+ammo_class		= ammo_9x18_pmm, ammo_9x18_fmj
+charged0 = clip_20_9x18_pmm
+charged1 = clip_20_9x18_fmj
+inv_weight = 0.084
+visual	= weapons\magazines\clip_20_900x18.ogf
+hud = clip_20_900x18_hud
+
+[clip_20_900x18_hud]:wm_hud
+visual = weapons\magazines\clip_20_900x18_hud.ogf
+
+;----- 27 патронов ------
+[wm_9x18a27]:wm	;_clip
+ammo_mag_size	= 27
+ammo_class		= ammo_9x18_fmj, ammo_9x18_pmm
+charged0 = clip_27_9x18_fmj
+charged1 = clip_27_9x18_pmm
+inv_weight = 0.1
+visual	= weapons\magazines\clip_27_900x18.ogf
+hud = clip_27_900x18_hud
+
+[wm_9x18b27]:wm	;_clip
+ammo_mag_size	= 27
+ammo_class		= ammo_9x18_pmm, ammo_9x18_fmj
+charged0 = clip_27_9x18_pmm
+charged1 = clip_27_9x18_fmj
+inv_weight = 0.1
+visual	= weapons\magazines\clip_27_900x18.ogf
+hud = clip_27_900x18_hud
+
+[clip_27_900x18_hud]:wm_hud
+visual = weapons\magazines\clip_27_900x18_hud.ogf
+
+;----- 64 патрона ------
+[wm_9x18a64]:wm	;_bizon
+ammo_mag_size	= 64
+ammo_class		= ammo_9x18_fmj, ammo_9x18_pmm
+charged0 = mag_64_9x18_fmj
+charged1 = mag_64_9x18_pmm
+inv_weight = 0.37
+visual	= weapons\magazines\mag_64_900x18.ogf
+hud = mag_64_900x18_hud
+
+[wm_9x18b64]:wm	;_bizon
+ammo_mag_size	= 64
+ammo_class		= ammo_9x18_pmm, ammo_9x18_fmj
+charged0 = mag_64_9x18_pmm
+charged1 = mag_64_9x18_fmj
+inv_weight = 0.37
+visual	= weapons\magazines\mag_64_900x18.ogf
+hud = mag_64_900x18_hud
+
+[mag_64_900x18_hud]:wm_hud
+visual = weapons\magazines\mag_64_900x18_hud.ogf
+
+;------------------------
+;-------- 9X19 ----------
+;------------------------
+;----- 8 патронов -------
+[wm_9x19a8]:wm	;_clip
+ammo_mag_size	= 8
+ammo_class		= ammo_9x19_fmj, ammo_9x19_pbp
+charged0 = clip_8_9x19_fmj
+charged1 = clip_8_9x19_pbp
+inv_weight = 0.071
+visual	= weapons\magazines\clip_8_900x19.ogf
+hud = clip_8_900x19_hud
+
+[wm_9x19b8]:wm	;_clip
+ammo_mag_size	= 8
+ammo_class		= ammo_9x19_pbp, ammo_9x19_fmj
+charged0 = clip_8_9x19_pbp
+charged1 = clip_8_9x19_fmj
+inv_weight = 0.071
+visual	= weapons\magazines\clip_8_900x19.ogf
+hud = clip_8_900x19_hud
+
+[clip_8_900x19_hud]:wm_hud
+visual = weapons\magazines\clip_8_900x19_hud.ogf
+
+;----- 13 патронов ------
+[wm_9x19a13]:wm	;_clip
+ammo_mag_size	= 13
+ammo_class		= ammo_9x19_fmj, ammo_9x19_pbp
+charged0 = clip_13_9x19_fmj
+charged1 = clip_13_9x19_pbp
+inv_weight = 0.1
+visual	= weapons\magazines\clip_13_900x19.ogf
+hud = clip_13_900x19_hud
+
+[wm_9x19b13]:wm	;_clip
+ammo_mag_size	= 13
+ammo_class		= ammo_9x19_pbp, ammo_9x19_fmj
+charged0 = clip_13_9x19_pbp
+charged1 = clip_13_9x19_fmj
+inv_weight = 0.1
+visual	= weapons\magazines\clip_13_900x19.ogf
+hud = clip_13_900x19_hud
+
+[clip_13_900x19_hud]:wm_hud
+visual = weapons\magazines\clip_13_900x19_hud.ogf
+
+;----- 15 патронов ------
+[wm_9x19a15]:wm	;_clip
+ammo_mag_size	= 15
+ammo_class		= ammo_9x19_fmj, ammo_9x19_pbp
+charged0 = clip_15_9x19_fmj
+charged1 = clip_15_9x19_pbp
+inv_weight = 0.1
+visual	= weapons\magazines\clip_15_900x19.ogf
+hud = clip_15_900x19_hud
+
+[wm_9x19b15]:wm	;_clip
+ammo_mag_size	= 15
+ammo_class		= ammo_9x19_pbp, ammo_9x19_fmj
+charged0 = clip_15_9x19_pbp
+charged1 = clip_15_9x19_fmj
+inv_weight = 0.1
+visual	= weapons\magazines\clip_15_900x19.ogf
+hud = clip_15_900x19_hud
+
+[clip_15_900x19_hud]:wm_hud
+visual = weapons\magazines\clip_15_900x19_hud.ogf
+
+;----- 16 патронов ------
+[wm_9x19a16]:wm	;_clip
+ammo_mag_size	= 16
+ammo_class		= ammo_9x19_fmj, ammo_9x19_pbp
+charged0 = clip_16_9x19_fmj
+charged1 = clip_16_9x19_pbp
+inv_weight = 0.08
+visual	= weapons\magazines\clip_16_900x19.ogf
+hud = clip_16_900x19_hud
+
+[wm_9x19b16]:wm	;_clip
+ammo_mag_size	= 16
+ammo_class		= ammo_9x19_pbp, ammo_9x19_fmj
+charged0 = clip_16_9x19_pbp
+charged1 = clip_16_9x19_fmj
+inv_weight = 0.08
+visual	= weapons\magazines\clip_16_900x19.ogf
+hud = clip_16_900x19_hud
+
+[clip_16_900x19_hud]:wm_hud
+visual = weapons\magazines\clip_16_900x19_hud.ogf
+
+;----- 17 патронов ------
+[wm_9x19a17]:wm	;_clip
+ammo_mag_size	= 17
+ammo_class		= ammo_9x19_fmj, ammo_9x19_pbp
+charged0 = clip_17_9x19_fmj
+charged1 = clip_17_9x19_pbp
+inv_weight = 0.078
+visual	= weapons\magazines\clip_17_900x19.ogf
+hud = clip_17_900x19_hud
+
+[wm_9x19b17]:wm	;_clip
+ammo_mag_size	= 17
+ammo_class		= ammo_9x19_pbp, ammo_9x19_fmj
+charged0 = clip_17_9x19_pbp
+charged1 = clip_17_9x19_fmj
+inv_weight = 0.078
+visual	= weapons\magazines\clip_17_900x19.ogf
+hud = clip_17_900x19_hud
+
+[clip_17_900x19_hud]:wm_hud
+visual = weapons\magazines\clip_17_900x19_hud.ogf
+
+;----- 18 патронов ------
+[wm_9x19a18]:wm	;_clip
+ammo_mag_size	= 18
+ammo_class		= ammo_9x19_fmj, ammo_9x19_pbp
+charged0 = clip_18_9x19_fmj
+charged1 = clip_18_9x19_pbp
+inv_weight = 0.08
+visual	= weapons\magazines\clip_18_900x19.ogf
+hud = clip_18_900x19_hud
+
+[wm_9x19b18]:wm	;_clip
+ammo_mag_size	= 18
+ammo_class		= ammo_9x19_pbp, ammo_9x19_fmj
+charged0 = clip_18_9x19_pbp
+charged1 = clip_18_9x19_fmj
+inv_weight = 0.08
+visual	= weapons\magazines\clip_18_900x19.ogf
+hud = clip_18_900x19_hud
+
+[clip_18_900x19_hud]:wm_hud
+visual = weapons\magazines\clip_18_900x19_hud.ogf
+
+;----- 20 патронов ------
+[wm_9x19a20]:wm	;_smgs
+ammo_mag_size	= 20
+ammo_class		= ammo_9x19_fmj, ammo_9x19_pbp
+charged0 = mag_20_9x19_fmj
+charged1 = mag_20_9x19_pbp
+inv_weight = 0.13
+visual	= weapons\magazines\mag_20_900x19.ogf
+hud = mag_20_900x19_hud
+
+[wm_9x19b20]:wm	;_smgs
+ammo_mag_size	= 20
+ammo_class		= ammo_9x19_pbp, ammo_9x19_fmj
+charged0 = mag_20_9x19_pbp
+charged1 = mag_20_9x19_fmj
+inv_weight = 0.13
+visual	= weapons\magazines\mag_20_900x19.ogf
+hud = mag_20_900x19_hud
+
+[mag_20_900x19_hud]:wm_hud
+visual = weapons\magazines\mag_20_900x19_hud.ogf
+
+;----- 30 патронов ------
+[wm_9x19a30]:wm	;_smgb
+ammo_mag_size	= 30
+ammo_class		= ammo_9x19_fmj, ammo_9x19_pbp
+charged0 = mag_30_9x19_fmj
+charged1 = mag_30_9x19_pbp
+inv_weight = 0.17
+visual	= weapons\magazines\mag_30_900x19.ogf
+hud = mag_30_900x19_hud
+
+[wm_9x19b30]:wm	;_smgb
+ammo_mag_size	= 30
+ammo_class		= ammo_9x19_pbp, ammo_9x19_fmj
+charged0 = mag_30_9x19_pbp
+charged1 = mag_30_9x19_fmj
+inv_weight = 0.17
+visual	= weapons\magazines\mag_30_900x19.ogf
+hud = mag_30_900x19_hud
+
+[mag_30_900x19_hud]:wm_hud
+visual = weapons\magazines\mag_30_900x19_hud.ogf
+
+;----- 31 патрон --------
+[wm_9x19a31]:wm	;_clip
+ammo_mag_size	= 31
+ammo_class		= ammo_9x19_fmj, ammo_9x19_pbp
+charged0 = clip_31_9x19_fmj
+charged1 = clip_31_9x19_pbp
+inv_weight = 0.1
+visual	= weapons\magazines\clip_31_900x19.ogf
+hud = clip_31_900x19_hud
+
+[wm_9x19b31]:wm	;_clip
+ammo_mag_size	= 31
+ammo_class		= ammo_9x19_pbp, ammo_9x19_fmj
+charged0 = clip_31_9x19_pbp
+charged1 = clip_31_9x19_fmj
+inv_weight = 0.1
+visual	= weapons\magazines\clip_31_900x19.ogf
+hud = clip_31_900x19_hud
+
+[clip_31_900x19_hud]:wm_hud
+visual = weapons\magazines\clip_31_900x19_hud.ogf
+
+;----- 32 патрона -------
+[wm_9x19a32]:wm	;_smgs
+ammo_mag_size	= 32
+ammo_class		= ammo_9x19_fmj, ammo_9x19_pbp
+charged0 = mag_32_9x19_fmj
+charged1 = mag_32_9x19_pbp
+inv_weight = 0.2
+visual	= weapons\magazines\mag_32_900x19.ogf
+hud = mag_32_900x19_hud
+
+[wm_9x19b32]:wm	;_smgs
+ammo_mag_size	= 32
+ammo_class		= ammo_9x19_pbp, ammo_9x19_fmj
+charged0 = mag_32_9x19_pbp
+charged1 = mag_32_9x19_fmj
+inv_weight = 0.2
+visual	= weapons\magazines\mag_32_900x19.ogf
+hud = mag_32_900x19_hud
+
+[mag_32_900x19_hud]:wm_hud
+visual = weapons\magazines\mag_32_900x19_hud.ogf
+
+;------------------------
+;------- 7.62X25 --------
+;------------------------
+;----- 8 патронов -------
+[wm_7.62x25a8]:wm	;_clip
+ammo_mag_size	= 8
+ammo_class		= ammo_7.62x25_p, ammo_7.62x25_ps
+charged0 = clip_8_7.62x25_p
+charged1 = clip_8_7.62x25_ps
+inv_weight = 0.086
+visual	= weapons\magazines\clip_8_762x25.ogf
+hud = clip_8_762x25_hud
+
+[wm_7.62x25b8]:wm	;_clip
+ammo_mag_size	= 8
+ammo_class		= ammo_7.62x25_ps, ammo_7.62x25_p
+charged0 = clip_8_7.62x25_ps
+charged1 = clip_8_7.62x25_p
+inv_weight = 0.086
+visual	= weapons\magazines\clip_8_762x25.ogf
+hud = clip_8_762x25_hud
+
+[clip_8_762x25_hud]:wm_hud
+visual = weapons\magazines\clip_8_762x25_hud.ogf
+
+;----- 20 патронов ------
+[wm_7.62x25a20]:wm	;_smgs
+ammo_mag_size	= 20
+ammo_class		= ammo_7.62x25_p, ammo_7.62x25_ps
+charged0 = mag_20_7.62x25_p
+charged1 = mag_20_7.62x25_ps
+inv_weight = 0.15
+visual	= weapons\magazines\mag_20_762x25.ogf
+hud = mag_20_762x25_hud
+
+[wm_7.62x25b20]:wm	;_smgs
+ammo_mag_size	= 20
+ammo_class		= ammo_7.62x25_ps, ammo_7.62x25_p
+charged0 = mag_20_7.62x25_ps
+charged1 = mag_20_7.62x25_p
+inv_weight = 0.15
+visual	= weapons\magazines\mag_20_762x25.ogf
+hud = mag_20_762x25_hud
+
+[mag_20_762x25_hud]:wm_hud
+visual = weapons\magazines\mag_20_762x25_hud.ogf
+
+;----- 64 патрона -------
+[wm_7.62x25a64]:wm	;_bizon
+ammo_mag_size	= 64
+ammo_class		= ammo_7.62x25_p, ammo_7.62x25_ps
+charged0 = mag_64_7.62x25_p
+charged1 = mag_64_7.62x25_ps
+inv_weight = 0.37
+visual	= weapons\magazines\mag_64_762x25.ogf
+hud = mag_64_762x25_hud
+
+[wm_7.62x25b64]:wm	;_bizon
+ammo_mag_size	= 64
+ammo_class		= ammo_7.62x25_ps, ammo_7.62x25_p
+charged0 = mag_64_7.62x25_ps
+charged1 = mag_64_7.62x25_p
+inv_weight = 0.37
+visual	= weapons\magazines\mag_64_762x25.ogf
+hud = mag_64_762x25_hud
+
+[mag_64_762x25_hud]:wm_hud
+visual = weapons\magazines\mag_64_762x25_hud.ogf
+
+;----- 71 патрон --------
+[wm_7.62x25a71]:wm	;_ppsh
+ammo_mag_size	= 71
+ammo_class		= ammo_7.62x25_p, ammo_7.62x25_ps
+charged0 = mag_71_7.62x25_p
+charged1 = mag_71_7.62x25_ps
+inv_weight = 1.23
+visual	= weapons\magazines\mag_71_762x25.ogf
+hud = mag_71_762x25_hud
+
+[wm_7.62x25b71]:wm	;_ppsh
+ammo_mag_size	= 71
+ammo_class		= ammo_7.62x25_ps, ammo_7.62x25_p
+charged0 = mag_71_7.62x25_ps
+charged1 = mag_71_7.62x25_p
+inv_weight = 1.23
+visual	= weapons\magazines\mag_71_762x25.ogf
+hud = mag_71_762x25_hud
+
+[mag_71_762x25_hud]:wm_hud
+visual = weapons\magazines\mag_71_762x25_hud.ogf
+
+;------------------------
+;--------- .45 ----------
+;------------------------
+;----- 7 патронов -------
+[wm_45a7]:wm	;_clip
+ammo_mag_size	= 7
+ammo_class		= ammo_11.43x23_fmj, ammo_11.43x23_hydro
+charged0 = clip_7_11.43x23_fmj
+charged1 = clip_7_11.43x23_hydro
+inv_weight = 0.07
+visual	= weapons\magazines\clip_7_1143x23.ogf
+hud = clip_7_1143x23_hud
+
+[wm_45b7]:wm	;_clip
+ammo_mag_size	= 7
+ammo_class		= ammo_11.43x23_hydro, ammo_11.43x23_fmj
+charged0 = clip_7_11.43x23_hydro
+charged1 = clip_7_11.43x23_fmj
+inv_weight = 0.07
+visual	= weapons\magazines\clip_7_1143x23.ogf
+hud = clip_7_1143x23_hud
+
+[clip_7_1143x23_hud]:wm_hud
+visual = weapons\magazines\clip_7_1143x23_hud.ogf
+
+;----- 8 патронов -------
+[wm_45a8]:wm	;_clip
+ammo_mag_size	= 8
+ammo_class		= ammo_11.43x23_fmj, ammo_11.43x23_hydro
+charged0 = clip_8_11.43x23_fmj
+charged1 = clip_8_11.43x23_hydro
+inv_weight = 0.077
+visual	= weapons\magazines\clip_8_1143x23.ogf
+hud = clip_8_1143x23_hud
+
+[wm_45b8]:wm	;_clip
+ammo_mag_size	= 8
+ammo_class		= ammo_11.43x23_hydro, ammo_11.43x23_fmj
+charged0 = clip_8_11.43x23_hydro
+charged1 = clip_8_11.43x23_fmj
+inv_weight = 0.077
+visual	= weapons\magazines\clip_8_1143x23.ogf
+hud = clip_8_1143x23_hud
+
+[clip_8_1143x23_hud]:wm_hud
+visual = weapons\magazines\clip_8_1143x23_hud.ogf
+
+;----- 30 патронов ------
+[wm_45a30]:wm	;_smgs
+ammo_mag_size	= 30
+ammo_class		= ammo_11.43x23_fmj, ammo_11.43x23_hydro
+charged0 = mag_30_11.43x23_fmj
+charged1 = mag_30_11.43x23_hydro
+inv_weight = 0.228
+visual	= weapons\magazines\mag_30_1143x23.ogf
+hud = mag_30_1143x23_hud
+
+[wm_45b30]:wm	;_smgs
+ammo_mag_size	= 30
+ammo_class		= ammo_11.43x23_hydro, ammo_11.43x23_fmj
+charged0 = mag_30_11.43x23_hydro
+charged1 = mag_30_11.43x23_fmj
+inv_weight = 0.228
+visual	= weapons\magazines\mag_30_1143x23.ogf
+hud = mag_30_1143x23_hud
+
+[mag_30_1143x23_hud]:wm_hud
+visual = weapons\magazines\mag_30_1143x23_hud.ogf
+
+;------------------------
+;--------- .357 ---------
+;------------------------
+;----- 6 патронов -------
+[wm_357a6]:wm	;_rev
+tri_state_reload = off
+ammo_mag_size	= 6
+ammo_class		= ammo_357_jfp, ammo_357_jhp
+charged0 = clip_6_357_jfp
+charged1 = clip_6_357_jhp
+inv_weight = 0.05
+visual	= weapons\magazines\clip_6_900x32.ogf
+hud = clip_6_900x32_hud
+
+[wm_357b6]:wm	;_rev
+tri_state_reload = off
+ammo_mag_size	= 6
+ammo_class		= ammo_357_jhp, ammo_357_jfp
+charged0 = clip_6_357_jhp
+charged1 = clip_6_357_jfp
+inv_weight = 0.05
+visual	= weapons\magazines\clip_6_900x32.ogf
+hud = clip_6_900x32_hud
+
+[clip_6_900x32_hud]:wm_hud
+visual = weapons\magazines\clip_6_900x32_hud.ogf
+;anim_open_weapon			= reload_o
+;anim_add_cartridge			= reload
+;anim_close_weapon			= reload_i
+
+;----- 8 патронов -------
+[wm_357a8]:wm	;_clip
+ammo_mag_size	= 8
+ammo_class		= ammo_357_jfp, ammo_357_jhp
+charged0 = clip_8_357_jfp
+charged1 = clip_8_357_jhp
+inv_weight = 0.11
+visual	= weapons\magazines\clip_8_900x32.ogf
+hud = clip_8_900x32_hud
+
+[wm_357b8]:wm	;_clip
+ammo_mag_size	= 8
+ammo_class		= ammo_357_jhp, ammo_357_jfp
+charged0 = clip_8_357_jhp
+charged1 = clip_8_357_jfp
+inv_weight = 0.11
+visual	= weapons\magazines\clip_8_900x32.ogf
+hud = clip_8_900x32_hud
+
+[clip_8_900x32_hud]:wm_hud
+visual = weapons\magazines\clip_8_900x32_hud.ogf
+
+;------------------------
+;------- 5.45X39 --------
+;------------------------
+;----- 30 патронов ------
+[wm_5.45x39a30]:wm	;_ak74
+ammo_mag_size	= 30
+ammo_class		= ammo_5.45x39_fmj, ammo_5.45x39_ap
+charged0 = mag_30_5.45x39_fmj
+charged1 = mag_30_5.45x39_ap
+inv_weight = 0.203
+visual	= weapons\magazines\mag_30_545x39.ogf
+hud = mag_30_545x39_hud
+
+[wm_5.45x39b30]:wm	;_ak74
+ammo_mag_size	= 30
+ammo_class		= ammo_5.45x39_ap, ammo_5.45x39_fmj
+charged0 = mag_30_5.45x39_ap
+charged1 = mag_30_5.45x39_fmj
+inv_weight = 0.203
+visual	= weapons\magazines\mag_30_545x39.ogf
+hud = mag_30_545x39_hud
+
+[mag_30_545x39_hud]:wm_hud
+visual = weapons\magazines\mag_30_545x39_hud.ogf
+
+;----- 45 патронов ------
+[wm_5.45x39a45]:wm	;_ak74
+ammo_mag_size	= 45
+ammo_class		= ammo_5.45x39_fmj, ammo_5.45x39_ap
+charged0 = mag_45_5.45x39_fmj
+charged1 = mag_45_5.45x39_ap
+inv_weight = 0.3
+visual	= weapons\magazines\mag_45_545x39.ogf
+hud = mag_45_545x39_hud
+
+[wm_5.45x39b45]:wm	;_ak74
+ammo_mag_size	= 45
+ammo_class		= ammo_5.45x39_ap, ammo_5.45x39_fmj
+charged0 = mag_45_5.45x39_ap
+charged1 = mag_45_5.45x39_fmj
+inv_weight = 0.3
+visual	= weapons\magazines\mag_45_545x39.ogf
+hud = mag_45_545x39_hud
+
+[mag_45_545x39_hud]:wm_hud
+visual = weapons\magazines\mag_45_545x39_hud.ogf
+
+;----- 75 патронов ------
+[wm_5.45x39a75]:wm	;_rpk
+ammo_mag_size	= 75
+ammo_class		= ammo_5.45x39_fmj, ammo_5.45x39_ap
+charged0 = mag_75_5.45x39_fmj
+charged1 = mag_75_5.45x39_ap
+inv_weight = 0.9
+visual	= weapons\magazines\mag_75_545x39.ogf
+hud = mag_75_545x39_hud
+
+[wm_5.45x39b75]:wm	;_rpk
+ammo_mag_size	= 75
+ammo_class		= ammo_5.45x39_ap, ammo_5.45x39_fmj
+charged0 = mag_75_5.45x39_ap
+charged1 = mag_75_5.45x39_fmj
+inv_weight = 0.9
+visual	= weapons\magazines\mag_75_545x39.ogf
+hud = mag_75_545x39_hud
+
+[mag_75_545x39_hud]:wm_hud
+visual = weapons\magazines\mag_75_545x39_hud.ogf
+
+;------------------------
+;------- 5.56x45 --------
+;------------------------
+;----- 30 патронов ------
+[wm_5.56x45a30]:wm	;_556
+ammo_mag_size	= 30
+ammo_class		= ammo_5.56x45_ss190, ammo_5.56x45_ap
+charged0 = mag_30_5.56x45_ss190
+charged1 = mag_30_5.56x45_ap
+inv_weight = 0.127
+visual	= weapons\magazines\mag_30_556x45.ogf
+hud = mag_30_556x45_hud
+
+[wm_5.56x45b30]:wm	;_556
+ammo_mag_size	= 30
+ammo_class		= ammo_5.56x45_ap, ammo_5.56x45_ss190
+charged0 = mag_30_5.56x45_ap
+charged1 = mag_30_5.56x45_ss190
+inv_weight = 0.127
+visual	= weapons\magazines\mag_30_556x45.ogf
+hud = mag_30_556x45_hud
+
+[mag_30_556x45_hud]:wm_hud
+visual = weapons\magazines\mag_30_556x45_hud.ogf
+
+;----- 100 патронов -----
+[wm_5.56x45a100]:wm	;_cmag
+ammo_mag_size	= 100
+ammo_class		= ammo_5.56x45_ss190, ammo_5.56x45_ap
+charged0 = mag_100_5.56x45_ss190
+charged1 = mag_100_5.56x45_ap
+inv_weight = 0.75
+visual	= weapons\magazines\mag_100_556x45.ogf
+hud = mag_100_556x45_hud
+
+[wm_5.56x45b100]:wm	;_cmag
+ammo_mag_size	= 100
+ammo_class		= ammo_5.56x45_ap, ammo_5.56x45_ss190
+charged0 = mag_100_5.56x45_ap
+charged1 = mag_100_5.56x45_ss190
+inv_weight = 0.75
+visual	= weapons\magazines\mag_100_556x45.ogf
+hud = mag_100_556x45_hud
+
+[mag_100_556x45_hud]:wm_hud
+visual = weapons\magazines\mag_100_556x45_hud.ogf
+
+;-- 100 патронов лента --
+[wm_5.56x45c100]:wm	;_belt
+ammo_mag_size	= 100
+ammo_class		= ammo_5.56x45_ss190, ammo_5.56x45_ap
+charged0 = belt_100_5.56x45_ss190
+charged1 = belt_100_5.56x45_ap
+inv_weight = 0.8
+visual	= weapons\magazines\box_100_556x45.ogf
+hud = belt_556x45_hud
+
+[wm_5.56x45d100]:wm	;_belt
+ammo_mag_size	= 100
+ammo_class		= ammo_5.56x45_ap, ammo_5.56x45_ss190
+charged0 = belt_100_5.56x45_ap
+charged1 = belt_100_5.56x45_ss190
+inv_weight = 0.8
+visual	= weapons\magazines\box_100_556x45.ogf
+hud = belt_556x45_hud
+
+[belt_556x45_hud]:wm_hud
+visual = weapons\magazines\belt_556x45_hud.ogf
+
+;------------------------
+;------- 7.62X39 --------
+;------------------------
+;----- 10 патронов ------
+[wm_7.62x39a10]:wm	;_ak47
+ammo_mag_size	= 10
+ammo_class		= ammo_7.62x39_fmj, ammo_7.62x39_ap
+charged0 = mag_10_7.62x39_fmj
+charged1 = mag_10_7.62x39_ap
+inv_weight = 0.11
+visual	= weapons\magazines\mag_10_762x39.ogf
+hud = mag_10_762x39_hud
+
+[wm_7.62x39b10]:wm	;_ak47
+ammo_mag_size	= 10
+ammo_class		= ammo_7.62x39_ap, ammo_7.62x39_fmj
+charged0 = mag_10_7.62x39_ap
+charged1 = mag_10_7.62x39_fmj
+inv_weight = 0.11
+visual	= weapons\magazines\mag_10_762x39.ogf
+hud = mag_10_762x39_hud
+
+[mag_10_762x39_hud]:wm_hud
+visual = weapons\magazines\mag_10_762x39_hud.ogf
+
+;----- 30 патронов ------
+[wm_7.62x39a30]:wm	;_ak47
+ammo_mag_size	= 30
+ammo_class		= ammo_7.62x39_fmj, ammo_7.62x39_ap
+charged0 = mag_30_7.62x39_fmj
+charged1 = mag_30_7.62x39_ap
+inv_weight = 0.22
+visual	= weapons\magazines\mag_30_762x39.ogf
+hud = mag_30_762x39_hud
+
+[wm_7.62x39b30]:wm	;_ak47
+ammo_mag_size	= 30
+ammo_class		= ammo_7.62x39_ap, ammo_7.62x39_fmj
+charged0 = mag_30_7.62x39_ap
+charged1 = mag_30_7.62x39_fmj
+inv_weight = 0.22
+visual	= weapons\magazines\mag_30_762x39.ogf
+hud = mag_30_762x39_hud
+
+[mag_30_762x39_hud]:wm_hud
+visual = weapons\magazines\mag_30_762x39_hud.ogf
+
+;----- 75 патронов ------
+[wm_7.62x39a75]:wm	;_rpk
+ammo_mag_size	= 75
+ammo_class		= ammo_7.62x39_fmj, ammo_7.62x39_ap
+charged0 = mag_75_7.62x39_fmj
+charged1 = mag_75_7.62x39_ap
+inv_weight = 0.9
+visual	= weapons\magazines\mag_75_762x39.ogf
+hud = mag_75_762x39_hud
+
+[wm_7.62x39b75]:wm	;_rpk
+ammo_mag_size	= 75
+ammo_class		= ammo_7.62x39_ap, ammo_7.62x39_fmj
+charged0 = mag_75_7.62x39_ap
+charged1 = mag_75_7.62x39_fmj
+inv_weight = 0.9
+visual	= weapons\magazines\mag_75_762x39.ogf
+hud = mag_75_762x39_hud
+
+[mag_75_762x39_hud]:wm_hud
+visual = weapons\magazines\mag_75_762x39_hud.ogf
+
+;------------------------
+;--------- 9X39 ---------
+;------------------------
+;----- 10 патронов ------
+[wm_9x39a10]:wm	;_vss
+ammo_mag_size	= 10
+ammo_class		= ammo_9x39_pab9, ammo_9x39_ap
+charged0 = mag_10_9x39_pab9
+charged1 = mag_10_9x39_ap
+inv_weight = 0.1
+visual	= weapons\magazines\mag_10_900x39.ogf
+hud = mag_10_900x39_hud
+
+[wm_9x39b10]:wm	;_vss
+ammo_mag_size	= 10
+ammo_class		= ammo_9x39_ap, ammo_9x39_pab9
+charged0 = mag_10_9x39_ap
+charged1 = mag_10_9x39_pab9
+inv_weight = 0.1
+visual	= weapons\magazines\mag_10_900x39.ogf
+hud = mag_10_900x39_hud
+
+[mag_10_900x39_hud]:wm_hud
+visual = weapons\magazines\mag_10_900x39_hud.ogf
+
+;----- 20 патронов ------
+[wm_9x39a20]:wm	;_vss
+ammo_mag_size	= 20
+ammo_class		= ammo_9x39_pab9, ammo_9x39_ap
+charged0 = mag_20_9x39_pab9
+charged1 = mag_20_9x39_ap
+inv_weight = 0.17
+visual	= weapons\magazines\mag_20_900x39.ogf
+hud = mag_20_900x39_hud
+
+[wm_9x39b20]:wm	;_vss
+ammo_mag_size	= 20
+ammo_class		= ammo_9x39_ap, ammo_9x39_pab9
+charged0 = mag_20_9x39_ap
+charged1 = mag_20_9x39_pab9
+inv_weight = 0.17
+visual	= weapons\magazines\mag_20_900x39.ogf
+hud = mag_20_900x39_hud
+
+[mag_20_900x39_hud]:wm_hud
+visual = weapons\magazines\mag_20_900x39_hud.ogf
+
+;------------------------
+;------ 7.62X54 ---------
+;------------------------
+;----- 10 патронов ------
+[wm_7.62x54a10]:wm	;_svd
+ammo_mag_size	= 10
+ammo_class		= ammo_7.62x54_7h1, ammo_7.62x54_7h14, ammo_7.62x54_ap
+charged0 = mag_10_7.62x54_7h1
+charged1 = mag_10_7.62x54_7h14
+charged2 = mag_10_7.62x54_ap
+inv_weight = 0.14
+visual	= weapons\magazines\mag_10_762x54.ogf
+hud = mag_10_762x54_hud
+
+[wm_7.62x54b10]:wm	;_svd
+ammo_mag_size	= 10
+ammo_class		= ammo_7.62x54_ap, ammo_7.62x54_7h1, ammo_7.62x54_7h14
+charged0 = mag_10_7.62x54_ap
+charged1 = mag_10_7.62x54_7h1
+charged2 = mag_10_7.62x54_7h14
+inv_weight = 0.14
+visual	= weapons\magazines\mag_10_762x54.ogf
+hud = mag_10_762x54_hud
+
+[wm_7.62x54c10]:wm	;_svd
+ammo_mag_size	= 10
+ammo_class		= ammo_7.62x54_7h14, ammo_7.62x54_ap, ammo_7.62x54_7h1
+charged0 = mag_10_7.62x54_7h14
+charged1 = mag_10_7.62x54_ap
+charged2 = mag_10_7.62x54_7h1
+inv_weight = 0.14
+visual	= weapons\magazines\mag_10_762x54.ogf
+hud = mag_10_762x54_hud
+
+[mag_10_762x54_hud]:wm_hud
+visual = weapons\magazines\mag_10_762x54_hud.ogf
+
+;----- 47 патронов ------
+[wm_7.62x54a47]:wm	;_lewis
+ammo_mag_size	= 47
+ammo_class		= ammo_7.62x54_7h1, ammo_7.62x54_7h14, ammo_7.62x54_ap
+charged0 = mag_47_7.62x54_7h1
+charged1 = mag_47_7.62x54_7h14
+charged2 = mag_47_7.62x54_ap
+inv_weight = 1.79
+visual	= weapons\magazines\mag_47_762x54.ogf
+hud = mag_47_762x54_hud
+
+[wm_7.62x54b47]:wm	;_lewis
+ammo_mag_size	= 47
+ammo_class		= ammo_7.62x54_ap, ammo_7.62x54_7h1, ammo_7.62x54_7h14
+charged0 = mag_47_7.62x54_ap
+charged1 = mag_47_7.62x54_7h1
+charged2 = mag_47_7.62x54_7h14
+inv_weight = 1.79
+visual	= weapons\magazines\mag_47_762x54.ogf
+hud = mag_47_762x54_hud
+
+[wm_7.62x54c47]:wm	;_lewis
+ammo_mag_size	= 47
+ammo_class		= ammo_7.62x54_7h14, ammo_7.62x54_ap, ammo_7.62x54_7h1
+charged0 = mag_47_7.62x54_7h14
+charged1 = mag_47_7.62x54_ap
+charged2 = mag_47_7.62x54_7h1
+inv_weight = 1.79
+visual	= weapons\magazines\mag_47_762x54.ogf
+hud = mag_47_762x54_hud
+
+[mag_47_762x54_hud]:wm_hud
+visual = weapons\magazines\mag_47_762x54_hud.ogf
+
+;----- 100 патронов ------
+[wm_7.62x54a100]:wm	;_belt
+ammo_mag_size	= 100
+ammo_class		= ammo_7.62x54_7h1, ammo_7.62x54_7h14, ammo_7.62x54_ap
+charged0 = belt_100_7.62x54_7h1
+charged1 = belt_100_7.62x54_7h14
+charged2 = belt_100_7.62x54_ap
+inv_weight = 1.75
+visual	= weapons\magazines\box_100_762x54.ogf
+hud = belt_762x54_hud
+
+[wm_7.62x54b100]:wm	;_belt
+ammo_mag_size	= 100
+ammo_class		= ammo_7.62x54_ap, ammo_7.62x54_7h1, ammo_7.62x54_7h14
+charged0 = belt_100_7.62x54_ap
+charged1 = belt_100_7.62x54_7h1
+charged2 = belt_100_7.62x54_7h14
+inv_weight = 1.75
+visual	= weapons\magazines\box_100_762x54.ogf
+hud = belt_762x54_hud
+
+[wm_7.62x54c100]:wm	;_belt
+ammo_mag_size	= 100
+ammo_class		= ammo_7.62x54_7h14, ammo_7.62x54_ap, ammo_7.62x54_7h1
+charged0 = belt_100_7.62x54_7h14
+charged1 = belt_100_7.62x54_ap
+charged2 = belt_100_7.62x54_7h1
+inv_weight = 1.75
+visual	= weapons\magazines\box_100_762x54.ogf
+hud = belt_762x54_hud
+
+[belt_762x54_hud]:wm_hud
+visual = weapons\magazines\belt_762x54_hud.ogf
+
+;------------------------
+;-------- 12/76 ---------
+;------------------------
+;------ 8 патронов ------
+[wm_12x76a8]:wm	;_12cal
+ammo_mag_size	= 8
+ammo_class		= ammo_12x76_zhekan, ammo_12x70_kart
+charged0 = mag_8_12x76_zhekan
+charged1 = mag_8_12x70_kart
+inv_weight = 0.26
+visual	= weapons\magazines\mag_8_12-76.ogf
+hud = mag_8_12-76_hud
+
+[wm_12x76b8]:wm	;_12cal
+ammo_mag_size	= 8
+ammo_class		= ammo_12x76_zhekan, ammo_12x70_kart
+charged0 = mag_8_12x76_zhekan
+charged1 = mag_8_12x70_kart
+inv_weight = 0.26
+visual	= weapons\magazines\mag_8_12-76.ogf
+hud = mag_8_12-76_hud
+
+[mag_8_12-76_hud]:wm_hud
+visual = weapons\magazines\mag_8_12-76_hud.ogf
+
+

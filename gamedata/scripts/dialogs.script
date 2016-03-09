@@ -1,0 +1,1212 @@
+function allow_break_dialog(first_speaker, second_speaker, id)
+	if second_speaker:profile_name() == "osoznanie" then
+		return false
+	end
+
+	return true
+end
+
+
+function break_dialog(first_speaker, second_speaker, id)
+	first_speaker:stop_talk()
+	second_speaker:stop_talk()
+end
+
+function disable_talk_self(first_speaker, second_speaker)
+	first_speaker:disable_talk()
+end
+function disable_talk_victim(first_speaker, second_speaker)
+	second_speaker:disable_talk()
+end
+
+function punch(first_speaker, second_speaker)
+	--abort("KICK ASS !!!!")
+	--xr_punch.punch[first_speaker:id()] = second_speaker
+	db.storage[second_speaker:id()].punch.enabled = true
+end
+
+function get_money_then_leave(first_speaker, second_speaker)
+	db.storage[first_speaker:id()].meet.enabled = false
+	db.storage[first_speaker:id()].robber.enabled = true
+end
+
+function is_escape(first_speaker, second_speaker)
+	if level.name() == "l01_escape" then
+		local npc_comm1 = first_speaker:character_community()
+		local npc_comm2 = second_speaker:character_community()
+		if npc_comm1 ~= "military" and npc_comm2 ~= "military" then
+			return true
+		else	
+			return false
+		end
+	else
+		return false
+	end
+end
+
+function is_wounded(first_speaker, second_speaker)
+    if db.storage[first_speaker:id()].wounded ~= nil and
+       db.storage[first_speaker:id()].wounded.wound_manager.can_use_medkit == true
+    then
+        return false
+    end
+
+	return xr_wounded.is_wounded(first_speaker)
+end
+-- Так и не понял с какого перепоя написали функции is_wounded и is_not_wounded, если эти функции проверяют раненность ГГ, пришлось написать проверку на -- -- (не)раненость для соб(утыльника)еседника (Quest)
+function is_wounded1(first_speaker, second_speaker)
+	
+	local hwo_is_wounded_one = 0
+	local not_actor = 0
+	
+	if first_speaker:id() == db.actor:id() then
+		not_actor = 2
+	else
+		not_actor = 1
+	end
+	
+	if not_actor > 0 then
+		if not_actor == 1 then
+			hwo_is_wounded_one = first_speaker
+		else
+			hwo_is_wounded_one = second_speaker
+		end	
+	else	
+		return false
+	end
+	
+	if hwo_is_wounded_one ~= 0 then
+		return xr_wounded.is_wounded(hwo_is_wounded_one)
+	end
+
+	return false
+end
+
+function is_opp_wounded(first_speaker, second_speaker, dialog_id)
+    if db.storage[second_speaker:id()].wounded ~= nil and
+       db.storage[second_speaker:id()].wounded.wound_manager.can_use_medkit == true
+    then
+        return false
+    end
+	return	xr_wounded.is_wounded(second_speaker)
+end
+function is_not_wounded(first_speaker, second_speaker)
+	return not this.is_wounded(first_speaker, second_speaker)
+end
+
+-- Так и не понял с какого перепоя написали функции is_wounded и is_not_wounded, если эти функции проверяют раненность ГГ, пришлось написать проверку на -- -- (не)раненость для соб(утыльника)еседника (Quest)
+function is_not_wounded1(first_speaker, second_speaker)
+	return not this.is_wounded1(first_speaker, second_speaker)
+end
+
+
+function actor_have_medkit(first_speaker, second_speaker)
+	return first_speaker:object("medkit") ~= nil or
+		   first_speaker:object("medkit_army") ~= nil or
+		   first_speaker:object("medkit_scientic") ~= nil
+end
+
+
+function actor_have_medkit_revers(first_speaker, second_speaker)
+	return second_speaker:object("medkit") ~= nil or
+		   second_speaker:object("medkit_army") ~= nil or
+		   second_speaker:object("medkit_scientic") ~= nil
+end
+
+function make_relationship_with_actor(relation, npc, actor)
+	local companion_id = nil
+	local companion = nil
+	for k, v in pairs(xr_companion.companions) do
+		if xr_companion.companions[k] == "companion" then
+			companion_id = k
+			break
+		end
+	end
+	if companion_id then
+		companion = level.object_by_id(companion_id)
+	end
+	if relation == "friend" then
+		xrs_battle_ai.reset_everything(npc)
+		npc:set_relation(game_object.friend, db.actor)
+		npc:set_goodwill(5000, db.actor)
+		xrs_battle_ai.disable_object(npc, db.actor)
+		if companion then
+			npc:set_relation(game_object.friend, companion)
+			npc:set_goodwill(5000, companion)
+			companion:set_relation(game_object.friend, npc)
+			companion:set_goodwill(5000, npc)	
+			xrs_battle_ai.disable_object(npc, companion)
+			xr_combat_companion.disable_object(companion, npc) 
+		end
+	elseif relation == "neutral" then
+		xrs_battle_ai.reset_everything(npc)
+		npc:set_relation(game_object.neutral, db.actor)
+		npc:set_goodwill(500, db.actor)
+		xrs_battle_ai.disable_object(npc, db.actor)
+		if companion then
+			npc:set_relation(game_object.neutral, companion)
+			npc:set_goodwill(500, companion)
+			companion:set_relation(game_object.neutral, npc)
+			companion:set_goodwill(500, npc)		
+			xrs_battle_ai.disable_object(npc, companion)
+			xr_combat_companion.disable_object(companion, npc) 			
+		end		
+	elseif relation == "enemy" then
+		npc:set_relation(game_object.enemy, db.actor)
+		npc:set_goodwill(-5000, db.actor)
+		if companion then
+			npc:set_relation(game_object.enemy, companion)
+			npc:set_goodwill(-5000, companion)
+			companion:set_relation(game_object.enemy, npc)
+			companion:set_goodwill(-5000, npc)			
+		end			
+	end
+	
+end
+
+function actor_have_bandage(first_speaker, second_speaker)
+	return first_speaker:object("bandage") ~= nil
+end
+function transfer_medkit(first_speaker, second_speaker)
+	if first_speaker:object("medkit") ~= nil then
+		dialogs.relocate_item_section(second_speaker, "medkit", "out")
+	elseif first_speaker:object("medkit_army") ~= nil then
+		dialogs.relocate_item_section(second_speaker, "medkit_army", "out")
+	else
+		dialogs.relocate_item_section(second_speaker, "medkit_scientic", "out")
+	end
+
+	local obj_community = second_speaker:character_community()
+	--' Тут надо анлочить аптечку для использования.
+	xr_wounded.unlock_medkit(second_speaker)	
+	
+	--' Добрые дела искупают прошлые грехи
+	local dead_friends = tonumber(ogse.load_variable("dead_fr", 0))
+	if dead_friends > 0 then 
+		dead_friends = dead_friends - 1
+		ogse.save_variable("dead_fr", dead_friends)	
+	end
+	
+	if second_speaker:relation(first_speaker) == game_object.enemy then
+		local rand = math.random()
+		if obj_community == "monolith" then
+			first_speaker:change_character_reputation(-25)
+			if rand < 0.1 then
+				-- друг
+				make_relationship_with_actor("friend", second_speaker, first_speaker)
+			elseif rand >= 0.1 and rand < 0.15 then
+				-- нейтрал
+				make_relationship_with_actor("neutral", second_speaker, first_speaker)
+			end
+		elseif obj_community == "zombied" then
+			make_relationship_with_actor("neutral", second_speaker, first_speaker)			
+		else
+			first_speaker:change_character_reputation(-10)
+			if rand < 0.35 then
+				-- друг
+				make_relationship_with_actor("friend", second_speaker, first_speaker)
+			elseif rand >= 0.35 and rand < 0.55 then
+				-- нейтрал
+				make_relationship_with_actor("neutral", second_speaker, first_speaker)		
+			end
+		end	
+	elseif second_speaker:relation(first_speaker) == game_object.neutral then
+		first_speaker:change_character_reputation(25)
+		make_relationship_with_actor("friend", second_speaker, first_speaker)	
+	elseif second_speaker:relation(first_speaker) == game_object.friend then
+		first_speaker:change_character_reputation(10)
+		make_relationship_with_actor("friend", second_speaker, first_speaker)
+	end
+
+end
+
+function transfer_bandage(first_speaker, second_speaker)
+	dialogs.relocate_item_section(second_speaker, "bandage", "out")
+	second_speaker:set_relation(game_object.friend, first_speaker)
+end
+function kill_yourself(npc, actor)
+	npc:kill(actor)
+end
+
+
+--' Obsolete, do not use!!!
+function relocate_item(victim, obj, type)
+	if db.actor and victim then
+		if type == "in" then
+			victim:transfer_item(obj, db.actor)
+		elseif type == "out" then
+			db.actor:transfer_item(obj, victim)
+		end
+		--'news_manager.relocate_item(db.actor, type, obj)
+	end
+end
+--' Use this function instead.
+function relocate_item_section(victim, section, type)
+	if db.actor and victim then
+		if type == "in" then
+
+			--' Трансферить нужно только квестовые предметы.
+			if quest_section[section] == true and
+			   victim:object(section) ~= nil 
+			then
+				victim:transfer_item(victim:object(section), db.actor)
+			else
+				alife():create(section,	
+					    db.actor:position(),
+						db.actor:level_vertex_id(),	
+						db.actor:game_vertex_id(),
+						db.actor:id())
+			end
+		elseif type == "out" then
+			db.actor:transfer_item(db.actor:object(section), victim)
+		end
+		news_manager.relocate_item(db.actor, type, section)
+	end
+end
+
+
+function relocate_money(victim, num, type)
+	if db.actor and victim then
+		if type == "in" then
+			db.actor:give_money(num)
+			--game_stats.money_quest_update (num) 
+		elseif type == "out" then
+			db.actor:transfer_money(num, victim)
+			--game_stats.money_quest_update (-num) 
+		end
+		news_manager.relocate_money(db.actor, type, num)
+	end
+end
+
+--'---------------------------------------------------------------------------------
+--' DIALOG ALLOWED
+--'---------------------------------------------------------------------------------
+function dialog_allowed(object, victim, id)
+	if id ~= nil then
+--		log1("*DIALOGS*: dialog_allowed: %s", id)
+	else
+--		log1("*DIALOGS*: dialog_allowed: nil")
+	end
+	if db.storage[victim:id()].actor_dialogs ~= nil then
+		for k,v in pairs(db.storage[victim:id()].actor_dialogs) do
+			if v == id then return true end
+		end
+	end
+	return false
+end
+function dialog_not_disable(object, victim, id)
+	if id ~= nil then
+--		log1("*DIALOGS*: dialog_disable:%s", id)
+	else
+--		log1("*DIALOGS*: dialog_disable:nil")
+	end
+	if db.storage[victim:id()].actor_disable ~= nil then
+		for k,v in pairs(db.storage[victim:id()].actor_disable) do
+			if v == id then return false end
+		end
+	end
+	return true
+end
+
+function allow_wounded_dialog(object, victim, id)
+	if db.storage[victim:id()].wounded == nil then
+		return false
+	end	
+	if db.storage[victim:id()].wounded.help_dialog == id then
+		return true
+	end
+	return false	
+end
+
+
+-----------------------------------------------------------------------------------
+-- LEVELS
+-----------------------------------------------------------------------------------
+function level_escape(first_speaker, second_speaker)
+	return level.name() == "l01_escape"
+end
+
+function level_garbage(first_speaker, second_speaker)
+	return level.name() == "l02_garbage"
+end
+
+function level_agroprom(first_speaker, second_speaker)
+	return level.name() == "l03_agroprom_ai2" or level.name() == "l03_agroprom"
+end
+
+function level_agroprom_freeplay(first_speaker, second_speaker)
+	if has_alife_info("task_1_start") and has_alife_info("pri_what_the_fuck") and
+	(level.name() == "l03_agroprom_ai2" or level.name() == "l03_agroprom") then
+		return true
+	else	
+		return false
+	end
+end
+
+-----------------------------------------------------------------------------------
+-- Relation functions
+-----------------------------------------------------------------------------------
+function is_friend(first_speaker, second_speaker)
+	return first_speaker:relation(second_speaker) == game_object.friend
+end
+
+function is_not_friend(first_speaker, second_speaker)
+	return not is_friend(first_speaker, second_speaker)
+end
+
+function become_friend(first_speaker, second_speaker)
+	first_speaker:set_relation(game_object.friend, second_speaker)
+end
+
+function is_friend_or_zombied(first_speaker, second_speaker)
+	if first_speaker:relation(second_speaker) == game_object.friend or
+	has_alife_info("actor_set_zombied")
+	then
+		return true
+	end
+	return false
+end
+-----------------------------------------------------------------------------------
+-- Community
+-----------------------------------------------------------------------------------
+function clear_all_actor_community_info()
+	if db.actor then
+		if has_alife_info("actor_set_actor") then
+			db.actor:disable_info_portion("actor_set_actor")
+		end
+		if has_alife_info("actor_set_dolg") then
+			db.actor:disable_info_portion("actor_set_dolg")
+		end
+		if has_alife_info("actor_set_freedom") then
+			db.actor:disable_info_portion("actor_set_freedom")
+		end
+		if has_alife_info("actor_set_bandit") then
+			db.actor:disable_info_portion("actor_set_bandit")
+		end
+		if has_alife_info("actor_prebandit") then
+			db.actor:disable_info_portion("actor_prebandit")
+		end
+		if has_alife_info("osvedomitel_actor_prebandit") then
+			db.actor:disable_info_portion("osvedomitel_actor_prebandit")
+		end
+		if has_alife_info("actor_set_zombied") then
+			db.actor:disable_info_portion("actor_set_zombied")
+		end
+		if has_alife_info("actor_set_milstalker") then
+			db.actor:disable_info_portion("actor_set_milstalker")
+		end		
+	end
+end
+
+function end_bandits_neutral_by_lab_end()
+	if has_alife_info("actor_prebandit") then
+		dialogs.actor_clear_community(actor, npc)
+	end
+end
+
+function actor_clear_community(actor, npc)
+	log1("ACTOR NOW IN [NEUTRAL] COMMUNITY")
+	clear_all_actor_community_info()
+	if db.actor and db.actor:alive() then
+		db.actor:set_character_community("actor", 0, 0)
+		db.actor:give_info_portion("actor_set_actor")
+		xr_companion.set_community_by_actor()
+	end
+	return true
+end
+
+
+function actor_in_dolg(actor, npc)
+	if db.actor then
+		return db.actor:character_community() == "actor_dolg"
+	end
+	return false
+end
+function actor_not_in_dolg(actor, npc)
+	return not actor_in_dolg(actor, npc)
+end
+function actor_set_dolg(actor, npc)
+	log1("ACTOR NOW IN [DOLG] COMMUNITY")
+	clear_all_actor_community_info()
+	if db.actor and db.actor:alive() then
+		db.actor:set_character_community("actor_dolg", 0, 0)
+		db.actor:give_info_portion("actor_set_dolg")
+		xr_companion.set_community_by_actor()
+		return true
+	end
+end
+
+function actor_set_freedom()
+	log1("ACTOR NOW IN [FREEDOM] COMMUNITY")
+	clear_all_actor_community_info()
+	if db.actor and db.actor:alive() then
+		db.actor:set_character_community("actor_freedom",0,0)
+		db.actor:give_info_portion("actor_set_freedom")
+		xr_companion.set_community_by_actor()
+		return true
+	end
+end
+
+
+function actor_set_bandit()
+	log1("ACTOR NOW IN [BANDIT] COMMUNITY")
+	clear_all_actor_community_info()
+	if db.actor and db.actor:alive() then
+		db.actor:set_character_community("bandit",0,0)
+		db.actor:give_info_portion("actor_set_bandit")
+		xr_companion.set_community_by_actor()
+		return true
+	end
+end
+
+function set_actor_prebandit()
+	log1("ACTOR NOW IN [PREBANDIT] COMMUNITY")
+	clear_all_actor_community_info()
+	if db.actor and db.actor:alive() then
+		db.actor:set_character_community("actor_prebandit",0,0)
+		db.actor:give_info_portion("actor_prebandit")
+		xr_companion.set_community_by_actor()
+		ogse.g_start_timer("dismiss_prebandit",0,24,0)
+		return true
+	end
+end
+
+function set_actor_prebandit1()
+	log1("ACTOR NOW IN [PREBANDIT] COMMUNITY")
+	clear_all_actor_community_info()
+	if db.actor and not has_alife_info("actor_set_bandit") and db.actor:alive() then
+		db.actor:set_character_community("actor_prebandit",0,0)
+		db.actor:give_info_portion("actor_prebandit")
+		xr_companion.set_community_by_actor()
+		ogse.g_start_timer("dismiss_prebandit",0,48,0)
+		return true
+	end
+end
+
+
+function set_actor_milstalker()
+	log1("ACTOR NOW IN [MIL_STALKER] COMMUNITY")
+	clear_all_actor_community_info()
+	if db.actor and db.actor:alive() then
+		db.actor:set_character_community("mil_stalker",0,0)
+		db.actor:give_info_portion("actor_set_milstalker")
+		xr_companion.set_community_by_actor()
+		return true
+	end
+end
+
+function escort_task_fail(task, objective)
+    return 
+  not has_alife_info("val_escort_actor_helped")
+end
+
+-----------------------------------------------------------------------------------
+-- Zombied
+-----------------------------------------------------------------------------------
+function actor_in_zombied(actor, npc)
+	if db.actor then
+		return db.actor:character_community() == "zombied"
+	end
+	return false
+end
+function actor_not_in_zombied(actor, npc)
+	return not actor_in_zombied(actor, npc)
+end
+
+
+function actor_set_zombied(actor, npc)
+	log1("ACTOR NOW IN [ZOMBIED] COMMUNITY")
+	if db.actor and db.actor:dont_has_info("actor_set_zombied") and db.actor:alive() then
+		log1("ACTOR NOW [ZOMBIED] - PLAY EFFECTS")
+		ogse_quests.turn_pnv_off()
+		log1("ACTOR NOW [ZOMBIED] - 1")
+		clear_all_actor_community_info()
+		log1("ACTOR NOW [ZOMBIED] - 2")
+		db.actor:set_character_community("actor_zombied", 0, 0)
+		log1("ACTOR NOW [ZOMBIED] - 3")
+		db.actor:give_info_portion("actor_set_zombied")
+		log1("ACTOR NOW [ZOMBIED] - 4")
+		xr_companion.set_community_by_actor()
+		log1("ACTOR NOW [ZOMBIED] - 5")
+		level.add_pp_effector("deadcity_wake_old.ppe", 2007, false)
+		log1("ACTOR NOW [ZOMBIED] - 6")
+		level.add_cam_effector("camera_effects\\prison_1.anm", 100, false, "")
+		log1("ACTOR NOW [ZOMBIED] - 7")
+		soundtrack.set_zombie()
+		log1("ACTOR NOW [ZOMBIED] - END")
+	elseif db.actor and db.actor:alive() then
+		log1("ACTOR ALREADY [ZOMBIED] - KILL_ACTOR")
+		local object = nil
+		for npc_id, is_npc in pairs(db.creature) do
+			local npc = level.object_by_id(npc_id)
+			if npc and npc:alive() and not is_npc then
+				log1("ACTOR ALREADY [ZOMBIED] - KILL_ACTOR_OBJ_IS ["..npc:name().."]")
+				object = npc
+			end
+		end	
+		if object then
+			local hit = hit()
+			hit.direction = vector():set(0,0,0)
+			hit.impulse = 0
+			hit.draftsman = object
+			hit.power = 1000
+			hit.type = hit.explosion
+			if db.actor then
+				log1("ACTOR ALREADY [ZOMBIED] - KILL_ACTOR_HIT")
+				db.actor:hit(hit)
+			end	
+		end
+		log1("ACTOR ALREADY [ZOMBIED] - END")
+	end
+	return true
+end
+
+-----------------------------------------------------------------------------------
+-- Money functions
+-----------------------------------------------------------------------------------
+function has_2000_money(first_speaker, second_speaker)
+	return first_speaker:money() >= 2000
+end
+
+-----------------------------------------------------------------------------------
+-- TRADE
+-----------------------------------------------------------------------------------
+--' Инициализация торговли
+function trade_init(seller, buyer)
+	db.storage[seller:id()].meet.begin_wait_to_see.begin = time_global()/1000
+	xr_position.setPosition(db.storage[seller:id()].meet.Seller, 
+							db.storage[seller:id()].meet.Seller:level_vertex_id())
+	db.storage[seller:id()].meet.Buyer = buyer
+end
+
+function want_trade(seller, buyer)
+	if seller:relation(buyer) == game_object.friend or
+		seller:relation(buyer) == game_object.neutral then
+		return true
+	else
+		return false
+	end
+end
+
+function dont_want_trade(seller, buyer)	
+	return not want_trade(seller,buyer)
+end
+
+
+function change_relation_reputation(first_speaker, second_speaker)
+	first_speaker:set_relation(game_object.friend, second_speaker)
+	db.actor:change_character_reputation(10)
+end
+
+------------------------------------------------------------------------------------
+-- Companion
+------------------------------------------------------------------------------------
+local not_follow_type = 0
+
+function check_following(npc, actor)
+--------------------------
+-- Проверка условий отказа
+--------------------------
+-- Условия отказа:
+-- 1) Это квестовый непись
+-- 2) У ГГ хреновая репутация в коммунити
+-- 3) Это Толик или кто-то из пленников
+-- 4) ГГ ниже опытом чем непись
+-- 5) ГГ значительно опытнее непися
+-- 6) У ГГ уже есть напарник
+-- 7) ГГ из другой группировки
+-- 8) с ГГ погибло слишком много народу
+------------------------------------------
+	not_follow_type = 0
+	
+	local npc_rank_level = 0
+	local actor_rank_level = 0
+
+	local st = db.storage[npc:id()]
+	local actor_comm = db.actor:character_community()
+	actor_comm = xr_companion.community_by_actor(actor_comm)
+	
+	local npc_comm = npc:character_community()
+	local npc_rank = ranks.get_obj_rank_name(npc)
+	local actor_rank = db.actor:character_rank()
+	local name = npc:name()
+	local profile = npc:profile_name()
+	local dead_friends = tonumber(ogse.load_variable("dead_fr", 0))
+	
+	if npc_rank == "novice" then npc_rank_level = 1
+	elseif npc_rank == "experienced" then npc_rank_level = 2
+	elseif npc_rank == "veteran" then npc_rank_level = 3
+	elseif npc_rank == "master" then npc_rank_level = 4 end
+
+	if actor_rank < 300 then actor_rank_level = 1
+	elseif actor_rank >= 300 and actor_rank < 600 then actor_rank_level = 2
+	elseif actor_rank >= 600 and actor_rank < 900 then actor_rank_level = 3
+	elseif actor_rank >= 900 then actor_rank_level = 4 end	
+	
+	if not st 
+	or ogse.is_quest_npc(npc)
+	or npc:story_id() ~= 4294967296
+	or string.find(profile, "sniper")
+	or string.find(profile, "leader")
+	or string.find(profile, "commander")
+	or string.find(name, "val_rob")
+	then
+		-- 1) Это квестовый непись
+		not_follow_type = 1
+		return true
+	else
+		if relation_registry.community_goodwill(npc_comm, db.actor:id()) < -30
+		then
+			-- 2) У ГГ хреновая репутация в коммунити или он бандит
+			not_follow_type = 2
+			return true
+		else
+			if name and (string.find(name, "wounded") or string.find(name, "prisoner"))
+			then
+				-- 3) Это Толик или кто-то из пленников
+				not_follow_type = 3
+				return true			
+			else
+				if npc_rank_level > actor_rank_level then
+					-- 4) ГГ ниже опытом чем непись
+					not_follow_type = 4
+					return true					
+				else
+					local diff = actor_rank_level - npc_rank_level
+					if diff > 1 then
+						-- 5) ГГ значительно опытнее непися
+						not_follow_type = 5
+						return true						
+					else
+						if xr_companion.number_of_companions > 0 then
+						-- 6) У ГГ уже есть напарник
+							not_follow_type = 6
+							return true	
+						else
+							if actor_comm ~= npc_comm then
+							-- 7) ГГ из другой группировки
+								not_follow_type = 7
+								return true	
+							else
+								if dead_friends >= 4 then
+								-- 8) с ГГ погибло слишком много народу
+									not_follow_type = 8
+									return true	
+								else
+									not_follow_type = 0
+									return false
+								end
+							end
+						end
+					end
+				end
+			end
+		end			
+	end	
+	return false
+end
+
+function companion_will_follow(npc, actor)
+------------------------------------------
+-- Проверка на то, согласится ли непись
+-- идти вместе с ГГ. Если согласится, то
+-- ему присвоится коммунити актора.
+-- В итоге схема будет автоматически
+-- включаться для неписей с коммунити
+-- актора.
+------------------------------------------
+	if not check_following(npc, actor) then
+		return true
+	else	
+		return false
+	end
+end
+
+function companion_not_follow(npc, actor)
+	if not_follow_type == 1 then
+		return true
+	else	
+		return false
+	end
+end
+
+function companion_not_follow_bad(npc, actor)
+	if not_follow_type == 2 then
+		return true
+	else	
+		return false
+	end
+end
+
+function companion_not_follow_tired(npc, actor)
+	if not_follow_type == 3 then
+		return true
+	else	
+		return false
+	end	
+end
+
+function companion_not_follow_lowrank(npc, actor)
+	if not_follow_type == 4 then
+		return true
+	else	
+		return false
+	end	
+end
+
+function companion_not_follow_highrank(npc, actor)
+	if not_follow_type == 5 then
+		return true
+	else	
+		return false
+	end	
+end
+
+function companion_not_follow_toomuch(npc, actor)
+	if not_follow_type == 6 then
+		return true
+	else	
+		return false
+	end	
+end
+
+function companion_not_follow_other_community(npc, actor)
+	if not_follow_type == 7 then
+		return true
+	else	
+		return false
+	end	
+end
+
+function companion_not_follow_deadly(npc, actor)
+	if not_follow_type == 8 then
+		return true
+	else	
+		return false
+	end	
+end
+
+function companion_start_following(npc, actor)
+	local st = db.storage[npc:id()]
+	local st_c = db.storage[npc:id()].companion
+	local actor_comm = db.actor:character_community()
+	local npc_com = xr_companion.community_by_actor(actor_comm)
+	
+	if st and st_c then
+
+		xr_companion.reset_npc_logic(npc)
+		xr_gulag.resetJob(npc)
+		xr_companion.number_of_companions = xr_companion.number_of_companions + 1
+		xr_companion.companions[npc:id()] = "companion"
+		
+		xr_companion.save_var_companion(npc:id(), "is_companion", 1)
+		xr_companion.save_var_companion(npc:id(), "orig_community", npc:character_community())
+		xr_companion.save_var_companion(npc:id(), "friendship_status", npc:relation(db.actor))
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", xr_companion.beh_walk_simple)
+		
+		local time_to_release = game.time() + 30*60*1000*ogse.game_time_factor -- напарника нельзя отпустить раньше чем через полчаса от начала игры с ним
+		xr_companion.save_var_companion(npc:id(), "release_time", time_to_release)
+		
+		npc:set_character_community(npc_com, 0, 0)
+		npc:set_relation(game_object.friend, db.actor) 
+		
+		trade_manager.trade_init(npc, "misc\\trade_obmen.ltx")
+		level_tasks.add_location_by_id(npc:id(), "alife_presentation_companion", "it_is_your_companion_text")	
+		
+		st_c.enabled = true
+		st_c.behavior = xr_companion.beh_walk_simple
+		
+		event("companion_start_following"):trigger({obj = npc, who = db.actor})
+	end	
+end
+
+function companion_stop_following(npc, actor)
+---------------------------------------------
+-- При выключении схемы вернём компаньону
+-- его изначальное коммунити. Дернем его из
+-- визуала непися.
+---------------------------------------------
+	xr_companion.post_work[npc:id()]	= true
+	db.storage[npc:id()].companion.enabled = false
+	xr_companion.number_of_companions = xr_companion.number_of_companions - 1
+	-- local comm = xr_companion.real_community(npc)
+	
+	xr_companion.save_var_companion(npc:id(), "is_companion", 0)
+	
+	local comm = xr_companion.load_var_companion(npc:id(), "orig_community", nil)
+	local relation = xr_companion.load_var_companion(npc:id(), "friendship_status", nil)
+	
+	npc:set_character_community(comm, 0, 0)
+	npc:set_relation(tonumber(relation), db.actor)
+	npc:set_goodwill(500, actor)
+	
+	trade_manager.trade_init(npc, "misc\\trade_generic.ltx")	
+	level_tasks.remove_location_by_id(npc:id(), "alife_presentation_companion")
+	xr_companion.companions[npc:id()] = nil
+	xr_gulag.resetJob(npc)
+	event("companion_stop_following"):trigger({obj = npc, who = db.actor})
+end
+
+function quest_companion_stop_following(npc, actor)
+---------------------------------------------
+-- При выключении схемы вернём компаньону
+-- его изначальное коммунити. Дернем его из
+-- визуала непися.
+---------------------------------------------
+	xr_companion.post_work[npc:id()]	= true
+	db.storage[npc:id()].companion.enabled = false
+	xr_companion.number_of_companions = xr_companion.number_of_companions - 1
+	-- local comm = xr_companion.real_community(npc)
+	
+	xr_companion.save_var_companion(npc:id(), "is_companion", 0)
+	
+	local relation = xr_companion.load_var_companion(npc:id(), "friendship_status", nil)
+	npc:set_relation(game_object.neutral, db.actor)
+	npc:set_goodwill(500, actor)	
+	
+	trade_manager.trade_init(npc, "misc\\trade_generic.ltx")	
+	level_tasks.remove_location_by_id(npc:id(), "alife_presentation_companion")
+	xr_companion.companions[npc:id()] = nil
+	xr_gulag.resetJob(npc)
+end
+
+function is_companion(actor, npc)
+	local st = db.storage[npc:id()]
+	if not st then
+		return false
+	end
+	if xr_wounded.is_wounded(npc) then
+		return false
+	end	
+	if not st.companion then
+		return false
+	end
+	if not st.companion.enabled then
+		return false
+	end
+	return true
+end
+
+function can_be_free(actor, npc)
+	local st = db.storage[npc:id()]
+	if not st then
+		return false
+	end
+	if not st.companion then
+		return false
+	end
+	if not st.companion.enabled then
+		return false
+	end
+	-- проверяем, что в напарниках не квестовые Дезертир или Псих
+	local sid = npc:story_id()
+	if sid == story_ids.agr_deserter or sid == story_ids.Mil_Crazy then
+		return false
+	end
+	local time_release = xr_companion.load_var_companion(npc:id(), "release_time", 0)
+	if not time_release then time_release = 0 end
+	if tonumber(game.time()) > tonumber(time_release) then
+		return true
+	else	
+		return false
+	end
+end
+
+function not_is_companion(actor, npc)
+---/// Схема включена. Для включения удалите этот кусок кода --
+	-- local disabled = true
+	-- if disabled then return false end
+---/// Схема включена. Для включения удалите этот кусок кода --
+	if ogse.is_quest_npc(npc) and not (string.find(npc:name(), "esc_wolf") and level.name() == "l07_military") then
+		return false
+	end
+	if not has_alife_info("agroprom_military_case") then -- Взятие напарников происходит только после взятия у Сидоровича особого задания - взять кейс на Агропроме
+		return false
+	end
+	if xr_wounded.is_wounded(npc) then
+		return false
+	end
+	if npc:relation(actor) == game_object.enemy then
+		return false
+	end
+	if is_companion(actor, npc) then
+		return false
+	end
+	return true
+end
+
+---///--------------- прекондишены
+
+function is_stalker_companion(actor, npc)
+	local npc_comm = npc:character_community()
+	if npc_comm == "stalker" or npc_comm == "quest_stalker" or npc_comm == "mil_stalker" then return true else return false end
+end
+
+function is_dolg_companion(actor, npc)
+	local npc_comm = npc:character_community()
+	if npc_comm == "dolg" then return true else return false end
+end
+
+function is_freedom_companion(actor, npc)
+	local npc_comm = npc:character_community()
+	if npc_comm == "freedom" then return true else return false end
+end
+
+function is_bandit_companion(actor, npc)
+	local npc_comm = npc:character_community()
+	if npc_comm == "bandit" or npc_comm == "actor_prebandit" then return true else return false end
+end
+
+function is_zombie_companion(actor, npc)
+	local npc_comm = npc:character_community()
+	if npc_comm == "zombied" then return true else return false end
+end
+
+--///---------------- прекондишены
+
+function companion_beh_walk_simple(actor, npc)
+	local st = db.storage[npc:id()]
+	if st and st.companion then
+		st.companion.behavior = xr_companion.beh_walk_simple
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", st.companion.behavior)
+		xr_companion.save_var_companion(npc:id(),"w_lvl",nil)
+	end
+end
+
+function companion_beh_walk_low_aggr(actor, npc)
+	local st = db.storage[npc:id()]
+	if st and st.companion then
+		st.companion.behavior = xr_companion.beh_walk_low_aggr
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", st.companion.behavior)
+		xr_companion.save_var_companion(npc:id(),"w_lvl",nil)
+	end
+end
+
+function companion_beh_walk_ignore(actor, npc)
+	local st = db.storage[npc:id()]
+	if st and st.companion then
+		st.companion.behavior = xr_companion.beh_walk_ignore
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", st.companion.behavior)
+		xr_companion.save_var_companion(npc:id(),"w_lvl",nil)
+	end
+end
+
+function companion_beh_wait_simple(actor, npc)
+	local st = db.storage[npc:id()]
+	if st and st.companion then
+		st.companion.behavior = xr_companion.beh_wait_simple
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", st.companion.behavior)
+		xr_companion.save_var_companion(npc:id(),"w_lvl",level.name())
+	end
+end
+
+function companion_beh_wait_low_aggr(actor, npc)
+	local st = db.storage[npc:id()]
+	if st and st.companion then
+		st.companion.behavior = xr_companion.beh_wait_low_aggr
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", st.companion.behavior)
+		xr_companion.save_var_companion(npc:id(),"w_lvl",level.name())
+	end
+end
+
+function companion_beh_wait_ignore(actor, npc)
+	local st = db.storage[npc:id()]
+	if st and st.companion then
+		st.companion.behavior = xr_companion.beh_wait_ignore
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", st.companion.behavior)
+		xr_companion.save_var_companion(npc:id(),"w_lvl",level.name())
+	end
+end
+
+function companion_beh_crouch_simple(actor, npc)
+	local st = db.storage[npc:id()]
+	if st and st.companion then
+		st.companion.behavior = xr_companion.beh_crouch_simple
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", st.companion.behavior)
+		xr_companion.save_var_companion(npc:id(),"w_lvl",nil)
+	end
+end
+
+function companion_beh_crouch_low_aggr(actor, npc)
+	local st = db.storage[npc:id()]
+	if st and st.companion then
+		st.companion.behavior = xr_companion.beh_crouch_low_aggr
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", st.companion.behavior)
+		xr_companion.save_var_companion(npc:id(),"w_lvl",nil)
+	end
+end
+
+function companion_beh_crouch_ignore(actor, npc)
+	local st = db.storage[npc:id()]
+	if st and st.companion then
+		st.companion.behavior = xr_companion.beh_crouch_ignore
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", st.companion.behavior)
+		xr_companion.save_var_companion(npc:id(),"w_lvl",nil)
+	end
+end
+
+function companion_beh_hide_simple(actor, npc)
+	local st = db.storage[npc:id()]
+	if st and st.companion then
+		st.companion.behavior = xr_companion.beh_hide_simple
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", st.companion.behavior)
+		xr_companion.save_var_companion(npc:id(),"w_lvl",level.name())
+	end
+end
+
+function companion_beh_hide_low_aggr(actor, npc)
+	local st = db.storage[npc:id()]
+	if st and st.companion then
+		st.companion.behavior = xr_companion.beh_hide_low_aggr
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", st.companion.behavior)
+		xr_companion.save_var_companion(npc:id(),"w_lvl",level.name())
+	end
+end
+
+function companion_beh_hide_ignore(actor, npc)
+	local st = db.storage[npc:id()]
+	if st and st.companion then
+		st.companion.behavior = xr_companion.beh_hide_ignore
+		xr_companion.save_var_companion(npc:id(), "companion_behavior", st.companion.behavior)
+		xr_companion.save_var_companion(npc:id(),"w_lvl",level.name())
+	end
+end
+
+function companion_suicide(actor, npc)
+
+	local h = hit()
+	h.power = 1000
+	--h.direction = vector_rotate_y(npc:direction(), 90)
+	h.direction = npc:direction()
+	h.bone = "bip01_head"
+	h.draftsman = npc 
+	h.impulse = 10
+	h.type = hit.wound
+	npc:hit(h)
+
+end
+
+function is_from_novice_village(actor, npc)
+	if not npc:is_stalker() then return false end
+	--log3("is_from_novice_village precond: actor arg = %s, npc arg = %s", actor:name(), npc:name())
+	local gl = xr_gulag.get_npc_gulag(npc)
+	--log3("gulag = %s", tostring(gl and gl.name or "none"))
+	if gl and gl.name == "esc_lager" and string.find(npc:name(), "esc_lager") then
+		--local job = gl:getJob(npc:id())
+		--print_table_inlog(job)
+		--local ex =  not not gl.npc_info[npc:id()].exclusive
+		--log3("exclusive: %s", ex)
+		return true
+	end
+	return false
+end
+
+-- апгрейд оружия
+function has_money_for_ak74()
+	if db.actor:money() >= 2500 then
+		return true
+	end
+	return false
+end
+function has_no_money_for_ak74()
+	return not has_money_for_ak74()
+end
+function has_money_for_ak102()
+	if db.actor:money() >= 5000 then
+		return true
+	end
+	return false
+end
+function has_no_money_for_ak102()
+	return not has_money_for_ak102()
+end
+function is_stok_ak102_in_slot()
+	local it = db.actor:item_in_slot(2)
+	if it and string.find(it:section(), "wpn_ak102") and string.find(it:section(), "stok") then
+		return true
+	end
+	return false
+end
+function is_stok_ak74_in_slot()
+	local it = db.actor:item_in_slot(2)
+	if it and (string.find(it:section(), "wpn_akm") or string.find(it:section(), "wpn_ak74") or string.find(it:section(), "wpn_aks74")) and string.find(it:section(), "ironsight") then
+		return true
+	end
+	return false
+end
+function is_no_proper_gun_in_slot()
+	local it = db.actor:item_in_slot(2)
+	if it then
+		if string.find(it:section(), "wpn_akm") or string.find(it:section(), "wpn_ak74") or string.find(it:section(), "wpn_aks74") then
+			return false
+		else
+			return true
+		end
+	else
+		return true		
+	end
+end
+function is_upgraded_gun_in_slot()
+	local it = db.actor:item_in_slot(2)
+	if it and string.find(it:section(), "wpn_ak102") and not string.find(it:section(), "stok") then
+		return true
+	end
+	if it and (string.find(it:section(), "wpn_akm") or string.find(it:section(), "wpn_ak74") or string.find(it:section(), "wpn_aks74")) and not string.find(it:section(), "ironsight") then
+		return true
+	end
+	return false
+end
+
+function modify_weapon(old, new)
+	local it = db.actor:item_in_slot(2)
+	if it then
+		local s_cur_weapon = alife():object(it:id())
+		local sect = it:section()
+		-- спавним актору патроны, которые заряжены в ствол
+		local cur_weapon_data = m_net_utils.get_weapon_data(s_cur_weapon)
+		local ammo_sections = get_names(sect, "ammo_class") -- получаем список секций патронов
+		local ammo_sec = ammo_sections[cur_weapon_data.ammo_type+1] -- и узнаём заряженную секцию
+		ogse.spawn_ammo_in_inv(ammo_sec, cur_weapon_data.ammo_elapsed, db.actor)
+		-- снимаем стандартные аддоны
+		if ogse_addons.is_addon_installed(it, ogse_wpn_utils.addons_flags.scope) then
+			local scope = get_string(sect, "scope_name", "")
+			if scope ~= "" then
+				ogse.spawn_item_in_inv(scope, db.actor)
+			end
+		end
+		if ogse_addons.is_addon_installed(it, ogse_wpn_utils.addons_flags.gl) then
+			local gl = get_string(sect, "grenade_launcher_name", "")
+			if gl ~= "" then
+				ogse.spawn_item_in_inv(gl, db.actor)
+			end
+		end
+		if ogse_addons.is_addon_installed(it, ogse_wpn_utils.addons_flags.silencer) then
+			local silencer = get_string(sect, "silencer_name", "")
+			if silencer ~= "" then
+				ogse.spawn_item_in_inv(silencer, db.actor)
+			end
+		end
+		-- снимаем магазин, если есть
+		local new_sect = sect
+		local magazine =  get_string(sect, "magazine_name", "")
+		if magazine ~= "" then
+			ogse.spawn_item_in_inv(magazine, db.actor)
+			new_sect = get_string(sect, "magazine_removed_section")
+		end
+		new_sect = string.gsub(new_sect, old, new)
+		-- удаляем старый ствол
+		db.actor:move_to_ruck(it)
+		alife():release(s_cur_weapon, true)
+		-- даем новый ствол
+		relocate_item_section(db.actor, new_sect, "in")
+	end
+end
+
+function attach_side_rail()
+	modify_weapon("ironsight", "side_rail_kobra")
+	db.actor:give_money(-2500)
+end
+function attach_custom_kit()
+	modify_weapon("stok", "custom")
+	db.actor:give_money(-5000)
+end

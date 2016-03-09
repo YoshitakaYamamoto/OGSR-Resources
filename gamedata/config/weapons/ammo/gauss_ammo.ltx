@@ -1,0 +1,141 @@
+[ammo_gauss_std]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\ammo\ammo_gauss" ; option for Level Editor
+class			= AMMO
+cform                   = skeleton
+visual                  = weapons\ammo\ammo_gauss.ogf
+description				= enc_weapons1_ammo_ammo-gauss_std
+$prefetch 		= 64
+
+cost			= 550
+
+box_size		= 50 ;10
+
+inv_name		= ammo-gauss_std
+inv_name_short	= ammo-gauss_std_s
+inv_weight		= 1.75 ;.5
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 13
+inv_grid_y			= 23
+
+k_dist			= 1
+k_disp			= 1
+k_hit			= 1.5
+k_impulse		= 0.7
+k_pierce		= 4.5
+impair			= 1.7
+buck_shot		= 1
+tracer			= off
+wm_size         = 0.12
+
+explosive		= on
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[ammo_gauss_ndl]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\ammo\ammo_gauss" ; option for Level Editor
+class			= AMMO
+cform                   = skeleton
+visual                  = weapons\ammo\ammo_gauss.ogf
+description				= enc_weapons1_ammo_ammo-gauss_ndl
+$prefetch 		= 64
+
+cost			= 550
+
+box_size		= 50 ;10
+
+inv_name		= ammo-gauss_ndl
+inv_name_short	= ammo-gauss_ndl_s
+inv_weight		= 1.75 ;.5
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 12
+inv_grid_y			= 23
+k_dist			= 1
+k_disp			= 80
+k_hit			= 1
+k_impulse		= 0.25
+k_pierce		= 1.25
+impair			= 1
+buck_shot		= 28
+tracer			= off
+wm_size         = 0.02
+
+explosive		= off
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[ammo_gauss]:ammo_base
+$spawn			= "weapons\ammo\ammo_gauss" ; option for Level Editor
+visual          = weapons\ammo\ammo_gauss.ogf
+description		= enc_weapons1_ammo_ammo-gauss
+
+cost			= 910
+
+box_size		= 10
+
+inv_name		= ammo-gauss
+inv_name_short	= ammo-gauss_s
+inv_weight		= 0.5
+
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x		= 4
+inv_grid_y		= 14
+
+k_dist			= 1.5
+k_hit			= 5.5
+k_impulse		= 1.2
+k_pierce		= 2.5
+impair			= 0.7
+
+[mag_10_gauss]:ammo_gauss
+box_size	= 1
+mag_size	= 10
+script_binding  = ammo_manager.init
+wm_section	= wm_12x76a8
+inv_name		= mag_10_gauss
+description		= desc_load_gauss
+inv_name_short	= mag_10_gauss_s
+inv_weight		= 0.001
+belt = false ; незаряжаемый своими силами
+
+[mag_50_gauss_std]:ammo_gauss_std
+box_size	= 1
+mag_size	= 50
+script_binding  = ammo_manager.init
+wm_section	= wm_12x76a8
+inv_name		= mag_50_gauss
+description		= desc_load_gauss_std
+inv_name_short	= mag_50_gauss_std_s
+inv_weight		= 0.028
+belt = false ; незаряжаемый своими силами
+
+[mag_50_gauss_ndl]:ammo_gauss_ndl
+box_size	= 1
+mag_size	= 50
+script_binding  = ammo_manager.init
+wm_section	= wm_12x76a8
+inv_name		= mag_50_gauss
+description		= desc_load_gauss_ndl
+inv_name_short	= mag_50_gauss_ndl_s
+inv_weight		= 0.028
+belt = false ; незаряжаемый своими силами
+
+[mag_10_gauss_e]:mag_10_gauss
+description		= desc_load_gauss_e
+inv_weight = 0.34
+
+[mag_50_gauss_std_e]:mag_50_gauss_std
+description		= desc_load_gauss_std_e
+inv_weight = 0.35
+
+[mag_50_gauss_ndl_e]:mag_50_gauss_ndl
+description		= desc_load_gauss_ndl_e
+inv_weight = 0.35
+
+

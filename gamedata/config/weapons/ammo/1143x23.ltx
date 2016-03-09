@@ -1,0 +1,181 @@
+;;; .45ACP
+[ammo_11.43x23_fmj]:ammo_base
+$spawn			= "weapons\ammo\ammo_11.43x23_fmj" ; option for Level Editor
+visual          = weapons\ammo\ammo_1143x23_fmj.ogf
+description		= enc_weapons1_ammo_ammo-11.43x23-fmj
+
+cost			= 380
+
+box_size		= 20
+
+inv_name		= ammo-11.43x23-fmj
+inv_name_short	= ammo-11.43x23-fmj_s
+inv_weight		= 0.3
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 9
+inv_grid_y		= 12
+
+k_disp			= 3
+k_hit			= 1.5
+k_impulse		= 1.1
+k_pierce		= 1.1
+wm_size         = 0.07
+
+;------------------------------
+[ammo_11.43x23_hydro]:ammo_base
+$spawn			= "weapons\ammo\ammo_11.43x23_hydro" ; option for Level Editor
+visual          = weapons\ammo\ammo_1143x23_Hydro.ogf
+description		= enc_weapons1_ammo_ammo-11.43x23-hydro
+
+cost			= 430
+
+box_size		= 20
+
+inv_name		= ammo-11.43x23-hydro
+inv_name_short	= ammo-11.43x23-hydro_s
+inv_weight		= 0.3
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 7
+inv_grid_y		= 12
+
+k_dist			= 0.95
+k_disp			= 3
+k_hit			= 1.7
+k_impulse		= 1.25
+k_pierce		= 1.1
+impair			= 1.15
+wm_size         = 0.07
+explosive		= on
+
+;------------------------------
+
+[clip_7_11.43x23_fmj]:ammo_11.43x23_fmj
+box_size	= 1
+mag_size	= 7
+script_binding  = ammo_manager.init
+wm_section	= wm_45a7
+inv_name		= clip_7_45
+description		= desc_load_45_fmj
+inv_name_short	= clip_7_45_fmj_s
+inv_weight		= 0.0140
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 15
+visual	= weapons\magazines\clip_7_1143x23.ogf
+cost = 25
+
+[clip_7_11.43x23_hydro]:ammo_11.43x23_hydro
+box_size	= 1
+mag_size	= 7
+script_binding  = ammo_manager.init
+wm_section	= wm_45b7
+inv_name		= clip_7_45
+description		= desc_load_45_hydro
+inv_name_short	= clip_7_45_hydro_s
+inv_weight		= 0.0140
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 15
+visual	= weapons\magazines\clip_7_1143x23.ogf
+cost = 25
+
+[clip_8_11.43x23_fmj]:ammo_11.43x23_fmj
+box_size	= 1
+mag_size	= 8
+script_binding  = ammo_manager.init
+wm_section	= wm_45a8
+inv_name		= clip_8_45
+description		= desc_load_45_fmj
+inv_name_short	= clip_8_45_fmj_s
+inv_weight		= 0.0140
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 10
+visual	= weapons\magazines\clip_8_1143x23.ogf
+cost = 30
+
+[clip_8_11.43x23_hydro]:ammo_11.43x23_hydro
+box_size	= 1
+mag_size	= 8
+script_binding  = ammo_manager.init
+wm_section	= wm_45b8
+inv_name		= clip_8_45
+description		= desc_load_45_hydro
+inv_name_short	= clip_8_45_hydro_s
+inv_weight		= 0.0140
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 10
+visual	= weapons\magazines\clip_8_1143x23.ogf
+cost = 30
+
+[mag_30_11.43x23_fmj]:ammo_11.43x23_fmj
+box_size	= 1
+mag_size	= 30
+script_binding  = ammo_manager.init
+wm_section	= wm_45a30
+inv_name		= mag_30_45
+description		= desc_load_45_fmj
+inv_name_short	= mag_30_45_fmj_s
+inv_weight		= 0.0140
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 6
+visual	= weapons\magazines\mag_30_1143x23.ogf
+cost = 70
+
+[mag_30_11.43x23_hydro]:ammo_11.43x23_hydro
+box_size	= 1
+mag_size	= 30
+script_binding  = ammo_manager.init
+wm_section	= wm_45b30
+inv_name		= mag_30_45
+description		= desc_load_45_hydro
+inv_name_short	= mag_30_45_hydro_s
+inv_weight		= 0.0140
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 6
+visual	= weapons\magazines\mag_30_1143x23.ogf
+cost = 70
+
+[clip_7_11.43x23_fmj_e]:clip_7_11.43x23_fmj
+description		= desc_clip_e
+inv_weight = 0.07
+
+[clip_7_11.43x23_hydro_e]:clip_7_11.43x23_hydro
+description		= desc_clip_e
+inv_weight = 0.07
+
+[clip_8_11.43x23_fmj_e]:clip_8_11.43x23_fmj
+description		= desc_clip_e
+inv_weight = 0.077
+
+[clip_8_11.43x23_hydro_e]:clip_8_11.43x23_hydro
+description		= desc_clip_e
+inv_weight = 0.077
+
+[mag_30_11.43x23_fmj_e]:mag_30_11.43x23_fmj
+description		= desc_mag_e
+inv_weight = 0.228
+
+[mag_30_11.43x23_hydro_e]:mag_30_11.43x23_hydro
+description		= desc_mag_e
+inv_weight = 0.228
+

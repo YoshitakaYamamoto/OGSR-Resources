@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<!-- ГЛАВНОЕ МЕНЮ -->
+	<!-- Первый экран (игра не загружена) -->
+	<string id="ui_mm_newgame">
+		<text>Новая игра</text>
+	</string>
+	<string id="ui_mm_load_game">
+		<text>Загрузить</text>
+	</string>
+	<string id="ui_mm_last_save">
+		<text>Последняя запись</text>
+	</string>
+	<string id="ui_mm_options_n">
+		<text>Настройки</text>
+	</string>
+	<string id="ui_mm_credits">
+		<text>Создатели</text>
+	</string>
+	<string id="ui_mm_quit2windows">
+		<text>Выйти в Windows</text>
+	</string>
+	<string id="ui_st_want_to_leave_game_q">
+		<text>Вы действительно хотите покинуть Зону?</text>
+	</string>
+	<!-- Первый экран (игра загружена, недостающие строки) -->
+	<string id="ui_mm_return_game">
+		<text>Продолжить игру</text>
+	</string>
+	<string id="ui_mm_quit_game">
+		<text>Завершить игру</text>
+	</string>
+	<!-- Первый экран (после смерти, недостающие строки) -->
+	<string id="st_game_over_press_jump">
+		<text>Нажмите ($$ACTION_JUMP$$) для выхода в главное меню</text>
+	</string>
+	<!-- Окно выбора сложности -->
+	<string id="ui_mm_novice">
+		<text>Новичок</text>
+	</string>
+	<string id="ui_mm_stalker">
+		<text>Опытный</text>
+	</string>
+	<string id="ui_mm_veteran">
+		<text>Ветеран</text>
+	</string>
+	<string id="ui_mm_master">
+		<text>Легенда</text>
+	</string>
+	<string id="ui_mm_back">
+		<text>Назад</text>
+	</string>
+	<!-- Окно загрузки -->
+	<string id="ui_mm_load">
+		<text>Выбрать</text>
+	</string>
+	<!-- загрузка разное -->
+	<string id="ui_st_load_game_confirm">
+		<text>Загрузка игры приведет к потере несохраненных данных. Желаете продолжить?</text>
+	</string>
+	<string id="ui_st_invalid_saved_game">
+		<text>Не совпадает версия сохранённой игры или сохранённая игра испорчена.</text>
+	</string>	
+	<string id="ui_mm_delete_existing_file_q">
+		<text>Вы действительно хотите удалить файл?</text>
+	</string>
+	<string id="ui_load_press_any_key_to_start">
+		<text>Нажмите любую клавишу для перехода к игре</text>
+	</string>
+	<!-- Окно сохранения -->
+	<string id="ui_mm_save_game">
+		<text>Сохранить</text>
+	</string>
+	<string id="ui_mm_save">
+		<text>Сохранить</text>
+	</string>
+	<string id="ui_st_file_exist_owerwrite_q">
+		<text>Файл с таким именем уже существует. Перезаписать?</text>
+	</string>
+	<string id="ui_st_file_name_is_empty">
+		<text>Имя файла пустое</text>
+	</string>
+	<!-- Запрос на прерывание игры -->
+	<string id="ui_mm_quit_game_message">
+		<text>Прервать игру?</text>
+	</string>
+	<!-- Запрос на выход в Windows -->
+	<string id="ui_mm_quit_windows_message">
+		<text>Уйти из Зоны?</text>
+	</string>
+	<!-- Общие -->
+	<string id="ui_mm_cancel">
+		<text>Отмена</text>
+	</string>
+	<string id="ui_mm_apply">
+		<text>Применить</text>
+	</string>
+	<string id="ui_mm_delete">
+		<text>Удалить</text>
+	</string>
+	<!-- Окно настроек -->
+	<string id="ui_mm_options">
+		<text>НАСТРОЙКИ</text>
+	</string>
+	<!-- Экран "Видео" -->
+	<string id="ui_mm_video">
+		<text>Видео</text>
+	</string>
+	<!-- Пресеты -->
+	<string id="Minimum">
+		<text>минимальные</text>
+	</string>
+	<string id="Low">
+		<text>низкие</text>
+	</string>
+	<string id="Default">
+		<text>средние</text>
+	</string>
+	<string id="High">
+		<text>высокие</text>
+	</string>
+	<string id="Extreme">
+		<text>максимальные</text>
+	</string>
+	<!-- базовые настройки видео -->
+	<string id="ui_mm_quality_presets">
+		<text>Установки качества</text>
+	</string>
+	<string id="ui_mm_resolution">
+		<text>Разрешение</text>
+	</string>
+	<string id="ui_mm_gamma">
+		<text>Гамма</text>
+	</string>
+	<string id="ui_mm_contrast">
+		<text>Контраст</text>
+	</string>
+	<string id="ui_mm_brightness">
+		<text>Яркость</text>
+	</string>
+	<string id="ui_mm_fullscreen">
+		<text>Полный экран</text>
+	</string>
+	<string id="ui_mm_advanced">
+		<text>Расширенные</text>
+	</string>
+	<!-- Окно расширенных настроек видео -->
+	<string id="qt_off">
+		<text>выкл.</text>
+	</string>
+	<string id="qt_low">
+		<text>низкое</text>
+	</string>
+	<string id="qt_medium">
+		<text>среднее</text>
+	</string>
+	<string id="qt_high">
+		<text>высокое</text>
+	</string>
+	<string id="qt_extreme">
+		<text>максимальное</text>
+	</string>
+	<string id="ui_mm_need_restart">
+		<text>Изменения вступят в силу только после перезагрузки игры</text>
+	</string>
+	<string id="hint_name_text">
+		<text>Описание настроек</text>
+	</string>
+	<string id="hint_caption_text">
+		<text>Нажмите кнопку 'Расширенные', чтобы изменить настройки, добавленные модом OGSE</text>
+	</string>	
+	<string id="hint_caption_adv_text">
+		<text>Наведите курсор мыши на опцию и увидите здесь её описание. Таким образом вы сможете понять смысл незнакомых вам настроек, а так же новых настроек, добавленных модом OGSE.</text>
+	</string>	
+	<string id="ui_mm_simply">
+		<text>Базовые</text>
+	</string>
+	<string id="ui_mm_vis_distance">
+		<text>Дальность видимости</text>
+	</string>
+	<string id="ui_mm_r2_ao">
+		<text>Ambient Occlusion (Затенение окружения)</text>
+	</string>		
+	<string id="ui_mm_r2_ao_intensity">
+		<text>Интенсивность AO</text>
+	</string>	
+	<string id="ui_mm_r2_ssao_base">
+		<text>Глобальное освещение</text>
+	</string>	
+	<string id="ui_mm_r2_ssao_mode">
+		<text>Режим глобального освещения</text>
+	</string>	
+	<string id="ssdo">
+		<text>SSDO</text>
+	</string>
+	<string id="hbao">
+		<text>HBAO</text>
+	</string>	
+	<string id="ui_mm_r2_steep_parallax">
+		<text>Улучшенная рельефность поверхностей</text>
+	</string>	
+	<string id="ui_mm_r2_dynamic_dof">
+		<text>Эффект фокусировки глаз</text>
+	</string>
+	<string id="ui_mm_r2_reload_dof">
+		<text>Эффект глубины сцены при перезарядке</text>
+	</string>
+	<string id="ui_mm_r2_zoom_dof">
+		<text>Эффект глубины сцены при прицеливании</text>
+	</string>	
+	<string id="ui_mm_r2_dof_quality">
+		<text>Качество эффекта фокусировки глаз</text>
+	</string>
+	<string id="ui_mm_geometry_lod">
+		<text>Детализация объектов</text>
+	</string>
+	<string id="ui_mm_detail_density">
+		<text>Плотность травы</text>
+	</string>
+	<string id="ui_mm_detail_distance">
+		<text>Дальность отрисовки травы</text>
+	</string>	
+	<string id="ui_mm_r2_soft_water">
+		<text>Мягкие края воды</text>
+	</string>	
+	<string id="ui_mm_r2_soft_particles">
+		<text>Мягкие эффекты частиц</text>
+	</string>		
+	<string id="ui_mm_r__bloodmarks">
+		<text>Следы попаданий пуль</text>
+	</string>		
+	<string id="ui_mm_texture_quality">
+		<text>Качество текстур</text>
+	</string>
+	<string id="ui_mm_anisotropic">
+		<text>Фильтрация текстур</text>
+	</string>
+	<string id="ui_mm_r2_aa">
+		<text>Сглаживание (R2)</text>
+	</string>			
+	<string id="ui_mm_r2_aa_mode">
+		<text>Режим сглаживания (R2)</text>
+	</string>	
+	<string id="fxaa">
+		<text>FXAA</text>
+	</string>
+	<string id="smaa">
+		<text>SMAA</text>
+	</string>	
+	<string id="ui_mm_r2_sun">
+		<text>Тень от солнца</text>
+	</string>
+	<string id="ui_mm_r2_sun_details">
+		<text>Тень от травы</text>
+	</string>
+	<string id="ui_mm_r2_detail_bump">
+		<text>Детальный бамп</text>
+	</string>		
+	<string id="ui_mm_r2_sunshafts">
+		<text>Объёмные лучи</text>
+	</string>	
+	<string id="ui_mm_r2_sunshafts_mode">
+		<text>Тип объёмных лучей</text>
+	</string>
+	<string id="volumetric">
+		<text>S.T.A.L.K.E.R. Чистое Небо</text>
+	</string>
+	<string id="screen_space">
+		<text>Crysis</text>
+	</string>
+	<string id="ui_mm_light_distance">
+		<text>Дальность освещения</text>
+	</string>
+	<string id="ui_mm_npc_torch">
+		<text>Свет фонариков НПС</text>
+	</string>
+	<string id="ui_mm_sun_quality">
+		<text>Качество теней</text>
+	</string>
+	<string id="ui_mm_vsync">
+		<text>Верт. синхронизация</text>
+	</string>
+	<string id="ui_mm_60_hz">
+		<text>Частота 60 Гц</text>
+	</string>
+	<string id="ui_mm_r2_sun_near">
+		<text>Дальность отрисовки теней</text>
+	</string>
+	<string id="ui_mm_r2_tf_mipbias">
+		<text>Отчетливость текстур на расстоянии</text>
+	</string>
+	<string id="ui_mm_r2_gloss_factor">
+		<text>Глянцевость поверхностей</text>
+	</string>
+	<string id="ui_mm_r2_true_sun_shadows">
+		<text>Правильные тени</text>
+	</string>	
+	<string id="ui_mm_r2_soft_shadows">
+		<text>Мягкие края теней</text>
+	</string>
+	<string id="ui_mm_r2_lights_shadow_fade">
+		<text>Мягкие тени ламп</text>
+	</string>	
+	<string id="ui_mm_r2_tonemap">
+		<text>Тональное отображение HDR</text>
+	</string>
+	<string id="ui_mm_r2_tonemap_middlegray">
+		<text>Интенсивность HDR</text>
+	</string>
+	<string id="ui_mm_r2_sun_lumscale_amb">
+		<text>Фоновая освещенность</text>
+	</string>
+	<string id="ui_mm_cam_inert">
+		<text>Инерция камеры</text>
+	</string>
+	<string id="ui_mm_r2_lens_flare">
+		<text>Флары от ламп</text>
+	</string>
+	<string id="ui_mm_r2_lens_dirt">
+		<text>Грязь на линзе</text>
+	</string>
+	<string id="ui_mm_r2_rain_drops">
+		<text>Капли на стекле</text>
+	</string>	
+	<string id="ui_mm_r2_puddles">
+		<text>Лужи</text>
+	</string>
+	<string id="ui_mm_r2_wet_surfaces">
+		<text>Намокание</text>
+	</string>
+	<string id="ui_mm_r2_volumetric_lights">
+		<text>Объемный свет</text>
+	</string>		
+	<string id="ui_mm_r2_reflections">
+		<text>Отражения</text>
+	</string>
+	<string id="ui_mm_r2_reflections_mode">
+		<text>Режим отражений</text>
+	</string>
+	<string id="water">
+		<text>на воде</text>
+	</string>
+	<string id="ground">
+		<text>на асфальте</text>
+	</string>
+	<string id="both">
+		<text>на воде и асфальте</text>
+	</string>
+	<string id="ui_mm_r2_image_sharpening">
+		<text>Резкость изображения</text>
+	</string>
+	<string id="ui_mm_r2_volumetric_fog">
+		<text>Объёмный туман</text>
+	</string>
+	<!-- неактивные настройки видео -->
+	<string id="ui_mm_r2_ssao_base">
+		<text>Screen Space Ambient Occlusion</text>
+	</string>	
+	<string id="ui_mm_r2_soft_particles">
+		<text>Мягкие партиклы</text>
+	</string>	
+	<string id="ui_mm_r__bloodmarks">
+		<text>Блудмарки</text>
+	</string>	
+	<string id="ui_mm_r2_details_opt">
+		<text>Оптимизация травы</text>
+	</string>
+	<string id="ui_mm_r2_gbuffer_opt">
+		<text>Оптимизация шейдеров</text>
+	</string>
+	<string id="ui_mm_supersample_check">
+		<text>Сглаживание движком игры</text>
+	</string>	
+	<string id="ui_mm_supersample">
+		<text>Качество сглаживания (R1)</text>
+	</string>
+	<string id="ui_mm_switch_torch">
+		<text>Использование фонариков AI</text>
+	</string>
+	<string id="ui_mm_r2_sun_near_border">
+		<text>Угол отрисовки теней</text>
+	</string>
+		<string id="ui_mm_r2_sun_lumscale">
+		<text>Яркость света солнца</text>
+	</string>
+	<string id="ui_mm_r2_aa">
+		<text>Сглаживание</text>
+	</string>	
+	<string id="ui_mm_r2_gi">
+		<text>Глобальное освещение (экспериментально)</text>
+	</string>
+	<string id="ui_mm_particles_distance">
+		<text>Дальность партиклов</text>
+	</string>
+	<string id="ui_mm_r2_sun_shafts">
+		<text>Солнечные лучи</text>
+	</string>
+	<string id="ui_mm_r2_ssao">
+		<text>Качество глобального освещения</text>
+	</string>		
+	<string id="ui_mm_r2_float32">
+		<text>Освещение Кука-Торренса</text>
+	</string>
+	<string id="ui_mm_r2_dof">
+		<text>Динамическая глубина поля зрения</text>
+	</string>	
+	<!-- Окно "Звук" -->
+	<string id="ui_mm_sound">
+		<text>Звук</text>
+	</string>
+	<string id="ui_mm_music_volume">
+		<text>Громкость музыки</text>
+	</string>
+	<string id="ui_mm_master_volume">
+		<text>Громкость</text>
+	</string>
+	<string id="ui_mm_eax">
+		<text>EAX</text>
+	</string>
+	<!-- неактивные настройки звука -->
+	<string id="ui_mm_sound_quality">
+		<text>Качество звука</text>
+	</string>
+	<!-- Окно "Игра" -->
+	<string id="ui_mm_gameplay">
+		<text>Игра</text>
+	</string>
+	<string id="ui_mm_difficulty">
+		<text>Сложность</text>
+	</string>
+	<string id="gd_novice">
+		<text>Новичок</text>
+	</string>
+	<string id="gd_stalker">
+		<text>Опытный</text>
+	</string>
+	<string id="gd_veteran">
+		<text>Ветеран</text>
+	</string>
+	<string id="gd_master">
+		<text>Мастер</text>
+	</string>
+	<string id="ui_mm_show_crosshair">
+		<text>Показывать прицел</text>
+	</string>
+	<string id="ui_mm_dyn_crosshair">
+		<text>Динамический прицел</text>
+	</string>
+	<string id="ui_mm_show_weapon">
+		<text>Показывать оружие</text>
+	</string>
+	<string id="ui_mm_crosshair_distance">
+		<text>Дистанция до цели</text>
+	</string>
+	<string id="ui_mm_tips">
+		<text>Распознавание НПС</text>
+	</string>
+	<!-- Окно "Управление" -->
+	<string id="ui_mm_controls">
+		<text>Управление</text>
+	</string>
+	<string id="ui_mm_mouse_sense">
+		<text>Чувствительность мыши</text>
+	</string>
+	<string id="ui_mm_invert_mouse">
+		<text>Инвертировать мышь</text>
+	</string>
+	<string id="ui_mm_keyboard_setup">
+		<text>Настройка клавиатуры</text>
+	</string>
+	<string id="ui_mm_action">
+		<text>Действие</text>
+	</string>
+	<string id="ui_mm_key">
+		<text>Кнопка</text>
+	</string>
+	<string id="ui_mm_default">
+		<text>По умолчанию</text>
+	</string>
+</string_table>

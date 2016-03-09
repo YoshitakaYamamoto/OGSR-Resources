@@ -1,0 +1,39 @@
+;Тактическая рукоятка (устанавливается на нижнюю рельсу Пикатинни)
+[wpn_addon_grip]:wpn_fake_addon_base
+inv_grid_width				= 1
+inv_grid_height				= 1
+inv_grid_x					= 65	;37
+inv_grid_y					= 11	;35
+visual          = weapons\upgrade\grip.ogf 
+inv_name		= addon_gip
+inv_name_short	= addon_gip_s
+description		= enc_addon_gip
+cost			= 1300
+inv_weight		= 1.0
+is_grip_addon = true
+fake_item_section = fake_wpn_addon_grip
+always_fake = true
+; только для совместимости с системой аддонов
+[fake_wpn_addon_grip]:wpn_addon_grip
+real_item_section = wpn_addon_grip
+
+
+;щека приклада СВД
+[wpn_addon_svd_scheek]:wpn_fake_addon_base
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x			= 71
+inv_grid_y			= 11
+visual          = weapons\upgrade\svd_scheek.ogf
+inv_name		= addon_svd_scheek
+inv_name_short	= addon_svd_scheek_s
+description		= enc_addon_svd_scheek
+cost			= 3000
+inv_weight		= 0.1
+is_grip_addon = true
+fake_item_section	= fake_wpn_addon_svd_scheek
+always_fake = true
+; только для совместимости с системой аддонов
+[fake_wpn_addon_svd_scheek]:wpn_addon_svd_scheek
+real_item_section = wpn_addon_svd_scheek
+

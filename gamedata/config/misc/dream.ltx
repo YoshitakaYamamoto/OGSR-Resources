@@ -1,0 +1,174 @@
+;--------------------------------------------------------------------------------
+;--- Dreams ---------------------------------------------------------------------
+;--------------------------------------------------------------------------------
+[dreams]
+regular_probability = 70
+scenario            = scenario1, scenario2, scenario3
+regular             = regular_dream1, regular_dream2, regular_dream3, regular_dream4, regular_dream5, regular_dream6, regular_dream7, regular_dream8, regular_dream9, regular_dream10
+dream_types         = nightmare, normal, happy
+
+;--------------------------------------------------------------------------------
+;--- Regular dreams -------------------------------------------------------------
+;--------------------------------------------------------------------------------
+[regular_dream1]
+dream       = aes_sky_red
+probability = 9
+type        = nightmare
+
+[regular_dream2]
+dream       = esc_sky_01
+probability = 10
+type        = normal
+
+[regular_dream3]
+dream       = Movie-003_Rats_OutPut-010
+probability = 8
+type        = happy
+
+[regular_dream4]
+dream       = dream_monolith_call
+probability = 8
+type        = nightmare
+
+[regular_dream5]
+dream       = dream_the_past
+probability = 10
+type        = nightmare
+
+[regular_dream6]
+dream       = dream_4
+probability = 7
+type        = nightmare
+
+[regular_dream7]
+dream       = dream_5
+probability = 6
+type        = nightmare
+
+[regular_dream8]
+dream       = dream_6
+probability = 8
+type        = normal
+
+[regular_dream9]
+dream       = dream_7
+probability = 7
+type        = normal
+
+[regular_dream10]
+dream       = intro_kill
+probability = 6
+type        = normal
+
+;--------------------------------------------------------------------------------
+;--- Scenario dreams ---------------------------------------------------------------
+;--------------------------------------------------------------------------------
+[scenario1]
+dream       = sleep\Movie-003_Rats_OutPut-010
+;to_regular  = 3,normal
+cond        = {+agr_military_documents_done}
+
+[scenario2]
+dream       = sleep\Movie-003_Rats_OutPut-010
+;to_regular  = 3,normal
+cond        = {+agr_military_documents_done}
+
+[scenario3]
+dream       = sleep\Movie-003_Rats_OutPut-010
+;to_regular  = 3,normal
+cond        = {+agr_military_documents_done}
+
+;--------------------------------------------------------------------------------
+;--- Level specific -------------------------------------------------------------
+;--------------------------------------------------------------------------------
+[L01_Escape]
+probability = 5
+types = happy,normal
+
+[L02_Garbage]
+probability = 5
+types = happy,normal
+
+[L03_Agroprom]
+probability = 10
+types = normal
+
+[l03u_agr_underground]
+probability = 30
+types = nightmare 
+
+[L05_Bar]
+probability = 15
+types = all
+
+[l04_darkvalley]
+probability = 50
+types = normal,nightmare 
+
+[l04u_LabX18]
+probability = 70
+types = nightmare 
+
+[k01_darkscape]
+probability = 20
+types = happy,normal
+
+[L06_rostok]
+probability = 20
+types = all
+
+[l08_yantar]
+probability = 70
+types = nightmare 
+
+[l08u_brainlab]
+probability = 80
+types = nightmare 
+
+[L09_Deadcity]
+probability = 40
+types = all
+
+[L13_DeadMil]
+probability = 30
+types = normal,nightmare 
+
+[L07_Military]
+probability = 35
+types = normal,nightmare 
+
+[l10u_bunker]
+probability = 30
+types = normal,nightmare 
+
+[l10_radar]
+probability = 75
+types = nightmare 
+
+[L17_Radar_Underground]
+probability = 85
+types = nightmare 
+
+[L11_Pripyat]
+probability = 80
+types = normal,nightmare 
+
+[L12_Stancia]
+probability = 85
+types = nightmare 
+
+[L12U_Sarcofag]
+probability = 90
+types = nightmare 
+
+[l12u_control_monolith]
+probability = 95
+types = nightmare 
+
+[L12_Stancia_2]
+probability = 100
+types = nightmare 
+
+[l23_final_battle]
+probability = 100
+types = nightmare 

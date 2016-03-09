@@ -1,0 +1,874 @@
+--Здесь будут находиться функции с постоянной проверкой в биндере-----------------------------------
+--03.02.2012----------------------------------------------------------------------------------------
+
+-- Список используемых из инвентаря квестовых предметов
+-- Работает следующим образом:
+-- Ключ таблицы это секция предмета
+-- значением элемента таблицы может быть два типа:
+-- Первый - это строка. Если элемент строчный, то ГГ при использовании
+-- этого предмета выдастся инфопоршен этой строкой.
+-- Оформлять такие строки следует так:
+-- ["секция_вашего_предмета"] 			= "инфопоршен_который_надо_выдать",
+-- Второй - это функция. Тогда при использовании этого предмета вызовется содержимое этой функции.
+-- Оформлять такие функции следует так:
+-- ["секция_вашего_предмета"] 			= function () 
+	-- вызов_вашей_функции1()
+	-- вызов_вашей_функции2()
+-- end,
+
+local pda =
+{
+	-- Первач Лесника:	
+	["glassful"] 		= function ()
+		if db.actor:dont_has_info("pervach_info") then
+			db.actor:give_info_portion ("pervach_info")
+		end
+	end,
+
+	-- Ключи сержанта из МГ:	
+	["cit_tow_box_keys"] 		= function ()
+		jekan_work.use_cit_tow_box_keys()
+		soundtrack.keys()
+	end,
+
+	-- "Маятник (целый)":	
+	["magnit_full"] 		= function ()
+		jekan_work.spawn_magnit_part()
+		jekan_work.mark_magnit_part()
+		jekan_work.actor_disable_inventory()
+		ogse.spawn_item_in_inv("af_magnit_part1")
+	end,
+
+	-- Дипломат командира:
+	["kommander_diplomat"] 			= function () 
+		ogse.spawn_item_in_inv("kommander_key")
+		db.actor:give_money(10000)
+		news_manager.send_tip(db.actor, "kommander_key_in", nil, "default", 5000, nil)
+		news_manager.send_tip(db.actor, "kommander_money_in", nil, "money", 5000, nil)
+		soundtrack.diplomat_open()
+	end,
+
+	-- "Чебурашка":	
+	["cheb"] = function ()
+		if db.actor:dont_has_info("cheb_task1") then
+			soundtrack.cheb_open()
+			jekan_devices2.cheb1_1()
+			jekan_work.give_chebur_hello_portion()
+			db.actor:disable_info_portion("cheb_sleep")
+		elseif db.actor:dont_has_info("cheb_sleep") then
+			soundtrack.cheb_open()
+			jekan_devices2.cheb2_1()
+			db.actor:disable_info_portion("cheb_sleep")
+		else
+			soundtrack.cheb_open()
+			jekan_devices2.cheb2_7()
+			db.actor:disable_info_portion("cheb_sleep")
+		end
+	end,
+
+	-- Самогон "Кордоновский":
+	["kordon_samogon"] 			= function () 
+			db.actor:give_info_portion("kordon_samogon_forsage")
+			soundtrack.kordon_samogon_drink()
+	end,
+
+	-- Сборная турель ПКМ:
+	--[[["turret_pkm"] 			= function () 
+		soundtrack.pkm_activate()
+		level.disable_input()
+		jekan_work.actor_disable_inventory()
+		jekan_devices.use_turret_interface_installing()
+		ogse.start_timer("pkm1",5)
+	end,]]
+
+	-- ПДА Диггера юры:
+	["diggers_pda"] 			= function () 
+			db.actor:give_info_portion("diggers_pda_info")
+			jekan_work.digger_weapon_change()
+	end,
+	
+	-- ПДА Князя:
+	["knyaz_pda"] 			= function () 
+		if not has_alife_info("knyaz_pda_info") then
+			db.actor:give_info_portion("knyaz_pda_info")
+			news_manager.send_tip(db.actor, "knyaz_pda_info", nil)   
+		end	
+	end,
+	-- ПДА Проныры:	
+	["robber_pda"] 			= function () 
+		if not has_alife_info("robber_pda_info") then
+			db.actor:give_info_portion("robber_pda_info")
+			news_manager.send_tip(db.actor, "robber_pda_info", nil)   
+		end	
+	end,
+	
+	-- ПДА Жеки:	
+	["bratstvo_agent_pda"] 			= "zapravka_pda_off",
+	
+	-- Детонатор наемников:
+	["dar_road_detonator"] 			= function () 
+		ogse.start_timer("road_bomb_expl",2)
+		jekan_work.dar_road_bomb_expl()
+	end,
+	
+	-- Планшет наемников:
+	["dar_merc_planshet"] 			= "dar_merc_planshet_info",
+}
+
+----------------------------------------------------------------------------------------------------
+
+function attach(sm)
+   sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
+end
+
+function on_key_down(key, bind)
+
+end
+
+local watchdog = 0
+local watchdog_max = 17
+
+function watchdog_quest()
+
+	ogse_debug.process_actor("upd", 22)
+
+	if watchdog == 1 then
+		ogse_debug.process_actor("upd", 23)
+		this.dolg_zahvat()
+	end
+	if watchdog == 2 then
+		ogse_debug.process_actor("upd", 24)
+		this.af_puzir_destroy()
+	end
+	if watchdog == 3 then
+		ogse_debug.process_actor("upd", 25)
+		this.af_light_destroy()
+	end
+	if watchdog == 4 then
+		ogse_debug.process_actor("upd", 26)
+		this.af_uley_packed()
+	end
+	if watchdog == 5 then
+		ogse_debug.process_actor("upd", 27)
+		this.af_mayatnik_effect()
+	end
+	if watchdog == 6 then
+		ogse_debug.process_actor("upd", 28)
+		this.af_ray_travel()
+	end
+	if watchdog == 7 then
+		ogse_debug.process_actor("upd", 29)
+		this.cheburashka_greeting()
+	end
+	if watchdog == 8 then
+		ogse_debug.process_actor("upd", 291)
+		this.fake_arts_delete()
+	end
+	if watchdog == 9 then
+		ogse_debug.process_actor("upd", 292)
+		this.magnit_part_work_from_belt()
+	end
+	if watchdog == 10 then
+		ogse_debug.process_actor("upd", 293)
+		this.magnit_part_work_on_take()
+	end
+	if watchdog == 11 then
+		ogse_debug.process_actor("upd", 294)
+		xr_effects.af_uley_effect()
+	end
+	if watchdog == 12 then
+		ogse_debug.process_actor("upd", 295)
+		this.thunderbird_visual_effect()
+	end
+	if watchdog == 13 then
+		ogse_debug.process_actor("upd", 296)
+		this.rustyfield_effect1()
+	end
+	if watchdog == 14 then
+		ogse_debug.process_actor("upd", 297)
+		this.rustyfield_effect2()
+	end
+	if watchdog == 15 then
+		ogse_debug.process_actor("upd", 298)
+		this.rustyfield_effect3()
+	end
+	if watchdog == 16 then
+		ogse_debug.process_actor("upd", 299)
+		this.strange_zone_actor_particle()
+	end
+	
+	ogse_debug.process_actor("upd", 2222)
+	
+	watchdog = watchdog + 1
+	if watchdog >= watchdog_max then
+		watchdog = 0
+	end
+
+end
+
+function on_use_item(obj)
+	if obj == nil or alife():object(obj:id()) == nil then return end
+	local portion = pda[obj:section()]
+	if portion ~= nil then 
+		if type(portion) == "string" then
+			if not has_alife_info(portion) then
+				db.actor:give_info_portion(portion)
+			end		
+		elseif type(portion) == "function" then
+			portion()
+		end
+	end
+end
+
+----------------------------------------------------------------------------------------------------
+
+function magnit_part_work_from_belt()
+	if db.actor and inventory.belt["af_magnit_part1"] then
+		jekan_work.teleport_to_magnit()
+	end
+end
+
+function magnit_part_work_on_take()
+	if db.actor:object("af_magnit_part1") ~= nil  and db.actor:object("af_magnit_part2") ~= nil  then
+		ogse.remove_item_from_inventory(db.actor:object("af_magnit_part1"), db.actor)
+		ogse.remove_item_from_inventory(db.actor:object("af_magnit_part2"), db.actor)
+		ogse.spawn_item_in_inv("magnit_full")
+		news_manager.send_tip(db.actor, "af_magnit_is_full", nil, "anomal", 3000, nil)
+	end
+end
+
+----------------------------------------------------------------------------------------------------
+	local dz_zones = {
+		["strange_zone1_sound"] = {sig_off = "strangezone1_off", sig_birth = "af_invis1_1_birth", timer = {"str_zon1", 0, 9,0}},
+		["strange_zone2_sound"] = {sig_off = "strangezone2_off", sig_birth = "af_invis2_1_birth", timer = {"str_zon2", 0, 7,0}},
+		["strange_zone3_sound"] = {sig_off = "strangezone3_off", sig_birth = "af_invis3_1_birth", timer = {"str_zon3", 0,10,0}},
+		["strange_zone4_sound"] = {sig_off = "strangezone4_off", sig_birth = "af_invis4_1_birth", timer = {"str_zon4", 0,12,0}},
+		["strange_zone5_sound"] = {sig_off = "strangezone5_off", sig_birth = "af_invis5_1_birth", timer = {"str_zon5", 0, 8,0}},
+		["strange_zone6_sound"] = {sig_off = "strangezone6_off", sig_birth = "af_invis6_1_birth", timer = {"str_zon6", 0, 9,0}},
+		["strange_zone7_sound"] = {sig_off = "strangezone7_off", sig_birth = "af_invis7_1_birth", timer = {"str_zon7", 1, 0,0}},		
+	}
+	local dz_arts = {
+		["fake_art1"] = "af_polter",
+		["fake_art2"] = "af_sparks",
+		["fake_art3"] = "af_resine",
+	}
+	
+--TODO: висит на апдейте, может перенести в коллбек получения предмета?
+function fake_arts_delete()
+
+	for fake_art, real_art in pairs(dz_arts) do
+		if db.actor:object(fake_art) then
+			for zone, zone_params in pairs(dz_zones) do
+				if xr_conditions.actor_in_zone(nil,nil,{zone}) then
+					ogse.remove_item_from_inventory_by_name(fake_art, db.actor)
+					ogse.spawn_item_in_inv(real_art, db.actor)
+					db.actor:give_info_portion(zone_params.sig_off)
+					news_manager.send_tip(db.actor, "strange_zone_af_gathered", nil, "anomal", 5000, nil)
+					db.actor:disable_info_portion(zone_params.sig_birth)
+					ogse.g_start_timer(unpack(zone_params.timer))					
+				end
+			end
+		end
+	end
+	
+	if db.actor:object("cheb_fakeart") ~= nil then
+		jekan_work.delete_cheb_fakeart()
+		jekan_work.give_cheb_realart()
+		ogse.start_timer("cheb_art",1800)
+		soundtrack.cheb_fakeart_konteiner_open()
+	end
+end
+
+function restart_zone_1()
+	local zone_params = dz_zones["strange_zone1_sound"]
+	db.actor:give_info_portion(zone_params.sig_off)
+	db.actor:give_info_portion("strangezone1_has_same_art")
+	db.actor:disable_info_portion(zone_params.sig_birth)
+	ogse.g_start_timer(unpack(zone_params.timer))
+end
+
+function restart_zone_2()
+	local zone_params = dz_zones["strange_zone2_sound"]
+	db.actor:give_info_portion(zone_params.sig_off)
+	db.actor:give_info_portion("strangezone2_has_same_art")
+	db.actor:disable_info_portion(zone_params.sig_birth)
+	ogse.g_start_timer(unpack(zone_params.timer))
+end
+
+function restart_zone_3()
+	local zone_params = dz_zones["strange_zone3_sound"]
+	db.actor:give_info_portion(zone_params.sig_off)
+	db.actor:give_info_portion("strangezone3_has_same_art")
+	db.actor:disable_info_portion(zone_params.sig_birth)
+	ogse.g_start_timer(unpack(zone_params.timer))
+end
+
+function restart_zone_4()
+	local zone_params = dz_zones["strange_zone4_sound"]
+	db.actor:give_info_portion(zone_params.sig_off)
+	db.actor:give_info_portion("strangezone4_has_same_art")
+	db.actor:disable_info_portion(zone_params.sig_birth)
+	ogse.g_start_timer(unpack(zone_params.timer))
+end
+
+function restart_zone_5()
+	local zone_params = dz_zones["strange_zone5_sound"]
+	db.actor:give_info_portion(zone_params.sig_off)
+	db.actor:give_info_portion("strangezone5_has_same_art")
+	db.actor:disable_info_portion(zone_params.sig_birth)
+	ogse.g_start_timer(unpack(zone_params.timer))
+end
+
+function restart_zone_6()
+	local zone_params = dz_zones["strange_zone6_sound"]
+	db.actor:give_info_portion(zone_params.sig_off)
+	db.actor:give_info_portion("strangezone6_has_same_art")
+	db.actor:disable_info_portion(zone_params.sig_birth)
+	ogse.g_start_timer(unpack(zone_params.timer))
+end
+
+function restart_zone_7()
+	local zone_params = dz_zones["strange_zone7_sound"]
+	db.actor:give_info_portion(zone_params.sig_off)
+	db.actor:give_info_portion("strangezone7_has_same_art")
+	db.actor:disable_info_portion(zone_params.sig_birth)
+	ogse.g_start_timer(unpack(zone_params.timer))
+end
+
+function on_timer_cheb2(params_string)
+	if db.actor:dont_has_info("cheb_hello") then
+		jekan_work.send_cheb_hello_tip2()
+		ogse.start_tmr("cheb1", 7, script_name()..".on_timer_cheb1")
+	end
+end
+	
+function on_timer_cheb1(params_string)
+	if db.actor:dont_has_info("cheb_hello") then
+		jekan_work.send_cheb_hello_tip1()
+		ogse.start_tmr("cheb2", 7, script_name()..".on_timer_cheb2")
+	end
+end
+	
+function cheburashka_greeting()
+	if db.actor and db.actor:object("cheb") ~= nil and db.actor:dont_has_info("cheb_greeting") then
+		ogse.start_tmr("cheb1", 7, script_name()..".on_timer_cheb1")
+		db.actor:give_info_portion ("cheb_greeting")
+	end
+end
+
+function dolg_zahvat()
+	if db.actor and db.actor:object("klondaik_flash_2_fake") ~= nil then
+		jekan_work.actor_dolg_zahvat()
+		ogse.remove_item_from_inventory(db.actor:object("klondaik_flash_2_fake"), db.actor)
+	end
+end
+
+function af_ray_travel()
+	if db.actor and db.actor:object("af_ray") ~= nil and db.actor:dont_has_info("have_af_ray") then
+		db.actor:set_actor_position(vector():set(149.91,0.43,71.97))
+		db.actor:give_info_portion ("have_af_ray")
+		jekan_work.get_items_from_arena_box()
+		-- news_manager.send_tip(db.actor, "voronin_after_arena_tip", nil)
+		jekan_work.voronin_after_arena_tip()
+		ogse.remove_item_from_inventory(db.actor:object("wpn_knife_arena"), db.actor)
+	end
+end
+
+function af_mayatnik_effect()
+	if db.actor and inventory.belt["af_mayatnik"] then
+		level.add_pp_effector("snd_shock.ppe", 999, false)
+		ogse.remove_item_from_inventory(db.actor:object("af_mayatnik"), db.actor)
+		db.actor:set_actor_position(vector():set(423.17,-2.06,-363.09))
+		db.actor:give_info_portion ("have_af_mayatnik")
+		jekan_work.release_zapravka_port()
+		ogse.spawn_item_in_inv("mayatnik_p1", db.actor)
+		ogse.spawn_item_in_inv("mayatnik_p2", db.actor)
+		ogse.spawn_item_in_inv("mayatnik_p3", db.actor)
+		ogse.spawn_item_in_inv("mayatnik_p4", db.actor)
+		news_manager.send_tip(db.actor, "af_mayatnik_destroy", nil, "anomal", 5000, nil)
+	end
+end
+
+
+function af_puzir_destroy()
+	if db.actor:object("af_puzir") ~= nil and db.actor:dont_has_info("have_af_puzir") then
+		ogse.remove_item_from_inventory_by_name("af_puzir",db.actor)
+		soundtrack.af_puzir_destroy()
+		news_manager.send_tip(db.actor, "af_puzir_destroyed", nil)
+		db.actor:give_info_portion ("af_puzir_destroyed")
+	end
+end
+
+----------------------------------------------------------------------------------------------------
+
+function af_light_destroy()
+	if db.actor:object("af_light") ~= nil and db.actor:dont_has_info("af_light_have") then
+		ogse.remove_item_from_inventory_by_name("af_light",db.actor)
+		soundtrack.af_puzir_destroy()
+		news_manager.send_tip(db.actor, "af_puzir_destroyed", nil)
+		db.actor:give_info_portion ("af_light_destroyed")
+	end
+end
+
+--Суперконтролёр------------------------------------------------------------------------------------
+
+local sound_obj_right = sound_object([[characters_voice\scenario\superkontroler\avaaa]])
+local sound_obj_left = sound_object([[characters_voice\scenario\superkontroler\fooooood]])
+
+function controller_special_effect(p_obj)
+	sound_obj_right.volume = 1.0
+	sound_obj_left.volume = 1.0
+	if not has_alife_info("actor_set_zombied") then
+		if not sound_obj_left:playing() then 
+			local i=math.random(1,11)
+			if i==1 then 
+				sound_obj_left = sound_object([[characters_voice\scenario\superkontroler\ahrrr]])
+			elseif i==2 then 
+				jekan_update.actor_fake_sleep()
+			elseif i==3 then 
+				sound_obj_left = sound_object([[characters_voice\scenario\superkontroler\avaaa]])
+			elseif i==4 then
+				jekan_update.actor_fake_sleep()
+			elseif i==5 then
+				sound_obj_left = sound_object([[characters_voice\scenario\superkontroler\fooooood]])
+			elseif i==6 then 
+				jekan_update.actor_fake_sleep()
+			elseif i==7 then 
+				sound_obj_left = sound_object([[characters_voice\scenario\superkontroler\harrr]])
+			elseif i==8 then 
+				jekan_update.actor_fake_sleep()
+			elseif i==9 then 
+				jekan_update.actor_fake_sleep()
+			elseif i==10 then 
+				jekan_update.actor_fake_sleep()
+			elseif i==11 then 
+				jekan_update.actor_fake_sleep()
+			end
+			if sound_obj_left then
+				sound_obj_left:play_at_pos(db.actor, vector():set(1, 0, 1), 0, sound_object.s2d)
+			end
+		end
+		if not sound_obj_right:playing() then
+			local j=math.random(1,6)
+			if j==1 then 
+				jekan_update.actor_fake_sleep()
+			elseif j==2 then 
+				sound_obj_right = sound_object([[characters_voice\scenario\superkontroler\orrr]])
+			elseif j==3 then 
+				sound_obj_right = sound_object([[characters_voice\scenario\superkontroler\vaaa]])
+			elseif j==4 then 
+				sound_obj_right = sound_object([[characters_voice\scenario\superkontroler\ahrrr]])
+			elseif i==5 then 
+				jekan_update.actor_fake_sleep()
+			elseif i==6 then 
+				jekan_update.actor_fake_sleep()
+			end
+			if sound_obj_right then
+				sound_obj_right:play_at_pos(db.actor, vector():set(-1, 0, 1), 0, sound_object.s2d) 
+			end
+		end
+		if not sound_obj_left:playing() then 
+			local i=math.random(1,6)
+			if i==1 then 
+				sound_obj_left = sound_object([[characters_voice\scenario\superkontroler\ahrrr]])
+			elseif i==2 then
+				sound_obj_left = sound_object([[characters_voice\scenario\superkontroler\fooooood]])
+			elseif i==3 then
+				jekan_update.actor_fake_sleep()
+			elseif i==4 then
+				sound_obj_left = sound_object([[characters_voice\scenario\superkontroler\mmmm]])
+			elseif i==5 then
+				jekan_update.actor_fake_sleep()
+			elseif i==6 then
+				jekan_update.actor_fake_sleep()
+			end
+			if sound_obj_left then
+				sound_obj_left:play_at_pos(db.actor, vector():set(1, 0, 1), 0, sound_object.s2d)
+			end
+		end
+		if not sound_obj_right:playing() then
+			local j=math.random(1,6)
+			if j==1 then
+				sound_obj_right = sound_object([[characters_voice\scenario\superkontroler\orrr]])
+			elseif j==2 then
+				sound_obj_right = sound_object([[characters_voice\scenario\superkontroler\fooooood]])
+			elseif j==3 then
+				sound_obj_right = sound_object([[characters_voice\scenario\superkontroler\vaaa]])
+			elseif j==4 then
+				sound_obj_right = sound_object([[characters_voice\scenario\superkontroler\ahrrr]])
+			elseif i==5 then
+				jekan_update.actor_fake_sleep()
+			elseif i==6 then
+				jekan_update.actor_fake_sleep()
+			end
+			if sound_obj_right then
+				sound_obj_right:play_at_pos(db.actor, vector():set(-1, 0, 1), 0, sound_object.s2d) 
+			end
+		end
+	end
+end
+
+function actor_fake_sleep()
+	level.add_pp_effector("monolith_off.ppe", 2007, false)
+	level.add_cam_effector("camera_effects\\fatigue.anm", 100, true, "")
+end
+
+function actor_weapon_drop()
+	local active_item = db.actor:active_item()
+	if active_item and active_item:section()~= "bolt" and active_item:section()~= "wpn_knife" 
+	and active_item:section()~= "wpn_knife_m1" and active_item:section()~= "wpn_montirovka" then
+		db.actor:drop_item(active_item)
+	end
+end
+
+-- level.add_cam_effector("camera_effects\\head_shot.anm", 100, false, "") -- попадание в голову - запрокидывает голову, 
+--потом тряся ей восстанавливается
+-- level.add_cam_effector("camera_effects\\dream.anm", 100, false, "") -- смотрит вверх, потом вправо
+-- level.add_cam_effector("camera_effects\\dis_consciousness.anm", 100, false, "") -- раскачивание с переворотом через себя
+-- level.add_cam_effector("camera_effects\\earthquake.anm", 100, false, "") - имитация землетрясения
+-- level.add_cam_effector("camera_effects\\fusker.anm", 100, false, "") - сильный удар в лицо слева, плавное восстановление
+-- level.add_cam_effector("camera_effects\\fatigue.anm", 100, true, "") - сильное долгое раскачивание 
+-- level.add_cam_effector("camera_effects\\prison_1.anm", 100, false, "") - взгляд в небо, плавное восстановление с раскачиванием
+-- level.add_cam_effector("camera_effects\\drunk.anm", 100, false, "") - сильное раскачивание слева направо
+
+-- Спавним клона(спасибо Mixser) -------------------------------------------------------------------
+
+class "go_online_watch_timer" (ogse_qt.quick_timer)
+function go_online_watch_timer:__init(npc_id) super()
+   self.npc_id = npc_id -- запоминаем в таймере id непися
+end
+
+function go_online_watch_timer:condition()
+   return (level.object_by_id(self.npc_id))
+end
+
+function go_online_watch_timer:action()
+	-- Всучим оружие
+	for i=1,2 do
+		if db.actor:item_in_slot(i) then
+			ogse.spawn_item_in_inv(db.actor:item_in_slot(i):section(), level.object_by_id(self.npc_id))
+		end
+	end
+	-- Сделаем врагами
+	ogse.set_npc_relation(level.object_by_id(self.npc_id), db.actor, "enemy")
+end
+
+local visuals =
+{
+	["novice_outfit"] = [[actors\hero\stalker_novice]],
+	["outfit_novice_m1"] = [[actors\hero\stalker_novice]],
+	["outfit_bandit_m1"] = [[actors\hero\stalker_bandit]],
+	["stalker_outfit"] = [[actors\hero\stalker_hood]],
+	["outfit_stalker_m1"] = [[actors\hero\stalker_hood]],
+	["outfit_stalker_m2"] = [[actors\hero\stalker_hood]],
+	["scientific_outfit"] = [[actors\hero\stalker_scien]],
+	["bandit_plash"] = [[actors\bandit\stalker_bandit_veteran]],
+	["bandit_plash_m1"] = [[actors\bandit\stalker_bandit_master]],
+	["dolg_outfit"] = [[actors\hero\stalker_dolg]],
+	["outfit_dolg_m1"] = [[actors\hero\stalker_dolg]],
+	["svoboda_heavy_outfit"] = [[actors\hero\stalker_svoboda_heavy]],
+	["killer_outfit"] = [[actors\hero\stalker_killer]],
+	["outfit_killer_m1"] = [[actors\hero\stalker_killer]],
+	["monolit_outfit"] = [[actors\hero\stalker_monolit]],
+	["monolit_outfit_m1"] = [[actors\hero\stalker_monolit]],
+	["monolit_exoskeleton"] = [[actors\monolit\stalker_mo_exo]],
+	["ecolog_outfit"] = [[actors\hero\stalker_ecolog]],
+	["protection_outfit"] = [[actors\hero\stalker_scien]],
+	["soldier_outfit"] = [[actors\hero\stalker_soldier]],
+	["specops_outfit"] = [[actors\hero\stalker_specops]],
+	["outfit_specnaz_m1"] = [[actors\hero\stalker_specops]],
+	["military_outfit"] = [[actors\soldier\stalker_military_green]],
+	["exo_outfit"] = [[actors\hero\stalker_exoskeleton]]
+}
+
+function spawn_gg_clone()
+	local random_number = math.random(1, 3)
+	for i=1, random_number do
+		local clone = alife():create("gg_clone_simple", db.actor:position():add(vector():set(math.random(-2,2), 1, 0)), 
+			db.actor:level_vertex_id(), db.actor:game_vertex_id())
+		local pk = xs_netpk.monster(clone)
+		if not pk:isOk() then
+			pk = xs_netpk.stalker(clone)
+		end
+		if pk:isOk() then
+			local data = pk:get()
+			local outfit_visual = ""
+			if not db.actor:item_in_slot(6) then 
+				outfit_visual = [[actors\stalker_hero\stalker_sviter]]
+			else 
+				outfit_visual = visuals[db.actor:item_in_slot(6):section()]
+			end
+			data.visual_name = outfit_visual
+			pk:set(data)
+			go_online_watch_timer(clone.id):start()
+		end
+	end
+end
+
+-- КнижОнки н-н-н-ада? -----------------------------------------------------------------------------
+
+function book_using(sm)
+   sm:subscribe({signal = "on_use", fun = this.on_item_use})
+end
+
+--TODO: странный код, он работает? что вообще хотели делать с "книжонками"?
+local book_sections = { 
+	section1 = book_1,
+	section2 = book_2,
+	section3 = book_3,
+	section4 = book_4,
+	section5 = book_5
+}
+
+function on_item_use(item)
+	if item == nil or alife():object(item:id()) == nil then return end
+	local sec = item:section()
+	if book_sections[sec] then
+		return true
+	end
+end
+
+-- Эффекты от артефакта "Улей" ---------------------------------------------------------------------
+
+function af_uley_death_effect()
+	if has_alife_info("izgoy_doctor_reward") then
+		return
+	end
+	level.add_pp_effector("monolith_off.ppe", 999, false)
+	level.add_cam_effector("camera_effects\\head_shot.anm", 999, false, "")
+	soundtrack.pain1()
+	ogse.start_timer("uley_1",10)
+	db.actor:give_info_portion ("af_uley_reaction") 
+	jekan_work.uley_zaraza_message()
+end
+
+function af_uley_live_effect()
+	if has_alife_info("izgoy_doctor_reward") then
+		return
+	end
+	if db.actor.health > 0.1 then
+		db.actor.health = - 0.0005
+	end
+end
+
+function uley_timer_1()
+	if db.actor:dont_has_info("izgoy_doctor_reward") then
+		ogse.start_timer("uley_2",5)
+		jekan_update.uley_pain_1()
+--		db.actor.health = - 0.1
+	end
+end
+
+function uley_timer_2()
+	if db.actor:dont_has_info("izgoy_doctor_reward") then
+		ogse.start_timer("uley_1",5)
+		jekan_update.uley_pain_2()
+--		db.actor.health = - 0.1
+	end
+end
+
+function uley_pain_1()
+	if has_alife_info("izgoy_doctor_reward") then
+		return
+	end
+	if db.actor:alive() then
+		soundtrack.pain1()
+	end
+end
+
+function uley_pain_2()
+	if has_alife_info("izgoy_doctor_reward") then
+		return
+	end
+	if db.actor:alive() then
+		soundtrack.pain2()
+	end
+end
+
+function af_uley_effect()
+	if has_alife_info("izgoy_doctor_reward") then
+		return
+	end
+	local scientvisuals =
+	{
+		["scientific_outfit"] = true,
+		["ecolog_outfit"] = true,
+		["protection_outfit"] = true
+	} 
+	if db.actor:item_in_slot(6) and scientvisuals[db.actor:item_in_slot(6):section()] then
+		jekan_update.af_uley_live_effect()
+	else
+		jekan_update.af_uley_death_effect()
+	end
+end
+
+-- Упаковываем "Улей" в контейнер ------------------------------------------------------------------
+
+function af_uley_packed()
+	if db.actor:object("af_uley") ~= nil then
+		ogse.remove_item_from_inventory_by_name("af_container_empt", db.actor)
+		ogse.remove_item_from_inventory_by_name("af_uley", db.actor)
+		ogse.spawn_item_in_inv("af_container_full", db.actor)
+		soundtrack.af_uley_packed()
+		news_manager.send_tip(db.actor, "af_uley_packed", nil)
+	end
+end
+
+----------------------------------------------------------------------------------------------------
+
+function shustriy_atp_relations()			-- не пашет, но оставим на всякий пожарный
+	if db.actor:dont_has_info("atp_band_hitted") then
+		jekan_work.shustriy_atp_friend()
+	end
+	if has_alife_info("atp_band_hitted") then
+		jekan_work.shustriy_atp_enemy()
+	end
+end
+
+----------------------------------------------------------------------------------------------------
+
+function clear_npc_inventory()
+	local objt = level_object_by_sid(6) --тута обьект запросить.. 
+	if objt and objt ~= nil then
+		objt:set_callback(callback.use_object, non_item_take, self)
+	end
+end
+
+function non_item_take(obj, who)
+	if obj ~= nil then
+		if obj:is_weapon() or obj:is_weapon_magazined() or obj:is_weapon_gl() then 
+			who:drop_item(obj)
+		end
+	end
+end
+
+-- Артефакт Погодник -------------------------------------------------------------------------------
+
+function thunderbird_visual_effect()
+	local hud = get_hud()
+	if db.actor then
+		local next_time = ogse_weather_mgr.get_surge_time()
+		local need_show_static = next_time < 2
+		if inventory.belt["af_thunderbird"] and need_show_static then
+			hud:AddCustomStatic("blow", true)
+			local cs = hud:GetCustomStatic("blow"):wnd()
+			if cs then
+				if next_time < 2 and next_time >= 1 then
+					cs:SetText(game.translate_string("thunderbird_2h"))	
+				elseif next_time < 1 and next_time >= 0.5 then
+					cs:SetText(game.translate_string("thunderbird_1h"))	
+				elseif db.actor:dont_has_info("pre_blowout") then
+					cs:SetText(game.translate_string("thunderbird_halfh"))
+				else	
+					cs:SetText(game.translate_string("thunderbird_now"))
+				end
+				-- cs:SetText("До следующего выброса "..string.format("%4.2f",tostring(next_time)).." ч.")			
+			end
+		else
+			hud:RemoveCustomStatic("blow")
+		end
+	end
+end
+
+-- Ржавчина ----------------------------------------------------------------------------------------
+
+function rustyfield_effect1()
+	local outfit = db.actor:item_in_slot(6)
+	local h = hit()
+	h.power = 0.07
+	h.direction = vector():set (0, 0, 0)
+	h.impulse = 0
+	h.draftsman = db.actor
+	h.type = hit.chemical_burn
+	if outfit ~= nil and outfit:condition() >=0.30 and in_strange_zone() then
+		outfit:hit(h)
+	elseif outfit == nil then 
+		return false
+	end
+end
+
+function rustyfield_effect2()
+	local gun1 = db.actor:item_in_slot(2)
+	local h = hit()
+	h.power = 0.05
+	h.direction = vector():set (0, 0, 0)
+	h.impulse = 0
+	h.draftsman = db.actor
+	h.type = hit.explosion
+	if gun1 ~= nil and gun1:condition() >=0.30 and in_strange_zone() then
+		gun1:hit(h)
+	elseif gun1 == nil then
+		return false
+	end
+end
+
+function rustyfield_effect3()
+	local gun2 = db.actor:item_in_slot(3)
+	local h = hit()
+	h.power = 0.05
+	h.direction = vector():set (0, 0, 0)
+	h.impulse = 0
+	h.draftsman = db.actor
+	h.type = hit.explosion
+	if gun2 ~= nil and gun2:condition() >=0.30 and in_strange_zone() then
+		gun2:hit(h)
+	elseif gun2 == nil then
+		return false
+	end
+end
+
+
+function in_strange_zone()
+	return xr_conditions.actor_in_zone(nil,nil,{"strange_zone1"}) or xr_conditions.actor_in_zone(nil,nil,{"strange_zone2"}) or 
+		xr_conditions.actor_in_zone(nil,nil,{"strange_zone3"}) or xr_conditions.actor_in_zone(nil,nil,{"strange_zone4"}) or 
+		xr_conditions.actor_in_zone(nil,nil,{"strange_zone5"}) or xr_conditions.actor_in_zone(nil,nil,{"strange_zone6"}) or 
+		xr_conditions.actor_in_zone(nil,nil,{"strange_zone7"})
+end
+
+-- периодическое срабатывание странных аномалий
+local last_strange_zone_actor_time = 0
+function strange_zone_actor_particle()
+	if in_strange_zone() then
+		local t = time_global()
+		if t - last_strange_zone_actor_time > 5 then
+			last_strange_zone_actor_time = t
+			--
+			local pos = db.actor:position()
+			-- local fx_particle_name = "anomaly\\a-03-growing-sparks_old00"
+			local fx_particle_name = "anomaly\\a-03-sparks-03_old00"
+			local fx_particle = particles_object(fx_particle_name)
+			fx_particle:play_at_pos(pos)
+			--
+			local snd_obj = xr_sound.get_safe_sound_object([[anomaly\anomaly_gravy_blast00]])
+			snd_obj:play_at_pos(db.actor, pos, 0, sound_object.s3d)
+		end
+	end
+end
+--[[
+local last_playing_time = game.get_game_time()
+local period = 10
+local sounds_inited = 0
+
+local x18_giant_sounds = {}
+
+function init_giant_sounds()
+	for i = 1,5 do
+		local snd_name = "monsters\\giant2\\giant_hurt_"..tostring(i-1)
+		x18_giant_sounds[i] = xr_sound.get_safe_sound_object(snd_name)
+	end
+end
+
+function update_little_pseudogiant_sound(giant)
+	if sounds_inited == 0 then
+		init_giant_sounds()
+		sounds_inited = 1
+	end
+	if game.get_game_time():diffSec(last_playing_time) > period then
+		local index = math.random(1,5)
+		local sound = x18_giant_sounds[index]
+		log1("playing sound "..tostring(index))
+		sound:play_at_pos(db.actor, giant:position(), 0, sound_object.s3d)
+		period = math.random(12,14)
+		last_playing_time = game.get_game_time()
+	end
+end]]

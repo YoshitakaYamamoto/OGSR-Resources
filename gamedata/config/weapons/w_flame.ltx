@@ -1,0 +1,186 @@
+;Огнемет (AMK)
+;--------------------------------------
+[wpn_flame]:identity_immunities
+GroupControlSection 	    = spawn_group
+discovery_dependency 	    = 
+$spawn 						= "weapons\flame"
+$npc 						= on
+$prefetch 					= 8
+scheduled 					= off
+cform 						= skeleton
+class 						= WP_LR300
+min_radius 					= 0
+max_radius 					= 25
+inv_name 					= wpn-flame
+inv_name_short 				= wpn-flame
+description 				= enc_weapons1_wpn-flame
+	
+ef_main_weapon_type 	    = 2
+ef_weapon_type 				= 6
+
+;-----------------------------
+holder_range_modifier	= 1.0
+holder_fov_modifier		= 1.2
+;-----------------------------
+
+weapon_class 				= assault_rifle
+
+cost 						= 6000
+
+ammo_elapsed		        = 15
+ammo_mag_size 				= 15
+fire_modes 					= -1
+f_mode 						= 2
+
+ammo_class 					= ammo_flame
+
+hand_dependence 			= 1
+single_handed 				= 0
+
+slot 						= 2
+animation_slot 				= 2
+
+inv_weight 					= 3.5
+
+inv_grid_width 				= 5
+inv_grid_height 			= 2
+inv_grid_x 					= 29
+inv_grid_y 					= 22
+
+kill_msg_x 					= 0
+kill_msg_y 					= 123
+kill_msg_width 				= 69
+kill_msg_height 			= 30
+
+;-----------------------------------------------------------------------------------
+;-- base dispersion
+;--params of weapon recoil
+fire_dispersion_base 		= 2.0          ;--угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor 	= 1.25f
+disp_rate 					= 1.6
+
+;--отдача
+cam_relax_speed 			= 5            ;--скорость возврата в исходное положение
+cam_relax_speed_ai        	= 120.75
+cam_dispersion 				= 0.001        ;--увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc 			= 0.00001      ;--увеличениe cam_dispersion с каждым выстрелом
+cam_dispertion_frac 		= 0.00001      ;--ствол будет подыматься на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+cam_max_angle 				= 0.00001      ;--максимальный угол отдачи
+cam_max_angle_horz 			= 0.01         ;--(degree) maximum shot horizontal degree
+cam_step_angle_horz 		= 1.1          ;--(degree) size of step camera moved in horizontal position while shooting
+
+fire_dispersion_condition_factor = 5       ;--увеличение дисперсии в процентах при максимальном износе 
+misfire_probability 		= 0.003        ;--вероятность осечки при максимальном износе
+misfire_condition_k			= 0.05
+condition_shot_dec 			= 0.00000005   ;--увеличение износа при каждом выстреле
+;-----------------------------------------------------------------------------------
+
+fire_point 					= 0,0,2.5 ;-- position (3rd person view) for particles of fire 
+
+flame_particles 			= ogse\flamethrower_jet_long ;-- particles for shooting effects
+smoke_particles 			= 
+grenade_flame_particles     = weapons\generic_weapon01
+	
+shell_point 				= 0.00, 0.262, 0.189 ;-- position (3rd person view) for shell to throw out
+shell_particles 			= ;weapons\generic_shells ;-- name of the particles for shells
+
+PDM_disp_base 				= 3.5
+PDM_disp_vel_factor 		= 1.3
+PDM_disp_accel_factor 	    = 1.3
+PDM_crouch 			 		= 1.0
+PDM_crouch_no_acc 			= 1.0
+
+;-- ttc
+hit_power 					= 0.64    ;-- size of damage by bullet
+hit_impulse 				= 0       ;-- size of physic impulse by bullet	
+hit_type 					= burn    ;-- [] type of the wound
+hit_rate 					= 2.5
+
+fire_distance 				= 25  ;-- maximum fire distance that bullet can fly
+bullet_speed 				= 60  ;-- starting bullet speed
+rpm 						= 300 ;-- max round per minute
+
+use_aim_bullet 				= false ;true ;--Поддерживается ли первая суппер пуля
+time_to_aim 				= 1.0
+
+silencer_hit_power 			= 0.65
+silencer_hit_impulse 		= 65
+silencer_fire_distance 	    = 30
+silencer_bullet_speed	 	= 315
+
+hud 						= wpn_flame_hud ;-- name of the section of the hud
+
+position 					= -0.015,0.15,0.3 ;-- position (offset) and orientation of the weapon in the hands of character
+orientation 				= 0,0,0           ;-- (3rd person view)
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+strap_position 				= -0.16,0.0,0.15 ;-- position (offset) and orientation of the weapon when it is strapped 1 - вперёд/назад относительно человека 2 - влево/вправо 3 - вверх/вниз
+strap_orientation 		    = -10, -5, 10      ;-- (3rd person view in degrees)
+strap_bone0 				= bip01_spine2
+strap_bone1 				= bip01_spine1
+
+visual 						= weapons\flamethrower\wpn_flame.ogf ;-- name of the model for 3rd person view
+
+light_color 				= 0.6,0.5,0.3 ;-- params for light during the fire
+light_range 				= 5 ;-- radius
+light_var_color 			= 0.05
+light_var_range 			= 0.5
+light_time 					= 0.2
+
+;addons
+scope_status 				= 0
+silencer_status 			= 0
+grenade_launcher_status     = 0
+
+zoom_enabled 				= false ;-- (on,off)zoom mode (right mouse button)
+
+;------------------------------ O.G.S.E. sound remake -----------------------
+;--sounds (name of the sound, volume (0.0 - 1.0), delay (sec))
+snd_draw 					= weapons\flame\f_reload
+snd_holster 				= weapons\generic_holster
+snd_shoot 					= weapons\flame\f_shoot
+snd_shoot1 					= weapons\flame\f_shoot1
+snd_shoot2 					= weapons\flame\f_shoot2
+snd_shoot3 					= weapons\flame\f_shoot3
+snd_empty 					= $no_sound ;weapons\gen_empty, 0.5
+snd_reload 					= weapons\flame\f_reload
+snd_shoot_grenade 	        = $no_sound ;weapons\gen_grenshoot
+snd_reload_grenade 	        = $no_sound ;weapons\gen_grenload, 1.0, 0.8
+snd_switch 					= $no_sound ;weapons\groza_switch, 1.0, 0.5
+;-----------------------------------------------------------------------------
+;-----------------------------------------------------------------------------
+;-- HUD DESCRIPTION
+;-----------------------------------------------------------------------------
+[wpn_flame_hud]
+
+shell_point 				= 10.15, 0.0, -0.05
+shell_dir 					= -0.01, 1.0, 0.0
+
+fire_point 					= 1.35,-0.08,0.03
+fire_point2 				= 0.0, 0.00, 0.0
+fire_bone 					= wpn_flame
+
+orientation 				= 0.0, 0.0, 0.0
+position 					= -0.12, -0.17, 0.07
+visual 						= weapons\flamethrower\wpn_flame_hud.ogf
+
+;-- animation names
+anim_idle 				    = idle
+anim_idle_aim 		        = idle
+anim_reload 			    = empty
+anim_draw 				    = draw
+anim_holster 			    = holster
+anim_shoot 				    = shoot
+anim_idle_sprint 	        = sprint
+
+;--HUD offset in zoom mode (to all)
+;--(use CONSOLE: hud_adjust_mode 0,1,2, then keys WSADQE and P to show current value in console)
+zoom_offset 				= -0.137700,0.033800,-0.115100
+zoom_rotate_x 				= -0.005000
+zoom_rotate_y 				= 0.017900
+
+zoom_hide_crosshair	        = true ;--to hide crosshair in zoom
+
+[wpn_flame_repair]
+tech_complication = 500
+repair_compatibility = flame

@@ -1,0 +1,437 @@
+<game_task id="talk_with_hunter">
+	<title>talk_with_hunter_text_task</title>
+	<objective>
+		<text>talk_with_hunter_text_task</text>
+		<article>talk_with_hunter</article>
+		<icon>ui_iconsLesnik_Zaharich</icon>
+		<infoportion_complete>hunter_about_boltun</infoportion_complete>
+		<infoportion_fail>ds_hunter_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>talk_with_hunter_text_task</text>
+		<icon>ui_iconsLesnik_Zaharich</icon>
+		<map_location_type hint="talk_with_hunter2_text_task">green_location</map_location_type>
+		<object_story_id>ds_hunter</object_story_id>
+		<infoportion_complete>hunter_about_boltun</infoportion_complete>
+		<infoportion_fail>ds_hunter_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>talk_with_hunter3_text_task</text>
+		<infoportion_complete>hunter_about_boltun</infoportion_complete>
+		<infoportion_fail>ds_hunter_dead</infoportion_fail>
+	</objective>
+</game_task>
+
+<game_task id="ds_glavar_talk">
+	<title>ds_glavar_talk_text_task</title>
+	<objective>
+		<text>ds_glavar_talk_text_task</text>
+		<article>ds_glavar_talk</article>
+		<icon>ui_iconsTotal_gar_help_dymon</icon>
+		<infoportion_complete>yuriy_talk_to_surrend</infoportion_complete>
+		<infoportion_fail>ds_nalet_band_1_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>ds_glavar2_talk_text_task</text>
+		<map_location_type hint="ds_glavar3_talk_text_task">green_location</map_location_type>
+		<object_story_id>ds_nalet_band_1</object_story_id>
+		<infoportion_complete>prof_task_2</infoportion_complete>
+		<infoportion_fail>ds_nalet_band_1_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>ds_glavar4_talk_text_task</text>
+		<infoportion_complete>yuriy_talk_to_surrend</infoportion_complete>
+		<infoportion_fail>yuriy_dead</infoportion_fail>
+	</objective>
+</game_task>
+
+<game_task id="prof_task_1">
+	<title>prof_task_1_text_task</title>
+	<objective>
+		<text>prof_task_1_text_task</text>
+		<article>prof_task_1</article>
+		<icon>ui_iconsTotal_gar_help_dymon</icon>
+		<infoportion_complete>prof_task_1_reward</infoportion_complete>
+		<infoportion_fail>ds_nalet_band_8_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>prof_task_1_text2_task</text>
+		<function_complete>jekan_work.kill_iskateli</function_complete>
+		<infoportion_fail>ds_nalet_band_1_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>prof_task_1_text3_task</text>
+		<map_location_type hint="ds_glavar3_talk_text_task">green_location</map_location_type>
+		<object_story_id>ds_nalet_band_1</object_story_id>
+		<infoportion_complete>prof_task_1_reward</infoportion_complete>
+		<infoportion_fail>ds_nalet_band_8_dead</infoportion_fail>
+	</objective>
+</game_task>
+
+<game_task id="prof_task_2">
+	<title>prof_task_2_text_task</title>
+	<objective>
+		<text>prof_task_2_text_task</text>
+		<article>prof_task_2</article>
+		<icon>ui_iconsTotal_agr_agr_help_krot</icon>
+		<infoportion_complete>prof_task_2_reward</infoportion_complete>
+		<infoportion_fail>bandits_kill_iskateli</infoportion_fail>
+	</objective>
+	<objective>
+		<text>prof_task_2_text2_task</text>
+		<map_location_type hint="prof_task_2_text3_task">green_location</map_location_type>
+		<object_story_id>iskatel_yuriy</object_story_id>
+		<infoportion_complete>yuriy_talk_to_surrend</infoportion_complete>
+		<infoportion_fail>yuriy_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>prof_task_2_text4_task</text>
+		<map_location_type hint="ds_glavar3_talk_text_task">green_location</map_location_type>
+		<object_story_id>ds_nalet_band_1</object_story_id>
+		<infoportion_complete>bandits_kill_iskateli</infoportion_complete>
+		<infoportion_fail>ds_nalet_band_1_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>prof_task_2_text_task</text>
+		<infoportion_complete>iskateli_surrend1</infoportion_complete>
+		<infoportion_fail>yuriy_dead</infoportion_fail>
+	</objective>
+</game_task>
+
+<game_task id="yuriy_plenniy_talk">
+	<title>yuriy_plenniy_talk_text_task</title>
+	<objective>
+		<text>yuriy_plenniy_talk_text_task</text>
+		<article>yuriy_plenniy_talk</article>
+		<icon>ui_iconsTotal_gar_help_dymon</icon>
+		<infoportion_complete>kulg_band_surrend</infoportion_complete>
+		<infoportion_fail>ds_nalet_band_8_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>yuriy_plenniy_talk2_text_task</text>
+		<map_location_type hint="prof_task_2_text3_task">green_location</map_location_type>
+		<object_story_id>iskatel_yuriy</object_story_id>
+		<infoportion_complete>yuriy_plennik_pomilovan</infoportion_complete>
+		<infoportion_fail>yuriy_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>yuriy_plenniy_talk3_text_task</text>
+		<map_location_type hint="bloha_mark_text_task">green_location</map_location_type>
+		<object_story_id>ds_nalet_band_8</object_story_id>
+		<infoportion_complete>plenniy_shron_info</infoportion_complete>
+		<infoportion_fail>ds_nalet_band_8_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>yuriy_plenniy_talk4_text_task</text>
+		<!--function_complete>jekan_work.prof_zapiska_find</function_complete-->
+		<!--infoportion_complete>prof_zapiska_find</infoportion_complete-->
+		<infoportion_complete>infa_about_boltun</infoportion_complete>
+		<infoportion_fail>ds_nalet_band_8_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>yuriy_plenniy_talk5_text_task</text>
+		<map_location_type hint="ds_glavar3_talk_text_task">green_location</map_location_type>
+		<object_story_id>ds_nalet_band_1</object_story_id>
+		<infoportion_complete>kulg_band_surrend</infoportion_complete>
+		<infoportion_fail>ds_nalet_band_8_dead</infoportion_fail>
+	</objective>
+</game_task>
+
+<game_task id="plenniy_artnabor_task">
+	<title>plenniy_artnabor_task_text_task</title>
+	<objective>
+		<text>plenniy_artnabor_task_text_task</text>
+		<article>plenniy_artnabor_task</article>
+		<icon>ui_iconsTotal_artefacts</icon>
+		<infoportion_complete>plenniy_navodka</infoportion_complete>
+		<infoportion_fail>ds_nalet_band_8_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>plenniy_artnabor_task2_text_task</text>
+		<function_complete>jekan_work.bloha_arts_have</function_complete>
+	</objective>
+	<objective>
+		<text>plenniy_artnabor_task3_text_task</text>
+		<map_location_type hint="bloha_mark_text_task">green_location</map_location_type>
+		<object_story_id>ds_nalet_band_8</object_story_id>
+		<infoportion_complete>plenniy_navodka</infoportion_complete>
+	</objective>
+</game_task>
+
+<game_task id="kill_kulg_band">
+	<title>kill_kulg_band_text_task</title>
+	<objective>
+		<text>kill_kulg_band_text_task</text>
+		<icon>ui_iconsTotal_bar_crazy_veterans_quest</icon>
+		<infoportion_complete>kulg_band_dead</infoportion_complete>
+		<infoportion_fail>yuriy_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>kill_kulg_band2_text_task</text>
+		<map_location_type hint="ds_glavar3_talk_text_task">green_location</map_location_type>
+		<object_story_id>ds_nalet_band_1</object_story_id>
+		<function_complete>jekan_work.kill_lesop_bandits</function_complete>
+		<infoportion_fail>yuriy_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>kill_kulg_band3_text_task</text>
+		<map_location_type hint="prof_task_2_text3_task">green_location</map_location_type>
+		<object_story_id>iskatel_yuriy</object_story_id>
+		<infoportion_complete>kulg_band_dead</infoportion_complete>
+		<infoportion_fail>yuriy_dead</infoportion_fail>
+	</objective>
+</game_task>
+
+<game_task id="capture_the_officer">
+	<title>capture_the_officer_text_task</title>
+	<objective>
+		<text>capture_the_officer_text_task</text>
+		<icon>ui_iconsNpc_soldier_beret</icon>
+		<article>capture_the_officer</article>
+		<infoportion_complete>military_radio_request</infoportion_complete>
+		<infoportion_fail>dar_dez_uaz_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>capture_the_officer2_text_task</text>
+		<map_location_type hint="capture_the_officer3_text_task">green_location</map_location_type>
+		<object_story_id>dar_dez_uaz</object_story_id>
+		<infoportion_complete>uaz_spawn_desant</infoportion_complete>
+		<infoportion_fail>dar_dez_uaz_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>capture_the_officer4_text_task</text>
+		<function_complete>jekan_work.all_btr_soldiers_dead</function_complete>
+	</objective>
+	<objective>
+		<text>capture_the_officer5_text_task</text>
+		<infoportion_complete>military_radio_request</infoportion_complete>
+		<infoportion_fail>dar_officer_dead</infoportion_fail>
+	</objective>
+</game_task>
+
+<game_task id="kill_dar_btr">
+	<title>kill_dar_btr_text_task</title>
+	<objective>
+		<text>kill_dar_btr_text_task</text>
+		<icon>ui_iconsTotal_aes_military_task</icon>
+		<infoportion_complete>dar_dez_btr_dead</infoportion_complete>
+		<infoportion_fail>dar_merk_lider_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>kill_dar_btr_text_task</text>
+		<map_location_type hint="kill_dar_btr2_text_task">green_location</map_location_type>
+		<object_story_id>dar_dez_btr</object_story_id>
+		<infoportion_complete>dar_dez_btr_dead</infoportion_complete>
+		<infoportion_fail>dar_merk_lider_dead</infoportion_fail>
+	</objective>
+</game_task>
+
+
+<game_task id="read_book_4">
+	<title>read_book_4_text_task</title>
+	<objective>
+		<text>read_book_4_text_task</text>
+		<icon>ui_iconsTotal_bar_darklab_documents2</icon>
+		<infoportion_complete>darkstalk_spawn</infoportion_complete>
+		<infoportion_fail>ds_hunter_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>read_book_4_text_task</text>
+		<infoportion_complete>book_4_info</infoportion_complete>
+		<infoportion_fail>ds_hunter_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>talk_with_hunter_text_task</text>
+		<map_location_type hint="talk_with_hunter2_text_task">green_location</map_location_type>
+		<object_story_id>ds_hunter</object_story_id>
+		<infoportion_complete>darkstalk_spawn</infoportion_complete>
+		<infoportion_fail>ds_hunter_dead</infoportion_fail>
+	</objective>
+</game_task>
+
+<game_task id="meet_darkstalk">
+	<title>meet_darkstalk_text_task</title>
+	<objective>
+		<text>meet_darkstalk_text_task</text>
+		<icon>ui_iconsTotal_grouping</icon>
+		<infoportion_complete>dik_goto_pos1</infoportion_complete>
+		<infoportion_fail>dik_the_drifter_dead</infoportion_fail>
+	</objective>
+	<objective>
+		<text>meet_darkstalk_text_task</text>
+		<map_location_type hint="meet_darkstalk2_text_task">green_location</map_location_type>
+		<object_story_id>dik_the_drifter</object_story_id>
+		<infoportion_complete>dik_goto_pos1</infoportion_complete>
+		<infoportion_fail>dik_the_drifter_dead</infoportion_fail>
+	</objective>
+</game_task>
+
+
+<game_task id="af_light_task">
+	<title>af_light_task_text_task</title>
+	<objective>
+		<text>af_light_task_text_task</text>
+		<icon>ui_iconsTotal_tutorial_find_artefact</icon>
+		<function_complete>jekan_work.hawe_af_light</function_complete>
+		<infoportion_fail>dik_the_drifter_proval</infoportion_fail>
+	</objective>
+	<objective>
+		<text>af_light_task2_text_task</text>
+		<infoportion_complete>dik_goto_ochyag</infoportion_complete>
+		<infoportion_fail>dik_the_drifter_proval</infoportion_fail>
+	</objective>
+	<objective>
+		<text>af_light_task3_text_task</text>
+		<map_location_type hint="af_light_task4_text_task">green_location</map_location_type>
+		<object_story_id>drifter_dog</object_story_id>
+		<function_complete>jekan_work.all_dik_bandits_dead</function_complete>
+	</objective>
+	<objective>
+		<text>af_light_task5_text_task</text>
+		<infoportion_complete>dik_goto_ochyag</infoportion_complete>
+		<infoportion_fail>dik_the_drifter_proval</infoportion_fail>
+	</objective>
+	<objective>
+		<text>af_light_task6_text_task</text>
+		<icon>ui_iconsTotal_artefact</icon>
+		<function_complete>jekan_work.hawe_af_light</function_complete>
+		<infoportion_fail>dik_the_drifter_proval</infoportion_fail>
+	</objective>
+</game_task>
+
+<game_task id="zapravka_port_task">
+	<title>zapravka_port_task_text_task</title>
+	<objective>
+		<text>zapravka_port_task_text_task</text>
+		<icon>ui_iconsTotal_locations</icon>
+		<infoportion_complete>have_af_mayatnik</infoportion_complete>
+	</objective>
+	<objective>
+		<text>zapravka_port_task2_text_task</text>
+		<infoportion_complete>have_af_mayatnik</infoportion_complete>
+	</objective>
+</game_task>
+
+<game_task id="find_bratstvo_9">
+	<title>find_bratstvo_9_text_task</title>
+	<objective>
+		<text>find_bratstvo_9_text_task</text>
+		<article>find_bratstvo_9</article>
+		<icon>ui_iconsTotal_dar_codedoor_1</icon>
+		<infoportion_fail>bratstvo_lider_dead</infoportion_fail>
+		<infoportion_complete>bratstvo_finded</infoportion_complete>
+	</objective>
+	<objective>
+		<text>find_bratstvo_9_text2_task</text>
+		<infoportion_complete>bratstvo_finded</infoportion_complete>
+	</objective>
+	<objective>
+		<text>find_bratstvo_9_text3_task</text>
+		<map_location_type hint="find_bratstvo_9_text4_task">green_location</map_location_type>
+		<object_story_id>bratstvo_lider</object_story_id>
+		<infoportion_complete>bratstvo_finded</infoportion_complete>
+	</objective>
+</game_task>
+
+<game_task id="help_ds_agent">
+	<title>help_ds_agent_text_task</title>
+	<objective>
+		<text>help_ds_agent_text_task</text>
+		<article>help_ds_agent</article>
+		<icon>ui_iconsTotal_grouping</icon>
+		<infoportion_fail>bratstvo_agent_1_dead</infoportion_fail>
+		<infoportion_complete>bratstvo_agent_live</infoportion_complete>
+	</objective>
+	<objective>
+		<text>help_ds_agent_text2_task</text>
+		<map_location_type hint="help_ds_agent_text3_task">green_location</map_location_type>
+		<object_story_id>bratstvo_vrach</object_story_id>
+		<infoportion_complete>vrach_about_agent</infoportion_complete>
+	</objective>
+	<objective>
+		<text>help_ds_agent_text4_task</text>
+		<map_location_type hint="help_ds_agent_text3_task">green_location</map_location_type>
+		<object_story_id>bratstvo_vrach</object_story_id>
+		<infoportion_complete>dar_dolg_gaz66_desant</infoportion_complete>
+	</objective>
+	<objective>
+		<text>help_ds_agent_text5_task</text>
+		<infoportion_complete>bratstvo_saving_1</infoportion_complete>
+	</objective>
+	<objective>
+		<text>help_ds_agent_text6_task</text>
+		<map_location_type hint="help_ds_agent_text7_task">green_location</map_location_type>
+		<object_story_id>bratstvo_lider</object_story_id>
+		<infoportion_complete>bratstvo_agent_live</infoportion_complete>
+	</objective>
+</game_task>
+
+
+<game_task id="cheb_greeting">
+	<title>cheb_greeting_text_task</title>
+	<objective>
+		<text>cheb_greeting_text_task</text>
+		<icon>ui_iconsCheb1</icon>
+		<infoportion_fail>cheb_dead</infoportion_fail>
+		<infoportion_complete>cheb_task1</infoportion_complete>
+	</objective>
+	<objective>
+		<text>cheb_greeting_text2_task</text>
+		<infoportion_complete>cheb_hello</infoportion_complete>
+	</objective>
+	<objective>
+		<text>cheb_greeting_text3_task</text>
+		<infoportion_complete>cheb_task1</infoportion_complete>
+	</objective>
+</game_task>
+
+<game_task id="cheb_alltask">
+	<title>cheb_alltask_text_task</title>
+	<objective>
+		<text>cheb_alltask_text_task</text>
+		<article>cheb_alltask</article>
+		<icon>ui_iconsCheb1</icon>
+		<infoportion_complete>cheb_found_kolya</infoportion_complete>
+	</objective>
+	<objective>
+		<text>cheb_alltask_text2_task</text>
+		<icon x="200" y="50" width="50" height="50">ui\ui_icons_task</icon>
+		<map_location_type hint="hvost_name">green_location</map_location_type>	
+		<object_story_id>stalker_hvost</object_story_id>
+		<infoportion_fail>cheb_hvost_dead</infoportion_fail>
+		<infoportion_complete>cheb_talked_to_hvost</infoportion_complete>		
+	</objective>	
+	<objective>
+		<text>cheb_alltask_text3_task</text>
+		<icon x="200" y="50" width="50" height="50">ui\ui_icons_task</icon>
+		<infoportion_complete>cheb_found_kolya</infoportion_complete>
+	</objective>
+</game_task>
+
+<game_task id="hunter_samogon_quest">
+	<title>hunter_samogon_quest_text_task</title>
+	<objective>
+		<text>hunter_samogon_quest_text_task</text>
+		<article>hunter_samogon_quest</article>
+		<icon>ui_iconsLesnik_Zaharich</icon>
+		<infoportion_complete>222</infoportion_complete>
+	</objective>
+	<objective>
+		<text>hunter_samogon_quest_text2_task</text>
+		<infoportion_complete>city_samogon_info4</infoportion_complete>
+	</objective>
+	<objective>
+		<text>hunter_samogon_quest_text3_task</text>
+		<function_complete>jekan_work.samogon_apparat_finded</function_complete>
+	</objective>
+	<objective>
+		<text>hunter_samogon_quest_text4_task</text>
+		<map_location_type hint="talk_with_hunter2_text_task">green_location</map_location_type>
+		<object_story_id>ds_hunter</object_story_id>
+		<infoportion_complete>hunter_samogon_quest_done</infoportion_complete>
+	</objective>
+	<objective>
+		<text>hunter_samogon_quest_text5_task</text>
+		<infoportion_complete>222</infoportion_complete>
+	</objective>
+</game_task>

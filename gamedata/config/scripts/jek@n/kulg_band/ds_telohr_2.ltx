@@ -1,0 +1,37 @@
+[smart_terrains]
+none = true
+
+[logic]
+active = walker@begin
+combat_ignore = combat_ignore
+danger = danger_ignore
+on_death = death
+threshold = threshold@telohr_2_threshold
+on_hit = hit
+
+[walker@begin]
+path_walk =	telohr_2_walk
+path_look =	telohr_2_look
+combat_ignore_cond = {-kulg_band_hutor_attacked} always
+on_timer = 100 | walker 
+
+[walker]
+path_walk =	telohr_2_walk
+path_look =	telohr_2_look
+combat_ignore_cond = {-kulg_band_hutor_attacked} always
+
+[danger_ignore]
+ignore_distance = 5
+
+[combat_ignore]
+combat_ignore_cond = {-kulg_band_hutor_attacked} always
+
+[threshold@telohr_2_threshold]
+max_ignore_distance = 0
+ignore_monster = 0
+
+[death]
+on_info = %+ds_telohr_2_dead%
+
+[hit]
+on_info = {=hit_by_actor} %+kulg_band_hutor_attacked%

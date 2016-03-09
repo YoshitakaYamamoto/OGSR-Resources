@@ -1,0 +1,1042 @@
+
+ level_name = {}
+ community_name = {}
+ rate_name = {}
+ monster_classes = {}
+ anomaly_classes = {}
+ rate_prefix = {}
+ rate_postfix = {}
+ monster_prefix = {}
+ monster_suffix = {}
+ weapon_classes = {}
+ common = {}
+ seen_prefix = {}
+ spawn_prefix = {}
+ anomaly_prefix = {}
+ anomaly_postfix = {}
+
+function Init()
+--
+end
+
+pretext_base_points = {
+	[1] = {"near", "next to", "near"},
+	[2] = {"in area of", "near", "near"}
+}
+-- ƒобавить список вариантов дл€ text, text0
+-- ƒобавить радиус дл€ text0
+base_points = {
+     ["l01_escape"] = {
+          [1] = { name = "the abandoned factory", text = "the abandoned factory", text0 = "at the abandoned factory", p = {-6.99, 5.19, 86.94 } },
+          [2] = { name = "the abandoned farm", text = "the abandoned farm", text0 = "at the abandoned farm", p = {5.17, 2.31, 274.39 } },
+          [3] = { name = "the car park", text = "the car park", text0 = "at the car park", p = {112.56, -5.81, -16.56} },
+          [4] = { name = "the railway embankment", text = "the railway embankment", text0 = "at the railway embankment", p = {56.13, 3.29, 157.36} },
+          [5] = { name = "the military Checkpoint", text = "the military checkpoint", text0 = "at the military checkpoint", p = {-155.74, -28.49, -352.21} },
+          [6] = { name = "the checkpoint before the Garbage", text = "the checkpoint before the Garbage", text0 = "at the checkpoint before the Garbage", p = {14.08, 17.45, 669.28} },
+          [7] = { name = "the rookie camp", text = "the rookie camp", text0 = "at the rookie camp", p = {-193.57, -18.49, -145.71} }
+     },
+     ["l02_garbage"] = {
+          [1] = { name = "the hangar", text = "the hangar", text0 = "in the hangar", p = {-89.43, 1.78, 9.83} },
+          [2] = { name = "the abandoned vehicle junkyard", text = "the abandoned vehicle junkyard", text0 = "in the abandoned vehicle junkyard", p = {-99.32, -1.21, -205.70} },
+          [3] = { name = "the woods", text = "the woods", text0 = "in the woods", p = {186.81, 1.74, -135.74} },
+          [4] = { name = "the camp, past the abandoned vehicle junkyard", text = "camp, past the abandoned vehicle junkyard", text0 = "at the camp past the abandoned vehicle junkyard", p = {-203.86, -4.75, -153.29} },
+          [5] = { name = "the Duty checkpoint", text = "Duty checkpoint", text0 = "at the Duty checkpoint", p = {39.58, 1.84, 222.29} },
+          [6] = { name = "the swamp", text = "the swamp", text0 = "in the swamp", p = {168.68, -3.29, 95.92 } }
+     },
+     ["l03_agroprom"] = {
+          [1] = { name = "the central complex", text = "central complex", text0 = "in the central complex", p = {5.16, 0.00, 9.80} },
+          [2] = { name = "the swamp", text = "the swamp", text0 = "at the swamp", p = {-181.84, 2.99, 70.09} },
+          [3] = { name = "the Western complex", text = "the Western complex", text0 = "in the Western complex", p = {-138.95, -0.21, -182.71} },
+          [4] = { name = "the exit to the Garbage", text = "exit to the Garbage", text0 = "at the exit to the Garbage", p = {183.79, 0.26, -236.51} },
+          [5] = { name = "the rail tunnel", text = "the tunnel", text0 = "in the rail tunnel", p = {187.12, -0.20, 45.23} }    
+     },
+     ["l04_darkvalley"] = {
+          [1] = { name = "the laboratory", text = "laboratory", text0 = "in the laboratory", p = {116.69, 2.80, -259.05} },
+          [2] = { name = "the factory to the north", text = "the factory to the north", text0 = "at the factory to the north", p = {34.09, 17.05, -45.35} },
+          [3] = { name = "the swamp", text = "the swamp", text0 = "at the swamp", p = {18.19, 4.41, -332.89} },
+          [4] = { name = "the farm", text = "farm", text0 = "at the farm", p = {-118.22, 3.61, -506.06} },
+          [5] = { name = "the entrance to the Garbage", text = "entrance to the Garbage", text0 = "at the entrance to the Garbage", p = {-136.91, 2.34, -188.37} },
+          [6] = { name = "the hill", text = "the hill", text0 = "on the hill", p = {135.87, 16.94, -394.07} },
+     },                
+     ["l05_bar"] = {
+          [1] = { name = "the south blockpost", text = "the south blockpost", text0 = "on the south blockpost", p = {223.99, 1.32, -2.64} },
+          [2] = { name = "the north blockpost", text = "the north blockpost", text0 = "on the north blockpost", p = {84.84, 1.94, 140.97} },
+          [3] = { name = "the base", text = "the base", text0 = "in the base", p = {203.36, 1.76, 98.96} },
+          [4] = { name = "the Arena", text = "the Arena", text0 = "in the Arena", p = {157.53, 1.88, 84.77} },
+          [5] = { name = "the Bar", text = "the Bar", text0 = "in the Bar", p = {129.90, 1.29, 49.26} }
+     },
+     ["l06_rostok"] = {
+          [1] = { name = "the whipped heli", text = "the whipped heli", text0 = "near the whipped heli", p = {-256.68, -0.00, 157.16} },
+          [2] = { name = "the exit to the Bar", text = "the exit to the Bar", text0 = "near the exit to the Bar", p = {-14.60, 0.94, 140.47} },
+          [3] = { name = "the mercenary camp", text = "the mercenary camp", text0 = "in the mercenary camp", p = {-233.71, 10.61, 50.33} },
+          [4] = { name = "the tunnel with \"Burners\"", text = "the tunnel with \"Burners\"", text0 = "in the tunnel with \"Burners\"", p = {-167.79, -5.80, -86.10} }
+     },
+     ["l07_military"] = {         
+          [1] = { name = "the village", text = "the village", text0 = "in the village", p = {-235.53, -11.48, 44.28} },
+          [2] = { name = "the \"Freedom\" base", text = "the \"Freedom\" base", text0 = "in the \"Freedom\" base", p = {-7.72, -6.94, 2.05} },
+          [3] = { name = "the bloodsucker village", text = "the bloodsucker village", text0 = "in the bloodsucker village", p = {-287.41, -21.61, 238.97} },
+          [4] = { name = "the blockpost beyond the village", text = "the blockpost beyond the village", text0 = "on the blockpost beyond the village", p = {-344.72, -11.02, 389.12} },
+          [5] = { name = "the Barrier", text = "the Barrier", text0 = "near the Barrier", p = {53.84, -16.50, 365.99} },
+          [6] = { name = "the swamp", text = "the swamp", text0 = "on the swamp", p = {102.94, -10.33, 165.34} },
+          [7] = { name = "the stalker camp", text = "the stalker camp", text0 = "in the stalker camp", p = {-93.25, -19.23, 221.38} }
+     },
+     ["l08_yantar"] = {
+          [1] = { name = "the science base", text = "the science base", text0 = "near the science base", p = {30.01, -4.18, -272.08} },
+          [2] = { name = "the swamp", text = "the swamp", text0 = "in the swamp", p = {-54.12, -10.45, -257.11} },
+          [3] = { name = "the \"Yantar\" factory", text = "the \"Yantar\" factory", text0 = "in the \"Yantar\" factory territory", p = {20.80, 0.86, -11.20} }
+     },
+     ["l09_deadcity_ogse"] = {
+          [1] = { name = "the Lenin monument", text = "the Lenin monument", text0 = "near the Lenin monument", p = {-44.6264877319336,8.1719570159912,-26.8586082458496} }
+     },
+     ["l13_generators_ogse"] = {
+          [1] = { name = "the scorchers", text = "the scorchers", text0 = "near the scorchers", p = {0.0, 0.0, 0.0} }
+     },
+     ["k01_darkscape_ogse"] = {
+          [1] = { name = "the road", text = "the road", text0 = "near the road", p = {0.0, 0.0, 0.0} }
+     }, 
+     ["l22_marsh"] = {
+          [1] = { name = "the swamp", text = "the swamp", text0 = "near the swamp", p = {0.0, 0.0, 0.0} }
+     }	 
+}
+
+levels = {	
+	"l01_escape", 
+	"l02_garbage", 
+	"l03_agroprom", 
+	"l03u_agr_underground", 
+	"l04_darkvalley", 
+	"l04u_labx18", 
+	"l05_bar", 
+	"l06_rostok", 
+	"l07_military", 
+	"l08_yantar", 
+	"l08u_brainlab", 
+	"l10_radar", 
+	"l10u_bunker", 
+	"l11_pripyat", 
+	"l12_stancia", 
+	"l12_stancia_2", 
+	"l12u_control_monolith", 
+	"l12u_sarcofag",
+	"l09_deadcity_ogse",
+	"l13_generators_ogse",
+	"k01_darkscape_ogse",
+	"l22_marsh",
+	"l23_x9"
+}
+
+
+levels_types={
+	l01_escape=0,
+	l02_garbage=0,
+	l03_agroprom=0,
+	l03u_agr_underground=1,
+	l04_darkvalley=0,
+	l04u_labx18=1,
+	l05_bar=0,
+	l06_rostok=0,
+	l07_military=0,
+	l08_yantar=0,
+	l08u_brainlab=1,
+	l10_radar=0,
+	l10u_bunker=1,
+	l11_pripyat=0,
+	l12_stancia=0,
+	l12_stancia_2=0,
+	l12u_control_monolith=1,
+	l12u_sarcofag=1,
+	l09_deadcity_ogse=0,
+	l13_generators_ogse=0,
+	k01_darkscape_ogse=0,
+	l22_marsh=0,
+	l23_x9=1,
+}
+
+level_name = {
+	["l01_escape"] = {"Cordon", "at Cordon"},
+	["l02_garbage"] = {"Garbage", "at the Garbage"},
+	["l03_agroprom"] = {"Agroprom Research Institute", "at the Agroprom Research Institute"},
+	["l03u_agr_underground"] = {"Agroprom Tunnels", "in the Agroprom Tunnels"},
+	["l04_darkvalley"] = {"Dark Valley", "in the Dark Valley"},
+	["l04u_labx18"] = {"X-18 lab", "in the X-18 lab"},
+	["l05_bar"] = {"'Rostok' factory", "at the 'Rostok' factory"},
+	["l06_rostok"] = {"Wild Territory", "on the Wild Territory"},
+	["l07_military"] = {"Army Warehouses", "at the Army Warehouses"},
+	["l08_yantar"] = {"Yantar", "at Yantar"},
+	["l08u_brainlab"] = {"X-18 lab", "in the X-18 lab"},
+	["l10_radar"] = {"Brain Scorcher", "at the Brain Scorcher"},
+	["l10u_bunker"] = {"X-10 lab", "in the X-10 lab"},
+	["l11_pripyat"] = {"Pripyat", "in Pripyat"},
+	["l12_stancia"] = {"Chernobyl NPP", "at the Chernobyl NPP"},
+	["l12_stancia_2"] = {"Chernobyl NPP", "at the Chernobyl NPP"},
+	["l12u_control_monolith"] = {"Chernobyl NPP", "at the Chernobyl NPP"},
+	["l12u_sarcofag"] = {"Containment", "in the Containment"},
+	["l09_deadcity_ogse"] = {"Dead City", "In City-32"},
+	["l13_generators_ogse"] = {"Generators", "On Generators"},
+	["k01_darkscape_ogse"] = {"Darkscape", "In Darkscape"},
+	["l22_marsh"] = {"Black swamp", "On Swamp"},
+	["l23_x9"] = {"URR", "In railroad hub"}	
+}
+
+community_name["stalker"] 	= {"Stalker","stalker","stalker", "stalkers"}
+community_name["monolith"] 	={"\"Monolith\"","monolith stalker","monolith stalker", "monolith stalkers"}
+community_name["military"] 	= {"Army","army man","army man", "army men"}
+community_name["killer"] 	= {"Killer","killer","killer", "killers"}
+community_name["ecolog"] 	= {"Ecolog","ecolog","ecolog", "ecologs"}
+community_name["dolg"] 		= {"\"Duty\"","dolg stalker","dolg stalker", "dolg stalkers"}
+community_name["freedom"] 	= {"\"Freedom\"","freedom stalker","freedom stalker", "freedom stalkers"}
+community_name["bandit"] 	= {"Bandit","bandit","bandit", "bandits"}
+community_name["zombied"] 	= {"Zombie","zombie","zombie", "zombies"}
+
+
+rate_name["novice"] 		= {"novice", "he was quite unexperienced", "just a newbie", "wasn't long in the Zone", "didn't know enough"}
+rate_name["experienced"] 	= {"experienced", "not a novice", "serious man", "seen enough of the Zone"}
+rate_name["veteran"] 		= {"veteran", "not his first time in the Zone", "experienced"}
+rate_name["master"] 		= {"master", "professional", "one of the most experienced stalkers", "expert in stalking"}
+rate_prefix 				= {"Just imagine, ", "Oh no, ","Shit, ", "No, ", "It seems that ", "Well, "}
+rate_postfix 				= {"", "..", " Something strange happens there...", " Terribly.", " Weren't fortunate enough..."}
+
+common["sad_a"] 			= {"Eh,", "Shit,", "Oh,", "Too bad,", "Terribly,", "Strange,", "Very strange,", "Wow,"}
+common["sad_z"] 			= {"eh.", "shit.", "crap.", "holy s...", "just terrible.", "strange.", "strange thing.", "very strange."}
+common["fun_a"] 			= {"Its funny", "Heh", "Cool", ""}
+common["fun_z"] 			= {"thats it", "cool", "ha", "funny", ""}
+common["prob_a"] 			= {"It seems", "Seems to be", "It's evident", "Maybe", "I think", "Right,"}
+common["prob_z"] 			= {"it seems", "maybe", "I think"}
+common["kill_a"] 			= {"Killed", "slaughtered", "slain"}
+common["kill_z"] 			= {"killed", "slaughtered", "slain"}
+common["spawn_seen_a"] 		= {"I've seen", "I've found", "I saw", "I saw", "I noticed", "I've seen", "I've seen"}
+common["spawn_seen_z"] 		= {"I've seen", "I've found", "I saw", "I saw", "I noticed", "I've seen", "I've seen"}
+common["seen_a"] 			= {"I found", "I saw", "I've discovered", "I've noticed", "I've seen"}
+common["seen_z"] 			= {"I found", "I saw", "I've discovered", "I've noticed", "I've seen"}
+common["corpse_a"] 			= {"Dead body", "The corpse of", "I've seen... parts, eh"}
+common["corpse_z"] 			= {"the dead body of", "dead", "I've seen... remains, eh"}
+common["corpse_name_a"] 	= {"Judging by their PDAs' -", "Judging by his PDA -", "Judging by his equipment -"}
+common["corpse_name_z"] 	= {"judging by their PDAs' -", "judging by his PDA -", "judging by his equipment -"}
+common["carefull_a"] 		= {"Take care", "Be careful", "Be warned", "Pay attention", "Attention everyone"}
+common["carefull_z"] 		= {"careful there", "just be careful there", "don't know, what happened there", "it's dangerous"}
+common["when_a"] 			= {"Recently", "A few minutes ago", "Just now", "Today", "A short time ago"}
+common["when_z"] 			= {"recently", "just a few minutes ago", "just now", "today", "a short time ago"}
+common["kill_seen_a"] 		= {"I saw", "I noticed", "I've seen", "I've seen"}
+common["kill_seen_z"] 		= {"I saw", "I noticed", "I've seen", "I've seen"}
+common["killed_a"] 			= {"I killed", "I've killed"}
+common["killed_z"] 			= {"I killed", "I have killed"}
+common["cool_a"] 			= {"Cool", "Wow", "Awesome", "Ha-ha, fun"}
+common["cool_z"] 			= {"cool", "wow", "awesome", "ha-ha"}
+common["meet_a"] 			= {"I faced", "I've faced", "I've met", "I met"}
+common["meet_z"] 			= {"I faced", "I've faced", "I've met", "I met"}
+common["hard_a"] 			= {"Hardly", "Barely", "Luckily", "Don't know, how, but", "Well, I didn't lose -", "It's luck that I've managed, to don't allow it come close, so", "I wanted to run - but there was no way. And, so", "I had time to shoot, so", "I've managed to shoot quickly, so"}
+common["hard_z"] 			= {"just about", "barely", "luckily", "don't know, how, but", "well, I didn't lose -", "it's luck that I've managed, to don't allow it come close, so", "I wanted to run - but there was no way. And, so", "I had time to shoot, so", "I've managed to shoot quickly, so"}
+
+monsters = { "pseudogiant", "snork", "bloodsucker", "poltergeist", "burer", "chimera", "zombie", "controller", "pseudodog", "psy-dog", "dog", "flesh", "tushkano", "boar"}
+
+monster_classes[clsid.controller_s] 	= {"a controller", "a controller", "a controller", "a controller", "a controller", "controllers"}
+monster_classes[clsid.chimera_s] 		= {"a chimera", "a chimera", "a chimera", "a chimera", "a chimera", "chimeras"}
+monster_classes[clsid.poltergeist_s] 	= {"a poltergeist", "a poltergeist", "a poltergeist", "a poltergeist", "a poltergeist", "poltergeists"}
+monster_classes[clsid.snork_s] 			= {"a snork", "a snork", "a snork", "a snork", "a snork", "snorks"}
+monster_classes[clsid.gigant_s] 		= {"a pseudogiant", "a pseudogiant", "a pseudogiant","a pseudogiant", "a pseudogiant", "pseudogiants"}
+monster_classes[clsid.burer_s] 			= {"a burer", "a burer", "a burer", "a burer", "a burer", "burers"}
+monster_classes[clsid.bloodsucker_s] 	= {"a bloodsucker", "a bloodsucker", "a bloodsucker", "a bloodsucker", "a bloodsucker", "bloodsuckers"}
+monster_classes[clsid.zombie_s] 		= {"a zombie", "a zombie", "a zombie", "a zombie", "a zombie", "zombies"}
+monster_classes[clsid.boar_s] 			= {"a boar", "a boar", "a boar", "a boar", "a boar", "boars"}
+monster_classes[clsid.cat_s] 			= {"a cat", "a cat", "a cat", "a cat", "a cat", "cats"}
+monster_classes[clsid.pseudodog_s] 		= {"a pseudodog", "a pseudodog", "a pseudodog", "a pseudodog", "a pseudodog", "pseudodogs"}
+monster_classes[clsid.psy_dog_s] 		= {"a psy-dog", "a psy-dog", "a psy-dog", "a psy-dog", "a psy-dog", "psy-dogs"}
+monster_classes[clsid.dog_s] 			= {"a dog", "a dog", "a dog", "a dog", "a dog", "dogs"}
+monster_classes[clsid.flesh_s] 			= {"a flesh", "a flesh", "a flesh", "a flesh", "a flesh", "fleshes"}
+monster_classes[clsid.tushkano_s] 		= {"a tushkano", "a tushkano", "a tushkano", "a tushkano", "a tushkano", "tushkanos"}
+monster_classes[clsid.fracture_s] 		= {"a fracture", "a fracture", "a fracture", "a fracture", "a fracture", "fractures"}
+
+monster_prefix 		= {"","Was completely hacked.","They ate it all up.", "They gnawed on the bones.", "Mostly eaten."}
+monster_suffix[1] 	= {"Seems, ", "It seems ", "Maybe, ", "Evidently, ", "In all likelihood, "}
+monster_suffix[2] 	= {"It seems me the work of ", "Apparently, it did not run away from "}
+monster_suffix[3] 	= {"Encountered with ", "Met with ", "It seems that he met "}
+monster_suffix[4] 	= {"He fell ", "He became a dinner of "}
+
+anomalies = { "Fruit punch", "Vortex", "Mincer", "Mincer", "Electra", "Electra", "Burner" }
+
+anomaly_classes["burning_fuzz"] 			= {"Burning fuzz", "Burning fuzz", "Very strange death", "There is no blood on the body..."}
+anomaly_classes["buzz"] 					= {"Fruit punch", "Fruit punch", "Terrible mash instead of the feet...", "Little which remained", "Corroded"}
+anomaly_classes["gravi"] 					= {"Vortex", "Vortex", "Torn to pieces", "Separate pieces", "Torn to bits"}
+anomaly_classes["mincer"] 					= {"Mincer", "Mincer", "Torn to pieces", "Just torn to pieces", "Torn to bits"}
+anomaly_classes["witches"] 					= {"Electra", "Electra", "Just fried", "Fried"}
+anomaly_classes["mosquito"] 				= {"Mosquito bald", "Mosquito bald", "So many fractures... almost every bone...", "Squashed", "Just flatten"}
+anomaly_classes["zharka"] 					= {"Burner", "Burner", "Instantly burned", "Just burned"}
+anomaly_classes["radioactive"] 				= {"Radiation", "strong radiation", "Holy shit, so much blood... it's bleeding... from nose, ears, eyes...", "Strong bleeding. Nose, eyes - almost everywhere."}
+anomaly_classes["ice"] 						= {"Freezer", "Freezer", "Iced and torn to pieces", "Just torn to pieces", "Iced meat"}
+
+
+anomaly_prefix						= {"Seems that he entered ", "Ran into ", "Step into ", "Didn't notice "}
+anomaly_postfix						= {"", "I was too scared to come closer.", "I have identified him using his PDA.", "I found his PDA nearby."}
+
+spawn_prefix = {"It was impossible for me to drop this cattle down, so that, man, be careful.", "not again"}
+
+weapon_classes = {
+	[1] = {
+			["name"]   = {"pistol", "by a pistol", "with a pistol"},
+			["hit_a"]  = {"Emptied an entire cartridge into", "Shot in the body", "Hit in the neck", "Shot in the forehead", "Shot in the back", "Shot in both legs"},
+			["hit_z"]  = {"emptied an entire cartridge into", "shot in the body", "hit in the neck", "shot in the forehead", "shot in the back", "shot in both legs"},
+			["hear_a"] = {"Heard shooting from a pistol", "Heard shots from a pistol", "Sounded like pistol shots"},
+			["hear_z"] = {"I heard shooting from a pistol", "I heard shots from a pistol", "sounded like pistol fire"},
+			["hear_p"] = 0.4
+	},
+	[2] = {
+			["name"]   = {"rifle", "by a rifle", "with a rifle"},
+			["hit_a"]  = {"Probably a sniper", "A very precise headshot", "A direct headshot", "bullet has gone straight through"},
+			["hit_z"]  = {"probably a sniper", "it is a precise headshot", "it is a direct headshot", "the bullet has gone straight through"},
+			["hear_a"] = {"I heard rifle shots", "I heard rifle shots", "I heard what sounded like a rifle shot"},
+			["hear_z"] = {"heard rifle shots", "heard rifle shots", "heard what sounded like a rifle shot"},
+			["hear_p"] = 0.3
+	},
+	[3] = {
+			["name"]   = {"fast-firing weapon", "by a fast-firing weapon", "with a fast-firing weapon"},
+			["hit_a"]  = {"filled with holes", "emptied a cartridge into", "filled with lead, like a shot turkey", "turned the wretched creature into a sieve", "There's a lot of fire wound all over the body..."},
+			["hit_z"]  = {"made a lot of holes", "used a whole cartridge", "filled with lead, like a shot turkey", "turned the wretched creature into a sieve", "there's a lot of fire wound all over the body..."},
+			["hear_a"] = {"I heard fire from a fast-firing weapon", "heard what sounded like fire from a fast-firing weapon", "I've heard fast-firing weapon fire"},
+			["hear_z"] = {"I heard fast-firing weapon fire", "sounded like fire from a fast-firing weapon", "I've heard fire probably of a fist-firing weapon"},
+			["hear_p"] = 0.6
+	},
+	[4] = {
+			["name"]   = {"shotgun", "by a shotgun", "with a shotgun"},
+			["hit_a"]  = {"From a very close distance", "With shells. Not much left", "From a very close distance"},
+			["hit_z"]  = {"from a very close distance", "with shells - not much left", "from a very close distance"},
+			["hear_a"] = {"I've heard stogun shots", "Someone was shooting with a shotgun"},
+			["hear_z"] = {"I've heard shotgun shots", "somebody was shooting with a shotgun"},
+			["hear_p"] = 0.8
+	},
+	[5] = {
+			["name"]   = {"grenade launcher", "by a grenade launcher", "with a grenade launcher"},
+			["hit_a"]  = {"Only gore left", "Almost nothing left", "Was torn into pieces"},
+			["hit_z"]  = {"only gore left", "almost nothing left", "was torn apart"},
+			["hear_a"] = {"I've heard a grenade launcher shot", "Someone was striking with a grenade launcher", "Sounds like a grenade launcher bang"},
+			["hear_z"] = {"I've heard a grenade launcher shot", "someone was striking with a grenade launcher", "sounds like a grenade launcher bang"},
+			["hear_p"] = 0.9
+	},
+	[6] = {
+			["name"]   = {"knife", "by a knife", "with a knife"},
+			["hit_a"]  = {"Carefully slit his throat", "From behind" , "A lot of blood has poured out", "A couple of severe cuts"},
+			["hit_z"]  = {"carefully slit his throat", "from behind his back.", "a lot of blood has poured out", "I see several deep cuts"},
+			["hear_a"] = {""}, -- We do not hear a knife :)
+			["hear_z"] = {""}, -- We do not hear a knife :)
+			["hear_p"] = 0.0
+	},
+	[7] = {
+			["name"]   = {"grenade", "by a grenade", "with a grenade"},
+			["hit_a"]  = {"Was injured severely", "Was twisted by the explosion", "Blew off the head", "Blew off a leg"},
+			["hit_z"]  = {"was injured severely", "was twisted by the explosion", "has blown off his head", "has blown off his leg"},
+			["hear_a"] = {"detonated a grenade", "I heard an explosion", "it jerked"},
+			["hear_z"] = {"exploded a grenade", "heard an explosion", "a grenade jerked"},
+			["hear_p"] = 0.9
+	},
+	[8] = {
+			["name"]   = {"A flamethrower", "by a flamethrower", "with a flamethrower"},
+			["hit_a"]  = {"He was burnt seriously", "Only tiny bits of his body left", "He's simply baked"},
+			["hit_z"]  = {"he was burnt seriously", "nearly completely burnt", "they simply baked him"},
+			["hear_a"] = {""},
+			["hear_z"] = {""},
+			["hear_p"] = 0.0
+	},
+	[9] = {
+			["name"]   = {"an anomaly", "in an anomaly", "In anomaly"},
+			["hit_a"]  = {"", "", ""},
+			["hit_z"]  = {"", "", ""},
+			["hear_a"] = {"Shouted somebody", "Somebody shouted loudly ", "Somebody shouted"},
+			["hear_z"] = {"shouted somebody", "somebody shouted loudly ", "somebody shouted"},
+			["hear_p"] = 0.3
+	},
+	[10] = {
+			["name"]   = {"beasts", "beasts", "Beasts"},
+			["hit_a"]  = {"", "", ""},
+			["hit_z"]  = {"", "", ""},
+			["hear_a"] = {"I've heard that somebody was eaten alive", "Some beast growled", "Some beasts roars"},
+			["hear_z"] = {"heard that somebody was eaten alive", "some beast growled", "some beasts roars"},
+			["hear_p"] = 0.3
+	}
+}
+
+ weapon_templates = {
+"$kill_z $weapon_name_3.",
+"$kill_z $weapon_name_3, $prob_z.",
+"$kill_z $weapon_name_3, $sad_z.",
+"$kill_z $weapon_name_3 , $weapon_hit_z.",
+"$kill_z $weapon_name_3 . $weapon_hit_a.",
+"$kill_a $weapon_name_2.",
+"$kill_a $weapon_name_2, $prob_z.",
+"$kill_a $weapon_name_2, $sad_z.",
+"$kill_a $weapon_name_2, $weapon_hit_z.",
+"$kill_a $weapon_name_2. $weapon_hit_a.",
+"$prob_a $weapon_name_2 $kill_z.",
+"$prob_a $weapon_name_2 $kill_z, $weapon_hit_z.",
+"$prob_a $weapon_name_2 $kill_z. $weapon_hit_a.",
+"$prob_a $weapon_name_2 $kill_z.",
+"$prob_a $kill_z $weapon_name_2, $weapon_hit_z.",
+"$prob_a $kill_z $weapon_name_2. $weapon_hit_a."
+}
+
+ stalker_corpse_templates = {
+"$level $seen_z $corpse_z stalker. $name.",
+"$when_a $seen_z $corpse_z stalker $level. $name.",
+"$level $seen_z $corpse_z stalker. $name, $prob_z.",
+"$seen_a $corpse_z stalker $level $when_z. $name, $prob_z.",
+"$level $seen_z $corpse_z stalker. $name. $sad_a $rate.",
+"$when_a $level $seen_z $corpse_z stalker. $name. $sad_a $rate.",
+"$level $seen_z $corpse_z stalker. $name, $prob_z. $sad_a $rate.",
+"$level $seen_z $corpse_z stalker $when_z. $name, $prob_z. $sad_a $rate.",
+"$level $kill_z stalker. $name.",
+"$level $kill_z stalker. $name, $prob_z.",
+"$level $kill_z stalker. $name. $sad_a $rate.",
+"$level $kill_z stalker. $name, $prob_z. $sad_a $rate.",
+"$seen_a $corpse_z stalker. $name. $level.",
+"$seen_a $corpse_z stalker $when_z. $name. $level.",
+"$when_a $seen_z $corpse_z stalker. $name. $level.",
+"$seen_a $corpse_z stalker. $name, $prob_z. $level.",
+"$when_a $seen_z $corpse_z stalker. $name, $prob_z. $level.",
+"$when_a $seen_z $corpse_z stalker. $name, $prob_z. $level.",
+"$kill_a stalker. $name. $level.",
+"$kill_a stalker. $name, $prob_z. $level.",
+"$sad_a $seen_z $corpse_z stalker. $name. $level.",
+"$sad_a $when_z $seen_z $corpse_z stalker. $name. $level.",
+"$sad_a $seen_z $corpse_z stalker. $name, $prob_z. $level.",
+"$sad_a $when_z $seen_z $corpse_z stalker. $name, $prob_z. $level.",
+"$sad_a $kill_z stalker. $name. $level.",
+"$sad_a $kill_z stalker. $name, $prob_z. $level."
+}
+
+ npc_corpse_templates = {
+"$seen_a $corpse_z $level $class.",
+"$when_a $level $seen_z $corpse_z $class.",
+"$level $kill_z $class.",
+"$seen_a $corpse_z $class. $level.",
+"$seen_a $when_z $corpse_z $class. $level.",
+"$when_a $seen_z $corpse_z $class. $level.",
+"$kill_a $class. $level.",
+"$fun_a, $seen_z $corpse_z $class. $level.",
+"$fun_a, $kill_z $class. $level.",
+"$fun_a, $when_z $seen_z $corpse_z $class. $level.",
+"$fun_a, $when_z $seen_z $corpse_z $class. $corpse_name_a $name. $level.",
+"$fun_a, $when_z $seen_z $corpse_z $class. $name, $corpse_name_z. $level.",
+"$fun_a, $when_z $seen_z $corpse_z $class. $level."
+}
+
+ monster_corpse_templates = {
+"$level $seen_z $corpse_z $c_corpse.",
+"$level $seen_z $corpse_z $c_corpse. $fun_a.",
+"$level $seen_z $corpse_z $c_corpse, $fun_z.",
+"$when_a $level $seen_z $corpse_z $c_corpse.",
+"$when_a $level $seen_z $corpse_z $c_corpse. $fun_a.",
+"$when_a $level $seen_z $corpse_z $c_corpse, $fun_z.",
+"$when_a $level $seen_z $corpse_z $c_corpse.",
+"$when_a $level $seen_z $corpse_z $c_corpse. $fun_a.",
+"$when_a $level $seen_z $corpse_z $c_corpse, $fun_z.",
+"$level $kill_z $class.",
+"$level $kill_z $class. $fun_a.",
+"$level $kill_z $class, $fun_z.",
+"$seen_a $corpse_z $c_corpse. $level.",
+"$seen_a $corpse_z $c_corpse. $level. $fun_a.",
+"$when_a $seen_z $corpse_z $c_corpse. $level.",
+"$seen_a $corpse_z $c_corpse $when_z . $level. $fun_a.",
+"$seen_a $corpse_z $c_corpse $when_z. $level.",
+"$seen_a $corpse_z $c_corpse $when_z. $level. $fun_a.",
+"$when_a $seen_z $corpse_z $c_corpse. $level.",
+"$when_a $seen_z $corpse_z $c_corpse. $level. $fun_a.",
+"$kill_a $class. $level.",
+"$kill_a $class. $level. $fun_a.",
+"$fun_a, $seen_z $corpse_z $c_corpse. $level.",
+"$fun_a, $when_z $seen_z $corpse_z $c_corpse. $level.",
+"$fun_a, $seen_z $corpse_z $c_corpse $when_z. $level.",
+"$fun_a, $kill_z $class. $level."
+}
+
+killer_act_templates = {
+"$level $meet_z $class. $hard_a $killed_z.",
+"$level $meet_z $class $when_z. $hard_a $killed_z.",
+"$when_a $level $meet_z $class. $hard_a $killed_z.",
+"$level $killed_z $class $when_z.",
+"$meet_a $class $level. $hard_a $killed_z.",
+"$meet_a $class $level $when_z. $hard_a $killed_z.",
+"$meet_a $class $level $when_z. $hard_a $killed_z.",
+"$when_a $meet_z  $class $level. $hard_a $killed_z.",
+"$when_a $level $meet_z $class. $hard_a $killed_z.",
+"$when_a $meet_z $class $level. $hard_a $killed_z."
+}
+
+ hear_sounds_tempates = {
+"$level $hear_z.",
+"$level $hear_z, $carefull_z.",
+"$hear_a. $level.",
+"$carefull_a! $level $hear_z.",
+"$carefull_a, $hear_z. $level.",
+"$when_a $level $hear_z.",
+"$level $hear_z $when_z, $carefull_z.",
+"$hear_a $when_z. $level.",
+"$when_a $hear_z. $level.",
+"$carefull_a! $when_a $hear_z $level.",
+"$carefull_a, $when_z $hear_z. $level.",
+"$level $hear_z $when_z.",
+"$when_a $level $hear_z, $carefull_z.",
+"$hear_a $when_z. $level.",
+"$when_a $hear_z. $level.",
+"$carefull_a! $level $hear_z $when_z.",
+"$carefull_a, $when_z $hear_z. $level.",
+"$carefull_a! $when_z $level $hear_z.",
+"$carefull_a, $when_z $hear_z. $level."
+}
+
+ spawn_templates = {
+"$level $seen_z $class.",
+"$when_a $level $seen_z $class.",
+"$level $seen_z $class, $carefull_z.",
+"$when_a $seen_z $class $level, $carefull_z.",
+"$carefull_a! $level $seen_z $class.",
+"$carefull_a! $level $seen_z $class $when_z.",
+"$seen_a $class. $level.",
+"$when_a $seen_z $class. $level.",
+"$when_a $seen_z $class. $level.",
+"$carefull_a! $seen_a $class. $level.",
+"$carefull_a! $when_a $seen_z $class. $level.",
+"$carefull_a! $when_a $seen_z $class. $level.",
+"$carefull_a, $seen_z $class. $level.",
+"$carefull_a, $seen_z $class $when_z. $level.",
+"$carefull_a, $when_z $seen_z $class. $level.",
+"$seen_a $class. $level. $carefull_a.",
+"$when_a $seen_z $class. $level. $carefull_a.",
+"$when_a $seen_z $class. $level. $carefull_a."
+}
+
+spawn_templates_group = {
+"$level $seen_z $count $class.",
+"$level $seen_z $count $class $when_z.",
+"$level $seen_z $count $class, $carefull_z.",
+"$when_a $seen_z $count $class $level, $carefull_z.",
+"$carefull_a! $level $seen_z $count $class.",
+"$carefull_a! $level $seen_z $count $class $when_z.",
+"$seen_a $count $class. $level.",
+"$when_a $seen_z $count $class. $level.",
+"$when_a $seen_z $count $class. $level.",
+"$carefull_a! $seen_a $count $class. $level.",
+"$carefull_a! $seen_a $count $class $when_z. $level.",
+"$carefull_a! $when_a $seen_z $count $class. $level.",
+"$carefull_a, $seen_z $count $class. $level.",
+"$carefull_a, $seen_z $count $class $when_z. $level.",
+"$carefull_a, $when_z $seen_z $count $class. $level.",
+"$seen_a $count $class. $level. $carefull_a.",
+"$when_a $seen_z $count $class. $level. $carefull_a.",
+"$when_a $seen_z $count $class. $level. $carefull_a."
+}
+
+abuse_templates = {
+	"I'll explain for the slow-witted: if you're asked to holster your weapon, its better to holster your weapon - then your face won't suffer for it. Unless you want to end up like that guy...",
+	"People these days! Until you smack them across the face - they don't understand, that their gun should be lowered...",
+	"Right... If one more Peckerwood approaches me with a raised weapon - I won't hit him in the face. I'll smack him in the belly and drop him on the spot."
+}
+
+weather_templates_day = {
+	["clear_clear"] = {"Look at the weather! Beautiful! I can't even believe, that this is the Zone...", "The weather is superb. Shall I go sunbathing? :)", "The cloud runs off in a disguise,\\nThe sun is shining from the skies.\\nItsIt's so good and nice,\\nGiving us its warmth and light...\\n\\nYou know, I wanted to be a poet..."},
+	["clear_pasmurno"] = {"The clouds are everywhere. I hope it doesn't rain...", "The clouds look evil...", "I think it'll rain. Looks like we've got to cancel our expedition..."},
+	["clear_rain"] = {"Looks like it's gonna rain...", "Raining, not again.", "So, who was that clever person to say the weather is going to be nice?"},
+	["clear_groza"] = {"Wow, the thunder is going to be quite strong.", "Did you hear that thunder? The bang was immense!", "We've got a real show here - the lightnings shine everywhere."},
+	["pasmurno_clear"] = {"Here's the sun again.", "I told you - the weather will be good.", "That's fantastic! All the clouds are gone."},
+	["pasmurno_pasmurno"] = {"It's quite cloudy...", "Looks like the sun is gone for a long time."},
+	["pasmurno_rain"] = {"Hmm, here's the rain...", "Mark my words - it will rain.", "Once more the rains have fallen on the ground,\\nAnd with rain droplets silence leaves.\\nI can see that all around,\\nWater takes all lonely leaves."},
+	["pasmurno_groza"] = {"Wow, the thunder is going to be quite strong.", "Did you hear that thunder? The bang was immense.", "We've got a real show here - the lightnings shine everywhere."},
+	["rain_clear"] = {"Here's the sun again.", "Mark my words - the weather will be good.", "That's fantastic! All the clouds are gone."},
+	["rain_pasmurno"] = {"At least the rain stopped.", "Anyway, it stopped raining.", "Looks like the rain has finished.", "Don't feel happy about the rain stopping - just look at the clouds."},
+	["rain_rain"] = {"Is the rain going to stop at all?", "It's still raining...", "The percussion of the rain Ц \\nDrums are hitting silent land. \\nQuiet whispers are not heard, \\nFrom the skies they do descend. \\nIt refreshes our sense - \\nThe water falling from aboveЕ \\nAnd in thunder's angry bangs \\nOur silent world still stands. \\n\\nYou know, I was a poet... A long time ago."},
+	["rain_groza"] = {"Did you see the lightning? It seems it's not just rain - it's a thunderstorm.", "Did you hear the thunder? It was quite strong."},
+	["groza_clear"] = {"The sun is shining again.", "Believe me - the weather will be good.", "Hurray! The clouds have finally disappeared."},
+	["groza_pasmurno"] = {"The rain has stopped.", "Looks like the thunder has ended.", "Happy that the thunderstorm has stopped? Now look at the clouds."},
+	["groza_rain"] = {"The water is still dripping...", "There is no thunder anymore, have you noticed?", "No lightnings in the sky. I think the thunderstorm is about to finish."},
+	["groza_groza"] = {"It's still raining...", "I wonder, will the thunderstorm ever stop?", "Damn it! It just had to start raining as soon as we were finally ready to go."}
+}
+
+weather_templates_night = {
+	["clear_clear"] = {"Look how nice the weather is! For a moment I even forgot that I'm in the Zone...", "I'm telling you - the weather IS fantastic."},
+	["clear_pasmurno"] = {"I hope it's not going to rain...", "The clouds are quite scary...", "It seems as though it's going to rain..."},
+	["clear_rain"] = {"Looks like it's raining...", "Raining. Again!", "'The weather is going to be good', those sceintists said, eh?"},
+	["clear_groza"] = {"Jeez, the thunderstorm is going to be strong.", "Did you hear that thunder? That was bloody strong!", "We've got a real show here - the lightnings shine everywhere."},
+	["pasmurno_clear"] = {"I told you - the weather will be good.", "That's fantastic! All the clouds are gone."},
+	["pasmurno_pasmurno"] = {"It's quite cloudy...", "Looks like we wouldn't see clear sky for a long time."},
+	["pasmurno_rain"] = {"Hmm, here's the rain...", "I told you - it's going to rain.","Once more the rains have fallen on the ground,\\nAnd with rain droplets silence leaves.\\nI can see that all around,\\nWater takes all lonely leaves."},
+	["pasmurno_groza"] = {"Wow, the thunder is going to be quite strong.", "Did you hear that thunder? The bang was immense.", "You should see what's happening here - lightnings everywhere!"},
+	["rain_clear"] = {"The rain has stopped.", "I told you - the weather will be good.", "Hurray! The clouds have finally disappeared."},
+	["rain_pasmurno"] = {"At least the rain stopped.", "At least it stopped raining.", "Looks like the rain has finished.", "Happy that the thunderstorm has stopped? Now look at the clouds."},
+	["rain_rain"] = {"Is the rain going to stop at all?", "It's still raining...", "The percussion of the rain Ц \\nDrums are hitting silent land. \\nQuiet whispers are not heard, \\nFrom the skies they do descend. \\nIt refreshes our sense - \\nThe water falling from aboveЕ \\nAnd in thunder's angry bangs \\nOur silent world still stands. \\n\\nYou know, I was a poet... A long time ago."},
+	["rain_groza"] = {"Did you see the lightning? It seems it's not just rain - it's a thunderstorm.", "Did you hear the thunder? It was quite strong."},
+	["groza_clear"] = {"Believe me - the weather will be good.", "That's fantastic! All the clouds are gone."},
+	["groza_pasmurno"] = {"At least the rain stopped.", "Looks like the thunder has ended.", "Don't feel happy about the rain stopping - just look at the clouds."},
+	["groza_rain"] = {"The water is still dripping...", "There is no thunder anymore, have you noticed?", "No lightnings in the sky. I think the thunderstorm is about to finish."},
+	["groza_groza"] = {"It's still raining...", "I wonder, is the thunderstorm ever going to stop?", "Damn it! It just had to start raining as soon as we were finally ready to go."}
+}
+
+
+actor_seen_public_templates = {
+"$level $kill_seen_z some stalker $killed_z $class.",
+"$when_a $level $kill_seen_z some stalker $killed_z $class.",
+"$level $kill_seen_z some stalker $killed_z $class, $fun_z.",
+"$when_a $level $kill_seen_z some stalker $killed_z $class, $fun_z.",
+"$kill_seen_a some stalker $killed_z $class. $level.",
+"$when_a $kill_seen_z some stalker $killed_z $class. $level.",
+"$when_a $kill_seen_z some stalker $killed_z $class. $level.",
+"$kill_seen_a some stalker $killed_z $class. $level. $fun_a.",
+"$kill_seen_a some stalker $killed_z $class $when_z. $level. $fun_a.",
+"$when_a $kill_seen_z some stalker $killed_z $class. $level. $fun_a."
+}
+
+actor_seen_public_templates_group = {
+"$level $kill_seen_z some stalker $killed_z $count $class.",
+"$when_a $level $kill_seen_z some stalker $killed_z $count $class.",
+"$level $kill_seen_z some stalker $killed_z $count $class, $fun_z.",
+"$when_a $level $kill_seen_z some stalker $killed_z $count $class, $fun_z.",
+"$kill_seen_a some stalker $killed_z $count $class. $level.",
+"$kill_seen_a some stalker $killed_z $count $class $when_z. $level.",
+"$when_a $kill_seen_z some stalker $killed_z $count $class. $level.",
+"$kill_seen_a some stalker $killed_z $class. $count $level. $fun_a.",
+"$when_a $kill_seen_z some stalker $killed_z $count $class. $level. $fun_a.",
+"$when_a $kill_seen_z some stalker $killed_z $count $class. $level. $fun_a."
+}
+
+heli_templates = {
+	["seen"] = {
+		"$level a helicopter flew by. $carefull_a.", 
+		"$when_a saw a helicopter. $level.", 
+		"$level a helicopter flew by. Take cover, I don't know what orders they have.",		
+		"Hmm. People, a helicopter $level has just flown above me.",
+		"A helicopter $when_a has flew above me. What the hell is it doing here? I didn't get any info on any planned missions or operations $level and my informators are reliable. Something serious must've happened. $carefull_a."
+	},
+	["combat"] = {
+		"$carefull_a! $level it's hot around here - a helicopter searches the sector.", 
+		"I've just heard an army radiochat - their helicopter has just finished someone. $level.", 
+		"$carefull_a! $level there is a helicopter. Looks like it's searching for somebody.",
+		"Fucking hell... $level a helicopter is shooting at someone. Poor guy...",
+		"$carefull_a! Take cover! A copter is searching for someone here and if it spots you, I guarantee that you'll regret that!",
+		"$carefull_a! $level, some idiot has decided to take down a helicopter. Looks like he's dead.",
+		"$level. A helicopter's flying around, shooting somebody."
+	},
+	["flame"] = {
+		"I've just heard an army radiochat - their helicopter has just finished someone. $level.", 
+		"$level seriosly damaged the military helicopter...", 
+		"$carefull_a! $level someone blown up the helicopter.", 
+		"$level, there's a military heli on fire. Beautiful, eh...",
+		"Jesus! Someone shot a helicopter $level and to be honest, he did a fucking good job! Their engine went on fire. They're swearing in in their radio and falling somewhere to the side!",
+		"I see a heli $level, it's going down! Falling fast! Holy shit, someone seriosly blew it.",
+		"$level someone definitley wanted to commit a suicide. He shot down a helicopter! That's... That's just...."
+	},
+	["die"] = {
+		"$level a helicopter has crashed.", 
+		"carefull_a! $level a helicopter has been taken down.", 
+		"$level a helicopter has fallen, $carefull_z.", 
+		"I've heard army radiochat - they've got a helicopter taken down. $level.",
+		"Hell! A helicopter $level crashed, $carefull_z!",
+		"The soldiers are swearing so much my ears are gonna roll up. I guess it's very frustrating for them... Don't lose helicopters every day.",
+		"Wow... that was some big explosion. Somebody had seriously hated this helicopter, $level",
+		"$level. Looks like there's nothing left of pilots. Someone has just smashed down a helicopter. Hmm..."		
+	},
+	["retreat"] = {
+		"$level the helicopter has gone elsewhere $carefull_a.", 
+		"$when_a I saw a helicopter. It turned round and has gone somewhere else. $level.",
+		"Fuck... there's so much swearing in soldiers' radiochat now. They were having a rade, a helicopter $level was shot down and they've ordered their troops to retreat asap."
+	}
+}
+
+wound_templates = {
+	["single"] = {"'Mayday'! $level I can't go on, I won't hold out much longer...", "SOS! $level I can't hold on for much longer, ran out of first aid-kits, almost out of cartridges. Comrades, help me...", "'Mayday'! I can't...\\nPotap: I couldn't get the source of this signal. $level.", "Help me, they got me! I can't oppose for much longer! I'm $level!", "Fuck, there are so many of them... people, I won't make it alone, everyone who reads this please help! I'm $level.", "I've got huge problems. Extremely huge. I'm $level, and if there's no one nearby I will leave you very soon. Help me, people, if there's no one nearby I will leave you very soon. Help me, people.", "Jesus, it's a trap! 'Mayday'! I'm $level, help me!", "Fuck! There are so many of them! Help me, I won't kill them alone! I'm $level!", "I've just overheard a radiochat of some bastards, they've got an ambush for some stalker $level.", "Help me! I've got very little ammo and even less medkits. Looks like someone was waiting for me here! I'm $level, can't hold for much longer!" },
+	["group"] = {"$level I've got  'Mayday'! From $name. I'm moving towards him and I would appreciate any help.", "SOS! We have trouble $level, $name is wounded! People, help...", "Attention everyone! $name is in trouble $level, my PDA recieves his SOS signal. If anybody's nearby, help him.", "Shit, help me! We'll be torn apart! We're  $level! Fuck, is there anyone nearby!?", "Help! We've got serious problems, anyone who can - help! We're $level.", "Damn, we've got huge problems here! There is a wounded person among us, $name. We wouldn't hold for long! We are $level.", "We went for the 'Mayday' signal sent by $name. It was a trap! Help, we can't resist much longer!", "SOS! We got into an ambush $level, still holding but I don't think for much longer. Please help.", "I recieved a call for help from a group of stalkers. Their transmitter was crap, all I could get is their coordinates. They're $level. If anybody's near, help them.", "People, help us, we are in serious trouble, one of us is wounded! The place is $level." }
+}
+
+blowout_templates = { 
+	{text = "I've met the Swamp Doctor... Well, he healed me a bit from the pseudodog's bites, but that's irrelevant. The important thing is, he said that the blowout is going to be $when, so find a safe place!"},
+	{text = "I've visited scientists at Yantar. They warned me about the blowout. It'll be $when."},
+	{text = "Sakharov warned me that the blowout will happen $when. I recommend you to search for a hideout...", alive=902},	
+	{text = "Kruglov warned me, that the blowout will happen $when. I recommend you to search for a hideout...", alive=900},	
+	{text = "Something strange happens here... my devices began to max out. It seems that the blowout will happen $when."},
+	{text = "Mutant activity raised. I think the blowout is coming. Approximately - $when."},
+	{text = "I recommend you to search for a hideout, the blowout will happen approx. $when."},
+	{text = "Sakharov has told me that that the blowout will be $when.", alive=902},
+	{text = "Scientists have warned me about the blowout. It'll happen $when.", alive=902},
+	{text = "I've got the info about the next blowout - it'll happen $when. My informators are reliable and it seems that it's truth. Be careful."},
+	{text = "Blowout will happen $when."}
+}
+
+reward_phrases_authors = {
+	["trader"] = "Sidorovich",
+	["barman"] = "Barman"
+}
+
+reward_phrases_templates = {
+	["trader"] = {"$who came here, he has left you something. When you are here Ц take it.", "$who has thanked you. He said you've killed $target. He has left something for you.", "$who thanked you for $target. Come here.", "Marked One, $who came here, he was happy. He left something for you, he said that this is his gratitude.", "$who has come, he left something for you. If you are nearby Ц come to me, take your things, benefactor.", "Marked One... $who has come, he asked me to give a package to you. When youТll be here Ц take it."},
+	["barman"] = {"$who came here, he has left you something. When you are nearby Ц take it.", "$who thanked you. He said you've killed $target. He has left something for you.", "$who thanked you for the $target. If you'll pass nearby - come in, he has left something to you.", "Marked One, there was some guy here, he says he's looking for you. He became very sad when I told him that you're not here. He's given me something as a reward for what you've done. So, come over.", "$who left the package for you. He said, you've helped him a lot. When you'll have a time - come, take it."}
+}
+
+condition_templates = {
+	["excellent"] =	{" Almost new.", " In excellent condition.", " Almost new."},
+	["good"] =		{" Used a little.", " In good condition."},
+	["mediocre"] =	{" Not new, but still works well.", " In average condition."},
+	["bad"] =		{" Quite old.", " Bad condition.", " Very old."}
+}
+
+trade_templates = {
+"I'm selling $item. I can be found $level. There're many customers so hurry up.",
+"I can place $item into worthy hands. Obviously, not free of charge. If anyone is interested - I'm $level.",
+"I'm $level and can provide some very interesting merchandise. For example, $item.",
+"I'm selling $item for a decent price, if you're interested - meet me $level.",
+"I'm selling $item, if anyone is interested - search for me $level.",
+"I'm selling a very useful item, $item, If you're interested - fin me $level.",
+"If anyone is interested in buying $item - I'm $level.",
+"I can supply $item for a reasonable price. I'm $level.",
+"I'm willing to sell $item $level.",
+"Anyone interested in $item? You can buy excelent cpecimen $level.",
+"$level I'm selling $item. The price is a good one.",
+"I'm waiting for people interested in buying $item $level. The price is not small, but it's worth it.",
+"$level I'm selling - $item.",
+"I'm selling $item for a reasonable price $level.",
+"I'd advise you to hurry - I'm selling $item. $level.",
+"$level I can deliver $item into good hands. For a good price, of course.",
+"If anyone is interested - I can sell $item $level. A good piece.",
+"If anyone is interested, I'm selling $item. An outstanding piece. You can find me $level."
+}
+
+--"Communications Status:"
+connect_templates = {
+	"Communication is restored.",
+	"Signal detected.",
+	"Connecting to network...",
+	"Connection restored.",
+	"Connecting to server..."
+}
+
+disconnect_templates = {
+	"No connection.",
+	"Communication is interupted",
+	"Low signal, connection interrupted.",
+	"Connection lost.",
+	"No signal."
+}
+
+-- 23:00 - 04:00
+night_templates = {
+	{	texts = {
+		"People... Very strange things happen at night... Have you ever heard any radiochats?",
+		"Yup. And do one knows, who it is... What happens there? Some experiments, operations... And we don't know anything, only a tiny bit of info gets out...",
+		"I think its better for you not to know at all. That way you'll sleep more easily."
+		}
+	}, 
+	{	texts = {
+		"We got into the southern tunnel of the object. It goes down, soon will go underground. Red Forest could be seen from the windows. It's all quiet at the moment.",
+		"I'm losing you. Put up an external transmitter outside or continue transmitting with text as you're doing it now.",
+		"Okay. Yes, close the channel, we don't want any unwanted listeners, right?"
+		}, comments = "strange", prob=0.5
+	},
+	{	texts = {
+		"...[transmission error] close the tunnel, get into groups and seek through the underground part of the Object. Keep connection on at all times. If any of the groups get silent on the radio, everyone must return.",
+		"Sokol, what... [transmission error] ...that can appear? During the last time the whole group has vanished.",
+		"Talking about the protection measure, there is... [transmission error] ...living here, then... [transmission error] ...not discovered. Don't go too far. The point of no return is 2 hours. When they pass we are going."
+		}, comments = "strange", prob=0.5
+	},
+	{	texts = {
+		"Ajax, make contact immediately. I repeat, immediately. We must depart in six minutes, before it begins."
+		}, comments = "strange", prob=0.3
+	},
+	{	texts = {
+		"They demonstrate some very good thinking abilities. What do you think about that, Andrey Ilyich?",
+		"Yes, that's some interesting behaviour... Especially taking in account the amounts of emissions... Stop! Immediately change over to the encrypted channel! What the hell!?"
+		}, comments = "strange", prob=0.8
+	},
+	{	texts = {
+		"Candid, our equipment acts very strange... All detectors and dosimeters show nothing and Sergey's PDA has stopped working... even the connection dies here... What are the orders?",
+		"Get out of there! Get out! Do it fucking quickly!"
+		}, comments = "strange", prob=0.5
+	},
+	{	texts = {
+		"Have you found the observation centre?",
+		"Yes, we have. Some equipment is still intact. Most of the cameras are switched off, but motion sensors still work... wait, there is a diagram with indication... you're here and... hell, what is this!? Get out of here, a group of them is quickly going towards you through the northern corridors! Damn, there is more! In the ventilation system... [error, transmission interrupted]"
+		}, comments = "strange", prob=0.8
+	},
+	{	texts = {
+		"Rise the power for 10 percent. And, also... please, switch to another channel... this is seems to be not ciphered..."
+		}, comments = "strange", prob=0.5
+	},
+	{	texts = {
+		"Colonel, the helicopter with the experimental suppression f-generator was bringed down in the region of the Red Forest about hour ago. Immediately, I repeat, immediately send the fast responce group to the place of wreck. We'll provide all necessary equipment, just do it as fast as you can.",
+		"Turn on the ciphering! We will be on the place in 12 hours."
+		}, comments = "strange", prob=0.8
+	}
+}
+
+-- 04:30 - 07:00
+morning_templates = {
+	"Comrades, dawn... that is beautiful.",
+	"Sunrise...",
+	"People, it's dawn, I think we should move out, there aren't as many weird creatures as at night.",
+	"Its dawn. Time has passed and we are now more or less safe.",
+	"Guys, it's time to get up! Here it's morning already.",
+	"Hey, people! The sun is finally rising, I'm so tired of shivering in darkness. It's better to... shiver when it's light around...",
+	"Does anybody hear me? A group of our men has disappeared tonight. They should've come from Agroprom by dawn. Still aren't here. We are setting off to search for them. If you want to join us - please do.",
+	"Fuck, who has created morning..? We were drinking the whole night through... Cook, that bastard, has brought bad vodka again... Freedom guys, keep sleeping... the rade to Duty base can wait...",
+	"Comrades, you should see, what dawn brings at Yantar. Its something else... its as terrible as it is beautiful... the bodies of snorks so still, drift on the smooth surface of the lake, sparkling in the morning sun... almost romantic..."
+}
+
+-- 20:30 - 22:00
+evening_templates = {
+	"No, guys, do as you want, but I'm not going anywhere. The night is soon...",
+	"No, I'm not going anywhere. It's late already, all those weird creatures are going to come out now...",
+	"So, the sun sets already... and slowly will return. Now the Zone is dangerous.",
+	"Well, guys... if you want, go... to the bloodsuckers... alone. Extreme freaks, eh.",
+	"So? Who is going to kill the squad of pseudodogs with me? I'm scared to sleep in the tent alone at night, what if... dark... asks for water again... It's better to walk around somewhere...",
+	"The moon is rising... Fuck, I don't have enough time to get to the camp... People, is there anyone nearby? I think that something is following me.",
+	"Attention everyone! Scientists are reporting increased activity of mutants at Yantar tonight. Don't go far from your camps."
+}
+
+comments_templates = {
+	["strange"] = {
+		"Stop. What's this?",
+		"Holy shit... what's happening there?",
+		"Something strange happens in this town, he-he...",
+		"So they forgot to turn the ciphering on? Well...",
+		"What is this?",
+		"Fuckin shit... it is so frightening at night.",
+		"At night... some kind of... operations take place there.",
+		"You know, it's better for you not to know about some things that happen around here. It'll be easier to sleep.",
+		"Who's this? Military? Scientists?...or... someone else?",
+		"Strange.",
+		"So frightening...",
+		"I don't like this shit...",
+		"Who knows...",
+		"What's happening there?"
+	}
+}
+
+smart_filters = {
+	["military"] = {"esc_bridge", "esc_blokpost", "agr_nii", "agr_factory_hold"},
+	["bandit"] = {"gar_bandit_agr", "val_lager_bandits"},
+	["killer"] = {"mil_mercs"},
+	["zombied"] = {"yantar_zombies", "yan_st_zombie1", "yan_st_zombie2", "yan_st_zombie3", "yan_st_zombie4", "rad_zombied1", "rad_zombied2", "rad_before_tramplin_ambush"},
+	["zombie"] = {"yantar_zombies"},
+	["dog"] = {"esc_boars_dogs"},
+	["boar"] = {"esc_boars_dogs"},
+	["flesh"] = {"esc_flesh_1", "esc_flesh_2"},
+	["arena_enemy"] = {"bar_arena_monstr"},
+	["arena_monstr"] = {"bar_arena_monstr"}
+}
+
+miniquest_rewards = {
+	["novice"] = {
+		"ammo_9x18_fmj","ammo_9x18_pmm","ammo_12x70_kart","ammo_9x19_fmj","ammo_9x19_pbp","ammo_11.43x23_hydro","ammo_12x76_zhekan","ammo_11.43x23_fmj",
+		"af_vyvert","af_medusa","af_gravi","af_blood","af_fireball","af_ameba_mica","af_cristall_flower", "af_soul", "wpn_mp5_m2","wpn_aks74ub_aks74ub30_ironsight", 
+		"treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item"
+	},
+	["experienced"] = {
+		"ammo_7.62x54_7h1", "ammo_7.62x54_ap", "ammo_7.62x54_7h14","ammo_5.45x39_fmj","ammo_5.45x39_ap","ammo_5.56x45_ss190","ammo_5.56x45_ap","ammo_vog-25p","ammo_vog-25","ammo_m209",
+		"af_cry_1", "af_ameba_slime","af_ameba_slug","af_drops","af_mincer_meat","af_fuzz_kolobok","af_electra_sparkler","af_rusty_thorn","af_rusty_kristall","af_dummy_glassbeads",
+		"wpn_mp5_m2","wpn_addon_silencer","wpn_addon_scope","wpn_addon_grenade_launcher", 
+		"treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item"
+	},
+	["veteran"] = {
+		"wpn_addon_scope_susat","wpn_addon_grenade_launcher_m203", "wpn_winchester_m1",
+		"ammo_12x70_kart","ammo_9x39_pab9","ammo_9x39_ap","ammo_og-7b","ammo_vog-25p",
+		"af_babka_1", "af_pudd_1", "af_dik_1", "af_kol_1", "af_armor_1", "af_dummy_pellicle","af_rusty_sea-urchin","af_electra_flash","af_soul","af_dummy_spring","af_gold_fish","af_dummy_battery","af_dummy_dummy", 
+		"treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item"
+	},
+	["master"] = {
+		"af_spirit_2", "af_cry_2", "af_babka_2", "af_pudd_2", "af_dik_2", "af_kol_2", "af_armor_2", "af_cristall","af_dummy_glassbeads","af_night_star","af_electra_moonlight", "af_dummy_pellicle","af_dummy_battery", "af_dummy_dummy", "af_ameba_mica", "af_dummy_spring","af_spirit_1",
+		"ammo_7.62x54_7h1","ammo_7.62x54_ap","ammo_7.62x54_7h14","ammo_gauss",
+		"treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item", "treasure_item"		
+	}
+}
+
+class_templates = {
+	["stalker_novice"] = {"gar_stalker_respawn_1", "esc_stalker_respawn_1", "ds_stalker_respawn_1", "bar_stalker_respawn_3"},
+	["stalker_experienced"] = {"agr_stalker_regular","mil_stalker_respawn_1", "gar_stalker_respawn_2", "esc_stalker_respawn_2", "ds_stalker_respawn_2", "bar_stalker_respawn_4"},
+	["stalker_veteran"] = {"agr_stalker_veteran", "mil_stalker_respawn_2", "bar_stalker_respawn_1"},
+	["stalker_master"] = {"mil_neutral_barier_respawn_1", "mil_stalker_respawn_3", "bar_stalker_respawn_2"},
+	["bandit_novice"] = {"agr_bandit_respawn_1", "gar_bandit_respawn_1", "esc_bandit_respawn_1", "ds_bandit_respawn_1", "val_bandit_respawn_1"},
+	["bandit_experienced"] = {"agr_bandit_respawn_2", "gar_bandit_respawn_2", "esc_bandit_respawn_2", "ds_bandit_respawn_2", "val_bandit_respawn_2"},
+	["bandit_veteran"] = {"ds_bandit_respawn_3", "val_bandit_respawn_3", "ros_bandit_respawn_3"},
+	["bandit_master"] = {"val_bandit_respawn_4", "ros_bandit_respawn_4"},
+	["military_novice"] = {""},
+	["military_experienced"] = {"agr_soldier_regular", "esc_soldier_respawn_1"},
+	["military_veteran"] = {"agr_soldier_veteran", "esc_soldier_respawn_specnaz", "rad_specnaz_respawn_specnaz", "val_soldier_respawn_1"},
+	["military_master"] = {"rad_soldier_master"},
+	["killer_novice"] = {""},
+	["killer_experienced"] = {"mil_killer_respawn_3", "ros_killer_respawn_3"},
+	["killer_veteran"] = {"mil_killer_respawn_1", "mil_killer_respawn_2", "ros_killer_respawn_1", "ros_killer_respawn_2"},
+	["killer_master"] = {"mil_killer_respawn_4", "ros_killer_respawn_4"},
+	["monolith_novice"] = {""},
+	["monolith_experienced"] = {"pri_monolith_respawn_1", "rad_monolith_respawn_1"},
+	["monolith_veteran"] = {"pri_monolith_respawn_2", "rad_monolith_respawn_2"},
+	["monolith_master"] = {"mil_monolit_rush_respawn_1", "pri_monolith_respawn_3", "rad_monolith_respawn_3"},
+	["zombied_novice"] = {"rad_zombied_respawn_1", "yan_zombied_respawn_1", "amk_zombied_1"},
+	["zombied_experienced"] = {""},
+	["zombied_veteran"] = {"rad_zombied_respawn_2", "yan_zombied_respawn_2", "amk_zombied_2"},
+	["zombied_master"] = {"rad_zombied_respawn_3", "yan_zombied_respawn_3", "amk_zombied_3"},
+	["dolg_novice"] = {""},
+	["dolg_experienced"] = {"gar_dolg_respawn_1", "gar_dolg_respawn_2", "bar_dolg_respawn_1"},
+	["dolg_veteran"] = {"bar_dolg_respawn_2"},
+	["dolg_master"] = {"bar_dolg_respawn_3"},
+	["freedom_novice"] = {""},
+	["freedom_experienced"] = {"mil_freedom_respawn_2", "rad_freedom_respawn_2"},
+	["freedom_veteran"] = {"mil_freedom_respawn_1", "rad_freedom_respawn_1"},
+	["freedom_master"] = {"mil_freedom_respawn_3", "mil_freedom_respawn_sniper", "mil_freedom_barier_respawn_1", "rad_freedom_respawn_3"}
+}
+
+do_seen_monster_templates = {
+	{	enabled = true, text ="A mutilated corpse has been found near the abandoned farm in Cordon. It looks like the work of a bloodsucker.",
+		spawn = {
+			{class = "bloodsucker_weak", count = 1, point = {-2.46, 2.58, 83.14}, lv = 273930 , gv = 85 }
+		},
+		reward = {from = "author", r_type="money", c_min = 10, c_max = 50}
+	},		
+	{	enabled = true, text ="Those tushkanos are so annoying... they appeared in the camp again, so everyone who is scared of them, don't come here for a while.",
+		spawn = {
+			{class = "tushkano_normal", count = 6, point = {-221.00, -19.93, -158.54}, lv =32809, gv =47}
+		},
+		has_info = "escape_lager_killers_die, escape_lager_complete, esc_fanat_die"
+	},		
+	{	enabled = true, text ="Not far from the rookie camp in Cordon, under the bridge, I saw a pseudo-dog. All who pass there be cautious.",
+		spawn = {
+			{class = "pseudodog_strong", count = 1, point = {-64.17, -9.84, -49.40}, lv = 210981, gv = 77}
+		},
+		reward = {from = "author", r_type="money", c_min = 10, c_max = 50}		
+	},
+	{	enabled = true, text ="A pseudo-giant has strayed on to the carpark and passage to the Garbage is blocked. Someone, drop this cattle down...",
+		spawn = {
+			{class = "gigant_normal", count = 1, point = {65.17, 7.49, 605.40}, lv = 354789, gv = 214}
+		},
+		reward = {from = "author", r_type="money", c_min = 10, c_max = 50}
+	},		
+	{	enabled = true, text ="A bloodsucker just killed a group of bandits in the abandoned vehicle graveyard in the Garbage. All - be wary.",
+		spawn = {
+			{class = "bloodsucker_weak", count = 1, point = {-132.87, -1.90, -206.22}, lv = 83306, gv = 269}
+		},
+		has_info = "gar_hellcar_help, gar_hellcar_reject",
+		reward = {from = "author", r_type="money", c_min = 10, c_max = 50}
+	},		
+	{	enabled = true, text ="Someone saw a some fleshes near the entrance to the Agroprom underground.",
+		spawn = {
+			{class = "flesh_weak", count = 5, point = {-81.93, 2.40, 41.44}, lv = 158982, gv = 662}
+		}
+	},
+	{	enabled = true, text ="In Agroprom, near the factory, a fiery poltergeist just fried a group of stalkers.",
+		spawn = {
+			{class = "m_poltergeist_strong_flame", count = 1, point = {-21.78, 5.23, 8.43}, lv = 218746, gv = 485}
+		},
+		has_info = "agr_krot_task_complete, agr_find_gunslinger_cache_found, agr_krot_secret_info",
+		reward = {from = "author", r_type="money", c_min = 10, c_max = 50}
+	},
+	{	enabled = true, text ="Recently, a creature similar to a bloodsucker was seen on the fields in the Agroprom.",
+		spawn = {
+			{class = "bloodsucker_strong", count = 1, point = {-79.20, 12.04, -113.22}, lv = 160200, gv = 698}
+		},
+		reward = {from = "author", r_type="money", c_min = 10, c_max = 50}
+	},
+	{	enabled = true, text ="At Agroprom, a pseudo-giant was spotted near the rusty bus.",
+		spawn = {
+			{class = "gigant_strong", count = 1, point = {159.31, 0.19, 28.29}, lv = 386144, gv = 584}
+		},
+		reward = {from = "author", r_type="money", c_min = 10, c_max = 50}		
+	},
+	{	enabled = true, text ="There is a swarm of wild dogs attacking the west Agroprom complex.",
+		spawn = {
+			{class = "dog_normal", count = 6, point = {-82.35, -1.02, -179.61}, lv = 157957, gv = 438}
+		}
+	},				
+	{	enabled = true, text ="Just now, not far from the swamp in the Dark Valley, I witnessed a pseudo-giant bringing down down 2 wild boars. Not a sight for a faint hearted.",
+		spawn = {
+			{class = "gigant_strong", count = 1, point = {83.91, -2.95, -272.86}, lv = 277256, gv = 930}
+		},
+		reward = {from = "author", r_type="money", c_min = 10, c_max = 50}
+	},
+	{	enabled = true, text ="Pseudo-dogs have killed some stalkers in the village... well, I think, they'll face their death soon.",
+		spawn = {
+			{class = "pseudodog_strong", count = 3, point = {-194.27, -12.65, 65.62}, lv = 130834, gv = 1657}
+		}
+	},
+	{	enabled = true, text ="I've noticed the pseudo-giant near the abandoned bus stop, at the Military.",
+		spawn = {
+			{class = "gigant_strong", count = 1, point = {-144.18, -21.13, 117.02}, lv = 175287, gv = 1660}
+		},
+		reward = {from = "author", r_type="money", c_min = 10, c_max = 50}
+	},
+	{	enabled = true, text ="Yesterday night, as I entered the Bloodsucker Village, I've noticed the presence of the bloodsuckers. I",
+		spawn = {
+			{class = "bloodsucker_normal", count = 2, point = {-216.25, -20.48, 245.60}, lv = 112657, gv = 1766},
+			{class = "bloodsucker_strong", count = 1, point = {-239.43, -22.05, 258.71}, lv = 93353, gv = 1785}
+		},
+		reward = {from = "author", r_type="money", c_min = 10, c_max = 50}
+	},		
+	{	enabled = true, text ="A big pack of fleshes has run through the Freedom mine field recently. About half of them died, the rest are still around there.",
+		spawn = {
+			{class = "flesh_weak", count = 8, point = {70.91, -10.59, 233.36}, lv = 368619, gv = 1739}
+		}
+	},
+	{	enabled = true, text ="Snorks have been noticed in the swamp at the Army Warehouses, not sure how many of them though. Be careful.",
+		spawn = {
+			{class = "snork_strong", count = 5, point = {117.43, -11.69, 162.30}, lv = 407556, gv = 1642}
+		}
+	},
+	{	enabled = true, text ="I've recieved a message from some stalkers requesting help... they said they met a chimera. When I finally found them $where, they were all already dead. And you know... I'm pretty sure they weren't killed by a chimera... they were all burnt as though they got into an Electra... just be careful. It seems as though something new has appeared.",
+		spawn = {
+			{class = "electro_chimera", count = 1, point = {2.56,1.24,-41.24}, lv = 177375 , gv = 1049 }
+		},
+		reward = {from = "author", r_type="money", c_min = 30, c_max = 70}
+	},
+	{	enabled = true, text ="Stalkers! Several hours ago a group of Duty soldiers was severely damaged by some unknown creatures. If you know anything about any mutations that happened in the Zone after the last blowout, please help. The incident happened $where...",
+		spawn = {
+			{class = "electro_chimera", count = 1, point = {-175.68,-0.00,172.21}, lv = 31609 , gv = 1331 }
+		},
+		author = "DUTY", icon = "dolg",
+		reward = {from = "author", r_type="money", c_min = 30, c_max = 70}
+	},
+	{	enabled = true, text ="Sapsan, I'm observing a gunfight $where... a group of stalkers has a fight with a big mutant... I can't work out which one it is... I'm going for descend. And yes, change the channel to a different frequency, this one is not secure...",
+		spawn = {
+			{class = "electro_chimera", count = 1, point = {14.07,-3.63,7.17}, lv = 15238 , gv = 1877 }
+		},
+		author = "[message source could not be defined]", icon = "uniq",
+		reward = {from = "author", r_type="money", c_min = 30, c_max = 70}
+	},
+	{	enabled = true, text ="Duty reports on new type of chimeras. Their expedition has failed... They were going on a clean-up of mutant lair $where, and then... Well, the quad was gone in several seconds. That's definitely not an ordinary chimera... it simply can't... so many people at once...",
+		spawn = {
+			{class = "electro_chimera", count = 1, point = {-164.50,-0.20,-201.21}, lv = 72576 , gv = 554 }
+		},
+		reward = {from = "author", r_type="money", c_min = 30, c_max = 70}
+	},
+	{	enabled = true, text ="Scientists say that something strange happened to chimeras after the last blowout... they began to have some new strange mutations... be careful. Oh, yes, if anyone could help - some time ago I've seen a chimera $where. God knows whether it is normal or not...",
+		spawn = {
+			{class = "electro_chimera", count = 1, point = {-58.47,-12.51,-256.30}, lv = 17990 , gv = 1454 }
+		},
+		reward = {from = "author", r_type="money", c_min = 30, c_max = 70}
+	},
+	{	enabled = true, text ="Stalkers! According to our data... a strange creature has appeared $where. Most probably that's a new type of chimera, mutated because of last blowout. Be careful.",
+		spawn = {
+			{class = "electro_chimera", count = 1, point = {-16.08,-0.20,-1.09}, lv = 224157 , gv = 466 }
+		},
+		author = "Sakharov", icon = "ecolog",
+		reward = {from = "author", r_type="money", c_min = 30, c_max = 70}
+	},
+	{	enabled = true, text ="...believe that in the end this could result in unneeded victims? Just think about it. Stalkers constantly die because of different things in the Zone without that, and those that do manage to survive prefer not to know the details of deaths of their... colleagues. And what? I don't think that the appearance of some new creature $where will result in a big reaction from stalkers. They are used to this kind of stuff.",
+		spawn = {
+			{class = "electro_chimera", count = 1, point = {491.89,-46.11,-226.66}, lv = 162873 , gv = 2058 }
+		},
+		author = "[message source could not be defined]", icon = "uniq",		
+		reward = {from = "author", r_type="money", c_min = 30, c_max = 70}
+	},
+	{	enabled = true, text ="I confirm the information about the appearance of a new creature $where. Send a heavy-armed quad, my men aren't able to do anything here.",
+		spawn = {
+			{class = "electro_chimera", count = 1, point = {-97.14,-2.21,119.78}, lv = 18685 , gv = 2211}
+		},
+		author = "DUTY", icon = "dolg",		
+		reward = {from = "author", r_type="money", c_min = 30, c_max = 70}
+	},
+	{	enabled = true, text ="Damn it... just listen to this. I've bumped into a military patrol $where. Well, it doesn't look very attractive... to be honest it's hard to call it a patrol. Probably even their guts are hanging on trees nearby. I could only recognize their uniform... Well, two things. First of all, a punishing rade could be done here or, even worse, a helicopter could be sent. Second, I'm more worried that a new strange creature has appeared somewhere around here. All mutants I've seen can't tear patrols up that bad.",
+		spawn = {
+			{class = "electro_chimera", count = 1, point = {136.10,-0.34,29.57}, lv = 333522 , gv = 913 }
+		},
+		reward = {from = "author", r_type="money", c_min = 30, c_max = 70}
+	},
+	{	enabled = true, text ="I'm observing a chimera $where. It just took down a group of stalkers with some effective fireworks. So, if you have a strong desire to go for a walk in this area - I advise you to think twice. It's much better to turn around and leave than to end up lying around here with you arse giving off steam, like these poor people have.",
+		spawn = {
+			{class = "electro_chimera", count = 1, point = {62.06,-1.73,43.85}, lv = 174087, gv = 2223}
+		},
+		reward = {from = "author", r_type="money", c_min = 30, c_max = 70}
+	}
+}
+
+

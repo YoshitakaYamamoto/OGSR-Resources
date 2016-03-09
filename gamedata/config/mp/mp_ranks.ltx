@@ -1,0 +1,102 @@
+[rank_sign]
+texture			= ui\ui_icon_rank
+
+[mp_item_groups]
+
+mk				= mp_medkit
+mka				= mp_antirad
+expl			= mp_grenade_rgd5,mp_grenade_f1 
+smk				= mp_grenade_gd-05
+glgr			= mp_ammo_vog-25, mp_ammo_m209, mp_ammo_og-7b,
+g_a				= mp_ammo_gauss
+
+standart_ammo_p	= mp_ammo_9x18_fmj, mp_ammo_11.43x23_fmj
+advanced_ammo_p = mp_ammo_9x18_pmm, mp_ammo_11.43x23_hydro
+
+standart_ammo	= mp_ammo_7.62x39_fmj, mp_ammo_5.45x39_fmj, mp_ammo_9x19_fmj, mp_ammo_7.62x54_7h1, mp_ammo_5.56x45_ss190, mp_ammo_9x39_pab9, mp_ammo_12x70_kart, ammo_7.62x39_fmj
+advanced_ammo	= ammo_flame, mp_ammo_5.45x39_ap, mp_ammo_9x19_pbp, mp_ammo_7.62x54_ap, mp_ammo_5.56x45_ap, mp_ammo_9x39_ap, mp_ammo_12x76_zhekan, ammo_7.62x39_ap, ammo_arbolt, ammo_m208a
+
+best_ammo		= mp_ammo_12x70_kart
+wpn_auto		= wpn_mp40, wpn_sg550sr_sk1, wpn_mac10, wpn_mac10_m1, mp_wpn_ak74u, mp_wpn_ak74,  mp_wpn_mp5, mp_wpn_sig550, mp_wpn_groza, mp_wpn_g36, mp_wpn_fn2000, mp_wpn_val, mp_wpn_vintorez, mp_wpn_vintorez_m1, mp_wpn_svd, mp_wpn_svu, mp_wpn_gauss, mp_wpn_rpg7, mp_wpn_toz34, mp_wpn_pkm, mp_wpn_saiga12c, mp_wpn_saiga12c_m1, mp_wpn_bm16_full, mp_wpn_crossbow, cherep_svd, wpn_eagle_m1
+wpn_pist		= wpn_tt, mp_wpn_pm, mp_wpn_pb, mp_wpn_fort, mp_wpn_colt1911, mp_wpn_usp, mp_wpn_desert_eagle, mp_wpn_hpsa, mp_wpn_beretta, wpn_toz34_short, mp_wpn_bm16, mp_wpn_wincheaster1300, mp_wpn_spas12, mp_wpn_spas12_m1
+outfit			= mp_scientific_outfit, mp_military_stalker_outfit, mp_exo_outfit
+scp				= mp_wpn_addon_scope_susat, mp_wpn_addon_scope,mp_wpn_addon_acog,mp_wpn_addon_scope2,mp_wpn_addon_aug_a1,wpn_zf4
+sil				= mp_wpn_addon_silencer,mp_wpn_addon_sil_9_p, wpn_9mm_nato_silencer, mp_wpn_addon_sil_9_pb ,mp_wpn_addon_sil_545_ar,mp_wpn_addon_sil_556_ar,mp_wpn_addon_sil_762_ar,mp_wpn_addon_sil_762_p,mp_wpn_addon_sil_762_pms,mp_wpn_addon_sil_1143_p
+gl			    = mp_wpn_addon_grenade_launcher, mp_wpn_addon_grenade_launcher_m203
+torch			= mp_device_torch
+binoc			= mp_wpn_binoc
+kf			    = mp_wpn_knife,  wpn_montirovka
+
+[rank_base]
+amount_restriction = mk:0, expl:0, smk:0, advanced_ammo_p:0, standart_ammo_p:10, standart_ammo:0, advanced_ammo:0, best_ammo:0, glgr:0, wpn_auto:1, wpn_pist:1, device:1, mka:1, outfit:1, scp:1, sil:1, gl:1, torch:1, det:1, binoc:1, g_a:0, kf:1
+
+[rank_0]
+rank_name						= st_rank_novice		; звание
+rank_exp						= 0, 0          ; опыт, артефакты
+rank_diff_exp_bonus				= 1, 1.5, 2, 3, 4
+;----------------- new items -------------------------
+available_items					= wpn_montirovka, wpn_tt, wpn_zf4, wpn_mp40, wpn_sg550sr_sk1, wpn_flame, wpn_toz34_short, wpn_mac10, wpn_mac10_m1, wpn_sayga12k_sk1, wpn_eagle_m1, wpn_rpk74_sk1, wpn_m16a1_sk1, wpn_bm16_full
+amount_restriction				= mk:1, expl:1, smk:1, advanced_ammo_p:4, standart_ammo:5, advanced_ammo:4, best_ammo:3, glgr:0
+
+[rank_1]
+rank_name						= st_rank_experienced
+rank_exp						= 500,0;500
+rank_aquire_money				= 300
+rank_diff_exp_bonus				= 0.85, 1, 1.5, 2, 3.5
+;----------------- new items -------------------------
+available_items					= wpn_fort_m1, hunters_toz, wpn_beretta_m1, wpn_hpsa, wpn_ak74u_silenc
+;----------------- new prices ------------------------
+mp_wpn_pm_cost					= 0
+mp_wpn_pb_cost					= 0
+mp_wpn_fort_cost				= 0
+mp_ammo_9x18_fmj_cost			= 0
+mp_ammo_9x19_fmj_cost			= 0
+;----------------- new def items ---------------------
+def_item_repl_mp_wpn_pb 		= mp_wpn_fort
+amount_restriction				= mk:1, expl:2, smk:1, advanced_ammo_p:4, standart_ammo:5, advanced_ammo:4, best_ammo:3
+
+[rank_2]
+rank_name						= st_rank_professional
+rank_exp						= 1500,0;1500
+rank_aquire_money				= 850;800
+rank_diff_exp_bonus				= 0.65, 0.8, 1, 1.5, 2
+;----------------- new items -------------------------
+available_items					= cherep_svd
+;----------------- new prices ------------------------
+mp_wpn_colt1911_cost			= 0
+mp_ammo_11.43x23_fmj_cost		= 0
+;----------------- new def items ---------------------
+amount_restriction				= mk:2, expl:3, smk:2, glgr:1, advanced_ammo_p:4, standart_ammo:5, advanced_ammo:4, best_ammo:3
+
+[rank_3]
+rank_name						= st_rank_veteran
+rank_exp						= 3000,0 ; 3000;2500
+rank_aquire_money				= 1500
+rank_diff_exp_bonus				= 0.5, 0.7, 0.9, 1, 1.5
+;----------------- new items -------------------------
+available_items					= wpn_spas12_m1, wpn_groza_coll, wpn_winchester_m1, wpn_groza_m1, wpn_eagle_m1, wpn_colt_m1, wpn_val_m1
+;----------------- new prices ------------------------
+mp_wpn_colt1911_cost			= 0
+mp_ammo_11.43x23_fmj_cost		= 0
+mp_wpn_usp_cost					= 0
+;----------------- new def items ---------------------
+def_item_repl_mp_wpn_colt1911	= mp_wpn_usp
+amount_restriction				= mk:2, expl:3, smk:3, glgr:2, advanced_ammo_p:4, standart_ammo:5, advanced_ammo:4, best_ammo:3
+
+[rank_4]
+rank_name						= st_rank_legend
+rank_exp						= 6000, 1 ; 6000;4000
+rank_aquire_money				= 3000
+rank_diff_exp_bonus				= 0.2, 0.5, 0.7, 0.9, 1
+
+;---------------------------------------------------------------ARENA_EXTENSION_MOD------------------------------------------------------------------
+;----------------- new items -------------------------
+available_items					= wpn_svd_m1, wpn_svu_m1, wpn_vintorez_m1, wpn_mp5_m1, wpn_gauss_m1, wpn_pm_arena, wpn_mp5_arena, wpn_mp5_m2, wpn_toz34_arena, wpn_spas12_arena, wpn_ak74_arena, wpn_bm16_arena, wpn_ak74u_arena, wpn_val_arena, wpn_groza_arena, wpn_fn2000_arena, wpn_g36_arena, wpn_sig_m1, wpn_sig_m2,  wpn_wincheaster1300_arena,wpn_svd_arena,wpn_sig550_arena, wpn_vint_col_m1, wpn_pkm, wpn_m_134,  wpn_sg550sr_sk1, wpn_mp40, cherep_svd, wpn_pkm_digger
+;---------------------------------------------------------------ARENA_EXTENSION_MOD------------------------------------------------------------------
+
+;----------------- new prices ------------------------
+mp_wpn_usp_cost					= 0
+mp_wpn_colt1911_cost			= 0
+;----------------- new def items ---------------------
+def_item_repl_mp_wpn_colt1911	= mp_wpn_usp
+amount_restriction				= mk:3, expl:3, smk:3, glgr:3, advanced_ammo_p:4, standart_ammo:5, advanced_ammo:4, best_ammo:3, g_a:4

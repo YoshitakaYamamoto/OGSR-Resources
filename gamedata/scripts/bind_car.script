@@ -1,0 +1,275 @@
+local article_by_car_section = {
+	vehicle_zaz			 = "vehicles_zaporozh_gorb_article",
+	vehicle_zaz968		 = "vehicles_zaporozh_ush_article",	
+	vehicle_kamaz		 = "vehicles_kamaz_article",			
+	vehicle_btr			 = "vehicles_btr-70_article",			
+	vehicle_niva		 = "vehicles_niva_article",			
+	vehicle_niva2		 = "vehicles_niva_article",			
+	vehicle_tr13		 = "vehicles_traktor_article",			
+	vehicle_uaz			 = "vehicles_uaz_article",				
+	vehicle_uaz2		 = "vehicles_uaz_article",				
+	vehicle_uazbuhanka	 = "vehicles_uaz_buh_article",			
+	vehicle_moskvich	 = "vehicles_moskvich_article",		
+	vehicle_moskvich2	 = "vehicles_moskvich_article",		
+	vehicle_baggi		 = "vehicles_baggi_article",			
+	vehicle_zil_mmz		 = "vehicles_zil_mmz_article",			
+	vehicle_gaz66		 = "vehicles_gaz66_article",			
+	vehicle_avtobuszil	 = "vehicles_gaz53_article",			
+}
+
+function init(obj)
+   obj:bind_object(car_binder(obj))
+end
+
+class "car_binder" (object_binder)
+function car_binder:__init(obj) super(obj)
+	self.info = false
+end
+
+function car_binder:reload(section)
+end
+
+function car_binder:reinit()
+	self.object:set_callback(callback.death, self.death_callback, self)
+end
+
+function car_binder:load(reader)
+	if reader:r_eof() then
+		return
+	end
+	self.start_fuel = reader:r_float()
+	if reader:r_elapsed() ~= 0 then
+		return
+	end
+end
+
+function car_binder:net_spawn(server_object)
+	-- self.object:set_fuel_consumption(self.object:get_fuel_consumption()*100)
+	db.add_car(self.object)
+	trunk_inv.init_trunk(self.object)
+	ogse_car_control.register_target(self.object)
+	return true
+end
+
+function open_door(door_def)
+	door_def.bone:set_max_force_and_velocity(door_def.force, -door_def.velocity, door_def.axis)
+end
+
+function close_door(door_def)
+	door_def.bone:set_max_force_and_velocity(door_def.force, door_def.velocity, door_def.axis)
+end
+
+function read_door_definition(obj, line)
+	local ini = obj:get_visual_ini()
+	ASSERT(ini, "")
+	if ini:line_exist("car_definition", line) then
+		local door_defs = get_names("car_definition", line, ini)
+		ASSERT(#door_defs == 4, 
+			"'%s' parameter for the car '%s' is not fully defined. Must have 4 values (bone name, force, velocity, axis)",
+			line,
+			obj:name())
+		local def = {}
+		local ph_shell = obj:get_physics_shell()
+		ASSERT(ph_shell, "")
+		def.bone_name = door_defs[1]
+		def.bone = ph_shell:get_joint_by_bone_name(door_defs[1])
+		def.force = tonumber(door_defs[2])
+		def.velocity = tonumber(door_defs[3])
+		def.axis = tonumber(door_defs[4])
+		return def
+	end
+	return nil
+end
+
+function car_binder:update(delta)
+	if not self.ph_shell then
+		self.ph_shell = self.object:get_physics_shell()
+		if self.ph_shell then
+			-- даём пинок, чтобы опустить на землю
+			hit_object(self.object, vector(), 0.001, db.actor, 0.0, hit.explosion)
+			-- закрываем багажник
+			self.trunk_door_def = read_door_definition(self.object, "trunk_door")
+			if self.trunk_door_def then
+				close_door(self.trunk_door_def)
+			end
+			self.engine_door_def = read_door_definition(self.object, "engine_door")
+			if self.engine_door_def then
+				close_door(self.engine_door_def)
+			end
+			-- подписываемся на сигнал открывания/закрывания дверей
+			self.sm = ogse_signals.get_mgr()
+			self._open_trunk_door_desc = {signal = "on_car_trunk_open", self = self, fun = self.on_trunk_open}
+			self.sm:subscribe(self._open_trunk_door_desc)
+			self._open_engine_door_desc = {signal = "on_car_engine_open", self = self, fun = self.on_engine_open}
+			self.sm:subscribe(self._open_engine_door_desc)
+		end
+	end
+	if self.start_fuel then self.object:set_fuel(self.start_fuel) self.start_fuel = nil end
+	
+	-- дадим инфу для энциклопедии
+	if not self.info and db.actor then
+		local actor_car = ogse_car_control.get_actor_car()
+		if actor_car and actor_car:id() == self.object:id() then
+			local sect = self.object:section()
+			local info = nil
+			for k,v in pairs(article_by_car_section) do
+				if k == self.object:section() then
+					info = v
+					break
+				end
+			end
+			if info then
+				--log1(self.object:section()..": "..info)
+				if db.actor:dont_has_info(info) then
+					db.actor:give_info_portion(info)
+				end
+			end
+			self.info = true
+		end
+	end
+	
+	-- обработки туториального запора в деревне новичков
+	if string.find(self.object:name(), "esc_vehicle_zaz_in_novice_lager") then
+		-- сделаем запор неубиваемым, пока игрок не закончит квест с военными
+		if db.actor:dont_has_info("esc_kvest_sdelka_with_mils_complete") and db.actor:dont_has_info("esc_kvest_sdelka_with_mils_fail") then
+			local car = self.object:get_car()
+			car:SetfHealth(1.0)
+		end
+		-- условие завершения подзадачи на заправку запора
+		if db.actor:has_info("esc_kvest_sdelka_with_mils_start") and db.actor:dont_has_info("escape_kvest_with_military_zaz_fueled") then
+			if self.object:get_fuel() > 0.01 then
+				db.actor:give_info_portion("escape_kvest_with_military_zaz_fueled")
+			end
+		end
+	end
+	if string.find(self.object:name(), "vehicle_esc_last_request_gaz66") then
+		if db.actor:dont_has_info("esc_last_request_lets_drive_gaz66") then
+			local car = self.object:get_car()
+			car:SetfHealth(1.0)
+		end
+	end
+end
+
+class "wait_for_actor_move" (ogse_qt.quick_timer)
+function wait_for_actor_move:__init(binder) super()
+	self.initial_actor_pos = db.actor:position()
+	self.car_binder = binder
+	--self.sm = ogse_signals.get_mgr()
+end
+function wait_for_actor_move:on_key_down(key, bind)
+	if bind == 15 then
+		log1("wait_for_actor_move:on_key_down")
+		self.closed_by_key = true
+	end
+end
+function wait_for_actor_move:condition()
+	--[[if not self._on_key_desc then
+		self._on_key_desc = {signal = "on_key_down", self = self, fun = self.on_key_down}
+		self.sm:subscribe(self._on_key_desc)
+	end]]
+	if self.closed_by_key then
+		return true
+	end
+	local dist = self.initial_actor_pos:distance_to(db.actor:position())
+	return dist > 0.2
+end
+function wait_for_actor_move:action()
+	if self._on_key_desc then
+		self.sm:unsubscribe(self._on_key_desc)
+	end
+	close_door(self.car_binder.engine_door_def)
+end
+
+function car_binder:on_engine_open(car)
+	if self.object:id() == car:id() then
+		if self.engine_door_def then
+			open_door(self.engine_door_def)
+			wait_for_actor_move(self):start()
+		end
+		return true
+	end
+end
+
+class "wait_for_car_inventory_closed" (ogse_qt.quick_timer)
+function wait_for_car_inventory_closed:__init(binder) super()
+	self.car_binder = binder
+end
+function wait_for_car_inventory_closed:condition()
+	local inv_opened = trunk_inv.trunk_is_opened()
+	return not inv_opened
+end
+function wait_for_car_inventory_closed:action()
+	close_door(self.car_binder.trunk_door_def)
+end
+
+function car_binder:on_trunk_open(car)
+	if self.object:id() == car:id() then
+		if self.trunk_door_def then
+			open_door(self.trunk_door_def)
+			wait_for_car_inventory_closed(self):start()
+		end
+		return true
+	end
+end
+
+function car_binder:save(packet)
+   packet:w_float(self.object:get_fuel())
+end
+
+function car_binder:death_callback(victim, who)
+	local car = self.object
+	db.del_car(car) -- удаляем машину из глобальной базы
+	ogse_car_control.unregister_target(car) -- разрегистрируем машину как цель
+	ogse_car_control.on_car_death(car) -- выполняем посмертные действия для водилы
+	-- выкидываем предметы из багажника
+	local trunk = trunk_inv.get_trunk_for_car(car)
+	for i=0,trunk:inv_box_count()-1 do
+		local pos = vector():mad(car:position(), vector():setHP(math.random()*math.pi*2, 0), 1.0+math.random()*2)
+		local it = trunk:object_from_inv_box(i)
+		trunk:drop_item_and_teleport(it, pos)
+		alife():set_switch_online(it:id(), true)
+		alife():set_switch_offline(it:id(), false)
+		if it:is_explosive() then -- следим только за взрывающимися предметами
+			wait_independent(it, math.random(1000, 2000)):start()
+		end
+	end
+	-- удаляем сам багажник
+	trunk_inv.remove_trunk(car)
+	-- удаляем машину
+	local s_car = alife():object(car:id())
+	if s_car then
+		alife():release(s_car, true)
+	end
+end
+
+-- таймер ждёт, когда предмет окончательно переместится на уровень (не будет родительского объекта)
+-- и после этого пытается этот предмет взорвать
+-- надо для подрыва взрывоопасных предметов в инвентаре машины, поскольку сразу после телепорта
+-- предметы ещё находятся во владении онлайновой машины и взрываться не хотят
+class "wait_independent" (ogse_qt.quick_timer)
+function wait_independent:__init(item, dt) super()
+	self.kill_time = time_global() + dt
+	self.item = item
+end
+function wait_independent:condition()
+	return not self.item:parent() and time_global() > self.kill_time and self.item:get_physics_shell()
+end
+function wait_independent:action()
+	self.item:explode(0) -- взорвутся только те, которые могут взорваться
+end
+
+function car_binder:net_destroy()
+	db.del_car(self.object)
+	self.object:set_callback(callback.death, nil)
+	ogse_car_control.unregister_target(self.object)
+
+	-- проверка, прошел ли хоть один апдейт и успели ли мы подписаться на сигналы
+	if self.sm then
+		self.sm:unsubscribe(self._open_trunk_door_desc)
+		self.sm:unsubscribe(self._open_engine_door_desc)
+	end
+end
+
+function car_binder:net_save_relevant()
+   return true
+end

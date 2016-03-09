@@ -1,0 +1,333 @@
+--[[------------------------------------------------------------------------------------------------
+База данных живых онлайновых объектов, зон и рестрикторов, актёра
+Чугай Александр
+--------------------------------------------------------------------------------------------------]]
+
+zone_by_name        = {}
+quest_zones         = {}
+sl_by_name          = {}
+storage             = {}
+sound               = {}
+actor               = nil
+actor_proxy         = actor_proxy.actor_proxy()
+heli                = {}
+turret              = {}
+cars                = {}
+camp_storage        = {}
+story_by_id	        = {}
+smart_terrain_by_id = {}
+trader              = nil
+info_restr          = {}
+delayed             = {}
+strn_by_respawn     = {}
+dead_bodies         = {}
+creature            = {} -- true - человек, false - животное (исключая торговца)
+doors               = {}
+last_deadman        = nil
+
+artefacts			= {}
+
+FlagEsc = 0
+Flag2 = 0
+Dead2 = 0
+use_rk = 0
+cond_rk = 0
+cond_rk_dif = 0
+repaired_slot = 0
+check_lc_flag = 0
+
+function add_obj( obj )
+	if IsStalker(obj) then
+		creature[obj:id()] = true
+	elseif IsMonster(obj) then
+		creature[obj:id()] = false
+	end
+end
+
+function del_obj( obj )
+	--ASSERT(obj:clsid() ~= -1, "obj:clsid() ~= -1 [%s]", obj:name())
+	storage[obj:id()] = nil
+	creature[obj:id()] = nil
+	for id,npc in pairs(storage) do
+		if npc.enemy and npc.enemy:id() == obj:id() then npc.enemy = nil end
+	end	
+end
+
+function add_deadman( obj, backup )
+	if obj then
+		if not dead_bodies[obj:id()] then dead_bodies[obj:id()] = obj:id() end
+		return true
+	elseif backup then
+		if not dead_bodies[backup:id()] then dead_bodies[backup:id()] = backup:id() end
+		return true
+	else return false end
+end
+
+function remove_deadman()
+	for k,v in pairs(dead_bodies) do
+		if v ~= 0 then
+			local obj = level.object_by_id(v)
+			if obj then
+				if xrs_ai then xrs_ai.npc_death_callback(obj) end
+				obj:iterate_inventory(recheck, obj)
+				dead_bodies[k] = 0
+				break
+			end
+		else	
+			dead_bodies[k] = nil
+		end
+	end
+end
+
+function protected_loot(object, backup)
+	death_manager.drop_manager(object, backup):create_release_item()
+end
+
+function remove_delayed()
+		for k,v in pairs(delayed) do
+			if v ~= 0 then
+				local obj = level.object_by_id(v)
+				if obj then
+					local storage_npc = storage[obj:id()]
+					if storage_npc then
+						if storage_npc.death then
+							xr_logic.issue_event(obj, storage_npc.death, "death_callback", obj, obj)
+						end		
+						if storage_npc.active_section then
+							xr_logic.issue_event(obj, storage_npc[storage_npc.active_scheme], "death_callback", obj, obj)
+						end
+						sr_territory.issue_event(obj, "death_callback", obj, obj)
+						smart_terrain.on_death(obj:id())
+						local drop, err_msg = pcall(protected_loot,obj,obj)
+						if not drop then
+							log1("ERROR: DB remove_delayed pcall FAIL "..obj:name().." reason: "..tostring(err_msg))
+							db.actor:give_game_news(game.translate_string("deadman_fail_warning_text"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
+						end						
+						if rx_ai then rx_ai.npc_death(obj,obj) end
+						obj:set_patrol_extrapolate_callback(nil)
+						obj:set_callback(callback.hit, nil)
+						obj:set_callback(callback.death, nil)
+						db.add_deadman(obj, obj)
+						delayed[k] = 0
+						break						
+					else
+						if not ogse.is_quest_npc(obj) then
+							s_obj = alife():object(v)
+							if s_obj then
+								alife():release(s_obj, true)
+							end
+							delayed[k] = 0
+							break
+						end
+						delayed[k] = 0
+					end
+				end
+			else
+				delayed[k] = nil
+			end
+		end
+end
+
+local remove_this_shit_immediately = {
+	["fake_grenades_base"] = true,
+	["grenade_f1_fake"] = true,
+	["grenade_rgd5_fake"] = true,
+	["grenade_gd-05_fake"] = true,
+	["grenade_light_fake"] = true,
+	["grenade_f1_test"] = true,
+	["grenade_rgd5_test"] = true,
+	["grenade_gd-05_test"] = true,
+	["grenade_light_test"] = true,
+	["gl_test_shell"] = true,
+	["wpn_fake_missile"] = true,
+	["gl_test_shell_ammo_vog-25"] = true,
+	["gl_test_shell_ammo_vog-25p"] = true,
+	["gl_test_shell_ammo_m209"] = true,
+	["gl_test_shell_ammo_m208a"] = true,
+	["gl_fake_missile"] = true,
+	["gl_fake_missile_ammo_vog-25"] = true,
+	["gl_fake_missile_ammo_vog-25p"] = true,
+	["gl_fake_missile_ammo_m209"] = true,
+	["gl_fake_missile_ammo_m208a"] = true,
+}
+
+function recheck(npc, item)
+
+	if item == nil then return end
+	local s_obj = alife():object(item:id())
+	if not s_obj then return end
+	
+    local section = s_obj:section_name()
+	
+	if remove_this_shit_immediately[section] then
+		local s_obj = alife():object(item:id())
+		if s_obj then
+			alife():release(s_obj, true)
+		end
+		return false	
+	end		
+	
+	if string.find(section,"arena") then
+		return false
+	end	
+	
+	if string.find(npc:name(), "aem_") then
+		return false
+	end	
+
+	if string.find(section,"af_") then
+		if ogse.art_accesible(item) then
+			return true
+		else	
+			local community = npc:character_community()
+			if community == "bandit" and math.random() > 0.5 then
+				return true
+			end
+			alife():release(s_obj, true)
+			return false				
+		end
+	end
+	
+	if string.find(section,"wpn_binoc") 
+	or string.find(section,"binocular") 
+	or string.find(section,"hand_radio") 
+	or string.find(section,"device_pda") 
+	or string.find(section,"kolbasa_a") 
+	or string.find(section,"vodka_a") 
+	or string.find(section,"psy_helmet_a")
+	or string.find(section,"bread_a") 
+	or string.find(section,"guitar") 
+	or string.find(section,"yad") 
+	or string.find(section,"device_torch")
+	or string.find(section,"wpn_knife") then
+		alife():release(s_obj, true)
+		return false	
+	end	
+	
+	if string.find(section,"grenade_f1") then
+		if math.random() > 0.8 then 
+			return true
+		else
+			alife():release(s_obj, true)
+			return false
+		end
+	end	
+	
+	if string.find(section,"medkit") then
+		if math.random() > 0.95 then 
+			return true
+		else
+			alife():release(s_obj, true)
+			return false
+		end
+	end		
+	
+	if string.find(section,"wpn_") and 
+	not string.find(section,"scope") and
+	not string.find(section,"addon") and
+	not string.find(section,"zf4") and
+	not string.find(section,"_sil") and
+	not string.find(section,"grenade_launcher") and
+	item:condition() > 0.90 then
+		if math.random(1,100) > 40 then item:unload_magazine() end
+		if death_manager.rare_item and death_manager.rare_item[section] and death_manager.rare_item[section] == true then
+			item:set_condition(math.random(65,95)/100)						
+		else	
+			item:set_condition(math.random(death_manager.damage_boundaries(npc))/100)
+		end	
+	end
+
+end
+
+function add_zone( zone )
+	zone_by_name[zone:name()] = zone
+	add_obj( zone )
+end
+
+function del_zone( zone )
+	zone_by_name[zone:name()] = nil
+	del_obj( zone )
+end
+
+
+function add_sl( sl )
+	sl_by_name[sl:name()] = sl
+	add_obj( sl )
+end
+
+function del_sl( sl )
+	sl_by_name[sl:name()] = nil
+	del_obj( sl )
+end
+
+
+function add_actor( obj )
+	actor = obj
+	actor_proxy:net_spawn( obj )
+	add_obj( obj )
+end
+
+function del_actor()
+	del_obj( actor )
+	actor_proxy:net_destroy()
+	actor = nil
+end
+
+
+function add_heli(obj)	
+	heli[obj:id()] = obj
+end	
+function del_heli(obj)
+	heli[obj:id()] = nil
+end	
+
+--Туррели
+
+function add_turret(obj)
+	turret[obj:id()] = obj
+	-- нах не надо, но пусть будет.
+	add_obj(obj)
+end
+
+function del_turret(obj)
+	turret[obj:id()] = nil
+	del_obj(obj)
+end
+
+-- Транспорт
+
+function add_car(obj)
+	cars[obj:id()] = obj
+end
+
+function del_car(obj)
+	cars[obj:id()] = nil
+end
+
+-- Регистрация всех квестовых зон на локации
+function register_all_quest_zones()
+	for id=1,65535 do
+		local obj = alife():object(id)
+		if obj then
+			if obj:section_name() == "smart_terrain" then
+				add_quest_zone( obj )
+			end
+		end
+	end
+end
+
+function add_smart_terrain( obj )
+	smart_terrain_by_id[obj.id] = obj
+end
+
+function del_smart_terrain( obj )
+	smart_terrain_by_id[obj.id] = nil
+end
+
+function add_quest_zone( obj )
+	quest_zones[obj:name()] = obj.id
+end
+
+function del_quest_zone( obj )
+	quest_zones[obj:name()] = nil
+end

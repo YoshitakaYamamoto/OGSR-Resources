@@ -1,0 +1,471 @@
+[ammo_9x19_fmj]:ammo_base
+$spawn			= "weapons\ammo\ammo_9x19_fmj" ; option for Level Editor
+visual          = weapons\ammo\ammo_9x19_fmj.ogf
+description		= enc_weapons1_ammo_ammo-9x19-fmj
+$prefetch 		= 64
+
+cost			= 310
+
+box_size		= 20
+
+inv_name		= ammo-9x19-fmj
+inv_name_short	= ammo-9x19-fmj_s
+inv_weight		= 0.24
+
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x		= 15
+inv_grid_y		= 12
+
+k_disp			= 2
+k_impulse		= 1.5
+k_pierce		= 1.1
+
+;------------------------------
+[ammo_9x19_pbp]:ammo_base
+$spawn			= "weapons\ammo\ammo_9x19_pbp" ; option for Level Editor
+visual          = weapons\ammo\ammo_9x19_pbp.ogf
+description		= enc_weapons1_ammo_ammo-9x19-pbp
+
+cost			= 330
+
+box_size		= 20
+
+inv_name		= ammo-9x19-pbp
+inv_name_short	= ammo-9x19-pbp_s
+inv_weight		= 0.24
+
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x		= 14
+inv_grid_y		= 12
+
+k_disp			= 2
+k_hit			= 1.5
+k_impulse		= 2.5
+impair			= 2.5
+
+;------------------------------
+
+[clip_8_9x19_fmj]:ammo_9x19_fmj
+box_size	= 1
+mag_size	= 8
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19a8
+inv_name		= clip_8_9x19
+description		= desc_load_9x19_fmj
+inv_name_short	= clip_8_9x19_fmj_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 12
+visual	= weapons\magazines\clip_8_900x19.ogf
+cost = 22
+
+[clip_8_9x19_pbp]:ammo_9x19_pbp
+box_size	= 1
+mag_size	= 8
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19b8
+inv_name		= clip_8_9x19
+description		= desc_load_9x19_pbp
+inv_name_short	= clip_8_9x19_pbp_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 12
+visual	= weapons\magazines\clip_8_900x19.ogf
+cost = 22
+
+[clip_13_9x19_fmj]:ammo_9x19_fmj
+box_size	= 1
+mag_size	= 13
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19a13
+inv_name		= clip_13_9x19
+description		= desc_load_9x19_fmj
+inv_name_short	= clip_13_9x19_fmj_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 8
+visual	= weapons\magazines\clip_13_900x19.ogf
+cost = 27
+
+[clip_13_9x19_pbp]:ammo_9x19_pbp
+box_size	= 1
+mag_size	= 13
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19b13
+inv_name		= clip_13_9x19
+description		= desc_load_9x19_pbp
+inv_name_short	= clip_13_9x19_pbp_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 8
+visual	= weapons\magazines\clip_13_900x19.ogf
+cost = 27
+
+[clip_15_9x19_fmj]:ammo_9x19_fmj
+box_size	= 1
+mag_size	= 15
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19a15
+inv_name		= clip_15_9x19
+description		= desc_load_9x19_fmj
+inv_name_short	= clip_15_9x19_fmj_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 7
+visual	= weapons\magazines\clip_15_900x19.ogf
+cost = 30
+
+[clip_15_9x19_pbp]:ammo_9x19_pbp
+box_size	= 1
+mag_size	= 15
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19b15
+inv_name		= clip_15_9x19
+description		= desc_load_9x19_pbp
+inv_name_short	= clip_15_9x19_pbp_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 7
+visual	= weapons\magazines\clip_15_900x19.ogf
+cost = 30
+
+[clip_16_9x19_fmj]:ammo_9x19_fmj
+box_size	= 1
+mag_size	= 16
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19a16
+inv_name		= clip_16_9x19
+description		= desc_load_9x19_fmj
+inv_name_short	= clip_16_9x19_fmj_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 6
+visual	= weapons\magazines\clip_16_900x19.ogf
+cost = 34
+
+[clip_16_9x19_pbp]:ammo_9x19_pbp
+box_size	= 1
+mag_size	= 16
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19b16
+inv_name		= clip_16_9x19
+description		= desc_load_9x19_pbp
+inv_name_short	= clip_16_9x19_pbp_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 6
+visual	= weapons\magazines\clip_16_900x19.ogf
+cost = 34
+
+[clip_17_9x19_fmj]:ammo_9x19_fmj
+box_size	= 1
+mag_size	= 17
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19a17
+inv_name		= clip_17_9x19
+description		= desc_load_9x19_fmj
+inv_name_short	= clip_17_9x19_fmj_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 5
+visual	= weapons\magazines\clip_17_900x19.ogf
+cost = 37
+
+[clip_17_9x19_pbp]:ammo_9x19_pbp
+box_size	= 1
+mag_size	= 17
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19b17
+inv_name		= clip_17_9x19
+description		= desc_load_9x19_pbp
+inv_name_short	= clip_17_9x19_pbp_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 5
+visual	= weapons\magazines\clip_17_900x19.ogf
+cost = 37
+
+[clip_18_9x19_fmj]:ammo_9x19_fmj
+box_size	= 1
+mag_size	= 18
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19a18
+inv_name		= clip_18_9x19
+description		= desc_load_9x19_fmj
+inv_name_short	= clip_18_9x19_fmj_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 4
+visual	= weapons\magazines\clip_18_900x19.ogf
+cost = 40
+
+[clip_18_9x19_pbp]:ammo_9x19_pbp
+box_size	= 1
+mag_size	= 18
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19b18
+inv_name		= clip_18_9x19
+description		= desc_load_9x19_pbp
+inv_name_short	= clip_18_9x19_pbp_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 4
+visual	= weapons\magazines\clip_18_900x19.ogf
+cost = 40
+
+[mag_20_9x19_fmj]:ammo_9x19_fmj
+box_size	= 1
+mag_size	= 20
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19a20
+inv_name		= mag_20_9x19
+description		= desc_load_9x19_fmj
+inv_name_short	= mag_20_9x19_fmj_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 8
+visual	= weapons\magazines\mag_20_900x19.ogf
+cost = 45
+
+[mag_20_9x19_pbp]:ammo_9x19_pbp
+box_size	= 1
+mag_size	= 20
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19b20
+inv_name		= mag_20_9x19
+description		= desc_load_9x19_pbp
+inv_name_short	= mag_20_9x19_pbp_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 8
+visual	= weapons\magazines\mag_20_900x19.ogf
+cost = 45
+
+[mag_30_9x19_fmj]:ammo_9x19_fmj
+box_size	= 1
+mag_size	= 30
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19a30
+inv_name		= mag_30_9x19
+description		= desc_load_9x19_fmj
+inv_name_short	= mag_30_9x19_fmj_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 7
+visual	= weapons\magazines\mag_30_900x19.ogf
+cost = 60
+
+[mag_30_9x19_pbp]:ammo_9x19_pbp
+box_size	= 1
+mag_size	= 30
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19b30
+inv_name		= mag_30_9x19
+description		= desc_load_9x19_pbp
+inv_name_short	= mag_30_9x19_pbp_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 7
+visual	= weapons\magazines\mag_30_900x19.ogf
+cost = 60
+
+[clip_31_9x19_fmj]:ammo_9x19_fmj
+box_size	= 1
+mag_size	= 31
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19a31
+inv_name		= clip_31_9x19
+description		= desc_load_9x19_fmj
+inv_name_short	= clip_31_9x19_fmj_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 0
+visual	= weapons\magazines\clip_31_900x19.ogf
+cost = 55
+
+[clip_31_9x19_pbp]:ammo_9x19_pbp
+box_size	= 1
+mag_size	= 31
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19b31
+inv_name		= clip_31_9x19
+description		= desc_load_9x19_pbp
+inv_name_short	= clip_31_9x19_pbp_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 0
+visual	= weapons\magazines\clip_31_900x19.ogf
+cost = 55
+
+[mag_32_9x19_fmj]:ammo_9x19_fmj
+box_size	= 1
+mag_size	= 32
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19a32
+inv_name		= mag_32_9x19
+description		= desc_load_9x19_fmj
+inv_name_short	= mag_32_9x19_fmj_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 5
+visual	= weapons\magazines\mag_32_900x19.ogf
+cost = 65
+
+[mag_32_9x19_pbp]:ammo_9x19_pbp
+box_size	= 1
+mag_size	= 32
+script_binding  = ammo_manager.init
+wm_section	= wm_9x19b32
+inv_name		= mag_32_9x19
+description		= desc_load_9x19_pbp
+inv_name_short	= mag_32_9x19_pbp_s
+inv_weight		= 0.0119
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 5
+visual	= weapons\magazines\mag_32_900x19.ogf
+cost = 65
+
+[clip_8_9x19_fmj_e]:clip_8_9x19_fmj
+description		= desc_clip_e
+inv_weight = 0.071
+
+[clip_8_9x19_pbp_e]:clip_8_9x19_pbp
+description		= desc_clip_e
+inv_weight = 0.071
+
+[clip_13_9x19_fmj_e]:clip_13_9x19_fmj
+description		= desc_clip_e
+inv_weight = 0.1
+
+[clip_13_9x19_pbp_e]:clip_13_9x19_pbp
+description		= desc_clip_e
+inv_weight = 0.1
+
+[clip_15_9x19_fmj_e]:clip_15_9x19_fmj
+description		= desc_clip_e
+inv_weight = 0.1
+
+[clip_15_9x19_pbp_e]:clip_15_9x19_pbp
+description		= desc_clip_e
+inv_weight = 0.1
+
+[clip_16_9x19_fmj_e]:clip_16_9x19_fmj
+description		= desc_clip_e
+inv_weight = 0.08
+
+[clip_16_9x19_pbp_e]:clip_16_9x19_pbp
+description		= desc_clip_e
+inv_weight = 0.08
+
+[clip_17_9x19_fmj_e]:clip_17_9x19_fmj
+description		= desc_clip_e
+inv_weight = 0.078
+
+[clip_17_9x19_pbp_e]:clip_17_9x19_pbp
+description		= desc_clip_e
+inv_weight = 0.078
+
+[clip_18_9x19_fmj_e]:clip_18_9x19_fmj
+description		= desc_clip_e
+inv_weight = 0.08
+
+[clip_18_9x19_pbp_e]:clip_18_9x19_pbp
+description		= desc_clip_e
+inv_weight = 0.08
+
+[mag_20_9x19_fmj_e]:mag_20_9x19_fmj
+description		= desc_mag_e
+inv_weight = 0.13
+
+[mag_20_9x19_pbp_e]:mag_20_9x19_pbp
+description		= desc_mag_e
+inv_weight = 0.13
+
+[mag_30_9x19_fmj_e]:mag_30_9x19_fmj
+description		= desc_mag_e
+inv_weight = 0.17
+
+[mag_30_9x19_pbp_e]:mag_30_9x19_pbp
+description		= desc_mag_e
+inv_weight = 0.17
+
+[clip_31_9x19_fmj_e]:clip_31_9x19_fmj
+description		= desc_clip_e
+inv_weight = 0.1
+
+[clip_31_9x19_pbp_e]:clip_31_9x19_pbp
+description		= desc_clip_e
+inv_weight = 0.1
+
+[mag_32_9x19_fmj_e]:mag_32_9x19_fmj
+description		= desc_mag_e
+inv_weight = 0.2
+
+[mag_32_9x19_pbp_e]:mag_32_9x19_pbp
+description		= desc_mag_e
+inv_weight = 0.2
+
+
+

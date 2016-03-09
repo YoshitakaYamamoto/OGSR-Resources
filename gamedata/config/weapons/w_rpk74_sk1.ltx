@@ -1,0 +1,195 @@
+[wpn_rpk74_sk1]:identity_immunities,base_wpn_zoom
+GroupControlSection		= spawn_group
+discovery_dependency 	= 
+$spawn                  = "weapons\rpk74_sk1"					; option for Level Editor
+$npc			 		= on				; option for Level Editor
+$prefetch 		 		= 8
+scheduled               = off              ; option for ALife Simulator
+cform                   = skeleton
+class                   = WP_LR300
+min_radius              = 0
+max_radius              = 150
+description				= enc_arsenal_rpk74
+
+ef_main_weapon_type		= 2
+ef_weapon_type			= 6
+
+;-----------------------------------------------------------------------------------
+holder_range_modifier	= 1.0
+holder_fov_modifier		= 1.0
+;-----------------------------------------------------------------------------------
+
+weapon_class			= assault_rifle
+
+cost					= 5500
+
+ammo_elapsed			= 75
+ammo_mag_size		 	= 75
+ammo_class		 		= ammo_5.45x39_fmj, ammo_5.45x39_ap
+fire_modes				= 1, -1
+
+hand_dependence		 	= 1
+single_handed			= 0
+
+inv_name				= ars-rpk74
+inv_name_short			= ars-rpk74
+inv_weight				= 4.7
+
+inv_grid_width				= 6
+inv_grid_height			= 2
+inv_grid_x				= 35
+inv_grid_y				= 30
+
+kill_msg_x			= 72
+kill_msg_y			= 82
+kill_msg_width		= 56
+kill_msg_height		= 23
+
+slot 					= 2		; // secondary
+animation_slot			= 2		; type of the animation that will be used
+
+;-----------------------------------------------------------------------------------
+;params of weapon recoil
+fire_dispersion_base			= 0.20		;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor			= 1.25f
+
+;отдача
+cam_relax_speed         	= 4.5		;скорость возврата в исходное положение
+cam_relax_speed_ai         	= 120.75
+cam_dispersion          	= 0.15		;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc			= 0.3		;увеличениe cam_dispersion с каждым выстрелом
+cam_dispertion_frac			= 0.9		;ствол будет подыматься на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+cam_max_angle				= 10.0	    	;максимальный угол отдачи
+cam_max_angle_horz			= 20.0		;(degree) maximum shot horizontal degree 
+cam_step_angle_horz			= 1.1;1		;(degree) size of step camera moved in horizontal position while shooting
+
+fire_dispersion_condition_factor 	= 3.8	    	;увеличение дисперсии в процентах при максимальном износе 
+misfire_probability 	= 0.0015	;вероятность осечки при максимальном износе 
+misfire_condition_k		= 0.05
+condition_shot_dec 		= 0.0001	;увеличение износа при каждом выстреле
+;-----------------------------------------------------------------------------------
+
+direction               = 0, 0, 1
+
+fire_point             	=  0,0.224,0.772
+flame_particles			= weapons\generic_weapon05	; particles for shooting effects
+shell_particles	 		= weapons\arsenal_shells1
+
+shell_point		 		= 0,0.234,0.14
+shell_dir		 		= 0.0, 1.0, 0.0
+
+rpm_empty_click 	 	= 200
+
+PDM_disp_base 			= 1.4
+PDM_disp_vel_factor 		= 0.8
+PDM_disp_accel_factor 		= 0.8
+PDM_crouch	 		= 1.0
+PDM_crouch_no_acc 		= 1.0
+
+; ttc
+hit_power        	= 0.74
+hit_impulse		 	= 25
+hit_type 			= fire_wound
+
+fire_distance       = 250
+bullet_speed		= 990 ;начальная скорость пули
+rpm                 = 550
+; end ttc
+
+use_aim_bullet			= false		;Поддерживается ли первая суппер пуля
+time_to_aim					= 1.0
+
+silencer_hit_power       	= 0.67
+silencer_hit_impulse	 	= 25
+silencer_fire_distance   	= 800
+silencer_bullet_speed	 	= 870
+
+hud                     = wpn_rpk74_sk1_hud
+normal                  = 0, 1, 0
+position         	    = -0.026,-0.172,0
+orientation             = 0, 0, 0
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+strap_position         		= -0.16,-0.36,0.15			; position (offset) and orientation of the weapon when it is strapped
+strap_orientation      		= -10,-5,10					; (3rd person view in degrees)
+strap_bone0					= bip01_spine2
+strap_bone1					= bip01_spine1
+
+startup_ammo            = 1000
+visual                  = weapons\rpk74\wpn_rpk74_sk1.ogf
+
+light_color		 		= 0.6,0.5,0.3
+light_range		 		= 5
+light_var_color		 	= 0.05
+light_var_range		 	= 0.1
+light_time 		 		= 0.2
+
+;addons
+scope_status			= 2
+silencer_status			= 0
+grenade_launcher_status	= 0
+
+scope_name 					= wpn_addon_scope			; section name for the attachable scope
+scope_x 					= 43						; offset in inventory icon
+scope_y 					= -4
+
+silencer_name  				= wpn_addon_silencer
+silencer_x 					= 278
+silencer_y 					= 7
+
+;silencer_flame_particles 	= weapons\generic_weapon01
+silencer_smoke_particles 	= weapons\generic_shoot_00
+
+silencer_light_color		= 1.0, 0.1, 0.0
+silencer_light_range		= 0.01
+silencer_light_var_color	= 0.05
+silencer_light_var_range	= 0.5
+silencer_light_time 		= 0.2
+
+zoom_enabled			= true
+
+;------------------------------ O.G.S.E. sound remake -----------------------
+;sounds (name of the sound, volume (0.0 - 1.0), delay (sec))
+snd_draw					= weapons\ak74\ak74_draw
+snd_holster					= weapons\generic_rifle_holster
+snd_shoot			        = weapons\rpk74\rpk74_shot
+snd_shoot1					= weapons\rpk74\rpk74_shot
+snd_shoot2					= weapons\rpk74\rpk74_shot
+snd_shoot3					= weapons\rpk74\rpk74_shot	
+snd_empty					= weapons\generic_ak_empty, 0.7
+snd_reload			        = weapons\rpk74\rpk74_reload, 0.5
+snd_shoot_grenade			= weapons\gp30\gp30_grenshoot
+snd_reload_grenade			= weapons\gp30\gp30_grenload, 1.0, 0.8
+snd_switch					= weapons\gp30\gp30_switch, 1.0, 0.5
+snd_silncer_shot			= weapons\ak74\ak74_shot_sil 
+;-----------------------------------------------------------------------------
+
+;-----------------------------------------------------------------------------
+;-- HUD DESCRIPTION
+;----------------------------------------------------------------------------- 
+[wpn_rpk74_sk1_hud]
+shell_point          	= 0.00, 0.00, 0.00
+shell_dir		 = 0.0, 0.0, 0.0
+
+fire_point              = 0.325000,-0.003000,-0.006000
+fire_bone               = wpn_body
+orientation             = 0, 0, 0
+position                = 0, 0, 0
+visual                  = weapons\rpk74\wpn_rpk74_sk1_hud.ogf
+
+anim_idle			= idle
+anim_idle_aim		= idle_aim
+anim_reload			= reload
+anim_draw			= draw
+anim_holster		= holster
+anim_shoot			= shoot
+anim_idle_sprint	= idle_sprint
+
+;смещения HUD для режима приближения
+zoom_offset			= -0.126851,0.0465,-0.175
+zoom_rotate_x		= -0.0037
+zoom_rotate_y		= 0.0
+
+[wpn_rpk74_sk1_repair]
+tech_complication = 600
+repair_compatibility = rpk74

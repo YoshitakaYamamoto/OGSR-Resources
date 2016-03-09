@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<string_table>
+<!--Transport-->
+<string id="Vehicles">
+	<text>Véhicules</text>
+</string>
+ 
+<!--Niva-->
+<string id="Niva">
+	<text>Niva 2121</text>
+</string>
+ 
+<string id="enc_vehicles_niva">
+	<text>Voiture tout-terrain\nCapacité du coffre: 60 kg.\nPour l'utiliser: batterie et carburant.</text>
+</string>
+ 
+<!--btr 70-->
+<string id="btr-70">
+	<text>BTR-70(z)</text>
+</string>
+ 
+<string id="enc_vehicles_btr-70">
+	<text>Véhicule de patrouille blindé. Depuis la version originale modifiée (BTR-82A) ce modèle n'a plus presque plus rien en commun. Blindage renforcé, visée thermique et recherche de reconnaissance des formes, système de visée électronique et adaptation automatique des munitions appropriées. L'ordinateur de bord commande toute la machine. Un seul homme peut à la fois conduire ce véhicule et utiliser ses armes automatisées, même s'il est prévu pour embarquer une équipe. \nCapacité du coffre: 100 kg.\nPour l'utiliser: batterie lourde et carburant.</text>
+</string>
+ 
+<!--mi 24-->
+<string id="mi-24">
+	<text>MI-24</text>
+</string>
+ 
+<string id="enc_vehicles_mi-24">
+	<text>Hélicoptère d'attaque.\nCapacité: huit soldats avec armes lourdes, des munitions, du matériel. \nPour l'utiliser: batterie et carburant.</text>
+</string>
+ 
+<!--Kamaz-->
+<string id="Kamaz">
+	<text>Camion Kamaz</text>
+</string>
+ 
+<string id="enc_vehicles_kamaz">
+	<text>Gros camion fiable. \nCapacité: grande. \nPour l'utiliser: batterie et carburant.</text>
+</string>
+ 
+<!--Traktor-->
+<string id="traktor">
+	<text>Tracteur</text>
+</string>
+ 
+<string id="enc_vehicles_traktor">
+	<text>Les tracteurs ont une bonne maniabilité, mais ça secoue beaucoup. \n Capacité de charge: 40 kg. \nPour l'utiliser: batterie et carburant.</text>
+</string>
+ 
+<!--Moskvich-->
+<string id="Moskvich">
+	<text>Moskvitch 2141</text>
+</string>
+ 
+<string id="enc_vehicles_moskvich">
+	<text>Voitures de tourisme. Malgré ses défauts, était très populaire auprès des jardiniers. Souvent, il a continué et la police. \n Capacité de charge: 60 kg. \nPour l'utiliser: batterie et carburant.</text>
+</string>
+ 
+<string id="Moskvich2">
+	<text>Moskvitch 412</text>
+</string>
+ 
+<!--Zaporozhets Gorbatiy-->
+<string id="Zaporozh_gorb">
+	<text>ZAZ 965 (mini)</text>
+</string>
+ 
+<string id="enc_vehicles_zaporozh_gorb">
+	<text>Bagnole bien aimée de tout le monde qui fait l'objet de pleins de plaisanteries. Bonne maniabilité et une excellente protection anti-vol: "Salut mec, même si tu me donnes les clés, je crois que je vais te la laisser, hein ?"\n Capacité du coffre: 40 kg.\nPour l'utiliser: batterie, carburant et besoin de la pousser un peu à la main.</text>
+</string>
+ 
+<!--Zaporozhets Ushastiy-->
+<string id="Zaporozh_ush">
+	<text>Porsche 968 (oreilles)</text>
+</string>
+ 
+<string id="enc_vehicles_zaporozh_ush">
+	<text>Pas de blagues moins populaires descendant du bossu. \n Capacité du coffre: 40 kg. \nPour l'utiliser: batterie, carburant et besoin de la pousser un peu à la main.</text>
+</string>
+ 
+<!--UAZ-->
+<string id="Uaz">
+	<text>UAZ 469 (jeep)</text>
+</string>
+ 
+<string id="enc_vehicles_uaz">
+	<text>UAZ. Une jeep fiable. Populaire dans l'armée. \n Capacité du coffre: 80 kg. \nPour l'utiliser: batterie et carburant.</text>
+</string>
+ 
+<!--UAZ Buhanka-->
+<string id="Uaz_buh">
+	<text>UAZ 3962 (fourgonette)</text>
+</string>
+ <string id="enc_vehicles_uaz_buhanka">
+	<text>Un minibus robuste.\n
+Capacité du coffre: 100 kg.\n
+Pour l'utiliser: Batterie lourde et essence.</text>
+</string>
+	<!--Baggi-->
+<string id="Baggi">
+	<text>Buggy</text>
+</string>
+
+<string id="enc_vehicles_baggi">
+	<text>Une petite bombe de vitesse faite à la main. N'a pas de protections.\n Capacité du coffre: 40 kg.\nPour l'utiliser: batterie et carburant.</text>
+ </string>
+ 
+<!--ZIL MMZ-->
+<string id="Zil_MMZ">
+	<text>ZIL MMZ</text>
+</string>
+ 
+<string id="enc_vehicles_zil_mmz">
+	<text>Le camion, qui a une mauvaise réputation dans la Zone. Les stalkers les appellent "Les camions de la Mort."\n Charge: Tellement de cadavres, c'est incroyables!\nPour l'utiliser: batterie et carburant.</text>
+</string>
+ 
+<!--GAZ66-->
+<string id="GAZ66">
+	<text>Camion GAZ-66 (shishiga)</text>
+</string>
+ 
+<string id="enc_vehicles_gaz66">
+	<text>Fiable terrain camion. Presque camping \n Capacité: grande. \nPour l'utiliser: batterie et carburant.</text>
+</string>
+ 
+<!--GAZ53-->
+<string id="GAZ53">
+	<text>Bus 53 GAZ</text>
+</string>
+ 
+<string id="enc_vehicles_gaz53">
+	<text>Bus sur la base du camion GAZ-53.\nCapacité: grande.\nPour l'utiliser: batterie et carburant.</text>
+</string>
+ 
+<string id="st_veh_health">
+	<text>État</text>
+</string>
+ 
+<string id="st_trunk_max_weight">
+	<text>Poids maximal.</text>
+</string>
+ 
+<string id="st_trunk_weight">
+	<text>Téléchargé</text>
+</string>
+ 
+<!-- La description Machines à vendre -->
+<string id="uaz2_esc_sidor_desc">
+	<text>Le Cordon peut conduire une chèvre. Shabby, mais monte encore. Au ATP garage zaberesh.</text>
+</string>
+ 
+<string id="moskvich_garb_sidor_desc">
+	<text>Il ya 412 Moscovites. Garé abandonnée zaberesh de l'équipement.</text>
+</string>
+ 
+<string id="uaz_garb_sidor_desc">
+	<text>Dans les décharges, il UAZ. Se tiendra près des ruines opposées Dolgovskaya checkpoint.</text>
+</string>
+ 
+<string id="uaz_agr_sidor_desc">
+	<text>Je peux adapter une chèvre. Zaberesh près du tunnel de chemin de fer.</text>
+</string>
+ 
+<string id="niva_agr_sidor_desc">
+	<text>Vous pouvez Niva. Trouver là ... Sur la route après avoir quitté l'Institut ...</text>
+</string>
+ 
+<string id="uazbuhanka_dv_sidor_desc">
+	<text>Dans la vallée sombre peut conduire Loaf. Un endroit dangereux. Sera à la station d'essence en face de la base de porc.</text>
+</string>
+ 
+<string id="niva_bar_sidor_desc">
+	<text>Le bar sera Niva. Près de la route en face de la citerne.</text>
+</string>
+ 
+<string id="zaz_jantar_sidor_desc">
+	<text>Amber - bosse! Petit et peu fiable! Prenez! Comme tu entreras dans la vallée de voir immédiatement!</text>
+</string>
+ 
+<string id="baggi_mil_shur_desc">
+	<text>Buggy prendre? Si oui, puis à droite à la sortie et enlever notre cheval de bataille.</text>
+</string>
+ 
+<string id="moskvich2_mil_shur_desc">
+	<text>Je peux encore tenir Moskvitch. Dans les sangsues du village ... Dans le même temps, et la chasse! Hehe!</text>
+</string>
+ 
+<string id="zaz968_rad_shur_desc">
+	<text>Tu peux prendre la jeep au Radar ... Elle sera près du checkpoint du monolithe, en parfait état.</text>
+</string>
+ 
+</string_table>

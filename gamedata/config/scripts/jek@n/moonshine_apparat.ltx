@@ -1,0 +1,18 @@
+[collide]
+ignore_static
+
+[logic]
+active = ph_button@1
+
+[ph_button@1]
+anim_blend  = true
+anim        = lab_primary_switcher_idle
+tooltip     = moonshine_apparat_use
+on_press    = ph_button@2 %=moonshine_apparat_use1%
+
+[ph_button@2]
+anim_blend  = true
+anim        = lab_primary_switcher_idle
+tooltip     = moonshine_apparat_use_empty
+on_press    = %=moonshine_apparat_use2%
+on_timer = 180000 | ph_button@1

@@ -1,0 +1,765 @@
+;-----------------------------------------------------------------------------------
+;Сменные аддоны ОГСЕ
+;-----------------------------------------------------------------------------------
+;управляемые В СЕКЦИЯХ АДДОНОВ кости (64=54+b+5s+2m+2d) АК102 с привязкой by k01jan:
+;wpn_body		патрон в стволе
+;  wpn_grenade_launcher 
+;Имеются посадочные места для установки штык-ножа.
+;	wpn_grenade			
+;  wpn_silencer	ТГП-В
+;  wpn_scope	- (движковая, д/б пустая)
+;  mag			- пустая, анимированная
+;  	ammo		2 патрона в магазине (скрытА при разряжании, виднА при заряжании)
+;  	mag: m1		СВД 10
+;  	mag: m2		СВУ-А 20
+;  m3			- 
+;  muzzle		- 
+;  d1			щека
+;  d2			калоша
+;  s1			ПСО-1 х4
+;  s2			1П59 "Гиперон" (пер.кратность)
+;  s3			1ПН51 (НСПУ-3 "Казуар") х3,46
+;  s4			1П29 (УСП-1 "Тюльпан") х4
+;  s5			ЭКП-8М-01 "Кобра" х1
+;  safe (сделать предохранитель)
+;-----------------------------------------------------------------------------------
+;материал: МИР объект-large_weapon
+;шейдеры:
+;lens_scope1 непрозрачная линза acog - ХУД модель-weapons / МИР модель-weapons
+;collimator_metka0 первая линза Кобры - прозрачная с меткой (сменная) ХУД худ-reddotsight1 / МИР 
+;collimator_lens01 вторая линза Кобры - полупрозрачная круглая зелёная ХУД модель-transparent / МИР 
+;-----------------------------------------------------------------------------------
+
+
+; базовая секция
+[wpn_swd_base]:wpn_swd
+silencer_status			= 2
+grenade_launcher_status	= 0
+scope_status			= 2
+scope_mount_status		= 0
+grip_status				= 2
+magazine_status			= 2
+script_binding  = ogse_bind_weapon.init
+;скрытые (управляемые) кости: d2, d1, s1, s2, s3, s4, s5, m1, m2, m3, muzzle
+;СВД нет щеки приклада - d1 надо ВСЕГДА скрывать
+;СВД нет калоши приклада - d2 надо ВСЕГДА скрывать
+managed_bones = d2, d1, s1, s2, s3, s4, s5, m1, m2, m3, muzzle
+;не надо своего описания description				= enc_weapons1_wpn-swd
+;inv_name	        	= wpn-swd
+;inv_name_short			= wpn-swd_s
+;cost					= 7500
+hud = wpn_swd_base_hud
+
+[wpn_swd_base_hud]:wpn_swd_hud
+
+
+
+;-----------------------------------------------------------------------------------
+;без магазина
+[wpn_swd_nomag_hud]:wpn_swd_hud				; перезарядка без магазина
+anim_reload					= idle			;reload
+;нет ГП anim_reload_gl				= idle_w_gl
+
+
+;-----------------------------------------------------------------------------------
+; служебные секции описателей прицелов
+
+; штатный механический прицел (пока не задействован)
+[swd_ironsight]
+;force_remove_texture = true
+;показываемые кости, был пустой, залочен (здесь НЕ работает?) bones = 
+; тест sto1en
+;смещение ствола при прицеливании: лево/право,верх/низ,от/к себя(е)
+zoom_offset			= -0.168800,0.072450,-0.235
+zoom_rotation		= 0.043400,0.030280
+
+[swd_ironsight_p] ; имитация движкового параметра для прицела
+scope_name = 
+; донастройка модели прицела
+scope                    = swd_ironsight
+;scope_x 					= 42
+;scope_y 					= 3
+
+
+
+;+при одетом прицеле кости bones показываются, bones_hide скрываются
+; 6Ц1 (ПСО-1) х4
+[swd_pso1]
+;тест мех.прицела force_remove_texture = true
+bones         = s1
+;штатный механический прицел (не настроен)
+zoom_offset			= -0.168800,0.072450,-0.235
+zoom_rotation		= 0.043400,0.030280
+
+[swd_pso1_p] ; имитация движкового параметра
+; движковый прицел
+scope_name               = wpn_addon_scope
+scope                    = swd_pso1
+;иконка прицела
+;scope_x 					= 42
+;scope_y 					= 3
+
+; 1П59 ("Гиперон") х3-10
+[swd_1p59]
+;тест мех.прицела force_remove_texture = true
+bones         = s2
+;штатный механический прицел (со сдвигом)
+zoom_offset			= -0.168800,0.072450,-0.235
+zoom_rotation		= 0.043400,0.030280
+
+[swd_1p59_p]:base_wpn_zoom ; имитация движкового параметра
+; движковый прицел
+scope_name               = wpn_addon_scope_1p59
+scope                    = swd_1p59
+;иконка прицела
+scope_x 					= 45
+scope_y 					= 1
+;ТЕСТ кратность 3х-10х
+class				= WP_BINOC
+;holder_range_modifier		= 2.2
+zoom_enabled				= true
+
+snd_gyro			= weapons\binoculars_gyro
+snd_zoomin			= weapons\binoculars_zoomin
+snd_zoomout			= weapons\binoculars_zoomout
+snd_close			= weapons\generic_close
+vision_present			= false
+vis_frame_speed			= 4			; скорость, с которой наводится рамка на цель
+vis_frame_color			= 0.7,0.7,0.7,1.0	; цвет рамки RGBA (A) Не учитывается
+found_snd			= detectors\DA-2_beep1
+
+
+; 1ПН51 (НСПУ-3 "Казуар") х3,46
+[swd_1pn51]
+;тест мех.прицела force_remove_texture = true
+bones         = s3
+;+скрываем кость bones_hide = 
+;штатный механический прицел (не настроен)
+zoom_offset			= -0.168800,0.072450,-0.235
+zoom_rotation		= 0.043400,0.030280
+shell_point			= 0.90, 0.03, -0.045
+
+[swd_1pn51_p] ; имитация движкового параметра
+; движковый прицел
+scope_name               = wpn_addon_scope_1pn51
+scope                    = swd_1pn51
+;иконка прицела
+scope_x 					= 45
+scope_y 					= 0
+
+
+; 1П29 (УСП-1 "Тюльпан") х4
+[swd_1p29]
+;тест мех.прицела force_remove_texture = true
+;показываемые кости
+bones         = s4
+;штатный механический прицел (не настроен)
+zoom_offset			= -0.168800,0.072450,-0.235
+zoom_rotation		= 0.043400,0.030280
+
+; кусок секции для наследования
+[swd_1p29_p] ; имитация движкового параметра
+; движковый прицел
+scope_name               = wpn_addon_scope_1p29
+; донастройка модели прицела
+scope                    = swd_1p29
+;иконка прицела
+scope_x 					= 50
+scope_y 					= 3
+
+; ЭКП-8М-01 "Кобра" х1
+[swd_kobra]
+force_remove_texture = true
+bones         = s5
+;штатный механический прицел (со сдвигом)
+zoom_offset			= -0.167800,0.020450,-0.239100
+zoom_rotation		= 0.032600,0.029480
+
+
+[swd_kobra_p] ; имитация движкового параметра
+; движковый прицел
+scope_name               = wpn_addon_scope_kobra
+scope                    = swd_kobra
+;иконка прицела
+scope_x 					= 55
+scope_y 					= 4
+
+
+
+;-----------------------------------------------------------------------------------
+; служебные секции описателей магазинов
+;+при одетом аддоне показываются только соответствующие bones кости
+
+[swd_svd10]
+bones = m1
+[swd_svd10_p] ; имитация движкового параметра для магазина АК-101
+magazine_name            = wpn_addon_mag_svd10
+magazine                 = swd_svd10
+ammo_mag_size			= 10
+inv_grid_x			= 73
+inv_grid_y			= 0
+;inv_weight				= 3.63		;АКМ 3.48 = 3.15 + 0.33 ;АКМС (+0,15) 3,63=3,3+0,33
+;cost					= 5100
+
+;------------------------------------------------------------------------------------
+[swd_svd20]
+bones = m2
+[swd_svd20_p] ; имитация движкового параметра для магазина Beta C-Mag
+magazine_name            = wpn_addon_mag_svd20
+magazine                 = swd_svd20
+ammo_mag_size            = 20
+inv_grid_x			= 73
+inv_grid_y			= 2
+;inv_weight				= 3.75		;АКМ 3.5 = 3.15 + 0.45 ;АКМС (+0,15) 3,75=3,3+0,45
+;cost					= 5200
+;------------------------------------------------------------------------------------
+
+[swd_nomag]
+;bones = 
+[swd_nomag_p] ; имитация движкового параметра для магазинов
+ammo_class               = ammo_7.62x54_dummy, ammo_7.62x54_dummy, ammo_7.62x54_dummy	;патрон-залушка
+ammo_mag_size            = 0					; не во что заряжать
+rpm                      = 0					; нечем стрелять
+snd_reload               = $no_sound
+snd_empty                = $no_sound
+hud                      = wpn_swd_nomag_hud
+
+
+
+;-----------------------------------------------------------------------------------
+; служебные секции описателей аддонов
+
+;щека d1 (фейк ручки)
+[swd_scheek]
+bones = d1
+;bones_hide =  
+[swd_scheek_p]
+grip_name				= wpn_addon_svd_scheek
+grip					= swd_scheek
+;+ТЕСТ точности wpn_svd_m1 "Дальнобойщик"
+fire_dispersion_base	= 0.013		 	;ОГСЕ СВД 0.015
+control_inertion_factor	= 2.3f			;ОГСЕ СВД 2.2f		;удобность
+
+
+;-ТЕСТ калоши d2 (НЕ ИСПОЛЬЗУЕТСЯ)
+;[swd_gp_galoscha]
+;bones = d2
+;bones_hide = 
+;[swd_gp_galoscha_p] ; имитация движкового параметра
+;cam_dispersion			= 0.9			;ОГСЕ СВД 1.8	;отдача (ПЕРЕНЕСТИ на калошу) увеличения угла (в градусах) с каждым выстрелом
+;cam_step_angle_horz	= 0.1			;ОГСЕ СВД 0.25	;(degree) size of step camera moved in horizontal position while shooting
+;-cam_relax_speed       = 4.7			;ОГСЕ СВД 4.7	;скорость возврата в исходное положение
+
+
+;-----------------------------------------------------------------------------------
+[wpn_6b1_repair]
+tech_complication = 700
+repair_compatibility = svd
+
+
+
+;-----------------------------------------------------------------------------------
+; секции оружия с аддонами
+;-----------------------------------------------------------------------------------
+;;;;;;;;;;;;;;;;;;;;нет магазина
+; ПСО, нет магазина
+[wpn_swd_nomag_pso1]:wpn_swd_base,swd_pso1_p,swd_nomag_p
+cost		= 7500
+inv_weight	= 4.31
+;прицелы на боковую планку
+wpn_addon_scope_1p59     = wpn_swd_nomag_1p59
+wpn_addon_scope_1pn51    = wpn_swd_nomag_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_nomag_1p29
+wpn_addon_scope_kobra	 = wpn_swd_nomag_kobra
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_pso1
+wpn_addon_mag_svd20      = wpn_swd_svd20_pso1
+;щека
+wpn_addon_svd_scheek = wpn_swd_nomag_grip_pso1
+[wpn_swd_nomag_pso1_repair]:wpn_6b1_repair
+[wpn_swd_nomag_grip_pso1]:wpn_swd_base,swd_pso1_p,swd_nomag_p,swd_scheek_p
+cost		= 10500
+inv_weight	= 4.41
+grip_removed_section = wpn_swd_nomag_pso1
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope_1p59     = wpn_swd_nomag_grip_1p59
+wpn_addon_scope_1pn51    = wpn_swd_nomag_grip_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_nomag_grip_1p29
+wpn_addon_scope_kobra	 = wpn_swd_nomag_grip_kobra
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_grip_pso1
+wpn_addon_mag_svd20      = wpn_swd_svd20_grip_pso1
+[wpn_swd_nomag_grip_pso1_repair]:wpn_6b1_repair
+
+; Ночник, нет магазина
+[wpn_swd_nomag_1pn51]:wpn_swd_base,swd_1pn51_p,swd_nomag_p
+cost		= 7500
+inv_weight	= 4.31
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_nomag_pso1
+wpn_addon_scope_1p59     = wpn_swd_nomag_1p59
+wpn_addon_scope_1p29	 = wpn_swd_nomag_1p29
+wpn_addon_scope_kobra	 = wpn_swd_nomag_kobra
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_1pn51
+wpn_addon_mag_svd20      = wpn_swd_svd20_1pn51
+;щека
+wpn_addon_svd_scheek = wpn_swd_nomag_grip_1pn51
+[wpn_swd_nomag_1pn51_repair]:wpn_6b1_repair
+[wpn_swd_nomag_grip_1pn51]:wpn_swd_base,swd_1pn51_p,swd_nomag_p,swd_scheek_p
+cost		= 10500
+inv_weight	= 4.41
+grip_removed_section = wpn_swd_nomag_1pn51
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_nomag_grip_pso1
+wpn_addon_scope_1p59     = wpn_swd_nomag_grip_1p59
+wpn_addon_scope_1p29	 = wpn_swd_nomag_grip_1p29
+wpn_addon_scope_kobra	 = wpn_swd_nomag_grip_kobra
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_grip_1pn51
+wpn_addon_mag_svd20      = wpn_swd_svd20_grip_1pn51
+[wpn_swd_nomag_grip_1pn51_repair]:wpn_6b1_repair
+
+; Гиперон, нет магазина
+[wpn_swd_nomag_1p59]:wpn_swd_base,swd_1p59_p,swd_nomag_p
+cost		= 7500
+inv_weight	= 4.31
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_nomag_pso1
+wpn_addon_scope_1pn51    = wpn_swd_nomag_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_nomag_1p29
+wpn_addon_scope_kobra	 = wpn_swd_nomag_kobra
+scope_removed_section	 = wpn_swd_nomag_pso1
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_1p59
+wpn_addon_mag_svd20      = wpn_swd_svd20_1p59
+;щека
+wpn_addon_svd_scheek = wpn_swd_nomag_grip_1p59
+[wpn_swd_nomag_1p59_repair]:wpn_6b1_repair
+[wpn_swd_nomag_grip_1p59]:wpn_swd_base,swd_1p59_p,swd_nomag_p,swd_scheek_p
+cost		= 10500
+inv_weight	= 4.41
+grip_removed_section = wpn_swd_nomag_1p59
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_nomag_grip_pso1
+wpn_addon_scope_1pn51    = wpn_swd_nomag_grip_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_nomag_grip_1p29
+wpn_addon_scope_kobra	 = wpn_swd_nomag_grip_kobra
+scope_removed_section	 = wpn_swd_nomag_grip_pso1
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_grip_1p59
+wpn_addon_mag_svd20      = wpn_swd_svd20_grip_1p59
+[wpn_swd_nomag_grip_1p59_repair]:wpn_6b1_repair
+
+; Тюльпан, нет магазина
+[wpn_swd_nomag_1p29]:wpn_swd_base,swd_1p29_p,swd_nomag_p
+cost		= 7500
+inv_weight	= 4.31
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_nomag_pso1
+wpn_addon_scope_1p59     = wpn_swd_nomag_1p59
+wpn_addon_scope_1pn51    = wpn_swd_nomag_1pn51
+wpn_addon_scope_kobra	 = wpn_swd_nomag_kobra
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_1p29
+wpn_addon_mag_svd20      = wpn_swd_svd20_1p29
+;щека
+wpn_addon_svd_scheek = wpn_swd_nomag_grip_1p29
+[wpn_swd_nomag_1p29_repair]:wpn_6b1_repair
+[wpn_swd_nomag_grip_1p29]:wpn_swd_base,swd_1p29_p,swd_nomag_p,swd_scheek_p
+cost		= 10500
+inv_weight	= 4.41
+grip_removed_section = wpn_swd_nomag_1p29
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_nomag_grip_pso1
+wpn_addon_scope_1p59     = wpn_swd_nomag_grip_1p59
+wpn_addon_scope_1pn51    = wpn_swd_nomag_grip_1pn51
+wpn_addon_scope_kobra	 = wpn_swd_nomag_grip_kobra
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_grip_1p29
+wpn_addon_mag_svd20      = wpn_swd_svd20_grip_1p29
+[wpn_swd_nomag_grip_1p29_repair]:wpn_6b1_repair
+
+; Кобра, нет магазина
+[wpn_swd_nomag_kobra]:wpn_swd_base,swd_kobra_p,swd_nomag_p
+cost		= 7500
+inv_weight	= 4.31
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_nomag_pso1
+wpn_addon_scope_1p59     = wpn_swd_nomag_1p59
+wpn_addon_scope_1pn51    = wpn_swd_nomag_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_nomag_1p29
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_kobra
+wpn_addon_mag_svd20      = wpn_swd_svd20_kobra
+;щека
+wpn_addon_svd_scheek = wpn_swd_nomag_grip_kobra
+[wpn_swd_nomag_kobra_repair]:wpn_6b1_repair
+[wpn_swd_nomag_grip_kobra]:wpn_swd_base,swd_kobra_p,swd_nomag_p,swd_scheek_p
+cost		= 10500
+inv_weight	= 4.41
+grip_removed_section = wpn_swd_nomag_kobra
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_nomag_grip_pso1
+wpn_addon_scope_1p59     = wpn_swd_nomag_grip_1p59
+wpn_addon_scope_1pn51    = wpn_swd_nomag_grip_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_nomag_grip_1p29
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_grip_kobra
+wpn_addon_mag_svd20      = wpn_swd_svd20_grip_kobra
+[wpn_swd_nomag_grip_kobra_repair]:wpn_6b1_repair
+
+
+;;;;;;;;;;;;;;;;;;;;магазин СВД
+; ПСО-1, магазин СВД
+[wpn_swd_svd10_pso1]:wpn_swd_base,swd_pso1_p,swd_svd10_p
+cost		= 7650
+inv_weight	= 4.52
+;прицелы на боковую планку
+wpn_addon_scope_1p59     = wpn_swd_svd10_1p59
+wpn_addon_scope_1pn51    = wpn_swd_svd10_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_svd10_1p29
+wpn_addon_scope_kobra	 = wpn_swd_svd10_kobra
+;магазины
+wpn_addon_mag_svd20      = wpn_swd_svd20_pso1
+magazine_removed_section = wpn_swd_nomag_pso1
+;щека
+wpn_addon_svd_scheek = wpn_swd_svd10_grip_pso1
+[wpn_swd_svd10_pso1_repair]:wpn_6b1_repair
+[wpn_swd_svd10_grip_pso1]:wpn_swd_base,swd_pso1_p,swd_svd10_p,swd_scheek_p
+cost		= 10650
+inv_weight	= 4.62
+grip_removed_section = wpn_swd_svd10_pso1
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope_1p59     = wpn_swd_svd10_grip_1p59
+wpn_addon_scope_1pn51    = wpn_swd_svd10_grip_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_svd10_grip_1p29
+wpn_addon_scope_kobra	 = wpn_swd_svd10_grip_kobra
+;магазины
+wpn_addon_mag_svd20      = wpn_swd_svd20_grip_pso1
+magazine_removed_section = wpn_swd_nomag_grip_pso1
+[wpn_swd_svd10_grip_pso1_repair]:wpn_6b1_repair
+
+; НСПУ, магазин СВД
+[wpn_swd_svd10_1pn51]:wpn_swd_base,swd_1pn51_p,swd_svd10_p
+cost		= 7650
+inv_weight	= 4.52
+;прицелы на боковую планку
+wpn_addon_scope     	= wpn_swd_svd10_pso1
+wpn_addon_scope_1p59     = wpn_swd_svd10_1p59
+wpn_addon_scope_1p29	 = wpn_swd_svd10_1p29
+wpn_addon_scope_kobra	 = wpn_swd_svd10_kobra
+;магазины
+wpn_addon_mag_svd20      = wpn_swd_svd20_1pn51
+magazine_removed_section = wpn_swd_nomag_1pn51
+;щека
+wpn_addon_svd_scheek = wpn_swd_svd10_grip_1pn51
+[wpn_swd_svd10_1pn51_repair]:wpn_6b1_repair
+[wpn_swd_svd10_grip_1pn51]:wpn_swd_base,swd_1pn51_p,swd_svd10_p,swd_scheek_p
+cost		= 10650
+inv_weight	= 4.62
+grip_removed_section = wpn_swd_svd10_1pn51
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope    		 = wpn_swd_svd10_grip_pso1
+wpn_addon_scope_1p59     = wpn_swd_svd10_grip_1p59
+wpn_addon_scope_1p29	 = wpn_swd_svd10_grip_1p29
+wpn_addon_scope_kobra	 = wpn_swd_svd10_grip_kobra
+;магазины
+wpn_addon_mag_svd20      = wpn_swd_svd20_grip_1pn51
+magazine_removed_section = wpn_swd_nomag_grip_1pn51
+[wpn_swd_svd10_grip_1pn51_repair]:wpn_6b1_repair
+
+; Гриперон, магазин СВД
+[wpn_swd_svd10_1p59]:wpn_swd_base,swd_1p59_p,swd_svd10_p
+cost		= 7650
+inv_weight	= 4.52
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd10_pso1
+wpn_addon_scope_1pn51    = wpn_swd_svd10_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_svd10_1p29
+wpn_addon_scope_kobra	 = wpn_swd_svd10_kobra
+scope_removed_section	 = wpn_swd_svd10_pso1
+;магазины
+wpn_addon_mag_svd20      = wpn_swd_svd20_1p59
+magazine_removed_section = wpn_swd_nomag_1p59
+;щека
+wpn_addon_svd_scheek = wpn_swd_svd10_grip_1p59
+[wpn_swd_svd10_1p59_repair]:wpn_6b1_repair
+[wpn_swd_svd10_grip_1p59]:wpn_swd_base,swd_1p59_p,swd_svd10_p,swd_scheek_p
+cost		= 10650
+inv_weight	= 4.62
+grip_removed_section = wpn_swd_svd10_1p59
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd10_grip_pso1
+wpn_addon_scope_1pn51    = wpn_swd_svd10_grip_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_svd10_grip_1p29
+wpn_addon_scope_kobra	 = wpn_swd_svd10_grip_kobra
+scope_removed_section	 = wpn_swd_svd10_grip_pso1
+;магазины
+wpn_addon_mag_svd20      = wpn_swd_svd20_grip_1p59
+magazine_removed_section = wpn_swd_nomag_grip_1p59
+[wpn_swd_svd10_grip_1p59_repair]:wpn_6b1_repair
+
+; Тюльпан, магазин СВД
+[wpn_swd_svd10_1p29]:wpn_swd_base,swd_1p29_p,swd_svd10_p
+cost		= 7650
+inv_weight	= 4.52
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd10_pso1
+wpn_addon_scope_1p59     = wpn_swd_svd10_1p59
+wpn_addon_scope_1pn51    = wpn_swd_svd10_1pn51
+wpn_addon_scope_kobra	 = wpn_swd_svd10_kobra
+;магазины
+wpn_addon_mag_svd20      = wpn_swd_svd20_1p29
+magazine_removed_section = wpn_swd_nomag_1p29
+;щека
+wpn_addon_svd_scheek = wpn_swd_svd10_grip_1p29
+[wpn_swd_svd10_1p29_repair]:wpn_6b1_repair
+[wpn_swd_svd10_grip_1p29]:wpn_swd_base,swd_1p29_p,swd_svd10_p,swd_scheek_p
+cost		= 10650
+inv_weight	= 4.62
+grip_removed_section = wpn_swd_svd10_1p29
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd10_grip_pso1
+wpn_addon_scope_1p59     = wpn_swd_svd10_grip_1p59
+wpn_addon_scope_1pn51    = wpn_swd_svd10_grip_1pn51
+wpn_addon_scope_kobra	 = wpn_swd_svd10_grip_kobra
+;магазины
+wpn_addon_mag_svd20      = wpn_swd_svd20_grip_1p29
+magazine_removed_section = wpn_swd_nomag_grip_1p29
+[wpn_swd_svd10_grip_1p29_repair]:wpn_6b1_repair
+
+; Кобра, магазин СВД
+[wpn_swd_svd10_kobra]:wpn_swd_base,swd_kobra_p,swd_svd10_p
+cost		= 7650
+inv_weight	= 4.52
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd10_pso1
+wpn_addon_scope_1p59     = wpn_swd_svd10_1p59
+wpn_addon_scope_1pn51    = wpn_swd_svd10_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_svd10_1p29
+;магазины
+wpn_addon_mag_svd20      = wpn_swd_svd20_kobra
+magazine_removed_section = wpn_swd_nomag_kobra
+;щека
+wpn_addon_svd_scheek = wpn_swd_svd10_grip_kobra
+[wpn_swd_svd10_kobra_repair]:wpn_6b1_repair
+[wpn_swd_svd10_grip_kobra]:wpn_swd_base,swd_kobra_p,swd_svd10_p,swd_scheek_p
+cost		= 10650
+inv_weight	= 4.62
+grip_removed_section = wpn_swd_svd10_kobra
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd10_grip_pso1
+wpn_addon_scope_1p59     = wpn_swd_svd10_grip_1p59
+wpn_addon_scope_1pn51    = wpn_swd_svd10_grip_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_svd10_grip_1p29
+;магазины
+wpn_addon_mag_svd20      = wpn_swd_svd20_grip_kobra
+magazine_removed_section = wpn_swd_nomag_grip_kobra
+[wpn_swd_svd10_grip_kobra_repair]:wpn_6b1_repair
+
+;;;;;;;;;;;;;;;;;;;;магазин СВУ-А
+; ПСО-1, магазин СВУ-А
+[wpn_swd_svd20_pso1]:wpn_swd_base,swd_pso1_p,swd_svd20_p
+cost		= 7680
+inv_weight	= 4.62
+;прицелы на боковую планку
+wpn_addon_scope_1p59     = wpn_swd_svd20_1p59
+wpn_addon_scope_1pn51    = wpn_swd_svd20_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_svd20_1p29
+wpn_addon_scope_kobra	 = wpn_swd_svd20_kobra
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_pso1
+magazine_removed_section = wpn_swd_nomag_pso1
+;щека
+wpn_addon_svd_scheek = wpn_swd_svd20_grip_pso1
+[wpn_swd_svd20_pso1_repair]:wpn_6b1_repair
+[wpn_swd_svd20_grip_pso1]:wpn_swd_base,swd_pso1_p,swd_svd20_p,swd_scheek_p
+cost		= 10680
+inv_weight	= 4.72
+grip_removed_section = wpn_swd_svd20_pso1
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope_1p59     = wpn_swd_svd20_grip_1p59
+wpn_addon_scope_1pn51    = wpn_swd_svd20_grip_1pn51
+wpn_addon_scope_1p29	 = wpn_swd_svd20_grip_1p29
+wpn_addon_scope_kobra	 = wpn_swd_svd20_grip_kobra
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_grip_pso1
+magazine_removed_section = wpn_swd_nomag_grip_pso1
+[wpn_swd_svd20_grip_pso1_repair]:wpn_6b1_repair
+
+; НСПУ, магазин СВУ-А
+[wpn_swd_svd20_1pn51]:wpn_swd_base,swd_1pn51_p,swd_svd20_p
+cost		= 7680
+inv_weight	= 4.62
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd20_pso1
+wpn_addon_scope_1p59     = wpn_swd_svd20_1p59
+wpn_addon_scope_1p29	 = wpn_swd_svd20_1p29
+wpn_addon_scope_kobra 	 = wpn_swd_svd20_kobra
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_1pn51
+magazine_removed_section = wpn_swd_nomag_1pn51
+;щека
+wpn_addon_svd_scheek = wpn_swd_svd20_grip_1pn51
+[wpn_swd_svd20_1pn51_repair]:wpn_6b1_repair
+[wpn_swd_svd20_grip_1pn51]:wpn_swd_base,swd_1pn51_p,swd_svd20_p,swd_scheek_p
+cost		= 10680
+inv_weight	= 4.72
+grip_removed_section = wpn_swd_svd20_1pn51
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd20_grip_pso1
+wpn_addon_scope_1p59     = wpn_swd_svd20_grip_1p59
+wpn_addon_scope_1p29	 = wpn_swd_svd20_grip_1p29
+wpn_addon_scope_kobra 	 = wpn_swd_svd20_grip_kobra
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_grip_1pn51
+magazine_removed_section = wpn_swd_nomag_grip_1pn51
+[wpn_swd_svd20_grip_1pn51_repair]:wpn_6b1_repair
+
+; Гриперон, магазин СВУ-А
+[wpn_swd_svd20_1p59]:wpn_swd_base,swd_1p59_p,swd_svd20_p
+cost		= 7680
+inv_weight	= 4.62
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd20_pso1
+wpn_addon_scope_1pn51    = wpn_swd_svd20_1pn51
+wpn_addon_scope_1p29 	 = wpn_swd_svd20_1p29
+wpn_addon_scope_kobra 	 = wpn_swd_svd20_kobra
+scope_removed_section	 = wpn_swd_svd20_pso1
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_1p59
+magazine_removed_section = wpn_swd_nomag_1p59
+;щека
+wpn_addon_svd_scheek = wpn_swd_svd20_grip_1p59
+[wpn_swd_svd20_1p59_repair]:wpn_6b1_repair
+[wpn_swd_svd20_grip_1p59]:wpn_swd_base,swd_1p59_p,swd_svd20_p,swd_scheek_p
+cost		= 10680
+inv_weight	= 4.72
+grip_removed_section = wpn_swd_svd20_1p59
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd20_grip_pso1
+wpn_addon_scope_1pn51    = wpn_swd_svd20_grip_1pn51
+wpn_addon_scope_1p29 	 = wpn_swd_svd20_grip_1p29
+wpn_addon_scope_kobra 	 = wpn_swd_svd20_grip_kobra
+scope_removed_section	 = wpn_swd_svd20_grip_pso1
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_grip_1p59
+magazine_removed_section = wpn_swd_nomag_grip_1p59
+[wpn_swd_svd20_grip_1p59_repair]:wpn_6b1_repair
+
+; Тюльпан, магазин СВУ-А
+[wpn_swd_svd20_1p29]:wpn_swd_base,swd_1p29_p,swd_svd20_p
+cost		= 7680
+inv_weight	= 4.62
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd20_pso1
+wpn_addon_scope_1p59     = wpn_swd_svd20_1p59
+wpn_addon_scope_1pn51    = wpn_swd_svd20_1pn51
+wpn_addon_scope_kobra    = wpn_swd_svd20_kobra
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_1p29
+magazine_removed_section = wpn_swd_nomag_1p29
+;щека
+wpn_addon_svd_scheek = wpn_swd_svd20_grip_1p29
+[wpn_swd_svd20_1p29_repair]:wpn_6b1_repair
+[wpn_swd_svd20_grip_1p29]:wpn_swd_base,swd_1p29_p,swd_svd20_p,swd_scheek_p
+cost		= 10680
+inv_weight	= 4.72
+grip_removed_section = wpn_swd_svd20_1p29
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd20_grip_pso1
+wpn_addon_scope_1p59     = wpn_swd_svd20_grip_1p59
+wpn_addon_scope_1pn51    = wpn_swd_svd20_grip_1pn51
+wpn_addon_scope_kobra    = wpn_swd_svd20_grip_kobra
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_grip_1p29
+magazine_removed_section = wpn_swd_nomag_grip_1p29
+[wpn_swd_svd20_grip_1p29_repair]:wpn_6b1_repair
+
+; Кобра, магазин СВУ-А
+[wpn_swd_svd20_kobra]:wpn_swd_base,swd_kobra_p,swd_svd20_p
+cost		= 7680
+inv_weight	= 4.62
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd20_pso1
+wpn_addon_scope_1p59     = wpn_swd_svd20_1p59
+wpn_addon_scope_1pn51    = wpn_swd_svd20_1pn51
+wpn_addon_scope_1p29     = wpn_swd_svd20_1p29
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_kobra
+magazine_removed_section = wpn_swd_nomag_kobra
+;щека
+wpn_addon_svd_scheek = wpn_swd_svd20_grip_kobra
+[wpn_swd_svd20_kobra_repair]:wpn_6b1_repair
+[wpn_swd_svd20_grip_kobra]:wpn_swd_base,swd_kobra_p,swd_svd20_p,swd_scheek_p
+cost		= 10680
+inv_weight	= 4.72
+grip_removed_section = wpn_swd_svd20_kobra
+;cost				= 
+;inv_grid_x			= 
+;inv_grid_y			= 
+;прицелы на боковую планку
+wpn_addon_scope		     = wpn_swd_svd20_grip_pso1
+wpn_addon_scope_1p59     = wpn_swd_svd20_grip_1p59
+wpn_addon_scope_1pn51    = wpn_swd_svd20_grip_1pn51
+wpn_addon_scope_1p29     = wpn_swd_svd20_grip_1p29
+;магазины
+wpn_addon_mag_svd10      = wpn_swd_svd10_grip_kobra
+magazine_removed_section = wpn_swd_nomag_grip_kobra
+[wpn_swd_svd20_grip_kobra_repair]:wpn_6b1_repair
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;ОГСЕ
+[cherep_svd]:wpn_swd_svd10_grip_1p59
+scope_status = 1
+[cherep_svd_repair]:wpn_6b1_repair
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Лекарство
+;[wpn_svd]:wpn_swd_svd10_pso1
+;scope_status = 1
+;[wpn_svd_repair]:wpn_6b1_repair
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -1,0 +1,1456 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<string id="find_da_art_text">
+		<text>Je trouverai bien cet artefact à force de chercher...</text>
+	</string>
+<string id="ui_inventory_single_belt_item">
+	<text>La ceinture ne peut porter qu'un seul élément '%s'</text>
+</string>
+<string id="ui_inventory_art_burn_warning">
+	<text>Ne portez pas à la ceinture plusieurs artefacts dont les protections contre la chaleur dépassent %4.2f%% - vous pourriez brûler vif !</text>
+</string>
+<string id="ui_inventory_art_strike_warning">
+	<text>Ne portez pas à la ceinture plusieurs artefacts dont les protections contre les chocs dépassent %4.2f%% - vous pourriez mourir d'une sclérose des organes vitaux !</text>
+</string>
+<string id="ui_inventory_art_shock_warning">
+	<text>Ne portez pas à la ceinture plusieurs artefacts dont les protections contre l'électricité dépassent %4.2f%% - l'électricité statique pourrait vous tuer !</text>
+</string>
+<string id="ui_inventory_art_wound_warning">
+	<text>Ne portez pas à la ceinture plusieurs artefacts dont les protections contre les griffures dépassent %4.2f%% - vos muscles pourraient se déchirer !</text>
+</string>
+<string id="ui_inventory_art_radiation_warning">
+	<text>Ne portez pas à la ceinture plusieurs artefacts dont les protections contre les radiations dépassent %4.2f%% - vous risquez d'être fortement irradié !</text>
+</string>
+<string id="ui_inventory_art_telepatic_warning">
+	<text>Ne portez pas à la ceinture plusieurs artefacts dont les protections contre les dommages-psi dépassent %4.2f%% - vous pouvez devenir fou !</text>
+</string>
+<string id="ui_inventory_art_chemical_burn_warning">
+	<text>Ne portez pas à la ceinture plusieurs artefacts dont les protections contre les brûlures chimiques dépassent %4.2f%% - vous pouvez mourir à cause de changements irréversibles dans le sang!</text>
+</string>
+<string id="ui_inventory_art_explosion_warning">
+	<text>Ne portez pas à la ceinture plusieurs artefacts dont les protections contre les explosions dépassent %4.2f%% - vous périrez du durcissement de vos organes internes !</text>
+</string>
+<string id="ui_inventory_art_fire_wound_warning">
+	<text>Ne portez pas à la ceinture plusieurs artefacts dont les protections contre les blessures par balle dépassent %4.2f%% - vous périrez du durcissement de vos organes internes !</text>
+</string>
+<string id="msg_crash_1_text">
+	<text>---------------------------</text>
+</string>
+<string id="msg_crash_2_text">
+	<text>ATTENTION, le jeu a buggé!</text>
+</string>
+<string id="msg_crash_3_text">
+	<text>Il peut être une erreur dans le mode de code, mais peut - problème de jeu.</text>
+</string>
+<string id="msg_crash_4_text">
+	<text>Dans tous les cas, vous devez le signaler à la mode</text>
+</string>
+<string id="msg_crash_5_text">
+	<text>Emballé dans un départ journal d'archivage complète et le fichier dmp</text>
+</string>
+<string id="msg_crash_6_text">
+	<text>et la signaler et à joindre le fichier avec le journal et vider dans notre</text>
+</string>
+<string id="msg_crash_7_text">
+	<text>Forum - www.ogse.ru le sujet des départs ou sur notre ModDB.</text>
+</string>
+<string id="msg_crash_8_text">
+	<text>Et surtout, ne soyez pas nerveux - une grande partie du problème est complètement résolu</text>
+</string>
+<string id="msg_crash_9_text">
+	<text>vous devriez certainement essayer de vous aider!</text>
+</string>
+<string id="msg_crash_text">
+	<text>ATTENTION PANNE DANS LE JEU! ENVOYER UN LOG COMPLET AUX DÉVELOPPEURS !!!</text>
+</string>
+<string id="bar_spawn_message_pattern_text">
+	<text>Attention, attention! Sur la partie de %s va détachement %s! Préparation au combat déclarée! Tous les combattants de prendre position!</text>
+</string>
+<string id="bar_spawn_message_monsters_pattern_text">
+	<text>Attention, attention! De la part de trouvé %s combattants %s! Tous ceux qui est maintenant dans la région, se il vous plaît aider la dette dans la destruction des mutants.</text>
+</string>
+<string id="bar_spawn_communites_bandit_text">
+	<text>une bande de bandits</text>
+</string>
+<string id="bar_spawn_communites_freedom_text">
+	<text>un escadron de la Liberté</text>
+</string>
+<string id="bar_spawn_communites_zombied_text">
+	<text>une bande de zombies</text>
+</string>
+<string id="bar_spawn_communites_killer_text">
+	<text>une équipe de mercenaires</text>
+</string>
+<string id="bar_spawn_communites_military_text">
+	<text>un escadron de militaires</text>
+</string>
+<string id="bar_spawn_monsters_dogs_text">
+	<text>des chiens aveugles</text>
+</string>
+<string id="bar_spawn_monsters_cats_text">
+	<text>des chats</text>
+</string>
+<string id="bar_spawn_monsters_boar_text">
+	<text>des sangliers</text>
+</string>
+<string id="bar_spawn_monsters_flesh_text">
+	<text>des croque-mort</text>
+</string>
+<string id="bar_spawn_monsters_zombie_text">
+	<text>des zombies</text>
+</string>
+<string id="bar_spawn_monsters_pseudo_text">
+	<text>des pseudo-géants</text>
+</string>
+<string id="bar_spawn_monsters_burer_text">
+	<text>des burers (nains)</text>
+</string>
+<string id="bar_spawn_monsters_snork_text">
+	<text>des snorks</text>
+</string>
+<string id="bar_spawn_monsters_bloodsuck_text">
+	<text>des sangsues</text>
+</string>
+<string id="bar_spawn_places_garbage_text">
+	<text>Décharge</text>
+</string>
+<string id="bar_spawn_places_rostok_text">
+	<text>Territoires sauvages</text>
+</string>
+<string id="bar_spawn_places_military_text">
+	<text>Entrepôts militaires</text>
+</string>
+<string id="ogse_duty_text">
+	<text>Devoir</text>
+</string>
+<string id="bind_stalker_table_group_1_text">
+	<text>Remarque dans le journal:</text>
+</string>
+<string id="bind_stalker_table_group_2_text">
+	<text>Note sur les mutants:</text>
+</string>
+<string id="bind_stalker_table_group_3_text">
+	<text>Informations sur le groupe:</text>
+</string>
+<string id="bind_stalker_table_group_4_text">
+	<text>Note sur les artefacts:</text>
+</string>
+<string id="bind_stalker_table_group_5_text">
+	<text>Note sur les anomalies:</text>
+</string>
+<string id="bind_stalker_table_group_6_text">
+	<text>Informations sur l'emplacement:</text>
+</string>
+<string id="bind_stalker_table_group_7_text">
+	<text>Histoire de la Zone:</text>
+</string>
+<string id="bind_stalker_table_group_8_text">
+	<text>Le folklore local:</text>
+</string>
+<string id="bind_stalker_table_group_9_text">
+	<text>Note personnelle:</text>
+</string>
+<string id="bind_stalker_table_group_10_text">
+	<text>Données téléchargées:</text>
+</string>
+<string id="deadman_fail_warning_text">
+	<text>ATTENTION Impossible de cadavre non transformés! Dans le journal message reçu de diagnostic - Enregistrer, quitter le jeu et jeter hors d'un journal pour les développeurs!</text>
+</string>
+<string id="death_news_levels_1_text">
+	<text>Cordon</text>
+</string>
+<string id="death_news_levels_1a_text">
+	<text>Au Cordon</text>
+</string>
+<string id="death_news_levels_2_text">
+	<text>Décharge</text>
+</string>
+<string id="death_news_levels_2a_text">
+	<text>À la Décharge</text>
+</string>
+<string id="death_news_levels_3_text">
+	<text>Institut de recherche Agroprom</text>
+</string>
+<string id="death_news_levels_3a_text">
+	<text>À Agroprom</text>
+</string>
+<string id="death_news_levels_4_text">
+	<text>Les sous-sols Agroprom</text>
+</string>
+<string id="death_news_levels_4a_text">
+	<text>Dans les sous-sols d'Agroprom</text>
+</string>
+<string id="death_news_levels_5_text">
+	<text>Vallée Obscure</text>
+</string>
+<string id="death_news_levels_5a_text">
+	<text>Dans la vallée obscure</text>
+</string>
+<string id="death_news_levels_6_text">
+	<text>Laboratoire x18</text>
+</string>
+<string id="death_news_levels_6a_text">
+	<text>Dans le lab-x18</text>
+</string>
+<string id="death_news_levels_7_text">
+	<text>Rostock</text>
+</string>
+<string id="death_news_levels_7a_text">
+	<text>Rostock</text>
+</string>
+<string id="death_news_levels_8_text">
+	<text>Rostock</text>
+</string>
+<string id="death_news_levels_8a_text">
+	<text>Les territoires sauvages</text>
+</string>
+<string id="death_news_levels_9_text">
+	<text>Entrepôts militaires</text>
+</string>
+<string id="death_news_levels_9a_text">
+	<text>Dans les entrepôts militaires</text>
+</string>
+<string id="death_news_levels_10_text">
+	<text>Yantar</text>
+</string>
+<string id="death_news_levels_10a_text">
+	<text>À Yantar</text>
+</string>
+<string id="death_news_levels_11_text">
+	<text>Laboratoire x16</text>
+</string>
+<string id="death_news_levels_11a_text">
+	<text>Dans le labo x16</text>
+</string>
+<string id="death_news_levels_12_text">
+	<text>Radar</text>
+</string>
+<string id="death_news_levels_12a_text">
+	<text>Au radar</text>
+</string>
+<string id="death_news_levels_13_text">
+	<text>Laboratoire X10</text>
+</string>
+<string id="death_news_levels_13a_text">
+	<text>Dans le labo X10</text>
+</string>
+<string id="death_news_levels_14_text">
+	<text>Pripyat</text>
+</string>
+<string id="death_news_levels_14a_text">
+	<text>A Pripyat</text>
+</string>
+<string id="death_news_levels_15_text">
+	<text>Tchernobyl</text>
+</string>
+<string id="death_news_levels_15a_text">
+	<text>A Tchernobyl</text>
+</string>
+<string id="death_news_levels_16_text">
+	<text>Sarcophage</text>
+</string>
+<string id="death_news_levels_16a_text">
+	<text>Dans le Sarcophage</text>
+</string>
+<string id="death_news_levels_17_text">
+	<text>Ville morte</text>
+</string>
+<string id="death_news_levels_17a_text">
+	<text>Dans la Ville-morte</text>
+</string>
+<string id="death_news_levels_18_text">
+	<text>Générateurs</text>
+</string>
+<string id="death_news_levels_18a_text">
+	<text>Aux Générateurs</text>
+</string>
+<string id="death_news_levels_19_text">
+	<text>Darkscape</text>
+</string>
+<string id="death_news_levels_19a_text">
+	<text>A Darkscape</text>
+</string>
+<string id="death_news_levels_20_text">
+	<text>Le Marais</text>
+</string>
+<string id="death_news_levels_20a_text">
+	<text>Au Marais</text>
+</string>
+<string id="death_news_levels_21_text">
+	<text>Dans la mine</text>
+</string>
+<string id="death_news_levels_21a_text">
+	<text>Dans le souterrain</text>
+</string>
+<string id="univ_comm_names_stalker_text">
+	<text>Stalker</text>
+</string>
+<string id="univ_comm_names_monolith_text">
+	<text>Monolithe</text>
+</string>
+<string id="univ_comm_names_military_text">
+	<text>Militaire</text>
+</string>
+<string id="univ_comm_names_killer_text">
+	<text>Mercenaire</text>
+</string>
+<string id="univ_comm_names_ecolog_text">
+	<text>Écologiste</text>
+</string>
+<string id="univ_comm_names_dolg_text">
+	<text>Devoir</text>
+</string>
+<string id="univ_comm_names_freedom_text">
+	<text>Liberté</text>
+</string>
+<string id="univ_comm_names_bandit_text">
+	<text>Bandit</text>
+</string>
+<string id="univ_comm_names_zombied_text">
+	<text>Stalker zombifié</text>
+</string>
+<string id="univ_comm_names_stranger_text">
+	<text>Stalker</text>
+</string>
+<string id="death_news_comments_1_text">
+	<text>Encore un cadavre à dépouiller, hé hé!</text>
+</string>
+<string id="death_news_comments_2_text">
+	<text>Oh! Sido, il est mort alors qu'il te devait du pognon!</text>
+</string>
+<string id="death_news_comments_3_text">
+	<text>Hé barman, on fait quoi maintenant? Ok, je vais jeter un oeil au cadavre et récupérer le PDA ... S'il y a quelque chose d'intéssant je t'en informerai.</text>
+</string>
+<string id="death_news_comments_4_text">
+	<text>Merde, ça va s'arrêter quand ... ?!</text>
+</string>
+<string id="death_news_comments_5_text">
+	<text>M'en fous! J'en ai vraiment plus rien à foutre, j'en peux plus de ces conneries ...</text>
+</string>
+<string id="death_news_comments_6_text">
+	<text>Oh! Dire que je l'ai croisé hier ... Désolé pour ce gamin ...</text>
+</string>
+<string id="death_news_comments_7_text">
+	<text>Un bon stalker celui-là ... Je vais récupérer son PDA - du bon butin en perspective, héhé ...</text>
+</string>
+<string id="death_news_comments_8_text">
+	<text>Voilà, encore un concurrent parti rejoindre notre Seigneur ... Amen ... ha ha ha</text>
+</string>
+<string id="death_news_comments_9_text">
+	<text>C'était un sale petit comploteur, celui-là ... J'espère qu'ils ne vont pas lui ouvrir les portes du Paradis ...</text>
+</string>
+<string id="death_news_comments_10_text">
+	<text>Et merde, ce con est mort et je ne reverrai jamais mon fric ...</text>
+</string>
+<string id="death_news_comments_11_text">
+	<text>Celui-là, il le méritait bien !!!</text>
+</string>
+<string id="death_news_comments_12_text">
+	<text>Un stalker de moins, un cadavre de plus.</text>
+</string>
+<string id="death_news_comments_13_text">
+	<text>Ce gars va bientôt puer la charogne, c'est comme ça que nous finiront tous ...</text>
+</string>
+<string id="death_news_comments_14_text">
+	<text>Bah, ce mec était complètement naze, salut ducon ! ...</text>
+</string>
+<string id="death_news_comments_15_text">
+	<text>Incroyable... On me l'avait recommandé, aucun risque avec lui, ils disaient ... Eh bien, j'ai refusé à la dernière minute de l'accompagner, j'ai eu le nez creux ...</text>
+</string>
+<string id="death_news_comments_16_text">
+	<text>Ouais ... encore un touriste victime de la Zone.</text>
+</string>
+<string id="death_news_comments_17_text">
+	<text>Que dire ... Ce genre de crétins se comportent comme des touristes dans la Zone, ils oublient les balles et le reste, tant pis pour eux ...</text>
+</string>
+<string id="death_news_comments_18_text">
+	<text>Camarade stalker, j'espère que tu n'as pas trop souffert ...</text>
+</string>
+<string id="death_news_comments_19_text">
+	<text>Bah, un peu de nettoyage ne peut pas faire de mal ...</text>
+</string>
+<string id="death_news_comments_20_text">
+	<text>C'était un brave homme qui partageait toujours avec ses camarades !</text>
+</string>
+<string id="death_news_comments_21_text">
+	<text>Hmm, beaucoup trop de morts ces derniers temps, je vais rester au Bar !</text>
+</string>
+<string id="death_news_comments_22_text">
+	<text>Où est-ce qu'il est tombé ? ... Des coordonnées ?</text>
+</string>
+<string id="death_news_comments_23_text">
+	<text>Un vrai dur vient de tomber, quelle tristesse !</text>
+</string>
+<string id="death_news_comments_24_text">
+	<text>Oh, Zone ... combien de vies as-tu ruinées ...</text>
+</string>
+<string id="death_news_comments_25_text">
+	<text>Ah, c'était un brave homme, mais il était trop sûr de lui ...</text>
+</string>
+<string id="death_news_comments_26_text">
+	<text>Ah non !! Il m'avait promis de me donner sa combinaison ! ... fait chier !!</text>
+</string>
+<string id="death_news_comments_27_text">
+	<text>Vous avez entendu ?! Ne passez pas de ce côté-là !</text>
+</string>
+<string id="death_news_comments_28_text">
+	<text>Ah ! Mais c'est pas le même gars qui s'est fait foutre dehors du Bar, hier ?</text>
+</string>
+<string id="death_news_comments_29_text">
+	<text>Le Barman va sûrement envoyer un gars récupérer le butin ...</text>
+</string>
+<string id="death_news_comments_30_text">
+	<text>La Zone a encore pris une âme... Combien de temps avant que ça soit mon tour ?</text>
+</string>
+<string id="death_news_comments_31_text">
+	<text>Désolé pour ce pauvre type, qu'il repose en paix ...</text>
+</string>
+<string id="death_news_comments_32_text">
+	<text>Ca me rappelle une anecdote, hé hé ...</text>
+</string>
+<string id="it_is_your_companion_text">
+	<text>Votre compagnon</text>
+</string>
+<string id="guiders_patterns_text">
+	<text>%s Prix: %s</text>
+</string>
+<string id="guiders_patterns_2_text">
+	<text> %s</text>
+</string>
+<string id="guiders_patterns_2_pilot_text">
+	<text> %s</text>
+</string>
+<string id="inventory_art_hand_belt_text">
+	<text>Vous avez essayé de prendre l'artefact, la chaleur chaude de votre corps à la taille, et il est mort à cause de son activation prématurée. Rappeler Artefacts dans les mains peuvent être prises que dans le sac à dos!</text>
+</string>
+<string id="inventory_art_warning_pattern_text">
+	<text>Ne peut pas être porté à la ceinture un certain nombre d'artefacts %s la protection totale de plus de %s - %s</text>
+</string>
+<string id="inventory_fire_protect_text">
+	<text>Feu</text>
+</string>
+<string id="inventory_strike_protect_text">
+	<text>Choc</text>
+</string>
+<string id="inventory_shock_protect_text">
+	<text>Electricité</text>
+</string>
+<string id="inventory_wound_protect_text">
+	<text>Griffures</text>
+</string>
+<string id="inventory_radiation_protect_text">
+	<text>Radiation</text>
+</string>
+<string id="inventory_telepatic_protect_text">
+	<text>Dommages-psi</text>
+</string>
+<string id="inventory_chemical_protect_text">
+	<text>Brûlures chimiques</text>
+</string>
+<string id="inventory_explosive_protect_text">
+	<text>Explosion</text>
+</string>
+<string id="inventory_fire_wound_protect_text">
+	<text>Blessures par balle</text>
+</string>
+<string id="inventory_fire_protect_effect_text">
+	<text>vous pouvez brûler vifs!</text>
+</string>
+<string id="inventory_strike_protect_effect_text">
+	<text>vous périrez de durcissement des organes internes!</text>
+</string>
+<string id="inventory_shock_protect_effect_text">
+	<text>vous tuez décharge statique d'eux!</text>
+</string>
+<string id="inventory_wound_protect_effect_text">
+	<text>votre tissus mous déchirure du stress!</text>
+</string>
+<string id="inventory_radiation_protect_effect_text">
+	<text>vous serez fortement irradiés rayonnement diffusé!</text>
+</string>
+<string id="inventory_telepatic_protect_effect_text">
+	<text>vous pouvez aller fou!</text>
+</string>
+<string id="inventory_chemical_protect_effect_text">
+	<text>vous allez mourir de changements irréversibles dans le sang!</text>
+</string>
+<string id="inventory_explosive_protect_effect_text">
+	<text>vous périrez de durcissement des organes internes!</text>
+</string>
+<string id="inventory_fire_wound_protect_effect_text">
+	<text>vous périrez de durcissement des tissus mous!</text>
+</string>
+<string id="inventory_art_warning_2_text">
+	<text>Ne peut pas être porté à la ceinture plus d'un artefact plus d'une espèce - les effets secondaires vous tuer!</text>
+</string>
+<string id="inventory_art_warning_3_text">
+	<text>Ne peut pas être porté à la ceinture pendant plus de deux objets solides d'une espèce - les effets secondaires vous tuer!</text>
+</string>
+<string id="inventory_art_warning_4_text">
+	<text>Ne peut pas être porté à la ceinture pendant plus de trois artefacts ordinaires d'une espèce - les effets secondaires vous tuer!</text>
+</string>
+<string id="inventory_art_warning_5_text">
+	<text>Ne peut pas être porté à la ceinture des objets identiques d'une espèce de plus %s les effets secondaires vous tueront '</text>
+</string>
+<string id="cheb_places_1_text">
+	<text>Au Cordon</text>
+</string>
+<string id="cheb_places_2_text">
+	<text>A Agroprom</text>
+</string>
+<string id="cheb_places_3_text">
+	<text>Dans la Vallée obscure</text>
+</string>
+<string id="cheb_places_4_text">
+	<text>Dans les Entrepôts militaires</text>
+</string>
+<string id="cheb_places_5_text">
+	<text>A Yantar</text>
+</string>
+<string id="jekan_work_izgoy_tip_text">
+	<text>Signal SOS inconnu</text>
+</string>
+<string id="jekan_work_cheb_tip_text">
+	<text>Mettre l'accent sur Cheburashka</text>
+</string>
+<string id="jekan_work_magnet_part_text">
+	<text>Aimant de partie</text>
+</string>
+<string id="jekan_work_para_blood_text">
+	<text>Sangsue paralysée</text>
+</string>
+<string id="jekan_work_para_dog_text">
+	<text>Chien paralysé</text>
+</string>
+<string id="minigames_bets_info_5000_text">
+	<text>Pari minimal - 500 Maximum - 5000.</text>
+</string>
+<string id="minigames_blackjack_pattern_1_text">
+	<text>Votre score est: %s. Points de l'adversaire: %s.</text>
+</string>
+<string id="minigames_blackjack_pattern_2_text">
+	<text>Votre score est: %s. Points de l'adversaire: %s. Argent reçu: %s</text>
+</string>
+<string id="minigames_blackjack_pattern_3_text">
+	<text>Votre score est: %s. Points de l'adversaire: %s. Argent perdu: %s</text>
+</string>
+<string id="minigames_draw_text">
+	<text>Tirage !</text>
+</string>
+<string id="minigames_win_text">
+	<text>Vous avez gagné !</text>
+</string>
+<string id="minigames_lose_text">
+	<text>Vous avez perdu !</text>
+</string>
+<string id="minigames_incorrect_bet_text">
+	<text>Pari incorrect ou vous n'avez pas assez d'argent !</text>
+</string>
+<string id="minigames_bets_info_2000_text">
+	<text>Pari minimum - 500  maximum - 2000.</text>
+</string>
+<string id="minigames_katala_pattern_1_text">
+	<text>Vous avez deviné juste ! Argent reçu: %s</text>
+</string>
+<string id="minigames_katala_pattern_2_text">
+	<text>Vous avez perdu ! Argent perdu: %s</text>
+</string>
+<string id="news_amk_type_weapon_1_text">
+	<text>blessure par balle</text>
+</string>
+<string id="news_amk_type_weapon_2_text">
+	<text>couteau</text>
+</string>
+<string id="news_amk_type_weapon_3_text">
+	<text>brûlures</text>
+</string>
+<string id="news_amk_type_weapon_4_text">
+	<text>grenade</text>
+</string>
+<string id="news_amk_death_unkown_text">
+	<text>cause de la mort - inconnue</text>
+</string>
+<string id="news_amk_stalker_killed_text">
+	<text>Un stalker est mort:</text>
+</string>
+<string id="news_amk_af_text">
+	<text>artefact</text>
+</string>
+<string id="news_amk_count_1_text">
+	<text>solitaire</text>
+</string>
+<string id="news_amk_count_2_text">
+	<text>couple</text>
+</string>
+<string id="news_amk_count_3_text">
+	<text>plusieurs</text>
+</string>
+<string id="news_amk_count_4_text">
+	<text>groupe</text>
+</string>
+<string id="news_amk_count_5_text">
+	<text>un grand groupe</text>
+</string>
+<string id="news_amk_count_6_text">
+	<text>un groupe</text>
+</string>
+<string id="news_amk_east_text">
+	<text>à l'est</text>
+</string>
+<string id="news_amk_neast_text">
+	<text>au nord-est</text>
+</string>
+<string id="news_amk_north_text">
+	<text>nord</text>
+</string>
+<string id="news_amk_nwest_text">
+	<text>au nord-ouest</text>
+</string>
+<string id="news_amk_west_text">
+	<text>à l'ouest</text>
+</string>
+<string id="news_amk_swest_text">
+	<text>au sud-ouest</text>
+</string>
+<string id="news_amk_south_text">
+	<text>au sud</text>
+</string>
+<string id="news_amk_esouth_text">
+	<text>au sud-est</text>
+</string>
+<string id="news_manager_location_1_text">
+	<text>au Cordon</text>
+</string>
+<string id="news_manager_location_2_text">
+	<text>à la Décharge</text>
+</string>
+<string id="news_manager_location_3_text">
+	<text>dans les souterrains d'Agroprom</text>
+</string>
+<string id="news_manager_location_4_text">
+	<text>à Agroprom</text>
+</string>
+<string id="news_manager_location_5_text">
+	<text>dans la Vallée Obscure</text>
+</string>
+<string id="news_manager_location_6_text">
+	<text>dans les Entrepôts Militaires</text>
+</string>
+<string id="news_manager_location_7_text">
+	<text>à Yantar</text>
+</string>
+<string id="news_manager_location_8_text">
+	<text>X-16</text>
+</string>
+<string id="news_manager_location_9_text">
+	<text>au Radar</text>
+</string>
+<string id="news_manager_location_10_text">
+	<text>à Pripyat</text>
+</string>
+<string id="news_manager_location_11_text">
+	<text>X-18</text>
+</string>
+<string id="news_manager_location_12_text">
+	<text>Bar</text>
+</string>
+<string id="news_manager_location_13_text">
+	<text>Territoires Sauvages</text>
+</string>
+<string id="ogse_addons_warn_text">
+	<text>Cet accessoire ne convient à aucune arme dans les emplacements 1 et 2</text>
+</string>
+<string id="ogse_autodoc_message_head_text">
+	<text>Avertissement de l' "Autodoc":</text>
+</string>
+<string id="ogse_autodoc_start_check_text">
+	<text>Début de la vérification ...</text>
+</string>
+<string id="ogse_autodoc_ad_healing_msg_text">
+	<text>Préparation médicale appliquée.</text>
+</string>
+<string id="ogse_autodoc_ad_stimulator_msg_text">
+	<text>Diminution de l'endurance! Dose de stimulant injectée.</text>
+</string>
+<string id="ogse_autodoc_is_not_on_belt_text">
+	<text>D'abord, placez le système "Autodoc" à la ceinture!</text>
+</string>
+<string id="ogse_autodoc_is_disabled_text">
+	<text>Le système "Autodoc" est désactivé!</text>
+</string>
+<string id="ogse_autodoc_no_healing_charges_text">
+	<text>Plus de doses médicales pour le soin des blessures! Sous-système médical désactivé!</text>
+</string>
+<string id="ogse_autodoc_healing_on_charges_text">
+	<text>Sous-système médical activé. Doses -</text>
+</string>
+<string id="ogse_autodoc_healing_off_text">
+	<text>Sous-système médical désactivé par l'utilisateur. Doses -</text>
+</string>
+<string id="ogse_autodoc_no_stimpack_charges_text">
+	<text>Plus de doses de stimulants! Le sous-système de stimulation est désactivé!</text>
+</string>
+<string id="ogse_autodoc_stimpack_on_charges_text">
+	<text>Sous-système de stimulation activé. Doses -</text>
+</string>
+<string id="ogse_autodoc_stimpack_off_text">
+	<text>Sous-système de stimulation désactivé par l'utilisateur. Doses -</text>
+</string>
+<string id="ogse_autodoc_no_antirad_charges_text">
+	<text>Plus de doses d'antirads! Le sous-système d'antiradiation est désactivé!</text>
+</string>
+<string id="ogse_autodoc_antirad_on_charges_text">
+	<text>Sous-système d'antiradiation activé. Doses -</text>
+</string>
+<string id="ogse_autodoc_antirad_off_text">
+	<text>Sous-système d'antiradiation désactivé par l'utilisateur. Doses -</text>
+</string>
+<string id="ogse_autodoc_health_charges_remaining_text">
+	<text>Doses de traitement des blessures restantes -</text>
+</string>
+<string id="ogse_autodoc_health_empty_text">
+	<text>Aucune recharge de doses médicales! Sous-système médical désactivé.</text>
+</string>
+<string id="ogse_autodoc_stim_charges_remaining_text">
+	<text>Doses stimulantes restantes -</text>
+</string>
+<string id="ogse_autodoc_stim_empty_text">
+	<text>Aucune recharge de doses stimulantes! Sous-système de stimulation désactivé.</text>
+</string>
+<string id="ogse_autodoc_antirad_charges_remaining_text">
+	<text>Doses d'antirads restantes -</text>
+</string>
+<string id="ogse_autodoc_antirad_empty_text">
+	<text>Aucune recharge de doses d'antirads! Sous-système d'antiradiation est désactivé.</text>
+</string>
+<string id="ogse_autodoc_rad_long_exposure_1_text">
+	<text>Niveau de radiations élevé!</text>
+</string>
+<string id="ogse_autodoc_rad_long_exposure_2_text">
+	<text>Médicament anti-radiations appliqué.</text>
+</string>
+<string id="ogse_autodoc_rad_long_exposure_3_text">
+	<text>Reçu une forte dose de radiation!</text>
+</string>
+<string id="ogse_autodoc_rad_long_exposure_4_text">
+	<text>Médicament anti-rayonnement appliqué.</text>
+</string>
+<string id="ogse_autodoc_rad_warning_1_text">
+	<text>DANGER! Niveau de radiations élevé! Il n'y a plus d'antirads!</text>
+</string>
+<string id="ogse_autodoc_rad_warning_2_text">
+	<text>DANGER! Reçu une forte dose de radiations! Il n'y a plus d'antirads!</text>
+</string>
+<string id="ogse_autodoc_health_sys_name_text">
+	<text>Médical</text>
+</string>
+<string id="ogse_autodoc_stim_sys_name_text">
+	<text>Stimulant</text>
+</string>
+<string id="ogse_autodoc_antirad_sys_name_text">
+	<text>Anti-Radiation</text>
+</string>
+<string id="ogse_autodoc_pattern_1_text">
+	<text>%s Tous les sous-systèmes de l'appareil sont rechargés. %s Charges de chaque</text>
+</string>
+<string id="ogse_autodoc_pattern_2_text">
+	<text>%s %s sous-système de recharge branché. Charges %s</text>
+</string>
+<string id="ogse_car_no_fuel_text">
+	<text>Pas de carburant dans l'inventaire.</text>
+</string>
+<string id="ogse_car_not_need_fuel_text">
+	<text>Le véhicule n'a pas besoin de carburant.</text>
+</string>
+<string id="ogse_car_fire_warning_1_text">
+	<text>!!! INCENDIE À BORD - ABANDONNEZ LE VEHICULE !!!</text>
+</string>
+<string id="ogse_car_fire_warning_2_text">
+	<text>!!! MENACE D'INCENDIE DES MUNITIONS !!!</text>
+</string>
+<string id="ogse_car_armor_state_text">
+	<text>ETAT DU BLINDAGE:</text>
+</string>
+<string id="ogse_car_enemy_too_near_text">
+	<text>AVERTISSEMENT - la cible est en-dessous de la portée du canon -</text>
+</string>
+<string id="ogse_car_turret_failure_text">
+	<text>INCENDIE DANS LA TOURELLE - panne moteur de la tourelle -</text>
+</string>
+<string id="ogse_car_following_target_text">
+	<text>CIBLE À SUIVRE -</text>
+</string>
+<string id="ogse_car_mode_text">
+	<text>MODE:</text>
+</string>
+<string id="ogse_car_fail_text">
+	<text>ECHEC</text>
+</string>
+<string id="ogse_car_human_gunner_text">
+	<text>Conseil: TIR</text>
+</string>
+<string id="ogse_car_automatic_text">
+	<text>AUTOMATIQUE</text>
+</string>
+<string id="ogse_car_broken_text">
+	<text>DÉFECTUEUX</text>
+</string>
+<string id="ogse_car_semiauto_text">
+	<text>SEMI-AUTO</text>
+</string>
+<string id="ogse_car_manual_text">
+	<text>MANUEL</text>
+</string>
+<string id="ogse_car_fof_text">
+	<text>/ Autre:</text>
+</string>
+<string id="ogse_car_blocked_text">
+	<text>BLOQUE</text>
+</string>
+<string id="ogse_car_on_text">
+	<text>ON.</text>
+</string>
+<string id="ogse_car_off_text">
+	<text>OFF.</text>
+</string>
+<string id="ogse_car_no_targ_text">
+	<text>Pas de cible -</text>
+</string>
+<string id="ogse_car_targ_failure_text">
+	<text>ORIENTATION électronique défectueuse -</text>
+</string>
+<string id="ogse_car_cur_targ_text">
+	<text>Cible actuelle:</text>
+</string>
+<string id="ogse_car_targ_unknown_text">
+	<text>Cible non identifiée -</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_1_text">
+	<text>STALKER SOLITAIRE</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_2_text">
+	<text>STALKER</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_3_text">
+	<text>BANDIT</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_4_text">
+	<text>STALKER 'FRATERNITÉ'</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_5_text">
+	<text>STALKER GR. DEMANDEURS</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_6_text">
+	<text>STALKER 'MONOLITHE'</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_7_text">
+	<text>MILITAIRES</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_8_text">
+	<text>MERCENAIRES</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_9_text">
+	<text>SCIENTIFIQUES</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_10_text">
+	<text>STALKER 'DEVOIR'</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_11_text">
+	<text>STALKER 'LIBERTÉ'</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_12_text">
+	<text>STALKER zombifié</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_13_text">
+	<text>VOYAGEUR</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_14_text">
+	<text>MARCHAND</text>
+</string>
+<string id="ogse_car_stalkers_comm2desc_15_text">
+	<text>STALKER 'Firmament'</text>
+</string>
+<string id="ogse_car_objects_sec2desc_1_text">
+	<text>SANGLIER</text>
+</string>
+<string id="ogse_car_objects_sec2desc_2_text">
+	<text>SANGSUE</text>
+</string>
+<string id="ogse_car_objects_sec2desc_3_text">
+	<text>CROQUE-MORT</text>
+</string>
+<string id="ogse_car_objects_sec2desc_4_text">
+	<text>CHIEN</text>
+</string>
+<string id="ogse_car_objects_sec2desc_5_text">
+	<text>PSEUDO-CHIEN</text>
+</string>
+<string id="ogse_car_objects_sec2desc_6_text">
+	<text>COTE</text>
+</string>
+<string id="ogse_car_objects_sec2desc_7_text">
+	<text>CHIMERE</text>
+</string>
+<string id="ogse_car_objects_sec2desc_8_text">
+	<text>PSEVDO-GEANT</text>
+</string>
+<string id="ogse_car_objects_sec2desc_9_text">
+	<text>ZOMBIE</text>
+</string>
+<string id="ogse_car_objects_sec2desc_10_text">
+	<text>BURER</text>
+</string>
+<string id="ogse_car_objects_sec2desc_11_text">
+	<text>CONTRÔLEUR</text>
+</string>
+<string id="ogse_car_objects_sec2desc_12_text">
+	<text>POLTERGEIST</text>
+</string>
+<string id="ogse_car_objects_sec2desc_13_text">
+	<text>SNORK</text>
+</string>
+<string id="ogse_car_objects_sec2desc_14_text">
+	<text>TWIST</text>
+</string>
+<string id="ogse_car_objects_sec2desc_15_text">
+	<text>CORBEAU</text>
+</string>
+<string id="ogse_car_objects_sec2desc_16_text">
+	<text>RAT</text>
+</string>
+<string id="ogse_car_objects_sec2desc_17_text">
+	<text>TUSHKANO</text>
+</string>
+<string id="ogse_car_objects_sec2desc_18_text">
+	<text>HÉLICOPTÈRE</text>
+</string>
+<string id="ogse_car_objects_sec2desc_19_text">
+	<text>TOURELLE INDÉPENDANTE</text>
+</string>
+<string id="ogse_car_objects_sec2desc_20_text">
+	<text>Véhicule blindé</text>
+</string>
+<string id="ogse_car_unrecognized_text">
+	<text>Objet inconnu</text>
+</string>
+<string id="ogse_car_trade_name_1_text">
+	<text>UAZ</text>
+</string>
+<string id="ogse_car_trade_loc_1_text">
+	<text>Cordon</text>
+</string>
+<string id="ogse_car_trade_desc_1_text">
+	<text>Ouais, je peux te procurer un véhicule au Cordon. Elle est pas toute neuve, mais avec quatre roues. Pour 9000 roubles, elle sera au parking ! Ou alors tu peux prendre la petite bagnole qui est vers une maison du village, une "Zapor", la "Volkswagen" russe ... Si tu peux la démarrer ! Ha-ha ! .. Mais celle-là est gratuite !</text>
+</string>
+<string id="ogse_car_trade_name_2_text">
+	<text>Moskvitch 412</text>
+</string>
+<string id="ogse_car_trade_loc_2_text">
+	<text>Décharge</text>
+</string>
+<string id="ogse_car_trade_desc_2_text">
+	<text>La Décharge ... Ouais ... Il y a une Moskvich 412 et un UAZ. Pour 8000 et 11 000 respectivement. Tu payes maintenant ou jamais !</text>
+</string>
+<string id="ogse_car_trade_name_3_text">
+	<text>UAZ</text>
+</string>
+<string id="ogse_car_trade_loc_3_text">
+	<text>Décharge</text>
+</string>
+<string id="ogse_car_trade_desc_3_text">
+	<text>Bien. Le véhicule sera près des ruines en face du poste de contrôle du Devoir.</text>
+</string>
+<string id="ogse_car_trade_name_4_text">
+	<text>UAZ</text>
+</string>
+<string id="ogse_car_trade_loc_4_text">
+	<text>Agroprom</text>
+</string>
+<string id="ogse_car_trade_desc_4_text">
+	<text>Je peux te procurer une voiture. À Agroprom près du tunnel de chemin de fer.</text>
+</string>
+<string id="ogse_car_trade_name_5_text">
+	<text>Niva VAZ-2121</text>
+</string>
+<string id="ogse_car_trade_loc_5_text">
+	<text>Agroprom</text>
+</string>
+<string id="ogse_car_trade_desc_5_text">
+	<text>Tu pourras trouver une Niva ... Sur la route après avoir quitté l'Institut ...</text>
+</string>
+<string id="ogse_car_trade_name_6_text">
+	<text>UAZ Minibus</text>
+</string>
+<string id="ogse_car_trade_loc_6_text">
+	<text>Vallée Obscure</text>
+</string>
+<string id="ogse_car_trade_desc_6_text">
+	<text>Dans la Vallée Obscure tu peux avoir un minibus pour 15000 roubles. Un endroit dangereux. Il sera à la station service, en face de la base des bandits.</text>
+</string>
+<string id="ogse_car_trade_name_7_text">
+	<text>Niva VAZ-2121</text>
+</string>
+<string id="ogse_car_trade_loc_7_text">
+	<text>Bar</text>
+</string>
+<string id="ogse_car_trade_desc_7_text">
+	<text>Au bar ... une Niva. Elle sera près de la route, en face de la citerne.</text>
+</string>
+<string id="ogse_car_trade_name_8_text">
+	<text>ZAZ-965 "mini"</text>
+</string>
+<string id="ogse_car_trade_loc_8_text">
+	<text>Yantar</text>
+</string>
+<string id="ogse_car_trade_desc_8_text">
+	<text>Yantar - la mini russe ! Petite et peu fiable ! Si tu la prends, elle sera immédiatement après la transition de Yantar !</text>
+</string>
+<string id="ogse_car_trade_name_9_text">
+	<text>Buggy</text>
+</string>
+<string id="ogse_car_trade_loc_9_text">
+	<text>Entrepôts militaires</text>
+</string>
+<string id="ogse_car_trade_desc_9_text">
+	<text>Tu veux prendre le buggy ? Si oui, il sera juste devant notre base. Pour 10 000 roubles.</text>
+</string>
+<string id="ogse_car_trade_name_10_text">
+	<text>Moskvitch 412</text>
+</string>
+<string id="ogse_car_trade_loc_10_text">
+	<text>Entrepôts militaires</text>
+</string>
+<string id="ogse_car_trade_desc_10_text">
+	<text>Si tu ne veux pas le Buggy, tu peux prendre la Moskvitch. Dans le village des sangsues ! Fais-vite ! Hé hé !</text>
+</string>
+<string id="ogse_car_trade_name_11_text">
+	<text>ZAZ-968 "jeep"</text>
+</string>
+<string id="ogse_car_trade_loc_11_text">
+	<text>Radar</text>
+</string>
+<string id="ogse_car_trade_desc_11_text">
+	<text>Tu peux prendre la jeep au Radar ... Elle sera près du checkpoint du monolithe, en parfait état.</text>
+</string>
+<string id="ogse_dbg_tel_1_text">
+	<text>Erreur dans l'axe X</text>
+</string>
+<string id="ogse_dbg_tel_2_text">
+	<text>Erreur dans le Y</text>
+</string>
+<string id="ogse_dbg_tel_3_text">
+	<text>Erreur dans l'axe Z</text>
+</string>
+<string id="critical_error_alife_text">
+	<text>ATTENTION Dépend ALAYF JEUX !!! ENVOYER À UN PLEIN LOG DÉVELOPPEURS !!!</text>
+</string>
+<string id="dinhud_gatling_text">
+	<text>Vous avez choisi une mitrailleuse Gatling - M-134, mais vu son poids et son recul, sans exosquelette il est impossible de l'utiliser ...</text>
+</string>
+<string id="dinhud_gasmask_text">
+	<text>Vous avez essayé de mettre un masque à gaz par dessus celui qui équipe déjà votre combinaison, c'est possible, mais vous allez vous étouffer ...</text>
+</string>
+<string id="ogse_healing_first_intoxication_warning_text">
+	<text>Efficacité des kits réduite !</text>
+</string>
+<string id="ogse_healing_second_intoxication_warning_text">
+	<text>Efficacité des kits réduite de moitié !</text>
+</string>
+<string id="ogse_healing_third_intoxication_warning_text">
+	<text>Efficacité des kits réduite extrêmement réduite !</text>
+</string>
+<string id="ogse_healing_forth_intoxication_warning_text">
+	<text>L'intoxication aux médics dépasse le niveau critique !</text>
+</string>
+<string id="ogse_healing_text_using_voda_text">
+	<text>Efficacité des kits entièrement restaurée.</text>
+</string>
+<string id="ogse_healing_text_already_using_text">
+	<text>Impossible de réutiliser la trousse de premiers soins !</text>
+</string>
+<string id="ogse_healing_text_autodoctor_using_text">
+	<text>Vous ne pouvez pas utiliser de médikits quand vous êtes équipés de l' "Autodoc" en raison du risque de surdose !</text>
+</string>
+<string id="ogse_healing_text_overdose_error_text">
+	<text>Ne pas réutiliser le médicament à cause du surdosage !</text>
+</string>
+<string id="ogse_healing_text_yod_error_text">
+	<text>Le médicament est inefficace si vous êtes déjà contaminé ! Il doit être pris à l'avance !</text>
+</string>
+<string id="ogse_repair_short_1_text">
+	<text>Anormal</text>
+</string>
+<string id="ogse_repair_short_2_text">
+	<text>Ahn.</text>
+</string>
+<string id="ogse_repair_short_3_text">
+	<text>Anormal</text>
+</string>
+<string id="ogse_repair_short_4_text">
+	<text>Ahn.</text>
+</string>
+<string id="ogse_repair_short_5_text">
+	<text>Combinaisons</text>
+</string>
+<string id="ogse_repair_short_6_text">
+	<text>Kombez</text>
+</string>
+<string id="ogse_repair_short_7_text">
+	<text>combinaisons</text>
+</string>
+<string id="ogse_repair_short_8_text">
+	<text>kombez</text>
+</string>
+<string id="ogse_repair_short_9_text">
+	<text>Armée</text>
+</string>
+<string id="ogse_repair_short_10_text">
+	<text>Arm.</text>
+</string>
+<string id="ogse_repair_short_11_text">
+	<text>Armée</text>
+</string>
+<string id="ogse_repair_short_12_text">
+	<text>Arm.</text>
+</string>
+<string id="ogse_repair_short_13_text">
+	<text>Bronekomplekt</text>
+</string>
+<string id="ogse_repair_short_14_text">
+	<text>B/c</text>
+</string>
+<string id="ogse_repair_short_15_text">
+	<text>Inhabituel</text>
+</string>
+<string id="ogse_repair_short_16_text">
+	<text>Eng.</text>
+</string>
+<string id="ogse_repair_in_use_text">
+	<text>(Dans les mains)</text>
+</string>
+<string id="ogse_repair_equipped_text">
+	<text>(Porté)</text>
+</string>
+<string id="ogse_sleep_mgr_warn_1_text">
+	<text>Vous ne pouvez pas dormir pendant l'émission</text>
+</string>
+<string id="ogse_sleep_mgr_warn_2_text">
+	<text>Vous ne pouvez pas dormir pendant les émissions-psi</text>
+</string>
+<string id="ogse_sleep_mgr_warn_3_text">
+	<text>L'intuition d'un danger vous a réveillé</text>
+</string>
+<string id="ogse_sleep_mgr_warn_4_text">
+	<text>Vous ne pouvez pas dormir \nvotre état s'aggrave</text>
+</string>
+<string id="ogse_sleep_mgr_warn_5_text">
+	<text>Vous ne pouvez pas dormir quand des ennemis sont à proximité</text>
+</string>
+<string id="ogse_sleep_mgr_warn_6_text">
+	<text>Vous ne pouvez pas dormir dans la voiture au milieu de la zone  \nc'est dangereux!</text>
+</string>
+<string id="ogse_sleep_mgr_warn_7_text">
+	<text>Vous ne pouvez pas dormir sous la pluie - \ntrouvez un coin au sec</text>
+</string>
+<string id="ogse_sleep_mgr_warn_8_text">
+	<text>C'est un endroit trop dangereux pour dormir</text>
+</string>
+<string id="ogse_sleep_mgr_warn_9_text">
+	<text>Vous ne pouvez pas dormir à cause d'effets énergisants</text>
+</string>
+<string id="ogse_sleep_mgr_warn_10_text">
+	<text>Vous ne pouvez pas dormir - \nvous allez devenir fou</text>
+</string>
+<string id="ogse_sleep_mgr_warn_11_text">
+	<text>Vous ne pouvez pas dormir quand vous êtes zombifié</text>
+</string>
+<string id="ogse_tp_art_1_text">
+	<text>Hmm, quelque chose ne vous empêche d'avancer ...</text>
+</string>
+<string id="ogse_tp_art_2_text">
+	<text>Il est possible que l'artefact que vous avez trouvé vous empêche de sortir ...</text>
+</string>
+<string id="ogse_tp_art_3_text">
+	<text>Il faut jeter l'artefact et aller parler du problème à Sakharov ...</text>
+</string>
+<string id="ogse_tp_art_4_text">
+	<text>Gardez l'artefact sur vous - l'AAS a commencé l'analyse. Ne jetez pas l'artefact!</text>
+</string>
+<string id="ogse_tp_art_5_text">
+	<text>L'AAS a complètement numérisé les propriétés de l'artefact - revenez me voir pour de nouvelles informations.</text>
+</string>
+<string id="ogse_tp_art_6_text">
+	<text>Le Tatoué, l'AAS n'a pas numérisé l'artefact - reprenez l'artefact et recommencez!</text>
+</string>
+<string id="ogse_tp_art_7_text">
+	<text>Le Tatoué, vous êtes vivant? Une lumière sur l'AAS a indiqué que vous vous déplaciez à grande vitesse. J'espère que c'était juste un parasite et que tout va bien. Je répète - l'AAS a analysé l'artefact. J'ai hâte de vous revoir!</text>
+</string>
+<string id="ogse_yan_rand_part_1_text">
+	<text>Le Tatoué, bonjour! Comme vous l'avez demandé, je vous envoie une liste des articles nécessaires pour notre recherche:\n</text>
+</string>
+<string id="pma_esc_quest_msg_1_text">
+	<text>Le Tatoué ! Oublie l'artefact, tu t'en occuperas plus tard. Va immédiatement à la caravane, au bord de la route. Mes hommes ont besoin d'aide. Ces imbéciles ont ouvert le feu sur un hélico. Je t'ai envoyé les coordonnées. T'as trouvé un nouvel emploi rapidement !</text>
+</string>
+<string id="pma_esc_quest_msg_2_text">
+	<text>Le Tatoué ! Va immédiatement à la caravane, au bord de la route. Mes hommes ont besoin d'aide. Ces imbéciles ont ouvert le feu sur un hélico. Je t'ai envoyé les coordonnées. T'as trouvé un nouvel emploi rapidement !</text>
+</string>
+<string id="pma_esc_quest_msg_3_text">
+	<text>Eh bien, étiqueté, vous êtes si vain. Quoi qu'il en soit, vérifiez que vous êtes allé, mais avec Wolf et son équipe savez maintenant comment il comprend. En général, je suis en attente. La chose est.</text>
+</string>
+<string id="pma_esc_quest_msg_4_text">
+	<text>Le Tatoué. Est-ce que mes gars sont en train de mourir?</text>
+</string>
+<string id="pma_esc_quest_msg_5_text">
+	<text>Bien joué, le Tatoué! Tu viens de te faire plein de nouveaux amis. Viens me voir au bunker, faut qu'on cause.</text>
+</string>
+<string id="pma_esc_quest_msg_6_text">
+	<text>Le Tatoué, merci pour l'aide que tu as apportée à notre camarade. Maintenant, tu peux passer me voir.</text>
+</string>
+<string id="remkit_main_msg_1_text">
+	<text>Impossible\nLes réparations sont impossibles quand des ennemis sont proches</text>
+</string>
+<string id="remkit_main_msg_2_text">
+	<text>La boîte à outils est trop usée</text>
+</string>
+<string id="remkit_main_msg_3_text">
+	<text>La boîte à outils est trop usée</text>
+</string>
+<string id="zastava_commander_name_text">
+	<text>Kitsenko</text>
+</string>
+<string id="task_functor_1_text">
+	<text>Vous vous réveillez avec une note dans la main et un artefact rare dans le sac à dos.</text>
+</string>
+<string id="task_functor_esc_show_trader_kvests_1_text">
+	<text>Trouver une guitare dans le village des débutants</text>
+</string>
+<string id="task_functor_esc_show_trader_kvests_2_text">
+	<text>Les militaires dans les anomalies</text>
+</string>
+<string id="task_functor_esc_show_trader_kvests_3_text">
+	<text>Mercenaires au Cordon</text>
+</string>
+<string id="task_functor_esc_show_trader_kvests_4_text">
+	<text>Un invité au Moulin</text>
+</string>
+<string id="task_functor_bar_show_barman_kvests_1_text">
+	<text>L'ami du Barman</text>
+</string>
+<string id="task_functor_bar_show_barman_kvests_2_text">
+	<text>Prisonnier à la base militaire d'Agroprom</text>
+</string>
+<string id="task_functor_mil_show_max_kvests_1_text">
+	<text>Aider le membre de la Liberté au radar</text>
+</string>
+<string id="esc_kvest_sdelka_with_mils_messsage_car_is_near_1_text">
+	<text>Eteins le moteur, et ramènes-toi ici pour faire l'échange.</text>
+</string>
+<string id="esc_kvest_sdelka_with_mils_messsage_car_is_near_2_text">
+	<text>Kuznetsov:</text>
+</string>
+<string id="spawn_specotryad_for_kill_blockpost_1_text">
+	<text>Escouade spéciale</text>
+</string>
+<string id="update_have_af_esc_anomaly_1_text">
+	<text>Hé, stalker, où est-ce que tu vas ? Va-t-en d'ici !</text>
+</string>
+<string id="kill_him_now_text">
+	<text>Tue-le maintenant !</text>
+</string>
+<string id="actor_far_esc_killers_text">
+	<text>Le niveau de qualité d'enregistrement a diminué.</text>
+</string>
+<string id="spawn_bomba_text">
+	<text>Désamorcer la bombe</text>
+</string>
+<string id="on_use_mic_text">
+	<text>Vous ne pouvez pas enregistrer la conversation.</text>
+</string>
+<string id="tips_yan_sold">
+	<text>Il fait quelque chose avec le générateur ! Vous devez l'arrêter !</text>
+</string>
+<string id="tips_actor_hit_soldier">
+	<text>Il semble que le générateur est en marche !</text>
+</string>
+<string id="wait_sound_record_1_text">
+	<text>Eh bien, le Tatoué, t'as réussi l'enregistrement ? Viens me le faire écouter.</text>
+</string>
+<string id="ui_neutralize_bomb_1_text">
+	<text>Jaune</text>
+</string>
+<string id="ui_neutralize_bomb_2_text">
+	<text>Vert</text>
+</string>
+<string id="messege_of_sidor_a_kill_mercs_text">
+	<text>Bien joué, le Tatoué !\nIl faut maintenant régler le problème avec les mercenaires qui ont posé la bombe, sinon ils vont recommencer. Détruis-les et viens chercher ta récompense.</text>
+</string>
+<string id="messege_barman_search_him_friend_text">
+	<text>Bien joué, t'as trouvé le PDA de Shvidi, parfait ! Je me demande où il est ... Le Tatoué, essaye de retrouver mon ami, il est probablement quelque part dans la Vallée Obscure. Consulte son PDA, ça devrait aider.</text>
+</string>
+<string id="on_hit_sv_enemy_text">
+	<text>Cet enfoiré veut libérer nos prisonniers! Allez, faites sauter la bombe !</text>
+</string>
+<string id="spawn_dolg_for_sdelka_text">
+	<text>Rencontrer un groupe du Devoir</text>
+</string>
+<string id="meet_with_dolg_otryad_text">
+	<text>Prendre un point d'observation</text>
+</string>
+<string id="talking_dolg_with_killers_1_text">
+	<text>Eh bien, nous allons sans beaucoup de bruit. Notre libération.</text>
+</string>
+<string id="talking_dolg_with_killers_2_text">
+	<text>Argent à l'avance. Nous sommes des gens d'affaires, rien de personnel. Première argent, alors un prisonnier.</text>
+</string>
+<string id="talking_dolg_with_killers_3_text">
+	<text>Je pense que vous êtes allé trop à l'achat.</text>
+</string>
+<string id="talking_dolg_with_killers_4_text">
+	<text>Que pensez-vous ce ne est pas notre problème. Obtenez un captif libre que démonté dans un sac en plastique.</text>
+</string>
+<string id="talking_dolg_with_killers_5_text">
+	<text>Vous ohreneli il tout à fait oublié à qui se adresser? La libération immédiate de notre monde et de se disperser!</text>
+</string>
+<string id="talking_dolg_with_killers_6_text">
+	<text>Cas claires conduisent à vous travaillez pas. Ne vous inquiétez pas, la suite sera plus intelligent. Groupe, tirer pour tuer!</text>
+</string>
+<string id="thanks_of_dolg_on_sdelka_text">
+	<text>Merci, harceleur qui nous couvrait. Sans vous couvrir.</text>
+</string>
+<string id="prisoner_map_mark_text">
+	<text>Captif</text>
+</string>
+<string id="captive_on_agr_mill_base_shutdown_news_text">
+	<text>Attention, les harceleurs! Dit le barman. Les circonstances sont telles que nous devons désactiver le harceleur de réseau. Approximative panne de communication - deux jours.</text>
+</string>
+<string id="spawn_feedomer_on_radar_text">
+	<text>Hélicoptère</text>
+</string>
+<string id="mil_guid_feedomer_to_base_text">
+	<text>Merci de m'avoir accompagné, le Tatoué. Quand j'aurai déchiffré les données de la boîte, je n'oublierai pas de t'envoyer les résultats.</text>
+</string>
+<string id="btr_error_1_text">
+	<text>ERR 0000:0000 CPU_FAULT</text>
+</string>
+<string id="btr_error_2_text">
+	<text>DEVICE ERROR</text>
+</string>
+<string id="btr_error_3_text">
+	<text>SYSTEM FAULT</text>
+</string>
+<string id="btr_error_power_offline_text">
+	<text>Batterie presque morte</text>
+</string>
+<string id="ds_get_btr_for_freedom_quest_info_desc">
+	<text>Lukash a demandé de trouver le BTR de l' "Expédition perdue" dans la Ville-32 et de le livrer à la Barrière pour améliorer sa défense. Il promet une sérieuse récompense en échange. Il faudra probablement bricoler un peu, car il n'est pas sûr que le BTR soit en état de démarrer. Les membres survivants de l'expédition ont tenté de s'enfuir avec un hélicoptère de transport "Chinook" qui s'est apparemment écrasé. Il faut retrouver l'épave de l'hélico pour trouver les clés du BTR. Pour les questions techniques relatives au BTR, je dois m'adresser à Python, le technicien de la Liberté.</text>
+</string>
+<string id="ds_get_btr_for_freedom_talk_shurup_text">
+	<text>Négocier avec Python</text>
+</string>
+<string id="ds_get_btr_for_freedom_find_btr_text">
+	<text>Trouver l' "expédition perdue" et le BTR</text>
+</string>
+<string id="ds_get_btr_for_freedom_drive_to_barrier_text">
+	<text>Conduire le BTR jusqu'à la Barrière</text>
+</string>
+<string id="quest_btr_keys_name">
+	<text>Clé du BTR</text>
+</string>
+<string id="quest_btr_keys_desc">
+	<text>Clé électronique permettant d'ouvrir les portes du BTR</text>
+</string>
+<string id="ds_get_btr_for_freedom_keys_quest_desc">
+	<text>Pour entrer dans le BTR, je dois d'abord trouver sa clé. Python dit que les membres survivants de l'expédition ont essayé de s'enfuir un hélicoptère 'Chinook', mais qu'ils se sont écrasés. Je dois retrouver le lieu du crash, car un des membres de l'expédition avait peut-être la clé du BTR sur lui. Les corps devraient être intacts, car cet hélico est très résistant aux chocs.</text>
+</string>
+<string id="btr_quest_pilot_name">
+	<text>Trouver le conducteur du BTR</text>
+</string>
+<string id="btr_quest_commander_name">
+	<text>Colonel Sevastiyanov</text>
+</string>
+<string id="ds_get_btr_for_freedom_power_offline_quest_desc">
+	<text>L'inspection du BTR a révélé que la situation n'est pas fameuse - le véhicule est gravement endommagé, le carburant manque, il n'y a pas de courant, la batterie est probablement complètement déchargée. Il faut aller voir Python - le technicien de la Liberté, pour faire le point, parce que je ne sais pas quoi faire pour remettre en état cet engin.</text>
+</string>
+<string id="accum_depleted_name">
+	<text>Batterie de voiture déchargée</text>
+</string>
+<string id="accum_depleted_desc">
+	<text>Batterie de voiture à l'acide et au plomb tout à fait commune. Il faut la donner à Python pour qu'il la recharge.</text>
+</string>
+<string id="accum_full_name">
+	<text>Batterie de voiture chargée</text>
+</string>
+<string id="accum_full_desc">
+	<text>Batterie de voiture à l'acide et au plomb tout à fait commune. Python l'a rechargée complètement. Maintenant, elle peut être installée dans le BTR.</text>
+</string>
+<string id="ds_get_btr_for_freedom_get_accum_quest_desc">
+	<text>La batterie du BTR est complètement à plat et semble impossible à recharger. Je dois en trouver une autre. N'importe quelle batterie de voiture ferait l'affaire. Le meilleur endroit où en chercher une est la casse de véhicule de la Décharge. Mais comme ces voitures sont vieilles de plusieurs années, avant d'utiliser la batterie, je devrai probablement la donner à recharger à Python. Après quoi, je pourrai l'utiliser pour démarrer le BTR.</text>
+</string>
+<string id="zaberi_accum_screw">
+	<text>Vous avez repéré à proximité ? Pouvez-vous aller pour ramasser la batterie, fait tout, vérifié les travaux. Tension pour exécuter l'APC avec suffisamment de précision.</text>
+</string>
+<string id="ds_get_btr_for_freedom_computer_offline_quest_desc">
+	<text>Il semble que l'ordinateur est défectueux APC. Dans cet état, il ne est clairement pas adapté pour la bataille, vous avez besoin de parler avec les vis, il peut être possible de fixer une certaine manière il.</text>
+</string>
+<string id="btr_comp_full_name">
+	<text>Ordinateur de bord pour BTR de classe "gardien"</text>
+</string>
+<string id="btr_comp_full_desc">
+	<text>Caisse résistant aux chocs protégeant un ordinateur de bord.</text>
+</string>
+<string id="btr_upgrade_full_name">
+	<text>Améliorer l'ordinateur de bord pour BTR de classe "gardien"</text>
+</string>
+<string id="btr_upgrade_full_desc">
+	<text>Module informatique pour la tourelle de tir du BTR "gardien". Les cibles sont repérérées et indentifiées automatiquement et éliminées sur simple commande .</text>
+</string>
+<string id="ds_get_btr_for_freedom_computer_find_quest_desc">
+	<text>L'ordinateur de bord du BTR est défectueux et doit être remplacé. Python dit que la base militaire d'Agroprom a des BTR qui patrouillent régulièrement dans la zone. Il doit sûrement y avoir des pièces de rechange là-bas. Peut-être dans les garages des bêtiments. Mais je me souviens aussi avoir rencontré un marchand à Agroprom, celui qui refourgue du matériel militaire. Je devrai aller le voir, peut-être qu'il pourra me fournir un ordinateur de bord sans avoir à me battre avec toute la garnison.</text>
+</string>
+<string id="what_the_fuck_quest_text">
+	<text>La Mémoire retrouvée</text>
+</string>
+<string id="what_the_fuck_quest_text_quest_2_text">
+	<text>Trouver et détruire le laboratoire principal de la Conscience-C</text>
+</string>
+<string id="what_the_fuck_quest_text_quest_3_text">
+	<text>Pour éclaircir la situation, je dois parler avec le Marchand Obscur</text>
+</string>
+<string id="what_the_fuck_quest_info_desc">
+	<text>Par l'enfer ! Où est le véritable laboratoire de la Conscience-C ? Je dois comprendre ce qui se passe ici. Il pourrait être utile d'interroger le Marchand Obscur, après tout il dit me connaître sous le nom de Strelok, je dois clarifier ça.</text>
+</string>
+<string id="final_assemble_force_text">
+	<text>Préparer l'assaut contre le laboratoire de la Conscience-C</text>
+</string>
+<string id="final_assemble_force_2_text">
+	<text>Rassembler des forces pour l'assaut contre le laboratoire</text>
+</string>
+<string id="final_assemble_force_text_desc">
+	<text>Je connais l'emplacement du laboratoire de la Conscience-C, mais y aller tout seul serait du suicide. Il doit être protégé par des combattants d'élite du Monolithe surarmés. Je dois parler aux chefs des différentes factions pour obtenir leur soutien dans l'assault du complexe.</text>
+</string>
+<string id="final_assemble_force_dolg_text">
+	<text>Demander le soutien du Devoir</text>
+</string>
+<string id="final_assemble_force_freedom_text">
+	<text>Demander le soutien de la Liberté</text>
+</string>
+<string id="final_assemble_force_military_text">
+	<text>Demander le soutien des militaires</text>
+</string>
+<string id="pri_trader_come_in">
+	<text>%c[100,50,50,250] Qui je vois sur le réseau ?! Strelok, c'est toi ? T'es vivant ? Je n'y crois pas ! Viens vite me voir. Je te donne ma position sur ton PDA.%c[default]</text>
+</string>
+<string id="generators_timer_str">
+	<text>Temps de grève</text>
+</string>
+<string id="thunderbird_2h">
+	<text>Une émission va se produire dans environ deux heures.</text>
+</string>
+<string id="thunderbird_1h">
+	<text>Environ une heure avant l'émission.</text>
+</string>
+<string id="thunderbird_halfh">
+	<text>Il ne reste plus qu'une demi-heure avant l'émission!</text>
+</string>
+<string id="thunderbird_now">
+	<text>L'émission commence!</text>
+</string>

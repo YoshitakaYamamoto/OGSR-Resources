@@ -1,0 +1,234 @@
+--/ ui_ogse_exo_control.script /--
+--/ Exoskeleton control module /--
+--/ OGS Evolution Team 2010 /--
+--/ version 1.9 (27/03/2011) /--
+
+--/ Модуль монтируемых экзоскелетов /--
+
+local sys_ini = system_ini()
+local sim = alife()
+
+local exo_condition = 1.0
+local outfit_condition = 1.0
+
+-- Функции
+function use_exo(use_object)
+	if use_object == nil or alife():object(use_object:id()) == nil then return end
+	local use_obj_section = use_object:section()
+	if sys_ini:line_exist(use_obj_section, "exoskeleton_type") then
+		local exoskeleton_type = sys_ini:r_string(use_obj_section, "exoskeleton_type")
+		if exoskeleton_type then
+			local outfit_item = db.actor:item_in_slot(6)
+			if outfit_item and sim:object(outfit_item:id()) and
+				not sys_ini:line_exist(outfit_item:section(), "without_exoskeleton") and
+				sys_ini:line_exist(outfit_item:section(), exoskeleton_type) 
+				then
+				local outfit_with_exo_section = sys_ini:r_string(outfit_item:section(), exoskeleton_type)
+				if outfit_with_exo_section then
+					-- уф, прошли все проверки - конвертим
+					convert_outfit(outfit_item, outfit_with_exo_section)
+					exo_condition = use_object:condition()
+					outfit_condition = outfit_item:condition()
+					return
+				end
+			end
+		end
+		-- а если не получается сконвертировать, то вертаем броньку взад
+		ogse.spawn_item_in_inv(use_obj_section, db.actor)
+	end
+end
+
+exo_to_rust = nil
+exo_to_rust_condition = nil
+
+function detach_exo()
+	local outfit_item = db.actor:item_in_slot(6)
+	if outfit_item and sim:object(outfit_item:id()) then
+		local outfit_sec = outfit_item:section()
+		if sys_ini:line_exist(outfit_sec, "without_exoskeleton") and sys_ini:line_exist(outfit_sec, "exo_section") then
+			local outfit_without_exo_section = sys_ini:r_string(outfit_sec, "without_exoskeleton")
+			local exo_section = sys_ini:r_string(outfit_sec, "exo_section")
+			if outfit_without_exo_section and exo_section and can_detach_exo(outfit_sec) then
+				local s_exo = ogse.spawn_item_in_inv(exo_section, db.actor)
+				local c_exo = level.object_by_id(s_exo.id)
+				local exo_rusting = outfit_item:condition() / outfit_condition
+				if c_exo then
+					-- c_exo:set_condition(exo_condition * exo_rusting)	-- учтем, что состояние броньки уже было не идеальное, да еще мы попортили
+					exo_to_rust = s_exo.id
+					exo_to_rust_condition = exo_condition * exo_rusting
+					ogse.start_timer("ex1",1) 
+				end
+				convert_outfit(outfit_item, outfit_without_exo_section)
+			end
+		end
+	end
+end
+
+function convert_outfit(outfit, new_outfit_section)
+	local sobj = sim:object(outfit:id())
+	if sobj then
+		local outfit_condition = outfit:condition()
+		ogse_night_vision.set_exo_convert_flag(true)
+		db.actor:move_to_ruck(outfit)
+		sim:release(sobj, true)
+		local s_new_outfit = ogse.spawn_item_in_inv(new_outfit_section, db.actor)
+		outfit_spawn_watcher(s_new_outfit.id, outfit_condition):start()
+	end
+end
+
+class "outfit_spawn_watcher" (ogse_qt.quick_timer)
+
+function outfit_spawn_watcher:__init(id, condition_to_set) super()
+	self.id = id
+	self.cond = condition_to_set
+end
+function outfit_spawn_watcher:condition()
+	self.obj = level.object_by_id(self.id)
+	return (self.obj ~= nil)
+end
+function outfit_spawn_watcher:action()
+	self.obj:set_condition(self.cond)
+	ogse_night_vision.set_exo_convert_flag(false)
+end
+
+-- Открытие/закрытие инвентаря.
+
+function on_inventory_info(info_id)
+	if info_id == "ui_inventory" then
+		on_show()
+	end
+	if info_id == "no_net_signal" or info_id == "net_signal" then
+		set_actor_parameters()
+	end
+end
+
+function save()
+	ogse.save_variable("exo_condition", exo_condition)
+	ogse.save_variable("outfit_condition", outfit_condition)
+end
+
+function load()
+	exo_condition = tonumber(ogse.load_variable("exo_condition", 1.0))
+	outfit_condition = tonumber(ogse.load_variable("outfit_condition", 1.0))
+end
+
+class "exo_control" (CUIScriptWnd)
+
+function exo_control:__init() super()
+	local xml = CScriptXmlInit()
+	xml:ParseFile("ui_ogse_exo_control.xml")
+    self:Init(880, 264,32,32) -- само скриптовое окно размещаем там, где должна быть кнопка
+	self.btn = xml:Init3tButton("ui_ogse_exo_control", self) -- кнопка, ради которой всё и делается
+	self:Register(self.btn,"btn_exo_control")
+	self:AddCallback("btn_exo_control", ui_events.BUTTON_CLICKED, self.btn_action, self)
+	self:Show(true) -- без этого не увидим
+end
+function exo_control:AttachToInventory(inventory_window)
+	self.inv = inventory_window
+	inventory_window:AttachChild(self)
+end
+function exo_control:__finalize()
+	self.inv:DetachChild(self)
+end
+function exo_control:btn_action()
+	detach_exo()
+end
+
+local rec_wnd = exo_control() -- создаём один раз
+
+function on_show()
+	if not rec_wnd.inv then
+		rec_wnd:AttachToInventory(level.main_input_receiver())
+	end
+	chek_button_accessibility()
+end
+
+function can_detach_exo(outfit_sec)
+	local can_be_detached = true
+	if sys_ini:line_exist(outfit_sec, "can_detach_exo") then
+		can_be_detached = sys_ini:r_bool(outfit_sec, "can_detach_exo")
+	end
+	return can_be_detached
+end
+
+function chek_button_accessibility()
+	local outfit_item = db.actor:item_in_slot(6)
+	local enabled = 
+		outfit_item and sim:object(outfit_item:id()) and
+		sys_ini:line_exist(outfit_item:section(), "without_exoskeleton") and 
+		sys_ini:line_exist(outfit_item:section(), "exo_section") and
+		can_detach_exo(outfit_item:section())
+	rec_wnd.btn:Enable(enabled)
+end
+
+function set_actor_parameters()
+	if db.actor and db.actor:alive() then
+		local jump_speed = sys_ini:r_float("actor", "jump_speed")
+		local sprint_koef = sys_ini:r_float("actor", "sprint_koef")
+		local run_coef = sys_ini:r_float("actor", "run_coef")
+		local run_back_coef = sys_ini:r_float("actor", "run_back_coef")
+		local outfit_item = db.actor:item_in_slot(6)
+		local max_weight = sys_ini:r_float("inventory", "max_weight")
+		local max_walk_weight = sys_ini:r_float("actor_condition", "max_walk_weight")
+		local exo_used =
+			outfit_item and sim:object(outfit_item:id()) and
+			sys_ini:line_exist(outfit_item:section(), "exo_section")
+--		local condition_for_weight_calc
+		if outfit_item then			-- проверка нужна на время переодевания костюма
+			if exo_used then
+				local exo_section = sys_ini:r_string(outfit_item:section(), "exo_section")
+				if sys_ini:line_exist(exo_section, "jump_speed_dif") then
+					local jump_speed_dif = sys_ini:r_float(exo_section, "jump_speed_dif")
+					jump_speed = jump_speed+jump_speed_dif
+					if db.actor:has_info("no_net_signal") then
+						jump_speed = jump_speed*0.1
+					end
+				end
+				if sys_ini:line_exist(exo_section, "sprint_koef_dif") then
+					local sprint_koef_dif = sys_ini:r_float(exo_section, "sprint_koef_dif")
+					sprint_koef = sprint_koef+sprint_koef_dif
+					if db.actor:has_info("no_net_signal") then
+						sprint_koef = sprint_koef*0.9
+					end
+				end
+				if sys_ini:line_exist(exo_section, "run_coef_dif") then
+					local run_coef_dif = sys_ini:r_float(exo_section, "run_coef_dif")
+					run_coef = run_coef+run_coef_dif
+					if db.actor:has_info("no_net_signal") then
+						run_coef = run_coef*0.9
+					end
+				end
+				if sys_ini:line_exist(exo_section, "run_back_coef_dif") then
+					local run_back_coef_dif = sys_ini:r_float(exo_section, "run_back_coef_dif")
+					run_back_coef = run_back_coef+run_back_coef_dif
+					if db.actor:has_info("no_net_signal") then
+						run_back_coef = run_back_coef*0.9
+					end
+				end
+--[[				condition_for_weight_calc = exo_condition
+			else
+				condition_for_weight_calc = outfit_item:condition()]]
+			end
+			-- KD: отключено, т.к. неудобно в геймплейном плане.
+--[[			local sect = outfit_item:section()
+				-- это херня, что добавляемый вес не зависит от состояния экзы. исправим.
+			
+			if sys_ini:line_exist(sect, "additional_inventory_weight") then
+				local walk_weight = sys_ini:r_float(sect, "additional_inventory_weight")
+				max_walk_weight = max_walk_weight+walk_weight*(condition_for_weight_calc - 1)	-- движок тоже прибавляет вес, так что учтем это
+			end
+			if sys_ini:line_exist(sect, "additional_inventory_weight2") then
+				local weight = sys_ini:r_float(sect, "additional_inventory_weight2")
+				max_weight = max_weight+weight*(condition_for_weight_calc - 1)	-- движок тоже прибавляет вес, так что учтем это
+			end
+]]
+		end
+		
+		set_jump_speed(jump_speed)
+		set_sprint_factor(sprint_koef)
+		set_run_factor(run_coef)
+		set_run_back_factor(run_back_coef)
+		db.actor:set_actor_max_weight(max_weight)
+		db.actor:set_actor_max_walk_weight(max_walk_weight)
+	end
+end

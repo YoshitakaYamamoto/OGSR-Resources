@@ -1,0 +1,905 @@
+-- Схема поведения НПС при выбросе, попадании в псизоны и прилёте вертушек для OGSЕ --
+				--- включает Deadly Blowout by KamikaZze ----
+------ Copyright 2007-2008 DEXXX, 2009 KamikaZze, небольшие фрагменты Monnoroch ------
+
+property_base = 12221
+property_blowout = property_base+1
+property_hideout_lost = property_base+2
+property_inhide = property_base+3
+property_psyzoned = property_base+4
+--property_enemyactor = property_base+5
+act_base = 13332
+act_hideout = act_base+1
+act_psy_effect = act_base+2
+act_inhide = act_base+3
+act_psyzoned = act_base+4
+
+local debug_flag = false
+local restrictions_off = false
+
+local locked_vertexes 		= {}		-- занятые вертексы
+
+local npc_psy = {}
+local npc_run = {}
+local npc_sit = {}
+local npc_go = {}
+local die_counter = {}
+local scared = {}
+local heli_timers = {}
+local psi_timer = {}
+local zombietime = {}
+local check_timer = {}
+local in_psy = {}
+
+-- NPC, внесенные в эту табличку, не бегут в укрытия. Вносить name
+local nonehide_npc =
+{
+	["first_neutral"] = true,
+	["bar_sergant_jivoderov"] = true,
+	["dolg_palach1"] = true,
+	["dolg_palach2"] = true,
+	["izgioy_lider"] = true,
+	["izgoy_pomoshnik"] = true,
+	["izgoy_first_patient"] = true,
+	["izgoy_second_patient"] = true,
+	["garb_novice_arthunter"] = true,
+	["rad_company_mikluha"] = true,
+	["rad_company_che"] = true,
+	["rad_company_fidel"] = true,
+	["rad_company_markiz"] = true,
+	["rad_company_graf"] = true,
+	["rad_company_zahar"] = true,
+	["bar_kulg_agent"] = true,
+	["bar_dr_gorbovsky"] = true,
+	["dar_officer"] = true,
+	["dar_merk_guard_2"] = true,
+	["dar_merk_guard_1"] = true,
+	["dar_merk_bomber"] = true,
+	["dar_merk_lider"] = true,
+	["esc_lekar"] = true,
+	["bridge_lekar"] = true,
+	["hohol"] = true,
+	["esc_digger"] = true,
+	["ds_hunter"] = true,
+	["ds_glavar"] = true,
+	["esc_millitary_near_anomaly_1"] = true,
+	["esc_millitary_near_anomaly_2"] = true,
+	["esc_millitary_near_anomaly_3"] = true,
+	["esc_millitary_near_anomaly_commander"] = true,
+	["bratstvo_lider"] = true,
+	["bratstvo_orujeinik"] = true,
+	["bratstvo_vrach"] = true,
+	["bratstvo_cleaner"] = true,
+	["dik_the_drifter"] = true,
+	["bratstvo_agent_1"] = true,
+	["dar_gaz_dolg_lider"] = true,
+	["dar_gaz_dolg1"] = true,
+	["dar_gaz_dolg2"] = true,
+	["dar_gaz_dolg3"] = true,
+	["major_pomoshnik2"] = true,
+	["major_wounded"] = true,
+	["bar_arena_kaligula"] = true,
+	["mil_Svoboda_zombi_stalker"] = true,
+	["esc_starik_searcing_doch"] = true,
+	["caravan_loader"] = true,
+	["caravan_guard1"] = true,
+	["caravan_guard2"] = true,
+	["bar_sinyak"] = true,
+	["swamp_doctor"] = true,
+	["ros_soldier"] = true,
+	["yan_zombsoldier"] = true,
+	["yan_soldier"] = true,
+	["freezer_bandos"] = true,
+	["girl_pervert"] = true,
+	["human_pervert"] = true,
+	["bandit_trader"] =	true,
+	["bandit_trader_spawn"]	= true,		
+}
+
+function nearest_helicopter(npc, attack_dist_sqr)
+    local npc_position = npc:position()
+    for k,v in pairs(db.heli) do
+		local heli = v:get_helicopter()
+		local health = heli:GetfHealth()
+		if health < 0 then
+			health = 0
+		end		
+        if health > 0.005
+		and v:position():distance_to_sqr(npc_position) <= attack_dist_sqr 
+		and is_hostile(npc:character_community(),v) then
+            return true
+        end
+    end
+	return false
+end
+
+function can_be_afraid(npc)
+--- can be VERY afraid 8)
+if db.actor:dont_has_info("tutorial_end") then return false end
+local level_name = level.name()
+	if (level_name == "l03_agroprom")
+	or (level_name == "l10_radar")
+	or (level_name == "l12_stancia")
+	or (level_name == "l12_stancia_2")
+	or (level_name == "l04_darkvalley")
+	or (level_name == "l11_pripyat")
+	or (level_name == "l08_yantar")
+	or npc:character_community() == "monolith"
+	or npc:character_community() == "military"
+	or npc:character_community() == "killer"
+	or npc:character_community() == "ecolog"
+	or npc:character_community() == "zombied"
+	or string.find(npc:name(), "esc_tutorial")
+	or string.find(npc:name(), "esc_ranger")
+	then return false end
+	return true
+end
+
+--->> nice one, taken from Monnoroch AI
+
+function is_hostile(comm,target)
+	if IsMonster(target) then
+		return true
+	end
+	local t_comm_number = 1
+	local t_comm = "actor"
+	if IsStalker(target) then
+		t_comm = target:character_community()
+	elseif string.find(target:section(),"helicopter") then
+		if target:spawn_ini():line_exist("logic","community") then
+			t_comm = ini:r_string("logic","community")
+		else
+			t_comm = "military"
+		end
+	elseif string.find(target:name(),"btr") then
+		t_comm = "military"
+	end
+	local hostile_treshold = tonumber(system_ini():r_string("game_relations", "attitude_neutal_threshold"))
+	local comm_attitude = parse_data(system_ini():r_string("communities_relations", comm))
+	local comm_list = parse_data(system_ini():r_string("game_relations", "communities"))
+	for k,v in pairs (comm_list) do
+		if t_comm == tostring(v) then
+			t_comm_number = (k+1)/2
+			break
+		end
+	end
+	attitude = tonumber(comm_attitude[t_comm_number]) or -5000
+	return attitude < hostile_treshold
+end
+
+---<< from Monnoroch AI
+
+function is_specific_npc(npc)
+	if string.find(npc:name(),"esc_millitary_near_anomaly") and not ogse.has_info("esc_kvest_know_do_mils_near_anomaly_take_item") and not ogse.has_info("esc_kvest_know_do_mils_near_anomaly_complete") and not ogse.has_info("esc_kvest_know_do_mils_near_anomaly_fail") then
+		return true
+	end
+	if npc:story_id() == 34 or npc:story_id() == 35 or npc:story_id() == 38 then
+		return true
+	end
+	return false
+end
+
+--- Эта функция возвращает нам вертекс на точку для убегания из пси-зоны
+function escape_point(npc, center_id, position_id, radius, min_radius)
+
+	local pos = level.vertex_position(center_id+math.random(9000)-math.random(9000))
+
+    local i = 1
+    while(level.vertex_position(position_id):distance_to(pos) < min_radius and i < 20) do
+		pos = level.vertex_position(center_id+math.random(9000)-math.random(9000))
+        i = i + 1
+    end
+
+    return (pos)
+end
+
+local backup_restrictions_out = {}
+local backup_restrictions_in = {}
+
+function process_restrictions(npc)
+	local name = npc:name()
+	local profile = npc:profile_name()
+	
+	if restrictions_off then
+		return
+	end	
+	
+	local restr_out = npc:out_restrictions()
+	local restr_in = npc:in_restrictions()
+	
+	if not backup_restrictions_out[npc:id()] then
+		backup_restrictions_out[npc:id()] = restr_out
+		-- write_log("--OGSM_HIDEOUT: RESTRICTIONS_OUT BACKUP FOR "..npc:name().." : "..restr_out)
+	end
+	if not backup_restrictions_in[npc:id()] then
+		backup_restrictions_in[npc:id()] = restr_in
+		-- write_log("--OGSM_HIDEOUT: RESTRICTIONS_IN BACKUP FOR "..npc:name().." : "..restr_in)
+	end	
+	log1("[OGSE HIDEOUT] REMOVING ALL RESTRICTIONS FOR "..npc:name())
+	npc:remove_all_restrictions()
+end
+
+function clean_restrictions(str_restr)
+	local out_str_1 = ""
+	local out_str_2 = ""
+	local out_str_3 = ""
+	local out_str = str_restr
+	local result = 0
+	for k, v in pairs(excluded_restrictors) do
+		local pattern_1 = k..","
+		local pattern_2 = ","..k
+		local pattern_3 = k
+		out_str_1, result = string.gsub(out_str, pattern_1, "")
+		out_str = out_str_1
+		out_str_2, result = string.gsub(out_str_1, pattern_2, "")
+		out_str = out_str_2
+		out_str_3, result = string.gsub(out_str_2, pattern_3, "")
+		out_str = out_str_3
+	end
+	return out_str
+end
+
+function restore_restrictions(npc)
+
+	if restrictions_off then
+		return
+	end
+
+	if backup_restrictions_out[npc:id()] or backup_restrictions_in[npc:id()] then
+		log1("[OGSE HIDEOUT] REMOVING ALL RESTRICTIONS FOR "..npc:name())
+		npc:remove_all_restrictions()
+		local restr_out = clean_restrictions(backup_restrictions_out[npc:id()])
+		local restr_in = clean_restrictions(backup_restrictions_in[npc:id()])
+		log1("[OGSE HIDEOUT] ADDING IN RESTRICTIONS "..restr_in.." FOR "..npc:name())
+		log1("[OGSE HIDEOUT] ADDING OUT RESTRICTIONS "..restr_out.." FOR "..npc:name())
+		npc:add_restrictions(restr_out, restr_in)
+		-- write_log("--XRS_BATTLE_AI: RESTRICTIONS RESTORED FOR "..npc:name().." OUT: ["..restr_out.."] IN: ["..restr_in.."]")
+		backup_restrictions_out[npc:id()] = nil
+		backup_restrictions_in[npc:id()] = nil
+		
+		ogse.fix_restrictors(npc)
+	end
+end
+
+local count_update 			= 0	-- Счетчик апдейтов. Нельзя чтобы схема стартовала включенной сразу же, иначе 
+local engage_after_update 	= 10 -- будут глюки на переключении схем и выборе оружия
+
+-- Создаем эвалуатор - проверяем, начался ли выброс
+class "evaluator_blowout" (property_evaluator)
+function evaluator_blowout:__init(name, storage) super (nil, name)
+	self.st = storage
+end
+function evaluator_blowout:evaluate()
+
+	if count_update <= engage_after_update then
+		count_update = count_update + 1
+		return false
+	end
+	
+	if not heli_timers[self.object:id()] then heli_timers[self.object:id()] = time_global() end
+	
+	if nonehide_npc[self.object:name()] 
+	or xr_companion.is_companion(self.object:id())
+	or ogse_hideouts.check_not_need_hide(self.object)
+	then
+		return false
+	end
+		
+	if not self.object:best_enemy() and 
+	   (db.Flag2==1 or scared[self.object:id()] == true) and db.Dead2==0 and 
+--	   db.Flag2==1 and db.Dead2==0 and 
+	   not (level.name()=="l11_pripyat" and self.object:character_community() == "monolith") and
+	   not ogse_hideouts.npc_inside_safe_zone(self.object) then
+		if debug_flag then log1("!!BLOW_UNSAFE "..self.object:name()) end
+		self.st.blowout = true
+	else
+		if debug_flag then log1("--BLOW_SAFE "..self.object:name()) end
+		self.st.blowout = false
+	end
+	
+	if time_global() > heli_timers[self.object:id()] then
+		local attack_heli = 40000
+		self.st.heli = nearest_helicopter(self.object, attack_heli)
+		if self.st.heli == true and can_be_afraid(self.object) then
+			scared[self.object:id()] = true
+			heli_timers[self.object:id()] = time_global() + 30000
+		else	
+			scared[self.object:id()] = false
+			heli_timers[self.object:id()] = time_global() + 2000
+		end
+	end
+	
+	if self.st.blowout == true then
+		ogse_debug.add_active_eval( self.object, script_name(), "blowout" )
+	else
+		if not has_alife_info("blowout") and 
+		not has_alife_info("pre_blowout") and 
+		not has_alife_info("pre_blowout2")  then
+			restore_restrictions(self.object)
+			locked_vertexes 		= {}
+		end
+	end
+	return self.st.blowout == true
+end
+
+-- Создаем эвалуатор - проверяем, потерял ли непись укрытие
+class "evaluator_hideout" (property_evaluator)
+function evaluator_hideout:__init(name, storage) super (nil, name)
+	self.st = storage
+end
+function evaluator_hideout:evaluate()
+
+	if count_update <= engage_after_update then
+		return false
+	end
+
+	if nonehide_npc[self.object:name()] 
+	or xr_companion.is_companion(self.object:id()) 
+	or ogse_hideouts.check_not_need_hide(self.object)	
+	then
+		return false
+	end
+
+	if db.Dead2==1 and not ogse_hideouts.npc_inside_safe_zone(self.object) then
+		if debug_flag then log1("!!BLOW_HIDEOUT_LOST "..self.object:name()) end
+		self.st.hideout_lost = true
+	else
+		if debug_flag then log1("--BLOW_HIDEOUT_HAVE "..self.object:name()) end
+		self.st.hideout_lost = false
+	end
+	if self.st.hideout_lost == true then
+		ogse_debug.add_active_eval( self.object, script_name(), "hideout" )
+	end	
+	return self.st.hideout_lost == true
+end
+
+-- Создаем эвалуатор - проверяем, сидит ли уже непись в укрытии
+class "evaluator_inhide" (property_evaluator)
+function evaluator_inhide:__init(name, storage) super (nil, name)
+	self.st = storage
+end
+function evaluator_inhide:evaluate()
+
+	if count_update <= engage_after_update then
+		return false
+	end
+
+	if nonehide_npc[self.object:name()] 
+	or xr_companion.is_companion(self.object:id()) 
+	or ogse_hideouts.check_not_need_hide(self.object)	
+	then	
+		return false
+	end
+
+	if self.object:best_enemy() then
+		local be = self.object:best_enemy()
+		if be:alive() then
+			if debug_flag then log1("!!BLOW_INHIDE_ENEMY "..self.object:name()) end
+			return false
+		end
+	end
+	if (db.Flag2==1 or scared[self.object:id()] == true) and ogse_hideouts.npc_inside_safe_zone(self.object) then
+--	if db.Flag2==1 and ogse_hideouts.npc_inside_safe_zone(self.object) then
+		if debug_flag then log1("--BLOW_IN_HIDE "..self.object:name()) end
+		self.st.inhide = true
+	else
+		if debug_flag then log1("!!BLOW_NOT_IN_HIDE "..self.object:name()) end
+		self.st.inhide = false
+	end
+	if self.st.inhide == true then
+		ogse_debug.add_active_eval( self.object, script_name(), "inhide" )
+	end
+	return self.st.inhide == true
+end 
+
+-- << Добавлено Kamikazze - этот эвалуатор определяет, не попали ли мы пси-аномалию
+class "evaluator_psyzoned" (property_evaluator)
+function evaluator_psyzoned:__init(name, storage) super (nil, name)
+	self.st = storage
+end
+function evaluator_psyzoned:evaluate()
+
+	local enabled = false
+	if not enabled then return false end -- выбегание из пси-зон отключено. Не нужно.
+
+	if count_update <= engage_after_update then
+		return false
+	end
+
+	if not check_timer[self.object:id()] then check_timer[self.object:id()] = time_global() end
+	
+	if nonehide_npc[self.object:name()] 
+	or ogse.is_quest_npc(self.object)
+	or xr_companion.is_companion(self.object:id()) 
+	or ogse_hideouts.check_not_need_hide(self.object)	
+	then
+		return false
+	end	
+
+	self.st.psyzoned = false
+	if has_alife_info("blowout") then return self.st.psyzoned end
+	if ogsm_respawn.psy_list then
+		for k, v in pairs(ogsm_respawn.psy_list) do
+			local psy_zn = db.zone_by_name[v:name()]
+			if psy_zn 
+			and self.object 
+			and self.object:character_community() ~= "zombied" 
+			and self.object:character_community() ~= "ecolog" 
+			and self.object:character_community() ~= "monolith"  then
+				if psy_zn:inside(self.object:position()) then
+					self.st.psyzoned = true
+				end
+			end
+		end
+	end	
+
+	if time_global() > check_timer[self.object:id()] then
+		if self.st.psyzoned == true then
+			in_psy[self.object:id()] = true
+			check_timer[self.object:id()] = time_global() + 5000
+		else	
+			in_psy[self.object:id()] = false
+			check_timer[self.object:id()] = time_global() + 1000
+			zombietime[self.object:id()] = nil
+			psi_timer[self.object:id()] = nil
+		end
+	end
+
+	if in_psy[self.object:id()] and in_psy[self.object:id()] == true then
+		ogse_debug.add_active_eval( self.object, script_name(), "psyzoned" )
+	end	
+	return in_psy[self.object:id()] == true
+end 
+
+-- Создаем оператор - направляем НПС в укрытие
+class "action_hideout" (action_base)
+function action_hideout:__init(name, storage) super (nil, name)
+	self.st = storage
+end
+function action_hideout:initialize()
+	action_base.initialize(self)
+	local npc = self.object
+	self.hide = ogsm_respawn.get_nearest_hide(npc)
+	self.st.dest_lvid = nil
+	self.st.deadman = 0
+	if self.hide then
+		-- есть укрытие
+		process_restrictions(npc)
+		self.st.dest_lvid = self.hide.obj:level_vertex_id()
+		if npc:accessible(self.st.dest_lvid) then
+			npc:movement_enabled(true)
+			npc:clear_animations()
+			xr_sound.set_sound(npc, nil)
+			stop_play_sound(npc)
+			npc_run[npc:id()] = 1
+		-- else
+			-- if debug_flag then log1("!!BLOW_CANNOT_REACH_HIDE "..self.object:name()) end
+			-- self.st.deadman = 1
+		end
+	else
+		-- нет укрытия
+		if debug_flag then log1("!!BLOW_CANNOT_FIND_HIDE "..self.object:name()) end
+		self.st.deadman = 1
+	end
+end
+function action_hideout:execute()
+	action_base.execute(self)
+	local npc = self.object
+	npc:disable_talk()
+	if self.st.deadman == 0 then
+		local dist = npc:position():distance_to(self.hide.obj:position())
+		npc:set_detail_path_type(move.curve)
+		npc:set_path_type(game_object.level_path)
+		npc:set_desired_direction()
+		npc:set_desired_position()
+		if dist > tonumber(self.hide.rad) then
+			utils.send_to_nearest_accessible_vertex(npc, self.st.dest_lvid)
+			state_mgr.set_state( script_name(), npc, "assault")
+		end
+	else
+		npc:set_desired_direction()
+		npc:set_desired_position()	
+		state_mgr.set_state( script_name(), npc, "hide")
+	end
+end
+function action_hideout:finalize()
+	action_base.finalize(self)
+	local npc = self.object
+	npc_run[npc:id()] = 0
+end
+
+-- Создаем оператор - колбасим НПС, если он не нашел укрытие
+class "action_raskolbas" (action_base)
+function action_raskolbas:__init(name, storage) super (nil, name)
+	self.st = storage
+end
+function action_raskolbas:initialize()
+	local npc = self.object
+	xr_sound.set_sound(npc, nil)
+	stop_play_sound(npc)	
+	npc:set_desired_position()
+	npc:set_desired_direction()
+	npc:clear_animations()
+	local ran = math.random(1,2)		
+	if npc_psy[npc:id()] ~= 1 then
+		if npc:character_community() == "monolith" then
+			state_mgr.set_state( script_name(), npc, "trans_1")
+		else
+			if ran == 1 then
+			--	state_mgr.set_state( script_name(), npc, "psycho_pain")
+				state_mgr.set_state( script_name(), npc, "psy_pain")
+			else
+				state_mgr.set_state( script_name(), npc, "psy_pain")
+			end
+		end
+		npc_psy[npc:id()] = 1
+	end
+end
+function action_raskolbas:execute()
+	local npc=self.object
+	local level_name = level.name()
+	npc:disable_talk()
+	--- Deadly Blowout by KamikaZze ----
+		 if not die_counter[npc:id()] or die_counter[npc:id()] == false then
+			if not isIndoor(level_name) then
+				 if math.random(0,100) > 33 then
+					 local blow = hit()
+					 blow.direction = vector():set(0,0,0)
+					 blow.impulse = 0
+					 blow.draftsman = npc
+					 blow.power = ogse.level_blow_damage(level_name)*ogse.armor_type(npc)
+					 blow.type = hit.explosion
+					 if not ogse.is_quest_npc(npc) then
+						npc:hit(blow)
+					 end
+					 die_counter[npc:id()] = true					
+				 else	
+					if level_name ~= "l05_bar" and level_name ~= "l01_escape" then
+						if not ogse.is_quest_npc(npc) and not ((level_name == "l07_military") and (npc:character_community() == "freedom")) then
+							npc:set_character_community("zombied",0,0)
+						end
+						die_counter[npc:id()] = true	
+					else	 
+						die_counter[npc:id()] = true
+					end
+				 end
+			end
+		end
+	--- Deadly Blowout by KamikaZze ----
+end
+function action_raskolbas:finalize()
+	action_base.finalize(self)
+	local npc = self.object
+	npc_psy[npc:id()] = 0
+	die_counter[npc:id()] = 0
+end
+
+function check_vertex_locked(npc, vertex)
+	for k, v in pairs(locked_vertexes) do
+		if v == vertex and k ~= npc:id() then
+			return true
+		end
+	end
+	return false
+end
+
+function find_free_vtx(vid, npc)
+	local flag_locked = 0
+	for k, v in pairs(locked_vertexes) do
+		if v == vid and k ~= npc:id() then
+			flag_locked = 1 -- ищем другой
+		end	
+	end
+	if flag_locked == 0 then
+		locked_vertexes[npc:id()] = vid
+		return vid
+	else
+		local node_1_vertex_id = nil
+		local node_1_distance = nil
+		local node_2_vertex_id = nil
+		local node_2_distance = nil	
+		local around_vertex = vid
+		local random_offset_1 = math.random(1, 3)
+		local random_offset_2 = math.random(1, 3)	
+		local counter = 0
+		while node_1_vertex_id == nil do
+			-- проверяем точку слева
+			local desired_direction = vector_rotate_y(vector():set(0,0,0), math.random(45,120) )
+			node_1_vertex_id = level.vertex_in_direction(around_vertex,
+				desired_direction,
+				random_offset_1 )
+			if npc:accessible(node_1_vertex_id) ~= true or node_1_vertex_id == around_vertex or check_vertex_locked(npc, node_1_vertex_id) then
+				node_1_vertex_id = nil
+			end
+			counter = counter + 1
+			if counter > 100 then
+				break
+			end
+		end		
+		counter = 0
+		while node_2_vertex_id == nil do
+			-- проверяем точку справа
+			local desired_direction = vector_rotate_y(vector():set(0,0,0), -math.random(45,120) )
+			node_2_vertex_id = level.vertex_in_direction (  around_vertex,
+				desired_direction,
+				random_offset_2 )
+			if npc:accessible(node_2_vertex_id) ~= true or node_2_vertex_id == around_vertex or check_vertex_locked(npc, node_2_vertex_id) then	
+				node_2_vertex_id = nil
+			end
+			counter = counter + 1
+			if counter > 100 then
+				break
+			end		
+		end
+		-- Проверяем растояния до точек
+		if node_1_vertex_id ~= nil then
+			node_1_distance = npc:position():distance_to_sqr(level.vertex_position(node_1_vertex_id))
+		else
+			node_1_distance = -1
+		end
+		if node_2_vertex_id ~= nil then
+			node_2_distance = npc:position():distance_to_sqr(level.vertex_position(node_2_vertex_id))
+		else
+			node_2_distance = -1
+		end
+		-- Выбираем ближайшую из существующих
+		if node_1_distance == -1 and node_2_distance == -1 then
+			if vid then return vid else return npc:level_vertex_id() end			
+		end
+		if node_1_distance == -1 then
+			locked_vertexes[npc:id()] = node_2_vertex_id
+			return node_2_vertex_id
+		end
+		if node_2_distance == -1 then
+			locked_vertexes[npc:id()] = node_1_vertex_id
+			return node_1_vertex_id
+		end
+		if node_1_distance < node_2_distance then
+			locked_vertexes[npc:id()] = node_1_vertex_id
+			return node_1_vertex_id
+		else
+			locked_vertexes[npc:id()] = node_2_vertex_id
+			return node_2_vertex_id
+		end		
+	end
+	if vid then return vid else return npc:level_vertex_id() end
+end
+
+-- Создаем оператор - усаживаем НПС, если он нашел укрытие
+class "action_inhide" (action_base)
+function action_inhide:__init(name, storage) super (nil, name)
+	self.st = storage
+end
+function action_inhide:initialize()
+	local npc = self.object
+	xr_sound.set_sound(npc, nil)
+	stop_play_sound(npc)	
+	npc:set_desired_position()
+	npc:set_desired_direction()
+	npc:clear_animations()
+	npc:set_detail_path_type(move.line)
+	npc:set_path_type(game_object.level_path)
+	self.hide = ogsm_respawn.get_nearest_hide(npc)
+	if self.hide then 
+		self.vertex = self.hide.obj:level_vertex_id()
+		self.offset = vector():set(math.random()*3-1, 0, math.random()*3-1)
+		self.offset:normalize()
+		if self.hide.rad and tonumber(self.hide.rad) > 2 then
+			self.radius = math.random(1, self.hide.rad)
+		else
+			self.radius = 1
+		end
+		self.lvid = npc:vertex_in_direction(self.vertex, self.offset, self.radius)
+		self.lvid = find_free_vtx(self.lvid, npc)
+		if npc:level_vertex_id() ~= self.lvid then
+			state_mgr.set_state( script_name(), npc,"patrol")
+			utils.send_to_nearest_accessible_vertex(npc, self.lvid) 
+		else
+			state_mgr.set_state( script_name(), npc,"hide")
+		end
+	else
+		state_mgr.set_state( script_name(), npc,"hide")
+	end
+end
+function action_inhide:execute()
+	local npc = self.object
+	npc:disable_talk()
+	if not self.lvid or self.lvid == nil then
+		self.lvid = npc:level_vertex_id()
+		log1("WARNING: NPC ["..npc:name().."] cannot find it's self.lvid")
+		-- abort("ogsm_hideout: self.lvid is nil for "..npc:name())
+	end
+	if npc:level_vertex_id()~=self.lvid then
+		if npc_go[npc:id()]~=1 then
+			state_mgr.set_state( script_name(), npc,"raid")
+			utils.send_to_nearest_accessible_vertex(npc, self.lvid) 
+			npc_go[npc:id()] = 1
+			npc_sit[npc:id()] = 0
+		end
+	else
+		if npc_sit[npc:id()]~=1 then
+			if npc:character_community()=="monolith" then
+				state_mgr.set_state( script_name(), npc,"trans_0")				
+			else
+				state_mgr.set_state( script_name(), npc,"hide")
+			end
+			npc_sit[npc:id()] = 1
+			npc_go[npc:id()] = 0
+		end
+	end
+end
+function action_inhide:finalize()
+	action_base.finalize(self)
+	local npc = self.object
+	npc_sit[npc:id()] = 0
+	npc_go[npc:id()] = 0
+end
+
+-- << Добавлено Kamikazze - это действие определяет, что мы делаем в пси-аномалии
+--- TODO: Переключить на out-рестриктор
+class "action_escape" (action_base)
+function action_escape:__init(name, storage) super (nil, name)
+	self.st = storage
+end
+function action_escape:initialize()
+	action_base.initialize(self)
+	local npc = self.object
+	if not zombietime[npc:id()] then
+		zombietime[npc:id()] = time_global() + 30000
+	end
+	if not psi_timer[npc:id()] then
+		psi_timer[npc:id()] = time_global() + 4000
+	end		
+	self.vertex = npc:level_vertex_id()
+	if not self.lvid then
+		self.lvid = escape_point(npc, self.vertex, self.vertex, 40, 25)
+	end
+end
+function action_escape:execute()
+	action_base.execute(self)
+	local npc = self.object
+	local uptime = time_global()
+	local timer = time_global()
+	if not zombietime[npc:id()] then
+		zombietime[npc:id()] = time_global() + 30000
+	end	
+	npc:clear_animations()
+	if npc:animation_count()>0 then return end
+	npc:set_movement_type(move.run)
+	npc:set_body_state(move.standing)
+	npc:movement_enabled(true)
+	npc:set_mental_state(anim.panic)
+	npc:disable_talk()
+	if (uptime and zombietime[npc:id()]) and uptime < zombietime[npc:id()] then
+		if npc:level_vertex_id() == self.lvid or (timer and timer > psi_timer[npc:id()]) then
+			--state_mgr.set_state( script_name(), npc,"assault")					
+			self.vertex = npc:level_vertex_id()
+			self.lvid = escape_point(npc, self.vertex, self.vertex, 40, 25)
+			utils.send_to_nearest_accessible_vertex(npc, self.lvid) 
+			psi_timer[npc:id()] = time_global() + 4000
+		else	
+			--state_mgr.set_state( script_name(), npc,"assault")	
+			utils.send_to_nearest_accessible_vertex(npc, self.lvid) 
+		end
+	else
+		if not ogse.is_quest_npc(npc) then
+			npc:set_character_community("zombied",0,0)
+			log1("[OGSE HIDEOUT] REMOVING ALL RESTRICTIONS FOR "..npc:name())
+			npc:remove_all_restrictions()
+		end
+	end
+end
+function action_escape:finalize()
+	local npc = self.object
+	npc:set_mental_state(anim.danger)
+	action_base.finalize(self)
+end
+
+
+-- Добавляем в планировщик нашу схему
+function add_to_binder(object, char_ini, scheme, section, st)
+	local manager = object:motivation_action_manager()
+	local property_wounded = xr_evaluators_id.sidor_wounded_base
+	
+	local state_mgr_to_idle_combat 	= xr_actions_id.state_mgr + 1
+	local state_mgr_to_idle_alife 	= xr_actions_id.state_mgr + 2	
+
+	manager:remove_evaluator(property_blowout)
+	manager:add_evaluator(property_blowout, evaluator_blowout("evaluator_blowout", st))
+
+	manager:remove_evaluator(property_hideout_lost)
+	manager:add_evaluator(property_hideout_lost, evaluator_hideout("evaluator_hideout", st))
+
+	manager:remove_evaluator(property_inhide)
+	manager:add_evaluator(property_inhide, evaluator_inhide("evaluator_inhide", st))
+
+	manager:remove_evaluator(property_psyzoned)
+	manager:add_evaluator(property_psyzoned, evaluator_psyzoned("evaluator_psyzoned", st))	
+	
+	-- manager:remove_evaluator(property_enemyactor)
+	-- manager:add_evaluator(property_enemyactor, evaluator_enemyactor("evaluator_enemyactor", st))		
+
+	local action = action_hideout("action_hideout", st)
+	action:add_precondition(world_property(stalker_ids.property_alive, true))
+	action:add_precondition(world_property(property_wounded, false))
+	action:add_precondition(world_property(stalker_ids.property_enemy, false))
+	action:add_precondition(world_property(stalker_ids.property_danger, false))
+	action:add_precondition(world_property(property_hideout_lost, false))
+	action:add_precondition(world_property(property_inhide, false))
+	action:add_precondition(world_property(property_psyzoned, false))
+	action:add_precondition(world_property(property_blowout, true))
+	action:add_effect(world_property(property_blowout, false))
+	manager:add_action(act_hideout, action)
+
+	local action = action_raskolbas("action_raskolbas", st)
+	action:add_precondition(world_property(stalker_ids.property_alive, true))
+	action:add_precondition(world_property(property_wounded, false))
+	action:add_precondition(world_property(property_blowout, false))
+	action:add_precondition(world_property(property_inhide, false))
+	action:add_precondition(world_property(property_psyzoned, false))
+	action:add_precondition(world_property(property_hideout_lost, true))
+	action:add_effect(world_property(property_hideout_lost, false))
+	manager:add_action(act_psy_effect, action)
+
+	local action = action_inhide("action_inhide", st)
+	action:add_precondition(world_property(stalker_ids.property_alive, true))
+	action:add_precondition(world_property(property_wounded, false))
+	action:add_precondition(world_property(stalker_ids.property_enemy, false))
+	action:add_precondition(world_property(stalker_ids.property_danger, false))
+	action:add_precondition(world_property(property_blowout, false))
+	action:add_precondition(world_property(property_hideout_lost, false))
+	action:add_precondition(world_property(property_psyzoned, false))
+	action:add_precondition(world_property(property_inhide, true))
+	action:add_effect(world_property(property_inhide, false))
+	manager:add_action(act_inhide, action)
+
+	local action = action_escape("action_escape", st)
+	action:add_precondition(world_property(stalker_ids.property_alive, true))
+	action:add_precondition(world_property(property_wounded, false))	
+	action:add_precondition(world_property(property_blowout, false))
+	action:add_precondition(world_property(property_hideout_lost, false))	
+	action:add_precondition(world_property(property_psyzoned, true))
+	action:add_effect(world_property(property_psyzoned, false))
+	manager:add_action(act_psyzoned, action)	
+	
+	action = manager:action(stalker_ids.action_alife_planner)
+	action:add_precondition(world_property(property_blowout, false))
+	action:add_precondition(world_property(property_hideout_lost, false))
+	action:add_precondition(world_property(property_inhide, false))
+	action:add_precondition(world_property(property_psyzoned, false))
+
+	action = manager:action(stalker_ids.action_combat_planner)
+	action:add_precondition(world_property(property_hideout_lost, false))
+	action:add_precondition(world_property(property_psyzoned, false))
+
+	action = manager:action(stalker_ids.action_danger_planner)
+	action:add_precondition(world_property(property_blowout, false))
+	action:add_precondition(world_property(property_inhide, false))
+	action:add_precondition(world_property(property_hideout_lost, false))
+	action:add_precondition(world_property(property_psyzoned, false))
+	
+	action = manager:action(state_mgr_to_idle_alife)
+	action:add_precondition(world_property(property_blowout, false))
+	action:add_precondition(world_property(property_inhide, false))
+	action:add_precondition(world_property(property_hideout_lost, false))
+	action:add_precondition(world_property(property_psyzoned, false))
+
+end
+
+
+-- Функции включения/выключения схемы
+function enable_scheme(npc, ini)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, "ogsm_hideout")
+	st.enabled=true
+end
+function disable_scheme(npc, scheme)
+	local st = db.storage[npc:id()][scheme]
+	if st then
+		st.enabled = false
+	end
+end
+
+
+-- Схема поведения НПС при выбросе, попадании в псизоны и прилёте вертушек для OGSЕ --
+				--- включает Deadly Blowout by KamikaZze ----
+---------------- Copyright 2007-2008 DEXXX, 2009 KamikaZze ----------------------

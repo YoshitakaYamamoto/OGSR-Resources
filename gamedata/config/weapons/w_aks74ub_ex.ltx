@@ -1,0 +1,664 @@
+;-----------------------------------------------------------------------------------
+;Сменные аддоны ОГСЕ
+;-----------------------------------------------------------------------------------
+;управляемые В СЕКЦИЯХ АДДОНОВ кости (64=54+5s+3m+2d) АКС74УН3 с привязкой by k01jan:
+;wpn_body				патрон в стволе
+;  wpn_grenade_launcher затыльник от ГП-25
+;  wpn_silencer			ПБС-4
+;  wpn_scope			- (движковая, д/б пустая)
+;  mag					- пустая, анимированная
+;  	ammo				2 патрона в магазине (скрытА при разряжании, виднА при заряжании)
+;  	mag: m1		рог 30 АК74
+;  	mag: m2		рог 45 РПК74
+;  	mag: m3		рог 60 АК105
+;  muzzle		щека СВД
+;  d2			планка "ласточкин хвост"
+;  s1			1П29 (УСП-1 "Тюльпан") х4
+;  s2			ЭКП-8М-01 "Кобра" х1
+;  s3			1ПН51 (НСПУ-3 "Казуар") х3,46
+;  d1			планка МТК-83 (кронштейн-переходник "ласточкин хвост"/Picatinny rail) 
+;  s4			ACOG TA31-CH х4
+;  s5			EOTech  552.A65 х1
+;-----------------------------------------------------------------------------------
+;материал: МИР объект-large_weapon
+;-----------------------------------------------------------------------------------
+;шейдеры:
+;lens_scope1 непрозрачная линза acog - ХУД модель-weapons / МИР модель-weapons
+;
+;collimator_metka0 первая линза Кобры - прозрачная с меткой (сменная) ХУД худ-reddotsight1 / МИР 
+;collimator_lens01 вторая линза Кобры - полупрозрачная круглая зелёная ХУД модель-transparent / МИР 
+;
+;lens_eotech первая линза EOTech - прозрачная с меткой ХУД худ-reddotsight1 / МИР 
+;collimator_linza0 вторая линза EOTech - полупрозрачная квадратная серая ХУД модель-transparent / МИР 
+;
+;-----------------------------------------------------------------------------------
+;текстуры:
+;act_arm_1_exo.dds	стандартные руки ЗП (стандартные руки ТЧ act_arm_perchatka/act_arm_perchatka_black)
+;act_arm_5.dds		стандартные рукава ЗП act_arm_х.dds (до 7?), Руки act_arm_perchatki.dds или рукава act_arm_perchatki_cs.dds
+;-----------------------------------------------------------------------------------
+
+; базовая секция
+[wpn_aks74ub_base]:wpn_aks74ub
+scope_status			= 0
+silencer_status			= 2
+grenade_launcher_status	= 0
+scope_mount_status		= 0
+grip_status				= 0
+magazine_status			= 2
+script_binding  = ogse_bind_weapon.init
+;скрытые (управляемые) кости: d2, d1, s1, s2, s3, s4, s5, m1, m2, m3, muzzle
+;нет (апгрейд ремонтника?) боковой прицельной планки "ласточкин хвост" - d2 надо ВСЕГДА скрывать
+managed_bones = d2, d1, s1, s2, s3, s4, s5, m1, m2, m3, muzzle
+;не надо своего описания description = "АКС74У БАЗА"
+cost					= 4000
+hud = wpn_aks74ub_base_hud
+
+[wpn_aks74ub_base_hud]:wpn_aks74ub_hud
+
+;-----------------------------------------------------------------------------------
+; базовая секция c планкой "ласточкин хвост"
+[wpn_aks74ub_base1]:wpn_aks74ub_base
+scope_status			= 2
+scope_mount_status		= 2
+;установлена боковая прицельная планка "ласточкин хвост" (d2 надо ВСЕГДА показывать)
+managed_bones = d1, s1, s2, s3, s4, s5, m1, m2, m3, muzzle
+description				= enc_weapons1_wpn-aks74ubn3
+inv_name	        	= wpn-aks74ubn3
+inv_name_short			= wpn-aks74ubn3_s
+cost					= 5000
+hud = wpn_aks74ub_base1_hud
+
+[wpn_aks74ub_base1_hud]:wpn_aks74ub_base_hud
+
+;-----------------------------------------------------------------------------------
+;без магазина
+[wpn_aks74ub_nomag_hud]:wpn_aks74ub_base_hud
+anim_reload					= idle
+anim_reload_gl				= idle_w_gl
+
+;-----------------------------------------------------------------------------------
+;четырёхрядный магазин 60 АК105
+[wpn_aks74ub_buben_hud]:wpn_aks74ub_base_hud
+anim_idle					= idle_drumm
+anim_idle_aim				= idle_aim_drumm
+anim_reload					= reload_drumm
+anim_draw					= draw_drumm
+anim_holster				= holster_drumm
+anim_shoot					= shoot_drumm
+anim_idle_sprint			= idle_sprint_drumm
+anim_idle_g					= idle_grenade_drumm
+anim_idle_g_aim				= idle_grenade_aim_drumm
+anim_reload_g				= reload_grenade_drumm
+anim_shoot_g				= shoot_grenade_drumm
+anim_switch_grenade_on		= switch_on_drumm
+anim_switch_grenade_off		= switch_off_drumm
+anim_draw_g					= draw_grenade_drumm
+anim_holster_g				= holster_grenade_drumm		;не работает? при убирании с активным подстволом, пригрывается holster (левая рука берётся за цевьё ЧЕРЕЗ подствольник)
+anim_idle_gl				= idle_w_gl_drumm
+anim_idle_gl_aim			= idle_w_gl_aim_drumm
+anim_reload_gl				= reload_w_gl_drumm			;++левой
+anim_draw_gl				= draw_w_gl_drumm
+anim_holster_gl				= holster_w_gl_drumm
+anim_shoot_gl				= shoot_w_gl_drumm
+
+;-----------------------------------------------------------------------------------
+; ТЕСТ прицеливания подствольником с прицелом: -работает, даже если НЕ одет прицел!
+[wpn_aks74ub_gl_scope_hud]:wpn_aks74ub_base_hud
+
+;-----------------------------------------------------------------------------------
+; служебные секции описателей прицелов
+
+; штатный механический прицел (пока не задействован)
+[aks74ub_ironsight]
+;force_remove_texture = true
+;показываемые кости, был пустой, залочен (здесь НЕ работает?) bones = 
+;смещение ствола при прицеливании: лево/право,верх/низ,от/к себя(е)
+;zoom_offset				= -0.112840,0.031250,-0.158000
+
+zoom_offset			= -0.168800,0.059450,-0.223100
+zoom_rotation		= 0.043400,0.030280
+
+[aks74ub_ironsight_p]
+; имитация движкового параметра для прицела
+;ВЫЛЕТ независимо от секции магазина и указываемого тут прицела scope_name = wpn_addon_acog
+;Addon 'wpn_addon_acog' has switching config in weapon's section 'wpn_aks74ub_nomag_ironsight', but this weapon has no addon of this type.
+scope_name = 
+; донастройка модели прицела
+scope                    = aks74ub_ironsight
+
+;+при одетом прицеле кости bones показываются, bones_hide скрываются
+; 1П29 (УСП-1 "Тюльпан") х4
+[aks74ub_1p29]
+;тест мех.прицела force_remove_texture = true
+;показываемые кости
+bones         = s1
+;штатный механический прицел (не настроен)
+;zoom_offset			= -0.112840,0.031250,-0.158000
+;zoom_rotation		= 0.054800,0.043280
+
+; тест sto1en
+zoom_offset			= -0.168800,0.059450,-0.223100
+zoom_rotation		= 0.043400,0.030280
+
+; кусок секции для наследования
+[aks74ub_1p29_p]
+; движковый прицел
+scope_name               = wpn_addon_scope_1p29
+; донастройка модели прицела
+scope                    = aks74ub_1p29
+;-ТЕСТ прицеливания подствольником с прицелом
+;-работает для секции (даже если НЕ одет прицел!)
+;hud = wpn_aks74ub_gl_scope_hud
+
+; ЭКП-8М-01 "Кобра" х1
+[aks74ub_kobra]
+force_remove_texture = true
+bones         = s3
+;штатный механический прицел (со сдвигом)
+;zoom_offset= -0.112840,-0.012750,-0.158000
+
+; тест sto1en
+zoom_offset			= -0.160140,0.024250,-0.229100
+zoom_rotation		= 0.038600,0.018480
+
+[aks74ub_kobra_p]
+scope_name               = wpn_addon_scope_kobra
+scope                    = aks74ub_kobra
+
+; 1ПН51 (НСПУ-3 "Казуар") х3,46
+[aks74ub_1pn51]
+;тест мех.прицела force_remove_texture = true
+bones         = s2
+;+скрываем кость ДТК АКC74E (навинчен пламягаситель АКМЛ: привязан к кости ночника)
+;bones_hide = 
+;штатный механический прицел (не настроен)
+;zoom_offset			= -0.112840,0.031250,-0.158000
+;zoom_rotation		= 0.054800,0.043280
+
+; тест sto1en
+zoom_offset			= -0.168800,0.059450,-0.223100
+zoom_rotation		= 0.043400,0.030280
+
+[aks74ub_1pn51_p]
+scope_name               = wpn_addon_scope_1pn51
+scope                    = aks74ub_1pn51
+;иконка прицела
+scope_x		= 60
+scope_y		= -3
+;щелевиднвй пламягаситель АКМЛ
+flame_particles			= amik\weapons\flame_particles\dtk_flame_particles_3
+smoke_particles   		= amik\weapons\smoke_particles\smoke_particles_04
+
+; ACOG TA31-CH х4
+[aks74ub_acog]
+;тест мех.прицела force_remove_texture = true
+bones         = s4
+;штатный механический прицел ACOG (не настроен)
+;zoom_offset			= -0.112840,0.031250,-0.158000
+;zoom_rotation		= 0.064800,0.043280
+
+; тест sto1en
+zoom_offset			= -0.168800,0.059450,-0.223100
+zoom_rotation		= 0.043400,0.030280
+
+[aks74ub_acog_p]
+scope_name               = wpn_addon_acog
+scope                    = aks74ub_acog
+
+; EOTech 552.A65 х1
+[aks74ub_eotech]
+force_remove_texture = true
+bones         = s5
+;штатный механический прицел (со сдвигом)
+;zoom_offset			= -0.168800,0.059450,-0.223100
+;zoom_rotation		= 0.043400,0.030280
+
+; тест sto1en
+zoom_offset			= -0.165740,0.014950,-0.181000
+zoom_rotation		= 0.033600,0.024780
+
+[aks74ub_eotech_p]
+scope_name               = wpn_addon_scope_eotech
+scope                    = aks74ub_eotech
+
+;-----------------------------------------------------------------------------------
+; служебные секции описателей магазинов
+;+при одетом аддоне кости bones показываются
+
+[aks74ub_aks74ub30]
+bones = m1
+[aks74ub_aks74ub30_p]
+; имитация движкового параметра для магазинов
+magazine_name            = wpn_addon_mag_ak7430
+magazine                 = aks74ub_aks74ub30
+ammo_mag_size			= 30
+inv_grid_x			= 69			; (след.=73+4ячейки)
+inv_grid_y			= 0
+inv_weight				= 2.93		;АК74 2.93 = 2.7 + 0.23
+cost					= 5100
+
+[aks74ub_rpk45]
+bones = m2
+[aks74ub_rpk45_p]
+magazine_name            = wpn_addon_mag_rpk7445
+magazine                 = aks74ub_rpk45
+ammo_mag_size            = 45
+inv_grid_x			= 69
+inv_grid_y			= 2
+inv_weight				= 3.0		;АК74 3.0 = 2.7 + 0.3
+cost					= 5200
+
+[aks74ub_ak60]
+bones = m3
+[aks74ub_ak60_p]
+magazine_name            = wpn_addon_mag_ak10560
+magazine                 = aks74ub_ak60
+ammo_mag_size            = 60
+inv_grid_x			= 69
+inv_grid_y			= 4
+inv_weight				= 3.2		;АК74 3.2 = 2.7 + ???0.5
+cost					= 5400
+hud                     = wpn_aks74ub_buben_hud
+
+[aks74ub_nomag]
+[aks74ub_nomag_p]
+ammo_class               = ammo_5.45x39_dummy, ammo_5.45x39_dummy	; патрон-залушка
+ammo_mag_size            = 0					; не во что заряжать
+rpm                      = 0					; нечем стрелять
+snd_reload               = $no_sound
+snd_empty                = $no_sound
+hud                      = wpn_aks74ub_nomag_hud
+
+
+
+;-----------------------------------------------------------------------------------
+; служебные секции описателей аддонов
+
+;кронштейн-переходник "ласточкин хвост"/Picatinny rail
+[aks74ub_mtk83]
+bones = d1
+[aks74ub_mtk83_p]
+scope_mount_name         = wpn_addon_mtk83
+scope_mount              = aks74ub_mtk83
+
+;боковая планка "ласточкин хвост"
+[aks74ub_side_rail]
+[aks74ub_side_rail_p]
+; имитация движкового параметра для боковой планки
+;scope_mount_name         = wpn_addon_side_rail		;не было
+;scope_mount              = aks74ub_side_rail			;не было
+
+;щелевиднвй пламягаситель АКМЛ (вместо ДТК АКМ)
+flame_particles			= amik\weapons\flame_particles\dtk_flame_particles_2
+smoke_particles   		= amik\weapons\smoke_particles\smoke_particles_04
+
+;-----------------------------------------------------------------------------------
+;ремонт ОГСЕ
+[wpn_aks74un3_repair]
+tech_complication = 200
+repair_compatibility = ak		;ОГСЕ ak74u
+
+;-----------------------------------------------------------------------------------
+; секции оружия с аддонами
+;-----------------------------------------------------------------------------------
+; сток
+[wpn_aks74ub_aks74ub30_ironsight]:wpn_aks74ub_base,aks74ub_ironsight_p,aks74ub_aks74ub30_p
+cost					 = 4400
+inv_weight				 = 3.03
+;магазины
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_ironsight
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_ironsight
+magazine_removed_section = wpn_aks74ub_nomag_ironsight
+[wpn_aks74ub_aks74ub30_ironsight_repair]:wpn_aks74un3_repair
+
+[wpn_aks74ub_rpk45_ironsight]:wpn_aks74ub_base,aks74ub_ironsight_p,aks74ub_rpk45_p
+cost					 = 4500
+inv_weight				 = 3.15
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_ironsight
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_ironsight
+magazine_removed_section = wpn_aks74ub_nomag_ironsight
+[wpn_aks74ub_rpk45_ironsight_repair]:wpn_aks74un3_repair
+
+[wpn_aks74ub_ak60_ironsight]:wpn_aks74ub_base,aks74ub_ironsight_p,aks74ub_ak60_p
+cost					 = 4700
+inv_weight				 = 3.50
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_ironsight
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_ironsight
+magazine_removed_section = wpn_aks74ub_nomag_ironsight
+[wpn_aks74ub_ak60_ironsight_repair]:wpn_aks74un3_repair
+
+[wpn_aks74ub_nomag_ironsight]:wpn_aks74ub_base,aks74ub_ironsight_p,aks74ub_nomag_p
+cost					 = 4300
+inv_weight				 = 2.70
+;не надо своего описания description = "АКС74У без планки"
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_ironsight
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_ironsight
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_ironsight
+[wpn_aks74ub_nomag_ironsight_repair]:wpn_aks74un3_repair
+;-----------------------------------------------------------------------------------
+
+
+; боковая планка, УСП-1, магазин АК74
+[wpn_aks74ub_aks74ub30_side_rail_1p29]:wpn_aks74ub_base1,aks74ub_1p29_p,aks74ub_side_rail_p,aks74ub_aks74ub30_p
+;ТЕСТ
+;?не нужно брать из aks74ub_1p29_p -работает, даже если НЕ одет прицел!
+;можно взять из aks74ub_aks74ub30_p
+;или перекрыть тут 
+cost					 = 4900
+inv_weight				 = 3.13
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_aks74ub_aks74ub30_side_rail_kobra
+wpn_addon_scope_1pn51    = wpn_aks74ub_aks74ub30_side_rail_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_aks74ub_aks74ub30_mtk83_acog
+;магазины
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_side_rail_1p29
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_side_rail_1p29
+magazine_removed_section = wpn_aks74ub_nomag_side_rail_1p29
+[wpn_aks74ub_aks74ub30_side_rail_1p29_repair]:wpn_aks74un3_repair
+
+; боковая планка, Кобра, магазин АК74
+[wpn_aks74ub_aks74ub30_side_rail_kobra]:wpn_aks74ub_base1,aks74ub_kobra_p,aks74ub_side_rail_p,aks74ub_aks74ub30_p
+cost					 = 4900
+inv_weight				 = 3.13
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_aks74ub_aks74ub30_side_rail_1p29
+wpn_addon_scope_1pn51    = wpn_aks74ub_aks74ub30_side_rail_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_aks74ub_aks74ub30_mtk83_acog
+;магазины
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_side_rail_kobra
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_side_rail_kobra
+magazine_removed_section = wpn_aks74ub_nomag_side_rail_kobra
+[wpn_aks74ub_aks74ub30_side_rail_kobra_repair]:wpn_aks74un3_repair
+
+; боковая планка, Казуар, магазин АК74
+[wpn_aks74ub_aks74ub30_side_rail_1pn51]:wpn_aks74ub_base1,aks74ub_1pn51_p,aks74ub_side_rail_p,aks74ub_aks74ub30_p
+cost					 = 4900
+inv_weight				 = 3.13
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_aks74ub_aks74ub30_side_rail_1p29
+wpn_addon_scope_kobra    = wpn_aks74ub_aks74ub30_side_rail_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_aks74ub_aks74ub30_mtk83_acog
+;магазины
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_side_rail_1pn51
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_side_rail_1pn51
+magazine_removed_section = wpn_aks74ub_nomag_side_rail_1pn51
+[wpn_aks74ub_aks74ub30_side_rail_1pn51_repair]:wpn_aks74un3_repair
+
+; боковая планка, УСП-1, магазин РПК 45
+[wpn_aks74ub_rpk45_side_rail_1p29]:wpn_aks74ub_base1,aks74ub_1p29_p,aks74ub_side_rail_p,aks74ub_rpk45_p
+cost					 = 5000
+inv_weight				 = 3.25
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_aks74ub_rpk45_side_rail_kobra
+wpn_addon_scope_1pn51    = wpn_aks74ub_rpk45_side_rail_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_aks74ub_rpk45_mtk83_acog
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_side_rail_1p29
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_side_rail_1p29
+magazine_removed_section = wpn_aks74ub_nomag_side_rail_1p29
+[wpn_aks74ub_rpk45_side_rail_1p29_repair]:wpn_aks74un3_repair
+
+; боковая планка, Кобра, магазин РПК 45
+[wpn_aks74ub_rpk45_side_rail_kobra]:wpn_aks74ub_base1,aks74ub_kobra_p,aks74ub_side_rail_p,aks74ub_rpk45_p
+cost					 = 5000
+inv_weight				 = 3.25
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_aks74ub_rpk45_side_rail_1p29
+wpn_addon_scope_1pn51    = wpn_aks74ub_rpk45_side_rail_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_aks74ub_rpk45_mtk83_acog
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_side_rail_kobra
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_side_rail_kobra
+magazine_removed_section = wpn_aks74ub_nomag_side_rail_kobra
+[wpn_aks74ub_rpk45_side_rail_kobra_repair]:wpn_aks74un3_repair
+
+; боковая планка, Казуар, магазин РПК 45
+[wpn_aks74ub_rpk45_side_rail_1pn51]:wpn_aks74ub_base1,aks74ub_1pn51_p,aks74ub_side_rail_p,aks74ub_rpk45_p
+cost					 = 5000
+inv_weight				 = 3.25
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_aks74ub_rpk45_side_rail_1p29
+wpn_addon_scope_kobra    = wpn_aks74ub_rpk45_side_rail_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_aks74ub_rpk45_mtk83_acog
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_side_rail_1pn51
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_side_rail_1pn51
+magazine_removed_section = wpn_aks74ub_nomag_side_rail_1pn51
+[wpn_aks74ub_rpk45_side_rail_1pn51_repair]:wpn_aks74un3_repair
+
+; боковая планка, УСП-1, магазин АК105 60
+[wpn_aks74ub_ak60_side_rail_1p29]:wpn_aks74ub_base1,aks74ub_1p29_p,aks74ub_side_rail_p,aks74ub_ak60_p
+cost					 = 5200
+inv_weight				 = 3.60
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_aks74ub_ak60_side_rail_kobra
+wpn_addon_scope_1pn51    = wpn_aks74ub_ak60_side_rail_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_aks74ub_ak60_mtk83_acog
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_side_rail_1p29
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_side_rail_1p29
+magazine_removed_section = wpn_aks74ub_nomag_side_rail_1p29
+[wpn_aks74ub_ak60_side_rail_1p29_repair]:wpn_aks74un3_repair
+
+; боковая планка, Кобра, магазин АК105 60
+[wpn_aks74ub_ak60_side_rail_kobra]:wpn_aks74ub_base1,aks74ub_kobra_p,aks74ub_side_rail_p,aks74ub_ak60_p
+cost					 = 5200
+inv_weight				 = 3.60
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_aks74ub_ak60_side_rail_1p29
+wpn_addon_scope_1pn51    = wpn_aks74ub_ak60_side_rail_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_aks74ub_ak60_mtk83_acog
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_side_rail_kobra
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_side_rail_kobra
+magazine_removed_section = wpn_aks74ub_nomag_side_rail_kobra
+[wpn_aks74ub_ak60_side_rail_kobra_repair]:wpn_aks74un3_repair
+
+; боковая планка, Казуар, магазин АК105 60
+[wpn_aks74ub_ak60_side_rail_1pn51]:wpn_aks74ub_base1,aks74ub_1pn51_p,aks74ub_side_rail_p,aks74ub_ak60_p
+cost					 = 5200
+inv_weight				 = 3.60
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_aks74ub_ak60_side_rail_1p29
+wpn_addon_scope_kobra    = wpn_aks74ub_ak60_side_rail_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_aks74ub_ak60_mtk83_acog
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_side_rail_1pn51
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_side_rail_1pn51
+magazine_removed_section = wpn_aks74ub_nomag_side_rail_1pn51
+[wpn_aks74ub_ak60_side_rail_1pn51_repair]:wpn_aks74un3_repair
+
+; боковая планка, УСП-1, нет магазина
+[wpn_aks74ub_nomag_side_rail_1p29]:wpn_aks74ub_base1,aks74ub_1p29_p,aks74ub_side_rail_p,aks74ub_nomag_p
+cost					 = 4800
+inv_weight				 = 2.80
+;прицелы на боковую планку
+wpn_addon_scope_kobra    = wpn_aks74ub_nomag_side_rail_kobra
+wpn_addon_scope_1pn51    = wpn_aks74ub_nomag_side_rail_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_aks74ub_nomag_mtk83_acog
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_side_rail_1p29
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_side_rail_1p29
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_side_rail_1p29
+[wpn_aks74ub_nomag_side_rail_1p29_repair]:wpn_aks74un3_repair
+
+; боковая планка, Кобра, нет магазина
+[wpn_aks74ub_nomag_side_rail_kobra]:wpn_aks74ub_base1,aks74ub_kobra_p,aks74ub_side_rail_p,aks74ub_nomag_p
+cost					 = 4800
+inv_weight				 = 2.80
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_aks74ub_nomag_side_rail_1p29
+wpn_addon_scope_1pn51    = wpn_aks74ub_nomag_side_rail_1pn51
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_aks74ub_nomag_mtk83_acog
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_side_rail_kobra
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_side_rail_kobra
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_side_rail_kobra
+[wpn_aks74ub_nomag_side_rail_kobra_repair]:wpn_aks74un3_repair
+
+; боковая планка, Казуар, нет магазина
+[wpn_aks74ub_nomag_side_rail_1pn51]:wpn_aks74ub_base1,aks74ub_1pn51_p,aks74ub_side_rail_p,aks74ub_nomag_p
+cost					 = 4800
+inv_weight				 = 2.80
+;прицелы на боковую планку
+wpn_addon_scope_1p29     = wpn_aks74ub_nomag_side_rail_1p29
+wpn_addon_scope_kobra    = wpn_aks74ub_nomag_side_rail_kobra
+;планка Пикатинни
+wpn_addon_mtk83          = wpn_aks74ub_nomag_mtk83_acog
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_side_rail_1pn51
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_side_rail_1pn51
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_side_rail_1pn51
+[wpn_aks74ub_nomag_side_rail_1pn51_repair]:wpn_aks74un3_repair
+
+; планка Пикатинни, ACOG, магазин АК74
+[wpn_aks74ub_aks74ub30_mtk83_acog]:wpn_aks74ub_base1,aks74ub_acog_p,aks74ub_mtk83_p,aks74ub_aks74ub30_p
+cost					 = 5900
+inv_weight				 = 3.44
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_aks74ub_aks74ub30_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_aks74ub_aks74ub30_side_rail_1p29
+;магазины
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_mtk83_acog
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_mtk83_acog
+magazine_removed_section = wpn_aks74ub_nomag_mtk83_acog
+[wpn_aks74ub_aks74ub30_mtk83_acog_repair]:wpn_aks74un3_repair
+
+; планка Пикатинни, EOTech, магазин АК74
+[wpn_aks74ub_aks74ub30_mtk83_eotech]:wpn_aks74ub_base1,aks74ub_eotech_p,aks74ub_mtk83_p,aks74ub_aks74ub30_p
+cost					 = 5900
+inv_weight				 = 3.44
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_aks74ub_aks74ub30_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_aks74ub_aks74ub30_side_rail_1p29
+;магазины
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_mtk83_eotech
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_mtk83_eotech
+magazine_removed_section = wpn_aks74ub_nomag_mtk83_eotech
+[wpn_aks74ub_aks74ub30_mtk83_eotech_repair]:wpn_aks74un3_repair
+
+; планка Пикатинни, ACOG, магазин РПК 45
+[wpn_aks74ub_rpk45_mtk83_acog]:wpn_aks74ub_base1,aks74ub_acog_p,aks74ub_mtk83_p,aks74ub_rpk45_p
+cost					 = 6000
+inv_weight				 = 3.60
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_aks74ub_rpk45_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_aks74ub_rpk45_side_rail_1p29
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_mtk83_acog
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_mtk83_acog
+magazine_removed_section = wpn_aks74ub_nomag_mtk83_acog
+[wpn_aks74ub_rpk45_mtk83_acog_repair]:wpn_aks74un3_repair
+
+; планка Пикатинни, EOTech, магазин РПК 45
+[wpn_aks74ub_rpk45_mtk83_eotech]:wpn_aks74ub_base1,aks74ub_eotech_p,aks74ub_mtk83_p,aks74ub_rpk45_p
+cost					 = 6000
+inv_weight				 = 3.60
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_aks74ub_rpk45_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_aks74ub_rpk45_side_rail_1p29
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_mtk83_eotech
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_mtk83_eotech
+magazine_removed_section = wpn_aks74ub_nomag_mtk83_eotech
+[wpn_aks74ub_rpk45_mtk83_eotech_repair]:wpn_aks74un3_repair
+
+; планка Пикатинни, ACOG, магазин АК105 60
+[wpn_aks74ub_ak60_mtk83_acog]:wpn_aks74ub_base1,aks74ub_acog_p,aks74ub_mtk83_p,aks74ub_ak60_p
+cost					 = 6200
+inv_weight				 = 3.91
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_aks74ub_ak60_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_aks74ub_ak60_side_rail_1p29
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_mtk83_acog
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_mtk83_acog
+magazine_removed_section = wpn_aks74ub_nomag_mtk83_acog
+[wpn_aks74ub_ak60_mtk83_acog_repair]:wpn_aks74un3_repair
+
+; планка Пикатинни, EOTech, магазин АК105 60
+[wpn_aks74ub_ak60_mtk83_eotech]:wpn_aks74ub_base1,aks74ub_eotech_p,aks74ub_mtk83_p,aks74ub_ak60_p
+cost					 = 6200
+inv_weight				 = 3.91
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_aks74ub_ak60_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_aks74ub_ak60_side_rail_1p29
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_mtk83_eotech
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_mtk83_eotech
+magazine_removed_section = wpn_aks74ub_nomag_mtk83_eotech
+[wpn_aks74ub_ak60_mtk83_eotech_repair]:wpn_aks74un3_repair
+
+; планка Пикатинни, ACOG, нет магазина
+[wpn_aks74ub_nomag_mtk83_acog]:wpn_aks74ub_base1,aks74ub_acog_p,aks74ub_mtk83_p,aks74ub_nomag_p
+cost					 = 5800
+inv_weight				 = 3.11
+;прицелы на планку Пикатинни
+wpn_addon_scope_eotech   = wpn_aks74ub_nomag_mtk83_eotech
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_aks74ub_nomag_side_rail_1p29
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_mtk83_acog
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_mtk83_acog
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_mtk83_acog
+[wpn_aks74ub_nomag_mtk83_acog_repair]:wpn_aks74un3_repair
+
+; планка Пикатинни, EOTech, нет магазина
+[wpn_aks74ub_nomag_mtk83_eotech]:wpn_aks74ub_base1,aks74ub_eotech_p,aks74ub_mtk83_p,aks74ub_nomag_p
+cost					 = 5800
+inv_weight				 = 3.11
+;прицелы на планку Пикатинни
+wpn_addon_acog           = wpn_aks74ub_nomag_mtk83_acog
+;секция при снятой планке Пикатинни
+scope_mount_removed_section      = wpn_aks74ub_nomag_side_rail_1p29
+;магазины
+wpn_addon_mag_ak7430      = wpn_aks74ub_aks74ub30_mtk83_eotech
+wpn_addon_mag_rpk7445      = wpn_aks74ub_rpk45_mtk83_eotech
+wpn_addon_mag_ak10560      = wpn_aks74ub_ak60_mtk83_eotech
+[wpn_aks74ub_nomag_mtk83_eotech_repair]:wpn_aks74un3_repair
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;ОГСЕ???потему ТУТ???
+[wpn_ak74u_arena]:wpn_aks74ub_aks74ub30_ironsight
+[wpn_ak74u_arena_repair]:wpn_aks74un3_repair
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;ОГСЕ
+;[wpn_aks74u_m1_camo1]:wpn_aks74ub_aks74ub30_side_rail_kobra
+;scope_status				= 1							; 0 - no addon (Can't find variable scope_texture)
+;[wpn_aks74u_m1_camo1_repair]:wpn_aks74un3_repair
+
+;[wpn_aks74u_m1]:wpn_aks74ub_aks74ub30_ironsight
+;silencer_status				= 1							; 0 - no addon
+;[wpn_aks74u_m1_repair]:wpn_aks74un3_repair
+
+;[wpn_ak74u_m1]:wpn_aks74ub_aks74ub30_ironsight
+;silencer_status				= 1							; 0 - no addon
+;[wpn_ak74u_m1_repair]:wpn_aks74un3_repair
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;+Лекарство
+;[wpn_ak74u]:wpn_aks74ub_aks74ub30_ironsight
+;[wpn_ak74u_repair]:wpn_aks74un3_repair
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+

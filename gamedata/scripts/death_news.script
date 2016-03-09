@@ -1,0 +1,287 @@
+
+--- death_news.script
+--- Выдача сообщений о смерти.
+--- FEAR93, Dusty79 (c) OGS Evolution Team 2010, sokol_jack
+--- version 0.4 (30.01.2011)
+
+local news_showtime = system_ini():r_s32("options","news_showtime") -- стандартное время показа сообщения
+local post_message_prob = 0.6 -- Вероятность того, что будет комментарий к смерти.
+local random_news = system_ini():r_s32("options","random_news")
+local message_death = 1 -- Сообщения о смерти
+local extra_debug = false -- Отладочный режим
+
+function printf(fmt, ...)
+	ogse.send_tip(fmt)
+	log1(fmt)
+end
+
+levels = {
+	["l01_escape"] = {{name = game.translate_string("death_news_levels_1_text"), name_where = game.translate_string("death_news_levels_1a_text")}},
+	["l02_garbage"] = {{name = game.translate_string("death_news_levels_2_text"), name_where = game.translate_string("death_news_levels_2a_text")}},
+	["l03_agroprom"] = {{name = game.translate_string("death_news_levels_3_text"), name_where = game.translate_string("death_news_levels_3a_text")}},
+	["l03u_agr_underground"] = {{name = game.translate_string("death_news_levels_4_text"), name_where = game.translate_string("death_news_levels_4a_text")}},
+	["l04_darkvalley"] = {{name = game.translate_string("death_news_levels_5_text"), name_where = game.translate_string("death_news_levels_5a_text")}},
+	["l04u_labx18"] = {{name = game.translate_string("death_news_levels_6_text"), name_where = game.translate_string("death_news_levels_6a_text")}},
+	["l05_bar"] = {{name = game.translate_string("death_news_levels_7_text"), name_where = game.translate_string("death_news_levels_7a_text")}},
+	["l06_rostok"] = {{name = game.translate_string("death_news_levels_8_text"), name_where = game.translate_string("death_news_levels_8a_text")}},
+	["l07_military"] = {{name = game.translate_string("death_news_levels_9_text"), name_where = game.translate_string("death_news_levels_9a_text")}},
+	["l08_yantar"] = {{name = game.translate_string("death_news_levels_10_text"), name_where = game.translate_string("death_news_levels_10a_text")}},
+	["l08u_brainlab"] = {{name = game.translate_string("death_news_levels_11_text"), name_where = game.translate_string("death_news_levels_11a_text")}},
+	["l10_radar"] = {{name = game.translate_string("death_news_levels_12_text"), name_where = game.translate_string("death_news_levels_12a_text")}},
+	["l10u_bunker"] = {{name = game.translate_string("death_news_levels_13_text"), name_where = game.translate_string("death_news_levels_13a_text")}},
+	["l11_pripyat"] = {{name = game.translate_string("death_news_levels_14_text"), name_where = game.translate_string("death_news_levels_14a_text")}},
+	["l12_stancia"] = {{name = game.translate_string("death_news_levels_15_text"), name_where = game.translate_string("death_news_levels_15a_text")}},
+	["l12_stancia_2"] = {{name = game.translate_string("death_news_levels_15_text"), name_where = game.translate_string("death_news_levels_15a_text")}},
+	["l12u_control_monolith"] = {{name = game.translate_string("death_news_levels_15_text"), name_where = game.translate_string("death_news_levels_15a_text")}},
+	["l12u_sarcofag"] = {{name = game.translate_string("death_news_levels_16_text"), name_where = game.translate_string("death_news_levels_16a_text")}},
+	["l09_deadcity_ogse"] = {{name = game.translate_string("death_news_levels_17_text"), name_where = game.translate_string("death_news_levels_17a_text")}},
+	["l13_generators_ogse"] = {{name = game.translate_string("death_news_levels_18_text"), name_where = game.translate_string("death_news_levels_18a_text")}},
+	["k01_darkscape_ogse"] = {{name = game.translate_string("death_news_levels_19_text"), name_where = game.translate_string("death_news_levels_19a_text")}},
+	["l22_marsh"] = {{name = game.translate_string("death_news_levels_20_text"), name_where = game.translate_string("death_news_levels_20a_text")}},
+	["l23_x9"] = {{name = game.translate_string("death_news_levels_21_text"), name_where = game.translate_string("death_news_levels_21a_text")}},
+	
+}
+	
+local community = {
+	stalker = game.translate_string("univ_comm_names_stalker_text"),
+	monolith = game.translate_string("univ_comm_names_monolith_text"),
+	military = game.translate_string("univ_comm_names_military_text"),
+	killer = game.translate_string("univ_comm_names_killer_text"),
+	ecolog = game.translate_string("univ_comm_names_ecolog_text"),
+	dolg = game.translate_string("univ_comm_names_dolg_text"),
+	freedom = game.translate_string("univ_comm_names_freedom_text"),
+	bandit = game.translate_string("univ_comm_names_bandit_text"),
+	zombied = game.translate_string("univ_comm_names_zombied_text"),
+	stranger = game.translate_string("univ_comm_names_stranger_text"),
+	}	
+
+local messages_comment = {}
+
+for i=1,32 do
+	messages_comment[i] = game.translate_string("death_news_comments_"..tostring(i).."_text")
+end
+
+function on_death(victim, killer)
+	if extra_debug == true then printf("Сообщения о смерти. Погиб сталкер.") end
+	if isIndoor(level.name()) or news_main_data.chk_Vibros() then return end
+	if random_news == 1 and message_death == 1 then
+	if extra_debug == true then printf("Сообщения о смерти. Все проверки пройдены, идём дальше") end	
+		if (victim ~= nil) then
+		if extra_debug == true then printf("Сообщения о смерти. victim не равен нулю.") end
+			if (IsStalker(victim)) then	
+				if extra_debug == true then printf("Сообщения о смерти. Это npc.") end
+				local m_obj
+				if (isGameObject(victim)) then
+					if extra_debug == true then printf("Сообщения о смерти. Это игровой объект.") end
+					m_obj = victim
+				else
+					m_obj = get_obj(victim.id)				
+				end
+				if (m_obj) then	
+					if extra_debug == true then printf("Сообщения о смерти. Всё отлично, вызываем генерирование сообщения.") end
+					on_stalker_death(victim, killer)
+				end	
+			end		
+		end
+	end
+end
+
+
+function on_stalker_death(victim_, killer_)
+	
+	if extra_debug == true then printf("Сообщения о смерти.  Вызвали on_stalker_death") end
+	
+	if (victim_ == nil) then return	end
+	
+	if (xs_stor.get("need_shutdown_stalker_news", false) == true) then return end
+	
+	if extra_debug == true then printf("Сообщения о смерти. victim_  не равно нулю.") end
+	
+	local m_victim = ""
+	local victim
+		if (isGameObject(victim_)) then
+			victim = victim_
+			
+			if extra_debug == true then printf("Сообщения о смерти. victim_  - игровой объект.") end
+		
+		else
+			victim = get_obj(victim_.id)
+		end
+		
+		if extra_debug == true then printf("Сообщения о смерти. Переходим к генерированию") end
+		
+		--if (IsActor(killer)) then
+		--	add_killed_by_actor(victim) -- Отметим, что это ГГ постарался.
+		--	if extra_debug == true then printf("Отметим, что это ГГ постарался.") end
+		--end
+		
+		if community_filter(victim) == false then 
+			if extra_debug == true then printf("Сообщения о смерти. Проверка на фильтр группировок НЕ пройдена.") end
+			return 
+		end
+		
+		if extra_debug == true then printf("Сообщения о смерти. Проверка на фильтр группировок пройдена.") end	
+		
+		if (isGameObject(killer_)) then
+				killer = killer_
+			else
+				killer = get_obj(killer_.id)
+			end
+			
+	
+	local m_name  = get_npc_name(victim)
+	if extra_debug == true then printf("Сообщения о смерти. Имя покойного - " .. m_name) end
+	local m_level = get_level_name(get_object_levelname(victim), 1)
+	if extra_debug == true then printf("Сообщения о смерти. Локация покойного - " .. m_level) end
+	local m_comm  = get_npc_community(victim)
+	if extra_debug == true then printf("Сообщения о смерти. Группировка покойного - " .. m_comm) end
+	local s_comm = ""
+	local m_post_message = ""
+		if m_comm and community[m_comm] then
+			s_comm = " ("..community[m_comm]..")"
+		else
+			s_comm = ""
+		end
+	local m_string = m_name..s_comm..". "..m_level.."."
+	if extra_debug == true then printf("Сообщения о смерти. Сообщение сгенерировано, можно выдавать.") end
+	
+	local news_text = "%c[255,160,160,160]".."Погиб сталкер:".."\\n".."%c[default]"..m_string
+	-- db.actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(0,658,83,47), 7000, 5000)
+	-- это не нужно, это будет из амк_news
+	
+	if math.random() < post_message_prob then
+		m_post_message = messages_comment[math.random(table.getn(messages_comment))]
+	end
+	
+	if (m_post_message ~= "" and community_filter(victim)==true) then
+		local from = news_main_new.gen_names_strings()
+		local news_text = "%c[255,160,160,160]"..from..":\\n".."%c[default]"..m_post_message
+		db.actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(498,47,83,47), math.random(8000,12000), news_showtime)	
+	end
+end
+
+
+function isGameObject(obj)
+	local bResult = false
+	if (obj and obj.fov) then
+		bResult = true
+	end
+	return bResult
+end
+
+function get_obj(id)
+	local m_obj = nil
+	if (id) then
+		m_obj = level.object_by_id(id)
+	end
+	return m_obj
+end
+
+function get_npc_name(obj)
+	local m_s_name = ""
+	if (obj) then
+		if (isGameObject(obj)) then
+			if (obj.character_name) then
+				m_s_name = obj:character_name()
+			end
+		else
+			local ob = get_obj(obj.id)
+			if (ob and ob.character_name) then
+				m_s_name = ob:character_name()
+			end
+		end
+	end
+	if (m_s_name == nil) then
+		m_s_name = ""
+	end
+	return m_s_name
+end
+
+-- Узнаём местонахождение объекта
+function get_level_name(level_, value_id)
+		local m_s_level 
+			if level_ == nil then
+				m_s_level = level.name()
+			else
+				m_s_level = level_
+			end
+		local m_tmp_str = ""
+			if levels[m_s_level] ~= nil then
+				level_name = levels[m_s_level]
+				for key0, value in pairs(level_name) do				
+					if value_id == 1 then 
+						value_id = value["name"] 
+					elseif value_id == 2 then 
+						value_id = value["name_where"]
+					end
+					name_of_level = value_id
+					m_tmp_str = name_of_level..""				       		
+				end
+			end
+		return m_tmp_str
+end
+
+-- Расположение игрового объекта
+function get_object_levelname(obj)
+	local mlevel = "null"	
+	if (obj) then
+		local m_game_vertex
+		local nm = "nil"
+		if (obj.name) then nm = obj:name() end
+		if (isGameObject(obj)) then
+			m_game_vertex = obj:game_vertex_id()
+		else
+			m_game_vertex = obj.m_game_vertex_id
+		end
+		if (m_game_vertex) then
+			local lvert = game_graph():vertex(m_game_vertex)
+			if (lvert ~= nil and lvert.level_id) then
+				local lid = lvert:level_id()
+				if (lid ~= nil) then
+					mlevel = alife():level_name(lid)
+				end
+			end
+			if mlevel == nil then mlevel = "nil" end
+		end
+	end
+	return mlevel
+end
+
+function get_npc_community(obj)
+	local m_s_c = ""
+	if (obj) then
+		if (obj.character_community) then				
+			m_s_c = obj:character_community()
+		elseif (obj.community) then
+			m_s_c = obj:community()
+		end
+	end
+	if (m_s_c == nil) then
+		m_s_c = ""
+	end
+	return m_s_c
+end
+
+function IsActor(obj)
+	if obj then
+		local m_comm  = get_npc_community(obj)
+		if (m_comm == "actor" or m_comm == "actor_dolg" or m_comm == "actor_freedom") then
+			return true
+		end
+	end
+	return false
+end
+
+function community_filter(obj)
+	if (obj and IsStalker(obj)) then
+		local community  = get_npc_community(obj)
+		if (community == "monolith" or 
+		    community == "bandit" or
+			community == "zombied" or 
+			community == "military" or 
+			community == "ecolog") then			
+			return false
+		end
+	end
+	return true
+end

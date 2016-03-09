@@ -1,0 +1,374 @@
+local treasure_manager = nil
+
+local opt =
+{
+	option_random_treasure = system_ini():r_s32("options","option_random_treasure"), -- Включение/выключение рандомных тайников тайников (true/false)
+	tr_v = system_ini():r_s32("options","treasure_dropout"), -- Частота выпада тайников при выполненом condlist. Чем меньше, тем больше вероятность. (70)
+	need_text = system_ini():r_s32("options","treasure_need_text") --Вывод содержимого в нычку
+}
+
+function parse_spawns(line)
+	if line == nil then
+		return {}
+	end
+
+	--' если default-ов больше, чем значений в ini, то забить недостающие последним значением из ini
+	local t = parse_names(line)
+	local n = table.getn(t)
+		
+	local ret_table = {}
+	local k = 1
+
+	while k <= n do
+		local spawn = {}
+		spawn.section = t[k]
+		-- Проверяем что это не последняя запись
+		if t[k+1] ~= nil then
+			local p = tonumber(t[k+1])
+			-- проверяем что вторым числом задана вероятность, а не другая секция спавну
+			if p then
+				-- забиваем число
+				spawn.prob = p
+				k = k + 2
+			else
+				-- забиваем дефолт 1
+				spawn.prob = 1
+				k = k + 1
+			end
+		else
+			spawn.prob = 1
+			k = k + 1
+		end
+		table.insert(ret_table, spawn)
+	end
+	return ret_table
+end
+
+
+class "CTreasure"
+function CTreasure:__init()
+	--' На конструкторе вычитываем LTX и создаем заготовки квестов.
+	self.ini = ini_file("misc\\treasure_manager.ltx")
+
+	--' Итерируемся по всем настройкам фраз
+	if not self.ini:section_exist("list") then
+		abort("There is no section [list] in treasure_manager.ltx")
+	end
+	local n = self.ini:line_count("list")
+	local id, value = "",""
+
+	--' начальная установка
+	self.treasure_info = {}
+
+	for i=0,n-1 do
+		result, id, value	= self.ini:r_line("list",i,"","")
+		
+		self.treasure_info[id] = {}
+
+		self.treasure_info[id].target		= utils.cfg_get_number(self.ini, id, "target", nil, true)
+		self.treasure_info[id].name			= utils.cfg_get_string(self.ini, id, "name", nil, true, "")
+		self.treasure_info[id].description	= utils.cfg_get_string(self.ini, id, "description", nil, true, "")
+		self.treasure_info[id].items		= parse_spawns(utils.cfg_get_string(self.ini, id, "items", nil, true, ""))
+		
+		local community	= parse_names(utils.cfg_get_string(self.ini, id, "community", nil, false, "", "stalker, bandit, dolg, freedom"))
+		self.treasure_info[id].community = {}
+		for k,v in pairs(community) do
+			self.treasure_info[id].community[v] = true
+		end
+	
+		if self.treasure_info[id].items == nil then
+			abort("cant find 'items' in %s", id)
+		end
+
+		self.treasure_info[id].condlist		= xr_logic.parse_condlist(db.actor, "treasure_manager", "condlist", utils.cfg_get_string(self.ini, id, "condlist", nil, false, "", ""))
+		
+		--' Отметим тайник как новый
+		self.treasure_info[id].active = false
+		self.treasure_info[id].done = false
+
+		--print_table(self.treasure_info)
+	end
+
+	--' Вспомогательные таблицы для облегчения поиска
+	self.treasure_by_target = {}
+	for k,v in pairs(self.treasure_info) do
+		self.treasure_by_target[v.target] = k	
+	end
+
+	self.loss_workaround_queue = {}
+end
+--' Юзание инициатора (возможность выдать тайник)
+function CTreasure:use(npc)
+	printf("TREASURE USE")
+
+	local se_obj = alife():object(npc:id())
+	if se_obj and se_obj.treasure_processed == true then
+		return
+	end
+	se_obj.treasure_processed = true
+	
+	--' Нужно рандомно выбрать один из тайников.
+	local avail = {}
+	local tr_sum = 0
+	for k,v in pairs(self.treasure_info) do
+
+		if v.done == false then
+			local treasure_prob = xr_logic.pick_section_from_condlist(db.actor, npc, v.condlist)
+		
+			if treasure_prob == "" or treasure_prob == nil then
+				treasure_prob = 0
+			end
+
+			if tonumber(treasure_prob) >= 0 and
+			v.community[npc:character_community()] == true and
+			v.active == false
+			then
+				if tonumber(treasure_prob) == 100 then
+				
+					self:give_treasure(k)
+				else
+					table.insert(avail, {k = k, prob = treasure_prob})
+					tr_sum = tr_sum + treasure_prob
+			
+				end
+			end
+		end
+	end
+
+	if tr_sum == 0 or
+		math.random(100) < opt.tr_v -- 65 (а для теста и все 10)
+	then
+		return
+	end
+
+	local tr_w = math.random(tr_sum)
+	
+	for k,v in pairs(avail) do
+		
+		tr_w = tr_w - v.prob
+		if tr_w <= 0 then
+		
+			self:give_treasure(v.k)
+			break
+		end
+	end
+	
+end
+--' Сохранение
+function CTreasure:check()
+
+	for k,v in pairs(self.treasure_info) do
+	
+		--' Выдать тайник
+		self:give_treasure(k)
+	end
+
+end
+--' Выдача тайника
+function CTreasure:give_treasure(k)
+	local v = self.treasure_info[k]
+	local sim = alife()
+	local obj = sim:story_object(v.target)
+	local item_ids = {}
+	local pos, lvid, gvid, pid, new_obj
+
+	if obj ~= nil then
+	
+	local text = ""
+		--' Пометить на карте		
+       if opt.need_text == 0 then
+			text = "%c[255,238,155,23]"..game.translate_string(v.name).."\\n".."%c[default]"..game.translate_string(v.description) 
+	   else text = "%c[255,238,155,23]"..game.translate_string(v.name).."\\n".."%c[default]"..game.translate_string(v.description).."\\n".."%c[255,225,0,0]"..game.translate_string("stash_manager_string").."\\n"		
+	   end	
+	--log1(text)
+		--' Сгенерить вещи
+		--'
+		--' Из-за какого-то дефекта в xrGame.dll тайник потеряет
+		--' сгенерированное содержимое в следующей ситуации:
+		--'  1) получена ссылка на тайник, который находится в online;
+		--'  2) игрок сохраняется и загружается;
+		--'  3) между 1 и 2 не было переводов тайника в offline хотя бы раз.
+		--' Для предотвращения этого создаём вещи у актёра, запоминаем
+		--' идентификаторы, а в вызове actor_binder:update() переносим их
+		--' в нужный ящик.
+		local need_workaround = level.object_by_id(obj.id) ~= nil
+		
+		if need_workaround then
+			pos = db.actor:position()
+			lvid = db.actor:level_vertex_id()
+			gvid = db.actor:game_vertex_id()
+			pid = db.actor:id()
+		else
+			pos = obj.position
+			lvid = obj.m_level_vertex_id
+			gvid = obj.m_game_vertex_id
+			pid = obj.id
+		end
+		
+	log1("Попробуем отследить что там не так с наградами")
+	print_table_inlog(v)
+		
+-- Рандомные награды
+	--if v.name then
+		local new_treasure = ogse_random_treasure.random_treasure(v.name, v.target)
+		log1(game.translate_string(v.name))
+		local new_items = new_treasure:set_random_reward()
+		if new_items then 
+			v.items = new_items
+			print_table_inlog(v.items,"v.items:")
+		end
+		new_treasure = nil -- чистим неиспользуемое
+	--end
+-- Рандомные награды	
+
+	for kk,vv in pairs(v.items) do
+		if ammo_section[vv.section] == true then
+			local left, box_size = vv.prob, system_ini():r_u32(vv.section, "box_size")
+			while left > box_size do
+				if vv.section ~= nil then
+					new_obj = sim:create_ammo(vv.section, pos, lvid, gvid, pid, box_size)
+					table.insert(item_ids, new_obj.id)
+					left = left - box_size
+				end
+		end
+		if left > 0 then
+			if vv.section ~= nil then
+				new_obj = sim:create_ammo(vv.section, pos, lvid, gvid, pid, left)
+				table.insert(item_ids, new_obj.id)
+			end	
+		end
+		else
+			if vv.section ~= nil then
+				for i=1,vv.prob do
+					new_obj = sim:create(vv.section, pos, lvid, gvid, pid)
+					table.insert(item_ids, new_obj.id)
+				end
+			end	
+		end
+
+		local tmp_str = ""
+			if kk > 1 then tmp_str = ", " else tmp_str = ""	end
+		if opt.need_text == 1 then
+			if string.find(text,treasure_find.get_treasure_name(vv.section)) == nil then
+				text = text.."%c[255,155,238,23]"..tmp_str..treasure_find.get_treasure_name(vv.section)
+			end
+		end
+		
+	end
+  		
+	if need_workaround then	self.loss_workaround_queue[v.target] = item_ids	end
+		
+		news_manager.send_treasure(v.name)
+		
+		level_tasks.add_location_by_id(obj.id, "treasure", text)
+	
+		--' Пометим тайник как выданный
+		self.treasure_info[k].active = true
+		self.treasure_info[k].done = true
+	
+	else
+		printf("TREASURE %s, target doesnt exist", k)
+	end
+		
+end
+
+
+--' Перенос содержимого для предотвращения возможной потери
+function CTreasure:loss_workaround()
+--	log1("Вызов функции CTreasure:loss_workaround с параметром ")
+	local pos, gv, lv = nil, nil, nil
+	local fault_use_teleport = false
+
+	for k,v in pairs(self.loss_workaround_queue) do
+		--type_info(self.loss_workaround_queue)
+		box = level_object_by_sid(k)
+		if box == nil then
+			-- смысла вылетать тут нет, спавнить вещи прямо Меченом в рюкзак фигня.
+			-- хер с ними, рассыплем вокруг тайника если он вообще есть такой
+			local sobj_box = alife():story_object(k)
+			if sobj_box then
+				local pos = sobj_box.position
+				local gv = sobj_box.m_game_vertex_id
+				local lv = sobj_box.m_level_vertex_id
+				pos.y = pos.y + 0.3
+				fault_use_teleport = true
+			else
+				abort("ERROR! Can't find treasure box with sid ["..tostring(k).."]")
+			end
+		end
+		-- dbglog("loss_workaround:box=%d", k)
+		for kk,vv in ipairs(v) do
+			if vv ~= nil then
+				-- dbglog("  item:name=%s", level.object_by_id(vv):name())
+				--log1("item:name = "..tostring(level.object_by_id(vv):name()))
+				if fault_use_teleport == true and pos and gv and lv then
+					alife():teleport_object("_", pos, lv, gv, vv)
+				else
+					db.actor:transfer_item(level.object_by_id(vv), box)
+				end
+			end
+		end
+	end
+	self.loss_workaround_queue = {}
+	--log1("Конец вызова функции CTreasure:loss_workaround с параметром ")
+end
+--' Снимаем отметку с тайника
+function CTreasure:treasure_empty(box, box_story_id)
+	printf("!!! treasure empty")
+	local k = self.treasure_by_target[box_story_id]
+
+	if k == nil or self.treasure_info[k] == nil then 
+		return
+	end
+
+	self.treasure_info[k].active = false
+	level_tasks.remove_location_by_id(box:id(), "treasure")
+end
+--' Сохранение
+function CTreasure:save(p)
+	--' Сохраняем размер таблицы
+	local size = 0
+	for k,v in pairs(self.treasure_info) do
+		size = size + 1
+	end
+	p:w_u16(size)
+	for k,v in pairs(self.treasure_info) do
+		p:w_u16(v.target)
+		p:w_bool(v.active)
+		p:w_bool(v.done)
+	end
+end
+--' Загрузка
+function CTreasure:load(p)
+	local t = p:r_u16()
+	for i = 1,t do
+		local k = self.treasure_by_target[p:r_u16()]
+		self.treasure_info[k].active = p:r_bool()
+		self.treasure_info[k].done = p:r_bool()
+	end
+end
+
+
+function get_treasure_manager()
+	if treasure_manager == nil then
+		treasure_manager = CTreasure()
+	end
+	return treasure_manager
+end
+
+function take_item_from_box(box, box_story_id)
+	printf("!!! take item from box %s", tostring(box:is_inv_box_empty()))
+	if box:is_inv_box_empty() == true then
+		get_treasure_manager():treasure_empty(box, box_story_id)
+	end
+end
+
+function save(p)
+	get_treasure_manager():save(p)
+end
+function load(p)
+	get_treasure_manager():load(p)
+end
+function clear_treasure_manager()
+	treasure_manager = nil
+end

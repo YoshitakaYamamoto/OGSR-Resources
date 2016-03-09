@@ -1,0 +1,66 @@
+-----------------------------------------------------------------------
+--- ogse_mines_binder.script
+--- Биндер мин OGSE 0.6.9.3
+--- 2014 (c) KamikaZze, OGS Evolution Team
+-----------------------------------------------------------------------
+
+function init(obj)
+	local new_binder = mines_binder(obj)
+	obj:bind_object(new_binder)
+end
+
+---------------------------------------------------------------------------------------------
+class "mines_binder" (object_binder)
+function mines_binder:__init(obj) super(obj)
+end 
+
+function mines_binder:reload(section)
+
+end
+
+function mines_binder:reinit()
+
+end
+
+function mines_binder:net_spawn(data)
+
+	local id = self.object:id()
+	local s_obj = alife():object(id)
+	if s_obj then
+		local data = m_net_utils.get_anomaly_data(s_obj)
+		if data.custom ~= "gsc_mine" and not checker_minefield.minefield_table[id] then
+			checker_minefield.minefield_table[id] = id
+		end	
+	end
+	return true
+end
+
+local update_times = {}
+local update_interval = 1000
+
+function mines_binder:update(delta)
+		
+	if not update_times[self.object:id()] then
+		update_times[self.object:id()] = time_global()
+	else	
+		if (update_times[self.object:id()] + update_interval) > time_global() then
+			return
+		else	
+			update_times[self.object:id()] = time_global()
+		end		
+	end
+	
+	local id = self.object:id()
+	
+	--- встраиваем выключение
+	local status = ogse_anomaly.get_anomaly_mode(id)
+	if status == "anom_off" then
+		self.object:disable_anomaly()
+	end
+
+end
+
+function mines_binder:net_destroy()
+--	log3("[mines_binder:net_destroy] name=%s, id=%d", self.object:name(), self.object:id())
+end
+

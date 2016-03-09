@@ -1,0 +1,210 @@
+	<credits_seq>
+
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="728" height="660" stretch = "1">
+				<texture x="0" y="0" width="728" height="660"></texture>
+			</auto_static>
+			<auto_static x="0" y="0" width="1024" height="768">
+				<texture x="0" y="0" width="1024" height="768">ui\ui_static_mm_back_06</texture>
+			</auto_static>
+			<auto_static x="524" y="641" width="256" height="128">
+				<texture></texture>
+			</auto_static>
+		</global_wnd>
+		<play_each_item>1</play_each_item>
+		<item>
+			<length_sec>190</length_sec>
+			<pause_state>on</pause_state>
+			<function_on_stop>ogse_quests.this_is_the_end</function_on_stop>
+			<guard_key/>
+			<pause_sound>on</pause_sound>
+			<sound>music\credits</sound>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>1</grab_input>
+			<main_wnd>
+
+				<auto_static start_time="0" length_sec="169" x="270" y="30" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti50" color="white">ogse_development</text>
+				</auto_static>
+
+				<auto_static start_time="2" length_sec="6" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">deathdoor_value</text>
+				</auto_static>
+				
+				<auto_static start_time="3" length_sec="5" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">deathdoor_name</text>
+				</auto_static>
+				
+				<auto_static start_time="9" length_sec="6" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">coordinators_value</text>
+				</auto_static>
+				
+				<auto_static start_time="10" length_sec="5" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">coordinators_name</text>
+				</auto_static>
+
+				<auto_static start_time="16" length_sec="6" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">engine_hacks_value</text>
+				</auto_static>
+				
+				<auto_static start_time="17" length_sec="5" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">engine_hacks_name</text>
+				</auto_static>
+
+				<auto_static start_time="23" length_sec="8" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">scripting_value</text>
+				</auto_static>
+				
+				<auto_static start_time="24" length_sec="7" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">scripting_name</text>
+				</auto_static>
+
+				<auto_static start_time="32" length_sec="7" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">scripting_guest_value</text>
+				</auto_static>
+				
+				<auto_static start_time="33" length_sec="6" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">scripting_guest_name</text>
+				</auto_static>
+
+				<auto_static start_time="40" length_sec="7" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">mapping_value</text>
+				</auto_static>
+				
+				<auto_static start_time="41" length_sec="6" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">mapping_name</text>
+				</auto_static>
+
+				<auto_static start_time="48" length_sec="10" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">modelling_value</text>
+				</auto_static>
+				
+				<auto_static start_time="49" length_sec="9" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">modelling_name</text>
+				</auto_static>
+
+				<auto_static start_time="59" length_sec="10" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">quest_value</text>
+				</auto_static>
+				
+				<auto_static start_time="60" length_sec="9" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">quest_name</text>
+				</auto_static>
+
+				<auto_static start_time="70" length_sec="12" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">quest_authors_value</text>
+				</auto_static>
+				
+				<auto_static start_time="71" length_sec="11" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">quest_authors_name</text>
+				</auto_static>
+
+				<auto_static start_time="83" length_sec="7" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">instruments_value</text>
+				</auto_static>
+				
+				<auto_static start_time="84" length_sec="6" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">instruments_name</text>
+				</auto_static>
+				
+				<auto_static start_time="91" length_sec="7" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">weapon_value</text>
+				</auto_static>
+				
+				<auto_static start_time="92" length_sec="6" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">weapon_name</text>
+				</auto_static>
+
+<!--				<auto_static start_time="91" length_sec="10" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">resigned_value</text>
+				</auto_static>
+				
+				<auto_static start_time="92" length_sec="9" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">resigned_name</text>
+				</auto_static> -->
+
+				<auto_static start_time="95" length_sec="6" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">editing_value</text>
+				</auto_static>
+				
+				<auto_static start_time="96" length_sec="5" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">editing_name</text>
+				</auto_static>
+				
+				<auto_static start_time="102" length_sec="6" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">english_translation_value</text>
+				</auto_static>
+				
+				<auto_static start_time="103" length_sec="5" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">english_translation_name</text>
+				</auto_static>
+				
+				<auto_static start_time="112" length_sec="6" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">french_translation_value</text>
+				</auto_static>
+				
+				<auto_static start_time="113" length_sec="5" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">french_translation_name</text>
+				</auto_static>
+
+				<auto_static start_time="116" length_sec="6" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">quality_assurance_lead_value</text>
+				</auto_static>
+				
+				<auto_static start_time="117" length_sec="5" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">quality_assurance_lead_name</text>
+				</auto_static>
+
+				<auto_static start_time="122" length_sec="12" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">quality_assurance_team_value</text>
+				</auto_static>
+				
+				<auto_static start_time="123" length_sec="11" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">quality_assurance_team_name</text>
+				</auto_static>
+
+				<auto_static start_time="128" length_sec="8" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">artwork_value</text>
+				</auto_static>
+				
+				<auto_static start_time="129" length_sec="7" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">artwork_name</text>
+				</auto_static>
+
+				<auto_static start_time="135" length_sec="15" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">third_party_value</text>
+				</auto_static>
+				
+				<auto_static start_time="136" length_sec="14" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">third_party_name</text>
+				</auto_static>
+
+				<auto_static start_time="142" length_sec="15" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">thanks_value</text>
+				</auto_static>
+				
+				<auto_static start_time="143" length_sec="14" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">thanks_name</text>
+				</auto_static>
+
+				<auto_static start_time="164" length_sec="6" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">website_value</text>
+				</auto_static>
+				
+				<auto_static start_time="165" length_sec="5" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">website_name</text>
+				</auto_static>
+
+				<!--auto_static start_time="177" length_sec="10" x="270" y="100" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti32" color="ui_clr_2">btw_value</text>
+				</auto_static>
+				
+				<auto_static start_time="178" length_sec="9" x="270" y="160" width="500" height="40" light_anim="credits_head" la_cyclic="0" la_texture="0" la_alpha="1">
+					<text align="c" font="graffiti22" color="white">btw_name</text>
+				</auto_static-->
+
+			</main_wnd>
+		</item>
+
+	</credits_seq>

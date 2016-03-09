@@ -1,0 +1,288 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[ammo_7.62x54_7h1]:ammo_base
+$spawn			= "weapons\ammo\ammo_7.62x54_7h1" ; option for Level Editor
+visual          = weapons\ammo\ammo_762x54_7h1.ogf
+description		= enc_weapons_ammo-7.62x54_7h1
+
+cost			= 440
+
+box_size		= 20
+
+inv_name		= ammo-7.62x54_7h1
+inv_name_short	= ammo-7.62x54_7h1_s
+inv_weight		= 0.25
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 15
+inv_grid_y		= 9
+
+k_dist			= 1.1
+k_disp			= 1.4
+k_hit			= 1.5
+k_impulse		= 1.2
+k_pierce		= 1.1
+wm_size         = 0.07
+impair			= 1.25
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[ammo_7.62x54_ap]:ammo_base
+$spawn			= "weapons\ammo\ammo_7.62x54_ap" ; option for Level Editor
+visual          = weapons\ammo\ammo_762x54_ap.ogf
+description		= enc_weapons_ammo-7.62x54ap
+
+cost			= 490
+
+box_size		= 20
+
+inv_name		= ammo-7.62x54ap
+inv_name_short	= ammo-7.62x54ap_s
+inv_weight		= 0.23
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 15
+inv_grid_y		= 10
+
+k_disp			= 1.4
+k_hit			= 1.3
+k_impulse		= 0.95
+k_pierce		= 1.5
+impair			= 1.05
+tracer			= on
+explosive		= on
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[ammo_7.62x54_7h14]:ammo_base
+$spawn			= "weapons\ammo\ammo_7.62x54_7h14" ; option for Level Editor
+visual          = weapons\ammo\ammo_762x54_7h14.ogf
+description		= enc_weapons_ammo-7.62x54-7h14
+
+cost			= 510
+
+box_size		= 20
+
+inv_name		= ammo-7.62x54-7h14
+inv_name_short	= ammo-7.62x54-7h14_s
+inv_weight		= 0.23
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 17
+inv_grid_y		= 9
+
+k_dist			= 1.25
+k_hit			= 1.25
+k_impulse		= 0.95
+k_pierce		= 1.4
+impair			= 1.1
+tracer			= on
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;фейк-боеприпас дл€ оружи€ без магазина 
+[ammo_7.62x54_dummy]:ammo_7.62x54_7h1
+;$spawn			= "weapons\ammo\ammo_wpn_dummy" ; option for Level Editor
+;visual          = physics\equipment_cache\equipment_box_01_case.ogf
+cost			= 0
+box_size		= 0
+inv_weight		= 0.001
+inv_name		= ammo-7.62x54-dummy
+inv_name_short	= ammo-7.62x54-dummy_s
+description		= enc_weapons_ammo-7.62x54-dummy
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;затычка
+;SVN_OGSE\spawns\sections.ini Line 543: 'ammo_7.62x54r' = cse_alife_item_ammo
+[ammo_7.62x54r]:ammo_7.62x54_7h1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[mag_10_7.62x54_7h1]:ammo_7.62x54_7h1
+box_size	= 1
+mag_size	= 10
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x54a10
+inv_name		= mag_10_7.62x54
+description		= desc_load_7.62x54_7h1
+inv_name_short	= mag_10_7.62x54_7h1_s
+inv_weight		= 0.0215
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 60
+inv_grid_y			= 8
+visual	= weapons\magazines\mag_10_762x54.ogf
+cost = 125
+
+[mag_10_7.62x54_ap]:ammo_7.62x54_ap
+box_size	= 1
+mag_size	= 10
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x54b10
+inv_name		= mag_10_7.62x54
+description		= desc_load_7.62x54_ap
+inv_name_short	= mag_10_7.62x54_ap_s
+inv_weight		= 0.0215
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 60
+inv_grid_y			= 8
+visual	= weapons\magazines\mag_10_762x54.ogf
+cost = 125
+
+[mag_10_7.62x54_7h14]:ammo_7.62x54_7h14
+box_size	= 1
+mag_size	= 10
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x54c10
+inv_name		= mag_10_7.62x54
+description		= desc_load_7.62x54_7h14
+inv_name_short	= mag_10_7.62x54_7h14_s
+inv_weight		= 0.0215
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 60
+inv_grid_y			= 8
+visual	= weapons\magazines\mag_10_762x54.ogf
+cost = 125
+
+[mag_47_7.62x54_7h1]:ammo_7.62x54_7h1
+box_size	= 1
+mag_size	= 47
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x54a47
+inv_name		= mag_47_7.62x54
+description		= desc_load_7.62x54_7h1
+inv_name_short	= mag_47_7.62x54_7h1_s
+inv_weight		= 0.0215
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 8
+visual	= weapons\magazines\mag_47_762x54.ogf
+cost = 220
+
+[mag_47_7.62x54_ap]:ammo_7.62x54_ap
+box_size	= 1
+mag_size	= 47
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x54b47
+inv_name		= mag_47_7.62x54
+description		= desc_load_7.62x54_ap
+inv_name_short	= mag_47_7.62x54_ap_s
+inv_weight		= 0.0215
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 8
+visual	= weapons\magazines\mag_47_762x54.ogf
+cost = 220
+
+[mag_47_7.62x54_7h14]:ammo_7.62x54_7h14
+box_size	= 1
+mag_size	= 47
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x54c47
+inv_name		= mag_47_7.62x54
+description		= desc_load_7.62x54_7h14
+inv_name_short	= mag_47_7.62x54_7h14_s
+inv_weight		= 0.0215
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 8
+visual	= weapons\magazines\mag_47_762x54.ogf
+cost = 220
+
+[belt_100_7.62x54_7h1]:ammo_7.62x54_7h1
+box_size	= 1
+mag_size	= 100
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x54a100
+inv_name		= belt_100_7.62x54
+description		= desc_load_7.62x54_7h1
+inv_name_short	= belt_100_7.62x54_7h1_s
+inv_weight		= 0.0215
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 0
+visual	= weapons\magazines\box_100_762x54.ogf
+cost = 460
+
+[belt_100_7.62x54_ap]:ammo_7.62x54_ap
+box_size	= 1
+mag_size	= 100
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x54b100
+inv_name		= belt_100_7.62x54
+description		= desc_load_7.62x54_ap
+inv_name_short	= belt_100_7.62x54_ap_s
+inv_weight		= 0.0215
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 0
+visual	= weapons\magazines\box_100_762x54.ogf
+cost = 460
+
+[belt_100_7.62x54_7h14]:ammo_7.62x54_7h14
+box_size	= 1
+mag_size	= 100
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x54c100
+inv_name		= belt_100_7.62x54
+description		= desc_load_7.62x54_7h14
+inv_name_short	= belt_100_7.62x54_7h14_s
+inv_weight		= 0.0215
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 59
+inv_grid_y			= 0
+visual	= weapons\magazines\box_100_762x54.ogf
+cost = 460
+
+[mag_10_7.62x54_7h1_e]:mag_10_7.62x54_7h1
+description		= desc_mag_e
+inv_weight = 0.14
+
+[mag_10_7.62x54_ap_e]:mag_10_7.62x54_ap
+description		= desc_mag_e
+inv_weight = 0.14
+
+[mag_10_7.62x54_7h14_e]:mag_10_7.62x54_7h14
+description		= desc_mag_e
+inv_weight = 0.14
+
+[mag_47_7.62x54_7h1_e]:mag_47_7.62x54_7h1
+description		= desc_mag_e
+inv_weight = 1.79
+
+[mag_47_7.62x54_ap_e]:mag_47_7.62x54_ap
+description		= desc_mag_e
+inv_weight = 1.79
+
+[mag_47_7.62x54_7h14_e]:mag_47_7.62x54_7h14
+description		= desc_mag_e
+inv_weight = 1.79
+
+[belt_100_7.62x54_7h1_e]:belt_100_7.62x54_7h1
+description		= desc_belt_e
+inv_weight = 1.75
+
+[belt_100_7.62x54_ap_e]:belt_100_7.62x54_ap
+description		= desc_belt_e
+inv_weight = 1.75
+
+[belt_100_7.62x54_7h14_e]:belt_100_7.62x54_7h14
+description		= desc_belt_e
+inv_weight = 1.75
+
+

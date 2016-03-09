@@ -1,0 +1,477 @@
+function gulag_enemy_s(w)
+	local gulag = xr_gulag.get_gulag_by_name(w)
+	if (gulag) then 
+		if gulag:npc_is_enemy_of_stalkers(db.actor) then return true end
+	end
+	return false
+end
+
+function gulag_enemy_f(w)
+	local gulag = xr_gulag.get_gulag_by_name(w)
+	if (gulag) then 
+		if gulag:npc_is_enemy_of_freedom(db.actor) then return true end
+	end
+	return false
+end
+
+function gulag_enemy_d(w)
+	local gulag = xr_gulag.get_gulag_by_name(w)
+	if (gulag) then 
+		if gulag:npc_is_enemy_of_dolg(db.actor) then return true end
+	end
+	return false
+end
+
+function gulag_enemy_b(w)
+	local gulag = xr_gulag.get_gulag_by_name(w)
+	if (gulag) then 
+		if gulag:npc_is_enemy_of_bandits(db.actor) then return true end
+	end
+	return false
+end
+
+function gulag_enemy_m(w)
+	local gulag = xr_gulag.get_gulag_by_name(w)
+	if (gulag) then 
+		if gulag:npc_is_enemy_of_military(db.actor) then return true end
+	end
+	return false
+end
+--------------------------------------------------------------------------------------------------------
+--/У Меченого есть деньги
+--------------------------------------------------------------------------------------------------------
+function has_1000(actor, npc)
+    return actor:money() >= 1000
+end
+
+function has_10000(actor, npc)
+    return actor:money() >= 10000
+end
+
+function has_20000(actor, npc)
+    return actor:money() >= 20000
+end
+
+function has_30000(actor, npc)
+    return actor:money() >= 30000
+end
+
+function has_40000(actor, npc)
+    return actor:money() >= 40000
+end
+
+function has_50000(actor, npc)
+    return actor:money() >= 40000
+end
+
+function has_60000(actor, npc)
+    return actor:money() >= 60000
+end
+
+function has_80000(actor, npc)
+    return actor:money() >= 80000
+end
+
+
+--------------------------------------------------------------------------------------------------------
+--/Передача денег
+--------------------------------------------------------------------------------------------------------
+function relocate_1000(trader, actor)
+	dialogs.relocate_money(actor, 1000, "out")
+end
+
+function relocate_10000(trader, actor)
+	dialogs.relocate_money(actor, 10000, "out")
+end
+
+function relocate_20000(trader, actor)
+	dialogs.relocate_money(actor, 20000, "out")
+end
+
+function relocate_30000(trader, actor)
+	dialogs.relocate_money(actor, 30000, "out")
+end
+
+function relocate_40000(trader, actor)
+	dialogs.relocate_money(actor, 40000, "out")
+end
+
+function relocate_50000(trader, actor)
+	dialogs.relocate_money(actor, 50000, "out")
+end
+function relocate_60000(trader, actor)
+	dialogs.relocate_money(actor, 60000, "out")
+end
+
+--------------------------------------------------------------------------------------------------------
+--/Восстановление отношений с одиночками
+--------------------------------------------------------------------------------------------------------
+
+function bad_relation_stalker(trader, actor)
+	if relation_registry.community_goodwill ("stalker", db.actor:id()) < -50 or
+		gulag_enemy_s("esc_lager") == true or
+		gulag_enemy_s("bar_dolg_general") == true or
+		gulag_enemy_s("bar_visitors") == true or
+		gulag_enemy_s("bar_dolg_bunker") == true or
+		gulag_enemy_s("bar_dolg_veterans") == true or
+		gulag_enemy_s("bar_zastava_2") == true or
+		gulag_enemy_s("bar_zastava") == true then
+			local comm = db.actor:character_community()
+			if (comm ~= "actor_zombied") 
+			and (comm ~= "bandit") 
+			and (comm ~= "military") 
+			and (comm ~= "killer") then 
+			return true end
+	else 
+		return false 
+	end
+end
+
+function bad_relation_30000(trader, actor)
+	if relation_registry.community_goodwill ("stalker", db.actor:id()) >= -150 and
+		gulag_enemy_s("bar_dolg_general") == true or
+		gulag_enemy_s("bar_visitors") == true or
+		gulag_enemy_s("bar_dolg_bunker") == true or
+		gulag_enemy_s("bar_dolg_veterans") == true or
+		gulag_enemy_s("bar_zastava_2") == true or
+		gulag_enemy_s("bar_zastava") == true then
+		return true 
+	else 
+		return false 
+	end
+end
+
+function bad_relation_10000(trader, actor)
+	if relation_registry.community_goodwill ("stalker", db.actor:id()) >= -150 and
+		gulag_enemy_s("esc_lager") == false and 
+		gulag_enemy_s("bar_dolg_general") == false and
+		gulag_enemy_s("bar_visitors") == false and
+		gulag_enemy_s("bar_dolg_bunker") == false and
+		gulag_enemy_s("bar_dolg_veterans") == false and
+		gulag_enemy_s("bar_zastava_2") == false and
+		gulag_enemy_s("bar_zastava") == false then
+		return true
+	else 
+		return false
+	end
+end
+
+function bad_relation_20000(trader, actor)
+	if relation_registry.community_goodwill ("stalker", db.actor:id()) >= -150 and
+		gulag_enemy_s("esc_lager") == true and 
+		gulag_enemy_s("bar_dolg_general") == false and
+		gulag_enemy_s("bar_visitors") == false and
+		gulag_enemy_s("bar_dolg_bunker") == false and
+		gulag_enemy_s("bar_dolg_veterans") == false and
+		gulag_enemy_s("bar_zastava_2") == false and
+		gulag_enemy_s("bar_zastava") == false then
+		return true
+	else
+		return false
+	end
+end
+
+
+function bad_relation_40000(trader, actor)
+	if relation_registry.community_goodwill ("stalker", db.actor:id()) < -150 and
+		relation_registry.community_goodwill ("stalker", db.actor:id()) >= -1000 and
+		gulag_enemy_s("bar_dolg_general") == false and
+		gulag_enemy_s("bar_visitors") == false and
+		gulag_enemy_s("bar_dolg_bunker") == false and
+		gulag_enemy_s("bar_dolg_veterans") == false and
+		gulag_enemy_s("bar_zastava_2") == false and
+		gulag_enemy_s("bar_zastava") == false then
+		return true
+	else
+		return false
+	end
+end
+
+function bad_relation_50000(trader, actor)
+	if relation_registry.community_goodwill ("stalker", db.actor:id()) < -150 and
+		relation_registry.community_goodwill ("stalker", db.actor:id()) >= -1000 and
+		gulag_enemy_s("bar_dolg_general") == true or
+		gulag_enemy_s("bar_visitors") == true or
+		gulag_enemy_s("bar_dolg_bunker") == true or
+		gulag_enemy_s("bar_dolg_veterans") == true or
+		gulag_enemy_s("bar_zastava_2") == true or
+		gulag_enemy_s("bar_zastava") == true then
+		return true
+	else
+		return false
+	end
+end
+
+function bad_relation_60000(trader, actor)
+	if relation_registry.community_goodwill ("stalker", db.actor:id()) < -1000 then
+		return true
+	else
+		return false
+	end
+end
+
+function repair_relation_stalker(trader, actor)
+--[[
+			xr_gulag.setGulagRelation ("esc_lager",         game_object.neutral, db.actor)
+			xr_gulag.setGulagRelation ("bar_dolg_general",  game_object.neutral, db.actor)
+			xr_gulag.setGulagRelation ("bar_dolg_bunker",   game_object.neutral, db.actor)
+			xr_gulag.setGulagRelation ("bar_visitors",      game_object.neutral, db.actor)
+			xr_gulag.setGulagRelation ("bar_dolg_veterans", game_object.neutral, db.actor)
+			xr_gulag.setGulagRelation ("bar_zastava_2",     game_object.neutral, db.actor)
+			xr_gulag.setGulagRelation ("bar_zastava",       game_object.neutral, db.actor)
+			relation_registry.set_community_goodwill ("stalker", db.actor:id(), 0)
+--]]
+
+	xr_gulag.setGulagRelation_ex ("esc_lager",         game_object.neutral, db.actor)
+	xr_gulag.setGulagRelation_ex ("bar_dolg_general",  game_object.neutral, db.actor)
+	xr_gulag.setGulagRelation_ex ("bar_dolg_bunker",   game_object.neutral, db.actor)
+	xr_gulag.setGulagRelation_ex ("bar_visitors",      game_object.neutral, db.actor)
+	xr_gulag.setGulagRelation_ex ("bar_dolg_veterans", game_object.neutral, db.actor)
+	xr_gulag.setGulagRelation_ex ("bar_zastava_2",     game_object.neutral, db.actor)
+	xr_gulag.setGulagRelation_ex ("bar_zastava",       game_object.neutral, db.actor)
+	
+	xr_gulag.setGulagPersonalGoodwill ("esc_lager",         500, db.actor)
+	xr_gulag.setGulagPersonalGoodwill ("bar_dolg_general",  500, db.actor)
+	xr_gulag.setGulagPersonalGoodwill ("bar_dolg_bunker",   500, db.actor)
+	xr_gulag.setGulagPersonalGoodwill ("bar_visitors",      500, db.actor)
+	xr_gulag.setGulagPersonalGoodwill ("bar_dolg_veterans", 500, db.actor)
+	xr_gulag.setGulagPersonalGoodwill ("bar_zastava_2",     500, db.actor)
+	xr_gulag.setGulagPersonalGoodwill ("bar_zastava",       500, db.actor)	
+	
+	relation_registry.set_community_goodwill ("stalker", db.actor:id(), 500)
+	
+end
+
+
+--------------------------------------------------------------------------------------------------------
+--/Восстановление отношений с долговцами
+--------------------------------------------------------------------------------------------------------
+function bad_relation_dolg(trader, actor)
+	if relation_registry.community_goodwill ("dolg", db.actor:id()) < 0 or
+		gulag_enemy_d("bar_dolg_general") == true or
+		gulag_enemy_d("bar_visitors") == true or
+		gulag_enemy_d("bar_dolg_bunker") == true or
+		gulag_enemy_d("bar_dolg_veterans") == true or
+		gulag_enemy_d("bar_zastava_2") == true or
+		gulag_enemy_d("bar_zastava") == true then
+			local comm = db.actor:character_community()
+			if (comm ~= "actor_freedom") and
+			(comm ~= "actor_zombied") and
+			(comm ~= "bandit") and
+			(comm ~= "military") and
+			(comm ~= "killer") then return true end
+	else 
+		return false
+	end
+end
+
+function give_info_dolg(first_speaker, second_speaker)
+	if db.actor ~= nil then
+		if gulag_enemy_d("bar_dolg_general") == false and
+			gulag_enemy_d("bar_visitors") == false and
+			gulag_enemy_d("bar_dolg_bunker") == false and
+			gulag_enemy_d("bar_dolg_veterans") == false and
+			gulag_enemy_d("bar_zastava_2") == false and
+			gulag_enemy_d("bar_zastava") == false then
+				db.actor:give_info_portion("actor_dolg_10000")
+				if has_alife_info("actor_dolg_30000") then
+					db.actor:disable_info_portion("actor_dolg_30000")
+				end
+				if has_alife_info("actor_dolg_80000") then
+					db.actor:disable_info_portion("actor_dolg_80000")
+				end
+		elseif gulag_enemy_d("bar_dolg_general") == true or
+			gulag_enemy_d("bar_visitors") == true or
+			gulag_enemy_d("bar_dolg_bunker") == true or
+			gulag_enemy_d("bar_dolg_veterans") == true then 
+				db.actor:give_info_portion("actor_dolg_80000")
+				if has_alife_info("actor_dolg_30000") then
+					db.actor:disable_info_portion("actor_dolg_30000")
+				end
+				if has_alife_info("actor_dolg_10000") then
+					db.actor:disable_info_portion("actor_dolg_10000")
+				end
+		else
+			db.actor:give_info_portion("actor_dolg_30000")
+		end
+	end
+end
+
+function repair_relation_dolg(trader, actor)
+	local comm = db.actor:character_community()
+	local howmuch = 0
+	if db.actor then 
+		if gulag_enemy_d("bar_dolg_general") == false and
+			gulag_enemy_d("bar_visitors") == false and
+			gulag_enemy_d("bar_dolg_bunker") == false and
+			gulag_enemy_d("bar_dolg_veterans") == false and
+			gulag_enemy_d("bar_zastava_2") == false and
+			gulag_enemy_d("bar_zastava") == false and 
+			db.actor:money() >= 10000 then 
+				howmuch = 10000 
+		elseif gulag_enemy_d("bar_dolg_general") == true or
+			gulag_enemy_d("bar_visitors") == true or
+			gulag_enemy_d("bar_dolg_bunker") == true or
+			gulag_enemy_d("bar_dolg_veterans") == true and 
+			db.actor:money() >= 80000 then
+				howmuch = 80000 
+		else
+			howmuch = 30000 
+		end
+		
+		dialogs.relocate_money(actor, howmuch, "out")
+		relation_registry.set_community_goodwill ("dolg", db.actor:id(), 500)
+		
+		xr_gulag.setGulagRelation_ex ("bar_dolg_general",  game_object.neutral, db.actor)
+		xr_gulag.setGulagRelation_ex ("bar_dolg_bunker",   game_object.neutral, db.actor)
+		xr_gulag.setGulagRelation_ex ("bar_dolg_veterans", game_object.neutral, db.actor)
+		xr_gulag.setGulagRelation_ex ("bar_zastava_2",     game_object.neutral, db.actor)
+		xr_gulag.setGulagRelation_ex ("bar_zastava",       game_object.neutral, db.actor)
+		xr_gulag.setGulagRelation_ex ("bar_visitors",      game_object.neutral, db.actor)
+		
+		xr_gulag.setGulagPersonalGoodwill ("bar_dolg_general",  500, db.actor)
+		xr_gulag.setGulagPersonalGoodwill ("bar_dolg_bunker",   500, db.actor)
+		xr_gulag.setGulagPersonalGoodwill ("bar_dolg_veterans", 500, db.actor)
+		xr_gulag.setGulagPersonalGoodwill ("bar_zastava_2",     500, db.actor)
+		xr_gulag.setGulagPersonalGoodwill ("bar_zastava",       500, db.actor)
+		xr_gulag.setGulagPersonalGoodwill ("bar_visitors",      500, db.actor)		
+		
+		if has_alife_info("actor_dolg_30000") then
+			db.actor:disable_info_portion("actor_dolg_30000")
+		end
+		if has_alife_info("actor_dolg_10000") then
+			db.actor:disable_info_portion("actor_dolg_10000")
+		end
+		if has_alife_info("actor_dolg_80000") then
+			db.actor:disable_info_portion("actor_dolg_80000")
+		end
+	end
+end
+--------------------------------------------------------------------------------------------------------
+--/Восстановление отношений со свободовцами 
+--------------------------------------------------------------------------------------------------------
+
+function bad_relation_freedom(trader, actor)
+	if relation_registry.community_goodwill ("freedom", db.actor:id()) < 0 then
+		local comm = db.actor:character_community()
+		if (comm ~= "actor_dolg") and
+			(comm ~= "actor_zombied") and
+			(comm ~= "bandit") and
+			(comm ~= "military") and
+			(comm ~= "killer") then return true end
+	else
+		return false
+	end
+end
+
+function give_info_free(first_speaker, second_speaker)
+	if db.actor then
+		if relation_registry.community_goodwill ("freedom", db.actor:id()) < 0 then
+			local chkgoodwill = relation_registry.community_goodwill("freedom",  db.actor:id ())
+			if chkgoodwill > -100 then 
+				db.actor:give_info_portion("actor_freedom_10000")
+				if has_alife_info("actor_freedom_30000") then
+					db.actor:disable_info_portion("actor_freedom_30000")
+				end
+				if has_alife_info("actor_freedom_80000") then
+					db.actor:disable_info_portion("actor_freedom_80000")
+				end
+			end
+			if chkgoodwill < -100 and chkgoodwill >= -1000 then 
+				db.actor:give_info_portion("actor_freedom_30000")
+				if has_alife_info("actor_freedom_10000") then
+					db.actor:disable_info_portion("actor_freedom_10000")
+				end
+				if has_alife_info("actor_freedom_80000") then
+					db.actor:disable_info_portion("actor_freedom_80000")
+				end
+			end
+			if chkgoodwill < -1000 then 
+				db.actor:give_info_portion("actor_freedom_80000")
+				if has_alife_info("actor_freedom_30000") then
+					db.actor:disable_info_portion("actor_freedom_30000")
+				end
+				if has_alife_info("actor_freedom_10000") then
+					db.actor:disable_info_portion("actor_freedom_10000")
+				end
+			end
+		end
+	end
+end
+
+
+function repair_relation_free(trader, actor)
+	local howmuch = 0
+	if db.actor ~= nil then 
+		local chkgoodwill = relation_registry.community_goodwill("freedom",  db.actor:id())
+		if chkgoodwill > -100 then howmuch = 10000 end
+		if chkgoodwill < -100 and chkgoodwill >= -1000 then howmuch = 30000 end
+		if chkgoodwill < -1000 then howmuch = 80000 end
+		dialogs.relocate_money(actor, howmuch, "out")
+		
+		relation_registry.set_community_goodwill ("freedom", db.actor:id(), 500)
+		
+		xr_gulag.setGulagRelation ("mil_freedom", game_object.neutral, db.actor)
+		xr_gulag.setGulagRelation ("mil_fblockpost", game_object.neutral, db.actor)
+
+		xr_gulag.setGulagPersonalGoodwill("mil_freedom", 500, db.actor)
+		xr_gulag.setGulagPersonalGoodwill("mil_fblockpost", 500, db.actor)		
+		
+		if has_alife_info("actor_freedom_30000") then
+			db.actor:disable_info_portion("actor_freedom_30000")
+		end
+		if has_alife_info("actor_freedom_10000") then
+			db.actor:disable_info_portion("actor_freedom_10000")
+		end
+		if has_alife_info("actor_freedom_80000") then
+			db.actor:disable_info_portion("actor_freedom_80000")
+		end
+	end
+end
+
+--------------------------------------------------------------------------------------------------------
+--/Восстановление отношений с бандитами через торговца бандитов Барыгу
+--------------------------------------------------------------------------------------------------------
+
+function bad_relation_bandit(trader, actor)
+	if relation_registry.community_goodwill ("bandit", db.actor:id()) < -50 then
+		local comm = db.actor:character_community()
+		if (comm ~= "actor_dolg") and
+			(comm ~= "actor_zombied") and
+			(comm ~= "actor") and
+			(comm ~= "actor_prebandit") and
+			(comm ~= "actor_freedom") then return true end
+	else 
+		return false
+	end
+end
+
+function bad_relation_bandit_10000(trader, actor)
+	if relation_registry.community_goodwill ("bandit", db.actor:id()) >= -150 then
+		return true
+	else
+		return false
+	end
+end
+
+function bad_relation_bandit_30000(trader, actor)
+	if relation_registry.community_goodwill ("bandit", db.actor:id()) < -150 and
+	relation_registry.community_goodwill ("bandit", db.actor:id()) >= -1000 then
+		return true
+	else 
+		return false
+	end
+end
+
+function bad_relation_bandit_50000(trader, actor)
+	if relation_registry.community_goodwill ("bandit", db.actor:id()) < -1000 then
+		return true
+	else
+		return false
+	end
+end
+
+function repair_relation_bandit(trader, actor)
+	relation_registry.set_community_goodwill ("bandit", db.actor:id(), 0)
+end
+

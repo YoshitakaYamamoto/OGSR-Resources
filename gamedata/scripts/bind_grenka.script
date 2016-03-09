@@ -1,0 +1,54 @@
+function init(obj)
+   obj:bind_object(grenka_binder(obj))
+end
+
+class "grenka_binder" (object_binder)
+-- default methods
+function grenka_binder:__init(obj) super(obj)
+end
+
+function grenka_binder:load(reader)
+	object_binder.load(self, reader)
+end
+
+function grenka_binder:reload(section)
+	object_binder.reload(self, section)
+end
+
+function grenka_binder:save(packet)
+   object_binder.save(self, packet)
+end
+
+function grenka_binder:reload(section)
+	object_binder.reload(self, section)
+end
+
+function grenka_binder:net_save_relevant()
+	return true
+end
+
+-- custom methods
+function grenka_binder:net_spawn(server_object)
+	if not object_binder.net_spawn(self, data) then
+		return false
+	end
+	log1("!!DEBUG_GRENKA I AM ALIVE ["..tostring(self.object:id()).."]")
+	return true
+end
+
+function grenka_binder:reinit()
+	object_binder.reinit(self)
+end
+
+function grenka_binder:net_destroy()
+
+	object_binder.net_destroy(self)
+end
+
+function grenka_binder:update(delta)
+	object_binder.update(self, delta)
+	local pos_actor = db.actor:position()
+	local pos_grenka = self.object:position()
+	local dist = pos_grenka:distance_to(pos_actor)
+	log1("!!DEBUG_GRENKA I AM ["..tostring(self.object:id()).."] AT DISTANCE ["..tostring(dist).."]")
+end

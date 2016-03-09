@@ -1,0 +1,250 @@
+#include "trade_unic.ltx"
+#include "trade_weapons.ltx"
+
+[trader]
+buy_condition = new_weapons_generic_buy
+sell_condition = new_weapons_generic_sale
+buy_supplies = new_weapons_generic_supplies
+
+[new_weapons_generic_buy]:unic_buy, weapons_buy_cheap
+;Аммуниция
+ammo_7.62x25_p		= 0.3,	0.1	   
+ammo_7.62x25_ps		= 0.5,	0.2
+ammo_7.62x39_fmj	= 0.3,	0.1
+ammo_7.62x39_ap		= 0.5,	0.2   
+ammo_9x18_fmj		= 0.3,	0.1
+ammo_9x18_pmm		= 0.5,	0.2
+ammo_9x19_fmj		= 0.3,	0.1
+ammo_9x19_pbp		= 0.5,	0.2
+ammo_5.45x39_fmj	= 0.3,	0.1  
+ammo_5.45x39_ap		= 0.5,	0.2 
+ammo_5.56x45_ss190	= 0.3,	0.1		   
+ammo_5.56x45_ap		= 0.5,	0.2	   
+ammo_7.62x54_7h1	= 0.5,	0.2	   
+ammo_7.62x54_ap		= 0.5,	0.2	   
+ammo_7.62x54_7h14	= 0.5,	0.2	   
+ammo_gauss			= 0.5,	0.2
+ammo_9x39_pab9		= 0.3,	0.1   
+ammo_9x39_ap		= 0.5,	0.2  
+ammo_11.43x23_fmj	= 0.3,	0.1	   
+ammo_11.43x23_hydro	= 0.5,	0.2		   
+ammo_12x76_zhekan	= 0.5,	0.2   
+ammo_12x70_kart		= 0.5,	0.2
+ammo_og-7b			= 0.5,	0.2   
+ammo_vog-25p		= 0.5,	0.2	   
+ammo_vog-25			= 0.5,	0.2  
+ammo_m209			= 0.5,	0.2
+ammo_flame			= 0.5,	0.2
+ammo_arbolt			= 0.5,	0.2
+ammo_m208a			= 0.5,	0.2
+
+;Гранаты
+grenade_f1				= 0.4,	0.3   
+grenade_light			= 0.4,	0.3
+grenade_rgd5			= 0.4,	0.3
+
+;Оружие. Берёт всё, но за гроши.
+wpn_pm					= 0.25,	0.1
+wpn_beretta				= 0.25,	0.1
+wpn_hpsa				= 0.25,	0.1
+wpn_tt					= 0.25,	0.1
+;Автоматы и ПП
+wpn_mp40                = 0.3,	0.1
+wpn_mp5			        = 0.3,	0.1 
+wpn_mac10				= 0.3,	0.1
+wpn_fn2000		        = 0.3,	0.1
+wpn_g36				    = 0.3,	0.1
+wpn_sig550				= 0.3,	0.1
+wpn_m16a1_sk1			= 0.3,	0.1
+wpn_ppsh41		    = 0.3,	0.1
+wpn_val				    = 0.3,	0.1
+wpn_groza				= 0.3,	0.1
+
+;Дробовики
+wpn_bm16			    = 0.3,	0.1
+wpn_bm16_full		    = 0.3,	0.1
+wpn_toz34_short			= 0.3,	0.1
+wpn_toz34				= 0.3,	0.1
+wpn_wincheaster1300		= 0.3,	0.1
+wpn_spas12				= 0.3,	0.1
+wpn_saiga12c			= 0.3,	0.1
+wpn_sayga12k_sk1		= 0.3,	0.1
+
+;Снайперские винтовки
+wpn_sg550sr_sk1         = 0.3,	0.1
+wpn_svu				    = 0.3,	0.1
+wpn_vintorez			= 0.3,	0.1	  
+wpn_gauss			    = 0.3,	0.1
+
+;Пулеметы
+wpn_rpk74_sk1			= 0.3,	0.1
+wpn_pkm				    = 0.3,	0.1
+
+;Другое
+wpn_flame			    = 0.3,	0.1
+wpn_crossbow			= 0.3,	0.1
+wpn_pb				    = 0.3,	0.1
+wpn_rpg7				= 0.3,	0.1
+
+;ADDONS
+
+wpn_zf4	   				   = 0.5,	0.3
+wpn_addon_scope	   		   = 0.5,	0.3
+wpn_addon_acog	   		   = 0.5,	0.3
+wpn_addon_scope_susat	   = 0.5,	0.3
+wpn_addon_scope_1p29	   = 0.5,	0.3
+wpn_addon_scope_kobra	   = 0.5,	0.3
+wpn_addon_scope_1pn51	   = 0.5,	0.3
+wpn_addon_scope_eotech	   = 0.5,	0.3
+wpn_addon_scope_pso1m21	   = 0.5,	0.3
+wpn_addon_scope_1p59	   = 0.5,	0.3
+
+wpn_addon_silencer	    = 0.5,	0.3
+wpn_9mm_nato_silencer	= 0.5,	0.3
+wpn_addon_sil_1143_p	= 0.5,	0.3
+wpn_addon_sil_556_ar	= 0.5,	0.3
+wpn_addon_sil_762_pbs1	= 0.5,	0.3
+wpn_addon_sil_762_tgp-v	= 0.5,	0.3
+wpn_addon_sil_545_pbs4	= 0.5,	0.3
+wpn_addon_sil_545_tgp-a	= 0.5,	0.3
+wpn_addon_sil_545_atg	= 0.5,	0.3
+
+wpn_addon_grenade_launcher		= 0.5,	0.3
+wpn_addon_grenade_launcher_m203 = 0.5,	0.3
+
+wpn_addon_mag_akm30         = 0.5,	0.3
+wpn_addon_mag_rpk40         = 0.5,	0.3
+wpn_addon_mag_rpk75         = 0.5,	0.3
+wpn_addon_mag_ak7430        = 0.5,	0.3
+wpn_addon_mag_rpk7445       = 0.5,	0.3
+wpn_addon_mag_ak10560       = 0.5,	0.3
+wpn_addon_mag_svd10         = 0.5,	0.3
+wpn_addon_mag_svd20         = 0.5,	0.3
+wpn_addon_mag_ak10230       = 0.5,	0.3
+wpn_addon_mag_cmag100       = 0.5,	0.3
+
+wpn_addon_grip = 0.5,	0.3
+wpn_addon_mtk83  = 0.5,	0.3
+wpn_addon_svd_scheek  = 0.5,	0.3
+
+mutant_flesh_eye	; NO TRADE
+mutant_boar_leg	; NO TRADE
+mutant_dog_tail	; NO TRADE
+mutant_psevdodog_tail	; NO TRADE
+mutant_krovosos_jaw	; NO TRADE
+mutant_burer_hand	; NO TRADE
+mutant_zombie_hand	; NO TRADE
+mutant_snork_leg	; NO TRADE
+mutant_face_tushkano		; NO TRADE
+mutant_hand_kontroler		; NO TRADE
+mutant_poltergeist_glas		; NO TRADE
+mutant_psevdogigant_hand	; NO TRADE
+mutant_tail_cat			; NO TRADE
+mutant_chimera_kogot		; NO TRADE
+
+;------------------------- АССОРТИМЕНТ -----------------------
+[new_weapons_generic_supplies]
+ammo_5.45x39_fmj	= 10,	1
+ammo_5.45x39_ap		= 9,	0.8
+ammo_7.62x39_fmj	= 10,	1
+ammo_7.62x39_ap		= 9,	0.8
+ammo_9x39_pab9		= 6,	1
+ammo_9x39_ap		= 6,	0.8
+ammo_9x18_fmj		= 6,	1
+ammo_9x18_pmm		= 6,	0.7
+ammo_7.62x54_7h1	= 8,	1
+ammo_7.62x54_7h14	= 7,	0.7
+ammo_7.62x54_ap		= 7,	0.8
+ammo_vog-25			= 7,	1
+ammo_vog-25p		= 7,	0.9
+ammo_12x76_zhekan	= 6,	0.8   
+ammo_12x70_kart		= 6,	0.8
+
+; новое оружие
+wpn_akm_akm30_ironsight		= 1,	0.6	   
+wpn_ak74n_ak74n30_ironsight			= 1,	0.6	 
+wpn_aks74ub_aks74ub30_ironsight			= 1,	0.6	 
+wpn_swd_svd10_pso1         = 1,	0.6	 
+wpn_ak102_ak10230_stok_kobra           = 1,	0.6	
+
+wpn_addon_mtk83         = 1,	0.6	 
+
+wpn_addon_scope_eotech         = 1,	0.6	 
+wpn_addon_scope_kobra         = 1,	0.6	 
+;------------------------- ПРОДАЖА -----------------------
+[new_weapons_generic_sale]:unic_sale
+;Аммуниция
+ammo_7.62x25_p			= 1,	4
+ammo_7.62x25_ps			= 1,	5
+ammo_7.62x39_fmj			= 1,	4
+ammo_7.62x39_ap			= 1,	5
+ammo_9x18_fmj			= 1,	4
+ammo_9x18_pmm			= 1,	5
+ammo_9x19_fmj			= 1,	4
+ammo_9x19_pbp			= 1,	5
+ammo_5.45x39_fmj			= 1,	4
+ammo_5.45x39_ap			= 1,	5   
+ammo_5.56x45_ss190		= 1,	4
+ammo_5.56x45_ap			= 1,	5
+ammo_7.62x54_7h1			= 1,	4
+ammo_7.62x54_ap			= 1,	5
+ammo_7.62x54_7h14			= 1,	5
+ammo_gauss				= 1,	5
+ammo_9x39_pab9			= 1,	4
+ammo_9x39_ap			= 1,	5
+ammo_11.43x23_fmj			= 1,	4
+ammo_11.43x23_hydro		= 1,	5
+ammo_12x76_zhekan			= 1,	4   
+ammo_12x70_kart			= 1,	4
+ammo_og-7b				= 1,	4
+ammo_vog-25p			= 1,	4
+ammo_vog-25				= 1,	4
+ammo_m209				= 1,	4
+ammo_arbolt				= 1,	4
+ammo_m208a				= 1,	4
+ammo_flame			= 1,	5
+
+;ADDONS
+wpn_addon_scope		= 1,	3
+wpn_addon_scope_susat	= 1,	3
+wpn_addon_acog		= 1,	3
+wpn_zf4             = 1,	3
+
+wpn_addon_silencer			= 1,	3
+wpn_9mm_nato_silencer			= 1,	3
+wpn_addon_sil_1143_p			= 1,	3
+wpn_addon_sil_556_ar			= 1,	3
+wpn_addon_sil_762_pbs1	= 1,	3
+wpn_addon_sil_762_tgp-v	= 1,	3
+wpn_addon_sil_545_pbs4	= 1,	3
+wpn_addon_sil_545_tgp-a	= 1,	3
+wpn_addon_sil_545_atg	= 1,	3
+
+wpn_addon_grenade_launcher		= 1,	3
+wpn_addon_grenade_launcher_m203 	= 1,	3
+
+; новое оружие
+wpn_akm_akm30_ironsight		= 1,	4	   
+wpn_ak74n_ak74n30_ironsight			= 1,	4
+wpn_aks74ub_aks74ub30_ironsight			= 1,	4
+wpn_swd_svd10_pso1         = 1,	4
+wpn_ak102_ak10230_stok_kobra           = 1,	4
+
+wpn_addon_scope_eotech         = 1,	3
+wpn_addon_scope_kobra         = 1,	3
+wpn_addon_mtk83         = 1,	3
+
+mutant_flesh_eye	; NO TRADE
+mutant_boar_leg	; NO TRADE
+mutant_dog_tail	; NO TRADE
+mutant_psevdodog_tail	; NO TRADE
+mutant_krovosos_jaw	; NO TRADE
+mutant_burer_hand	; NO TRADE
+mutant_zombie_hand	; NO TRADE
+mutant_snork_leg	; NO TRADE
+mutant_face_tushkano		; NO TRADE
+mutant_hand_kontroler		; NO TRADE
+mutant_poltergeist_glas		; NO TRADE
+mutant_psevdogigant_hand	; NO TRADE
+mutant_tail_cat			; NO TRADE
+mutant_chimera_kogot		; NO TRADE

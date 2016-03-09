@@ -1,0 +1,77 @@
+;------------------------------
+[ammo_12x70_kart]:ammo_base
+$spawn			= "weapons\ammo\ammo_12x70_kart" ; option for Level Editor
+visual          = weapons\ammo\ammo_12x70_buck.ogf
+description		= enc_weapons1_ammo_ammo-12x70-kart
+
+cost			= 170
+
+box_size		= 10
+
+inv_name		= ammo-12x70-kart
+inv_name_short	= ammo-12x70-kart_s
+inv_weight		= 0.44
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 13
+inv_grid_y		= 9
+
+k_dist			= 0.75
+k_disp			= 7.5
+k_hit			= 0.5
+k_impulse		= 1.5
+k_pierce		= 1.0
+buck_shot		= 10
+wm_size         = 0.04
+
+;------------------------------
+[ammo_12x76_zhekan]:ammo_base
+$spawn			= "weapons\ammo\ammo_12x76_zhekan" ; option for Level Editor
+visual          = weapons\ammo\ammo_12x76_zhekan.ogf
+description		= enc_weapons1_ammo_ammo-12x76-zhekan
+
+cost			= 160
+
+box_size		= 10
+
+inv_name		= ammo-12x76-zhekan
+inv_name_short	= ammo-12x76-zhekan_s
+inv_weight		= 0.45
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 11
+inv_grid_y		= 10
+
+k_dist			= 1.5
+k_disp			= 1.0
+k_hit			= 2.7
+k_impulse		= 1.6
+impair			= 1.15
+wm_size         = 0.08
+tracer			= on
+explosive		= on
+
+[mag_8_12x76_zhekan]:ammo_12x76_zhekan
+box_size	= 1
+mag_size	= 8
+script_binding  = ammo_manager.init
+wm_section	= wm_12x76b8
+inv_name		= mag_8_12x76
+description		= desc_load_12x76_zhekan
+inv_name_short	= mag_8_12x76_zhekan_s
+inv_weight		= 0.0475
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 15
+visual	= weapons\magazines\mag_8_12-76.ogf
+cost = 100
+
+[mag_8_12x76_zhekan_e]:mag_8_12x76_zhekan
+description		= desc_mag_e
+inv_weight = 0.26
+
+[ammo_12x70_buck]:ammo_12x70_kart

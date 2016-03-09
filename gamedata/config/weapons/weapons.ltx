@@ -1,0 +1,298 @@
+;;;;; Арбалет ;;;;;
+#include "w_crossbow.ltx"
+
+;;;;; Пистолеты ;;;;;
+#include "w_hpsa.ltx"
+#include "w_pm.ltx"
+#include "w_pb.ltx"
+#include "w_ups.ltx"
+#include "w_glock.ltx"
+#include "w_fort.ltx"
+#include "w_colt1911.ltx"
+#include "w_beretta.ltx"
+#include "w_desert_eagle.ltx"
+#include "w_tt.ltx"
+
+;;;;; Автоматы, ПП ;;;;;
+#include "w_groza.ltx"
+#include "w_val.ltx"
+#include "w_fn2000.ltx"
+#include "w_g36.ltx"
+#include "w_m16a1_sk1.ltx"
+#include "w_sig550.ltx"
+#include "w_mac10.ltx"
+#include "w_mp5.ltx"
+#include "w_mp40.ltx"
+#include "w_ppsh41.ltx"
+
+;;;;; Снайперские винтовки ;;;;;
+#include "w_svu.ltx"
+#include "w_gauss.ltx"
+#include "w_sig550sr_sk1.ltx"
+#include "w_vintorez.ltx"
+
+;;;;; Пулеметы ;;;;;
+#include "w_rpk74_sk1.ltx"
+#include "w_pkm.ltx"
+#include "w_m_134.ltx"
+
+;;;;; Дробовики ;;;;;
+#include "w_bm16.ltx"
+#include "w_toz34.ltx"
+#include "w_sayga12k_sk1.ltx"
+#include "w_sayga12c.ltx"
+#include "w_spas12.ltx"
+#include "w_wincheaster1300.ltx"
+
+;;;;; Гранатометы, гранаты, взрывающиеся предметы;;;;;
+#include "delayed_action_fuse.ltx"
+#include "w_rpg7.ltx"
+#include "grenade_m1.ltx" ; для подствольников
+#include "grenade_m2.ltx" ; ручные
+#include "explosive.ltx" ; взрывающиеся предметы
+
+;;;;; базовая секция для фейковых и скриптовых аддонов ;;;;;
+; ВАЖНО! все инклюды аддонов должны быть после этой строки
+#include "addon_fake.ltx"
+
+;;;;; Глушители ;;;;;
+#include "addon_silencer.ltx"
+
+;;;;; Прицелы ;;;;;
+#include "addon_scope.ltx"
+
+;;;;; Подствольные гранатометы ;;;;;
+#include "addon_glauncher.ltx"
+
+;;;;; Тактические рукоятки ;;;;;
+#include "addon_grip.ltx"
+
+;;;;; Планки для установки прицелов ;;;;;
+#include "addon_scope_mount.ltx"
+
+;;;;; Магазины ;;;;;
+#include "addon_magazine.ltx"
+
+;;;;; Другое ;;;;;
+#include "w_knife.ltx"
+#include "w_bolt.ltx"
+#include "w_binoc.ltx"
+#include "w_mounted.ltx"
+#include "w_flame.ltx"
+#include "w_gravigun.ltx"
+
+
+;;;;; ТЕСТ АДДОНОВ
+#include "w_akm.ltx"
+#include "w_ak74n.ltx"
+#include "w_aks74ub.ltx"
+#include "w_ak102.ltx"
+#include "w_swd.ltx"
+
+;------------------------------
+; Огнестрельное оружие
+;------------------------------
+;;;ТЕСТ Магазинное питания оружия #include "dark_matter.ltx"
+
+[bullet_manager]
+tracer_width					= 0.08
+tracer_length_max				= 10.0	;24.0 ;14.0	
+tracer_length_min				= 2		;0.2
+
+;расстояние после которого учитывается hit_probabilty полностью
+hit_probability_max_dist		= 10;
+
+gravity_const					= 9.81
+;сопротивление воздуха, процент, который отнимается от скорости полета пули
+air_resistance_k				= 0.25 ;0.3
+
+;размер шага времени (в милисекундах), по которому проигрываются 
+time_step						= 33
+;минимальная скорость (м/с), на которой пуля еще считается и показывается
+min_bullet_speed				= 3.0
+;cколько процентов энергии потеряет пуля при столкновении с материалом (при падении под прямым углом)
+collision_energy_min			= 0.80 ;0.75; 0.90
+;сколько процентов энергии останется у пули при любом столкновении
+collision_energy_max			= 0.5 ;0.7;0.50
+
+whine_sounds					= weapons\whine\whine_1, weapons\whine\whine_2, weapons\whine\whine_3, weapons\whine\whine_4, weapons\whine\whine_5, weapons\whine\whine_6, weapons\whine\whine_7, weapons\whine\whine_8, weapons\whine\whine_9, weapons\whine\whine_10, weapons\whine\whine_11, weapons\whine\whine_12
+explode_particles				= explosions\expl_bullet, explosions\expl_bullet_00, explosions\expl_bullet_01, explosions\expl_bullet_02, explosions\expl_bullet_03
+
+[tracers_color_table]	;color_table
+color_0 = 1.0, 0.54, 0.0 ; yellow
+color_1 = 1.0, 1.0, 1.0	; white
+color_2 = 1.0, 0.1, 0.0	; red
+color_3 = 0.3, 1.0, 0.3	; green
+color_4 = 0.0, 0.0, 0.1 ; blue
+
+;------------------------------
+; Боеприпасы
+;------------------------------
+; k_dist = коэффициент дальности, завязан на дальность в стволе 
+
+; k_disp = коэффициент кучности, завязан с кучностью в стволе 
+
+; k_hit  = коэффициент убойности, завязан с убойностью в стволе 
+
+; k_impulse = коэффициент "толчка" при попадании. Походу работает только на "неживых" 
+
+; k_pierce = коэффициент бронебойности. hit_power оружия на бронебойность влияния не оказывает.
+; 1.1  - не пробивается забор и жесть.
+; 1.12 - пробивается забор и застревает в первой стенке халупы.
+; 1.15 - пробивается забор и застревает в первой стенке халупы.
+; 1.2  - пробивается забор и застревает в первой стенке халупы.
+; 1.25 - ствол толстого дерева не пробивается. пробивается забор и первая стенка, застревает во второй стенке халупы.
+; 1.35 - ствол толстого дерева не пробивается.
+; 1.4  - ствол толстого дерева не пробивается.
+; 1.45 - ствол толстого дерева пробивается
+; 1.5  - ствол толстого дерева пробивается
+; бетон не пробивается никогда 
+ 
+; impair = коэффициент износа ствола от пули 
+
+; buck_shot = кол-во составляющих в пуле (напр картечь - 4, пуля - 1) 
+
+; tracer = on является ли патрон трассирующим (on/off) 
+
+; wm_size = визуальный размер дырки на стене от пули. wm скорей всего означает wallmark
+;------------------------------
+
+[ammo_base]:identity_immunities
+GroupControlSection	 = spawn_group
+discovery_dependency = 
+cform           = skeleton
+class			= AMMO
+$prefetch 		= 64
+;belt			= true
+impair			= 1
+buck_shot		= 1
+tracer			= off
+explosive		= off
+k_dist			= 1
+k_disp			= 1
+k_hit			= 1
+k_impulse		= 1
+k_pierce		= 1
+wm_size         = 0.05
+
+;------------------------------
+;фейк-боеприпас для бинокля
+[ammo_binoc_dummy]:ammo_base
+$spawn			= "weapons\ammo\ammo_binoc_dummy" ; option for Level Editor
+description		= binocular
+
+cost			= 0
+box_size		= 0
+
+inv_name		= binocular
+inv_name_short	= binocular
+inv_weight		= 0.1
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 16
+inv_grid_y		= 8
+
+wm_size         = 0.01
+
+;фейк-боеприпас для бинокля ТЧ
+[ammo_binocular_dummy]:ammo_binoc_dummy
+$spawn			= "weapons\ammo\ammo_binocular_dummy" ; option for Level Editor
+inv_grid_x					= 16
+inv_grid_y					= 8
+;------------------------------
+
+;Магазинное питания оружия
+#include "ammo\9x18.ltx"
+#include "ammo\9x19.ltx"
+#include "ammo\9x39.ltx"
+#include "ammo\12cal.ltx"
+#include "ammo\57x28.ltx"
+#include "ammo\357.ltx"
+#include "ammo\545x39.ltx"
+#include "ammo\556x45.ltx"
+#include "ammo\762x25.ltx"
+#include "ammo\762x39.ltx"
+#include "ammo\762x51.ltx"
+#include "ammo\762x54.ltx"
+#include "ammo\792x57.ltx"
+#include "ammo\1143x23.ltx"
+#include "ammo\1270x99.ltx"
+#include "ammo\1270x108.ltx"
+#include "ammo\gauss_ammo.ltx"
+#include "ammo\magazines.ltx"
+
+
+;Остатки ОГСЕ
+;------------------------------
+; Арбалетный болт
+;------------------------------
+[ammo_arbolt]:ammo_base
+$spawn			= "weapons\ammo\ammo_arbolt" ; option for Level Editor
+visual          = weapons\crossbow\strela.ogf
+cost			= 150
+box_size		= 5
+inv_name		= ammo-arbolt
+inv_name_short	= ammo-arbolt
+description 	= enc_weapons1_ammo_ammo-arbolt
+inv_weight		= 0.25
+
+inv_grid_width	= 1
+inv_grid_height	= 3
+inv_grid_x		= 17
+inv_grid_y		= 34
+
+k_dist			= 1.7
+k_hit			= 2
+k_pierce		= 1.2
+tracer			= on
+wm_size         = 0.02
+
+;------------------------------
+; Арбалетный заряд со снотворным(квестовый)
+;------------------------------
+[ammo_arbolt_spec]:ammo_base
+$spawn			= "weapons\ammo\ammo_arbolt_spec" ; option for Level Editor
+visual          = weapons\crossbow\strela.ogf
+cost			= 50
+box_size		= 1
+inv_name		= ammo-arbolt_spec
+inv_name_short	= ammo-arbolt_spec
+description 	= enc_weapons1_ammo_ammo-arbolt_spec
+inv_weight		= 0.25
+
+inv_grid_width	= 1
+inv_grid_height	= 3
+inv_grid_x		= 17
+inv_grid_y		= 34
+
+tracer			= on
+wm_size         = 0.01
+
+
+;------------------------------
+;Боеприпас к огнемету (AMK)
+;------------------------------
+[ammo_flame]:ammo_base
+$spawn 			= "weapons\ammo\ammo_flame"
+visual 			= equipments\ballon.ogf
+inv_name 		= ammo_flame
+inv_name_short 	= ammo_flame_s
+description 	= enc_weapons1_ammo_flame
+
+cost 			= 600
+box_size 		= 30
+inv_weight 		= 10.5
+
+inv_grid_width 	= 2
+inv_grid_height = 1
+inv_grid_x 		= 6
+inv_grid_y 		= 38
+
+k_disp 			= 3
+k_hit 			= 2.0
+k_impulse 		= 0
+buck_shot 		= 25
+wm_size 		= 0.001
+
+#include "grenadier.ltx"

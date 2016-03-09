@@ -1,0 +1,80 @@
+;боковая планка "ласточкин хвост" (устанавливается ремонтником)
+[wpn_addon_side_rail]:wpn_fake_addon_base
+visual          = weapons\upgrade\rail_dove_tail.ogf
+inv_name		= addon_scope_side_rail
+inv_name_short	= addon_scope_side_rail_s
+description		= enc_addon_scope_side_rail
+cost			= 500
+inv_weight		= 0.1
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 10
+fake_item_section	= fake_wpn_addon_side_rail
+is_scope_mount_addon = true
+always_fake = true
+
+[fake_wpn_addon_side_rail]:wpn_addon_side_rail
+real_item_section = wpn_addon_side_rail
+
+
+;кронштейн-переходник МТК-83 (ставится ГГ апгрейдом на боковую планку "ласточкин хвост")
+[wpn_addon_mtk83]:wpn_fake_addon_base
+visual          = weapons\upgrade\mtk-83.ogf
+inv_name		= addon_scope_mtk83
+inv_name_short	= addon_scope_mtk83_s
+description		= enc_addon_scope_mtk83
+cost			= 1000
+inv_weight		= 0.31
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61	;37
+inv_grid_y			= 10	;36
+fake_item_section	= fake_wpn_addon_mtk83
+is_scope_mount_addon = true
+always_fake = true
+
+[fake_wpn_addon_mtk83]:wpn_addon_mtk83
+real_item_section = wpn_addon_mtk83
+
+
+
+
+;Custom АК Kit - телескопический приклад, пистолетная анатомическая рукоятка и цевьё с нижней рельсой Пикатинни (устанавливается ремонтником)
+[wpn_addon_ak100_custom]:wpn_fake_addon_base
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x			= 63
+inv_grid_y			= 11
+visual          = weapons\upgrade\ak100_custom.ogf
+inv_name		= addon_ak100_custom
+inv_name_short	= addon_ak100_custom_s
+description		= enc_addon_ak100_custom
+cost			= 2000
+inv_weight		= 1.0
+is_scope_mount_addon = true
+fake_item_section	= fake_wpn_addon_ak100_custom
+always_fake = true
+; только для совместимости с системой аддонов
+[fake_wpn_addon_ak100_custom]:wpn_addon_ak100_custom
+real_item_section = wpn_addon_ak100_custom
+
+
+;Затыльник-амортизатор ГП-25 (не ставится)
+[wpn_addon_gp_galoscha]:wpn_fake_addon_base
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x			= 76
+inv_grid_y			= 10
+visual          = weapons\upgrade\gp_galoscha.ogf
+inv_name		= addon_gp_galoscha
+inv_name_short	= addon_gp_galoscha_s
+description		= enc_addon_gp_galoscha
+cost			= 456
+inv_weight		= 0.1
+is_scope_mount_addon = true
+fake_item_section	= fake_wpn_addon_gp_galoscha
+always_fake = true
+; только для совместимости с системой аддонов
+[fake_wpn_addon_gp_galoscha]:wpn_addon_gp_galoscha
+real_item_section = wpn_addon_gp_galoscha

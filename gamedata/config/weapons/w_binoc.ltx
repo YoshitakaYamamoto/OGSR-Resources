@@ -1,0 +1,175 @@
+;Армейский бинокль Б10х42 «Глянец»
+;гражданский аналог БПОс 10х42 "Байгыш" х10, с раздельной фокусировкой окуляров, +очки без сужения поля зрения.
+;1,3 кг, поле 5гр 50мин (5,83*17,5=102,025 м на 1000 метров)
+;БПОс 7х30 х7 (короткий, 1,1 кг, поле 8гр 30мин) [=Б7х30, "Секунда", 1Н8]
+;АО "Казанский оптико-механический завод"
+;классика:
+;БПЦ 8х30
+;1Н13 - бинокль Б-12-1 (БПс12х40) (БШ3.807.027))
+;1ПН33Б - бинокль ночной БН-1 "Блик" (Г36.16.067) увеличение 3.2,-поле зрения 9 гр. -дальность наблюдения 200 м.-питание 8.3-8.8 вольт,-вес 1.6 кг.
+;1ПН50 - бинокль ночной БН-2 "Реликвия" (Г36.16.070), 1ПН50М - бинокль ночной "Лидер"
+;1ПН98 - бинокль ночной БН-4 "Козельск" (АДШ3.803.024)
+;--------------------------------------------------------------------
+[wpn_binoc]:identity_immunities,base_wpn_zoom
+GroupControlSection			= spawn_group
+discovery_dependency		= 
+$spawn						= "weapons\binocular"
+$npc						= on							; option for Level Editor
+$prefetch 					= 8
+scheduled					= off							; option for ALife Simulator
+cform						= skeleton
+class						= WP_BINOC
+hud							= wpn_binoc_hud
+
+;KD 3888 от 15 ноября 2015 ~ПНВ не отключается при использовании бинокля и гаусса (временно)
+;nightvision_lock			= false
+
+ef_main_weapon_type			= 5
+ef_weapon_type				= 0
+
+flame_particles		   		= weapons\generic_weapon05
+smoke_particles		   		= weapons\generic_shoot_00
+
+fire_point               	= 0.0, 0.133, 0.161
+shell_point		 			= 0.0, 0.133, 0.047
+shell_dir		 			= 0.0, 0.0, 0.4
+shell_particles	 			= weapons\generic_shells
+
+position					= -0.08 , -0.05 , 0.05 
+normal						= 0, 1, 0
+direction					= 0, 0, 1
+orientation					= 0 , -90, 70
+
+attach_angle_offset			= 3.080506,-1.493053,-1.202040   ;устанавливается в радианах Angle*PI/180
+attach_position_offset		= 0.080000,0.021273,0.100000
+attach_bone_name			= bip01_r_hand
+auto_attach					= false
+
+visual						= weapons\binoculars\wpn_binoculars.ogf
+hand_dependence		 		= 1
+single_handed				= 0
+
+slot 			 			= 4		; // binocular
+animation_slot				= 13	; type of the animation that will be used
+
+ammo_limit		 			= 0
+ammo_current		 		= 0
+ammo_elapsed		 		= 0
+ammo_mag_size		 		= 0
+ammo_class		 	= ammo_binoc_dummy
+
+description					= enc_addon_bino	;enc_equipment_devic_binocul1
+inv_name		 			= addon_bino		;binocular
+inv_name_short				= addon_bino_s		;binocular
+inv_weight		 			= 1.0
+
+show_ammo					= false
+
+inv_grid_width				= 2
+inv_grid_height				= 1
+inv_grid_x					= 74	;ТЧ 16
+inv_grid_y					= 10	;ТЧ 8
+
+min_radius					= 100
+max_radius					= 150
+
+cost						= 200
+
+disp_vel_factor				= 0.1
+disp_crouch_factor			= 0.75
+disp_jump_factor			= 3
+
+scope_status				= 1
+silencer_status				= 0
+grenade_launcher_status		= 0
+
+zoom_enabled				= true
+;scope_texture				= wpn\scopes\scope_bino
+scope_texture				= wpn\scopes\scope_bino_bpo
+scope_zoom_factor			= 10						;8.5		;5.0
+
+fire_dispersion_base		= 0.1
+
+cam_relax_speed         	= 1.5	
+cam_dispersion          	= 1.5	
+cam_max_angle				= 7		
+cam_max_angle_horz			= 10.0	
+cam_step_angle_horz			= 1.5	
+
+fire_dispersion_condition_factor = 5
+misfire_probability 		= 0.0001
+condition_shot_dec 			= 0.00003
+
+hit_power                	= 1
+hit_impulse		 		 	= 1
+hit_type					= fire_wound	
+
+fire_distance            	= 1
+bullet_speed		 	 	= 1		
+rpm                      	= 1
+
+light_color		 			= 0.6,0.5,0.3
+light_range		 			= 3.0
+light_var_color		 		= 0.05
+light_var_range		 		= 0.5
+light_time 		 			= 0.2
+
+;------------------------------ O.G.S.E. sound remake ------------------------------
+snd_draw					= weapons\bino_draw
+snd_holster					= weapons\bino_holster
+snd_gyro					= weapons\binoculars_gyro
+snd_zoomin					= weapons\binoculars_zoomin
+snd_zoomout					= weapons\binoculars_zoomout
+snd_shoot			= $no_sound, 0
+snd_empty			= $no_sound, 0
+snd_reload			= $no_sound, 0
+snd_close			= $no_sound, 0
+;------------------------------------------------------------------------------------------
+
+vision_present				= false
+vis_frame_speed				= 4						; скорость, с которой наводится рамка на цель
+vis_frame_color             = 0.8,0.8,0.8,1.0		; 0.7; цвет рамки RGBA (A) Не учитывается
+found_snd				    = detectors\DA-2_beep1
+
+
+[wpn_binoc_hud]
+shell_point			        = 0.0, 0.0, 0.0
+fire_point              	= 0.05, 0.0, 0.1
+fire_bone               	= binoculars
+orientation             	= 10, 0, -2
+position                	= 0.18, -0.07, 0.25
+visual                  	= weapons\binoculars\wpn_binoculars_hud.ogf
+
+zoom_offset				    = -0.238600,0.153600,0.000000
+zoom_rotate_x				= -0.014000
+zoom_rotate_y				= 0.324000
+
+anim_idle				    = idle
+anim_reload				    = idle
+anim_draw				    = draw
+anim_holster				= holster
+anim_shoot				    = idle
+anim_idle_aim				= idle
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;Yukon NVB Tracker 3x42 (есть 3.5x40 RX) на основе ЭОП первого поколения
+[wpn_binoc_m1]:wpn_binoc
+$spawn						= "weapons\binocular_m1"
+visual						= weapons\binoculars\wpn_binoculars.ogf
+hud							= wpn_binoc_m1_hud
+ammo_class		 	= ammo_binocular_dummy
+inv_name		 			= addon_bino_nv
+inv_name_short				= addon_bino_nv_s
+description					= enc_addon_bino_nv
+inv_grid_x					= 16
+inv_grid_y					= 8
+inv_weight		 			= 0.7
+scope_texture				= wpn\scopes\scope_bino
+scope_zoom_factor			= 3
+;vision_present				= false
+nightvision_sect			= effector_nightvision_bad
+cost						= 1500
+
+[wpn_binoc_m1_hud]:wpn_binoc_hud
+visual                  	= weapons\binoculars\wpn_binoculars_hud.ogf

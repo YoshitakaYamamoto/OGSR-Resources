@@ -1,0 +1,61 @@
+--- ogse_minigun_sound.script
+--- ќзвучка раскрутки минигана
+--- KamikaZze (c) OGS Evolution Team 2011
+--- version 0.5 (11.03.2011)
+
+local on_sound = xr_sound.get_safe_sound_object([[weapons\m134\m134_on]])
+local off_sound = xr_sound.get_safe_sound_object([[weapons\m134\m134_off]])
+local spin_sound = xr_sound.get_safe_sound_object([[weapons\m134\m134_spin]])
+local spin_runing = false
+
+function chek_keys(key, bind)
+	if bind == key_bindings.kWPN_ZOOM then
+		if level.main_input_receiver() then return end
+		local act_itm = db.actor:active_item()
+		if act_itm and act_itm:section() == "wpn_m_134" then
+			on_sound:play_at_pos(db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
+			on_sound.volume = 0.8
+			spin_runing = true
+			if not spin_sound:playing() then
+				spin_sound:play_at_pos (db.actor, vector():set(0, 0, 0), 1.0, sound_object.s2d + sound_object.looped)
+				spin_sound.volume = 0.5
+			end
+		end
+	end
+end
+
+function chek_keys_free(key, bind)
+	if bind == key_bindings.kWPN_ZOOM then
+		local act_itm = db.actor:active_item()
+		if act_itm and act_itm:section() == "wpn_m_134" then
+			if spin_runing == true then
+				if on_sound:playing() then
+					on_sound:stop()
+				end
+				if spin_sound:playing() then
+					spin_sound:stop()
+				end
+				off_sound:play_at_pos(db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
+				off_sound.volume = 0.5
+				spin_runing = false
+			end
+		end
+	end
+end
+
+function chek_keys_hold(key, bind)
+	if bind == key_bindings.kWPN_ZOOM then
+		if level.main_input_receiver() then
+			if spin_runing == true then
+				chek_keys_free(key, bind)
+				return
+			end
+		end
+		local act_itm = db.actor:active_item()
+		if act_itm and act_itm:section() == "wpn_m_134" then
+			if not on_sound:playing() then
+				spin_sound.volume = 0.4
+			end			
+		end
+	end
+end

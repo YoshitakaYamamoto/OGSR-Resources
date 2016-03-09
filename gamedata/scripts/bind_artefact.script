@@ -1,0 +1,53 @@
+function init(obj)
+   obj:bind_object(artefact_binder(obj))
+end
+
+class "artefact_binder" (object_binder)
+-- default methods
+function artefact_binder:__init(obj) super(obj)
+end
+
+function artefact_binder:load(reader)
+	object_binder.load(self, reader)
+end
+
+function artefact_binder:reload(section)
+	object_binder.reload(self, section)
+end
+
+function artefact_binder:save(packet)
+   object_binder.save(self, packet)
+end
+
+function artefact_binder:reload(section)
+	object_binder.reload(self, section)
+end
+
+function artefact_binder:net_save_relevant()
+	return true
+end
+
+-- custom methods
+function artefact_binder:net_spawn(server_object)
+	if not object_binder.net_spawn(self, data) then
+		return false
+	end
+	db.artefacts[self.object:id()] = self.object
+	return true
+end
+
+function artefact_binder:reinit()
+	object_binder.reinit(self)
+	db.artefacts[self.object:id()] = self.object
+	self.st = db.artefacts[self.object:id()]
+end
+
+function artefact_binder:net_destroy()
+	db.artefacts[self.object:id()] = nil
+	object_binder.net_destroy(self)
+end
+
+function artefact_binder:update(delta)
+	object_binder.update(self, delta)
+	-- reserved for future use 
+end

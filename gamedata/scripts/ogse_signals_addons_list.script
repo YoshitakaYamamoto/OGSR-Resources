@@ -1,0 +1,38 @@
+-- список явно подключаемых модулей
+-- здесь надо регистрировать модули, которые не будут подключаться автоматически
+-- например те, у которых имя модуля не начинается на ogse
+addons = {
+	"ogse_misc_item_usage",
+	"tasks_functor",
+	"trunk_inv",
+	"ogse_car_control",
+	"ogse_addons",
+	"ogse_car_trade",
+	"ogse_unist",
+	"ogse_st_mgr",
+	"ogse_grenade_switcher",
+	"ogse_actor_conditions_mgr",
+	"ogse_sleep_mgr",
+	"ogse_hideouts",
+	"inventory",
+	"ogse_lights_mgr",
+	"ogse_autodoc",
+	"ogse_healing",
+	"jekan_update",
+	--"sr_sound_env",
+	"ogse_weather_mgr",
+	"ogse_surge_mgr",
+	"bind_statpkm",
+	--"ogse_raining_fx", -- более не используется, реализовано шейдерами
+	"ogse_trade_precondition",
+	"ogse_lc_mngr",
+	"ogse_detectors",
+	"ui_handradio",
+	"ogse_relations",
+	--"ogse_dynamic_hud",
+	"xr_sound",
+	"ogse_night_vision",
+	"ogse_metka",
+	"ogse_bind_weapon",
+}
+

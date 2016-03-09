@@ -1,0 +1,325 @@
+------------- БИОРАДАР -------------
+-- Dетектор живых форм, будь он неладен.
+-- Автор Charsi
+-- Data 29.11.2012
+-- переработка для OGSE KamikaZze 2012-2014
+-------------- настройки -----------
+local biomap_sweep_enabled = true -- включить волну
+local fading = true               -- затухание точек
+local sound_enabled = false		  -- играть ли звук
+------------------------------------
+local biomap_width = 256 -- пиксельная ширина биорадара
+local biomap_sweep_width = 220 --ширина статика волны
+local step_angle = 6/180 -- шаг за апдейт (скорость поворота)
+-------------------------------------
+local dot_size = 3
+local dots = {}
+local d = 125
+local koef_x = 0
+local koef_x_old = 0
+local a,s,c,b,xa = 0,0,1,0,0
+local level_object_by_id = level.object_by_id
+local ms, mc, math_atan2 = math.sin, math.cos, math.atan2
+local hud = get_hud()
+local angle = 0
+local lim_angle = 1000*2*math.pi
+local biomap_sweep = nil
+local need_show_by_sect = {}
+local max_dist = 46 --макс расстояние до цели (изначально 60)
+local screen_max_dist = 90 --макс расстояние в пикселях радара
+local _strfind = string.find
+
+local bio_marked = -- кого показывать по умолчанию
+{   
+	["bioradar_dog"] = true,
+    ["bioradar_flesh"] = true,
+    ["bioradar_boar"] = true,
+    ["bioradar_zombie"] = true,
+	["bioradar_stalker"] = true
+}
+
+local color_by_sect = {
+--  секция = { R, G, B }
+	actor 			= {0,255,0},
+	stalker 		= {255,255,255},
+	bloodsucker		= {255,0,120},
+	pseudodog		= {171,94,23},
+	psy_dog			= {171,94,23},
+	tushkano		= {64,255,255},
+	flesh			= {64,153,79},
+	cat				= {252,158,66},
+	burer			= {0,238,255},
+	snork			= {145,71,214},
+	controller 		= {0,238,255},
+	gigant			= {255,0,0},
+	zombie			= {127,127,127},
+	poltergeist		= {0,238,255},
+	chimera			= {255,0,0},
+	boar			= {64,153,79},
+	--NarSol
+	rat				= {164,25,150},
+	tarakan_normal 	= {64,255,255},
+	tarakan_strong 	= {255,0,120},
+	bibliotekar 	= {94,3,80},
+	-- OGSE
+	izlom 			= {127,255,127}
+}
+
+-- классс точки объекта
+class "dot"
+function dot:__init(o,is_stalker)
+	self.o_id = o:id()
+	dots[self.o_id] = self
+	self.alive = o:alive()
+	self.color = self.alive and self:get_color(o:section()) or {127,127,127}
+	self.a = fading and (self.o_id==0 and 255 or 0) or 255
+	self.need_show = IsStalker(o) or self:show_by_sect(o:section())
+	self.st = CUIStatic()
+	self.st:Init(1024,0,dot_size,dot_size)
+	self.st:InitTexture("biomap\\white_dot")
+	self.st:SetStretchTexture(true)
+	hud:GetCustomStatic("biomap"):wnd():AttachChild(self.st)
+	self.st:SetAutoDelete(true)
+	self.cnt = 0
+	self.st:SetWndPos(d * koef_x - 1,d)
+	self.st:SetColor(GetARGB(self.a,self.color[1],self.color[2],self.color[3]))
+end
+
+local snd_contact = xr_sound.get_safe_sound_object("motion_detector\\beep")
+local snd_update = xr_sound.get_safe_sound_object("motion_detector\\pulse")
+-- нарисовать точку
+function dot:draw(dir,obj_alive)
+
+	if self.cnt > 0 then
+		self.cnt = self.cnt - 1
+		return
+	end
+	
+	local z = dir:magnitude()/ max_dist
+	if z<=1 then
+		if self.alive and not obj_alive then
+			self.alive = false
+			if fading then
+				self.color = {127,127,127}
+			else
+				self.st:SetColor(GetARGB(self.a,127,127,127))
+			end
+		end
+		local vx,vz = dir.x/max_dist * screen_max_dist , -dir.z/max_dist * screen_max_dist
+		local x,y = vx * c - vz * s , vx * s + vz * c
+		self.st:SetWndPos( (x + d)*koef_x - 1, y + d)
+		if self.o_id == 0 then self.cnt = 100000 return end
+		-------- угасание точек -------
+		if fading then
+			local u = math_atan2(y, x) * (180 / math.pi) + 180
+			if (xa > u and xa-u or u-xa) < 1.5 then
+				self.a = 255 
+				if sound_enabled and self.alive and not snd_contact:playing() then
+					snd_contact.volume = 0.2
+					snd_contact:play_at_pos (db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
+				end
+			elseif self.a > 2 then
+				self.a = self.a - 2
+			end
+			self.st:SetColor(GetARGB(self.a,self.color[1],self.color[2],self.color[3]))
+		end
+		---------------------------------
+	else
+		self.cnt = math.ceil(math.random(30,50)*z*z)
+		self:hide()
+	end
+end
+
+-- скрыть точку
+function dot:hide()
+	self.st:SetWndPos(1024,0)
+end
+
+-- получение цвета точки по секции объекта
+function dot:get_color(section)
+	if section=="dog_weak" or section=="dog_normal" or section=="dog_strong" then
+		  return {252,158,66}
+	end
+	return table.foreach(color_by_sect, function(k,v) if string.find(section,k) then return v end end ) or {255,255,0}
+end
+
+-- можно ли отображать объект с секцией section
+function dot:show_by_sect(section)
+	return table.foreach(need_show_by_sect,function(k,v) if string.find(section,k) then return true end end ) or false
+end
+
+-- объект прошивки = инфопоршен
+local firmware_item =
+{
+    ["firmware_dog"] 			= "bioradar_dog",
+    ["firmware_psevdodog"] 		= "bioradar_psevdodog",
+    ["firmware_flesh"] 			= "bioradar_flesh",
+    ["firmware_boar"] 			= "bioradar_boar",
+    ["firmware_tushkano"] 		= "bioradar_tushkano",
+    ["firmware_krovosos"] 		= "bioradar_krovosos",
+    ["firmware_burer"] 			= "bioradar_burer",
+    ["firmware_zombie"] 		= "bioradar_zombie",
+    ["firmware_snork"] 			= "bioradar_snork",
+    ["firmware_kontroler"] 		= "bioradar_kontroler",
+    ["firmware_poltergeist"] 	= "bioradar_poltergeist",
+    ["firmware_psevdogigant"] 	= "bioradar_psevdogigant",
+    ["firmware_cat"] 			= "bioradar_cat",
+    ["firmware_chimera"] 		= "bioradar_chimera",
+	["firmware_stalker"] 		= "bioradar_stalker",
+}
+
+local firmware = {
+-- инфопоршен прошивки = { шаблоны для поиска в секции монстра}
+	["bioradar_dog"] 		= {"dog_weak","dog_normal","dog_strong"},
+	["bioradar_krovosos"] 	= {"krovosos","bloodsucker"},
+	["bioradar_psevdodog"] 	= {"dodog","psy_dog"},
+	["bioradar_tushkano"] 	= {"tushkano"},
+	["bioradar_flesh"] 		= {"flesh"},
+	["bioradar_cat"] 		= {"cat"},
+	["bioradar_burer"]		= {"burer"},
+	["bioradar_snork"]		= {"snork"},
+	["bioradar_kontroler"]	= {"controller"},
+	["bioradar_psevdogigant"]= {"gigant", "giant"},
+	["bioradar_poltergeist"]	= {"poltergeist"},
+	["bioradar_chimera"]	= {"chimera"},
+	["bioradar_boar"]			= {"boar"},
+	["bioradar_zombie"]		= {"zombie","izlom"},
+	["bioradar_stalker"]		= {"stalker","stalker_trader","stalker_diehard","bandit","quest_stalker","kulg_band","kulg_band_2","iskatel"}
+	}
+
+function on_use_item(obj)
+	if obj == nil or alife():object(obj:id()) == nil then return end
+    local portion = firmware_item[obj:section()]
+    if portion ~= nil and not has_alife_info(portion) then
+        db.actor:give_info_portion(portion)
+    end
+end
+
+-- убирает радар с экрана
+function bioradar_hide()
+	if hud:GetCustomStatic("biomap") then
+		dots = {}
+		hud:RemoveCustomStatic("biomap")
+		if biomap_sweep_enabled then
+			hud:RemoveCustomStatic("biomap_sweep")
+			biomap_sweep = nil
+		end
+	end
+end
+
+-- проверяет наличие прошивок ПО
+-- и определяет список секций (точнее их шаблонов) для объектов, для которых доступно отображение точек
+function check_monster_parts_on_belt()
+	need_show_by_sect = {}
+	local bio_belt = nil
+	local bio_in_slot = db.actor:item_in_slot(12)
+    if bio_in_slot then
+        bio_belt = bio_in_slot:section()
+    end	
+	if bio_belt then
+		for soft,tt in pairs(firmware)do
+			if has_alife_info(soft) then
+				for _,m_sect in pairs(tt) do
+					need_show_by_sect[m_sect] = true
+				end
+			end
+		end
+	end
+end
+
+local old_angle = 0
+-- вызывается из update биндера актора
+-- обновление положения точек и/или волны
+function update(mode)
+
+	local bio_belt = nil
+	local bio_in_slot = db.actor:item_in_slot(12)
+    if bio_in_slot then
+        bio_belt = bio_in_slot:section()
+    end
+
+	if not (bio_belt and bio_belt == "bioradar") or (mode and mode == "off") or level.main_input_receiver() then bioradar_hide() return end
+	
+	for k,v in pairs(bio_marked)do
+		if not has_alife_info(k) then
+			db.actor:give_info_portion(k)
+		end
+	end	
+	
+	check_monster_parts_on_belt()
+	
+	-- скорректируем ширину под ш\ф
+	koef_x = (device().height/device().width) / (768/1024)
+	if koef_x ~= koef_x_old then
+		koef_x_old = koef_x
+		hud:RemoveCustomStatic("biomap")
+		hud:RemoveCustomStatic("biomap_sweep")
+		dots={}
+	end
+	-- log1("BIOMAP INIT KOEFF: "..koef_x)
+	if not hud:GetCustomStatic("biomap") then
+
+		if biomap_sweep_enabled then
+			biomap_sweep = hud:AddCustomStatic("biomap_sweep"):wnd()
+			biomap_sweep:Init(1024 - 2 - (biomap_width + biomap_sweep_width)*koef_x/2,-2 + (biomap_width - biomap_sweep_width)/2,biomap_sweep_width*koef_x,biomap_sweep_width)
+			-- log1("BIOSWEEP INIT: "..tostring(1024 - 2 - (biomap_width + biomap_sweep_width)*koef_x/2)..","..tostring(-2 + (biomap_width - biomap_sweep_width)/2)..","..tostring(biomap_sweep_width*koef_x)..","..tostring(biomap_sweep_width))
+		end
+		
+		local biomap_static = hud:AddCustomStatic("biomap"):wnd()
+		biomap_static:SetWndPos(1024 - biomap_width*koef_x,0)
+		biomap_static:SetWidth(biomap_width*koef_x)
+	end
+	
+	local actor_pos = db.actor:position()
+	local sim = alife()
+	local sdir = device().cam_dir
+	a = math_atan2(-sdir.x,sdir.z)
+	s,c = ms(a),mc(a)
+	
+	if biomap_sweep_enabled or fading then
+		angle = angle - step_angle
+		if angle < -lim_angle then angle = angle + lim_angle end
+	end
+	
+	if biomap_sweep_enabled then
+		biomap_sweep:SetHeading(angle) -- поворачиваем статик
+		if ((-1*angle) - (-1*old_angle)) > 6 and sound_enabled and not snd_update:playing() then
+			old_angle = angle
+			snd_update.volume = 0.3
+			snd_update:play_at_pos (db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
+		end		
+		if koef_x < 1 then -- коррекция волны на ш/ф
+			local delta = ms(angle)
+			delta = biomap_sweep_width*(koef_x-1)*delta*delta
+			local delta_x = biomap_sweep_width*koef_x*(1/koef_x)
+			local delta_y = biomap_sweep_width*(1/koef_x)
+			biomap_sweep:Init(1024 - 2 - biomap_width*koef_x/2 - delta_x/2,-1 + biomap_width/2 - delta_y/2,delta_x,delta_y)
+			-- log1("BIOSWEEP INIT HF: "..tostring(1024 - 2 - biomap_width*koef_x/2 - delta_x/2)..","..tostring(-1 + biomap_width/2 - delta_y/2)..","..tostring(delta_x)..","..tostring(delta_y))
+		end
+	end
+
+	if fading then
+		xa = - math.fmod(angle*(180 / math.pi),360)
+	end
+	
+	for id,obj in pairs(db.storage) do
+		local so = sim:object(id)
+		if so then
+			local o = level_object_by_id(id)
+			if o then
+				local d = dots[id] or dot(o,is_stalker)
+				if d.need_show then
+					d:draw(o:position():sub(actor_pos),o:alive())
+				else
+					d:hide()
+				end
+			elseif dots[id] then
+				dots[id]:hide()
+			end
+		elseif dots[id] then
+			dots[id]:hide()
+			dots[id] = nil
+		end
+	end
+	
+end

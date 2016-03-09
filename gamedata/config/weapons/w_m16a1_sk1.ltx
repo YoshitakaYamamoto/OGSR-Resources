@@ -1,0 +1,252 @@
+; автомат М16А1
+;--------------------------------------
+[wpn_m16a1_sk1]:identity_immunities,base_wpn_zoom
+GroupControlSection		= spawn_group
+discovery_dependency 	= 
+$spawn                  = "weapons\m16a1_sk1"					; option for Level Editor
+$npc			 		= on				; option for Level Editor
+$prefetch 		 		= 8
+scheduled               = off              ; option for ALife Simulator
+cform                   = skeleton
+class                   = WP_AK74
+min_radius              = 15
+max_radius              = 150
+description				= enc_arsenal_m16a1
+
+ef_main_weapon_type		= 2
+ef_weapon_type			= 6
+
+;-----------------------------------------------------------------------------------
+holder_range_modifier	= 1.0
+holder_fov_modifier		= 1.0
+;-----------------------------------------------------------------------------------
+
+weapon_class			= assault_rifle
+
+cost					= 6400
+
+ammo_elapsed			= 20
+ammo_mag_size		 	= 20
+grenade_class			= ammo_m209
+ammo_class		 		= ammo_5.56x45_ss190, ammo_5.56x45_ap
+fire_modes				= 1, -1
+launch_speed = 0
+
+hand_dependence		 	= 1
+single_handed			= 0
+
+inv_name				= ars-m16a1
+inv_name_short			= ars-m16a1
+inv_weight				= 2.9
+
+inv_grid_width			= 5
+inv_grid_height			= 2
+inv_grid_x				= 36
+inv_grid_y				= 16
+
+kill_msg_x			= 72
+kill_msg_y			= 82
+kill_msg_width		= 56
+kill_msg_height		= 23
+
+slot 					= 2		; // secondary
+animation_slot			= 2		; type of the animation that will be used
+
+
+;-----------------------------------------------------------------------------------
+;params of weapon recoil
+fire_dispersion_base			= 0.14		;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor			= 1.25f
+
+;отдача
+cam_relax_speed         	= 6		;скорость возврата в исходное положение
+cam_relax_speed_ai         	= 120.75
+cam_dispersion          	= 0.15		;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc			= 0.3		;увеличениe cam_dispersion с каждым выстрелом
+cam_dispertion_frac			= 0.9		;ствол будет подыматься на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+cam_max_angle				= 10.0	    	;максимальный угол отдачи
+cam_max_angle_horz			= 20.0		;(degree) maximum shot horizontal degree 
+cam_step_angle_horz			= 1.1;1		;(degree) size of step camera moved in horizontal position while shooting
+
+fire_dispersion_condition_factor 	= 4.6	    	;увеличение дисперсии в процентах при максимальном износе 
+misfire_probability 		= 0.006	;вероятность осечки при максимальном износе 
+misfire_condition_k			= 0.06
+condition_shot_dec 			= 0.0002	;увеличение износа при каждом выстреле
+;--------------------------------------------------------------------------------
+
+direction               = 0, 0, 1
+
+fire_point             	=  0,0.235,0.673
+flame_particles			= weapons\generic_weapon05
+shell_particles	 		= weapons\arsenal_shells1
+grenade_flame_particles		= weapons\generic_weapon01
+
+shell_point		 		= 0,0.244,0.087
+shell_dir		 		= 0.0, 1.0, 0.0
+
+rpm_empty_click 	 	= 200
+
+PDM_disp_base 			= 1.2
+PDM_disp_vel_factor 		= 0.8
+PDM_disp_accel_factor 		= 0.8
+PDM_crouch	 		= 1.0
+PDM_crouch_no_acc 		= 1.0
+
+; ttc
+hit_power        	= 0.71
+hit_impulse		 	= 25
+hit_type 			= fire_wound
+
+fire_distance          	= 250
+bullet_speed			= 970 ;начальная скорость пули
+rpm                     = 700
+; end ttc
+
+use_aim_bullet			= false		;Поддерживается ли первая суппер пуля
+time_to_aim					= 1.0
+
+silencer_hit_power       	= 0.64
+silencer_hit_impulse	 	= 25
+silencer_fire_distance   	= 300
+silencer_bullet_speed	 	= 860
+
+hud                     = wpn_m16a1_sk1_hud
+normal                  = 0, 1, 0
+position         	    = -0.02,-0.172,0.02
+orientation             = 0, 0, 0
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+strap_position         		= -0.16,-0.36,0.15			; position (offset) and orientation of the weapon when it is strapped
+strap_orientation      		= -10,-5,10					; (3rd person view in degrees)
+strap_bone0					= bip01_spine2
+strap_bone1					= bip01_spine1
+
+startup_ammo            = 1000
+visual                   	= weapons\m16a1\wpn_m16a1_sk1.ogf
+
+light_color		 		= 0.6,0.5,0.3
+light_range		 		= 5
+light_var_color		 	= 0.05
+light_var_range		 	= 0.1
+light_time 		 		= 0.2
+
+;addons
+scope_status			= 2
+silencer_status			= 2
+grenade_launcher_status	= 2
+
+scope_name 					= wpn_addon_scope_susat
+scope_x 					= 66
+scope_y 					= -7
+
+silencer_name  				= wpn_addon_sil_556_ar
+silencer_x 					= 203
+silencer_y 					= 15
+
+grenade_launcher_name 		= wpn_addon_grenade_launcher_m203
+grenade_launcher_x 			= 112
+grenade_launcher_y 			= 26
+
+;silencer_flame_particles 	= weapons\generic_weapon01
+silencer_smoke_particles 	= weapons\generic_shoot_00
+
+silencer_light_color		= 1.0, 0.1, 0.0
+silencer_light_range		= 0.01
+silencer_light_var_color	= 0.05
+silencer_light_var_range	= 0.5
+silencer_light_time 		= 0.2
+
+zoom_enabled			= true
+
+;------------------------------ O.G.S.E. sound remake -----------------------
+;звуки
+snd_draw			= weapons\generic_draw, 0.5
+snd_holster			= weapons\generic_avtomat_holster, 0.5
+snd_shoot			= weapons\ar15\ar15_shot
+snd_empty			= weapons\gen_empty, 0.5
+snd_reload			= weapons\ar15\ar15_reload, 0.5
+snd_switch			= weapons\groza\groza_switch, 1.0, 0.5
+snd_silncer_shot	= weapons\ar15\ar15_silent, 0.5
+snd_shoot_grenade	= weapons\m203\m203_grenshoot
+snd_reload_grenade	= weapons\m203\m203_grenload
+;-----------------------------------------------------------------------------
+
+wpn_addon_acog				= wpn_m16a1_sk1_a
+
+[wpn_m16a1_sk1_a]:wpn_m16a1_sk1
+$spawn                  = 
+scope_name 					= wpn_addon_acog
+
+wpn_addon_scope_susat		= wpn_m16a1_sk1
+
+;-----------------------------------------------------------------------------
+;-- HUD DESCRIPTION
+;----------------------------------------------------------------------------- 
+[wpn_m16a1_sk1_hud]
+shell_point          	= 0.00, 0.00, 0.00
+shell_dir		 = 0.0, 0.0, 0.0
+
+fire_bone               = wpn_body
+fire_point              = 0.235,0.0,0.013
+fire_point2             = 0.235,0.0,-0.15
+
+orientation             = 0, 0, 0
+position                = 0, 0, 0
+visual                  = weapons\m16a1\wpn_m16a1_sk1_hud.ogf
+
+grenade_bone            	= grenka1	; name of the bone in the model for grenade launcher
+
+; animation names
+
+anim_idle					= idle
+anim_idle_aim				= idle_aim
+anim_reload					= reload
+anim_draw					= draw
+anim_holster				= holster
+anim_shoot					= shoot
+anim_idle_sprint			= idle_sprint
+
+; animation names
+; attached grenade launcher [GRENADE fire mode]
+anim_idle_g					= idle_g
+anim_idle_g_aim				= idle_g_aim
+anim_reload_g				= reload_g
+anim_shoot_g				= shoot_g
+anim_switch_grenade_on		= g_on
+anim_switch_grenade_off		= g_off
+anim_draw_g					= draw_g
+anim_holster_g				= holster_g
+
+; attached grenade launcher [NORMAL fire mode]
+anim_idle_gl				= idle_w_gl
+anim_idle_gl_aim			= idle_w_gl_aim
+anim_reload_gl				= reload_w_gl
+anim_draw_gl				= draw_w_gl
+anim_holster_gl				= holster_w_gl
+anim_shoot_gl				= shoot_w_gl
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;HUD offset in zoom mode (to all)
+;(use CONSOLE: hud_adjust_mode 0,1,2, then keys WSADQE and P to show current value in console)
+
+
+zoom_hide_crosshair	= true						;to hide crosshair in zoom 
+
+; same as above, but for attached grenade launcher for
+; in NORMAL shoot mode
+
+zoom_offset			= -0.127051,0.003851,-0.165
+zoom_rotate_x		= -0.0
+zoom_rotate_y		= 0.0
+
+grenade_normal_zoom_offset			= -0.127051,0.003851,-0.165
+grenade_normal_zoom_rotate_x		= -0.0
+grenade_normal_zoom_rotate_y		= 0.0
+
+grenade_zoom_offset			= -0.127051,-0.211,-0.15
+grenade_zoom_rotate_x		= -0.2
+grenade_zoom_rotate_y		= -0.0
+
+[wpn_m16a1_sk1_repair]
+tech_complication = 700
+repair_compatibility = m16a1

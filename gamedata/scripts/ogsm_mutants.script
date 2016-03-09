@@ -1,0 +1,723 @@
+---------------------- Обработчик монстров для OGSM 2.x -----------------------
+---------------------- Исправления и дополнения для OGSE 0.6.x ----------------
+---------------------- Copyright 2007-2008 DEXXX. -----------------------------
+---------------------- Copyright 2008-2009 QUEST, Kamikazze. ------------------
+---------------------- Reconstruction 2012 Mixser. ----------------------------
+
+old_corpses = {}
+local killed_monsters = {}
+
+local zombie_particle = particles_object("ogsm\\ogsm_zombieblow")
+local zombie_sound1 = sound_object([[anomaly\anomaly_body_tear_1]])
+local zombie_sound2 = sound_object([[weapons\f1_explode_]])
+
+local chimera_particle = particles_object("anomaly2\\electra2_blast_00")
+local chimera_sound = sound_object([[anomaly\bfuzz_blowout]])
+
+local jarka_particle = particles_object("static\\zharka_static")
+local jarka_sound = sound_object([[anomaly\bfuzz_blowout]])
+
+local insect_particle = particles_object("ogsm\\ogsm_flies_00")
+local insect_sound = sound_object([[anomaly\flies]])
+
+local phantom_particle = particles_object("anomaly2\\plasma_generator_death")
+local phantom_sound = sound_object([[monsters\phantom\phantom_snork_death]])
+
+local hand_spawned_flag = false
+
+local phantom_table =
+{
+	["zombie_phantom_2"] = true, ["flesh_phantom_2"] = true, ["phantom_krovosos_2"] = true, ["boar_phantom_2"] = true,
+	["phantom_dog_2"] = true, ["dog_phantom_1"] = true, ["dog_phantom_2"] = true, ["dog_phantom_3"] = true,
+	["snork_phantom_3"] = true, ["phantom_snork_4"] = true, ["phantom_chimera_2"] = true, ["chimera__phantom_3"] = true,
+	["zombie_phantom_invisible"] = true
+}
+
+local insect_table =
+{
+	{["name"] = "zombie_plague", ["distance"] = 8},
+	{["name"] = "rat_strong", ["distance"] = 2},
+	{["name"] = "rat_plague", ["distance"] = 3}
+}
+
+local dog_phantom_types = {"phantom_dog_2", "dog_phantom_3"}
+local hard_phantom_types = {"phantom_snork_4","phantom_chimera_2", "phantom_krovosos_2", "snork_phantom_3"}
+
+local oko_table =
+{
+	["snorkfreand_weak"] = "snork_weak", ["snorkfreand_normal"] = "snork_normal", ["snorkfreand_strong"] = "snork_strong", ["aes_snorkfreand"] = "aes_snork",
+	["burerfreand_weak"] = "burer_weak", ["burerfreand_strong"] = "burer_strong", ["burerfreand_v_strong"] = "burer_v_strong"
+}
+
+local knock_out_of_weapon =
+{
+	{["clsid"] = clsid.bloodsucker_s, ["min"] = 1, ["max"] = 2},
+	{["clsid"] = clsid.pseudodog_s, ["min"] = 1, ["max"] = 1.5},
+	{["clsid"] = clsid.burer_s, ["min"] = 1, ["max"] = 40}
+}
+
+local monster_infoportion =
+	{
+		-- self.object:section() [infoportion] = section OR {section1, section2...}
+		-- если необходимо, чтобы при смерти разных видов существ выдавался один и тот же инфопоршень, то нужно сделать так:
+		-- [имя_инфопоршня] = {имя1, имя2...}
+		["single"] =
+		{
+			["zombie_plague_dead"] 	= "zombie_plague",
+			["psy_burer_dead"] 		= "burer_strong",
+			["electrochimera_dead"] = "electro_chimera",
+			["psy_dog_dead"]		= "psy_dog",
+			["dog_dead"]			= {"dog_weak", "dog_normal", "dog_strong"},
+			["zombie_dead"]			= {"zombie_weak", "zombie_normal", "zombie_old", "zombie_immortal", "zombie_ghost"},
+			["zombie_ghost_dead"]	= "zombie_strong",
+			["chimera_dead"]		= "chimera_weak",
+			["burer_dead"]			= "burer_weak",
+			["rat_weak_dead"]		= {"rat_weak", "rat_normal"},
+			["rat_plague_dead"]		= {"rat_strong", "rat_plague"},
+			["sceleton_weak_dead"]	= "sceleton_weak"
+
+		},
+		-- string.find infoportion = section.."_dead"
+		["multiple"] =
+		{
+			"pseudodog", "flesh", "boar", "snork", "bloodsucker", "controller", "gigant", "poltergeist", "cat", "fracture", "tushkano"
+		}
+	}
+
+local sound_rnd_moan = {[[ambient\random\rnd_moan1]], [[ambient\random\rnd_moan2]], [[ambient\random\rnd_moan4]], [[ambient\random\rnd_moan5]]}
+
+local psy_burer_sound =
+{
+	{ ["sound_name"] = sound_object([[ambient\random\rnd_moan2]]), ["direction"] = 1,  ["volume"] = 0.5 },
+	{ ["sound_name"] = sound_object([[ambient\random\rnd_moan1]]), ["direction"] = -1, ["volume"] = 0.5 }
+}
+
+local phantom_explosion = 3 -- Расстояние, в интервале которого взрывается фантом
+local zombie_rusty_explosion = 1.2 -- Расстояние, в интервале которого взрывается зомби-камикадзе
+local dog_phantom_explosion = 15 -- Расстояние, в интервале которого зарождаются фантомы у dog_v_strong
+local electro_chimera_charge = 3 -- Расстояние, в интервале которого происходит разрядка электрохимеры
+local electra_movable_charge = 2.5 -- Расстояние, в интервале которого происходит разрядка подвижной электры
+local jarka_movable_charge = 2 -- Расстояние, в интервале которого происходит разрядка подвижной жарки
+local oko_distance = 50 -- Расстояние, в интервале которого работает артефакт Око
+local npc_zombie_min = 10 -- Минимальное расстояние, с которого контроллер зомбирует неписей
+local npc_zombie_max = 60 -- Максимальное расстояние, на котором контроллер зомбирует неписей
+local controller_phantom_min = 1 -- Минимальное расстояние, с которого контроллер пускает в ГГ фантомов
+local controller_phantom_max = 100 -- Максимальное расстояние, до которого контроллер пускает в ГГ фантомов
+local bloodsucker_drop_min = 1 -- Минимальное расстояние, с которого кровосос выбивает оружие из рук ГГ
+local bloodsucker_drop_max = 2 -- Максимальное расстояние, до которого кровосос выбивает оружие из рук ГГ
+local burer_strong_dead_zone = 20 -- Расстояние, на котором пси-бюрер играет эффектор
+
+function safely_destroy_creature(creature)
+	local blow = hit()
+	if not creature then return end
+	old_corpses[creature:id()] = creature:id()
+	blow.direction = vector():set(0,0,0)
+	blow.impulse = 0
+	blow.draftsman = creature
+	blow.power = 200
+	blow.type = hit.explosion
+	creature:hit(blow)
+
+	if creature and not creature:alive() then
+		for k,v in pairs(old_corpses) do
+			if creature:id() == k then
+				local sobj = alife():object(creature:id())
+				if sobj then
+					alife():release(sobj, true)
+					old_corpses[creature:id()] = nil
+				end
+			end
+		end
+	end
+
+end
+
+
+class "MutantManager"
+
+function MutantManager:__init()
+end
+
+function MutantManager:update(param)
+
+	self.object = param
+	local section_name = self.object:section()
+	local object_position = self.object:position()
+	local best_enemy = self.object:best_enemy()
+	local actor_position = db.actor:position()
+
+	local distance_to_actor = object_position:distance_to(actor_position)
+	local distance_to_best_enemy = 0
+	if best_enemy then distance_to_best_enemy = object_position:distance_to(best_enemy:position()) end
+
+	ogse_debug.process_monster(self.object, "m_up", 1)
+
+-- Взрыв фантома при его приближении к врагу
+	if phantom_table[section_name] then
+		if self.object and self.object:alive() then
+			if best_enemy and distance_to_best_enemy < phantom_explosion and self.object:see(best_enemy) then blow_phantom(self.object)	end
+		else
+			safely_destroy_creature(self.object)
+			if not phantom_particle:playing() then phantom_particle:play_at_pos(self.object:position()) end
+			ogse_debug.process_monster(self.object, "m_up", 0)
+			return
+		end
+	end
+
+	ogse_debug.process_monster(self.object, "m_up", 2)
+
+	-- Взрыв зомби-камикадзе при его приближении к врагу
+	if string.find(section_name, "zombie_rusty") and self.object:alive() then
+		if best_enemy
+			and not string.find(best_enemy:section(), "monolith")
+			and not (best_enemy:id() == 0 and db.actor:has_info("actor_set_zombied"))
+			and distance_to_best_enemy < zombie_rusty_explosion 
+			and self.object:see(best_enemy) then 
+			blow_zombie(self.object)
+			ogse_debug.process_monster(self.object, "m_up", 0)
+			return
+		end
+	end
+
+	ogse_debug.process_monster(self.object, "m_up", 3)
+
+-- Генерирование фантома при приближении к слепому псу
+	if section_name=="dog_v_strong" and self.object:alive() and not has_alife_info("actor_set_zombied") and not has_alife_info("phatnom_controller") then
+		if distance_to_actor < math.random(dog_phantom_explosion) then
+			alife():create(dog_phantom_types[math.random(#dog_phantom_types)], object_position, db.actor:level_vertex_id() , db.actor:game_vertex_id() )
+			db.actor:give_info_portion("phatnom_controller")
+			dog_attack_phantom()
+			ogse.start_timer("phatnom_controller", 8)
+		end
+	end
+
+	ogse_debug.process_monster(self.object, "m_up", 4)
+
+	-- Разряд электрохимеры при её приближении к врагу
+	if (string.find(section_name, "electro_chimera") or string.find(section_name, "chimera_strong") or string.find(section_name, "chimera_v_strong")) and self.object:alive() then
+		if best_enemy and distance_to_best_enemy < electro_chimera_charge and self.object:see(best_enemy) then charge_chimera(self.object) end
+	end
+
+	ogse_debug.process_monster(self.object, "m_up", 5)
+
+	-- Разряд подвижной электры при её приближении к врагу
+	if (string.find(section_name, "electra_movable") or string.find(section_name, "electra_movable1")) and self.object:alive() then
+		if best_enemy and distance_to_best_enemy < electra_movable_charge and self.object:see(best_enemy) then charge_electra_movable(self.object) end
+	end
+
+	ogse_debug.process_monster(self.object, "m_up", 6)
+
+	-- Разряд подвижной жарки при её приближении к врагу
+	if string.find(section_name, "jarka_movable") and self.object:alive() then
+		if best_enemy and distance_to_best_enemy < jarka_movable_charge and self.object:see(best_enemy) then charge_jarka_movable(self.object) end
+	end
+
+	ogse_debug.process_monster(self.object, "m_up", 7)
+
+	-- Исчезновение подвижной элекры и жарки по окончании времени ужаса
+	if (string.find(section_name, "jarka_movable") or string.find(section_name, "electra_movable") or string.find(section_name, "electra_movable1")) and not has_alife_info("horror_time") then
+		safely_destroy_creature(self.object)
+	end
+
+	ogse_debug.process_monster(self.object, "m_up", 8)
+
+	-- Атаки насекомых
+	if not has_alife_info("actor_set_zombied") then
+		for k,v in pairs(insect_table) do
+			if section_name == v.name and self.object:alive() then
+				if distance_to_actor < v.distance then
+					level.add_pp_effector("dead_zone.ppe", 1001, true)
+					level.set_pp_effector_factor(1001, 0.0005)
+					zombie_insect(self.object)
+				else
+					level.remove_pp_effector(1001)
+				end
+			end
+		end
+	end
+
+	ogse_debug.process_monster(self.object, "m_up", 11)
+
+	-- Превращение монстров из нейтралов во врагов, если не зомбирован
+	if not has_alife_info("actor_set_zombied") and (not inventory.belt["af_transmut_8"] or (inventory.belt["af_transmut_8"] and distance_to_actor > oko_distance)) then
+		local flag = 0
+
+		for k,v in pairs(oko_table) do
+			if section_name == k and self.object:alive() then
+				local object_name = self.object:name()
+				if not killed_monsters[object_name] then
+					killed_monsters[object_name] = true
+					alife():create(v, object_position, self.object:level_vertex_id() , self.object:game_vertex_id() )
+				end
+				flag = 1
+			end
+		end
+
+		if flag == 1 then kill_hit(self.object) end
+
+		release_from_old_corpses(self.object)
+
+	-- Превращение монстров из врагов в нейтралов, если зомбирован
+	elseif (has_alife_info("actor_set_zombied") or (inventory.belt["af_transmut_8"] and distance_to_actor <= oko_distance)) then
+		local flag = 0
+
+		for k,v in pairs(oko_table) do
+			if section_name == v and self.object:alive() then
+				local object_name = self.object:name()
+				if not killed_monsters[object_name] then
+					killed_monsters[object_name] = true
+					alife():create(k, object_position, self.object:level_vertex_id() , self.object:game_vertex_id() )
+				end
+				flag = 1
+			end
+		end
+
+		if flag == 1 then kill_hit(self.object) end
+
+		release_from_old_corpses(self.object)
+
+	end
+
+
+	ogse_debug.process_monster(self.object, "m_up", 12)
+
+	-- Контроллёр при атаке при приближении менее чем на случайное расстояние от 1 до 60 м с  вероятностью, зависящей от пси здоровья и сил ГГ, выбивает оружие -- (кроме ножа) из рук ГГ и зомбирует всех сталкеров
+	if self.object:clsid() == clsid.controller_s and self.object:alive() then
+		local npc = self.object:get_enemy()
+		if npc then
+			if  _g.IsStalker(npc) then
+				local npc_c_comm = npc:character_community() --/#~#
+				if 	npc:id() ~= db.actor:id() and npc:clsid() == clsid.script_stalker and self.object:see(npc)
+				and	npc_c_comm ~= "zombied" and	npc_c_comm ~= "actor_zombied"
+				and self.object:position():distance_to(npc:position()) < math.random(npc_zombie_min, npc_zombie_max) then
+					local sobj = alife():object( npc:id() )
+					if sobj and sobj.online then
+						if not ogse.is_quest_npc(npc) then
+							npc:set_character_community("zombied",0,0)
+						end
+					end
+				end
+			end
+
+			if npc:id() == db.actor:id() and self.object:see(db.actor) then
+				if distance_to_actor < math.random(controller_phantom_min, controller_phantom_max) then
+					if db.actor:dont_has_info("actor_set_zombied") then
+						if not has_alife_info("phatnom_controller") then
+							alife():create(hard_phantom_types[math.random(#hard_phantom_types)], object_position, db.actor:level_vertex_id() , db.actor:game_vertex_id() )
+							controller_attack_phantom()
+							db.actor:give_info_portion("phatnom_controller")
+							ogse.start_timer("phatnom_controller", 5)
+						end
+					end
+
+					local active_item = db.actor:active_item()
+
+					if active_item and active_item:section() ~= "bolt" and active_item:section() ~= "wpn_knife" and math.random(1, 100) / 100 > db.actor.psy_health then
+						db.actor:drop_item(active_item)
+					end
+				end
+			end
+		end
+	end
+
+
+	ogse_debug.process_monster(self.object, "m_up", 13)
+
+	-- Выбивание из рук оружий кроме ножа и болта различными существами
+	for k,v in pairs(knock_out_of_weapon) do
+		if self.object:clsid() == v.clsid and self.object:alive() and self.object.health > get_random_real() then
+			local npc = self.object:get_enemy()
+			if npc then
+				if npc:id() == db.actor:id() and db.actor:see(self.object) and self.object:see(db.actor) then
+					if get_random_real() > db.actor.power and get_random_real() > db.actor.health then
+						if distance_to_actor < math.random(v.min, v.max) then
+							local active_item = db.actor:active_item()
+							if active_item and active_item:section() ~= "bolt" and active_item:section() ~= "wpn_knife" then db.actor:drop_item(active_item) end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	ogse_debug.process_monster(self.object, "m_up", 14)
+
+	-- Эффект при приближении к пси-бюреру
+	if section_name == "burer_strong" and self.object:alive() then
+		if distance_to_actor < burer_strong_dead_zone then
+			level.add_pp_effector("dead_zone.ppe", 1002, true)
+			psy_burer(self.object)
+		else
+			level.remove_pp_effector(1002)
+		end
+	end
+
+	ogse_debug.process_monster(self.object, "m_up", 0)
+
+end
+
+local malish_arts = {"af_night_star", "af_soul", "af_electra_moonlight", "af_ameba_mica", "af_rusty_sea-urchin", "af_dummy_battery", "af_dummy_glassbeads", "af_fuzz_kolobok"}
+
+function MutantManager:on_death(param)
+
+	self.object = param
+
+	ogse_debug.process_monster(self.object, "m_dth", 1)
+
+	local section_name = self.object:section()
+	local who_hit_name = self.object:who_hit_name()
+
+	-- Уничтожение зомби-камикадзе + спаун руки
+
+	if string.find(section_name, "zombie_rusty") then
+		blow_zombie(self.object)
+		if who_hit_name == "single_player" then
+			if not has_alife_info("zombie_rusty_dead") then
+				db.actor:give_info_portion("zombie_rusty_dead")
+--SPAWN_V1
+				--local obj = alife():create("secret_treasure", vector():set(-347.58, -22.4, 194.8), 8132, 1839)
+				--if obj then alife():create("af_zombie_hand", vector():set(-347.58, -22.4, 194.8), 8132, 1839, obj.id) end
+--SPAWN_V2
+				local obj = ogse.spawn_object(ogse_spawn_db.script_spawn_registry.ogsm_mutants.secret_treasure)
+				if obj then alife():create("af_zombie_hand", vector(), 0, 0, obj.id) end
+			end
+		end
+	end
+
+	-- Уничтожение бронированного псевдогиганта из х-18 + спаун артефактов на его месте
+	if string.find(section_name, "x18_giant") then
+		db.actor:give_info_portion("x18_giant_dead")
+		local position = self.object:position()
+		local vid  = self.object:level_vertex_id()
+		local gvid = self.object:game_vertex_id()
+		position.y = position.y + 2
+
+--[[		local arts_by_level = {}
+		for art,lvl in pairs(ogse.art_levels) do
+			local arts = arts_by_level[lvl]
+			if arts == nil then
+				arts_by_level[lvl] = {}
+				arts = arts_by_level[lvl]
+			end
+			table.insert(arts, art)
+		end
+
+		local total = 15
+		while total > 0 do
+			local lvl = math.min(total, math.random(#arts_by_level))
+			local arts = arts_by_level[lvl]
+			local art = arts[math.random(#arts)]
+			alife():create(art, position, vid, gvid)
+			total = total - lvl
+		end]]
+		local last id = 0
+		for i = 1,4 do
+			local id = math.random(1, #malish_arts)
+			while id == last_id do
+				id = math.random(1, #malish_arts)
+			end
+			alife():create(malish_arts[id], position, vid, gvid)
+		end
+	end
+
+	ogse_debug.process_monster(self.object, "m_dth", 2)
+
+	-- Выдача статей энциклопедии при убийстве монстров
+
+	if who_hit_name == "single_player" then
+		if db.actor ~= nil then -- вставлено KamikaZze 25/02/2009
+
+			for k,v in pairs(monster_infoportion.multiple) do
+				if string.find(self.object:section(), v) then
+					if not has_alife_info(v.."_dead") then
+						db.actor:give_info_portion(v.."_dead")
+						break
+					end
+				end
+			end
+
+			for k,v in pairs(monster_infoportion.single) do
+				local accept = false
+
+				if type(v) == "string" then
+					if section_name == v then accept = true end
+				else
+					for k1,v1 in pairs(v) do
+						if section_name == v1 then
+							accept = true
+							break
+						end
+					end
+				end
+
+				if accept and not has_alife_info(k) then
+					db.actor:give_info_portion(k)
+					break
+				end
+			end
+		end
+	end
+
+	ogse_debug.process_monster(self.object, "m_dth", 0)
+
+end
+
+-- Взрыв зомби-камикадзе
+function blow_zombie(p_obj)
+	if p_obj then
+		local posit = p_obj:position()
+		local enemy = p_obj:best_enemy()
+		local zh = hit()
+		zh.type = hit.explosion
+		zh:bone("pelvis")
+		zh.power = 3
+		zh.impulse = 5
+
+		zombie_particle:play_at_pos(p_obj:position())
+
+		if zombie_sound1 then
+			zombie_sound1:play_at_pos(p_obj, p_obj:position(), 0)
+		end
+		if zombie_sound2 then
+			zombie_sound2:play_at_pos(p_obj, p_obj:position(), 0)
+		end
+
+		if enemy and posit:distance_to(enemy:position()) < 5 then
+			zh.draftsman = enemy
+			zh.direction = p_obj:position():sub(enemy:position())
+			enemy:hit(zh)
+		end
+
+		if not enemy and posit:distance_to(db.actor:position()) < 5 then
+			zh.draftsman = db.actor
+			zh.direction = p_obj:position():sub(db.actor:position())
+			db.actor:hit(zh)
+		end
+
+		if p_obj:section() == "rad_zombie_rusty" and not hand_spawned_flag then
+			alife():create("af_zombie_hand", p_obj:position(), p_obj:level_vertex_id(), p_obj:game_vertex_id())
+			hand_spawned_flag = true
+		end
+
+		safely_destroy_creature(p_obj)
+	end
+end
+
+
+-- Взрыв фантома
+function blow_phantom(p_obj)
+	if p_obj then
+		local posit = p_obj:position()
+		local enemy = p_obj:best_enemy()
+
+		local zh = hit()
+		zh.type = hit.telepatic
+		zh:bone("pelvis")
+		zh.power = 0.7
+		zh.impulse = 5
+
+		local zh_e = hit()
+		zh_e.type = hit.shock
+		zh_e:bone("pelvis")
+		zh_e.power = 0.2
+		zh_e.impulse = 5
+
+	--	phantom_particle:play_at_pos(p_obj:position())
+		if not phantom_particle:playing() then phantom_particle:play_at_pos(p_obj:position()) end
+		if phantom_sound and not phantom_sound:playing() then phantom_sound:play_at_pos(p_obj, p_obj:position(), 0) end
+
+		if enemy and posit:distance_to(enemy:position()) < 5 then
+			if enemy:id() == db.actor:id() then
+				if not has_alife_info("actor_set_zombied") then
+					zh.draftsman = enemy
+					zh.direction = p_obj:position():sub(enemy:position())
+					enemy:hit(zh)
+				else
+					zh_e.draftsman = enemy
+					zh_e.direction = p_obj:position():sub(enemy:position())
+					enemy:hit(zh_e)
+				end
+			else
+				zh_e.draftsman = enemy
+				zh_e.direction = p_obj:position():sub(enemy:position())
+				enemy:hit(zh_e)
+			end
+		end
+		safely_destroy_creature(p_obj)
+	end
+
+end
+
+-- Убийство с помощью хита
+function kill_hit(obj)
+	if obj then
+		local blow = hit()
+
+		old_corpses[obj:id()] = obj:id()
+		blow.direction = vector():set(0,0,0)
+		blow.impulse = 0
+		blow.draftsman = obj
+		blow.power = 240
+		blow.type = hit.explosion
+		obj:hit(blow)
+	end
+end
+
+-- Релизание из игры с помощью таблицы old_corpses
+function release_from_old_corpses(obj)
+	if obj and IsMonster(obj) and not obj:alive() then
+		for k,v in pairs(old_corpses) do
+			if obj:id() == k then
+				local sobj = alife():object(obj:id())
+				if sobj then
+					alife():release(sobj, true)
+					old_corpses[obj:id()] = nil
+				end
+			end
+		end
+	end
+end
+
+--Вернуть рандомное значение на отрезке 0.01 до 1
+function get_random_real()
+	return math.random(1, 100) / 100
+end
+
+-- Разряд электрохимеры
+function charge_chimera(p_obj)
+	if p_obj then
+		local posit = p_obj:position()
+		local enemy = p_obj:best_enemy()
+
+		if not chimera_particle:playing() then chimera_particle:play_at_pos(p_obj:position()) end
+		if chimera_sound and not chimera_sound:playing() then
+			chimera_sound:play_at_pos(p_obj, p_obj:position(), 0)
+			local zh = hit()
+			zh.draftsman = enemy
+			zh.type = hit.shock
+			zh.direction = p_obj:position():sub(enemy:position())
+			zh:bone("pelvis")
+			zh.power = 0.2
+			zh.impulse = 0.1
+			enemy:hit(zh)
+		end
+	end
+end
+
+
+-- Разряд подвижной электры
+function charge_electra_movable(p_obj)
+	if p_obj then
+		local posit = p_obj:position()
+		local enemy = p_obj:best_enemy()
+
+		if not chimera_particle:playing() then chimera_particle:play_at_pos(p_obj:position()) end
+		if chimera_sound and not chimera_sound:playing() then
+			chimera_sound:play_at_pos(p_obj, p_obj:position(), 0)
+			local zh = hit()
+			zh.draftsman = enemy
+			zh.type = hit.shock
+			zh.direction = p_obj:position():sub(enemy:position())
+			zh:bone("pelvis")
+			zh.power = 0.4
+			zh.impulse = 0.2
+			enemy:hit(zh)
+		end
+	end
+end
+
+-- Вспышка подвижной жарки
+function charge_jarka_movable(p_obj)
+if p_obj then
+	local posit = p_obj:position()
+	local enemy = p_obj:best_enemy()
+
+	if not jarka_particle:playing() then jarka_particle:play_at_pos(p_obj:position()) end
+	if jarka_sound and not jarka_sound:playing() then
+		jarka_sound:play_at_pos(p_obj, p_obj:position(), 0)
+		local zh = hit()
+		zh.draftsman = enemy
+		zh.type = hit.shock
+		zh.direction = p_obj:position():sub(enemy:position())
+		zh:bone("pelvis")
+		zh.power = 0.1
+		zh.impulse = 0.2
+		enemy:hit(zh)
+	end
+end
+end
+
+
+-- Атака насекомых чумного зомби
+function zombie_insect(p_obj)
+	if p_obj then
+
+		local posit = p_obj:position()
+		local actor = db.actor:position()
+		local zh = hit()
+		zh.draftsman = db.actor
+		zh.type = hit.chemical_burn
+		zh.direction = p_obj:position():sub(actor)
+		zh:bone("pelvis")
+		zh.power = 0.035
+		zh.impulse = 0.1
+
+		if not insect_particle:playing() then
+
+			insect_particle:play_at_pos(vector():set(actor.x, actor.y+1.8, actor.z))
+
+			if insect_sound and not insect_sound:playing() then
+				insect_sound:play_at_pos(db.actor, actor)
+				db.actor:hit(zh)
+			elseif insect_sound then
+				insect_sound:set_position(actor)
+			end
+
+		else
+
+			insect_particle:move_to(vector():set(actor.x, actor.y+1.8, actor.z),vector():set(actor.x, actor.y+1.8, actor.z))
+
+			if insect_sound and not insect_sound:playing() then
+				insect_sound:play_at_pos(db.actor, actor)
+				db.actor:hit(zh)
+			elseif insect_sound then
+				insect_sound:set_position(actor)
+			end
+		end
+	end
+end
+
+
+-- Аура пси-бюрера
+function psy_burer(p_obj)
+	if p_obj then
+		local zh = hit()
+		zh.draftsman = db.actor
+		if not has_alife_info("actor_set_zombied") then zh.type = hit.telepatic else zh.type = hit.shock end
+		zh.direction = p_obj:position():sub(db.actor:position())
+		zh:bone("pelvis")
+		zh.power = 0.1
+		for k,v in pairs(psy_burer_sound) do
+			if not v.sound_name:playing() then
+				v.sound_name = sound_object(sound_rnd_moan[math.random(#sound_rnd_moan)])
+				v.sound_name.volume = v.volume
+				v.sound_name:play_at_pos(db.actor, vector():set(v.direction, 0, 1), 0, sound_object.s2d)
+				db.actor:hit(zh)
+			end
+		end
+	end
+
+end
+
+function dog_attack_phantom()
+	local i = math.random(1,16)
+	local snd_obj = xr_sound.get_safe_sound_object("soundtrack\\dog_phantom\\"..tostring(i))
+	if snd_obj then snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)	end
+end
+
+function controller_attack_phantom()
+	local i = math.random(1,25)
+	local snd_obj = xr_sound.get_safe_sound_object("soundtrack\\controller\\"..tostring(i))
+	if snd_obj then snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)	end
+end
+

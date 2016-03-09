@@ -1,0 +1,98 @@
+[bolt]:identity_immunities
+class				= II_BOLT
+cform				= skeleton
+visual				= weapons\bolt\wpn_bolt.ogf
+inv_name			= st_bolt
+$prefetch 			= 16
+inv_name_short		= st_bolt
+inv_weight			= 0.0
+
+ef_weapon_type		= 1
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 20
+inv_grid_y			= 11
+
+;АНИМАЦИЯ ПРИ ВИДЕ СО СТОРОНЫ
+animation_slot		= 7 ;6
+;animation_slot		= 0 ;глючит
+;animation_slot		= 1 ;держит как пистолет
+;animation_slot		= 2 ;держит как ружье
+;animation_slot		= 6 ;изображает самолет, зато размахивается только 1 раз
+;animation_slot		= 7 ;анимация по умолчанию - глючная, т.к. размахивается 2 раза, хотя под dx9 это менее заметно
+;animation_slot		= 13;держит как бинокль
+;animation_slot		= 30;лезет по лестнице
+;animation_slot		= 40;держит как автомат
+;animation_slot		= 43;поправляется
+;animation_slot		= 44;плющит
+;animation_slot		= 45;колбасит
+;animation_slot		= 46;колбасит
+;animation_slot		= 50;прикольно
+
+single_handed		= 0
+
+slot				= 5
+hud					= bolt_hud
+force_min			= 10
+force_const			= 20
+force_max			= 35
+force_grow_speed	= 15
+
+destroy_time		= 30000
+
+;ОПРЕДЕЛЕНИЕ РАСПОЛОЖЕНИЯ В ПРОСТРАНСТВЕ ОТНОСИТЕЛЬНО РУКИ ПРИ ВЗГЛЯДЕ СО СТОРОНЫ
+attach_position_offset	= -0.028, -0.084, 0.030 ;нормально
+;attach_position_offset	= -0.021,-0.075,0.0     ;по умолчанию
+;ушел вглубь по длине руки (из-за первого параметра)
+;смещается вверх (в небо) перпендикулярно руке (из-за второго параметра)
+;смещается вглубь ладони перпендикулярно руке (из-за третьего параметра)
+
+attach_angle_offset		= 0,0,0
+attach_bone_name		= 
+
+;ВРОДЕ ОТНОСИТСЯ К УГЛУ ПОЛЕТА ПРИ ВИДЕ СО СТОРОНЫ
+// should be deleted after update
+position_offset			 = 0.0,0.0,0.0
+angle_offset			 = 1.570790,1.570790,3.92699
+
+cost				= 0
+
+throw_point			= 0,0.4,0.5
+throw_dir			= 0,0,1
+
+[bolt_hud]
+fire_point          = 0.05, 0.0, 0.1
+fire_bone           = bolt_0
+
+orientation         = 0,0,0
+position            = 0,0,0
+visual              = weapons\bolt\wpn_bolt_hud.ogf
+
+throw_point			= 0,0.4,0.3
+throw_dir			= 0,0,0
+
+;АНИМАЦИИ ПРИ ВИДЕ ИЗ ГЛАЗ
+anim_show			= draw3 ;draw
+anim_hide			= holster_0
+anim_idle			= idle_0
+anim_playing		= idle_01
+anim_throw_begin	= attack_0_begin
+anim_throw_idle		= attack_0_idle
+anim_throw_act		= attack_0_act	
+anim_throw_end		= attack_0_end
+anim_idle_sprint    = idle_sprint   ;вдруг когда-нибудь пригодится
+
+;допустимые анимации
+;idle_01         ;перекидывание из руки в руку
+;idle_0          ;покачивание руки
+;holster_0       ;убрать
+;draw3           ;подбрасывание
+;draw
+;attack_0
+;attack_0_idle
+;attack_0_act
+;attack_0_begin
+;attack_0_end
+;idle_sprint   ;анимация при беге, сработала бы, но anim_idle_sprint для данного класса почему-то отсутствует
+;чтобы понять, как должно было выглядеть, можно подставить к anim_show, например anim_show=idle_sprint

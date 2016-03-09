@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding="UTF-8"?>
+
+<window>
+	<main x="0" y="0" width="1024" height="768"/>
+	<car_fuel_back x="861" y="546" width="156" height="48" stretch="1" complex_mode="1">
+		<texture x="820" y="100" width="156" height="48">ui\ui_hud</texture>
+		<fuel_level x="32" y="19" width="110" height="10" stretch="1" complex_mode="1">
+			<texture x="347" y="197" width="110" height="10">ui\ui_hud</texture>
+		</fuel_level>
+	</car_fuel_back>
+</window>

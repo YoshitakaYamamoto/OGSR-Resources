@@ -1,0 +1,221 @@
+[ammo_7.62x25_p]:ammo_base
+$spawn			= "weapons\ammo\ammo_7.62x25_p" ; option for Level Editor
+visual          = weapons\ammo\ammo_762x25_p.ogf
+description		= enc_weapons1_ammo_ammo-7.62x25-p
+
+
+cost			= 360
+
+box_size		= 30
+
+inv_name		= ammo-7.62x25-p
+inv_name_short	= ammo-7.62x25-p_s
+inv_weight		= 0.3
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 21
+inv_grid_y		= 10
+
+k_disp			= 1.5
+k_hit			= 1.1
+k_impulse		= 2
+k_pierce		= 1.1
+
+;------------------------------
+[ammo_7.62x25_ps]:ammo_base
+$spawn			= "weapons\ammo\ammo_7.62x25_ps" ; option for Level Editor
+visual          = weapons\ammo\ammo_762x25_ps.ogf
+description		= enc_weapons1_ammo_ammo-7.62x25-ps
+
+cost			= 380
+
+box_size		= 30
+
+inv_name		= ammo-7.62x25-ps
+inv_name_short	= ammo-7.62x25-ps_s
+inv_weight		= 0.3
+
+inv_grid_width	= 2
+inv_grid_height	= 1
+inv_grid_x		= 21
+inv_grid_y		= 11
+
+k_disp			= 1.5
+k_hit			= 1.4
+k_impulse		= 1.5
+k_pierce		= 1.2
+impair			= 1.02
+wm_size         = 0.06
+
+;------------------------------
+
+
+[clip_8_7.62x25_p]:ammo_7.62x25_p
+box_size	= 1
+mag_size	= 8
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x25a8
+inv_name		= clip_8_7.62x25
+description		= desc_load_7.62x25_p
+inv_name_short	= clip_8_7.62x25_p_s
+inv_weight		= 0.0106
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 14
+visual	= weapons\magazines\clip_8_762x25.ogf
+cost = 25
+
+[clip_8_7.62x25_ps]:ammo_7.62x25_ps
+box_size	= 1
+mag_size	= 8
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x25b8
+inv_name		= clip_8_7.62x25
+description		= desc_load_7.62x25_ps
+inv_name_short	= clip_8_7.62x25_ps_s
+inv_weight		= 0.0106
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 14
+visual	= weapons\magazines\clip_8_762x25.ogf
+cost = 25
+
+[mag_20_7.62x25_p]:ammo_7.62x25_p
+box_size	= 1
+mag_size	= 20
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x25a20
+inv_name		= mag_20_7.62x25
+description		= desc_load_7.62x25_p
+inv_name_short	= mag_20_7.62x25_p_s
+inv_weight		= 0.0106
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 9
+visual	= weapons\magazines\mag_20_762x25.ogf
+cost = 50
+
+[mag_20_7.62x25_ps]:ammo_7.62x25_ps
+box_size	= 1
+mag_size	= 20
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x25b20
+inv_name		= mag_20_7.62x25
+description		= desc_load_7.62x25_ps
+inv_name_short	= mag_20_7.62x25_ps_s
+inv_weight		= 0.0106
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 9
+visual	= weapons\magazines\mag_20_762x25.ogf
+cost = 50
+
+[mag_64_7.62x25_p]:ammo_7.62x25_p
+box_size	= 1
+mag_size	= 64
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x25a64
+inv_name		= mag_64_7.62x25
+description		= desc_load_7.62x25_p
+inv_name_short	= mag_64_7.62x25_p_s
+inv_weight		= 0.0106
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 2
+visual	= weapons\magazines\mag_64_762x25.ogf
+cost = 130
+
+[mag_64_7.62x25_ps]:ammo_7.62x25_ps
+box_size	= 1
+mag_size	= 64
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x25b64
+inv_name		= mag_64_7.62x25
+description		= desc_load_7.62x25_ps
+inv_name_short	= mag_64_7.62x25_ps_s
+inv_weight		= 0.0106
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 2
+visual	= weapons\magazines\mag_64_762x25.ogf
+cost = 130
+
+[mag_71_7.62x25_p]:ammo_7.62x25_p
+box_size	= 1
+mag_size	= 71
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x25a71
+inv_name		= mag_71_7.62x25
+description		= desc_load_7.62x25_p
+inv_name_short	= mag_71_7.62x25_p_s
+inv_weight		= 0.0106
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 0
+visual	= weapons\magazines\mag_71_762x25.ogf
+cost = 180
+
+[mag_71_7.62x25_ps]:ammo_7.62x25_ps
+box_size	= 1
+mag_size	= 71
+script_binding  = ammo_manager.init
+wm_section	= wm_7.62x25b71
+inv_name		= mag_71_7.62x25
+description		= desc_load_7.62x25_ps
+inv_name_short	= mag_71_7.62x25_ps_s
+inv_weight		= 0.0106
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 61
+inv_grid_y			= 0
+visual	= weapons\magazines\mag_71_762x25.ogf
+cost = 180
+
+[clip_8_7.62x25_p_e]:clip_8_7.62x25_p
+description		= desc_clip_e
+inv_weight = 0.086
+
+[clip_8_7.62x25_ps_e]:clip_8_7.62x25_ps
+description		= desc_clip_e
+inv_weight = 0.086
+
+[mag_20_7.62x25_p_e]:mag_20_7.62x25_p
+description		= desc_mag_e
+inv_weight = 0.15
+
+[mag_20_7.62x25_ps_e]:mag_20_7.62x25_ps
+description		= desc_mag_e
+inv_weight = 0.15
+
+[mag_64_7.62x25_p_e]:mag_64_7.62x25_p
+description		= desc_mag_e
+inv_weight = 0.37
+
+[mag_64_7.62x25_ps_e]:mag_64_7.62x25_ps
+description		= desc_mag_e
+inv_weight = 0.37
+
+[mag_71_7.62x25_p_e]:mag_71_7.62x25_p
+description		= desc_mag_e
+inv_weight = 1.23
+
+[mag_71_7.62x25_ps_e]:mag_71_7.62x25_ps
+description		= desc_mag_e
+inv_weight = 1.23
+

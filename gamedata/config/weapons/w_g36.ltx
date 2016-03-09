@@ -1,0 +1,253 @@
+; Штурмовая винтовка (автомат) Heckler-Koch G36
+;----------------------------------------------
+[wpn_g36]:identity_immunities
+GroupControlSection			= spawn_group
+discovery_dependency		= 
+$spawn              		= "weapons\g36"		; option for Level Editor
+$npc						= on				; option for Level Editor
+$prefetch 					= 8
+scheduled					= off				; option for ALife Simulator
+cform               		= skeleton
+class               		= WP_AK74
+min_radius          		= 15
+max_radius          		= 150
+description			        = enc_weapons1_wpn-g36
+launch_speed				= 0
+ef_main_weapon_type			= 2
+ef_weapon_type				= 6
+
+;-----------------------------------------------------------------------------------
+holder_range_modifier	= 1.5		       ; во сколько раз увеличивается eye_range 
+holder_fov_modifier		= 1.0              ; во сколько раз увеличивается eye_fov
+;-----------------------------------------------------------------------------------
+
+cost						= 6900
+weapon_class				= assault_rifle	; Type of the weapon
+
+ammo_elapsed				= 30
+ammo_mag_size				= 30
+ammo_class					= ammo_5.56x45_ss190, ammo_5.56x45_ap
+grenade_class		        = ammo_m209
+fire_modes					= 1, -1
+
+hand_dependence				= 1
+single_handed				= 0	
+
+slot 						= 2	; // secondary
+animation_slot				= 2		; type of the animation that will be used
+
+inv_name	        		= wpn-g36
+inv_name_short				= wpn-g36
+inv_weight					= 3.6
+
+inv_grid_width				= 5
+inv_grid_height				= 2
+inv_grid_x					= 0
+inv_grid_y					= 10
+
+kill_msg_x					= 157
+kill_msg_y					= 29
+kill_msg_width				= 78
+kill_msg_height				= 31
+
+;-----------------------------------------------------------------------------------
+;базовая дисперсия
+dispersion_start		= 2
+fire_dispersion_base		= 0.15 	;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor		= 1.15f
+disp_rate 			= 1.88
+
+;отдача
+cam_relax_speed         	= 5.7;0.2	;скорость возврата в исходное положение
+cam_relax_speed_ai        	= 120.75
+cam_dispersion          	= 0.2		;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc			= 0.1		;увеличениe cam_dispersion с каждым выстрелом
+cam_dispertion_frac			= 0.95		;ствол будет подыматься на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+cam_max_angle				= 7.0		;максимальный угол отдачи
+cam_max_angle_horz			= 9.0		;(degree) maximum shot horizontal degree 
+cam_step_angle_horz			= 0.5		;(degree) size of step camera moved in horizontal position while shooting
+
+fire_dispersion_condition_factor = 4.1	;увеличение дисперсии в процентах при максимальном износе 
+misfire_probability 		= 0.002		;вероятность осечки при максимальном износе 
+misfire_condition_k			= 0.05
+condition_shot_dec 			= 0.00015 	;увеличение износа при каждом выстреле
+;-----------------------------------------------------------------------------------
+direction              		=  0, 0, 1
+fire_point             		=  0.0, 0.21, 0.58
+fire_point2            		=  0.0, 0.21, 0.71
+
+flame_particles				= weapons\generic_weapon05
+smoke_particles				= weapons\generic_shoot_00
+grenade_flame_particles		= weapons\generic_weapon01
+	
+shell_point		 			= 0.0, 0.21, 0.13
+shell_dir		 			= 0.0, 0.0, 0.4
+shell_particles	 			= weapons\generic_shells
+
+rpm_empty_click 	 		= 200
+
+PDM_disp_base 			= 1.2
+PDM_disp_vel_factor 		= 1.3
+PDM_disp_accel_factor 		= 1.4
+PDM_crouch	 		= 0.9
+PDM_crouch_no_acc 		= 0.8
+
+; ttc
+hit_power                	= 0.70
+hit_impulse		        	= 25
+hit_type 					= fire_wound
+hit_rate			= 1.85
+
+fire_distance            	= 250
+bullet_speed				= 970	;начальная скорость пули
+rpm                      	= 750
+; end ttc
+
+use_aim_bullet			= false		;Поддерживается ли первая суппер пуля
+time_to_aim					= 1.0	
+
+hud                      	= wpn_g36_hud
+normal                   	= 0, 1, 0
+
+;-----------------------------------------------------------------------------------
+position         	        = -0.026, -0.132, 0.0
+orientation      	        = 0, 0, 0
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;под мишкой
+strap_position         		= -0.26,-0.11,0.25			; position (offset) and orientation of the weapon when it is strapped
+strap_orientation      		= -15,-9,110				; (3rd person view in degrees)
+strap_bone0					= bip01_spine2
+strap_bone1					= bip01_spine1
+
+startup_ammo   		        = 90
+visual         		        = weapons\g36\wpn_g36.ogf
+	
+light_color					= 0.6,0.5,0.3
+light_range					= 5
+light_var_color				= 0.05
+light_var_range				= 0.5
+light_time 					= 0.2
+
+;addons
+scope_status				= 1
+silencer_status				= 2
+grenade_launcher_status		= 2
+
+zoom_enabled			= true		; (on,off)zoom mode (right mouse button)
+scope_zoom_factor	 	= 3.5 	; G36 x3.5	; fov for zoom mode
+ironsight_zoom_factor		= 1.0
+
+scope_texture			= wpn\scopes\scope_g36
+
+;scope_name 				= wpn_addon_scope_susat
+;scope_x 					= 78
+;scope_y 					= 0
+silencer_name  				= wpn_addon_sil_556_ar
+silencer_x 					= 214
+silencer_y 					= 12
+grenade_launcher_name 		= wpn_addon_grenade_launcher_m203
+grenade_launcher_x 			= 130
+grenade_launcher_y 			= 31
+
+;настройки для глушителя
+silencer_hit_power       	= 0.63
+silencer_hit_impulse	 	= 25
+silencer_fire_distance   	= 200
+silencer_bullet_speed	 	= 840
+
+;silencer_flame_particles 	= weapons\generic_weapon01
+silencer_smoke_particles 	= weapons\generic_shoot_00
+
+silencer_light_color		= 0.6,0.5,0.3
+silencer_light_range		= 0.01
+silencer_light_var_color	= 0.05
+silencer_light_var_range	= 0.5
+silencer_light_time 		= 0.2
+
+;------------------------------ S.T.A.L.K.E.R`s sound remake ----------------
+;звуки
+snd_draw					= weapons\g36\g36_draw
+snd_holster					= weapons\generic_avtomat_holster
+snd_shoot					= weapons\g36\g36_shoot
+snd_shoot1					= weapons\g36\g36_shoot1
+snd_shoot2					= weapons\g36\g36_shoot2
+snd_shoot3					= weapons\g36\g36_shoot3      
+snd_empty					= weapons\g36\g36_empty, 0.8
+snd_reload					= weapons\g36\g36_reload, 0.7, 0.35
+snd_shoot_grenade			= weapons\m203\M203_grenshoot
+snd_reload_grenade			= weapons\g36\g36_grenload, 1.0, 0.3
+snd_switch					= weapons\m203\M203_switch, 1.0, 0.5
+snd_silncer_shot			= weapons\g36\g36_shot_sil 
+;-----------------------------------------------------------------------------
+
+;-----------------------------------------------------------------------------
+;-- HUD DESCRIPTION
+;-----------------------------------------------------------------------------
+[wpn_g36_hud]
+
+allow_inertion			= true
+
+shell_point			= 0.15, 0.0, -0.05
+shell_dir			= 0.0, 1.0, 0.0
+
+fire_point			= -0.000000,0.062000,0.134000
+fire_point2 			= 0.30, 0.00, 0.05
+fire_bone 			= wpn_body
+
+orientation 			= 5, 0, 0
+position 			= 0, 0, 0
+visual 				= weapons\g36\wpn_g36_hud.ogf
+
+grenade_bone 			= grenade
+
+anim_idle			= idle
+anim_idle_aim			= idle
+anim_reload			= reload
+anim_draw			= draw
+anim_holster			= shoot
+anim_shoot			= shoot
+anim_idle_sprint		= idle_sprint
+			
+;анимации с подключенным подствольником
+;(режим стрельбы из подствольника)
+anim_idle_g			= idle_grenade
+anim_idle_g_aim			= idle_grenade
+anim_reload_g			= reload_grenade
+anim_shoot_g			= shoot_grenade
+anim_switch_grenade_on		= switch_on
+anim_switch_grenade_off		= switch_off
+anim_draw_g			= switch_on
+anim_holster_g			= switch_off
+;(режим обычной стрельбы)			 
+anim_idle_gl			= idle_w_gl
+anim_idle_gl_aim		= idle_w_gl
+anim_reload_gl			= reload_w_gl
+anim_draw_gl			= draw_w_gl
+anim_holster_gl			= holster_w_gl
+anim_shoot_gl			= shoot_w_gl
+
+;смещения HUD для режима приближения
+zoom_offset                 = -0.135500,0.010000,0.000000
+zoom_rotate_x          		= -0.013900
+zoom_rotate_y          		= 0.067000
+
+;режим подствольника
+grenade_zoom_offset			= -0.1173,-0.234600,0.000000
+grenade_zoom_rotate_x		= -0.266700
+grenade_zoom_rotate_y		= 0.067000
+
+grenade_normal_zoom_offset			= -0.135500,0.010000,-0.1
+grenade_normal_zoom_rotate_x		= -0.013900
+grenade_normal_zoom_rotate_y		= 0.067000
+
+;прячем перекрестие прицела в зуме
+zoom_hide_crosshair		= true
+
+;время поворота HUD (сек)
+zoom_rotate_time		= 0.4
+rotate_time			= 0.4
+
+[wpn_g36_repair]
+tech_complication = 1000
+repair_compatibility = g36

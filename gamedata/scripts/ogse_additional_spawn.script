@@ -1,0 +1,244 @@
+-----------------------------------------------------------------------
+--- ogse_additional_spawn.script                                       
+--- Модуль дополнительного спавна после выбросов                       
+--- Mixser (c) OGS Evolution Team                                      
+--- Загнано под ограничения численности
+--- version 1.1 (30/08/2011)                                             
+-----------------------------------------------------------------------
+
+class "additional_spawn"
+
+function additional_spawn:__init()
+	self.path = "misc\\additional_spawn.ltx"
+	self.ltx = ini_file(self.path)
+	self.ini = system_ini()
+	self.additional_spawn_accept = self.ini:r_s32("options","additional_spawn") -- опция в конфигураторе (1 - включено, 0 - выключено)
+	
+	self.creatures = {"human","mutant"} -- список существ
+	self.human_list = {"bandits", "army", "dolg", "freedom", "mercenary", "zombied", "monolith"} -- наименование группировок
+	self.mutant_list = {"dogs", "cats", "pseudodogs", "fleshes", "boars", "zombies", "izloms",
+						"burers", "snorks", "bloodsuckers", "chimeres", "pseudogigants"} -- наименование мутантов
+	
+	self.level_list = self:get_level_list() -- список уровней, где разрешён доп. спавн
+	self.level_spawn = self:get_level_spawn() -- список существ, которые могут спавнится на локациях
+	self.spawn_count = self:get_spawn_count() -- список минимального/максимального спавна для каждого существа
+	self.human_info = self:get_human_info() -- информация про возможные варианты спавна людей
+	self.mutant_info = self:get_mutant_info() -- информация про возможные варианты спавна мутантов
+	self.human_count = self:get_human_count() -- минимальное и максимальное количество людей, которых можно спавнить
+	self.mutant_count = self:get_mutant_count() -- минимальное и максимальное количество мутантов, которых можно спавнить
+	
+end
+
+function additional_spawn:__finalize()
+end
+
+function additional_spawn:get_level_list()
+	local time_array = {}
+	local n = self.ltx:line_count("level_list")
+	
+	for i=0,n-1 do
+		result, id, value = self.ltx:r_line("level_list",i,"","")
+
+		time_array[i+1] = id
+	end
+	
+	return time_array
+end
+
+function additional_spawn:get_level_spawn()
+	local time_array = {}
+	local a,b = {}
+	local n = 0
+	
+	for k,v in pairs(self.level_list) do
+		a = {}
+		for k1,v1 in pairs(self.creatures) do
+			b = {}
+			n = self.ltx:line_count(v.."_"..v1)
+			for i=0,n-1 do
+				result, id, value = self.ltx:r_line(v.."_"..v1,i,"","")
+				b[i+1] = id
+			end
+			a[v1] = b
+		end
+		time_array[v] = a
+	end
+	
+	return time_array
+end
+
+function additional_spawn:get_spawn_count()
+	local time_array = {}
+	local n = self.ltx:line_count("spawn_count")
+	local a = {}
+	
+	for i=0,n-1 do
+		result, id, value = self.ltx:r_line("spawn_count",i,"","")
+		local help = {}
+		local num = nil
+		a = {}
+		for num in string.gfind(value,"([%w_%-.\\]+)%p*") do table.insert(help, num) end
+		a.min = tonumber(help[1])
+		a.max = tonumber(help[2])
+		time_array[id] = a
+	end
+	
+	return time_array
+end
+
+function additional_spawn:get_human_info()
+	local time_array = {}
+	local n = 0
+	local a,b,c,d = {}
+
+	for k,v in pairs (self.human_list) do
+		n = self.ltx:r_u32("human_info_count",v)
+		a = {}
+		for i=1,n do
+			b = {}
+			b.name = self.ltx:r_string(v.."_info_"..tostring(i),"name")
+			b.cond1 = self.ltx:r_string(v.."_info_"..tostring(i),"cond1")
+			b.cond2 = self.ltx:r_string(v.."_info_"..tostring(i),"cond2")
+			if self.ltx:line_exist(v.."_info_"..tostring(i),"nospawn_level") then
+				local s = self.ltx:r_string(v.."_info_"..tostring(i),"nospawn_level")
+				local num = nil
+				c = {}
+				for num in string.gfind(s,"([%w_%-.\\]+)%p*") do table.insert(c, num) end
+				local d = {}
+				for k,v in pairs(c) do d[v] = true end
+				b["nospawn_level"] = d
+			end
+			a[i] = b
+		end
+		time_array[v] = a
+	end
+	
+	return time_array
+end
+
+function additional_spawn:get_mutant_info()
+	local time_array = {}
+	local n = 0
+	local a,b = {}
+	
+	for k,v in pairs (self.mutant_list) do
+		n = self.ltx:r_u32("mutant_info_count",v)
+		a = {}
+		for i=1,n do
+			b = {}
+			b.name = self.ltx:r_string(v.."_info_"..tostring(i),"name")
+			b.cond1 = self.ltx:r_string(v.."_info_"..tostring(i),"cond1")
+			b.cond2 = self.ltx:r_string(v.."_info_"..tostring(i),"cond2")
+			a[i] = b
+		end
+		time_array[v] = a
+	end
+	
+	return time_array
+end
+
+function additional_spawn:get_human_count()
+	local time_array = {}
+		time_array.min = self.ltx:r_u32("human_count","min")
+		time_array.max = self.ltx:r_u32("human_count","max")
+	return math.random(time_array.min, time_array.max)
+end
+
+function additional_spawn:get_mutant_count()
+	local time_array = {}
+		time_array.min = self.ltx:r_u32("mutant_count","min")
+		time_array.max = self.ltx:r_u32("mutant_count","max")
+	return math.random(time_array.min, time_array.max)
+end
+
+-- Функция генерации людей/мутантов. Вызывать нужно из внешнего скрипта!
+function additional_spawn:spawn_creatures()
+	if self.additional_spawn_accept == 1 then -- а нужно ли спавнить?
+		if self.level_spawn[level.name()] then -- есть ли запрет на дополнительный спавн на этой локации?
+			self:human_spawn() -- спавним людей
+			self:mutant_spawn() -- спавним мутантов
+		end
+	end
+end
+
+function additional_spawn:human_spawn()
+	local group,person = ""
+	local current_list = {}
+	-- log1("Начинаем спавнить людей...")
+	-- log1("human_count = "..tostring(self.human_count))
+	for i=1,self.human_count do
+		group = self.level_spawn[level.name()]["human"][math.random(table.getn(self.level_spawn[level.name()]["human"]))] -- выбрали группировку, которую будем спавнить
+		count = math.random(self.spawn_count[group].min,self.spawn_count[group].max) -- выбрали количество существ
+		current_list = {} -- заполним данную табличку возможными вариантами спавна
+		for k,v in pairs(self.human_info[group]) do
+			if ((not v["nospawn_level"]) or (not v["nospawn_level"][level.name()])) and ((has_alife_info(v.cond1) or v.cond1 == "none") and ((not has_alife_info(v.cond2)) or v.cond2 == "none")) then table.insert(current_list, v.name) end
+		end
+		if current_list[1] then
+			person = current_list[math.random(table.getn(current_list))] -- выбрали вариант спавна
+			-- log1("person = "..person)
+			-- log1("count = "..tostring(count))
+		end
+		if person then self:proceed_npc_spawn(person, count) else log1("ERROR (ogse_additional_spawn)! human_person is nil!") end
+	end
+end
+
+function additional_spawn:mutant_spawn()
+	local group,person = ""
+	local current_list = {}
+	-- log1("Начинаем спавнить мутантов...")
+	-- log1("mutant_count = "..tostring(self.mutant_count))
+	
+		
+	for i=1,self.mutant_count do
+		group = self.level_spawn[level.name()]["mutant"][math.random(table.getn(self.level_spawn[level.name()]["mutant"]))] -- выбрали группировку, которую будем спавнить
+		count = math.random(self.spawn_count[group].min,self.spawn_count[group].max) -- выбрали количество существ
+		current_list = {} -- заполним данную табличку возможными вариантами спавна
+		for k,v in pairs(self.mutant_info[group]) do
+			if (has_alife_info(v.cond1) or v.cond1 == "none") and ((not has_alife_info(v.cond2)) or v.cond2 == "none") then table.insert(current_list, v.name) end
+		end
+		person = current_list[math.random(table.getn(current_list))] -- выбрали вариант спавна
+		-- log1("person = "..person)
+		-- log1("count = "..tostring(count))
+		if person then self:proceed_npc_spawn(person, count) else log1("ERROR (ogse_additional_spawn)! mutant_person is nil!") end
+	end
+end
+
+--- перебирает координаты вертексов столько раз сколько указано в count, пока координаты не окажутся не менее 100 метров в радиусе от ГГ
+--- затем спавнит по ним (автор Kamikazze)
+function additional_spawn:proceed_npc_spawn(section, count)
+
+local respawn_ini = system_ini()
+
+for ind = 1, count do
+
+	local pos, new_lv, new_gv = ogse_anomaly.anomaly_position_choice(level.name(), false)
+
+    local community = r_str(respawn_ini, section, "community", "nil")
+    local rank = r_str(respawn_ini, section, "spec_rank", "nil")
+	local check_1 =  se_respawn.check_npc_spawn_allowed(section, community, rank)
+	local check_2 =  se_respawn.check_monster_spawn_allowed(section, community, rank)
+	if check_1 == true or check_2 == true then
+		if pos and new_lv and new_gv then
+			local obj = alife():create(section, pos, new_lv, new_gv)
+		end	
+		if obj then
+			local str = community.."_"..rank
+			if se_respawn.population_human[str] then
+				se_respawn.population_human[str] = se_respawn.population_human[str] + 1
+			end
+			if se_respawn.population_factions[community] then
+				se_respawn.population_factions[community] = se_respawn.population_factions[community] + 1
+			end
+			if IsMonster(obj) then
+				if se_respawn.population_monster[section] then
+					se_respawn.population_monster[section] = se_respawn.population_monster[section] + 1
+				end
+			end	
+		end	
+	else
+		-- log1("!!SE_RESPAWN> Add_Spawn Существо не прошло обе проверки "..section)
+	end
+end	
+
+
+end

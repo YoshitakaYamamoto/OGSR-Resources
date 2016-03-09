@@ -1,0 +1,159 @@
+;;; .357Magnum
+
+[ammo_357_jfp]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\ammo\ammo_357_jfp" ; option for Level Editor
+class			= AMMO
+cform                   = skeleton
+visual                  = weapons\ammo\ammo_357_jfp.ogf
+description				= enc_weapons1_ammo_ammo-357-jfp
+$prefetch 		= 64
+
+cost					 = 720
+
+box_size		= 24	;50
+
+inv_name		= ammo-357-jfp
+inv_name_short	= ammo-357-jfp_s
+inv_weight		= 0.360
+
+inv_grid_width		= 2;1
+inv_grid_height		= 1
+inv_grid_x			= 31
+inv_grid_y			= 3
+
+k_dist			= 1
+k_disp			= 1.27
+k_hit			= 1.78
+k_impulse		= 1
+k_pierce		= 1.0
+impair			= 1
+buck_shot		= 1
+tracer			= off
+wm_size 		= 0.09
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[ammo_357_jhp]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\ammo\ammo_357_jhp" ; option for Level Editor
+class			= AMMO
+cform                   = skeleton
+visual                  = weapons\ammo\ammo_357_jhp.ogf
+description				= enc_weapons1_ammo_ammo-357-jhp
+$prefetch 		= 64
+
+cost					 = 840
+
+box_size		= 24
+inv_weight		= 0.360
+
+inv_name		= ammo-357-jhp
+inv_name_short	= ammo-357-jhp_s
+
+
+inv_grid_width		= 2;1
+inv_grid_height		= 1
+inv_grid_x			= 31
+inv_grid_y			= 4
+
+k_dist			= 1
+k_disp			= 1.27
+k_hit			= 2.49
+k_impulse		= 1
+k_pierce		= 1.0
+impair			= 1
+buck_shot		= 1
+tracer			= off
+wm_size 		= 0.09
+
+
+[clip_6_357_jfp]:ammo_357_jfp
+box_size	= 1
+mag_size	= 6
+script_binding  = ammo_manager.init
+wm_section	= wm_357a6
+inv_name		= clip_6_357
+description		= desc_load_357_jfp
+inv_name_short	= clip_6_357_jfp_s
+inv_weight		= 0.0150
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 16
+visual	= weapons\magazines\clip_6_900x32.ogf
+cost = 35
+speedloader = true
+
+[clip_6_357_jhp]:ammo_357_jhp
+box_size	= 1
+mag_size	= 6
+script_binding  = ammo_manager.init
+wm_section	= wm_357b6
+inv_name		= clip_6_357
+description		= desc_load_357_jhp
+inv_name_short	= clip_6_357_jhp_s
+inv_weight		= 0.0150
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 16
+visual	= weapons\magazines\clip_6_900x32.ogf
+cost = 35
+speedloader = true
+
+[clip_8_357_jfp]:ammo_357_jfp
+box_size	= 1
+mag_size	= 8
+script_binding  = ammo_manager.init
+wm_section	= wm_357a8
+inv_name		= clip_8_357
+description		= desc_load_357_jfp
+inv_name_short	= clip_8_357_jfp_s
+inv_weight		= 0.0150
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 11
+visual	= weapons\magazines\clip_8_900x32.ogf
+cost = 40
+
+[clip_8_357_jhp]:ammo_357_jhp
+box_size	= 1
+mag_size	= 8
+script_binding  = ammo_manager.init
+wm_section	= wm_357b8
+inv_name		= clip_8_357
+description		= desc_load_357_jhp
+inv_name_short	= clip_8_357_jhp_s
+inv_weight		= 0.0150
+belt = true
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 62
+inv_grid_y			= 11
+visual	= weapons\magazines\clip_8_900x32.ogf
+cost = 40
+
+[clip_6_357_jfp_e]:clip_6_357_jfp
+description		= desc_mag_e ; так и надо
+inv_weight = 0.05
+
+[clip_6_357_jhp_e]:clip_6_357_jhp
+description		= desc_mag_e ; так и надо
+inv_weight = 0.05
+
+[clip_8_357_jfp_e]:clip_8_357_jfp
+description		= desc_clip_e
+inv_weight = 0.11
+
+[clip_8_357_jhp_e]:clip_8_357_jhp
+description		= desc_clip_e
+inv_weight = 0.11
+
+

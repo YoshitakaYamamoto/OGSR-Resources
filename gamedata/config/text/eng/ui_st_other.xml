@@ -1,0 +1,1024 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="id_mp_money">
+		<text>Money</text>
+	</string>
+	<string id="mm_mp_pda_hunt">
+		<text>PDA bonus</text>
+	</string>
+	<string id="st_drink">
+		<text>drink</text>
+	</string>
+	<string id="st_mp_direct_ip">
+		<text>Direct IP</text>
+	</string>
+	<string id="ui_mm_default">
+		<text>Default</text>
+	</string>
+	<string id="ui_mm_detail_density">
+		<text>Grass density</text>
+	</string>
+	<string id="ui_mm_detail_distance">
+		<text>Grass distance</text>
+	</string>
+	<string id="ui_mm_r2_sun">
+		<text>Sun shadow</text>
+	</string>
+	<string id="ui_mm_r2_sun_details">
+		<text>Grass shadow</text>
+	</string>
+	<string id="ui_mm_render_2">
+		<text>Render 2</text>
+	</string>
+	<string id="ui_pda_details">
+		<text># /details</text>
+	</string>
+	<string id="ui_st_btn_cancel">
+		<text>Cancel</text>
+	</string>
+	<string id="ui_st_btn_no">
+		<text>No</text>
+	</string>
+	<string id="ui_st_btn_ok">
+		<text>OK</text>
+	</string>
+	<string id="ui_st_btn_yes">
+		<text>Yes</text>
+	</string>
+	<string id="ui_st_cant_run_r2">
+		<text>You can't run Render 2 on your PC</text>
+	</string>
+	<string id="ui_st_conn_invalid_host">
+		<text>Connection error: Invalid host</text>
+	</string>
+	<string id="ui_st_conn_invalid_pass">
+		<text>Connection error: Invalid password</text>
+	</string>
+	<string id="ui_st_conn_rejected_server">
+		<text>Connection error: connection rejected by server</text>
+	</string>
+	<string id="ui_st_conn_sess_full">
+		<text>Connection error: session is full</text>
+	</string>
+	<string id="ui_st_days">
+		<text>Days</text>
+	</string>
+	<string id="ui_st_error">
+		<text>Error</text>
+	</string>
+	<string id="ui_st_file_exist_owerwrite_q">
+		<text>The file with this name already exists. Do you want to overwrite it?</text>
+	</string>
+	<string id="ui_st_file_name_is_empty">
+		<text>The file name is empty</text>
+	</string>
+	<string id="ui_st_hours">
+		<text>hr.</text>
+	</string>
+	<string id="ui_st_leave">
+		<text>Leave</text>
+	</string>
+	<string id="ui_st_mins">
+		<text>mins</text>
+	</string>
+	<string id="ui_st_months">
+		<text>months</text>
+	</string>
+	<string id="ui_st_params">
+		<text>Parameters</text>
+	</string>
+	<string id="ui_st_secs">
+		<text>sec.</text>
+	</string>
+	<string id="ui_st_select_one_map">
+		<text>Please select at least one map</text>
+	</string>
+	<string id="ui_st_take_all">
+		<text>Take all</text>
+	</string>
+	<string id="ui_st_time_remains">
+		<text>Remaining</text>
+	</string>
+	<string id="ui_st_trade">
+		<text>Trade</text>
+	</string>
+	<string id="ui_st_voting_disabled">
+		<text>Voting is disabled</text>
+	</string>
+	<string id="ui_st_want_to_leave_game_q">
+		<text>Do you really want to leave the game?</text>
+	</string>
+	<string id="ui_st_your_items">
+		<text>Your items</text>
+	</string>
+	<string id="st_game_over_press_jump">
+		<text>press ($$ACTION_JUMP$$) to exit to main menu</text>
+	</string>
+	<string id="st_level">
+		<text>Level</text>
+	</string>
+	<string id="st_opening_stream">
+		<text>[*********––––––––––––]</text>
+	</string>
+	<string id="st_loading_cform">
+		<text>[*********––––––––––––]</text>
+	</string>
+	<string id="st_prefetching_objects">
+		<text>[–––––––––––––––––––––]</text>
+	</string>
+	<string id="st_creating_new_game">
+		<text>[*********––––––––––––]</text>
+	</string>
+	<string id="st_loading_alife_simulator">
+		<text>[**–––––––––––––––––––]</text>
+	</string>
+	<string id="st_server_connecting">
+		<text>[*********––––––––––––]</text>
+	</string>
+	<string id="st_loading_saved_game">
+		<text>[*********––––––––––––]</text>
+	</string>
+	<string id="st_validating_cdkey">
+		<text>Validating CD Key</text>
+	</string>
+	<string id="st_loading_ai_objects">
+		<text>[***************––––––]</text>
+	</string>
+	<string id="st_client_connecting_to">
+		<text>[*********––––––––––––]</text>
+	</string>
+	<string id="st_client_spawning">
+		<text>[***************––––––]</text>
+	</string>
+	<string id="st_loading_textures">
+		<text>[***************––––––]</text>
+	</string>
+	<string id="st_client_synchronising">
+		<text>[*******************––]</text>
+	</string>
+	<string id="st_server_starting">
+		<text>[*––––––––––––––––––––]</text>
+	</string>
+	<string id="st_loading_shaders">
+		<text>[*************––––––––]</text>
+	</string>
+	<string id="st_loading_geometry">
+		<text>[*************––––––––]</text>
+	</string>
+	<string id="st_loading_spatial_db">
+		<text>[*************––––––––]</text>
+	</string>
+	<string id="st_loading_details">
+		<text>[***************––––––]</text>
+	</string>
+	<string id="st_loading_sectors_portals">
+		<text>[***************––––––]</text>
+	</string>
+	<string id="ui_st_conn_version_differs">
+		<text>Connection error: Different version.</text>
+	</string>
+	<string id="ui_st_conn_cdkey_invalid">
+		<text>Connection error: Invalid CD-Key.</text>
+	</string>
+	<string id="ui_st_conn_cdkey_in_use">
+		<text>Connection error: CD-Key already in use.</text>
+	</string>
+	<string id="ui_st_conn_cdkey_disabled">
+		<text>Connection error: Your CD-Key is disabled. Contact customer's service.</text>
+	</string>
+	<string id="ui_st_conn_new_patch">
+		<text>New patch is available.\n Version: %s\n Location: %s\nDo you want to download it now?</text>
+	</string>
+	<string id="ui_st_conn_no_new_patch">
+		<text>No new patches available now</text>
+	</string>
+	<string id="ui_mm_delete_existing_file_q">
+		<text>You really want to delete the file?</text>
+	</string>
+	<string id="st_game_paused">
+		<text>Pause</text>
+	</string>
+	<string id="st_bolt">
+		<text>Bolt</text>
+	</string>
+	<string id="st_items">
+		<text>Items</text>
+	</string>
+	<string id="st_video">
+		<text>Video</text>
+	</string>
+	<string id="st_audio">
+		<text>Sound</text>
+	</string>
+	<string id="st_game">
+		<text>Game</text>
+	</string>
+	<string id="st_controll">
+		<text>Controls</text>
+	</string>
+	<string id="ui_st_connecting_to_masterserver">
+		<text>Trying to connect to master server</text>
+	</string>
+	<string id="mp_only_one_voting">
+		<text>Only one active voting allowed</text>
+	</string>
+	<string id="ui_st_patch_download_success">
+		<text>Patch was successfully downloaded. Do you want to install it?</text>
+	</string>
+	<string id="ui_st_patch_download_error">
+		<text>Unable to download the patch.</text>
+	</string>
+	<string id="ui_st_load_game_confirm">
+		<text>Loading game will cause losing non-saved data. Proceed?</text>
+	</string>
+        	<string id="ui_st_invalid_saved_game">
+		<text>Saved game version mismatch or saved game is corrupted</text>
+	</string>
+
+	<string id="ui_remkit_out_of_item">
+		<text>There are no suitable items to be dismantled for spares.</text>
+	</string>
+	<string id="ui_remkit_select_item">
+		<text>Pick an item from the list to be used as spares.</text>
+	</string>
+	<string id="ui_remkit_invalid_item">
+		<text>That wouldn't work - the item is ruined. Choose one in better condition.</text>
+	</string>
+	<string id="ui_remkit_item_not_repaireble">
+		<text>The item could or may not be repaired any more.</text>
+	</string>
+	<string id="ui_remkit_item_not_wanted">
+		<text>The item does not need repairs.</text>
+	</string>
+	<string id="ui_remkit_repair_success">
+		<text>You managed to improve the item's condition.</text>
+	</string>
+	<string id="ui_remkit_repair_without_changes">
+		<text>You didn't manage to improve the item's condition.</text>
+	</string>
+	<string id="ui_remkit_repair_failure">
+		<text>Your insufficient skills worsened the item's condition.</text>
+	</string>
+	<string id="ui_repair_success">
+		<text>The item has been successfully repaired.</text>
+	</string>	
+	<string id="ui_remkit_repair_nomoney">
+		<text>You don't have enough money to repair this item.</text>
+	</string>
+	<string id="ui_repair_select_item">
+		<text>Select item for repair from list.</text>
+	</string>
+	<string id="ui_cartrade_nomoney">
+		<text>You don't have enough money to buy this transport.</text>
+	</string>	
+	<string id="ui_trunk_select_item">
+		<text>Choose the item to be transfered from the list.</text>
+	</string>
+	<string id="ui_trunk_overweight">
+		<text>You cannot place this item in the trunk - it's already full.</text>
+	</string>
+	
+	<string id="ui_rr_over_item_count">
+		<text>You can't take more than three items as reward.</text>
+	</string>
+	
+	<string id="ui_rr_no_money">
+		<text>You exceeded money limit for reward.</text>
+	</string>
+	
+	<string id="ui_mm_r2_sun_shafts">
+		<text>Sun shafts</text>
+	</string>
+
+	<string id="ui_mm_r2_soft_water">
+		<text>Soft edges of water</text>
+	</string>	
+	
+	<string id="ui_mm_r2_soft_particles">
+		<text>Soft particle effects</text>
+	</string>		
+	
+	<string id="ui_mm_r__bloodmarks">
+		<text>Bloodmark</text>
+	</string>		
+	
+	<string id="ui_mm_r2_volumetric_fog">
+		<text>Volumetric fog</text>
+	</string>
+	
+	<string id="ui_mm_r2_soft_shadows">
+		<text>Soft edges of shadows</text>
+	</string>
+	
+		<string id="ui_mm_r2_ssao_base">
+		<text>Global illumination</text>
+	</string>	
+	
+	<string id="ui_mm_r2_ssao_mode">
+		<text>Global illumination mode</text>
+	</string>	
+
+	<string id="ui_mm_r2_ssao">
+		<text>Global illumination quality</text>
+	</string>		
+	
+	
+	<string id="ui_mm_r2_float32">
+		<text>Cook-Torrance lighting</text>
+	</string>
+	
+	<string id="ui_mm_r2_steep_parallax">
+		<text>Steep parallax</text>
+	</string>	
+	
+	<string id="ui_mm_r2_dof">
+		<text>Dynamic depth of field</text>
+	</string>	
+	
+	<string id="ui_mm_r2_volumetric_lights">
+		<text>Volumetric lights</text>
+	</string>		
+		
+	<string id="ui_mm_r2_true_sun_shadows">
+		<text>True sun shadows</text>
+	</string>	
+	
+	<string id="ui_mm_r2_ao">
+		<text>Ambient Occlusion</text>
+	</string>		
+		
+	<string id="ui_mm_r2_ao_intensity">
+		<text>AO intensity</text>
+	</string>	
+	
+	<string id="hint_name_text">
+		<text>Option descrption</text>
+	</string>
+	
+	<string id="hint_caption_text">
+		<text>Puch "Extended" button to change settings added by OGSE mod</text>
+	</string>	
+	
+	<string id="hint_caption_adv_text">
+		<text>Point mouse cursor to option and you'll see its description. In that way you can understand the meaning of options that are unfamiliar to you and new options.</text>
+	</string>
+	
+	
+	<string id="bind_monster_debug1">
+		<text>WARNING! OFFLINE DEATH IS DETECTED! Object: ID: </text>
+	</string>
+	<string id="bind_monster_debug2">
+		<text> NAME:</text>
+	</string>
+	<string id="bind_monster_debug3">
+		<text> Loot will be processed and oject will be added to delete sequence!</text>
+	</string>
+	<string id="bind_monster_debug21">
+		<text>WARNING! PROCESSED OFFLINE DEAD MONSTER IS DETECTED! Object: ID: </text>
+	</string>
+	<string id="bind_monster_debug22">
+		<text> Deleting will be performed!</text>
+	</string>
+	<string id="xr_gulag_debug">
+		<text>WARNING! Logic initialization is failed! There's a diagnostic message in log - save game, exit and send log to OGSE team!</text>
+	</string>
+	<string id="xr_motivator_debug1">
+		<text>WARNING! Loot generation is failed! There's a diagnostic message in log - save game, exit and send log to OGSE team!</text>
+	</string>
+	<string id="xr_motivator_debug2">
+		<text>WARNING! Hit callback processing failed! There's a diagnostic message in log - save game, exit and send log to OGSE team!</text>
+	</string>
+	<string id="xr_motivator_debug3">
+		<text>WARNING! Shoot sound processing failed! There's a diagnostic message in log - save game, exit and send log to OGSE team!</text>
+	</string>
+	<string id="xr_motivator_debug4">
+		<text>WARNING! Death by APC processing failed! There's a diagnostic message in log - save game, exit and send log to OGSE team!</text>
+	</string>
+	<string id="xr_motivator_debug5">
+		<text>WARNING! Torchlight processing failed! There's a diagnostic message in log - save game, exit and send log to OGSE team!</text>
+	</string>
+	<string id="xr_motivator_debug6">
+		<text>WARNING! Rank massive cleaning failed! There's a diagnostic message in log - save game, exit and send log to OGSE team!</text>
+	</string>
+	<string id="xr_motivator_debug7">
+		<text>WARNING! Damaged quest corpse is found! Object:</text>
+	</string>
+	<string id="xr_motivator_debug8">
+		<text> ID: </text>
+	</string>
+	<string id="xr_motivator_debug9">
+		<text> Profile: </text>
+	</string>
+	<string id="xr_motivator_debug10">
+		<text>  Make sure that corpse is ok and it gave you all neccessary infoportions and other stuff!</text>
+	</string>
+	<string id="xr_motivator_debug11">
+		<text>WARNING! Sound callback processing failed! There's a diagnostic message in log - save game, exit and send log to OGSE team!</text>
+	</string>
+	<string id="companion_messages">
+		<text>Your companion </text>
+	</string>
+	<string id="companion_died">
+		<text> is dead!</text>
+	</string>
+	<string id="companion_died_bad">
+		<text> is dead, like all others! You've gained bad fame among stalker community!</text>
+	</string>
+	<string id="companion_signal1">
+		<text>"Found signal of the PDA of your companion. "</text>
+	</string>
+	<string id="companion_signal2">
+		<text>" is nearby!"</text>
+	</string>
+	<string id="remkit_string1">
+		<text>Anomal</text>
+	</string>
+	<string id="remkit_string2">
+		<text>Anom.</text>
+	</string>
+	<string id="remkit_string3">
+		<text>Anomal</text>
+	</string>
+	<string id="remkit_string4">
+		<text>Outfit</text>
+	</string>
+	<string id="remkit_string5">
+		<text>outfit</text>
+	</string>
+	<string id="remkit_string6">
+		<text>Suit</text>
+	</string>
+	<string id="remkit_string7">
+		<text>suit</text>
+	</string>
+	<string id="remkit_string8">
+		<text>Army</text>
+	</string>
+	<string id="remkit_string9">
+		<text>Army</text>
+	</string>
+	<string id="remkit_string10">
+		<text>Arm.</text>
+	</string>
+	<string id="remkit_string11">
+		<text>Armor suit</text>
+	</string>
+	<string id="remkit_string12">
+		<text>Unusual</text>
+	</string>
+	<string id="remkit_string13">
+		<text>Arm.</text>
+	</string>
+	<string id="remkit_string14">
+		<text>Unus.</text>
+	</string>
+	
+	<string id="quicklaunch_string1">
+		<text>Quick launch:</text>
+	</string>	
+	<string id="quicklaunch_string2">
+		<text>Use bandage</text>
+	</string>	
+	<string id="quicklaunch_string3">
+		<text>Use medkit</text>
+	</string>	
+	<string id="quicklaunch_string4">
+		<text>Take antirad</text>
+	</string>	
+	<string id="quicklaunch_string5">
+		<text>Take energy drink</text>
+	</string>	
+	<string id="quicklaunch_string6">
+		<text>Take B-190</text>
+	</string>	
+	<string id="quicklaunch_string7">
+		<text>Take Bipsyzon</text>
+	</string>	
+
+
+	<string id="btr_control_string1">
+		<text>APC control:</text>
+	</string>	
+	<string id="btr_control_string2">
+		<text>Open fire</text>
+	</string>	
+	<string id="btr_control_string3">
+		<text>Manual mode</text>
+	</string>	
+	<string id="btr_control_string4">
+		<text>Semiauto mode (autoaim, manual fire)</text>
+	</string>	
+	<string id="btr_control_string5">
+		<text>Auto mode (completely automatic fire)</text>
+	</string>	
+	<string id="btr_control_string6">
+		<text>Target pointing</text>
+	</string>	
+	<string id="btr_control_string7">
+		<text>Switch to another target</text>
+	</string>	
+	<string id="btr_control_string8">
+		<text>Friend/Fee system</text>
+	</string>	
+	<string id="btr_control_string9">
+		<text>Fire is controlled by gunman (companion is required)</text>
+	</string>
+	
+	<string id="hint_string1">
+		<text>Settings description</text>
+	</string>	
+	<string id="hint_string2">
+		<text>Press 'Advanced' button to change settings, added by OGSE.</text>
+	</string>	
+	<string id="hint_string3">
+		<text>Point mouse cursor on setting and you'll see its description. In this way you can understand the meaning of setting.</text>
+	</string>
+
+
+	<string id="flask_string1">
+		<text>Fill the flask</text>
+	</string>	
+	<string id="flask_string2">
+		<text>You can't fill the flask. There's no specific water around.</text>
+	</string>	
+	<string id="flask_string3">
+		<text>You can't drink medicine alone. Give it to Chuk!</text>
+	</string>	
+	<string id="flask_string4">
+		<text>There's Figa's records around</text>
+	</string>	
+	
+	<string id="quest_elevator_string1">
+		<text>Marked One, are you nuts? Why the hell did you kill him? Are you consider yourself, like, Terminator? Mission's failed.</text>
+	</string>	
+	<string id="quest_elevator_string2">
+		<text>Marked One, there's a problem. Target eliminated hunter. Do me a favor, clean that mess up. There will be a reward.</text>
+	</string>	
+	<string id="quest_elevator_string3">
+		<text>Barman:</text>
+	</string>	
+	
+	<string id="heart_of_yantar_string1">
+		<text>You can't destroy O-21 specimen. There's no anomaly around that capable to destroy its structure.</text>
+	</string>	
+	
+	<string id="dobrozhelatel_string1">
+		<text>Get a case</text>
+	</string>
+	<string id="dobrozhelatel_string2">
+		<text>Marked One, it's Monolith squad commander. We know, you're here - HE told us. Show up yourself and die like a man. You've gone too far! It's your destiny. Don't even try to escape - exit is blocked.</text>
+	</string>
+	<string id="dobrozhelatel_string3">
+		<text>Monolith squad commander:</text>
+	</string>
+	<string id="dobrozhelatel_string4">
+		<text>Meet Messenger</text>
+	</string>
+	<string id="dobrozhelatel_string5">
+		<text>Invalid password!</text>
+	</string>
+	<string id="dobrozhelatel_string6">
+		<text>Good password! Now you can disable Brain Scorcher.</text>
+	</string>	
+	
+		
+	<string id="video_settings_name_1">
+		<text>Camera inertion - cam_inert</text>
+	</string>
+	<string id="video_settings_name_2">
+		<text>Visibility distance - rs_vis_distance</text>
+	</string>
+	<string id="video_settings_name_3">
+		<text>Object detalization - r__geometry_lod</text>
+	</string>
+	<string id="video_settings_name_4">
+		<text>Grass density - r__detail_density</text>
+	</string>
+	<string id="video_settings_name_5">
+		<text>Grass rendering distance - r__detail_radius</text>
+	</string>
+	<string id="video_settings_name_6">
+		<text>Grass renderinf optimization - r2_details_opt</text>
+	</string>
+	<string id="video_settings_name_7">
+		<text>Texture quality - texture_lod</text>
+	</string>
+	<string id="video_settings_name_8">
+		<text>Texture filtering - r__tf_aniso</text>
+	</string>
+	<string id="video_settings_name_9">
+		<text>Bloodmarks - r__bloodmarks</text>
+	</string>
+	<string id="video_settings_name_10">
+		<text>Antialiasing quality on static renderer - r__supersample</text>
+	</string>
+	<string id="video_settings_name_11">
+		<text>Sun shadow - r2_sun</text>
+	</string>
+	<string id="video_settings_name_12">
+		<text>Grass shadow - r2_sun_details</text>
+	</string>
+	<string id="video_settings_name_13">
+		<text>Lighting distance - r2_slight_fade</text>
+	</string>
+	<string id="video_settings_name_14">
+		<text>NPC torch lights - ai_use_torch_dynamic_lights</text>
+	</string>
+	<string id="video_settings_name_15">
+		<text>Shadow quality - r2_ls_squality</text>
+	</string>
+	<string id="video_settings_name_16">
+		<text>Vert. synchronization - rs_v_sync</text>
+	</string>
+	<string id="video_settings_name_17">
+		<text>60 Hz frequency - rs_refresh_60hz</text>
+	</string>
+	<string id="video_settings_name_18">
+		<text>Antialiasing on dynamic renderer - r2_aa</text>
+	</string>
+	<string id="video_settings_name_19">
+		<text>Type od antialiasing - r2_aa_mode</text>
+	</string>
+	<string id="video_settings_name_20">
+		<text>Texture sharpness - r2_tf_mipbias</text>
+	</string>
+	<string id="video_settings_name_21">
+		<text>Gloss of surfaces - r2_gloss_factor</text>
+	</string>
+	<string id="video_settings_name_22">
+		<text>High Def shadow distance - r2_sun_near</text>
+	</string>
+	<string id="video_settings_name_23">
+		<text>Angle of shadow rendering - r2_sun_near_border</text>
+	</string>
+	<string id="video_settings_name_24">
+		<text>True sun shadows - r2_true_sun_shadows</text>
+	</string>
+	<string id="video_settings_name_25">
+		<text>High Dynamic Range - r2_tonemap</text>
+	</string>
+	<string id="video_settings_name_26">
+		<text>HDR intensity - r2_tonemap_middlegray</text>
+	</string>
+	<string id="video_settings_name_27">
+		<text>Sun brightness - r2_sun_lumscale</text>
+	</string>
+	<string id="video_settings_name_28">
+		<text>Ambient brightness - r2_sun_lumscale_amb</text>
+	</string>
+	<string id="video_settings_name_29">
+		<text>Sunshafts - r2_sunshafts</text>
+	</string>
+	<string id="video_settings_name_30">
+		<text>Sunshafts type - r2_sunshafts_mode</text>
+	</string>
+	<string id="video_settings_name_31">
+		<text>Soft water edges - r2_soft_water</text>
+	</string>
+	<string id="video_settings_name_32">
+		<text>Soft particles - r2_soft_particles</text>
+	</string>
+	<string id="video_settings_name_33">
+		<text>Soft shadow edges - r2_soft_shadows</text>
+	</string>
+	<string id="video_settings_name_34">
+		<text>Soft lamp shadow edges - r2_lights_shadow_fade</text>
+	</string>
+	<string id="video_settings_name_35">
+		<text>Precalculated AO - r2_ao</text>
+	</string>
+	<string id="video_settings_name_36">
+		<text>Precalculated AO intensity - r2_ao_intensity</text>
+	</string>
+	<string id="video_settings_name_37">
+		<text>Screen space AO - r2_ssao</text>
+	</string>
+	<string id="video_settings_name_38">
+		<text>Screen space AO mode - r2_ssao_mode</text>
+	</string>
+	<string id="video_settings_name_39">
+		<text>Surface steep parallax - r2_steep_parallax</text>
+	</string>
+	<string id="video_settings_name_40">
+		<text>Depth of field effect - r2_dof</text>
+	</string>
+	<string id="video_settings_name_41">
+		<text>Reload DOF - r2_dof_reload</text>
+	</string>
+	<string id="video_settings_name_42">
+		<text>Aiming DOF - r2_dof_zoom</text>
+	</string>
+	<string id="video_settings_name_43">
+		<text>DOF quality - r2_dof_quality</text>
+	</string>
+	<string id="video_settings_name_44">
+		<text>Detail bump - r2_detail_bump</text>
+	</string>
+	<string id="video_settings_name_45">
+		<text>Lamp lens flares - r2_lens_flare</text>
+	</string>
+	<string id="video_settings_name_46">
+		<text>Lens dirt - r2_lens_dirt</text>
+	</string>
+	<string id="video_settings_name_47">
+		<text>Drops on glass - r2_rain_drops</text>
+	</string>
+	<string id="video_settings_name_48">
+		<text>Dynamic puddles - r2_puddles</text>
+	</string>
+	<string id="video_settings_name_49">
+		<text>Wet surfaces - r2_wet_surfaces</text>
+	</string>
+	<string id="video_settings_name_50">
+		<text>Volumetric light - r2_volumetric_lights</text>
+	</string>
+	<string id="video_settings_name_51">
+		<text>Reflections - r2_reflections</text>
+	</string>
+	<string id="video_settings_name_52">
+		<text>Reflections mode - r2_reflections_mode</text>
+	</string>
+	<string id="video_settings_name_53">
+		<text>Shader optimization - r2_gbuffer_opt</text>
+	</string>
+	<string id="video_settings_name_54">
+		<text>Image sharpness - r2_image_sharpening</text>
+	</string>
+	<string id="video_settings_name_55">
+		<text>Volumetric fog - r2_volumetric_fog</text>
+	</string>
+	<string id="video_settings_desc_1">
+		<text>This option defines the degree of inertion of player's point of view. The bigger the value, the stronger the swing of point of view while walking or running, if hit. Also scope offset will be more noticable if protagonist is exhausted. WARNING! This is controversial option, don't enable it if you don't know exactly what you're doing.</text>
+	</string>
+	<string id="video_settings_desc_2">
+		<text>This option controls multiplier for visibility distance from weather profile. Range is from 0.4 to 1.5. For example, if base weather visibility distance is 150 meters, on minimum option visibility will be 60 meters, on maximum - 225 meters. WARNING! Option affects performance since more objects need to be drawn in frame with bigger option values.</text>
+	</string>
+	<string id="video_settings_desc_3">
+		<text>This option controls quality of rendering and lighting of models of human, monsters and weapon. The bigger the value, the more smooth and detailed models will be.</text>
+	</string>
+	<string id="video_settings_desc_4">
+		<text>This option controls how tight grass bushes are rendered. The bigger the value, the more dense grass. WARNING! Heavily affects performance, change it in small steps.</text>
+	</string>
+	<string id="video_settings_desc_5">
+		<text>This option controls maximum distance of grass rendering. The bigger the value, the bigger the grass area. Range of option is from 48 (standard Stalker value) to 240 meters. WARNING! Heavily affects performance, change it in moderate steps. Good looking value is 150-200 meters (middle of trackbar).</text>
+	</string>
+	<string id="video_settings_desc_6">
+		<text>This option enables optimized mode of grass rendering. Helps to save some performance if grass distance and density are big enough. Game restart is required.</text>
+	</string>
+	<string id="video_settings_desc_7">
+		<text>This option controls texture detalization. The bigger the value, the better quality of textures can be achieved.</text>
+	</string>
+	<string id="video_settings_desc_8">
+		<text>This option controls quality of anisotropic filtration for textures. Minimum value is 1x filtration, maximum - 6x. The bigger the value, the better texture look on far distance.</text>
+	</string>
+	<string id="video_settings_desc_9">
+		<text>This optiona enables bloodmarks on bodies after firewound.</text>
+	</string>
+	<string id="video_settings_desc_10">
+		<text>This option controls quality of antialiasing on static renderer.</text>
+	</string>
+	<string id="video_settings_desc_11">
+		<text>This option enables shadows from the sun. Disable it for performance boost on weak PC.</text>
+	</string>
+	<string id="video_settings_desc_12">
+		<text>This option enables casting shadows of grass bushes from sun and other light sources.Now we fixed it and it really works. WARNING! Heavily affects performance, especially in combination with big grass distance and density.</text>
+	</string>
+	<string id="video_settings_desc_13">
+		<text>This option controls quality of shadows on distance. The bigger the value, the better quality of shadows from dynamic light sources.</text>
+	</string>
+	<string id="video_settings_desc_14">
+		<text>This option enables flashlights of NPC as dynamic light sources. They will be processed with accurately lighting and shadowing. Disabling it can boost performance during nights in locations with lot of stalkers.</text>
+	</string>
+	<string id="video_settings_desc_15">
+		<text>This option controls shadow rendering. The more the value, the smoother shadow edges.</text>
+	</string>
+	<string id="video_settings_desc_16">
+		<text>This option enables vertycal sync, i.e. accordance between FPS and monitor frequency. When enabled eliminates effect of horizontal offset some parts of frame after fast mouse moves, but also can reduce FPS.</text>
+	</string>
+	<string id="video_settings_desc_17">
+		<text>This option forces game to run with 60 FPS. Helpful when game can't properly determine monitor frequency.</text>
+	</string>
+	<string id="video_settings_desc_18">
+		<text>This option enables shader antialiasing on dynamic renderer.</text>
+	</string>
+	<string id="video_settings_desc_19">
+		<text>This option switches type of shader antialiasing on dynamic renderer. There're two types of it - FXAA (Fast Approximate AntiAliasing) and SMAA (Subpixel Morphological AntiAliasing).</text>
+	</string>
+	<string id="video_settings_desc_20">
+		<text>This option controls switching between mip levels of textures. Normal trackbar position is middle; when less, textures on far distance will be less sharp, when bigger - more sharp. If too high, can cause flickering on distant objects.</text>
+	</string>
+	<string id="video_settings_desc_21">
+		<text>This option controls reflectance of surfaces with materials like metal, leather, wood and other. WARNING! This is controversial setting, don't change it if you're not sure, what you're doing. Big values cause weird look.</text>
+	</string>
+	<string id="video_settings_desc_22">
+		<text>This option controls distance of big quality shadows rendering. On distance, bigger than this, simplifier shadow rendering is occured. Can be switched in range from 1 to 60. MUST be configured in couple with shadow map resolution. The bigger the value, the bigger shadow map resolution should be used for good quality.</text>
+	</string>
+	<string id="video_settings_desc_23">
+		<text>This option controls angle of view in which shadows are rendered properly. Cause strange triangle shadows when value of this angle isn't enough. It's recommended to max this option.</text>
+	</string>
+	<string id="video_settings_desc_24">
+		<text>This option enables shadow rendering from real sun position. Shadows will be true, but FPS can be reduced when sun rises or sets.</text>
+	</string>
+	<string id="video_settings_desc_25">
+		<text>This option enables High Dynamic Range effect. It can enhance image by mapping frame, rendered in full range into monitor color range.</text>
+	</string>
+	<string id="video_settings_desc_26">
+		<text>This option controls HDR effect intensity. WARNING! Adjust it very carefully or your image will be overbright and unrealistic.</text>
+	</string>
+	<string id="video_settings_desc_27">
+		<text>This option controls intensity of sunlight. The bigger the value, the brighter sunlight and the deeper the shadows.</text>
+	</string>
+	<string id="video_settings_desc_28">
+		<text>This option controls ambient light intensity. The bigger the value, the brighter all shadowed spots in game. WARNING! This is controversial setting, change it only if you're sure what you're doing. Raise it if you think that game is really dark, but very high values can flatten the image.</text>
+	</string>
+	<string id="video_settings_desc_29">
+		<text>This option controls rendering of volumetric lights.</text>
+	</string>
+	<string id="video_settings_desc_30">
+		<text>This option switches the type of volumetric lighting. You can choose between Crysis of Stalker:CLear Sky types. WARNING! Clear sky lights heavily affects performance.</text>
+	</string>
+	<string id="video_settings_desc_31">
+		<text>This option enables soft water edges. With this option enabled edges of water will smoothly fades out whith decreasing deepness. WARNING! Game restart is required.</text>
+	</string>
+	<string id="video_settings_desc_32">
+		<text>This option enables soft particles. Greatly enhances look of fire, smoke particles and so on. WARNING! Game restart is required.</text>
+	</string>
+	<string id="video_settings_desc_33">
+		<text>This option controls smoothness of game shadows, leads to more realistic shadows.</text>
+	</string>
+	<string id="video_settings_desc_34">
+		<text>This option controls smoothness of shadows of lamps. More realistic shadows can be achieved.</text>
+	</string>
+	<string id="video_settings_desc_35">
+		<text>This option enables precalculated global illumination. It uses hemi-lightmaps, prepared during locations compilation. Don't affect performance. Option will cause more darker indoor, so tune it wisely. Remember that SSAO also leads to darker image. If used in combination it's better to decrease strength of both effects.</text>
+	</string>
+	<string id="video_settings_desc_36">
+		<text>This option controls intensity of precalculated global illumination. The bigger the value, the more realistic image, but high values causes dark indoors.</text>
+	</string>
+	<string id="video_settings_desc_37">
+		<text>This option enables shader ambient occlusion effect. If enabled, gives more realistic image due to calculation of self-shadowing. Affects performance.</text>
+	</string>
+	<string id="video_settings_desc_38">
+		<text>This option controls mode of shader ambient occlusion effect.</text>
+	</string>
+	<string id="video_settings_desc_39">
+		<text>This option controls steep parallax effect. It uses raytracing in heightmap space which can give more realistic surface. WARNING! Game restart is required.</text>
+	</string>
+	<string id="video_settings_desc_40">
+		<text>This option enables depth of field (DOF) effect. If you don't like it, disable it.</text>
+	</string>
+	<string id="video_settings_desc_41">
+		<text>This option enables additional DOF effect while reloading.</text>
+	</string>
+	<string id="video_settings_desc_42">
+		<text>This option enables additional DOF effect while aiming.</text>
+	</string>
+	<string id="video_settings_desc_43">
+		<text>This option controls DOF effect quality.</text>
+	</string>
+	<string id="video_settings_desc_44">
+		<text>This option enables detail bump, which adds little details and roughness on objects. WARNING! Game restart is required.</text>
+	</string>
+	<string id="video_settings_desc_45">
+		<text>This options enables flares on lamps.</text>
+	</string>
+	<string id="video_settings_desc_46">
+		<text>This option enables imitation of lens "dirt" on screen.</text>
+	</string>
+	<string id="video_settings_desc_47">
+		<text>This option enables drops on helmet and antigas lenses during rain.</text>
+	</string>
+	<string id="video_settings_desc_48">
+		<text>This option enables dynamic puddles, that appears during rain.</text>
+	</string>
+	<string id="video_settings_desc_49">
+		<text>This option enables wet surfaces during rain.
+		Настройка включает намокание поверхностей во время дождя. WARNING! Game restart is required.</text>
+	</string>
+	<string id="video_settings_desc_50">
+		<text>This options enables volumetric light from some lamps.</text>
+	</string>
+	<string id="video_settings_desc_51">
+		<text>This option enables reflections on water, puddles and wet surfaces (if they're enabled) during rain. WARNING! Game restart is required. Also, HEAVILY affects performance.</text>
+	</string>
+	<string id="video_settings_desc_52">
+		<text>This option controls reflections mode. There're next modes: on water only, on asphalt only and on both. WARNING! Can affect performance if choosed asphalt or both.</text>
+	</string>
+	<string id="video_settings_desc_53">
+		<text>This option enables shaders optimization mode. Can increase FPS on videoadapters with poor memory bandwidth or memory bus capacity. WARNING! Game restart is required.</text>
+	</string>
+	<string id="video_settings_desc_54">
+		<text>This option controls sharpness of image. WARNING! This is controversial setting. Enable it only if you like granular image.</text>
+	</string>
+	<string id="video_settings_desc_55">
+		<text>This option enables volumetric fog in game. It's used for imitation of fog in ravines, turbid water and so on.</text>
+	</string>
+	
+	<string id="stash_manager_string">
+		<text>Content description:</text>
+	</string>
+	<string id="scvid_location_string">
+		<text>Shvid</text>
+	</string>
+	<string id="radist_stash_location_string">
+		<text>Possible location of Radioman's stash</text>
+	</string>
+	
+	<string id="lc_mngr_string1">
+		<text>Level changer info gathered: </text>
+	</string>
+	<string id="lc_mngr_string2">
+		<text>from Escape to Swamp</text>
+	</string>
+	<string id="lc_mngr_string3">
+		<text>from Escape to Darkscape</text>
+	</string>
+	<string id="lc_mngr_string4">
+		<text>from Agroprom to Swamp</text>
+	</string>
+	<string id="lc_mngr_string5">
+		<text>from Agroprom to Yantar</text>
+	</string>
+	<string id="lc_mngr_string6">
+		<text>from Dark Valley to URR</text>
+	</string>
+	<string id="lc_mngr_string7">
+		<text>from Dark Valley to Military Warehouses</text>
+	</string>
+	<string id="lc_mngr_string8">
+		<text>from Military Warehouses to City-32</text>
+	</string>
+	<string id="lc_mngr_string9">
+		<text>from Military Warehouses to Dark Valley</text>
+	</string>
+	<string id="lc_mngr_string10">
+		<text>from Yantar to Agroprom</text>
+	</string>
+	<string id="lc_mngr_string11">
+		<text>from Yantar to City-32</text>
+	</string>
+	<string id="lc_mngr_string12">
+		<text>from Yantar to Radar</text>
+	</string>
+	<string id="lc_mngr_string13">
+		<text>from Radar to URR</text>
+	</string>
+	<string id="lc_mngr_string14">
+		<text>from Radar to Yantar</text>
+	</string>
+	<string id="lc_mngr_string15">
+		<text>from CNPP-1 to CNPP-2</text>
+	</string>
+	<string id="lc_mngr_string16">
+		<text>from CNPP-2 to Generators</text>
+	</string>
+	<string id="lc_mngr_string17">
+		<text>from CNPP-2 to CNPP-1</text>
+	</string>
+	<string id="lc_mngr_string18">
+		<text>from City-32 to Military Warehouses</text>
+	</string>
+	<string id="lc_mngr_string19">
+		<text>from City-32 to Generators</text>
+	</string>
+	<string id="lc_mngr_string20">
+		<text>from City-32 to URR</text>
+	</string>
+	<string id="lc_mngr_string21">
+		<text>from URR to Dark Valley</text>
+	</string>
+	<string id="lc_mngr_string22">
+		<text>from URR to City-32</text>
+	</string>
+	
+	<string id="krot_ammo_string1">
+		<text>Box with ammunition</text>
+	</string>
+	<string id="krot_ammo_string2">
+		<text>Box with ammunition 5.56x45</text>
+	</string>
+	<string id="krot_ammo_string3">
+		<text>Box with ammunition 7.62x39</text>
+	</string>
+	<string id="krot_ammo_string4">
+		<text>Box with ammunition 7.62x54</text>
+	</string>
+	<string id="krot_ammo_string5">
+		<text>Box with ammunition 5.45x39</text>
+	</string>
+	
+	<string id="bomba_string">
+		<text>Bomb</text>
+	</string>
+	
+	<string id="rub_string">
+		<text>r.</text>
+	</string>
+	
+	<string id="guest_on_elevator_string">
+		<text>Check location of strange guest</text>
+	</string>
+	<string id="companion_became_your_enemy_string">
+		<text> became your enemy!</text>
+	</string>	
+</string_table>

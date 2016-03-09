@@ -1,0 +1,153 @@
+function table.IsSequential(t)
+    local i = 1
+    for key, value in pairs (t) do
+        if not tonumber(i) or key ~= i then return false end
+        i = i + 1
+    end
+    return true
+end
+
+function table.tostring(t,n,nice)
+    local         nl,tab  = "",  ""
+    if nice then     nl,tab = "\n", "\t"    end
+
+    local function MakeTable ( t, nice, indent, done, tree)
+    local tree, out = (tree or {}), (out or {})
+        local str = ""
+        local done = done or {}
+        local indent = indent or 0
+        local idt = ""
+        if nice then idt = string.rep ("\t", indent) end
+
+        local sequential = table.IsSequential(t)
+
+        for key, value in pairs (t) do
+        if not tree[v] then
+            str = str .. idt .. tab .. tab
+
+            if not sequential then
+                if type(key) == "number" or type(key) == "boolean" then
+                    key ='['..tostring(key)..']' ..tab..'='
+                else
+                    key = tostring(key) ..tab..'='
+                end
+            else
+                key = ""
+            end
+
+            if type (value) == "table" and not done [value] then
+
+                done [value] = true
+                str = str .. key .. tab .. '{' .. nl
+                .. MakeTable (value, nice, indent + 1, done, tree)
+                str = str .. idt .. tab .. tab ..tab .. tab .."},".. nl
+
+            else
+                
+                if     type(value) == "string" then
+                    value = '"'..tostring(value)..'"'
+                elseif  type(value) == "Vector" then
+                    value = 'Vector('..value.x..','..value.y..','..value.z..')'
+                elseif  type(value) == "Angle" then
+                    value = 'Angle('..value.pitch..','..value.yaw..','..value.roll..')'
+                else
+                    value = tostring(value)
+                end
+                
+                str = str .. key .. tab .. value .. ",".. nl
+
+            end
+
+        end end
+        return str
+    end
+    local str = ""
+    if n then str = n.. tab .."=" .. tab end
+    str = str .."{" .. nl .. MakeTable ( t, nice) .. "}"
+    return str
+end
+
+function table.copy(_table, lookup_table, tree)
+	local tree = (tree or {})
+         for k,v in pairs(_table) do
+			if not tree[v] then
+              if type(v) == "table" then
+				tree[v] = true
+                lookup_table[k] = (lookup_table[k] or {})
+				table_copy(v, lookup_table[k], tree)
+              else
+                lookup_table[k] = v
+              end
+         end end
+	return lookup_table
+end
+
+function table.update(source, dest, tree)
+local tree = (tree or {}) 
+	for k,v in pairs(source) do
+		if dest[k] ~= nil and not tree[v] then
+			if type(v) == 'table' and type(dest[k])=='table' then
+				tree[v] = true
+				table_update(v, dest[k], tree)
+			else
+				dest[k] = v
+			end
+		end
+	end
+	return dest
+end
+
+function table.hasvalue(_table, val, tree)
+local tree = (tree or {}) 
+	for k,v in pairs(_table) do
+	if not tree[v] then
+		tree[v] = (type(v) == "table" and true or nil)
+    	local what = (v == val or (type(v) == "table" and table_hasvalue(v, val, tree)))
+			if what then return true end
+	end
+	end
+return false
+end
+
+function table.count(_tab, tree)
+	local tree = (tree or {})
+    local count = 0
+    for _,v in pairs(_tab) do
+	if not tree[v] then
+         if type(v) == "table" then
+			tree[v] = true
+            count = count + tab_count(v, tree)
+         else
+			count = count + 1
+         end 
+	end end
+    return count
+end
+
+function table.clearvalkeys(_table, out, what, tree)
+	local tree = (not tree and {} or tree)
+         for k,v in pairs(_table) do
+			if not tree[v] then
+              if type(v) == "table" then
+                tree[v] = true
+				out[((what == "keys") and k or (#out+1))] = table_ClearValKeys(v, {}, tree)
+              else
+				table.insert(out, (what == "keys" and k or v))
+              end
+         end end
+    return (out)
+end
+
+function table.keyt(_table, out, tree)
+local tree, out = (tree or {}), (out or {}) 
+         for k,v in pairs(_table) do
+			if not tree[v] then
+              if type(v) == "table" then
+                tree[v] = true
+				out[(k or (#out+1))] = table_keys(v, {}, tree)
+              else
+				out[v] = true
+              end
+         end end
+    return (out)
+end

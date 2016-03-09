@@ -1,0 +1,156 @@
+function attach(sm)
+	sm:subscribe({signal = "on_spawn",           fun = this.on_spawn})
+	sm:subscribe({signal = "on_storyline_start", fun = this.on_storyline_start})
+	sm:subscribe({signal = "on_trade_hide",      fun = this.on_trade_hide})
+	sm:subscribe({signal = "on_take",            fun = this.on_take})
+end
+
+local sim
+local sys_ini = system_ini()
+local trade_items = {}
+do
+	for _,sec in ipairs(get_section_keys("ogse_cars_trade")) do
+		local item = {}
+		item.sec             = get_string(sec, "car_section")     ASSERT(item.sec, "item.sec")
+		item.pos             = get_vector(sec, "position")        ASSERT(item.pos, "item.pos")
+		item.lvid            = get_u32(sec, "l_vid")              ASSERT(item.lvid, "item.lvid")
+		item.gvid            = get_u32(sec, "g_vid")              ASSERT(item.gvid, "item.gvid")
+		item.ownership_token = get_string(sec, "ownership_token") ASSERT(item.ownership_token, "item.ownership_token")
+		item.initial_trader  = get_string(sec, "initial_trader")  ASSERT(item.initial_trader, "item.initial_trader")
+		item.precond         = get_string(sec, "precond")         ASSERT(item.precond, "item.precond")
+		item.key_section     = get_string(sec, "key_section")     ASSERT(item.key_section, "item.key_section")
+		trade_items[sec] = item
+	end
+end
+function on_spawn(sactor)
+	sim = alife()
+end
+
+function on_storyline_start()
+	transport_spawn_load(object)
+end
+
+local function set_item_tradable(item, value)
+	item:set_inventory_item_int16(132, flags16():assign(item:get_inventory_item_int16(nil, 132)):set(4, value):get())
+end
+function trader_has_cars_for_trade(trader)
+	return next(get_available_trader_cars(trader)) ~= nil
+end
+function get_available_trader_cars(trader)
+	-- составляем список машин, которыми торгует данный барыга 
+	local trader_cars = {}
+	if trader:dont_has_info("inf_car_trade_initialized") then
+		-- в первый раз для данного торговца, список инфопорций не создан
+		trader:give_info_portion("inf_car_trade_initialized")
+		for sec, item in pairs(trade_items) do -- перебираем все машины для торговли
+			if item.initial_trader == trader:name() then -- если изначально приписана этому торгашу
+				trader:give_info_portion(item.ownership_token) -- то выдаём ему соответствующую инфопорцию
+				table.insert(trader_cars, sec)
+			end
+		end
+	else -- если не в первый раз, то список инфопорций уже был инициализирован
+		for sec, item in pairs(trade_items) do -- создаём список доступных машин по факту наличия соответствующего токена
+			if trader:has_info(item.ownership_token) then
+				table.insert(trader_cars, sec)
+			end
+		end
+	end
+	-- дополнительно фильтруем по предусловиям
+	local res = {}
+	for _,sec in ipairs(trader_cars) do
+		local precond = trade_items[sec].precond
+		if precond == "nil" or db.actor:has_info(precond) then
+			table.insert(res, sec)
+		end
+	end
+	return res
+end
+local last_trader
+function open_car_trade_dialog(actor, trader)
+	-- гасим все предметы в инвентаре ГГ
+	for i=0,actor:object_count()-1 do 
+		set_item_tradable(actor:object(i), false)
+	end
+	-- гасим все предметы в инвентаре торговца
+	for i=0,trader:object_count()-1 do
+		set_item_tradable(trader:object(i), false)
+	end
+	-- получаем для торговца его доступные машины и спавним соответствующие карточки ему в инвентарь
+	for _,sec in ipairs(get_available_trader_cars(trader)) do
+		ogse.spawn_item_in_inv(sec, trader)
+	end
+	last_trader = trader
+	actor:switch_to_trade()
+end
+
+function on_trade_hide(npc)
+	if not last_trader then return end
+	for i=0,last_trader:object_count()-1 do
+		local it = last_trader:object(i)
+		if trade_items[it:section()] then
+			local sobj = sim:object(it:id())
+			sim:release(sobj, true)
+		else
+			set_item_tradable(it, get_bool(it:section(), "can_trade", true))
+		end
+	end
+	for i=0,db.actor:object_count()-1 do
+		local it = db.actor:object(i)
+		set_item_tradable(it, get_bool(it:section(), "can_trade", true))
+	end
+	last_trader = nil
+end
+
+function on_take(item, sitem)
+	if not last_trader or not sitem then return end
+
+	local item_sec = item:section()
+	local item_info = trade_items[item_sec]
+	if not item_info then return end
+	ogse.spawn_item_in_inv(item_info.key_section)
+	sim:release(sitem, true)
+	last_trader:disable_info_portion(item_info.ownership_token)
+	--db.actor:give_info_portion(item_info.ownership_token)
+	sim:create(item_info.sec, item_info.pos, item_info.lvid, item_info.gvid)
+	return true
+end
+------------------------------------------------------------
+--	Горе :(
+------------------------------------------------------------
+
+function gore_1(first_speaker, second_speaker)
+	dialogs.relocate_item_section(first_speaker, "vodka", "in")
+end
+
+function gore_2(actor)
+	local vodka = db.actor:object("vodka")
+	if vodka then
+		db.actor:eat(vodka)
+	end
+end
+
+------------------------------------------------------------
+--	ПРЕКОНДИШЕНЫ
+------------------------------------------------------------
+
+function military_info()
+	return has_alife_info("mil_dolg_skull_sniper_end") or has_alife_info("mil_lukash_dolg_task_complete") 
+end
+
+------------------------------------------------------------
+--	Спавн транспорта без покупки
+------------------------------------------------------------
+
+function transport_spawn_load()
+	-- На Кордоне.																					--Вынес в all.spawn + дописал стори_айди 099 Призрак
+	--car_obj = sim:create( "vehicle_zaz", vector():set(-226.2, -20.3, -158.4), 28485, 48)
+
+	car_obj = sim:create( "vehicle_btr", vector():set(-148.15, -30.0, -383), 101494, 15)
+	car_obj = sim:create( "vehicle_tr13", vector():set(9, 0.5, 280.3), 286415, 181)
+	-- На Агропроме. на территории института у гаражей
+	car_obj = sim:create("vehicle_moskvich2", vector():set(-143.9, -0.2, -212.7) ,93986, 677)
+	-- Территория Бара
+	car_obj = sim:create( "vehicle_uaz2", vector():set(413.73626, 14.3532, -414.77145), 97806, 1289)
+	-- На АЭС 2
+	car_obj = sim:create("vehicle_uazbuhanka",vector():set(794.17,-0.0,279.42),212718,2643)
+end

@@ -1,0 +1,113 @@
+-------------------------------------------------------------------------------
+--| ogse_qt.script                                                          |--
+--| Quick Timers module                                                     |--
+--| Malandrinus, OGS Evolution Team, 2011                                   |--
+--| version 1.0                                                             |--
+-------------------------------------------------------------------------------
+
+storage = {} -- хранилище всех таймеров. Ключ - целое число, уникальный идентификатор таймера
+-- функция для получения уникального номера для таймера
+local function get_free_id()
+	local i = 0
+	for i_ in ipairs(storage) do
+		i = i_
+	end
+	return i + 1
+end
+
+---------------------------------------------------------------------------------
+--< базовый класс легковесного таймера для отслеживания произвольного события >--
+---------------------------------------------------------------------------------
+
+class "quick_timer"
+
+-- конструктор таймера в базовом классе
+function quick_timer:__init(timeout)
+	self.id = get_free_id() -- получаем уникальный номер
+	storage[self.id] = self -- сохраняем ссылку на себя в хранилище
+	local sname = script_name() -- имя этого файла без расширения
+	-- формируем служебную функцию-условие, уникальный номер этого объекта вшит прямо в код этой функции
+	-- по нему из глобального хранилища получаем себя и передаём в качестве self в пользовательское условие
+	self.aux_cond = loadstring(string.format("local t=%s.storage[%d];return t.condition(t)",sname,self.id))
+	-- аналогично формируем служебную функция действие
+	-- кроме вызова пользовательского действия эта функция также удаляет 
+	-- ссылку на объект таймера из глобального хранилища
+	self.aux_act = loadstring(string.format("local t=%s.storage[%d];t.action(t);%s.storage[%d]=nil",sname,self.id,sname,self.id))
+	-- действие по таймауту. Может также использоваться для простого таймера, срабатывающего через заданный промежуток времени
+	self.aux_tact = loadstring(string.format("local t=%s.storage[%d];t.taction(t);%s.storage[%d]=nil",sname,self.id,sname,self.id))
+	self.timeout = timeout
+end
+
+function quick_timer:__finalize() -- вызывается при сборке мусора
+end
+
+-- Запуск таймера
+function quick_timer:start()
+	if self.timeout then -- если при создании задавали таймаут
+		self.termination_time = time_global() + self.timeout -- то запоминаем время останова
+	end
+	level.add_call(self.aux_cond, self.aux_act) -- собственно запускаем движковый таймер
+end
+
+-- функция принудительного останова
+function quick_timer:stop()
+	self.need_stop = true -- взводим флажок для выхода при следующей проверке
+end
+
+-- проверка в базовом классе таймера обеспечивает сервис остановки по таймауту
+-- и возможность принудительной остановки
+-- если эти возможности не нужны, то можно эту проверку не вызывать
+function quick_timer:condition()
+	-- проверяем случаи вынужденной остановки: по запросу или по таймауту
+	if self.need_stop or (self.termination_time and time_global() > self.termination_time) then
+		-- выполняем действие по таймауту
+		self:taction()
+		-- в качестве основного действия задаём пустое действие
+		self.action = function(self)end
+		-- инициируем завершение, будет выполнено холостое действие
+		return true
+	end
+	return false -- просто продолжаем
+end
+
+-- пустое действие в базовом классе. Нужно для того случая, 
+-- когда по каким-то причинам не задаём действие в унаследованном классе
+function quick_timer:action()
+end
+function quick_timer:taction()
+end
+-----------------------------------------------------------------------------------
+--< базовый класс специального таймера для отслеживания выхода объекта в онлайн >--
+-----------------------------------------------------------------------------------
+
+class "spawn_watch_timer"
+
+-- конструктор базового класса
+function spawn_watch_timer:__init(id)
+	self.id = get_free_id() -- получаем уникальный номер
+	storage[self.id] = self -- сохраняем ссылку на себя в хранилище
+	self.client_id = id
+	self.actor_id = db.actor:id()
+	-- запускаем движковый таймер
+	self.sm = level.client_spawn_manager()
+	self.sm:add(id, self.actor_id, self.aux_act, self) 
+end
+
+-- Функция принудительного останова таймера
+function spawn_watch_timer:stop()
+	self.sm:remove(self.client_id, self.actor_id) -- останавливаем движковый таймер
+	storage[self.id] = nil -- удаляем себя из хранилища
+end
+
+-- вспомогательный метод-действие в базовом классе. Нужен для
+-- удаления объекта таймера из общего хранилища
+function spawn_watch_timer:aux_act()
+	self:action() -- выполняем пользовательское действие
+	storage[self.id] = nil -- удаляем себя из хранилища
+end
+
+-- пустое действие в базовом классе. Нужно для того случая, 
+-- когда по каким-то причинам не задаём действие в унаследованном классе
+function spawn_watch_timer:action()
+end
+

@@ -1,0 +1,36 @@
+[smart_terrains]
+none = true
+
+[logic]
+active = walker@begin
+combat_ignore = combat_ignore
+danger = danger_ignore
+on_death = death
+threshold = threshold@ds_glavar_threshold
+on_hit = hit
+
+[walker@begin]
+path_walk =	ds_glavar_walk
+path_look =	ds_glavar_look
+on_timer = 100 | walker 
+
+[walker]
+path_walk =	ds_glavar_walk
+path_look =	ds_glavar_look
+combat_ignore_cond = {-kulg_band_hutor_attacked} always
+
+[danger_ignore]
+ignore_distance = 1
+
+[combat_ignore]
+combat_ignore_cond = always
+
+[threshold@ds_glavar_threshold]
+max_ignore_distance = 0
+ignore_monster = 0
+
+[death]
+on_info = %+ds_glavar_dead%
+
+[hit]
+on_info = {=hit_by_actor} %+kulg_band_hutor_attacked%
