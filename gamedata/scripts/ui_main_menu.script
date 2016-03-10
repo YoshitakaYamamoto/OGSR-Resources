@@ -19,7 +19,7 @@ local press_any_key_on_start = false
 local sound_volume_eff,sound_volume_music = 0,0
 ----------------------<< CoP style load mod
 
-local mod_ver = system_ini():r_string_wq("mod_ver", "mod_ver") 
+local mod_ver = sys_ini:r_string_wq("mod_ver", "mod_ver") 
 
 class "main_menu" (CUIScriptWnd)
 
@@ -237,7 +237,6 @@ end
 
 function main_menu:OnButton_return_game()
 	ogse_rebind_key.unbind_key()
-	ogse_night_vision.on_main_menu()
 	cmd("main_menu", "off")
 end
 
@@ -399,7 +398,6 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 		if dik == DIK_keys.DIK_ESCAPE then
 			if level.present() and (db.actor ~= nil) and db.actor:alive() then
-				ogse_night_vision.on_main_menu()
 				ogse_rebind_key.unbind_key()
 				cmd("main_menu", "off")
 			end
@@ -407,12 +405,12 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 		
 	--/* Для универсализации, вызов скрипта персонального.
 	-- запускается без проверки alife, ввиду некоторых оссобеностей функциональной проверки в игре, так-же удален выход из главного меню, ввиду возможной специфики проводимых тестов.  */
-		if dik == DIK_keys.DIK_N then
+		--[[if dik == DIK_keys.DIK_N then
 			self.personal_test()
-		end
+		end]]
 	--// Phoenix
 
-		if dik == DIK_keys.DIK_F6 then
+		--[[if dik == DIK_keys.DIK_F6 then
 			if level.present() and (db.actor ~= nil) and db.actor:alive() then
 				cmd("main_menu", "off")
 				device():pause(true)
@@ -443,7 +441,14 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 					level.get_time_minutes()))
 				device():pause(false)
 			end
-		end
+		end]]
+------------KRodin: разблокирован тестовый спавн---------
+		--[[if dik == DIK_keys.DIK_S then
+			self:test_spawn()
+			cmd("main_menu", 0)
+		end]]
+---------------------------------------------------------
+
 --// Читерские, тестовые вызовы.
 --[[		if level.present() and db.actor and db.actor:alive() then
 			-- Управление ходом игрового времени
@@ -460,20 +465,27 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 					cmd("main_menu", 0)
 			
 			-- Показать текущие координаты
-			else]]if dik == DIK_keys.DIK_F3 then
-				self:main_cheat_f3()
+			else]]
+
+			if dik == DIK_keys.DIK_F3 then
+				self:main_cheat_f3() end
+
 			--[[
 			-- Стать зомбированным
 			elseif dik == DIK_keys.DIK_Z then
 				dialogs.actor_set_zombied(actor, npc)
 				]]
-			elseif dik == DIK_keys.DIK_P then
+			--[[else]]
+
+			if dik == DIK_keys.DIK_P then
 				if _sdata.GlobalEnable == false then
 					_sdata.GlobalEnable = true
 				else
 					_sdata.GlobalEnable = false
 					_sdata.switch_off()
-				end
+				--_sdata.GlobalEnable = not _sdata.GlobalEnable --почему-то это перестало работать...
+			end end
+
 			--[[
 			-- Очистить комьюнити
 			elseif dik == DIK_keys.DIK_X then
@@ -493,16 +505,16 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 				ogse_lc_mngr.lc5_yan_val_rad()
 				ogse_lc_mngr.lc6_esc_dscape()
 				ogse_lc_mngr.lc7_aes_pripyat()]]
-			end	--[[
+			--[[end	
 		else 
 			--log1("Game not start or actor died")
 		end]]
 
 	-- Быстрый выход из игры по клавише "Q"
+--[[
 		if dik == DIK_keys.DIK_Q then
 			self:OnMessageQuitWin()
 		end
---[[
 		if dik == DIK_keys.DIK_W then
 			--news_manager.send_tip(db.actor, jekan_work.check_anom_house_items(), nil, nil, 30000)
 			jekan_work.krot_ammo_box_st()
