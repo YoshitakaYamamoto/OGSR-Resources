@@ -1,30 +1,5 @@
----------------------- Инициализация расширений движка ------------------------
+--************************************************* Инициализация расширений движка ************************************************
 RvP()
-
-excluded_restrictors = {
-		["agr_factory_skirmish_defence"] = true,
-		["pri_followers_wave1_out_restr"] = true,
-		["pri_followers_wave2_out_restr"] = true,
-		["pri_followers_wave3_out_restr"] = true,
-		["pri_followers_wave4_out_restr"] = true,
-		["pri_followers_wave5_out_restr"] = true,
-		["pri_followers_wave6_out_restr"] = true,
-		["pri_followers_wave7_out_restr"] = true,
-		["agr_nii_sr_building"] = true,
-		["agr_nii_3_floor"] = true,
-		["agr_nii_space_restrictor"] = true,
-		["agr_factory_skirmish"] = true,
-		["mil_freedom_gulag_defense_res"] = true,
-		["yantar_bunker_space_restrictor"] = true,
-		["val_lager_bandits_nedostroyka_restrictor"] = true,
-		["val_lager_bandits_main_side_restrictor"] = true,
-		["val_lager_bandits_main_building_restrictor"] = true,
-		["pri_monolith_kolos_restr"] = true,
-		["pri_monolith_base_restr"] = true,
-		["sar_patrol_restrictor"] = true,
-		["rad_tramplin_sniper_restrictor"] = true,
-		["bar_arena_restrictor"] = true
-	}
 
 pairs_old = pairs
 pairs = function(t)
@@ -42,7 +17,7 @@ if type(SetLog) == "function" and os and os.clock() < 30 then
 	SetLog(name)
 	log1("--SetLogCallback to file " .. name)
 end
---
+
 local dir 		= "$fs_root$"
 local ext_path 	= "bin\\extensions"
 local path  	= getFS():update_path(dir, ext_path)
@@ -83,23 +58,6 @@ if os and os.clock() < 30 then
 	math.randomseed(os.time())
 end
 
-local additional_libraries = {
-	--["luaXml"] = true
-}
-prefetch("luaxml")
-
-for k,v in pairs(additional_libraries) do
-	if v then
-			log1("--try to load " .. k)
-			local rez, msg = pcall(require, k)
-			if (not(not rez)) then
-				log1("~~    loaded")
-			else
-				log1("!!    error, msg : " .. tostring(msg))
-			end
-	end
-end
-
 set_static_rescale_factor(device().height / device().width / 0.75)
 
 -- жуткая затычка для проблемы с большими целыми числами при сложении в Lua
@@ -120,6 +78,10 @@ function sum_args_ex(base, offs)
 	--log3("sum_args_ex: %s, %x, %x", base_s, offs, res)
 	return res
 end
+--******************************************** Инициализация расширений движка закончена ********************************************
+
+prefetch("luaxml")
+
 -- FIX Nazgool ------------------------------------------------------------------
 -- Возможно подобные функции уже где-то и есть, но я пока не нашёл.
 
@@ -155,74 +117,7 @@ function toBoolean(val)
     return not not val
 end
 
-local orig_sys_ini = system_ini()
-class "dbg_sys_ini"
-function dbg_sys_ini:__init()
-	log1("dbg_sys_ini:__init")
-end
-function dbg_sys_ini:line_count(sec)
-	log3("dbg_sys_ini:line_count: %s", sec)
-	return orig_sys_ini:line_count(sec)
-end
-function dbg_sys_ini:section_exist(sec)
-	log3("dbg_sys_ini:section_exist: %s", sec)
-	return orig_sys_ini:section_exist(sec)
-end
-function dbg_sys_ini:line_exist(sec, param)
-	log3("dbg_sys_ini:line_exist: %s - %s", sec, param)
-	return orig_sys_ini:line_exist(sec, param)
-end
-function dbg_sys_ini:r_bool(sec, param)
-	log3("dbg_sys_ini:r_bool: %s - %s", sec, param)
-	return orig_sys_ini:r_bool(sec, param)
-end
-function dbg_sys_ini:r_float(sec, param)
-	log3("dbg_sys_ini:r_float: %s - %s", sec, param)
-	return orig_sys_ini:r_float(sec, param)
-end
-function dbg_sys_ini:r_clsid(sec, param)
-	log3("dbg_sys_ini:r_clsid: %s - %s", sec, param)
-	return orig_sys_ini:r_clsid(sec, param)
-end
-function dbg_sys_ini:r_s32(sec, param)
-	log3("dbg_sys_ini:r_s32: %s - %s", sec, param)
-	return orig_sys_ini:r_s32(sec, param)
-end
-function dbg_sys_ini:r_u32(sec, param)
-	log3("dbg_sys_ini:r_u32: %s - %s", sec, param)
-	return orig_sys_ini:r_u32(sec, param)
-end
-function dbg_sys_ini:r_vector(sec, param)
-	log3("dbg_sys_ini:r_vector: %s - %s", sec, param)
-	return orig_sys_ini:r_vector(sec, param)
-end
-function dbg_sys_ini:r_string_wq(sec, param)
-	log3("dbg_sys_ini:r_string_wq: %s - %s", sec, param)
-	if param == "grenade_launcher_name" then
-		log1(debug.traceback())
-	end
-	return orig_sys_ini:r_string_wq(sec, param)
-end
-function dbg_sys_ini:r_string(sec, param)
-	log3("dbg_sys_ini:r_string: %s - %s", sec, param)
-	if param == "grenade_launcher_name" then
-		log1(debug.traceback())
-	end
-	return orig_sys_ini:r_string(sec, param)
-end
-function dbg_sys_ini:r_token(...)
-	--log3("dbg_sys_ini:r_token: %s - %s", sec, param)
-	return orig_sys_ini:r_token(...)
-end
-function dbg_sys_ini:r_line(sec, line_num)
-	log3("dbg_sys_ini:r_line: %s - %s", sec, line_num)
-	return orig_sys_ini:r_line(sec, line_num)
-end
-
-
---system_ini = function() return dbg_sys_ini() end
-
--- CUIScriptWnd Extension ------------------------------------------------------------------------------------------
+-- CUIScriptWnd Extension ----------------------------------------
 local function connect_action(func, ...)
     local arg = {...}
     return  function (obj) func(obj, unpack(arg)) end
@@ -233,13 +128,38 @@ end
 function CUIScriptWnd:Connect(name, event, func, obj, ...)
     self:AddCallback(name, event, connect_action(func, ...), obj)
 end
----------------------------------------------------------------------------------
+------------------------------------------------------------------
 -- путь к динамическому XML файлу
 DYN_XML_SAVE_PATH = getFS():update_path('$game_config$', 'ui\\')..'ui_dynamic.xml'
 
 -- END FIX  Nazgool --------------------------------------------------------------
 
------------------------ Инициализация расширений закончена --------------------
+excluded_restrictors = {
+		["agr_factory_skirmish_defence"] = true,
+		["pri_followers_wave1_out_restr"] = true,
+		["pri_followers_wave2_out_restr"] = true,
+		["pri_followers_wave3_out_restr"] = true,
+		["pri_followers_wave4_out_restr"] = true,
+		["pri_followers_wave5_out_restr"] = true,
+		["pri_followers_wave6_out_restr"] = true,
+		["pri_followers_wave7_out_restr"] = true,
+		["agr_nii_sr_building"] = true,
+		["agr_nii_3_floor"] = true,
+		["agr_nii_space_restrictor"] = true,
+		["agr_factory_skirmish"] = true,
+		["mil_freedom_gulag_defense_res"] = true,
+		["yantar_bunker_space_restrictor"] = true,
+		["val_lager_bandits_nedostroyka_restrictor"] = true,
+		["val_lager_bandits_main_side_restrictor"] = true,
+		["val_lager_bandits_main_building_restrictor"] = true,
+		["pri_monolith_kolos_restr"] = true,
+		["pri_monolith_base_restr"] = true,
+		["sar_patrol_restrictor"] = true,
+		["rad_tramplin_sniper_restrictor"] = true,
+		["bar_arena_restrictor"] = true
+	}
+
+----------------------------------------------------------------------
 
 schemes = {} -- соответствие схем модулям
 stypes = {} -- типы схем
@@ -337,30 +257,6 @@ if nil == time_global then
 	time_global = function () return device():time_global() end
 end
 
---[[function wait_game(time_to_wait)
-    verify_if_thread_is_running()
-    if (time_to_wait == nil) then
-        coroutine.yield()
-    else
-        local time_to_stop = game.time() + time_to_wait
-        while game.time() <= time_to_stop do
-            coroutine.yield()
-        end
-    end
-end
-
-function wait(time_to_wait)
-    verify_if_thread_is_running()
-    if (time_to_wait == nil) then
-        coroutine.yield()
-    else
-        local time_to_stop = time_global() + time_to_wait
-        while time_global() <= time_to_stop do
-            coroutine.yield()
-        end
-    end
-end]]
-
 function action(obj,...)
     local arg = {...}
     local act = entity_action()
@@ -397,13 +293,6 @@ function action_first(obj,...)
     return  entity_action(act)
 end
 
---[[function round (value)
-    local min = math.floor (value)
-    local max = min + 1
-    if value - min > max - value then return max end
-    return min
-end]]
-
 function distance_between(obj1, obj2)
     return obj1:position():distance_to(obj2:position())
 end
@@ -426,24 +315,6 @@ function reset_action (npc, script_name)
     end
     npc:script (true, script_name)
 end
-
---[[class "script_object"
-
-function script_object.__init(self,name,script,...)
-	self.action         = action(nil,...)
-	self.object_name    = name
-	self.script_name    = script
-	self.object         = nil
-end
-
-function script_object:update()
-    local                   obj = self.object
-    self.object             = level.object(self.object_name)
-    if ((obj == nil) and (self.object ~= nil)) then
-        self.object:script  (true,self.script_name)
-        self.object:command (self.action,false)
-    end
-end]]
 
 --------------------------------------------------
 --/ Functions and variables added by Zmey
@@ -520,195 +391,6 @@ function update_action (npc, script, ...)
     npc:command (act, false)
 end
 
-if (editor() == false) then
-class "pp_effector" (effector)
-
-function pp_effector:__init(effector_type,start_time,dest_power,life_time) super(effector_type,start_time)
-    self.start_time = start_time
-    self.stop_time  = start_time + life_time
-    self.max_power  = dest_power
-end
-
-function pp_effector:process(pp)
-    effector.process(self,pp)
-
-    local curr_time = time_global()
-    local d         = 0.0
-
-    if curr_time < self.start_time then
-        d           = 0.0
-    else
-        if curr_time < self.stop_time then
-            d           = (curr_time - self.start_time) / (self.stop_time - self.start_time)
-        else
-            self.info   = self.max_power
-            return      true
-        end
-    end
-
-    local dual      = duality()
-    local noise     = noise()
-    local base      = color()
-    local gray      = color()
-    local add       = color()
-
-    dual.h          = self.max_power.dual.h         * d
-    dual.v          = self.max_power.dual.v         * d
-
-    noise.grain     = self.max_power.noise.grain        * d
-    noise.intensity     = self.max_power.noise.intensity    * d
-    noise.fps       = self.max_power.noise.fps      * d
-
-    base.r          = self.max_power.color_base.r       * d
-    base.g          = self.max_power.color_base.g       * d
-    base.b          = self.max_power.color_base.b       * d
-
-    gray.r          = self.max_power.color_gray.r       * d
-    gray.g          = self.max_power.color_gray.g       * d
-    gray.b          = self.max_power.color_gray.b       * d
-
-    add.r           = self.max_power.color_add.r        * d
-    add.g           = self.max_power.color_add.g        * d
-    add.b           = self.max_power.color_add.b        * d
-
-    pp.gray         = self.max_power.gray           * d
-    pp.blur         = self.max_power.blur           * d
-
-    pp.dual         = dual
-    pp.noise        = noise
-    pp.color_base       = base
-    pp.color_gray       = gray
-    pp.color_add        = add
-
-    self.info       = pp
-    return              true
-end
-
-function pp_effector:finished()
-    return          self.stop_time < time_global()
-end
-
---
---/ postprocess for rainbow
---
-class "pp_linear_lerp" (effector)
-
-function pp_linear_lerp:__init(effector_type,start_time,life_time,start_power,dest_power) super(effector_type,start_time)
-    self.start_time = start_time
-    self.stop_time  = start_time + life_time
-    self.min_power  = start_power
-    self.max_power  = dest_power
-end
-
-function pp_linear_lerp:process(pp)
-    effector.process(self,pp)
-    local curr_time = time_global()
-    local d         = 0.0
-    if curr_time < self.start_time then
-        d           = 0.0
-    else
-        if curr_time < self.stop_time then
-            d           = (curr_time - self.start_time) / (self.stop_time - self.start_time)
-        else
-            self.info   = self.max_power
-            return      true
-        end
-    end
-
-    local dual      = duality()
-    local noise     = noise()
-    local base      = color()
-    local gray      = color()
-    local add       = color()
-
-    dual.h          = self.min_power.dual.h         + (self.max_power.dual.h        - self.min_power.dual.h     )   * d
-    dual.v          = self.min_power.dual.v         + (self.max_power.dual.v        - self.min_power.dual.v     )   * d
-
-    noise.grain     = self.min_power.noise.grain        + (self.max_power.noise.grain       - self.min_power.noise.grain    )   * d
-    noise.intensity     = self.min_power.noise.intensity    + (self.max_power.noise.intensity   - self.min_power.noise.intensity)   * d
-    noise.fps       = self.min_power.noise.fps      + (self.max_power.noise.fps         - self.min_power.noise.fps  )   * d
-
-    base.r          = self.min_power.color_base.r       + (self.max_power.color_base.r      - self.min_power.color_base.r   )   * d
-    base.g          = self.min_power.color_base.g       + (self.max_power.color_base.g      - self.min_power.color_base.g   )   * d
-    base.b          = self.min_power.color_base.b       + (self.max_power.color_base.b      - self.min_power.color_base.b   )   * d
-
-    gray.r          = self.min_power.color_gray.r       + (self.max_power.color_gray.r      - self.min_power.color_gray.r   )   * d
-    gray.g          = self.min_power.color_gray.g       + (self.max_power.color_gray.g      - self.min_power.color_gray.g   )   * d
-    gray.b          = self.min_power.color_gray.b       + (self.max_power.color_gray.b      - self.min_power.color_gray.b   )   * d
-
-    add.r           = self.min_power.color_add.r        + (self.max_power.color_add.r       - self.min_power.color_add.r    )   * d
-    add.g           = self.min_power.color_add.g        + (self.max_power.color_add.g       - self.min_power.color_add.g    )   * d
-    add.b           = self.min_power.color_add.b        + (self.max_power.color_add.b       - self.min_power.color_add.b    )   * d
-
-    pp.gray         = self.min_power.gray           + (self.max_power.gray          - self.min_power.gray       )   * d
-    pp.blur         = self.min_power.blur           + (self.max_power.blur          - self.min_power.blur       )   * d
-
-    pp.dual         = dual
-    pp.noise        = noise
-    pp.color_base       = base
-    pp.color_gray       = gray
-    pp.color_add        = add
-
-    self.info       = pp
-    return          true
-end
-
-function pp_linear_lerp:finished()
-    return          self.stop_time < time_global()
-end
---
---/ end of postprocess for rainbow
---
-
-----------------------------------------------------------------------
---/ Evaluators
-----------------------------------------------------------------------
---/ зарезервированы id с номерами от 0 до 256 для создания стандартных эвалуаторов.
-
---/ Constant evaluator
-class "const_evaluator" (property_evaluator)
-
-function const_evaluator:__init (name, value) super (nil, name)
-    self.value = value
-end
-
-function const_evaluator:evaluate()
-    return          self.value
-end
-
---/ Wait evaluator
-class "wait_evaluator" (property_evaluator)
-
-function wait_evaluator:__init (wait_time) super ()
-    self.wait_time = wait_time
-    self.first_call = true
-    self.current_time = 0
-end
-
-function wait_evaluator:evaluate ()
-    if self.first_call == true then
-       self.first_call = false
-       self.current_time = device ():time_global ()
-       return false
-    end
-
-    local t = device():time_global () - self.current_time;
-    if t > self.wait_time then return true end
-    return false
-end
---------------------------------------------------------------------------------
-class "enabled_evaluator" (property_evaluator)
-
-function enabled_evaluator:__init (name, storage) super ()
-    self.a = storage
-end
-
-function enabled_evaluator:evaluate()
-    return  self.a.enabled
-end
-
-end -- end of editor() == false
-
 function str_split (str)
 
     local strlen = string.len (str)
@@ -754,17 +436,6 @@ function str_split (str)
     printf("%s %s %d %d", str1, str2, str3, str4)
     return str1, str2, (str3 + 1) - 1, (str4 + 1) - 1
 end
-
---/ Время суток в мс
---[[local ms_per_day = 24 * 60 * 60 * 1000
-function day_time()
-	return math.mod( game.time(), ms_per_day )
-end]]
-
---/ Time in hours
---[[function local_hours()
-	return math.floor( math.mod( game.time()/1000, 86400 )/ 3600 )
-end]]
 
 function r_bool(spawn_ini, section, line, default)
 	if spawn_ini:line_exist( section, line ) then
@@ -833,15 +504,6 @@ function parse_nums( s )
     end
     return t
 end
---[[function r_2nums(ini, section, line, default1, default2)
-	if ini:line_exist(section, line) then
-		local s = ini:r_string(section, line)
-		local at, to, num1, num2 = string.find(s, "([%d%.]+)%s*,%s*([%d%.]+)")
-		return (tonumber(num1) or default1), (tonumber(num2) or default2)
-	else
-		return default1, default2
-	end
-end]]
 function r_2nums( spawn_ini, section, line, def1, def2 )
 	--log3("r_2nums: %s, %s", section, line)
 	if spawn_ini:line_exist( section, line ) then
@@ -909,11 +571,6 @@ function get_clsid(npc)
 end
 
 --/ Вычисляет yaw в радианах
---[[function yaw( v1, v2 )
-	if v1 and v2 then
-		return  math.acos( ( (v1.x*v2.x) + (v1.z*v2.z ) ) / ( math.sqrt(v1.x*v1.x + v1.z*v1.z ) * math.sqrt(v2.x*v2.x + v2.z*v2.z ) ) )
-	else return 1 end
-end]]
 function yaw(v1, v2)
 	if v1 and v2 then
 		return math.abs(v2:getH()-v1:getH())
@@ -922,21 +579,11 @@ end
 function yaw_degree(v1, v2)
 	return yaw(v1, v2) * 57.295779513
 end
---[[function yaw_degree3d( v1, v2 )
-	if v1 and v2 then
-		return  (math.acos((v1.x*v2.x + v1.y*v2.y + v1.z*v2.z)/(math.sqrt(v1.x*v1.x + v1.y*v1.y + v1.z*v1.z )*math.sqrt(v2.x*v2.x + v2.y*v2.y + v2.z*v2.z)))*57.2957)
-	else return 1 end
-end]]
 function yaw_degree3d(v1, v2)
 	if v1 and v2 then
 		return math.acos(v1:dotproduct(v2))*57.295779513
 	else return 1 end
 end
---[[function vector_cross (v1, v2)
-	if v1 and v2 then
-		return vector ():set (v1.y  * v2.z  - v1.z  * v2.y, v1.z  * v2.x  - v1.x  * v2.z, v1.x  * v2.y  - v1.y  * v2.x)
-	else return vector():set(0, 0, 0) end
-end]]
 function vector_cross(v1, v2)
 	if v1 and v2 then
 		return vector():crossproduct(v1, v2)
@@ -1057,39 +704,11 @@ function near_point_with_bit(point, patrol_path, bit)
 end
 
 --/ Рекурсивная распечатка таблицы
-function print_table(table, subs)
+function print_table(table, subs) --ПООТРЫВАТЬ ВЫЗОВЫ И УДАЛИТЬ!
 	do return end -- всё равно это не работает, а вызывается много откуда
-	local sub
-	if subs ~= nil then
-		sub = subs
-	else
-		sub = ""
-	end
-	for k,v in pairs(table) do
-		if type(v) == "table" then
-			printf(sub.."%s:", tostring(k))
-			print_table(v, sub.."    ")
-		elseif type(v) == "function" then
-			printf(sub.."%s:function", tostring(k))
-		elseif type(v) == "userdata" then
-			printf(sub.."%s:userdata", tostring(k))
-		elseif type(v) == "boolean" then
-			if v == true then
-				printf(sub.."%s:true", tostring(k))
-			else
-				printf(sub.."%s:false", tostring(k))
-			end
-		else
-			if v ~= nil then
-				printf(sub.."%s:%s", tostring(k),v)
-			else
-				printf(sub.."%s:nil", tostring(k),v)
-			end
-		end
-	end
 end
 
---/ Рекурсивная распечатка таблицы
+--/ Рекурсивная распечатка таблицы --ПООТРЫВАТЬ ВЫЗОВЫ И УДАЛИТЬ! ЕСТЬ V2
 function print_table_inlog(table, subs)
 	local sub
 	if subs ~= nil then
@@ -1121,7 +740,7 @@ function print_table_inlog(table, subs)
 	end
 end
 
---/ Рекурсивная распечатка таблицы
+--/ Рекурсивная распечатка таблицы --использовать это. остальное удалить.
 function print_table_inlog_v2(table, subs)
 	local sub
 	if subs ~= nil then
@@ -1323,13 +942,6 @@ function abort(fmt, ...)
 		log3("get_console():execute quit")
 		get_console():execute("quit")
 	end
-end
-
-function set_postprocess(name_ini_file)
-	bind_stalker.post_process = postprocess.PostProcess(ini_file(name_ini_file))
-end
-function remove_postprocess()
-	bind_stalker.post_process = nil
 end
 
 function set_inactivate_input_time(delta)
@@ -2431,17 +2043,5 @@ function reset_actor_items_tradability()
 		set_item_default_tradability(db.actor:object(i)) 
 	end
 end
---отладочные обёртки для глобальных функций level.enable_input и level.disable_input
-local enable_input_orig = level.enable_input
-level.enable_input = function()
-	--log1("level.enable_input")
-	--log1(debug.traceback())
-	enable_input_orig()
-end
-local disable_input_orig = level.disable_input
-level.disable_input = function()
-	--log1("level.disable_input")
-	--log1(debug.traceback())
-	disable_input_orig()
-end
+
 get_game_id = ogse_unist.get_game_id
