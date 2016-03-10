@@ -15,7 +15,6 @@ level_groups = {l01_escape = 1, l02_garbage = 2, l03_agroprom = 3, l03u_agr_unde
 				l13_generators_ogse = 21, l22_marsh = 22, l23_x9 = 23}
 
 local gulag_tasks_file_name  = "misc\\gulag_tasks.ltx"
-local gulag_tasks_ltx        = ini_file( gulag_tasks_file_name )
 
 local job_position_threshold = 120 --'50  -- расстояние до места работы при котором персонаж в онлайне считается достигшим места работы
 local job_idle_after_death   = 600 -- в течении такого периода времени после смерти персонажа его работа будет недоступна
@@ -273,7 +272,7 @@ function gulag:init_ltx(name, type)
 		self.ltx      = ltx
 		self.ltx_name = ltx_name
 	else
-		self.ltx      = gulag_tasks_ltx
+		self.ltx      = sys_ini
 		self.ltx_name = gulag_tasks_file_name
 	end
 end
