@@ -555,12 +555,12 @@ end
 --'Торговец
 class "se_trader" (cse_alife_trader)
 function se_trader:__init (section) super (section)
-   self.m_storage = nil --- вот тут добавляется поле
+--   self.m_storage = nil --- вот тут добавляется поле --Отключил KRodin. Теперь используется универсальное хранилище.
 end
 function se_trader:keep_saved_data_anyway()
 	return true
 end
---------------------
+--[[ --Отключил KRodin. Теперь используется универсальное хранилище.
 function se_trader:STATE_Write (packet)  --- добавил этот метод, его не было
    cse_alife_trader.STATE_Write (self, packet)
    if self.id == 65535 then return end
@@ -579,4 +579,4 @@ function se_trader:STATE_Read (packet, size)  --- добавил этот метод, его не был
    
    self.m_storage = packet:r_stringZ() -- если есть, загрузим из сохранённой строки
    log1("Размер нетпакета Сидоровича "..packet:r_tell())
-end
+end]]
