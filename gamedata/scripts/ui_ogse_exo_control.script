@@ -5,7 +5,17 @@
 
 --/ Модуль монтируемых экзоскелетов /--
 
-local sys_ini = system_ini()
+function attach(sm)
+	sm:subscribe({ signal = "on_spawn",			fun = this.load })
+	sm:subscribe({ signal = "on_first_update",	fun = this.set_actor_parameters })
+	sm:subscribe({ signal = "on_save",			fun = this.save })
+	sm:subscribe({ signal = "on_drop",			fun = this.chek_button_accessibility })
+	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.chek_button_accessibility })
+	sm:subscribe({ signal = "on_item_to_slot",	fun = this.chek_button_accessibility })
+	sm:subscribe({ signal = "on_inventory_open", fun = this.on_show })
+	sm:subscribe({ signal = "on_use",			fun = this.use_exo })
+end
+
 local sim = alife()
 
 local exo_condition = 1.0
@@ -68,7 +78,6 @@ function convert_outfit(outfit, new_outfit_section)
 	local sobj = sim:object(outfit:id())
 	if sobj then
 		local outfit_condition = outfit:condition()
-		ogse_night_vision.set_exo_convert_flag(true)
 		db.actor:move_to_ruck(outfit)
 		sim:release(sobj, true)
 		local s_new_outfit = ogse.spawn_item_in_inv(new_outfit_section, db.actor)
@@ -88,18 +97,6 @@ function outfit_spawn_watcher:condition()
 end
 function outfit_spawn_watcher:action()
 	self.obj:set_condition(self.cond)
-	ogse_night_vision.set_exo_convert_flag(false)
-end
-
--- Открытие/закрытие инвентаря.
-
-function on_inventory_info(info_id)
-	if info_id == "ui_inventory" then
-		on_show()
-	end
-	if info_id == "no_net_signal" or info_id == "net_signal" then
-		set_actor_parameters()
-	end
 end
 
 function save()
@@ -159,6 +156,7 @@ function chek_button_accessibility()
 		sys_ini:line_exist(outfit_item:section(), "exo_section") and
 		can_detach_exo(outfit_item:section())
 	rec_wnd.btn:Enable(enabled)
+	set_actor_parameters()
 end
 
 function set_actor_parameters()
@@ -180,30 +178,18 @@ function set_actor_parameters()
 				if sys_ini:line_exist(exo_section, "jump_speed_dif") then
 					local jump_speed_dif = sys_ini:r_float(exo_section, "jump_speed_dif")
 					jump_speed = jump_speed+jump_speed_dif
-					if db.actor:has_info("no_net_signal") then
-						jump_speed = jump_speed*0.1
-					end
 				end
 				if sys_ini:line_exist(exo_section, "sprint_koef_dif") then
 					local sprint_koef_dif = sys_ini:r_float(exo_section, "sprint_koef_dif")
 					sprint_koef = sprint_koef+sprint_koef_dif
-					if db.actor:has_info("no_net_signal") then
-						sprint_koef = sprint_koef*0.9
-					end
 				end
 				if sys_ini:line_exist(exo_section, "run_coef_dif") then
 					local run_coef_dif = sys_ini:r_float(exo_section, "run_coef_dif")
 					run_coef = run_coef+run_coef_dif
-					if db.actor:has_info("no_net_signal") then
-						run_coef = run_coef*0.9
-					end
 				end
 				if sys_ini:line_exist(exo_section, "run_back_coef_dif") then
 					local run_back_coef_dif = sys_ini:r_float(exo_section, "run_back_coef_dif")
 					run_back_coef = run_back_coef+run_back_coef_dif
-					if db.actor:has_info("no_net_signal") then
-						run_back_coef = run_back_coef*0.9
-					end
 				end
 --[[				condition_for_weight_calc = exo_condition
 			else
