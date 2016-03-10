@@ -1,4 +1,12 @@
 ------------------------- Copyright 2008-2010 OGSE Team -----------------------
+
+turn_pnv_off = ogse_night_vision.turn_pnv_off --KRodin: НЕ УДАЛЯТЬ! Вызывается из многих мест.
+
+function attach(sm)
+	sm:subscribe({ signal = "on_show_car_hud",	fun = this.set_btr_nonworking }) --действие при влезании в БТР
+	sm:subscribe({ signal = "on_show_car_hud",	fun = this.set_btr_fuel_empty }) --действие при влезании в БТР
+end
+
 --/ спавн квестовых предметов для OGSE и скриптовые квесты /--
 local spawn_db = ogse_spawn_db.script_spawn_registry.ogse_quests
 
@@ -9,13 +17,6 @@ local current_debug = false
 function write_log(str)
 	if current_debug then
 		log1(str)
-	end
-end
-
-function turn_pnv_off()
-	if ogse_night_vision.is_nv_working() then
-		ogse_night_vision.turn_off_nv_fx()
-		ogse.del_variable("pnv")
 	end
 end
 
@@ -32,7 +33,7 @@ function start_timer_finish_btr()
 end
 
 function give_reward_btr()
-	--if db.actor:has_info("btr_targeting_computer") then --пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+	--if db.actor:has_info("btr_targeting_computer") then --в будущем, прописать в награду альтернативный ствол и раскомментировать.
 		dialogs.relocate_item_section(db.actor, "ammo_5.56x45_ss190", "in")
 		dialogs.relocate_item_section(db.actor, "ammo_5.56x45_ss190", "in")
 		dialogs.relocate_item_section(db.actor, "ammo_5.56x45_ss190", "in")
@@ -533,28 +534,28 @@ alife():create("m_teleport_15",vector():set(-87.15, -0.0, 116.56),47719,1421)]]
 end
 
 -- Бар --
--- Аренда мощнецкой винтовки у Бармена
+-- Аренда Баррета В-94 у Бармена
 -- Проверяем есть ли у Мечного стоко денег
 function material_rifle_arenda_check_on(actor)
-	return db.actor:money() >= 50100
+	return false --db.actor:money() >= 50100 --пока отключено, пусть будет так чтоб не срабатывал диалог. Как исправят - НЕ ЗАБЫТЬ ВКЛЮЧИТЬ!
 end
 
--- Сдача мощнецкой винтовки в аренду Меченому
+-- Сдача В-94 баррет в пренду Меченому
 function material_rifle_arenda_on(trader,actor)
 	dialogs.relocate_money(actor, 50000, "out")
-    dialogs.relocate_item_section(actor, "wpn_ххх", "in")
-	dialogs.relocate_item_section(actor, "ammo_ххх", "in")
-	dialogs.relocate_item_section(actor, "ammo_ххх", "in")
+    dialogs.relocate_item_section(actor, "wpn_v94", "in")
+	dialogs.relocate_item_section(actor, "ammo_12.7x108", "in")
+	dialogs.relocate_item_section(actor, "ammo_12.7x108", "in")
 end
 
 -- Проверка не потерял ли Меченый винтовку
 function material_rifle_arenda_off_check(actor)
-	return actor:object("wpn_ххх") ~= nil
+	return actor:object("wpn_v94") ~= nil
 end
 
 -- Возарат винтовки Бармену
 function material_rifle_arenda_off_1(actor,trader)
-	dialogs.relocate_item_section(actor, "wpn_ххх", "out")
+	dialogs.relocate_item_section(actor, "wpn_v94", "out")
 	dialogs.relocate_money(actor, 20000, "in")
 end
 
@@ -1129,7 +1130,6 @@ function start_bomb_timer()
 	if obj then
 		ogse.save_var("voice_combat", obj.id, "number")
 	end
-	
 	ogse_psycho_fov.fov_start()
 end
 
