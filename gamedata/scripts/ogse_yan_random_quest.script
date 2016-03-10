@@ -18,14 +18,12 @@ local order_length = 5 -- количество заранее определённых комлектов
 
 -- Распределяем арты и запчасти монстров
 function insert_item_range()
-	local path = "misc\\ogse_yan_random_quest.ltx"
-	local ltx = ini_file(path)
 	local time_array, a = {}
 	
 	for k,v in pairs(item) do
 		time_array = {}
 		for k1,v1 in pairs(difficult) do
-			a = get_array_from_string(ltx:r_string(v, v1))
+			a = get_array_from_string(sys_ini:r_string(v, v1))
 			time_array[v1] = a
 		end
 		item_list[v] = time_array 
@@ -151,13 +149,13 @@ function show_item_list_as_tip()
 	local s = game.translate_string("ogse_yan_rand_part_1_text")
 	for k,v in pairs(difficult) do
 		local a = ogse.load_variable("yan_random_quest_"..v.."_".."art", "")
-		if a ~= "" then s = s.."%c[255,0,255,0]- "..game.translate_string(system_ini():r_string(a, "inv_name")).."\\n" end
+		if a ~= "" then s = s.."%c[255,0,255,0]- "..game.translate_string(sys_ini:r_string(a, "inv_name")).."\\n" end
 	end
 	for k,v in pairs(difficult) do
 		local a = ogse.load_variable("yan_random_quest_"..v.."_".."monster_part", "")
 		if a ~= "" then 
 			if a == "mutant_izlom_hand" then 
-				s = s.."%c[255,0,255,0]- "..game.translate_string(system_ini():r_string(a, "inv_name")).."\\n" 
+				s = s.."%c[255,0,255,0]- "..game.translate_string(sys_ini:r_string(a, "inv_name")).."\\n" 
 			else
 				s = s.."%c[255,0,255,0]- "..game.translate_string(a).."\\n"
 			end
@@ -218,13 +216,13 @@ function action_quest_show(npc, actor)
 	for k,v in pairs(difficult) do
 		local a = ogse.load_variable("yan_random_quest_"..v.."_".."art", "")
 		local task_texture, task_rect = get_texture_info("ui_icons_task_artefact", "ui_iconsTotal_locations")
-		db.actor:give_talk_message(game.translate_string(system_ini():r_string(a, "inv_name")), task_texture, task_rect, "iconed_trade_info")
+		db.actor:give_talk_message(game.translate_string(sys_ini:r_string(a, "inv_name")), task_texture, task_rect, "iconed_trade_info")
 	end
 	for k,v in pairs(difficult) do
 		local a = ogse.load_variable("yan_random_quest_"..v.."_".."monster_part", "")
 		local task_texture, task_rect = get_texture_info("ui_icons_monster_part", "ui_iconsTotal_locations")
 		if a == "mutant_izlom_hand" then
-			db.actor:give_talk_message(game.translate_string(system_ini():r_string(a, "inv_name")), task_texture, task_rect, "iconed_trade_info")
+			db.actor:give_talk_message(game.translate_string(sys_ini:r_string(a, "inv_name")), task_texture, task_rect, "iconed_trade_info")
 		else
 			db.actor:give_talk_message(game.translate_string(a), task_texture, task_rect, "iconed_trade_info") end
 	end
