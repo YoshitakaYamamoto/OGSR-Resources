@@ -1,6 +1,6 @@
 function attach(sm)
 	sm:subscribe({signal = "on_spawn",        fun = this.on_spawn})
-	sm:subscribe({signal = "on_update",       fun = this.on_update, queued = true}) --KRodin: пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ hit_from_arts пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	sm:subscribe({signal = "on_update",       fun = this.on_update, queued = true}) --KRodin: ни к чему обновлять hit_from_arts на каждом апдейте
 	sm:subscribe({signal = "on_update",       fun = this.on_update_lp, queued = true})
 	sm:subscribe({signal = "on_drop",         fun = this.on_item_drop})
 	sm:subscribe({signal = "on_item_to_slot", fun = this.on_item_to_slot})
@@ -137,14 +137,14 @@ function hit_from_arts()
 	for section, obj_num in pairs(belt) do
 		if string.find(section, "af_") and section ~= "af_maska" then
 -- -- log1("Найден артефакт: " .. section .. ", " .. obj_num .. " штук.")
-			if system_ini():section_exist(section) then
-				if system_ini():line_exist(section, "hit_absorbation_sect") then
-					local obj_hit_absorbation_sect = system_ini():r_string(section, "hit_absorbation_sect")
-					if system_ini():section_exist(obj_hit_absorbation_sect) then
+			if sys_ini:section_exist(section) then
+				if sys_ini:line_exist(section, "hit_absorbation_sect") then
+					local obj_hit_absorbation_sect = sys_ini:r_string(section, "hit_absorbation_sect")
+					if sys_ini:section_exist(obj_hit_absorbation_sect) then
 -- -- log1("Его секция иммунитетов: " .. obj_hit_absorbation_sect)
 						for immunity, value in pairs(immunities) do
-							if system_ini():line_exist(obj_hit_absorbation_sect, immunity) then
-								local tmp_immunity = system_ini():r_string(obj_hit_absorbation_sect, immunity)
+							if sys_ini:line_exist(obj_hit_absorbation_sect, immunity) then
+								local tmp_immunity = sys_ini:r_string(obj_hit_absorbation_sect, immunity)
 								tmp_immunity = (1-tmp_immunity)*100
 								immunities[immunity] = immunities[immunity] + (tmp_immunity*obj_num)
 							end
