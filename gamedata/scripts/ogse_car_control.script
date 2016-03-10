@@ -26,7 +26,6 @@ function attach(sm) -- для менеджера сигналов
 end
 
 local sim
-local sys_ini = system_ini()
 local btr_hud_wnd
 local car_hud_wnd
 local surge = false
@@ -748,10 +747,9 @@ function show_car_hud(car, btr)
 	if btr then
 		bg:AttachChild(btr_hud_wnd) -- поместить окно на подложку
 		db.actor:set_camera_fov(fov_vol)
-		ogse_dynamic_hud.on_show_car_hud()
 		current_target_id = nil
-		-- синхронизация модуля ночного видения
-		ogse_night_vision.on_btr_sit(true)
+
+		ogse_signals.get_mgr():call("on_show_car_hud")
 	end
 	bg:AttachChild(car_hud_wnd) -- поместить окно на подложку
 end
@@ -761,11 +759,8 @@ function hide_car_hud(btr)
 		db.actor:set_camera_fov(fov_vol)
 		current_target_id = nil
 		db.actor:set_camera_fov(fov_vol)
-		
-		ogse_night_vision.on_btr_sit(false)
-		ogse_dynamic_hud.on_hide_car_hud()
-		--
-		ogse_night_vision.on_btr_sit(false)
+
+		ogse_signals.get_mgr():call("on_hide_car_hud")
 	end
 end
 
