@@ -32,10 +32,8 @@ local duplicates = {}
 --' Нижний/Верхний уровень износа редких стволов
 local low_damage_rar,high_damage_rar = 65, 95
 
-local death_ini = ini_file("misc\\death_generic.ltx")
-
-local suit_prob = system_ini():r_s32("options","suit_probability")
-local exo_prob = system_ini():r_s32("options","exo_probability")
+local suit_prob = sys_ini:r_s32("options","suit_probability")
+local exo_prob = sys_ini:r_s32("options","exo_probability")
 
 local rank_to_mult = {
 	novice      = {0, 15}, -- {<for low boundary>, <for upper boundary>}
@@ -86,21 +84,21 @@ function init_drop_settings()
     for k,v in pairs(community_list) do
         --' Необходимо заполнить таблицу
         item_by_community[v] = {}
-        if death_ini:section_exist(v) then
-		    local n = death_ini:line_count(v)
+        if sys_ini:section_exist("death_gen_"..v) then
+		    local n = sys_ini:line_count("death_gen_"..v)
 		    local id, value = "", ""
 		    for i=0,n-1 do
-			    result, id, value	= death_ini:r_line(v,i,"","")
+			    result, id, value	= sys_ini:r_line("death_gen_"..v,i,"","")
                 item_by_community[v][id] = 100*tonumber(value)
 		    end
         end
     end
 
     --' Заполняем таблицу зависимостей
-	local n = death_ini:line_count("item_dependence")
+	local n = sys_ini:line_count("death_gen_item_dependence")
 	local id, value = "", ""
 	for i=0,n-1 do
-		result, id, value	= death_ini:r_line("item_dependence",i,"","")
+		result, id, value	= sys_ini:r_line("death_gen_item_dependence",i,"","")
 		item_dependence[id] = {}
 		local vvv = parse_names(value)
 		for k,v in pairs(vvv) do
@@ -111,25 +109,25 @@ function init_drop_settings()
 	--' Множители и минимаксы для выпадения вещей в зависимости от уровня
     local level_name = level.name()
 	
-	if not death_ini:section_exist(level_name) then
+	if not sys_ini:section_exist("death_gen_"..level_name) then
 		level_name = "default"
 	end
 
-    local n = death_ini:line_count(level_name)
+    local n = sys_ini:line_count("death_gen_"..level_name)
 	local id, value = "", ""
 	for i=0,n-1 do
-		result, id, value	= death_ini:r_line(level_name,i,"","")
+		result, id, value	= sys_ini:r_line("death_gen_"..level_name,i,"","")
         mul_by_level[id] = tonumber(value)
 	end        
 
     local item_count_section = "item_count_" .. level.get_game_difficulty()
-    local n = death_ini:line_count(item_count_section)
+    local n = sys_ini:line_count("death_gen_"..item_count_section)
 	for i=0,n-1 do
-		result, id, value	= death_ini:r_line(item_count_section,i,"","")
+		result, id, value	= sys_ini:r_line("death_gen_"..item_count_section,i,"","")
         --' Нужно распарсить value в два значения
         local t = parse_nums(value)
 		if t[1] == nil then
-            abort("Error on [death_ini] declaration. Section [%s], line [%s]", item_count_section, tostring(id))
+            abort("Error on [sys_ini] declaration. Section [%s], line [%s]", item_count_section, tostring(id))
         end
         local min = t[1]
         local max = t[2] or min
@@ -143,18 +141,18 @@ function init_drop_settings()
 	end        
 
  	--' Предметы, которые нельзя удалять (квестовые например)
-    local n = death_ini:line_count("keep_items")
+    local n = sys_ini:line_count("death_gen_keep_items")
 	for i=0,n-1 do
-		result, id, value	= death_ini:r_line("keep_items",i,"","")
+		result, id, value	= sys_ini:r_line("death_gen_keep_items",i,"","")
         if value == "true" then
             always_keep_item[id] = true
         end
     end
 	
  	--' Предметы, которые нельзя сильно портить
-    local n = death_ini:line_count("rare_items")
+    local n = sys_ini:line_count("death_gen_rare_items")
 	for i=0,n-1 do
-		result, id, value	= death_ini:r_line("rare_items",i,"","")
+		result, id, value	= sys_ini:r_line("death_gen_rare_items",i,"","")
         if value == "true" then
             rare_item[id] = true
         end
@@ -162,10 +160,10 @@ function init_drop_settings()
 
 	--' Предметы, относящиеся к патронам. Их надо спаунить другим методом.
     ammo_sections = {}
-    local n = death_ini:line_count("ammo_sections")
+    local n = sys_ini:line_count("death_gen_ammo_sections")
 	local id, value = "", ""
 	for i=0,n-1 do
-		result, id, value	= death_ini:r_line("ammo_sections",i,"","")
+		result, id, value	= sys_ini:r_line("death_gen_ammo_sections",i,"","")
         ammo_sections[id] = true
 	end
 end
@@ -519,7 +517,6 @@ function keep_item(npc, item)
 end
 
 function release_deferred_ammo()
-	local ini = system_ini()
 	for k, v in pairs(deferred_release) do
 		local game_object = level.object_by_id(k)
 		local s_obj = alife():object(k)
@@ -549,14 +546,6 @@ function release_deferred_ammo()
 			write_log("!!DEFFERED_DEBUG DEBUG_DELETING_ONLY_GAMEOBJ")
 		end		
 	end
-end
-
-function get_ammo_size(obj)
-	local se_obj = alife():object(obj:id())
-	local packet = net_packet()
-	cse_alife_item_ammo.STATE_Write(se_obj, packet)
-	packet:r_seek(packet:w_tell() - 2)
-	return packet:r_u16()
 end
 
 --' Функция вызывается для каждого предмета, если вернет false то предмет удалится.

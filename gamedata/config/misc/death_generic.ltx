@@ -6,7 +6,7 @@
 ; изменения подгружаются, без полной перезагрузки игры. Достаточно сейв-лоад. Возможно, что это действует и для остальных конфигов.
 ; сделаем так: от простого оружия в трупе будут только простые патроны. Усиленые патроны от уникального оружия.
 ; здесь коментить патроны НЕЛЬЗЯ (иначе они буду всегда спавнится в труп если в death_items_by_levels.ltx стоит 1), если их не надо спанить в трупе, то лучше ставить 0 в death_items_by_levels.ltx
-[item_dependence]
+[death_gen_item_dependence]
 ammo_9x18_fmj		= wpn_pm, wpn_pb, wpn_fort
 ammo_9x18_pmm		= wpn_mp5_m1
 
@@ -52,7 +52,7 @@ ammo_flame  		= wpn_flame
 
 ammo_arbolt			= wpn_crossbow
 
-[keep_items] ;Предметы, которые нельзя удалять c трупа (квестовые например)
+[death_gen_keep_items] ;Предметы, которые нельзя удалять c трупа (квестовые например)
 af_uley = true
 btr_control_module_upgrade = true
 btr_control_module = true
@@ -177,7 +177,7 @@ box_amm_4=true
 af_kolya = true
 mil_transponder = true
 
-[rare_items] ;Предметы, которые нельзя сильно портить при луте (уникальные стволы)
+[death_gen_rare_items] ;Предметы, которые нельзя сильно портить при луте (уникальные стволы)
 wpn_vintorez_m1	= true
 wpn_val_m1	= true
 wpn_saiga12c_m1 = true
@@ -190,7 +190,7 @@ wpn_m_134 = true
 wpn_rpg7 = true
 wpn_sig_m2 = true
 
-[ammo_sections]
+[death_gen_ammo_sections]
 ammo_9x18_fmj
 ammo_9x18_pmm
 ammo_9x19_pbp

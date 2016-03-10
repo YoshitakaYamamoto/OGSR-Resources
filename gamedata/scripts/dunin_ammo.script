@@ -8,16 +8,12 @@ local repack = false
 --------
 function init()
 	local i, result, section, value
-	-- отсюда возьмём размеры полных пачек
-	local sys = system_ini()
-	-- список патронов возьмём из "death_generic.ltx"
-	local ini = ini_file("misc\\death_generic.ltx")
-	local n = ini:line_count("ammo_sections")
+	local n = sys_ini:line_count("death_gen_ammo_sections")	--список патронов возьмём из "death_generic.ltx"
 	for i=0,n-1 do
-		result, section, value = ini:r_line("ammo_sections",i,"","")
+		result, section, value = sys_ini:r_line("death_gen_ammo_sections",i,"","")
 		ammo[section] = {}
 		ammo[section].repack = false
-		ammo[section].box = sys:r_u32(section, "box_size")
+		ammo[section].box = sys_ini:r_u32(section, "box_size")
 	end
 	repack = false
 	inited = true
@@ -53,7 +49,6 @@ function on_take(obj)
 			if get_ammo_size(obj) < ammo[section].box then
 				ammo[section].repack = true
 				repack = true
-				remkit_main.skip_updates = 2
 			end
 		end
 	else
@@ -84,7 +79,6 @@ function on_update()
 			end
 		end
 		repack = false
-		remkit_main.skip_updates = 2
 	end
 end
 
@@ -171,9 +165,11 @@ end
 
 --------
 -- возвращает колличество патрон в пачке
+-- http://www.amk-team.ru/forum/index.php?showtopic=10538&p=713968
 --------
 function get_ammo_size(obj)
 	ASSERT(obj, "[dunin_ammo.get_ammo_size] object is a nil reference!")
 	ASSERT(obj:is_ammo(), "[dunin_ammo.get_ammo_size] object '%s' is not an ammo!", obj:name())
-	return obj:get_inventory_item_int16("", 692)
+
+	return obj:get_go_int16( "", 476 ) --return obj:get_inventory_item_int16("", 692)
 end
