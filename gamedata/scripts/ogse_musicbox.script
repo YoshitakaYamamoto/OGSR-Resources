@@ -581,7 +581,9 @@ function musicbox_base:onStop()
     self.checkedTrack = 0
     self.snd_obj      = nil
     
-    if self.isClosed then self:unBind() end
+    if (self.isClosed and not self.checkedPlayAll) then --Fix by KRodin. 13.01.2016
+		self:unBind()
+    end
 end
 
 function musicbox_base:onPlayAll()
