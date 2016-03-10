@@ -1,8 +1,5 @@
 --	—хема озвучки
 nstl = 64
-
-snd_ini = ini_file("misc\\script_sound.ltx")
-
 theme = {}
 -----------------------------------------------------------------------------------------------------------------------------------
 --	Theme  functions
@@ -614,8 +611,8 @@ function load_sound(obj)
 	-- загрузка звуков на основе данных ltx
 	function load_sound_from_ltx(obj, name, tbl)		
 		tbl.max_ids[obj:id()] = {}
-		if snd_ini:section_exist(name.."_rnd") then		
-			local s = select_sound_from_ltx(obj, name.."_rnd", snd_ini)			
+		if sys_ini:section_exist(name.."_rnd") then		
+			local s = select_sound_from_ltx(obj, name.."_rnd", sys_ini)			
 			if s then
 				local flag, path = check_prefix(s)
 				if flag == "0" then
@@ -632,8 +629,8 @@ function load_sound(obj)
 			end
 		end
 -->>		special for musics
-		if snd_ini:section_exist(name.."_spec") then		
-			local s = select_sound_from_ltx(obj, name.."_spec", snd_ini)			
+		if sys_ini:section_exist(name.."_spec") then		
+			local s = select_sound_from_ltx(obj, name.."_spec", sys_ini)			
 			if s then
 				local flag, path = check_prefix(s)
 				character_prefix = obj:sound_prefix()
@@ -644,8 +641,8 @@ function load_sound(obj)
 			end
 		end
 --<<		end special for musics
-		if snd_ini:section_exist(name.."_seq") then
-			local s = select_sound_from_ltx(obj, name.."_seq", snd_ini)
+		if sys_ini:section_exist(name.."_seq") then
+			local s = select_sound_from_ltx(obj, name.."_seq", sys_ini)
 			if s then
 				local flag, path = check_prefix(s)
 				if flag == "0" then
@@ -662,8 +659,8 @@ function load_sound(obj)
 				end
 			end
 		end
-		if snd_ini:section_exist(name.."_single") then
-			local s = select_sound_from_ltx(obj, name.."_single", snd_ini)
+		if sys_ini:section_exist(name.."_single") then
+			local s = select_sound_from_ltx(obj, name.."_single", sys_ini)
 			if s then
 				local flag, path = check_prefix(s)
 				if flag == "0" then
