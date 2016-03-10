@@ -24,16 +24,15 @@ local flags_table = {[sc] = {[1] = true,[3] = true,[5] = true,[7] = true},
 
 local remt,ctmp,cont = {},{},{}
 
-local ad_ini = ini_file("misc\\rx_addons.ltx")
 local addons_sets = {forbiddens = {addons = {},weapons = {},factions = {},npcs = {}},
-				check_prd = read_from_ini(ad_ini,"main","check_period",60000),
-				enabled = read_from_ini(ad_ini,"main","enabled",false,0),
-				maxw = read_from_ini(ad_ini,"main","max_upg_weapons",5)}
+				check_prd = read_from_ini(sys_ini,"rx_addons_main","check_period",60000),
+				enabled = read_from_ini(sys_ini,"rx_addons_main","enabled",false,0),
+				maxw = read_from_ini(sys_ini,"rx_addons_main","max_upg_weapons",5)}
 
 function init()
---	addons_sets.forbiddens.weapons = rx_utils.parse_list(ad_ini,"main","forbidden_weapons",true)
-	addons_sets.forbiddens.factions = rx_utils.parse_list(ad_ini,"main","forbidden_factions",true)
-	addons_sets.forbiddens.npcs = rx_utils.parse_list(ad_ini,"main","forbidden_npcs",true)
+--	addons_sets.forbiddens.weapons = rx_utils.parse_list(sys_ini,"rx_addons_main","forbidden_weapons",true)
+	addons_sets.forbiddens.factions = rx_utils.parse_list(sys_ini,"rx_addons_main","forbidden_factions",true)
+	addons_sets.forbiddens.npcs = rx_utils.parse_list(sys_ini,"rx_addons_main","forbidden_npcs",true)
 	addons_sets.inited = true
 end
 
