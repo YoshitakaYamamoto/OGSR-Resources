@@ -8,8 +8,6 @@ local count_by_level = {}
 --' Предметы, относящиеся к патронам. Их надо спаунить другим методом.
 local ammo_sections = {}
 
-local death_ini = ini_file("misc\\ph_box_generic.ltx")
-
 class "ph_item_box"
 
 function ph_item_box:__init(obj)
@@ -20,11 +18,11 @@ function ph_item_box:__init(obj)
 	for k,v in pairs(community_list) do
         --' Необходимо заполнить таблицу
         item_by_community[v] = {}
-        if death_ini:section_exist(v) then
-		    local n = death_ini:line_count(v)
+        if sys_ini:section_exist(v) then
+		    local n = sys_ini:line_count(v)
 		    local id, value = "", ""
 		    for i=0,n-1 do
-			    result, id, value	= death_ini:r_line(v,i,"","")
+			    result, id, value	= sys_ini:r_line(v,i,"","")
                 item_by_community[v][id] = 100*tonumber(value)
 		    end
         end
@@ -33,25 +31,25 @@ function ph_item_box:__init(obj)
 	--' Множители и минимаксы для выпадения вещей в зависимости от уровня
     local level_name = level.name()
 	
-	if not death_ini:section_exist(level_name) then
+	if not sys_ini:section_exist(level_name) then
 		level_name = "default"
 	end
 
-    local n = death_ini:line_count(level_name)
+    local n = sys_ini:line_count(level_name)
 	local id, value = "", ""
 	for i=0,n-1 do
-		result, id, value	= death_ini:r_line(level_name,i,"","")
+		result, id, value	= sys_ini:r_line(level_name,i,"","")
         mul_by_level[id] = tonumber(value)
 	end        
 
     local item_count_section = "item_count_" .. level.get_game_difficulty()
-    local n = death_ini:line_count(item_count_section)
+    local n = sys_ini:line_count(item_count_section)
 	for i=0,n-1 do
-		result, id, value	= death_ini:r_line(item_count_section,i,"","")
+		result, id, value	= sys_ini:r_line(item_count_section,i,"","")
         --' Нужно распарсить value в два значения
         local t = parse_nums(value)
 		if t[1] == nil then
-            abort("Error on [death_ini] declaration. Section [%s], line [%s]", item_count_section, tostring(id))
+            abort("Error on [sys_ini] declaration. Section [%s], line [%s]", item_count_section, tostring(id))
         end
         local min = t[1]
         local max = t[2]
@@ -70,10 +68,10 @@ function ph_item_box:__init(obj)
 	end        
 	--' Предметы, относящиеся к патронам. Их надо спаунить другим методом.
    ammo_sections = {}
-    local n = death_ini:line_count("ammo_sections")
+    local n = sys_ini:line_count("ammo_sections")
 	local id, value = "", ""
 	for i=0,n-1 do
-		result, id, value	= death_ini:r_line("ammo_sections",i,"","")
+		result, id, value	= sys_ini:r_line("ammo_sections",i,"","")
         ammo_sections[id] = true
 	end        
 	        
