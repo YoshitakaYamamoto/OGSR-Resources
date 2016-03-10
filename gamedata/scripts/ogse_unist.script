@@ -5,10 +5,10 @@
 --| version 1.0                                                             |--
 -------------------------------------------------------------------------------
 -- Использование:
--- ogse.save_variable(name, value [,type]) -- сохранить переменную
--- ogse.load_variable(name [,default_value [,type]]) -- прочитать переменную
--- ogse.variable_exists(name) -- проверить существование переменной
--- ogse.delete_variable(name) -- удалить переменную, чтобы освободить место
+-- ogse.save_var(name, value [,type]) -- сохранить переменную
+-- ogse.load_var(name [,default_value [,type]]) -- прочитать переменную
+-- ogse.var_exists(name) -- проверить существование переменной
+-- ogse.delete_var(name) -- удалить переменную, чтобы освободить место
 -- name - строка с уникальным именем переменной
 -- value - значение
 -- type - строка с типом. Это в ряде случаев необязательный параметр. 
@@ -226,7 +226,7 @@ function on_load()
 		ASSERT(ready, "[ogse_unist.on_load] cannot load game_id. Check the logic!")
 	end
 	--ASSERT(ready, "ogse_unist.on_init: storage was not succesfully created")
---	ogse_unist.print_storage()
+	ogse_unist.print_storage()
 end
 
 function on_save(--[[packet]]) -- аргумент не используем
