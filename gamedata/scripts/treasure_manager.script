@@ -2,9 +2,9 @@ local treasure_manager = nil
 
 local opt =
 {
-	option_random_treasure = system_ini():r_s32("options","option_random_treasure"), -- Включение/выключение рандомных тайников тайников (true/false)
-	tr_v = system_ini():r_s32("options","treasure_dropout"), -- Частота выпада тайников при выполненом condlist. Чем меньше, тем больше вероятность. (70)
-	need_text = system_ini():r_s32("options","treasure_need_text") --Вывод содержимого в нычку
+	option_random_treasure = sys_ini:r_s32("options","option_random_treasure"), -- Включение/выключение рандомных тайников тайников (true/false)
+	tr_v = sys_ini:r_s32("options","treasure_dropout"), -- Частота выпада тайников при выполненом condlist. Чем меньше, тем больше вероятность. (70)
+	need_text = sys_ini:r_s32("options","treasure_need_text") --Вывод содержимого в нычку
 }
 
 function parse_spawns(line)
@@ -47,30 +47,27 @@ end
 
 class "CTreasure"
 function CTreasure:__init()
-	--' На конструкторе вычитываем LTX и создаем заготовки квестов.
-	self.ini = ini_file("misc\\treasure_manager.ltx")
-
 	--' Итерируемся по всем настройкам фраз
-	if not self.ini:section_exist("list") then
-		abort("There is no section [list] in treasure_manager.ltx")
+	if not sys_ini:section_exist("treasure_list") then
+		abort("There is no section [treasure_list] in treasure_manager.ltx")
 	end
-	local n = self.ini:line_count("list")
+	local n = sys_ini:line_count("treasure_list")
 	local id, value = "",""
 
 	--' начальная установка
 	self.treasure_info = {}
 
 	for i=0,n-1 do
-		result, id, value	= self.ini:r_line("list",i,"","")
+		result, id, value	= sys_ini:r_line("treasure_list",i,"","")
 		
 		self.treasure_info[id] = {}
 
-		self.treasure_info[id].target		= utils.cfg_get_number(self.ini, id, "target", nil, true)
-		self.treasure_info[id].name			= utils.cfg_get_string(self.ini, id, "name", nil, true, "")
-		self.treasure_info[id].description	= utils.cfg_get_string(self.ini, id, "description", nil, true, "")
-		self.treasure_info[id].items		= parse_spawns(utils.cfg_get_string(self.ini, id, "items", nil, true, ""))
+		self.treasure_info[id].target		= utils.cfg_get_number(sys_ini, id, "target", nil, true)
+		self.treasure_info[id].name			= utils.cfg_get_string(sys_ini, id, "name", nil, true, "")
+		self.treasure_info[id].description	= utils.cfg_get_string(sys_ini, id, "description", nil, true, "")
+		self.treasure_info[id].items		= parse_spawns(utils.cfg_get_string(sys_ini, id, "items", nil, true, ""))
 		
-		local community	= parse_names(utils.cfg_get_string(self.ini, id, "community", nil, false, "", "stalker, bandit, dolg, freedom"))
+		local community	= parse_names(utils.cfg_get_string(sys_ini, id, "community", nil, false, "", "stalker, bandit, dolg, freedom"))
 		self.treasure_info[id].community = {}
 		for k,v in pairs(community) do
 			self.treasure_info[id].community[v] = true
@@ -80,7 +77,7 @@ function CTreasure:__init()
 			abort("cant find 'items' in %s", id)
 		end
 
-		self.treasure_info[id].condlist		= xr_logic.parse_condlist(db.actor, "treasure_manager", "condlist", utils.cfg_get_string(self.ini, id, "condlist", nil, false, "", ""))
+		self.treasure_info[id].condlist		= xr_logic.parse_condlist(db.actor, "treasure_manager", "condlist", utils.cfg_get_string(sys_ini, id, "condlist", nil, false, "", ""))
 		
 		--' Отметим тайник как новый
 		self.treasure_info[id].active = false
@@ -223,7 +220,7 @@ function CTreasure:give_treasure(k)
 
 	for kk,vv in pairs(v.items) do
 		if ammo_section[vv.section] == true then
-			local left, box_size = vv.prob, system_ini():r_u32(vv.section, "box_size")
+			local left, box_size = vv.prob, sys_ini:r_u32(vv.section, "box_size")
 			while left > box_size do
 				if vv.section ~= nil then
 					new_obj = sim:create_ammo(vv.section, pos, lvid, gvid, pid, box_size)
@@ -326,6 +323,11 @@ function CTreasure:treasure_empty(box, box_story_id)
 end
 --' Сохранение
 function CTreasure:save(p)
+----------------------
+	p = net_packet()
+	p:w_begin( 123 )
+	p:r_seek( 2 )
+----------------------
 	--' Сохраняем размер таблицы
 	local size = 0
 	for k,v in pairs(self.treasure_info) do
@@ -337,9 +339,15 @@ function CTreasure:save(p)
 		p:w_bool(v.active)
 		p:w_bool(v.done)
 	end
+-------------------------
+	ogse.save_var( script_name() .. ".treasure_info", p, "chunk")
 end
 --' Загрузка
 function CTreasure:load(p)
+	if ogse.var_exists( script_name() .. ".treasure_info") then
+		p = ogse.load_var( script_name() .. ".treasure_info")
+	end
+------------------------
 	local t = p:r_u16()
 	for i = 1,t do
 		local k = self.treasure_by_target[p:r_u16()]
