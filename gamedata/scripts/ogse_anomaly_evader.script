@@ -119,6 +119,8 @@ function update_norm(e)
 	
 	local npc = e.obj
 	
+	if not npc:alive() then return end
+
 	if is_alife_controlled(npc) and not xr_companion.is_companion(npc:id()) then
 		return
 	end
