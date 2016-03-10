@@ -255,6 +255,7 @@ function PsyAntenna:save(p)
 		p:w_u16(v.idx)	
 	end
 end
+
 function PsyAntenna:load(p)
 	self.hit_intensity  = p:r_float()
 	self.sound_intensity  = p:r_float()	
@@ -417,6 +418,10 @@ end
 
 ---------------------------------------------------------------------------------------------------------------------
 function save( p )
+    p = net_packet()
+    p:w_begin( 123 )
+    p:r_seek( 2 )
+
 	if psy_antenna and not utils.level_changing() then
 		p:w_bool( true )
 
@@ -424,9 +429,15 @@ function save( p )
 	else
 		p:w_bool( false )
 	end
+
+    ogse.save_var( script_name(), p, "chunk")
 end
 
 function load(p)
+	if ogse.var_exists( script_name() ) then
+		p = ogse.load_var( script_name() )
+	end
+
 	local b = p:r_bool()
 
 	if b then
