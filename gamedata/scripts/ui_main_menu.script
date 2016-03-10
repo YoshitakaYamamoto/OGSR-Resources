@@ -52,7 +52,6 @@ function main_menu:InitBackground(xml)
 	local tex_orig_w = screen_aspect_ratio * 1024 * 0.5625
 	local tex_orig_x_offs = (1024 - tex_orig_w) / 2
 	self.bg_st:SetOriginalRect(tex_orig_x_offs, 0, tex_orig_w, 768);
-	integ_init()
 end
 
 function main_menu:InitControls()
