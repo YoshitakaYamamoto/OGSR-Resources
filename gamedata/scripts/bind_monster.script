@@ -200,8 +200,6 @@ function generic_object_binder:update(delta)
 			end
 		end
 	end
-	
-	ogse_debug.process_monster(self.object, "upd", 4)
 		
 	ogse_debug.process_monster(self.object, "upd", 5)
 
@@ -212,13 +210,6 @@ function generic_object_binder:update(delta)
 			jekan_update.controller_special_effect(p_obj)
 			jekan_update.actor_weapon_drop()
 		end
-	end
-
-     --' Слепые псы
-	if self.object:alive() and self:actor_targets_monster(self.object) and (string.find(self.object:section(), "dog_v_strong") or string.find(self.object:section(), "psy_dog") or string.find(self.object:section(), "psy_dog_radar")) then
-		--ogse_monster.psy_dog(self.object)
-		--ogse.send_tip("Вызвалось. Собака в прицеле.") 							
-		--log1("Вызвалось. Собака в прицеле.")
 	end
 	
 	ogse_debug.process_monster(self.object, "upd", 6)
@@ -255,8 +246,6 @@ function generic_object_binder:update(delta)
 	else
 		self.object:set_tip_text_default()
 	end
-	
-	ogse_debug.process_monster(self.object, "upd", 9)
 
 	ogse_debug.process_monster(self.object, "upd", 10)	
 
@@ -478,15 +467,15 @@ function generic_object_binder:net_spawn(sobject)
 	
 	ogse_debug.process_monster(self.object, "m_spw", 4)
 
-	local particle_param = utils.cfg_get_string(system_ini(), self.object:section(), "bones_particles", null, false, false, nil)
+	local particle_param = utils.cfg_get_string(sys_ini, self.object:section(), "bones_particles", null, false, false, nil)
 	
 	ogse_debug.process_monster(self.object, "m_spw", 5)
 	
-	if particle_param and system_ini():section_exist(particle_param) then
-		local tmp=ogse.parse_ini_section_to_array(system_ini(),particle_param)
+	if particle_param and sys_ini:section_exist(particle_param) then
+		local tmp=ogse.parse_ini_section_to_array(sys_ini,particle_param)
 		
 		for k,v in pairs(tmp) do
-			local t = ogse.parse_ini_section_to_array(system_ini(), v)
+			local t = ogse.parse_ini_section_to_array(sys_ini, v)
 			t.obj = self.object
 			if not t.stop_on_death or self.object:alive() then
 				play_particle(self.object, t)
