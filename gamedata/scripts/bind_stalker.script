@@ -32,8 +32,6 @@ local game_difficulty_by_num = {
 	[3] = "gd_master"
 	}
 
-lasthealth  = 0
-lasttime	= 0
 post_process = 0
 local weapon_hide = false
 
@@ -45,7 +43,7 @@ function actor_binder:__init(obj) super(obj)
 	self.object:disable_info_portion("ui_inventory")
 	sim = alife()
 	self.bCheckStart = false
-	self.actor_detector = xr_detector.actor_detector()
+	--self.actor_detector = xr_detector.actor_detector()
 	self.am = ogse_signals.get_mgr()
 	self.am:call("on_load_before_all")
 	self.am:call("on_init", obj)
@@ -65,35 +63,26 @@ function actor_binder:net_spawn(data)
 	xr_gulag.make_restrictors_registry()
 	
 	ogse_debug.process_actor("a_spw", 2)
-	
+
 	self.bCheckStart = true
 	self.weapon_hide = false -- спрятано или нет оружие при разговоре.
 	weapon_hide = false -- устанавливаем глобальный дефолтовый флаг.
-	
-	ogse_debug.process_actor("a_spw", 3)
 
-	--[[if object_binder.net_spawn(self,data) == false then
-		ogse_debug.process_actor("a_spw", 0)
-		return false
-	end]]
-	
 	ogse_debug.process_actor("a_spw", 4)
 
 	db.add_actor(self.object)
-	
+
 	ogse_debug.process_actor("a_spw", 5)
-	
+
 	set_extensions_flags(15)
-	
+
 	ogse_debug.process_actor("a_spw", 6)
 
 	if self.st.disable_input_time == nil then
 		level.enable_input()
 	end
-	
-	ogse_debug.process_actor("a_spw", 7)
 
-	ogse_debug.process_actor("a_spw", 8)
+	ogse_debug.process_actor("a_spw", 7)
 
 	if(actor_stats.add_to_ranking~=nil)then
 		actor_stats.add_to_ranking(self.object:id())
@@ -105,9 +94,6 @@ function actor_binder:net_spawn(data)
 	death_manager.init_drop_settings()
 	
 	ogse_debug.process_actor("a_spw", 10)
-	
-	
-	ogse_debug.process_actor("a_spw", 11)
 	
     ogse.on_game_load()
 	
@@ -126,19 +112,9 @@ function actor_binder:net_spawn(data)
 	
 	ogse_debug.process_actor("a_spw", 14)
 	
-	local screen = device()
-	local scr_width = screen.width
-	local scr_height = screen.height
-
-	if scr_width > 0 and scr_height > 0 then
-		ui_rad.orig_aspect = scr_width / scr_height
-	end	
-	
-	ogse_debug.process_actor("a_spw", 15)
-	
--------- пауза при загрузке ---------------
+-------- пауза при загрузке --------
 	ui_main_menu.start()
--------------------------------------------
+------------------------------------
 
 	ogse_debug.process_actor("a_spw", 0)
 
@@ -151,7 +127,6 @@ function actor_binder:net_destroy()
 	if(actor_stats.remove_from_ranking~=nil)then
 		actor_stats.remove_from_ranking(self.object:id())
 	end
---	game_stats.shutdown ()
 	set_extensions_flags(0)
 	db.del_actor(self.object)
 
@@ -161,7 +136,6 @@ function actor_binder:net_destroy()
 	self.object:set_callback(callback.article_info, nil)
 	self.object:set_callback(callback.on_item_take, nil)
 	self.object:set_callback(callback.on_item_drop, nil)
-	--self.object:set_callback(callback.actor_sleep, nil)
 	self.object:set_callback(callback.task_state, nil)
 	self.object:set_callback(callback.level_border_enter, nil)
 	self.object:set_callback(callback.level_border_exit, nil)
@@ -180,9 +154,9 @@ function actor_binder:net_destroy()
 	self.object:set_callback(callback.hit, nil)
 	
 	self.object:set_callback(callback_ex.on_goodwill_change, nil)
---	self.object:set_callback(callback_ex.on_release_npc, nil)
 	
 	self.object:set_callback(callback.death, nil)
+	self.object:set_callback(callback_ex.on_after_save, nil)
 
 	self.object:set_callback(callback_ex.dbg_gg_distance_failed, nil)
 
@@ -196,10 +170,6 @@ function actor_binder:net_destroy()
 
 	xr_sound.stop_all_sound_object()
 	
-	ogse_dynamic_hud.switch_shader_effects("off")
-	cmd("r2_render_mode normal")
-
-	ogse.on_net_destroy()
 	self.am:call("on_destroy")
 	event("actor_destroy"):trigger()
 end
@@ -219,9 +189,7 @@ function actor_binder:reinit()
 	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
 	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)
 	self.object:set_callback(callback.trade_sell_buy_item, self.on_trade, self) -- for game stats
-	--self.object:set_callback(callback.actor_sleep, self.sleep_callback, self) -- сна в движке нет
 	self.object:set_callback(callback.task_state, self.task_callback, self)
-	--self.object:set_callback(callback.map_location_added, self.map_location_added_callback, self)
 	self.object:set_callback(callback.level_border_enter, self.level_border_enter, self)
 	self.object:set_callback(callback.level_border_exit, self.level_border_exit, self)
 	self.object:set_callback(callback.take_item_from_box, self.take_item_from_box, self)
@@ -240,13 +208,11 @@ function actor_binder:reinit()
 	self.object:set_callback(callback_ex.on_slot, self.item_to_slot, self)		-- перемещение предмета в слот
 	self.object:set_callback(callback_ex.on_hud_animation_end, self.hud_animation_end, self) -- вызывается в конце проигрывания анимации худа (только если используем play_hud_animation)
 	self.object:set_callback(callback_ex.on_goodwill_change, self.on_goodwill_change, self)		-- изменение отношений
---	self.object:set_callback(callback_ex.on_release_npc, self.on_release_npc, self)		-- удаление серверного объекта непися или монстра
 	--
 	self.object:set_callback(callback_ex.entity_alive_before_hit, self.before_hit_callback, self)
 	self.object:set_callback(callback_ex.on_before_use_item, self.before_use, self)
-	
-	--self.object:set_callback(callback_ex.dbg_gg_distance_failed,					self.debug_monster_follow_path,		self)
-	--
+	self.object:set_callback(callback_ex.on_after_save, self.after_save, self)
+
 	self.am:call("on_reinit")
 	event("actor_reinit"):trigger()
 end
@@ -254,16 +220,10 @@ end
 function actor_binder:hud_animation_end(a1, blend_addr)
 	local addr = sum_args_ex(blend_addr, 56)
 	local value = db.actor:get_memory_int("", addr)
-
-	--log3("[actor_binder:hud_animation_end] blend_addr = %x, v = %d, a1 = %d", blend_addr, value, a1)
 end
 function actor_binder:on_goodwill_change(from, to)
 	self.am:call("on_goodwill_change", from, to)
 end
-
---function actor_binder:on_release_npc(npc_id)
---	self.am:call("on_release_npc", npc_id)
---end
 
 controllerSoundPresentOnDeath = false
 function actor_binder:actor_death_callback(victim, who)
@@ -298,43 +258,21 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:take_item_from_box(box, item)
 	local story_id = box:story_id()
-	if story_id == nil then
-		return
-	end
-
+	if story_id == nil then return end
 	treasure_manager.take_item_from_box(box, story_id)
---[[
-	local respawner = se_respawn.get_respawner_by_parent(story_id)
-	if respawner == nil then
-		return
-	end
 
-	--' Необходимо уменьшить счетчик в респавнере
-	respawner:remove_spawned(item:id())
-
-	local smart_terrain = db.strn_by_respawn[respawner:name()]
-	if smart_terrain == nil then
-		return
-	end
-
-	local npc = smart_terrain.gulag:get_nearest_online_obj(db.actor:position())
-    if npc ~= nil then
-	    xr_sound.set_sound_play(npc, "reac_box")
-	    xr_gulag.setGulagEnemy(smart_terrain:name() , db.actor)
-    end
-]]
 	self.am:call("on_take_from_box", box, item, sim:object(item:id()))
 	event("actor_take_item_from_box"):trigger({from = box, what = item})
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:level_border_enter(npc, info_id)
-	self.actor_detector:actor_enter()
+	--self.actor_detector:actor_enter()
 	self.am:call("on_level_border_enter", npc, info_id)
 	event("actor_level_border_enter"):trigger({who = npc, info = info_id})
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:level_border_exit(npc, info_id)
-	self.actor_detector:actor_exit()
+	--self.actor_detector:actor_exit()
 	self.am:call("on_level_border_exit", npc, info_id)
 	event("actor_level_border_exit"):trigger({who = npc, info = info_id})
 end
@@ -396,7 +334,6 @@ function actor_binder:info_callback(npc, info_id)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_trade(item, sell_bye, money)
-	--game_stats.money_trade_update(sell_bye and money or -money)
 	self.am:call("on_trade", item, sell_bye, money)
 	event("actor_trade"):trigger({what = item, money = money, item_is_sold = sell_bye})
 end
@@ -413,9 +350,6 @@ function actor_binder:article_callback(npc, group, name, article_type)
 	event("actor_article"):trigger({who = npc, article_group = group, article_name = name, article_type = article_type})
 end
 ----------------------------------------------------------------------------------------------------------------------
-debug_item_id = nil
-debug_item_name = nil
-
 
 local remove_this_shit_immediately = {
 	["fake_grenades_base"] = true,
@@ -454,23 +388,16 @@ end
 function actor_binder:on_item_take(obj)
 
 	ogse_debug.process_actor("itm_t", 1)
-	
-	local sobj = nil
-	
-	if not obj then 
-		ogse_debug.process_actor("itm_t", 0)
-		return 
-	else	
-		local id = obj:id()
-		sobj = alife():object(id)
-		if not sobj then
-			if obj:section() ~= "bolt" then
-				db.actor:drop_item(obj)
-			end
-			ogse_debug.process_actor("itm_t", 0)
-			return
+
+	if not obj then ogse_debug.process_actor("itm_t", 0) return end
+	local sobj = alife():object(obj:id())
+	if not sobj then
+		if obj:section() ~= "bolt" then
+			db.actor:drop_item(obj)
 		end
-	end	
+		ogse_debug.process_actor("itm_t", 0)
+		return
+	end
 
 	ogse_debug.process_actor("itm_t", 2)
 	
@@ -494,11 +421,7 @@ function actor_binder:on_item_take(obj)
 	ogse_debug.process_actor("itm_t", 4)
 	
     level_tasks.proceed(self.object)
-	remkit_main.skip_updates = 3
 
-	ogse_debug.process_actor("itm_t", 5)	
-	
-    --game_stats.update_take_item (obj, self.object)
     ogse.on_item_take(obj)
 
 	ogse_debug.process_actor("itm_t", 6)
@@ -509,16 +432,11 @@ function actor_binder:on_item_take(obj)
 
 	ogse_debug.process_actor("itm_t", 7)
 		
-	ogse_debug.process_actor("itm_t", 8)
-	
-	--if obj:section() ~= "bolt" then
-		local sobj = sim:object(obj:id()) 
-		if sobj then -- такое бывает, если до этого объект был удалён в on_ruck
---		log1(obj:section())
-			self.am:call("on_take", obj, sobj)
-			event("actor_item_take"):trigger({what = obj})
-		end
-	--end
+	local sobj = sim:object(obj:id()) 
+	if sobj then -- такое бывает, если до этого объект был удалён в on_ruck
+		self.am:call("on_take", obj, sobj)
+		event("actor_item_take"):trigger({what = obj})
+	end
 	
 	ogse_debug.process_actor("itm_t", 0)
 end
@@ -541,19 +459,11 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:use_inventory_item(obj)
 	ogse_debug.process_actor("itm_u", 1)
-	
-	if not obj then 
-		ogse_debug.process_actor("itm_u", 0)
-		return 
-	else	
-		local id = obj:id()
-		local sobj = alife():object(id)
-		if not sobj then
-			ogse_debug.process_actor("itm_u", 0)
-			return
-		end
-	end	
-	
+
+	if not obj then ogse_debug.process_actor("itm_u", 0) return end
+	local sobj = alife():object(obj:id())
+	if not sobj then ogse_debug.process_actor("itm_u", 0) return end
+
 	ogse.use_inventory_item(obj)
 	ogse_debug.process_actor("itm_u", 0)
 	self.am:call("on_use", obj, sim:object(obj:id()))
@@ -566,7 +476,6 @@ function actor_binder:before_hit_callback(p_s_hit, p_ignore_flags)
 end
 
 function actor_binder:actor_hit_callback(obj, amount, local_direction, who, bone_index)
-
 	ogse_critical_hit.check_critical(amount, bone_index, who)
 	checker_minefield.on_act_hit()
 	self.am:call("on_hit", obj, amount, local_direction, who, bone_index)
@@ -598,14 +507,6 @@ function actor_binder:task_callback(_task, _objective, _state)
 	event("actor_task"):trigger({task = _task, objective = _objective, state = _state})
 end
 
-----------------------------------------------------------------------------------------------------------------------
-function actor_binder:map_location_added_callback(spot_type_str, object_id)
-	if (false==app_ready()) or (device().precache_frame>1) then return end
-	--'news_manager.send_task(db.actor, "new")
-	self.am:call("on_add_map_location", spot_type_str, object_id)
-	event("actor_add_map_location"):trigger({spot_type = spot_type_str, object_id = object_id})
-end
-----------------------------------------------------------------------------------------------------------------------
 local cnt = 0
 local update_was_never_called = true
 ----------------------------------------------------------------------------------------------------------------------
@@ -613,7 +514,7 @@ function actor_binder:update(delta)
 	--// Для персональных функций, в обновлениях. Phoenix
 	personal_update.main()
 	--//End
-	
+
 	if cnt == 0 then
 		for k, v in pairs(xr_companion.companions) do
 			if xr_companion.companions[k] == "companion" then
@@ -628,47 +529,23 @@ function actor_binder:update(delta)
 	ogse_debug.check_npc()
 	ogse_debug.check_monsters()	
 	ogse_debug.check_gulag()	
-	
-	ogse_debug.process_actor("upd", 1)
-	
-	local time = time_global()
 
-	ogse_debug.process_actor("upd", 2)
-	
-	jekan_update.watchdog_quest()
-	
-	ogse_debug.process_actor("upd", 3)
+	--ogse_debug.process_actor("upd", 3)
+	--self.actor_detector:update() --апдейт схемы детектора
 
-	-- апдейт схемы детектора
-	self.actor_detector:update()
-	
 	ogse_debug.process_actor("upd", 4)
+	xr_sound.update_actor() --апдейт звуковой схемы актера
 
-	-- апдейт звуковой схемы актера
-	xr_sound.update_actor()
-	
 	ogse_debug.process_actor("upd", 5)
-	
-	--' Проверка потери жизни
---[[
-	if self.object.health - lasthealth > 0.001 or
-	   self.object.health - lasthealth < -0.001 then
-		lasthealth = self.object.health
-		lasttime = game.time()
-	end
-]]
-	-- Обновление отключения ввода с клавиатуры.
-	if self.st.disable_input_time ~= nil and
+	if self.st.disable_input_time ~= nil and --Обновление отключения ввода с клавиатуры.
 	   game.get_game_time():diffSec(self.st.disable_input_time) >= self.st.disable_input_idle
 	then
 		level.enable_input()
 		self.st.disable_input_time = nil
 	end
-	
+
 	ogse_debug.process_actor("upd", 6)
-	
-	-- Обновление сна с переносом чувака в указанную позицию
-	if self.st.sleep_relocate_time ~= nil and
+	if self.st.sleep_relocate_time ~= nil and --Обновление сна с переносом чувака в указанную позицию
 	   game.get_game_time():diffSec(self.st.sleep_relocate_time) >= self.st.sleep_relocate_idle
 	then
 		self.object:set_actor_position(self.st.sleep_relocate_point)
@@ -678,9 +555,7 @@ function actor_binder:update(delta)
 	end
 
 	ogse_debug.process_actor("upd", 7)
-	
-	-- Апдейт прятание оружия игрока во время диалога
-	if weapon_hide == true or self.object:is_talking() then
+	if weapon_hide == true or self.object:is_talking() then --Апдейт прятание оружия игрока во время диалога
 		if self.weapon_hide == false then
 			self.object:hide_weapon()
 			self.weapon_hide = true
@@ -692,42 +567,37 @@ function actor_binder:update(delta)
 		end
 	end
 
-	ogse_debug.process_actor("upd", 8)
-	
-	-- обновление рестрикторов, которые под логикой, срабатывает через интервалы времени
-	if self.next_restrictors_update_time < time then
+	ogse_debug.process_actor("upd", 8) --перевести это всё на сигналы на низкий приоритет. как раз подходит по частоте апов.
+	if self.next_restrictors_update_time < time_global() then --обновление рестрикторов, которые под логикой, срабатывает через интервалы времени
 		ogse_debug.process_actor("upd", 811)
 		bind_restrictor.actor_update(delta)
+
 		ogse_debug.process_actor("upd", 812)
-		-- Апдейтим наш телепорт
-		bind_mteleport.actor_update(delta)
+		bind_mteleport.actor_update(delta) --Апдейтим наш телепорт
+
 		ogse_debug.process_actor("upd", 813)
-		self.next_restrictors_update_time = time + 200
 		task_manager.actor_update()
+
 		ogse_debug.process_actor("upd", 814)
 		ogse_water_restrictor.actor_update(delta)
+
+		self.next_restrictors_update_time = time_global() + 200
 	end
 
 	ogse_debug.process_actor("upd", 9)
-	
-	-- обновление постпроцессов
-	if post_process ~= 0 then
+	if post_process ~= 0 then --обновление постпроцессов
 		if post_process:update () == true then
 		   post_process = 0
 		end
 	end
 	
 	ogse_debug.process_actor("upd", 10)
-
-	-- обновление пси-антенны
-	if sr_psy_antenna.psy_antenna then
+	if sr_psy_antenna.psy_antenna and level.name() == "l10_radar" then --обновление пси-антенны апдейтиться будет только если актор находится на радаре.
 		sr_psy_antenna.psy_antenna:update(delta)
 	end
 
 	ogse_debug.process_actor("upd", 11)
-	
-	--' Вывод сообщения о большой радиации
-	if self.object.radiation >= 0.7 then
+	if self.object.radiation >= 0.7 then --Вывод сообщения о большой радиации
 		local hud = get_hud()
 		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
 		if custom_static == nil then
@@ -743,18 +613,11 @@ function actor_binder:update(delta)
 	end
 
 	ogse_debug.process_actor("upd", 12)
-
  	if self.bCheckStart then
-		if not has_alife_info("storyline_actor_start") and
-		   (level.name() == "l01_escape")
-		then
+		if not has_alife_info("storyline_actor_start") and (level.name() == "l01_escape") then
 	        self.am:call("on_storyline_start")
 			self.object:give_info_portion("storyline_actor_start")
 		end
-
---		if not has_alife_info("encyclopedy") then
---			self.object:give_info_portion("encyclopedy")
---		end
 
 		if not has_alife_info("global_dialogs") then
 			self.object:give_info_portion("global_dialogs")
@@ -764,49 +627,33 @@ function actor_binder:update(delta)
 			self.object:give_info_portion("level_changer_icons")
 		end
 
-		--level_tasks.add_lchanger_location()
 		ogse_lc_mngr.lc_restore_location()
 
 		self.bCheckStart = false
 	end
 	
 	ogse_debug.process_actor("upd", 13)
-	
-	-- Обновление актора
-	ogse.on_actor_update()
+	ogse.on_actor_update() --Обновление актора
 	
 	ogse_debug.process_actor("upd", 14)
-	
 	_sdata.vis_int()
-	
+------------------------------------------------------
 	ogse_debug.process_actor("upd", 15)
-	
-	self.am:call("on_update", delta)
-	
-	ogse_debug.process_actor("upd", 16)
-	
+	self.am:call("on_update", delta)	
 	if update_was_never_called then
+		ogse_debug.process_actor("upd", 16)
 		self.am:call("on_first_update")
 		update_was_never_called = false
 	end
-	
-	ogse_debug.process_actor("upd", 17)
-
 	event("actor_update"):trigger({delta = delta})
-	
+-----------------------------------------------------
 	ogse_debug.process_actor("upd", 18)
-	
-	-- Обновление упаковщика патронов -- должно быть предпоследним на апе актора!
-	dunin_ammo.on_update()	
+	dunin_ammo.on_update() --Обновление упаковщика патронов -- должно быть предпоследним на апе актора!
 	
 	ogse_debug.process_actor("upd", 19)
-	
-	-- Отложенное удаление патронов -- должно быть последним на апе актора!
-	
-	death_manager.release_deferred_ammo()
+	death_manager.release_deferred_ammo() --Отложенное удаление патронов -- должно быть последним на апе актора!
 	
 	ogse_debug.process_actor("upd", 0)
-
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_key(key)
@@ -818,158 +665,99 @@ function actor_binder:on_key(key)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_key_free(key)
-	ogse_debug.process_actor("key_f", 1)
-	ogse.on_key_free(key, dik_to_bind(key))
-	ogse_debug.process_actor("key_f", 0)
 	self.am:call("on_key_up", key, dik_to_bind(key))
 	event("key_up"):trigger({key = key, bind = dik_to_bind(key)})
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_key_hold(key)
-	ogse_debug.process_actor("key_h", 1)
-	ogse.on_key_hold(key, dik_to_bind(key))
-	ogse_debug.process_actor("key_h", 0)
 	self.am:call("on_key_hold", key, dik_to_bind(key))
 	event("key_hold"):trigger({key = key, bind = dik_to_bind(key)})
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_wheel_rotation(vol)
-	ogse_debug.process_actor("key", 1)
-	ogse.on_wheel_rotation(vol-100000)
-	ogse_debug.process_actor("key", 0)
 	self.am:call("on_wheel", vol-100000)
 	event("mouse_wheel"):trigger({val = vol-100000})
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_mouse_move(velx, vely)
-	ogse_debug.process_actor("key", 1)
-	ogse.on_mouse_move(velx, vely)
-	ogse_debug.process_actor("key", 0)
 	self.am:call("on_mouse_move", velx-100000, vely-100000)
 	event("mouse_move"):trigger({ x = velx-100000, y = vely-100000})
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:item_to_belt(obj)
-	ogse.on_item_to_belt(obj)
+	if not obj then return end
 	local sobj = sim:object(obj:id())
-	if sobj then
-		self.am:call("on_item_to_belt", obj, sobj)
-		event("actor_item_to_belt"):trigger({what = obj})
-	end
+	if not sobj then return end
+
+	self.am:call("on_item_to_belt", obj, sobj)
+	event("actor_item_to_belt"):trigger({what = obj})
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:item_to_backpack(obj)
-	ogse.on_item_to_backpack(obj)
+	if not obj then return end
 	local sobj = sim:object(obj:id())
-	if sobj then -- такое бывает, когда спавним в инвентарь предмет, а потом его тут же удаляем ещё выхода в онлайн
-		self.am:call("on_item_to_ruck", obj, sobj)
-		event("actor_item_to_ruck"):trigger({what = obj})
-	end
+	if not sobj then return end
+
+	self.am:call("on_item_to_ruck", obj, sobj)
+	event("actor_item_to_ruck"):trigger({what = obj})
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:item_to_slot(obj)
-	ogse.on_item_to_slot(obj)
+	if not obj then return end
 	local sobj = sim:object(obj:id())
-	if sobj then
-		self.am:call("on_item_to_slot", obj, sobj)
-		event("actor_item_to_slot"):trigger({what = obj})
-	end
+	if not sobj then return end
+
+	self.am:call("on_item_to_slot", obj, sobj)
+	event("actor_item_to_slot"):trigger({what = obj})
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:save(packet)
-
 	ogse.on_game_save(packet)
 
 	if rx_ai then rx_ai.actor_save(packet) end
 
-	local pk1 = fake_net_packet.fake_net_packet()
-	self:save_old(pk1)
-	
-	log1("~~Actor netpacket size "..pk1:w_tell())
-	get_console():execute("flush")
-	
-	if pk1:w_tell() > 7500 then
-		task_manager.cleanup_actor()
-	end	
-	
-	if pk1:w_tell() > 7700 then
-		task_manager.cleanup_actor()
+	ogse.save_var("game_difficulty", level.get_game_difficulty()) --Сохраняем уровень сложности
+
+	if self.st.disable_input_time then --Сохраняем данные об отключенном вводе
+		log1("self.st.disable_input_time STORED: "..tostring(self.st.disable_input_time))
+		ogse.save_var("disable_input_time", self.st.disable_input_time, "time")
+	elseif ogse.var_exists("disable_input_time") then
+		log1("disable_input_time DELETED!")
+		ogse.delete_var("disable_input_time")
 	end
-	
-	
-	self:save_old(packet)
+
+	xr_logic.pstor_save_all(self.object, packet)
+	treasure_manager.save(packet)
+	task_manager.save(packet)
+	sr_psy_antenna.save(packet)
+	--self.actor_detector:save(packet)
+
+	log1("~~Actor netpacket size "..packet:w_tell())
+
 	self.am:call("on_save", packet)
 	event("actor_save"):trigger({packet = packet})
 	self.am:call("on_save_after_all")
 end 
-
-function actor_binder:save_old(packet)
-	local save_treasure_manager = true
-
-	--' Сохраняем уровень сложности
-	if save_treasure_manager == true then
-		packet:w_u8(level.get_game_difficulty() + 128)
-	else
-		packet:w_u8(level.get_game_difficulty())
-	end
-
-
-	--' Сохраняем данные об отключенном вводе
-	if self.st.disable_input_time == nil then
-		packet:w_bool(false)
-	else
-		packet:w_bool(true)  ---- fixed by Kamikazze
-		utils.w_CTime(packet, self.st.disable_input_time)
-	end
-
-	xr_logic.pstor_save_all(self.object, packet)
-
-	sr_psy_antenna.save( packet )
-
-	if save_treasure_manager == true then
-		treasure_manager.save(packet)
-	end
-
-	task_manager.save(packet)
-	self.actor_detector:save(packet)
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:after_save()
+	self.am:call( "on_after_save" )
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:load(reader)
+	local game_difficulty = ogse.load_var("game_difficulty", 3) --Загружаем уровень сложности
+	get_console():execute("g_game_difficulty "..game_difficulty_by_num[game_difficulty]) --и устанавливаем его.
 
-	--' Загружаем уровень сложности
-	local game_difficulty = reader:r_u8()
-
-	local load_treasure_manager = false
-	if game_difficulty >= 128 then
-		game_difficulty = game_difficulty - 128
-		load_treasure_manager = true
-	end
-
-	if game_difficulty_by_num[game_difficulty] ~= nil then -- изменено KamikaZze с целью отладки 25/02/2009
-		get_console():execute("g_game_difficulty "..game_difficulty_by_num[game_difficulty])
-	else 	
-		get_console():execute("g_game_difficulty ".."gd_master")
-	end
-
-	if reader:r_eof() then
-		abort("SAVE FILE IS CORRUPT")
-	end
-
-	local stored_input_time = reader:r_u8()
-	if stored_input_time == true then
-		self.st.disable_input_time = utils.r_CTime(reader)
+	if ogse.var_exists("disable_input_time") then
+		self.st.disable_input_time = ogse.load_var("disable_input_time")
+		log1("LOADING self.st.disable_input_time: "..tostring(self.st.disable_input_time))
 	end
 
 	xr_logic.pstor_load_all(self.object, reader)
-
-	sr_psy_antenna.load(reader)
-
-	if load_treasure_manager == true then
-		treasure_manager.load(reader)
-	end
-
+	treasure_manager.load(reader)
 	task_manager.load(reader)
-	self.actor_detector:load(reader)
+	sr_psy_antenna.load(reader)
+	--self.actor_detector:load(reader)
+
 	self.am:call("on_load", reader)
 	event("actor_load"):trigger({packet = reader})
 end
