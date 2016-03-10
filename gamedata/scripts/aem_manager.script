@@ -18,40 +18,8 @@ local sim = alife()
 local spawn_db = ogse_spawn_db.script_spawn_registry.aem_manager
 
 ---------------------------------------------------------------------------------------------------
--- вывод отладочной информации
----------------------------------------------------------------------------------------------------
---SPAWN_V1 : примечание. Смотри также файл config\misc\aem_manager.ltx и отметку в нём
-
-function printf(fmt, ...)
---	local msg = string.format(fmt, ...)
---	local msg_no_ws = string.gsub(msg, "%s", "_")
---	get_console():execute("dbg:" .. msg_no_ws)
-end
-
----------------------------------------------------------------------------------------------------
 -- функции для работы с ltx
 ---------------------------------------------------------------------------------------------------
-
-function read_string(ini, section, field, candef, def)
-	if ini:section_exist(section) and ini:line_exist(section, field) then
-		return ini:r_string(section, field)
-	end
-	if candef == false then
-		abort("can't read string field '" .. field .. "' from section [" .. section .. "]")
-	end
-	return def
-end
-
-function read_number(ini, section, field, candef, def)
-	if ini:section_exist(section) and ini:line_exist(section, field) then
-		return ini:r_float(section, field)
-	end
-	if candef == false then
-		abort("can't read number field '" .. field .. "' from section [" .. section .. "]")
-	end
-	return def
-end
-
 function parse_place(line)
 	if line == nil then
 		abort("no value for section [place] in aem_manager.ltx")
@@ -72,48 +40,46 @@ function parse_place(line)
 end
 
 function load_team(ini, section)
-	--printf("load_team('%s')", section)
 	local info = {}
-	info.name   = read_string(ini, section, "name", true, "aem_" .. section)
-	info.name1  = read_string(ini, section, "name1", true, "aem_" .. section .. "1")
-	info.name2  = read_string(ini, section, "name2", true, "aem_" .. section .. "2")
-	info.intro  = read_string(ini, section, "intro", true, nil)
-	info.extro  = read_string(ini, section, "extro", true, nil)
-	info.spawn1 = parse_names(read_string(ini, section, "spawn1", true, ""))
-	info.spawn2 = parse_names(read_string(ini, section, "spawn2", true, ""))
-	info.place1 = parse_names(read_string(ini, section, "place1", false, nil))
-	info.place2 = parse_names(read_string(ini, section, "place2", false, nil))
-	info.humans_min = read_number(ini, section, "humans_min", true, 6)
-	info.humans_max = read_number(ini, section, "humans_max", true, 6)
-	info.mutants_min = read_number(ini, section, "mutants_min", true, 6)
-	info.mutants_max = read_number(ini, section, "mutants_max", true, 6)
+	info.name   = get_string(section, "name", "aem_" .. section)
+	info.name1  = get_string(section, "name1", "aem_" .. section .. "1")
+	info.name2  = get_string(section, "name2", "aem_" .. section .. "2")
+	info.intro  = get_string(section, "intro", nil)
+	info.extro  = get_string(section, "extro", nil)
+	info.spawn1 = parse_names(get_string(section, "spawn1", ""))
+	info.spawn2 = parse_names(get_string(section, "spawn2", ""))
+	info.place1 = parse_names(get_string(section, "place1", nil))
+	info.place2 = parse_names(get_string(section, "place2", nil))
+	info.humans_min		= get_u32(section, "humans_min", 6)
+	info.humans_max		= get_u32(section, "humans_max", 6)
+	info.mutants_min	= get_u32(section, "mutants_min", 6)
+	info.mutants_max	= get_u32(section, "mutants_max", 6)
 	return info
 end
 
 function load_group(ini, section)
-	--printf("load_group('%s')", section)
 	local info = {}
 
-	if section == "turnament" then
-		info.title  = read_string(ini, section, "title", true, "aem_" .. section)
-		info.info   = read_string(ini, section, "info", true, "aem_" .. section .. "_info")
-		info.done   = read_string(ini, section, "done", true, "aem_" .. section .. "_done")
-		info.teams  = parse_names(read_string(ini, section, "teams", false, nil))
-		info.fights = parse_names(read_string(ini, section, "fights", false, nil))
+	if section == "aem_mgr_turnament" then
+		info.title  = get_string(section, "title", "aem_" .. section)
+		info.info   = get_string(section, "info", "aem_" .. section .. "_info")
+		info.done   = get_string(section, "done", "aem_" .. section .. "_done")
+		info.teams  = parse_names(get_string(section, "teams", nil))
+		info.fights = parse_names(get_string(section, "fights", nil))
 		info.dlg_size = 100 + 100 * (table.getn(info.teams) * (table.getn(info.teams) - 1))
-	elseif section == "stakes" then
-		info.title  = read_string(ini, section, "title", true, "aem_" .. section)
-		info.info   = read_string(ini, section, "info", true, "aem_" .. section .. "_info")
-		info.done   = read_string(ini, section, "done", true, "aem_" .. section .. "_done")
-		info.teams1 = parse_names(read_string(ini, section, "teams1", false, nil))
-		info.teams2 = parse_names(read_string(ini, section, "teams2", false, nil))
-		info.fights = parse_names(read_string(ini, section, "fights", false, nil))
+	elseif section == "aem_mgr_stakes" then
+		info.title  = get_string(section, "title", "aem_" .. section)
+		info.info   = get_string(section, "info", "aem_" .. section .. "_info")
+		info.done   = get_string(section, "done", "aem_" .. section .. "_done")
+		info.teams1 = parse_names(get_string(section, "teams1", nil))
+		info.teams2 = parse_names(get_string(section, "teams2", nil))
+		info.fights = parse_names(get_string(section, "fights", nil))
 		info.dlg_size = 100 + 100 * (table.getn(info.teams1) * table.getn(info.teams2))
 	else
-		info.title  = read_string(ini, section, "title", true, "aem_" .. section)
-		info.info   = read_string(ini, section, "info", true, "aem_" .. section .. "_info")
-		info.done   = read_string(ini, section, "done", true, "aem_" .. section .. "_done")
-		info.fights = parse_names(read_string(ini, section, "fights", false, nil))
+		info.title  = get_string(section, "title", "aem_" .. section)
+		info.info   = get_string(section, "info", "aem_" .. section .. "_info")
+		info.done   = get_string(section, "done", "aem_" .. section .. "_done")
+		info.fights = parse_names(get_string(section, "fights", nil))
 		info.dlg_size = 100
 	end
 
@@ -121,44 +87,43 @@ function load_group(ini, section)
 end
 
 function load_fight(ini, section, group)
-	--printf("load_fight('%s')", section)
 	local info = {}
 	info.group = group
 
-	if group == "turnament" then
-		info.done  = read_string(ini, section, "done", true, "aem_" .. section .. "_done")
-		info.intro = read_string(ini, section, "intro", true, nil)
-		info.extro = read_string(ini, section, "extro", true, nil)
-		info.team1 = read_string(ini, section, "team1", true, "aem_" .. section .. "_1")
-		info.team2 = read_string(ini, section, "team2", true, "aem_" .. section .. "_2")
-		info.winer = read_string(ini, section, "winer", true, nil)
+	if group == "aem_mgr_turnament" then
+		info.done  = get_string(section, "done", "aem_" .. section .. "_done")
+		info.intro = get_string(section, "intro", nil)
+		info.extro = get_string(section, "extro", nil)
+		info.team1 = get_string(section, "team1", "aem_" .. section .. "_1")
+		info.team2 = get_string(section, "team2", "aem_" .. section .. "_2")
+		info.winer = get_string(section, "winer", nil)
 		info.dlg_size = 0
-	elseif group == "stakes" then
-		info.done  = read_string(ini, section, "done", true, "aem_" .. section .. "_done")
-		info.intro = read_string(ini, section, "intro", true, nil)
-		info.extro = read_string(ini, section, "extro", true, nil)
-		info.team1 = read_string(ini, section, "team1", true, "aem_" .. section .. "_1")
-		info.team2 = read_string(ini, section, "team2", true, "aem_" .. section .. "_2")
+	elseif group == "aem_mgr_stakes" then
+		info.done  = get_string(section, "done", "aem_" .. section .. "_done")
+		info.intro = get_string(section, "intro", nil)
+		info.extro = get_string(section, "extro", nil)
+		info.team1 = get_string(section, "team1", "aem_" .. section .. "_1")
+		info.team2 = get_string(section, "team2", "aem_" .. section .. "_2")
 		info.dlg_size = 0
 	else
-		info.title = read_string(ini, section, "title", true, "aem_" .. section)
-		info.done  = read_string(ini, section, "done", true, "aem_" .. section .. "_done")
-		info.intro = read_string(ini, section, "intro", true, nil)
-		info.extro = read_string(ini, section, "extro", true, nil)
-		info.spawn = parse_names(read_string(ini, section, "spawn", false, nil))
-		info.place = parse_names(read_string(ini, section, "place", false, nil))
-		info.money = read_number(ini, section, "money", false, 0)
-		info.bonus_5s = read_number(ini, section, "bonus_5s", true, 0)
-		info.bonus_10s = read_number(ini, section, "bonus_10s", true, 0)
-		info.bonus_15s = read_number(ini, section, "bonus_15s", true, 0)
-		info.bonus_20s = read_number(ini, section, "bonus_20s", true, 0)
-		info.bonus_30s = read_number(ini, section, "bonus_30s", true, 0)
-		info.bonus_40s = read_number(ini, section, "bonus_40s", true, 0)
-		info.bonus_50s = read_number(ini, section, "bonus_50s", true, 0)
-		info.bonus_60s = read_number(ini, section, "bonus_60s", true, 0)
-		info.bonus = read_string(ini, section, "bonus", true, nil)
-		info.unlimit = read_string(ini, section, "unlimit", true, nil)
-		info.nounlimit = read_string(ini, section, "nounlimit", true, nil)
+		info.title = get_string(section, "title", "aem_" .. section)
+		info.done  = get_string(section, "done", "aem_" .. section .. "_done")
+		info.intro = get_string(section, "intro", nil)
+		info.extro = get_string(section, "extro", nil)
+		info.spawn = parse_names(get_string(section, "spawn", nil))
+		info.place = parse_names(get_string(section, "place", nil))
+		info.money = get_u32(section, "money", 0)
+		info.bonus_5s = get_u32(section, "bonus_5s", 0)
+		info.bonus_10s = get_u32(section, "bonus_10s", 0)
+		info.bonus_15s = get_u32(section, "bonus_15s", 0)
+		info.bonus_20s = get_u32(section, "bonus_20s", 0)
+		info.bonus_30s = get_u32(section, "bonus_30s", 0)
+		info.bonus_40s = get_u32(section, "bonus_40s", 0)
+		info.bonus_50s = get_u32(section, "bonus_50s", 0)
+		info.bonus_60s = get_u32(section, "bonus_60s", 0)
+		info.bonus = get_string(section, "bonus", nil)
+		info.unlimit = get_string(section, "unlimit", nil)
+		info.nounlimit = get_string(section, "nounlimit", nil)
 		info.dlg_size = 100
 	end
 
@@ -189,15 +154,12 @@ function CArenaext:__init()
 	self.mk = xr_logic.pstor_retrieve(db.actor, "aem_mk", 0)
 	self.mk_all = 0
 
-	-- чтение LTX
-	local ini = ini_file("misc\\aem_manager.ltx")
-
 	-- вещи, которые нельзя выносить с арены (удаляются при выходе с арены)
 	self.arena_items = {}
-	if ini:section_exist("arena_items") then
-		n = ini:line_count("arena_items")
+	if sys_ini:section_exist("aem_mgr_arena_items") then
+		n = sys_ini:line_count("aem_mgr_arena_items")
 		for i=0,n-1 do
-			result, id, value = ini:r_line("arena_items",i,"",nil)
+			result, id, value = sys_ini:r_line("aem_mgr_arena_items",i,"",nil)
 			--printf(" arena_items: '%s'", id)
 			self.arena_items[id] = true
 		end
@@ -205,10 +167,10 @@ function CArenaext:__init()
 
 	-- запрещённые для боя на арене вещи
 	self.remove_items = {}
-	if ini:section_exist("remove_items") then
-		n = ini:line_count("remove_items")
+	if sys_ini:section_exist("aem_mgr_remove_items") then
+		n = sys_ini:line_count("aem_mgr_remove_items")
 		for i=0,n-1 do
-			result, id, value = ini:r_line("remove_items",i,"",nil)
+			result, id, value = sys_ini:r_line("aem_mgr_remove_items",i,"",nil)
 			--printf(" remove_items: '%s'", id)
 			self.remove_items[id] = true
 		end
@@ -216,56 +178,56 @@ function CArenaext:__init()
 
 	-- вещи оставляемые ГГ во время тотализатора
 	self.keep_items = {}
-	if ini:section_exist("keep_items") then
-		n = ini:line_count("keep_items")
+	if sys_ini:section_exist("aem_mgr_keep_items") then
+		n = sys_ini:line_count("aem_mgr_keep_items")
 		for i=0,n-1 do
-			result, id, value = ini:r_line("keep_items",i,"",nil)
+			result, id, value = sys_ini:r_line("aem_mgr_keep_items",i,"",nil)
 			--printf(" keep_items: '%s'", id)
 			self.keep_items[id] = true
 		end
 	end
 
 	-- чтение списка стартовых позиций
-	if not ini:section_exist("places") then
+	if not sys_ini:section_exist("aem_mgr_places") then
 		abort("no section [places] in aem_manager.ltx")
 	end
 	self.places = {}
-	n = ini:line_count("places")
+	n = sys_ini:line_count("aem_mgr_places")
 	for i=0,n-1 do
-		result, id, value = ini:r_line("places",i,"",nil)
+		result, id, value = sys_ini:r_line("aem_mgr_places",i,"",nil)
 		--printf(" places: '%s'-'%s'", id, value)
 		self.places[id] = parse_place(value)
 	end
 
 	-- чтение команд
-	if not ini:section_exist("teams") then
+	if not sys_ini:section_exist("aem_mgr_teams") then
 		abort("no section [teams] in aem_manager.ltx")
 	end
 	self.teams = {}
-	n = ini:line_count("teams")
+	n = sys_ini:line_count("aem_mgr_teams")
 	for i=0,n-1 do
-		result, id, value = ini:r_line("teams",i,"",nil)
+		result, id, value = sys_ini:r_line("aem_mgr_teams",i,"",nil)
 		--printf(" teams: '%s'-'%s'", id, value)
-		self.teams[id] = load_team(ini, id)
+		self.teams[id] = load_team(sys_ini, "aem_mgr_"..id)
 	end
 
 	-- чтение груп и боёв
-	if not ini:section_exist("groups") then
+	if not sys_ini:section_exist("aem_mgr_groups") then
 		abort("no section [groups] in aem_manager.ltx")
 	end
 	self.groups = {}
 	self.fights = {}
-	self.groups_order = parse_names(read_string(ini, "groups", "order", false, nil))
+	self.groups_order = parse_names(get_string("aem_mgr_groups", "order", nil))
 	n = table.getn(self.groups_order)
 	local bit = 1
 	for i=1,n do
 		id = self.groups_order[i]
-		self.groups[id] = load_group(ini, id)
+		self.groups[id] = load_group(sys_ini, "aem_mgr_"..id)
 
 		n2 = table.getn(self.groups[id].fights)
 		for j=1,n2 do
 			id2 = self.groups[id].fights[j]
-			self.fights[id2] = load_fight(ini, id2, id)
+			self.fights[id2] = load_fight(sys_ini, "aem_mgr_"..id2, "aem_mgr_"..id)
 		end
 
 		if id ~= "mutants" and id ~= "special" then
@@ -277,20 +239,20 @@ function CArenaext:__init()
 
 	-- чтение 'stakes'
 	id = "stakes"
-	self.groups[id] = load_group(ini, id)
+	self.groups[id] = load_group(sys_ini, "aem_mgr_"..id)
 	n2 = table.getn(self.groups[id].fights)
 	for j=1,n2 do
 		id2 = self.groups[id].fights[j]
-		self.fights[id2] = load_fight(ini, id2, id)
+		self.fights[id2] = load_fight(sys_ini, "aem_mgr_"..id2, "aem_mgr_"..id)
 	end
 
 	-- чтение 'turnament'
 	id = "turnament"
-	self.groups[id] = load_group(ini, id)
+	self.groups[id] = load_group(sys_ini, "aem_mgr_"..id)
 	n2 = table.getn(self.groups[id].fights)
 	for j=1,n2 do
 		id2 = self.groups[id].fights[j]
-		self.fights[id2] = load_fight(ini, id2, id)
+		self.fights[id2] = load_fight(sys_ini, "aem_mgr_"..id2, "aem_mgr_"..id)
 	end
 
 	-- настройка id фраз диалога
@@ -628,78 +590,6 @@ function CArenaext:timeup()
 end
 
 -------
--- удаление мода
--------
-function CArenaext:cleanup()
-	local i, n, result, id, value, obj, section
-	--printf("CArenaext:cleanup()")
-	
-	-- чтение LTX
-	local ini = ini_file("misc\\aem_manager.ltx")
-	
-	-- возврат стандартного освещения на арене
-	aem_lights.remove_all_aem_lamps()
-	aem_lights.turn_arena_lamps_on()
-	
-	-- создание списка удаляемых инфопоршинов
-	local info = {}
-	if ini:section_exist("info") then
-		n = ini:line_count("info")
-		for i=0,n-1 do
-			result, id, value = ini:r_line("info",i,"",nil)
-			table.insert(info, id)
-		end
-	end
-	for id, value in pairs(self.groups) do
-		table.insert(info, value.done)
-	end
-	for id, value in pairs(self.fights) do
-		table.insert(info, value.done)
-	end
-	
-	-- создание списка удаляемых переменных
-	local pstor = {}
-	if ini:section_exist("pstor") then
-		n = ini:line_count("pstor")
-		for i=0,n-1 do
-			result, id, value = ini:r_line("pstor",i,"",nil)
-			table.insert(pstor, id)
-		end
-	end
-	for id, value in pairs(self.fights) do
-		if value.group == "stakes" or value.group == "turnament" then
-			table.insert(pstor, value.team1)
-			table.insert(pstor, value.team2)
-		end
-	end
-	
-	local storage = db.storage[db.actor:id()].pstor
-	
-	-- удаление инфопоршинов
-	for id, value in pairs(info) do
-		db.actor:disable_info_portion(value)
-	end
-	
-	-- удаление переменных
-	for id, value in pairs(pstor) do
-		if storage[value] ~= nil then
-			storage[value] = nil
-		end
-	end
-
-	-- удаление объектов
-	for id=0, 65535 do
-		obj = sim:object(id)
-		if obj then
-			if string.find(obj:name(), "aem_") then
-				sim:release(obj)
-			end
-		end
-	end
-	news_manager.send_tip(db.actor, "%c[25,240,25,25]АРЕНА-МОД УДАЛЁН", nil, nil, 30000)
-end
-
--------
 -- сгенерить доступные бои
 -------
 function CArenaext:reinit()
@@ -907,7 +797,7 @@ function CArenaext:update()
 		end
 	end
 	
-	-- проверка Арни(админа) по сохранённому id: мёртв или уничтожен	
+	--проверка Арни(админа) по сохранённому id: мёртв или уничтожен	
 	if  update_time < game.get_game_time() then
 		local idle_time = game.CTime()
 		idle_time:setHMSms(0, 5, 0, 0)
@@ -1070,12 +960,12 @@ function CArenaext:update()
 			self:start_stake()		
 		end
 		
-		-- ???
+		--[[ --разрядка подствольных гранат. отключено.
 		if self.grenads then
 			if aem_grenade.unload2(self.grenads) then
 				self.grenads = nil
 			end
-		end
+		end]]
 	end
 	
 	self.lt = curr
@@ -1187,8 +1077,8 @@ function CArenaext:start(phr_id)
 		-- отнимем у ГГ опасные вещи
 		put_items_to_box(box, self.remove_items)
 		
-		-- ???
-		self.grenads = aem_grenade.unload1()
+		-- разрядка подствольных гранат. отключено.
+		--self.grenads = aem_grenade.unload1()
 		
 		-- запускаем кучу логики, завязанную на этот info_portion
 		db.actor:give_info_portion("bar_arena_fight")
@@ -2412,12 +2302,6 @@ end
 
 function timeup()
 	get_aem():timeup()
-end
--------
--- удаление мода
--------
-function cleanup()
-	get_aem():cleanup()
 end
 
 -------
