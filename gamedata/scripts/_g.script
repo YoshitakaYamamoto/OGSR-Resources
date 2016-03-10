@@ -2213,7 +2213,9 @@ callback_ex = {
 	["on_belt"]                      = 130,
 	["on_ruck"]                      = 131,
 	["on_slot"]                      = 132,
-	
+
+	["on_after_save"]				 = 140,
+
 	["on_goodwill_change"]           = 145,
 	["on_release_npc"]               = 146,
 
