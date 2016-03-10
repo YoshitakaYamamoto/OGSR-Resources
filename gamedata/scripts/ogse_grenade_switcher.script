@@ -2,7 +2,7 @@ function attach(sm)
 	sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
 end
 
-local grenades_sequence = {"grenade_f1", "grenade_rgd5", "grenade_light", "grenade_gd-05", "grenade_gas"}
+local grenades_sequence = {"grenade_f1", "grenade_rgd5", "grenade_light", "grenade_gd-05"}
 local sect2key = {}
 for i,sec in ipairs(grenades_sequence) do sect2key[sec] = i end
 
