@@ -117,8 +117,6 @@ function generic_scheme_overrides(npc)
 --	gulag_name - имя гулага, если скрипт включается гулагом, а не биндером
 --]]
 function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_name)
-	--printf("DEBUG: enable_scripts: npc:name()=%s", npc:name())
-
 	local npc_id = npc:id()
 	local st     = db.storage[npc_id]
 	
@@ -685,21 +683,20 @@ end
 -- Выполняет переключение на указанную секцию, если задана.
 -- Если section == nil, остается работать старая секция.
 function switch_to_section(npc, st, section)
-	if section == nil or section == "" then
-		return false
-	end
-	local active_section = db.storage[npc:id()].active_section
-	if active_section == section then
-		return false
-	end
+	if section == nil or section == "" then return false end
 
-	-- call scheme::finalize()
-	if active_section then
-		issue_event(npc, db.storage[npc:id()][db.storage[npc:id()].active_scheme], "deactivate", npc)
-	end
+    local npc_storage    = db.storage[npc:id()]
+    local active_section = npc_storage.active_section
+        
+    if active_section == section then return false end
 
-	db.storage[npc:id()].active_section = nil
-	db.storage[npc:id()].active_scheme = nil
+    if active_section then
+        issue_event(npc, npc_storage[npc_storage.active_scheme], "deactivate", npc)
+    end
+        
+    npc_storage.active_section = nil
+    npc_storage.active_scheme  = nil
+
 	activate_by_section(npc, st.ini, section, false)
 	return true
 end
@@ -713,17 +710,14 @@ function cond_name(cond, etalon)
 end
 
 function try_switch_to_another_section(npc, st, actor)
+	if not actor then return end
+
 	local l = st.logic
-	local npc_id = npc:id()
-
-	if not actor then
-		-- abort("try_switch_to_another_section(): error in implementation of scheme '%s': actor is nil", st.scheme)
-		return
-	end
-
 	if not l then
 		abort("Can't find script switching information in storage, scheme '%s'", st.active_scheme)
 	end
+
+	local npc_id = npc:id()
 
 	local switched = false
 	for n, c in pairs(l) do
@@ -853,7 +847,7 @@ function parse_infop1(rslt, str)
 			elseif sign == "!" then
 				rslt[infop_n] = { func = infop_name, expected = false }
 			else
-				abort_syntax_error_in_cond(npc, section, field)
+				abort("XR_LOGIC - ERROR in function parse_infop1")
 			end
 			infop_n = infop_n + 1
 		end
@@ -910,7 +904,7 @@ function parse_infop(rslt, str)
 				--printf("_bp: n = %s; r = %s", infop_name, utils.to_str(params))
 				rslt[infop_n] = { func = infop_name, expected = false, params = params }
 			else
-				abort_syntax_error_in_cond(npc, section, field)
+				abort("XR_LOGIC - ERROR in function parse_infop")
 			end
 			infop_n = infop_n + 1
 		end
@@ -1435,10 +1429,6 @@ function load_obj(obj, reader)
 		-- При этом реальная active_section станет равной nil.
 		active_section = "nil"
 	end
-	
-	if ini_filename then
-		local ini = ini_file(ini_filename)
-	end
 
 	--local active_scheme = reader:r_stringZ()
 	--if active_scheme == "" then
@@ -1478,14 +1468,18 @@ function get_customdata_or_ini_file(npc, filename)
 		if ini then
 			return ini
 		else
-			return ini_file([[scripts\dummy.ltx]])
+			return sys_ini
 		end
 	elseif string.find( filename, "*" ) == 1 then
 		-- динамический ltx
 		local p = string.find( filename, "*", 2 )
 		return gulag_tasks.loadLtx( string.sub(filename, 2, p-1), string.sub(filename, p+1) )
 	else
-		return ini_file(filename)
+		if string.find( filename, "gulag_tasks" ) then --KRodin: если нашли в названии переменной "gulag_tasks", то будем использовать быстрый sys_ini
+			return sys_ini
+		else
+			return ini_file(filename)
+		end
 	end
 end
 
