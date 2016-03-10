@@ -735,7 +735,7 @@ states = {
 				animstate = "stand",
 				animation = "wounded"
 			},
-	wounded_heavy = { weapon = "drop",
+	wounded_heavy = { weapon = "none", --weapon = "drop",
 				movement = move.stand,
 				mental = anim.danger,
 				bodystate = move.crouch,
@@ -743,7 +743,7 @@ states = {
 				animstate = "stand",
 				animation = "wounded_heavy_1"
 			},
-	wounded_heavy_2 = { weapon = "drop",
+	wounded_heavy_2 = { weapon = "none", --weapon = "drop",
 				movement = move.stand,
 				mental = anim.danger,
 				bodystate = move.crouch,
@@ -751,7 +751,7 @@ states = {
 				animstate = "stand",
 				animation = "wounded_heavy_2"
 			},
-	wounded_heavy_3 = { weapon = "drop",
+	wounded_heavy_3 = { weapon = "none", --weapon = "drop",
 				movement = move.stand,
 				mental = anim.danger,
 				bodystate = move.crouch,
