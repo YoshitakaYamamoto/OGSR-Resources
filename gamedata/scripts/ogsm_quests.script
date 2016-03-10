@@ -48,20 +48,26 @@ end
 
 -- Проверка помощи Круглову
 function kruglov_help_chek()
-	if has_alife_info("bar_rescue_research_start") and not has_alife_info("bar_kruglov_follow_actor") then
-		if level.name() ~= "l06_rostok" then db.actor:give_info_portion("bar_rescue_research_fail") end
+	if has_alife_info("bar_rescue_research_start") and not has_alife_info("bar_kruglov_follow_actor") and not has_alife_info("bar_rescue_research_fail") then
+		if level.name() ~= "l06_rostok" then
+			db.actor:give_info_portion("bar_rescue_research_fail")
+--------------Убиваем круглова------------
+			local kruglov = level_object_by_sid (story_ids.bar_ecolog_professor)
+			ogse.kill_offline_npc(kruglov)
+------------------------------------------
+		end
 	end
 end
 
--- Убиваем Круглова, если ему не помогли и провалили задание
+--[[Убиваем Круглова, если ему не помогли и провалили задание
 function kruglov_kill()
 	if level.name() == "l06_rostok" then
 		local npc = level_object_by_sid (story_ids.bar_ecolog_professor)
 		if npc ~= nil and npc:alive() == true then
-			if has_alife_info("bar_rescue_research_fail") then npc:kill(npc) end
+		npc:kill(npc)
 		end
 	end
-end
+end]]
 
 -- Функция передача экзоскелета от Борова за убийство Фраера
 function kill_fraer_complete(first_speaker, second_speaker) 
