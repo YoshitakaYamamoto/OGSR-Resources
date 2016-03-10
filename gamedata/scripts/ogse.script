@@ -5,44 +5,31 @@
 --- 2009-2013 (c) OGS Evolution Team
 -----------------------------------------------------------------------
 
-local k_timers = 1
 game_time_factor = level.get_time_factor()
-local npc_spawner={}
+local fov_vol = sys_ini:r_s32("options","fov_volume")
+local max_alarm_fov_vol = sys_ini:r_s32("options","max_fov_volume")
+local min_alarm_fov_vol = sys_ini:r_s32("options","min_fov_volume")
 local quest_dead_on_arrival = {}
-local timers={}
-local g_timers={}
-local markers={}
-local x_objs={}
-local timer_trigger=nil
-local debug_mode = system_ini():r_bool("options","debug_mode")
-local fov_vol = system_ini():r_s32("options","fov_volume")
-local max_alarm_fov_vol = system_ini():r_s32("options","max_fov_volume")
-local min_alarm_fov_vol = system_ini():r_s32("options","min_fov_volume")
-local psyzones_flag = system_ini():r_s32("options","psyzones_flag")
-offline_alife_enabled = system_ini():r_bool("options","offline_alife")
+---------------------------------------------------------------
+deadmans_table = {}
+-- Формат хранения:
+-- [id] = { time_died = time_when_killed, killer = who:id() }
+---------------------------------------------------------------
 
-local vertexes_checked = false
-local bar_timer = time_global()
-local sleep_timer = time_global()
-local car_timer = time_global()
-local ids_timer = time_global()
-local mine_timer = time_global()
-local health_time = time_global()
-local loot_timer = time_global()
-local new_mine_timer = time_global()
-local buggy_timer = time_global()
-local anom_enum = time_global()
-local armor_healing = time_global()
-local heal_interval = 200
-local watchdog = 0
-local watchdog_max = 28
-local drug_timer = time_global()
-local off_timer = time_global()
-local off_timer_1 = time_global()
-local timer_trigger_step = 500		-- шаг проверки таймеров (мс)
-local main_variable_tbl = nil
-local loaded_slot = nil
-
+-----------Псевдонимы для удобства вызова-----------
+save_var = ogse_unist.set_value
+load_var = ogse_unist.get_value
+load_var_safe = ogse_unist.get_value_safe
+var_exists = ogse_unist.value_exist
+delete_var = ogse_unist.remove_value
+save_or_delete_var = ogse_unist.set_or_remove_value
+----------------------------------------------------
+start_tmr = ogse_st_mgr.start_timer
+start_gtmr = ogse_st_mgr.start_gtimer
+get_tmr = ogse_st_mgr.get_timer
+tmr_exists = ogse_st_mgr.timer_exists
+--Таймеры с визуальным счётчиком на худе вызываются прямо отсюда. См. внизу скрипта.
+----------------------------------------------------
 
 art_levels = {
 ["af_medusa"] = 1,
@@ -145,7 +132,7 @@ function go_offline_kill_timer:action()
    local s_npc = alife():object(self.npc_id)
    if s_npc then
       alife():release(s_npc, true)
-   else
+   --else
       --send_tip("Something wrong!") -- такое возможно при удалении объекта
    end
 end
@@ -220,32 +207,6 @@ if (pos.x >= x1 and pos.x <= x2) and (pos.z >= y1 and pos.z <= y2) and (pos.y >=
 	return true
 end
 return false
-end
-
--- Проверка, является ли объект монстром
-function is_monster(object)
-local id = get_clsid (object)
-if id then
-	if id == clsid.boar_s or
-	   id == clsid.bloodsucker_s or
-	   id == clsid.dog_s or
-	   id == clsid.flesh_s or
-	   id == clsid.pseudodog_s or
-	   id == clsid.psy_dog_s or
-	   id == clsid.burer_s or
-	   id == clsid.cat_s or
-	   id == clsid.chimera_s or
-	   id == clsid.controller_s or
-	   id == clsid.fracture_s or
-	   id == clsid.poltergeist_s or
-	   id == clsid.gigant_s or
-	   id == clsid.zombie_s or
-	   id == clsid.tushkano_s or
-	   id == clsid.snork_s then
-		return 1
-	end
-end
-return 0
 end
 
 local quest_profiles = {
@@ -452,7 +413,7 @@ function go_offline_watch_timer:action()
    if s_npc then
       s_npc.position = self.pos -- кастуем злое колдунство
       s_npc.force_offline = nil -- отправляем обратно в онлайн
-   else
+   --else
       --log1("Something wrong!") -- такое возможно при удалении объекта
    end
 end
@@ -535,125 +496,54 @@ function send_tip(news_text, header, timeout, showtime, sender, sound)
 	return true
 end
 
+--****************************************ТАЙМЕРЫ - НАЧАЛО.*************************************************
+--KRodin перевёл все функции на систему ogse_st_mgr.script
+--Для создания новых таймеров использовать ТОЛЬКО ogse_st_mgr.script!!!
+class "timer_new" (ogse_st_mgr.savable_timer)
+function timer_new:__init(timer_id) super(timer_id)
+	self._class = script_name()..".timer_new"
+end
+function timer_new:set_data(timer_name,timer_action)
+	self.name = timer_name
+	self.action = timer_action
+end
+function timer_new:load(packet)
+	self.name = packet:r_stringZ()
+	self.action = packet:r_stringZ()
+end
+function timer_new:save(packet)
+	packet:w_stringZ(self.name)
+	packet:w_stringZ(self.action)
+end
+function timer_new:taction()
+	log1("timer_new: Timer ending. Ekshn doing: __do_timer_action("..self.name..","..self.action..")")
+	__do_timer_action(self.name,self.action)
+end
 
--- Старт таймера в реальном времени
 function start_timer(name,delay,action)
-	if not delay then
-		return false
-	end
+	if not delay then return end
+	if not action then action = "" end
 
-	if not action then
-		action = ""
-	end
-
-	local a=1
-	while main_variable_tbl["rt"..a] do
-		a=a+1
-		if a>100 then
-			return false
-		end
-	end
-
-	save_variable("rt"..a, name)
-	save_variable("rt"..a.."c", 0)
-	save_variable("rt"..a.."d", delay*1000)
-	save_variable("rt"..a.."p", action)
-
-	--log1("start_timer: timer started "..tostring("rt"..a).." = "..name)
-
-	return true
+	log1("timer_new: Timer in real time starting: "..tostring(name.."_"..action.."_"..delay))
+	local t = timer_new(tostring(name.."_"..action.."_"..delay)) --Нужно сложное имя, чтобы не было повторов в названиях таймеров
+	t:set_data(name,action)
+	t:set_delay(delay)
+	t:start()
+	log1("timer_new: Timer Started!")
 end
 
-
--- Старт таймера в игровом времени
 function g_start_timer(name,delay_d,delay_h,delay_m,action)
-	if delay_d==nil or delay_h==nil or delay_m==nil then
-		return false
-	end
+	if not delay_d or not delay_h or not delay_m then return end
+	if not action then action = "" end
 
-	if not action then
-		action = ""
-	end
+	local delay_general = delay_d * 24 * 3600 + delay_h * 3600 + delay_m * 60 --переводим в секунды
 
-	local gtime = game.time() --time in seconds since 1970
-	local a=1
-	while main_variable_tbl["gt"..a] do
-		a=a+1
-		if a>100 then
-			return false
-		end
-	end
-
-	save_variable("gt"..a, name)
-	save_variable("gt"..a.."d", gtime+delay_d*24*60*60*1000+delay_h*60*60*1000+delay_m*60*1000)
-	save_variable("gt"..a.."p", action)
-
-	--log1("g_start_timer: timer started "..tostring("gt"..a).." = "..name)
-
-	return true
-end
-
-
-local checked = 0
-
--- Проверка таймеров, использует 3 следующие за ним функции для выбора действия
-function check_timers()
-	local tmp
-	local horror_fault = true
-	local surge_fault = true
-	local game_time = game.time()
-
-	for a=1,100,1 do
-		tmp=load_variable("rt"..a,nil)
-		if tmp~=nil then
-			__timer_found(a)
-			-- log1("timer found ".."rt"..a.." = "..tostring(tmp))
-		end
-	end
-
-	for a=1,100,1 do
-		tmp=load_variable("gt"..a,nil)
-		if tmp~=nil then
-			__g_timer_found(a)
-			-- log1("g_timer found ".."gt"..a.." = "..tostring(tmp))
-		end
-	end
-
-	checked = checked + 1
-end
-function __timer_found(idx)
-	local delay = tonumber(load_variable("rt"..idx.."d", nil))
-	local count = tonumber(load_variable("rt"..idx.."c", nil))
-	count = count+timer_trigger_step
-	if delay > count then
-		del_variable("rt"..idx.."c")
-		save_variable("rt"..idx.."c", count)
-	else
-		local name = load_variable("rt"..idx, nil)
-		local params = load_variable("rt"..idx.."p", nil)
-		del_variable("rt"..idx)
-		del_variable("rt"..idx.."c")
-		del_variable("rt"..idx.."d")
-		del_variable("rt"..idx.."p")
-		printf("__timer_found: timer execute ".."rt"..idx.." = "..tostring(name))
-		__do_timer_action(name, params)
-		return true
-	end
-	return false
-end
-function __g_timer_found(idx)
-     local gtime = game.time() --time in seconds since 1970
-	if tonumber(load_variable("gt"..idx.."d", nil)) <= gtime then
-		local name = load_variable("gt"..idx, nil)
-		local params = load_variable("gt"..idx.."p", nil)
-		del_variable("gt"..idx)
-		del_variable("gt"..idx.."d")
-		del_variable("gt"..idx.."p")
-		printf("__g_timer_found: timer execute ".."gt"..idx.." = "..tostring(name))
-		__do_timer_action(name, params)
-		return true
-	end
-	return false
+	log1("timer_new: Timer in game time starting: "..tostring(name.."_"..action.."_"..delay_general))
+	local t = timer_new(tostring(name.."_"..action.."_"..delay_general)) --Нужно сложное имя, чтобы не было повторов в названиях таймеров
+	t:set_data(name,action)
+	t:set_gdelay(delay_general)
+	t:start()
+	log1("timer_new: Timer starting!")
 end
 
 local selector = {
@@ -682,10 +572,6 @@ local selector = {
 	["rsp"] = function(params_string)
 		ogsm_respawn.level_spawn()
 		g_start_timer("rsp",0, vars.t_spawn+math.random(-1,1), 0)
-	end,
-
-	["rkc"] = function(params_string)
-		remkit_main.search_repair_kit()
 	end,
 
 	["kol"] = function(params_string)
@@ -720,12 +606,6 @@ local selector = {
 	["oso"] = function(params_string)
 		ogse_quests.turn_pnv_off()
 		level.add_pp_effector("deadcity_wake.ppe", 2008, false)
-
-		-- local point = patrol("sar_poltergeist_home")
-		-- local look = patrol("mon_jump_aes2_look")
-		-- db.actor:set_actor_position(point:point(0))
-		-- local dir = look:point(0):sub(point:point(0))
-		-- db.actor:set_actor_direction(-dir:getH())
 
 		local point = patrol("mon_jump_aes2_walk")
 		local look = patrol("mon_jump_aes2_look")
@@ -892,26 +772,10 @@ local selector = {
 	["recall_all"] = function(params_string)
 		ogse_quests.flashback()
 	end,	
-	
+
 	["final_talk"] = function(params_string)
 		ogse_quests.init_talk_final()
 	end,	
-	
-
-	--[[
-	["pkm1"] = function(params_string)
-		level.enable_input()
-		bind_statpkm.create_stat_pkm_on_actor()
-		jekan_work.spawn_pkm_case()
-	end,
-
-	["pkm2"] = function(params_string)
-		level.enable_input()
-		jekan_work.release_stat_pkm()
-		jekan_work.release_pkm_case()
-		alife():create('turret_pkm', db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
-	end,
-	]]
 	
 	["orlov_talk_1"] = function(params_string)
 		xr_effects.show_messeges_shpion_to_orlov1()
@@ -1059,7 +923,7 @@ local selector = {
 	["unicsos2"] = function(params_string)
 		if db.actor:dont_has_info("sleep_bloodsucker_on_place") then
 			jekan_work.spawn_krovos_unic_bad2()
-			ogse.start_timer("unicsos3",0,1)
+			start_timer("unicsos3",0,1)
 		end
 	end,
 
@@ -1074,7 +938,7 @@ local selector = {
 	["psdog2"] = function(params_string)
 		if db.actor:dont_has_info("sleep_pseudodog_on_place") then
 			jekan_work.spawn_pseudodog_unic_bad2()
-			ogse.start_timer("psdog3",0,1)
+			start_timer("psdog3",0,1)
 		end
 	end,
 
@@ -1169,9 +1033,11 @@ function __do_timer_action(select_string, params_string)
 	if action ~= nil then
 		action(params_string)
 	else
+		send_tip("ERROR!!! Wrong select string!!! [%s] [%s]", select_string, params_string)
 		log3("ERROR!!! Wrong select string!!! [%s] [%s]", select_string, params_string)
 	end
 end
+--****************************************ТАЙМЕРЫ - КОНЕЦ.*************************************************
 
 -- Спавним несколько объектов в инвентарь
 function spawn_items_in_inv(section,npc,num)
@@ -1182,21 +1048,24 @@ end
 -- Спавним объекты в инвентарь
 function spawn_item_in_inv(section,npc)
 	local npc = (npc or db.actor)
-	--log1("~~spawn_item_in_inv sect ["..tostring(section).."] npc ["..npc:name().."]")	
-	local sobj_abstr = alife():create(section,
-			npc:position(),
-			npc:level_vertex_id(),
-			npc:game_vertex_id(),
-			npc:id())
+	local sobj_abstr = alife():create(section, npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id())
 	if sobj_abstr then
-		return alife():object(sobj_abstr.id)
+		if npc:id() == db.actor:id() then
+			return alife():object(sobj_abstr.id)
+		else
+			level.client_spawn_manager():add(sobj_abstr.id, -1, fix_spawn_item_in_inv, npc) --Фикс пропадания доспавненного предмета при сейв/лоаде
+			return sobj_abstr
+		end
 	else	
 		log1("!!Error spawn_item_in_inv sect ["..tostring(section).."] npc ["..npc:name().."]")	
 		return false
 	end	
 end
+function fix_spawn_item_in_inv(npc, id, sobj_abstr)
+    npc:transfer_item(sobj_abstr, npc)
+end
 
--- Спавним патроны в инвентарь
+-- Спавним патроны в инвентарь --пока что используется только для спавна патронов актору. При спавне патронов неписю, скорее всего нужен фикс пропадания как в функции выше.
 function spawn_ammo_in_inv(section,number,npc)
 	local npc = (npc or db.actor)
 	log1("~~spawn_ammo_in_inv sect ["..tostring(section).."] npc ["..npc:name().."]")	
@@ -1214,10 +1083,8 @@ function spawn_ammo_in_inv(section,number,npc)
 	end
 end
 
-
 -- Удаляем объект из игры
 function remove_item(item_to_remove)
-	--ASSERT(item_to_remove, "[ogse.remove_item] item is a nil reference!")
 	if item_to_remove then
 		local sobj = alife():object(item_to_remove:id())
 		if sobj then
@@ -1232,7 +1099,6 @@ end
 
 -- Удаляем объект из игры по имени
 function remove_item_by_name(item_to_remove)
-	--ASSERT(item_to_remove, "[ogse.remove_item] item is a nil reference!")
 	if item_to_remove then
 		local sobj = alife():object(item_to_remove)
 		if sobj then
@@ -1268,12 +1134,10 @@ function drop_item(npc,item)
 	end
 end
 
-
 -- Убиваем непися
 function make_suicide(npc)
 	npc:kill(npc)
 end
-
 
 -- Узнаем отношение одного непися к другому
 function get_npc_relation(obj,target)
@@ -1282,7 +1146,6 @@ function get_npc_relation(obj,target)
 		return (rel==game_object.neutral and "neutral" or rel==game_object.friend and "friend" or rel==game_object.enemy and "enemy") or false
 	end
 end
-
 
 -- Задаем отношение одного непися к другому
 function set_npc_relation(obj,target,relation)
@@ -1300,12 +1163,10 @@ function set_npc_relation(obj,target,relation)
 	return true
 end
 
-
 -- Узнаем группировку непися, применимо к ГГ
 function get_npc_community(npc)
 	return npc:community()
 end
-
 
 -- Выставляем группировку непися, можно ГГ
 function set_npc_community(npc,community_string)
@@ -1313,8 +1174,7 @@ function set_npc_community(npc,community_string)
 	return npc:set_character_community(community_string, 0, 0)
 end
 
-
--- Удаляем предмет из инвентаря
+-- Удаляем предмет из инвентаря по имени
 function remove_item_from_inventory_by_name(remove_item_name,npc)
 	return remove_item_from_inventory(npc:object(remove_item_name),npc)
 end
@@ -1333,13 +1193,6 @@ function remove_item_from_inventory(remove_item,npc)
 	return false
 end
 
-
--- Создаем "ожидатели" для неписей нужно для корректной работы с объектами, созданными внутри скрипта
-function create_waiter_for_npc(npc,select_string)
-	npc_spawner[npc.id]=select_string
-end
-
-
 -- Очищаем инвентарь непися, можно ГГ, использует следующую фунцию для удаления предмета
 function clear_npc_inventory(npc)
     npc:iterate_inventory(__del_item, npc)
@@ -1357,7 +1210,6 @@ function __del_item(npc, item)
 	end
 end
 
-
 -- Проверка, запущена ли игра
 function check_game()
 	if level.present() and (db.actor ~= nil) and db.actor:alive() then
@@ -1366,82 +1218,28 @@ function check_game()
 	return false
 end
 
--- Записываем переменную
+--**********************************************************************************************************
+--KRodin перевёл все функции на систему ogse_unist.script.
+--В будущем эти функции НЕ ИСПОЛЬЗОВАТЬ! А использовать ТОЛЬКО ogse_unist.script!!! Подробности читать там.
 function save_variable(variable_name, value)
-	if main_variable_tbl == nil then
-		main_variable_tbl = {}
-	end
-	main_variable_tbl[variable_name] = value
+	save_var("ogse."..variable_name, value)
 end
 
--- Загружаем переменную
 function load_variable(variable_name, value_if_not_found)
-	if main_variable_tbl ~= nil and main_variable_tbl[variable_name] ~= nil then
-		local val = main_variable_tbl[variable_name]
-		if val ~= nil then
-			return val
-		end
-	end
-	if value_if_not_found ~= nil then
+	if var_exists("ogse."..variable_name) then
+		return load_var("ogse."..variable_name)
+	elseif value_if_not_found ~= nil then
 		return value_if_not_found
 	end
+	log3("!!!ОШИБКА!!! ПЕРЕМЕННАЯ: ogse."..tostring(variable_name).." НЕ НАЙДЕНА В ХРАНИЛИЩЕ И value_if_not_found = nil !!!")
+	send_tip("!!!ОШИБКА!!! ПЕРЕМЕННАЯ: ogse."..tostring(variable_name).." НЕ НАЙДЕНА В ХРАНИЛИЩЕ И value_if_not_found = nil !!!")
 	return nil
 end
 
--- Удаляем переменную
 function del_variable(variable_name)
-	if main_variable_tbl[variable_name] then
-		main_variable_tbl[variable_name] = nil
-	end
+	delete_var("ogse."..variable_name)
 end
-
-local sidor_sobj
--- Готовим хранилище Сидорыча
-function create_sidor_storage()
-	sidor_sobj = alife():story_object(story_ids.Escape_Trader)
-end
-
-deadmans_table = {}
--- Формат хранения:
--- [id] = { time_died = time_when_killed, killer = who:id() }
-
--- Восстанавливаем оперативные переменные из хранилища Сидорыча
-function load_main_variable_tbl()
-	main_variable_tbl = nil
-	if sidor_sobj and sidor_sobj.m_storage then
-		local m_storage_parsed = sidor_sobj.m_storage
-		local m_storage_unparsed = m_net_utils.parse_custom_data(m_storage_parsed)
-		if not m_storage_unparsed.m_storage then
-			main_variable_tbl = {}
-			deadmans_table = {}
-			log1("load_main_variable_tbl: Warning! main_variable_tbl load as empty!")
-		else
-			main_variable_tbl = m_storage_unparsed.m_storage
-			deadmans_table = m_storage_unparsed.bones_pile
-			log1("load_main_variable_tbl: INFO: main_variable_tbl load is succesful")
-		end
-	else
-		main_variable_tbl = {}
-		deadmans_table = {}
-		log1("load_main_variable_tbl: ERROR!: sidor_sobj or sidor_sobj.m_storage is faile!")
-		log1("load_main_variable_tbl: Warning! main_variable_tbl load as empty!")
-	end
-end
-
--- Сохраняем оперативные переменные в хранилище Сидорыча
-function save_main_variable_tbl()
-	if sidor_sobj then
-		local m_storage_unparsed = {}
-		m_storage_unparsed.m_storage = main_variable_tbl
-		m_storage_unparsed.bones_pile = deadmans_table
-		local m_storage_parsed = m_net_utils.gen_custom_data(m_storage_unparsed)
-		sidor_sobj.m_storage = m_storage_parsed
-		log1("save_main_variable_tbl: INFO: main_variable_tbl saved in store is succesful")
-	else
-		log1("save_main_variable_tbl: ERROR!: sidor_sobj is faile!")
-	end
-end
-
+--***********************************************************************************************************
 
 -- Определяем находится ли ГГ в определенной зоне
 function check_npc_in_box(npc, p1,p2)
@@ -1468,25 +1266,11 @@ end
 
 -- Получаем инвентарное название объекта
 function get_inv_name(section)
-	return system_ini():r_string(section,"inv_name")
+	return sys_ini:r_string(section,"inv_name")
 end
 
 -- Колбэк на появление предмета в инвентаре ГГ
 function on_item_take(obj)
-
-	if not obj then 
-		return 
-	else	
-		local id = obj:id()
-		local sobj = alife():object(id)
-		if not sobj then
-			return
-		end
-	end
-
--- Проверка экзы
-	ui_ogse_exo_control.chek_button_accessibility()
-
 	local level_name = level.name()
 	if db.actor and db.actor:dont_has_info("player_have_crowbar") and string.find(obj:section(), "wpn_montirovka") and level_name == "l06_rostok" then
 		soundtrack.rostok_gordon()
@@ -1494,338 +1278,92 @@ function on_item_take(obj)
 	end
 	-- квест чебурана и аномальные итемы
 	quest_deadcity.on_item_take(obj)
-	--метка
 end
 
 -- Колбэк на потерю предмета из инвентаря ГГ
 function on_item_drop(obj)
-
-	ogse_night_vision.chek_drop_pnv(obj)
 	--генератор по квесту радиста
 	jekan_work.check_generator(obj)
 	ogse_anomaly.check_artefact_activation(obj)
--- Проверка экзы
-	ui_ogse_exo_control.chek_button_accessibility()
 end
 
 -- Колбэк на использование предмета в инвентаре ГГ
 function use_inventory_item(obj)
-
-	if not obj then 
-		return 
-	else	
-		local id = obj:id()
-		local sobj = alife():object(id)
-		if not sobj then
-			return
-		end
-	end
-
-	remkit_main.check_use_repair_kit(obj)
-	ui_ogse_exo_control.use_exo(obj)
-	biodetector.on_use_item(obj)
 	jekan_books.on_use_item(obj)
 	jekan_update.on_use_item(obj)
 end
 
-local inventory_updated_first = false
-local updates_check = 0
-local slot_change_retries = 0
-local resetted_item_id = 0
+------------------Переменные для апдейта актора--------------------
+local psyzones_flag = sys_ini:r_s32("options","psyzones_flag")
+local vertexes_checked = false
+local ids_timer = time_global()
+local mine_timer = time_global()
+local loot_timer = time_global()
+local buggy_timer = time_global()
+local anom_enum = time_global()
+local watchdog = 0
+local watchdog_max = 42
+--------------------------------------------------------------------
+function on_actor_update(obj) --Колбэк на апдейт ГГ
+---------------------АПДЕЙТЫ С ВЫСОКИМ ПРИОРИТЕТОМ ПОМЕЩАТЬ СЮДА!---------------------
+	ogse_debug.process_actor("upd_a", 2)
+	on_actor_updating_start() -- Перехват события начала апдейта актора
 
--- Колбэк на апдейт ГГ
-function on_actor_update(obj)
-	--local pt = ogse_profiler.profiler("ogse_on_actor_update"):start()
-
--- АПДЕЙТЫ С ВЫСОКИМ ПРИОРИТЕТОМ ПОМЕЩАТЬ СЮДА!
-
-	ogse_debug.process_actor("upd_a", 1)
+	ogse_debug.process_actor("upd_a", 3)
+	game_time_factor = level.get_time_factor() -- Проверка таймфактора
 
 	local glob_time = time_global()
 
-	if updates_check <= 1001 then
-		updates_check = updates_check + 1
-	end
-
-	ogse_debug.process_actor("upd_a", 2)
-
--- Обновление таймеров
-	if not timer_trigger then
-		timer_trigger=glob_time
-	end
-	if timer_trigger<=glob_time then
-		timer_trigger=glob_time+timer_trigger_step
-		check_timers()
-	end
--- Обновление таймеров
-
-	ogse_debug.process_actor("upd_a", 3)
-
--- Перехват события начала апдейта актора
-	on_actor_updating_start()
--- Перехват события начала апдейта актора
-
 	ogse_debug.process_actor("upd_a", 4)
-
--- Перенесено из inventory.script
--- Апдейтим ремкомплекты
-	remkit_main.update_repair_kit()
--- Сюда вставим выставление параметров актора
-	ui_ogse_exo_control.set_actor_parameters()
-
--- Проверка таймфактора
-	game_time_factor = level.get_time_factor()
--- Проверка таймфактора	
-
-	local check_slot = db.actor:active_slot()
-	if check_slot == 4294967296 then
-		check_slot = -1
-	end
-	
-	if resetted_item_id ~= 0 then
-		local item = level.object_by_id(resetted_item_id)
-		if item then
-			db.actor:transfer_item(item, db.actor)
-			db.actor:activate_slot(loaded_slot)
-			loaded_slot = nil
-			resetted_item_id = 0
-			-- log1("!!DEBUG! Slot restored forcefully ")
-		end
-	else	
-		if loaded_slot and check_slot ~= loaded_slot then
-			db.actor:activate_slot(loaded_slot)
-			-- log1("!!DEBUG! Trying to restore slot "..tostring(loaded_slot))
-			slot_change_retries = slot_change_retries + 1
-			if slot_change_retries > 25 then
-				local act_item = db.actor:active_item()
-				if act_item then
-					resetted_item_id = act_item:id()
-					db.actor:drop_item(act_item)
-					slot_change_retries = 0	
-				end
-			end		
-		elseif loaded_slot and check_slot == loaded_slot then
-			loaded_slot = nil
-			-- log1("!!DEBUG! Slot restored after ["..slot_change_retries.."] retries")
-			slot_change_retries = 0
-		end
-	end
-
-	ogse_debug.process_actor("upd_a", 5)
-
--- Обновление шкалы радиации и худа при использовании бинокля/прицела
-	ogse_dynamic_hud.check_sniper()
-	ogse_dynamic_hud.update_hud_elements()
-	ogse_night_vision.PNV_noise_update()
--- Обновление шкалы радиации и худа при использовании бинокля/прицела
-
-	ogse_debug.process_actor("upd_a", 6)
--- Динамический худ
-	ogse_dynamic_hud.doabcevents()
--- Динамический худ
-
-	ogse_debug.process_actor("upd_a", 7)
-
--- Противогаз
-	if updates_check > 100 then
-		ogse_dynamic_hud.hud_antigaz()
-	end
-	-- Противогаз
-
-	ogse_debug.process_actor("upd_a", 77777)
-	
-	-- квестовые срочности
-	
-	ogse_quests.set_btr_nonworking()
-	
-	ogse_debug.process_actor("upd_a", 777771)	
-	
-	ogse_scripted_btr.update()
-	
-	ogse_debug.process_actor("upd_a", 777772)	
-	
-	ogse_quests.play_digger_motor_sound()	
-
-	ogse_debug.process_actor("upd_a", 8)
-
-	ogse_teleport_art_quest.check_actor_leave_zone()
+	ogse_scripted_btr.update() --Охранный БТР. надо перевести на сигналы
 
 	ogse_debug.process_actor("upd_a", 10)
-
--- Проверка, ранен ли актор
-	ogsm_quests.wounded_pp()
--- Проверка, ранен ли актор
+	ogsm_quests.wounded_pp() --эффекты ранения актора
 
 	ogse_debug.process_actor("upd_a", 12)
-
--- Подсказка по кнопке
-	ui_ogse_quicklaunch.check_quicklaunch_hint()
--- Подсказка по кнопке
+	ui_ogse_quicklaunch.check_quicklaunch_hint() --Подсказки по кнопке быстрого доступа. надо перевести на сигналы
 
 	ogse_debug.process_actor("upd_a", 13)
-
-	-- Периодические обновления менеджера гранатометания и вооружений
-	-- Обновление АИ-пака
-	if xrs_ai then xrs_ai.actor_update(delta) end
-    --обновление AI управления оружием
-    if rx_ai then rx_ai.actor_update() end
-	-- Периодические обновления менеджера гранатометания и вооружений
-
-	ogse_debug.process_actor("upd_a", 14)
-	
-	ogse_quests.make_colonel_follow()
+	if xrs_ai then xrs_ai.actor_update(delta) end -- Обновление АИ-пака
+	if rx_ai then rx_ai.actor_update() end --обновление AI управления оружием
 
 	ogse_debug.process_actor("upd_a", 15)
+	ogse_wpn_explode_fx.update() -- Подрыв ствола в руках
+--------------------------КОНЕЦ АПДЕЙТОВ С ВЫСОКИМ ПРИОРИТЕТОМ-------------------------
 
--- Багфикс таймеров
-	local d = game.time()
-	if d >= 200000 then
-		k_timers = 0
-	end
-	if k_timers == 0 then
-		if d < 200000 then
-			-- abort("Игровое время вышло, пошлите ближайший сейв разработчикам для проверки сброса таймеров!")
-			task_manager.cleanup_actor()
-			timer_trigger=game.time()
-			check_timers()
-			k_timers = 1
-		end
-	end
--- Багфикс таймеров
-
-	ogse_debug.process_actor("upd_a", 17)
-
--- Подрыв ствола в руках
-	ogse_wpn_explode_fx.update()
--- Подрыв ствола в руках
-
-	ogse_debug.process_actor("upd_a", 19)
-	
--- Проверка убиванцев по выходу в оффлайн
-	check_doa_kills()
-
-	ogse_debug.process_actor("upd_a", 21)
-
-	_sdata.vis_int()
-
-	ogse_debug.process_actor("upd_a", 22)
-
--- Сценка с вертушкой на Кордоне
-	PMA_escape.show_heli_scene()
--- Сценка с вертушкой на Кордоне
-
-	-- КОНЕЦ АПДЕЙТОВ С ВЫСОКИМ ПРИОРИТЕТОМ
-	--pt:save("hi_pri")
 if watchdog == 1 then
 	ogse_debug.process_actor("upd_a", 23)
--- Предохранительное отключение аномалий
 	if ogse_anomaly then
-		ogse_anomaly.lvl_anomaly_disable()
+		ogse_anomaly.lvl_anomaly_disable() -- Предохранительное отключение аномалий
 	end
--- Предохранительное отключение аномалий
 end
 
 if watchdog == 2 then
 	ogse_debug.process_actor("upd_a", 24)
--- Выводим время на HUD
-	if ogse_dynamic_hud.need_to_show_time() then
-		show_time()
-	else
-		hide_time()
-	end
--- Выводим время на HUD
+	show_time() -- Выводим время на HUD
 end
 
+if watchdog == 3 then
+	ogse_debug.process_actor("upd_a", 19)
+	check_doa_kills() -- Проверка убиванцев по выходу в оффлайн
+end
 
 if watchdog == 4 then
-	ogse_debug.process_actor("upd_a", 26)
--- Пытаемся включить ПНВ при загрузке сейва
-	ogse_night_vision.try_to_restart_nv_fx()
--- Пытаемся включить ПНВ при загрузке сейва
+	ogse_debug.process_actor("upd_a", 28)
+	treasure_manager.get_treasure_manager():loss_workaround() -- Запускаем затычку от возможной потери содержимого тайников
+end
+
+if watchdog == 5 then
+	ogse_debug.process_actor("upd_a", 30)
+	aem_manager.get_aem():update() -- Обновление арены
 end
 
 if watchdog == 6 then
-	ogse_debug.process_actor("upd_a", 28)
--- Запускаем затычку от возможной потери содержимого тайников
-	treasure_manager.get_treasure_manager():loss_workaround()
--- Запускаем затычку от возможной потери содержимого тайников
+	ogse_debug.process_actor("upd_a", 37)
+	xr_companion.check_in_car() -- Поездки в машине с напарником
 end
 
 if watchdog == 7 then
-	ogse_debug.process_actor("upd_a", 29)
--- Багфикс радара
-	ogse_quests_fix.check_radar_off()
--- Багфикс радара
-end
-
-if watchdog == 8 then
-	ogse_debug.process_actor("upd_a", 30)
--- Обновление арены
-	aem_manager.get_aem():update()
--- Обновление арены
-end
-
-if watchdog == 9 then
-	ogse_debug.process_actor("upd_a", 31)
--- Обновление квестового барахла
-	ogse_quests.set_btr_fuel_empty()
-end
-
-
-if watchdog == 11 then
-	ogse_debug.process_actor("upd_a", 33)
--- Новости
-    news_main_data.show_news_main()
--- Новости
-end
-
-if watchdog == 12 then
-	ogse_debug.process_actor("upd_a", 34)
--- Квестовые заморочки
-	ogsm_quests.kruglov_kill()
--- Квестовые заморочки
-end
-
-if watchdog == 13 then
-	ogse_debug.process_actor("upd_a", 35)
--- Очищаем уровни от трупов во фриплее
-	ogse_quests_fix.clean_level()
--- Очищаем уровни от трупов во фриплее
-end
-
-if watchdog == 14 then
-	ogse_debug.process_actor("upd_a", 36)
--- Постэффект ношения "Ока" актором
-	ogsm_quests.actor_af_transmut_8_fx()
--- Постэффект ношения "Ока" актором
-
--- Постэффект зомбирования актора
-	ogsm_quests.actor_zombied_fx()
--- Постэффект зомбирования актора
-
--- Проверка транспондера на поясе
-	ogse_quests.transponder_on_belt()
--- Проверка транспондера на поясе
-end
-
-if watchdog == 15 then
-	ogse_debug.process_actor("upd_a", 37)
--- Поездки в машине с напарником
-	xr_companion.check_in_car()
--- Поездки в машине с напарником	
-end
-
-if watchdog == 16 then
-	ogse_debug.process_actor("upd_a", 38)
---сон НПС - врублен Kamikazze после апдейта от FEAR
-	if glob_time > sleep_timer then
-			ms_ai.update()
-		sleep_timer = sleep_timer + math.random(120000, 180000)
-	end
---сон НПС
-end
-
-if watchdog == 17 then
 	ogse_debug.process_actor("upd_a", 39)
 -- зачистка таблички сохраненных трупиков
 	if not deadmans_table then deadmans_table = {} end
@@ -1857,17 +1395,15 @@ if watchdog == 17 then
 -- зачистка таблички сохраненных трупиков
 end
 
-if watchdog == 18 then
+if watchdog == 8 then
 	ogse_debug.process_actor("upd_a", 40)
--- Уборка трупов и лута
 	if glob_time > loot_timer then
-		db.remove_deadman()
+		db.remove_deadman() -- Уборка трупов и лута
 		loot_timer = loot_timer + math.random(500, 800)
 	end
--- Уборка трупов и лута
 end
 
-if watchdog == 19 then
+if watchdog == 9 then
 	ogse_debug.process_actor("upd_a", 41)
 -- Обновление баг-таймера
 	if glob_time > buggy_timer then
@@ -1883,25 +1419,10 @@ if watchdog == 19 then
 		buggy_timer = buggy_timer + math.random(20000,25000)
 	end
 -- Обновление баг-таймера
--- Удаление глючных трупов с битым пстором
-	db.remove_delayed()
--- Удаление глючных трупов с битым пстором
+	db.remove_delayed() -- Удаление глючных трупов с битым пстором
 end
 
-if watchdog == 20 then
-	ogse_debug.process_actor("upd_a", 42)
---	jekan_work.check_bind_anom_house_items()	
-	jekan_work.check_bind_avail_six_anom_house_items()
-end
-
-if watchdog == 21 then
-	ogse_debug.process_actor("upd_a", 43)
--- обновление хоррор-тайм
-	horror_time.horror_process()
--- обновление хоррор-тайм
-end
-
-if watchdog == 22 then
+if watchdog == 10 then
 	ogse_debug.process_actor("upd_a", 44)
 -- периодическая проверка количества идентификаторов
 	if id_cleaner and id_cleaner.check_ids_flag == 1 then
@@ -1916,7 +1437,7 @@ if watchdog == 22 then
 -- периодическая проверка количества идентификаторов
 end
 
-if watchdog == 23 then
+if watchdog == 11 then
 	ogse_debug.process_actor("upd_a", 45)
 -- Периодическая проверка численности
 	if glob_time > anom_enum then
@@ -1931,51 +1452,148 @@ if watchdog == 23 then
 -- Периодическая проверка численности
 end
 
-if watchdog == 24 then
+if watchdog == 12 then
 	ogse_debug.process_actor("upd_a", 46)
--- Обработка мин
 	if checker_minefield then
 		if glob_time > mine_timer then
-			ogse_debug.process_actor("upd_a", 451)
-			checker_minefield.delete_mines()
+			checker_minefield.delete_mines() -- Обработка мин
 			mine_timer = mine_timer + math.random(15000, 20000)
 		end
 	end
--- Обработка мин
+end
+
+if watchdog == 13 then
+	ogse_debug.process_actor("upd_a", 36087)
+	ogsm_quests.actor_zombied_fx() -- Постэффект зомбирования актора
+end
+
+------------------------------------------------Квестовые апдейты---------------------------------------------
+if watchdog == 14 then
+	ogse_debug.process_actor("upd_a", 36088)
+	ogse_quests.transponder_on_belt() -- Проверка транспондера на поясе
+end
+
+if watchdog == 15 then
+	ogse_debug.process_actor("upd_a", 48)
+	quest_deadcity.check_first_enter()
+end
+
+if watchdog == 16 then
+	ogse_debug.process_actor("upd_a", 481)
+	ogse_quests.check_gorkom_books()
+end
+
+if watchdog == 17 then
+	ogse_debug.process_actor("upd_a", 482)
+	ogse_quests.check_colonel_dead()
+end
+
+if watchdog == 18 then
+	ogse_debug.process_actor("upd_a", 29)
+	ogse_quests_fix.check_radar_off() -- Багфикс радара
+end
+
+if watchdog == 19 then
+	ogse_debug.process_actor("upd_a", 35)
+	ogse_quests_fix.clean_level() -- Очищаем уровни от трупов во фриплее
+end
+
+if watchdog == 20 then
+	ogse_debug.process_actor("upd_a", 36)
+	ogsm_quests.actor_af_transmut_8_fx() -- Постэффект ношения "Ока" актором
+end
+
+if watchdog == 21 then
+	ogse_debug.process_actor("upd_a", 42)
+	jekan_work.check_bind_avail_six_anom_house_items()
+end
+
+if watchdog == 22 then
+	ogse_debug.process_actor("upd_a", 5)	
+	ogse_quests.play_digger_motor_sound()	
+end
+
+if watchdog == 23 then
+	ogse_debug.process_actor("upd_a", 8)
+	ogse_teleport_art_quest.check_actor_leave_zone()
+end
+
+if watchdog == 24 then
+	ogse_debug.process_actor("upd_a", 14)
+	ogse_quests.make_colonel_follow()
 end
 
 if watchdog == 25 then
-	ogse_debug.process_actor("upd_a", 47)
-	-- оффлайн-алайф
-	ogse_debug.process_actor("upd_a", 55)
-	news_amk_core.check_news()
-	if glob_time > off_timer then
-		ogse_debug.process_actor("upd_a", 56)
-		news_amk_core.on_news()
-		off_timer = off_timer + math.random(40000, 80000)
-	end
-	ogse_debug.process_actor("upd_a", 57)
-	if offline_alife_enabled then
-		if glob_time > off_timer_1 then
-			amk_offline_alife.update()
-			off_timer_1 = off_timer_1 + math.random(20000, 30000)
-		end
-	end
-	-- оффлайн-алайф
+	ogse_debug.process_actor("upd_a", 22)
+	PMA_escape.show_heli_scene() -- Сценка с вертушкой на Кордоне
 end
 
+--===========Перенесено из jekan_update.script==================
 if watchdog == 26 then
-	ogse_debug.process_actor("upd_a", 48)
--- квесты 
-	quest_deadcity.check_first_enter()
-	ogse_quests.check_gorkom_books()
-	ogse_quests.check_colonel_dead()	
+	jekan_update.dolg_zahvat()
 end
 
 if watchdog == 27 then
-	ogse_debug.process_actor("upd_a", 49)
-	
+	jekan_update.af_puzir_destroy()
 end
+
+if watchdog == 28 then
+	jekan_update.af_light_destroy()
+end
+
+if watchdog == 29 then
+	jekan_update.af_uley_packed()
+end
+
+if watchdog == 30 then
+	jekan_update.af_mayatnik_effect()
+end
+
+if watchdog == 31 then
+	jekan_update.af_ray_travel()
+end
+
+if watchdog == 32 then
+	jekan_update.cheburashka_greeting()
+end
+
+if watchdog == 33 then
+	jekan_update.fake_arts_delete()
+end
+
+if watchdog == 34 then
+	jekan_update.magnit_part_work_from_belt()
+end
+
+if watchdog == 35 then
+	jekan_update.magnit_part_work_on_take()
+end
+
+if watchdog == 36 then
+	xr_effects.af_uley_effect()
+end
+
+if watchdog == 37 then
+	jekan_update.thunderbird_visual_effect()
+end
+
+if watchdog == 38 then
+	jekan_update.rustyfield_effect1()
+end
+
+if watchdog == 39 then
+	jekan_update.rustyfield_effect2()
+end
+
+if watchdog == 40 then
+	jekan_update.rustyfield_effect3()
+end
+
+if watchdog == 41 then
+	jekan_update.strange_zone_actor_particle()
+end
+--==============================================================
+------------------------------------------Конец квестовых апдейтов--------------------------------------------
 
 -- НЕ ТРОГАТЬ!!! БИБЛИОТЕЧНАЯ КОНСТРУКЦИЯ! ДОЛЖНО ЗАМЫКАТЬ ФУНКЦИЮ!
 watchdog = watchdog + 1
@@ -1984,121 +1602,6 @@ if watchdog >= watchdog_max then
 end
 
 ogse_debug.process_actor("upd_a", 0)
-
-end
-
--- Коллбэк на нажатие клавиши
-function on_key(key, bind)
-	-- Вкл/выкл ПНВ
-	ogse_night_vision.call_pnv(key, bind)
-
-	-- Проверка клавиш быстрого меню
-	ui_ogse_quicklaunch.chek_keys(key, bind)
-
-	-- Проверка управления оружием
-	--ogse_addons.chek_keys(key, bind)  -- сейчас работает под управлением менеджера аддонов
-
-	-- Проверка зумма
-	ogse_dynamic_hud.chek_keys(key, bind)
-
-	-- Раскрутка минигана
-	ogse_minigun_sound.chek_keys(key, bind)
-
-end
-
--- Коллбэк на отпускание клавиши
-function on_key_free(key, bind)
-
-	-- Проверка зумма
-	ogse_dynamic_hud.chek_keys_free(key, bind)
-
-	-- Раскрутка минигана
-	ogse_minigun_sound.chek_keys_free(key, bind)
-
-end
-
--- Коллбэк на удержание клавиши
-function on_key_hold(key, bind)
-
-	-- Раскрутка минигана
-	ogse_minigun_sound.chek_keys_hold(key, bind)
-
-end
-
--- Коллбэк на вращение колесика мыши
-function on_wheel_rotation(vol)
-end
-
--- Коллбэк на движение мыши
-function on_mouse_move(vol)
-end
-
--- Коллбэк на перенос предмета на пояс
-function on_item_to_belt(obj)
-
-	if not obj then 
-		return 
-	else	
-		local id = obj:id()
-		local sobj = alife():object(id)
-		if not sobj then
-			return
-		end
-	end
-
-
-end
-
--- Коллбэк на перенос предмета в рюкзак
-function on_item_to_backpack(obj)
-
-	if not obj then 
-		return 
-	else	
-		local id = obj:id()
-		local sobj = alife():object(id)
-		if not sobj then
-			return
-		end
-	end
-
--- Проверка потери ПНВ
-	ogse_night_vision.chek_drop_pnv(obj)
--- Проверка экзы
-	ui_ogse_exo_control.chek_button_accessibility()
-
-end
-
--- Коллбэк на перенос предмета в слот
-function on_item_to_slot(obj)
-
-	if not obj then 
-		return 
-	else	
-		local id = obj:id()
-		local sobj = alife():object(id)
-		if not sobj then
-			return
-		end
-	end
-
--- Проверка экзы
-	ui_ogse_exo_control.chek_button_accessibility()
--- Убирание с пояса лишних ПНВ
-	ogse_night_vision.chek_outfit_double_pnv(obj)
-
-end
-
--- Колбэк на выдачу инфопоршена ГГ
-function on_info_update(info_id)
-	_sdata.infos(info_id)
-
-	ogse_night_vision.on_inventory_info(info_id)
-	ui_ogse_exo_control.on_inventory_info(info_id)
-
--- "Выключение" PDA в Выброс
-	pda_fx.on_pda_info(info_id)
-
 end
 
 -- Перехват события начала апдейта актора
@@ -2118,32 +1621,19 @@ function on_actor_first_update()
 	-- Перехват хоткеев
 	ogse_rebind_key.unbind_key()
 
-	-- Пытаемся включить ПНВ после загрузки сейва
-	ogse_night_vision.try_to_restart_nv_fx()
-
-	-- Пытаемся восстановить эффекты экзо после загрузки сейва
-	ui_ogse_exo_control.set_actor_parameters()
-
-	-- Восстанавливаем активный слот
-	-- log1("~~ Restore active slot "..tonumber(load_variable("store_slot", 5)))
-	loaded_slot = tonumber(load_variable("store_slot", 5))
-	if loaded_slot == 4294967296 or loaded_slot == 3 or loaded_slot == 6 or loaded_slot == 7 or loaded_slot > 8 then
-		loaded_slot = -1
-	end
-	
 	-- проверка валидности удаления телепортов
 	ogse_anomaly.emergency_restr_reset()
-	
+
 	-- позволим актору выйти через тот же выход на Агро, что он пришел
 	agroprom_tasks.check_enter()
-	
+
 	-- заебал уже этот фонарь
 	local torch = db.actor:item_in_slot(9)
 	if torch then
 		torch:switch_torch(not torch:is_torch_enabled())
 		torch:switch_torch(not torch:is_torch_enabled())
 	end
-	
+
 	-- здесь удаляется глючно заспавненная модель автомата
 	local bug = alife():object("mil_physic_object_0127")
 	if bug then
@@ -2151,21 +1641,29 @@ function on_actor_first_update()
 	end
 end
 
+-- Коллбэк на нажатие клавиши
+function on_key(key, bind)
+	-- Проверка клавиш быстрого меню
+	ui_ogse_quicklaunch.chek_keys(key, bind)
+end
+
+-- Колбэк на выдачу инфопоршена ГГ
+function on_info_update(info_id)
+	_sdata.infos(info_id)
+
+-- "Выключение" PDA в Выброс
+	pda_fx.on_pda_info(info_id)
+end
+
 -- Загружаем все переменные, которые нужно, вызывается при загрузке игры автоматически
 function on_game_load()
-
 	ogse_debug.process_actor("a_spw", 111)
-
-	-- Подготовим хранилище Сидора
-	create_sidor_storage()
-
-	ogse_debug.process_actor("a_spw", 112)
 
 	se_respawn.check_zone_population()
 
 	ogse_debug.process_actor("a_spw", 113)
-	-- Загрузим из хранилища Сидора все переменные
-	load_main_variable_tbl()
+
+	deadmans_table = load_var( "ogse.deadmans_table", {}, "table" )
 
 	ogse_debug.process_actor("a_spw", 114)
 
@@ -2173,17 +1671,6 @@ function on_game_load()
 	game_time_factor = level.get_time_factor()
 
 	ogse_debug.process_actor("a_spw", 115)
-
-	-- -- Чистим фантомов пси-собак при загрузке
-	-- for i=1,65355 do
-		-- local sobj = alife():object(i)
-		-- if sobj and string.find(sobj:section_name(), "psy_dog") then
-			-- -- log1("phantom_release")
-			-- alife():release(sobj, true)
-		-- end
-	-- end
-
-	ogse_debug.process_actor("a_spw", 116)
 
 	-- Отключаем в PDA вкладку "Контакты"
 	get_console():execute("unbind contacts")
@@ -2205,8 +1692,6 @@ function on_game_load()
 	-- Первый запуск мода
 	if db.actor:dont_has_info("storyline_actor_start") then
 	
-		db.actor:give_info_portion("OGSE_FINAL_2")
-	
 		g_start_timer("rsp",0, 5+math.random(-1,1), 0)
 		ogsm_respawn.first_run()
 		ogse_spawns.traders_spawn()
@@ -2222,7 +1707,7 @@ function on_game_load()
 		
 		ogse_quests.scape_doors_start() -- двери в Лощине
 
-     end
+	end
 	 
 	--KD: установка настроек графики
 
@@ -2255,7 +1740,6 @@ function on_game_load()
 
 	ogse_debug.process_actor("a_spw", 1110)
 
-
 	db.register_all_quest_zones()
 
 	ogse_debug.process_actor("a_spw", 1111)
@@ -2264,8 +1748,6 @@ function on_game_load()
 	trick_sr.art_and_ammo_random()
 
 	ogse_debug.process_actor("a_spw", 1112)
-
-	bar_timer = bar_timer + 20000
 
 	anom_enum = anom_enum + 15000
 
@@ -2278,13 +1760,6 @@ function on_game_load()
 
 	-- проверка прохождения X-18
 	ogse_quests.dar_stalker_explorer_spawn()
-
-	ogse_debug.process_actor("a_spw", 1115)
-
-	ogse_night_vision.add_nv_fx_faile_hud()
-
-	ogse_debug.process_actor("a_spw", 1116)
-
 
 	ogse_debug.process_actor("a_spw", 1117)
 
@@ -2317,32 +1792,8 @@ function on_game_load()
 	end
 
 	ogse_debug.process_actor("a_spw", 1120)
-	
 	-- Квестовые умиранцы 
-	
 	quest_dead_on_arrival = load_var("q_doa", {}, "array")
-
-	ogse_debug.process_actor("a_spw", 1121)
-
-	-- Апдейтим ремкомплекты
-	remkit_main.update_repair_kit()
-
-	ogse_debug.process_actor("a_spw", 1122)
-
-    ---новости(фильтр левелов)
-    news_main_data.message_filter()
-
-	ogse_debug.process_actor("a_spw", 1123)
-
-	ogse_debug.process_actor("a_spw", 1124)
-
-	-- Выставляем глосс-фактор по умолчанию
-	--ogse_raining_fx.gloss_reset() -- перенесено на сигнальную основу
-
-	ogse_debug.process_actor("a_spw", 1125)
-	--tasks_functor.car_for_yashik_disable_fuel()
-
-	ogse_debug.process_actor("a_spw", 1126)
 
 	ogse_debug.process_actor("a_spw", 1127)
 	-- Восстановим сценку с вертолётом
@@ -2359,68 +1810,17 @@ function on_game_load()
 		if spw_3 then
 			PMA_escape.deadman[spw_3] = spw_3
 		end
-		-- print_table_inlog_v2(PMA_escape.deadman,"DEAD_MANS>>")
 	end
-
-	ogse_debug.process_actor("a_spw", 1128)
-
-	news_amk_core.init()
-
-	if offline_alife_enabled then
-
-	ogse_debug.process_actor("a_spw", 1129)
-
-	amk_offline_alife.init()
-
-	ogse_debug.process_actor("a_spw", 1130)
-
-	amk_offline_alife.update_npc_tables()
-
-	ogse_debug.process_actor("a_spw", 1131)
-
-	amk_offline_alife.update_trade()
-
-	end
-
-	ogse_debug.process_actor("a_spw", 1133)
-
-	ogse_debug.process_actor("a_spw", 1134)
-	
-	ui_ogse_exo_control.load()
-	
-	if not db.actor:has_info("OGSE_FINAL_2") then
-		abort("Невозможно загрузить сейв от старой версии OGSE")
-	end
-	
 end
-
--- Коллбэк на удаление актора
-function on_net_destroy()
-	ogse_night_vision.remove_PNV_rec_wnd()
-end
-
 
 -- Коллбэк на запись сейва
 function on_game_save(packet)
-	-- log1("!!Memory used by Lua before cleanup: "..collectgarbage("count"))
-	collectgarbage("collect")
-	-- log1("--Memory used by Lua after cleanup: "..collectgarbage("count"))
-	-- Проверим численность
 	save_var("q_doa", quest_dead_on_arrival, "array")
-	se_respawn.check_zone_population()
-	-- Запоминаем активный слот
-	-- log1("Store active slot")
-	local act_slot = db.actor:active_slot()
-	save_variable("store_slot", act_slot)
-	log1("Active slot = "..act_slot..", stored")
-	
-	ui_ogse_exo_control.save()
 
-	-- Сохраняем оперативные переменные в хранилище Сидорыча
-	save_main_variable_tbl()
+	se_respawn.check_zone_population() --Проверим численность
 
+	save_var( "ogse.deadmans_table", deadmans_table, "table" )
 end
-
 
 function check_doa_kills()
 	for k, v in pairs(quest_dead_on_arrival) do
@@ -2475,29 +1875,28 @@ function check_offline_npc(obj)
 		else
 			return false
 		end
-		-- send_tip("HEALTH "..health)
 	end
 end
 
--- Выводим время на HUD
+-------------------Выводим время на HUD-------------------
 function show_time()
 	local hud = get_hud()
-
---  hud:AddCustomStatic("hud_time_tex", true)
-
-    local time_h = sr_timer.time2str(level.get_time_hours())
+	local time_h = sr_timer.time2str(level.get_time_hours())
 	local time_m = sr_timer.time2str(level.get_time_minutes())
-	hud:AddCustomStatic("hud_timer_text1", true)
+	if not hud:GetCustomStatic("hud_timer_text1") then 
+		hud:AddCustomStatic("hud_timer_text1", true)
+	end
 	cs = hud:GetCustomStatic("hud_timer_text1"):wnd()
 	cs:SetText(time_h..":"..time_m)
-
 end
+
 function hide_time()
 	local hud = get_hud()
 	if hud:GetCustomStatic("hud_timer_text1") ~= nil then 
 		hud:RemoveCustomStatic("hud_timer_text1")
 	end
 end
+-----------------------------------------------------------
 
 -- Парсинг ини-файла в массив
 function parse_ini_section_to_array(ini,section)
@@ -2521,25 +1920,7 @@ function on_my_psy()
 		db.actor:give_info_portion("encyclopedy_tutorial_psy")
 	end
 end
---! НЕ ИСПОЛЬЗУЕТСЯ
-function add_spot_on_map(obj_id,type,text)
-  --возможные типы type смотри в ui\map_spots.xml
-  if obj_id then
-    if text==nil then text=" " end
-    -- Ставим метку на серверный объект чтобы её не пришлось обновлять
-    level_tasks.add_location_by_id(obj_id, type, text)
---    save_variable("x_marker_type_"..obj_id, type)
---    save_variable("x_marker_text_"..obj_id, text)
-  end
-end
---! НЕ ИСПОЛЬЗУЕТСЯ
-function remove_spot_from_map(obj_id,type)
-  if obj_id and level.map_has_object_spot(obj_id, type)~= 0 then
-    level_tasks.remove_location_by_id(obj_id, type)
---    del_variable("x_marker_type_"..obj_id)
---    del_variable("x_marker_text_"..obj_id)
-  end
-end
+
 -- вспомогательная функция, создание одного или нескольких объектов в заданной точке
 -- назначение: убрать повторный код из функций далее по тексту
 local function spawn_single_object_internal(res, spawn_item)
@@ -2582,6 +1963,7 @@ local function spawn_single_object_internal(res, spawn_item)
 		table.insert(res, sobj)
 	end
 end
+
 -- спавнит один или несколько одинаковых предметов в заданной точке
 -- фактически просто обёртка над spawn_single_object_internal
 function spawn_object(spawn_item)
@@ -2632,6 +2014,7 @@ function kill_crow()
 		end
 	end
 end
+
 --TODO: не из-за этой ли функции вороны вылетают из одной точки на земле?
 function spawn_crow()
 	local lv = db.actor:level_vertex_id()
@@ -2652,26 +2035,21 @@ end
 
 function give_supplies_to_actor(first_speaker, second_speaker)
 	if not db.actor:object("detector_simple") then
---		spawn_item_in_inv("detector_simple")
 		dialogs.relocate_item_section(first_speaker, "detector_simple", "in")
 	end
 	if not db.actor:object("device_torch") then
---		spawn_item_in_inv("device_torch")
 		dialogs.relocate_item_section(first_speaker, "device_torch", "in")
 	end
 	if not db.actor:object("hand_radio_f") then
---		spawn_item_in_inv("hand_radio_f")
 		dialogs.relocate_item_section(first_speaker, "hand_radio_f", "in")
 	end
 end
 
 function give_binocl_to_actor(first_speaker, second_speaker)
 	if not db.actor:object("wpn_binoc") then
---		spawn_item_in_inv("wpn_binoc")
 		dialogs.relocate_item_section(first_speaker, "wpn_binoc", "in")
 	end
 end
-
 
 --[[function money_in(money)
 	dialogs.relocate_money(db.actor, money, "in")
@@ -2755,12 +2133,7 @@ function reputation_up_20(stalker, player)
 	db.actor:change_character_reputation(20)
 end
 
-save_var = ogse_unist.set_value
-load_var = ogse_unist.get_value
-load_var_safe = ogse_unist.get_value_safe
-var_exists = ogse_unist.value_exist
-delete_var = ogse_unist.remove_value
-save_or_delete_var = ogse_unist.set_or_remove_value
+--*************************************************Таймеры с визуальным счётчиком на худе*************************************************
 ------------------ таймер со счётчиком на экране --------------------------------
 class "visual_timer" (ogse_st_mgr.delayed_fun_start)
 function visual_timer:__init(name) super(name)
@@ -2853,73 +2226,20 @@ end
 function start_conditional_visual_gtimer(name, delay, cond_name, act_name, ...)
 	return conditional_visual_timer(name):set_gdelay(delay):init(cond_name, act_name, ...):start(true)
 end
--- псевдонимы для удобства вызова
-start_tmr = ogse_st_mgr.start_timer
-start_gtmr = ogse_st_mgr.start_gtimer
-get_tmr = ogse_st_mgr.get_timer
-tmr_exists = ogse_st_mgr.timer_exists
-
--- специальный таймер для прокрутки игрового времени. Является основой для более
--- специализированного таймера сна sleep_timer (см. ogse_sleep_mgr.script)
--- использование:
--- ogse.time_rewind_timer(12, 5, 4):start()
--- прокрутить 12 игровых часов за 5 секунд ревльного времени, используя 4 такта
--- ogse.time_rewind_timer(5):start() -- прокрутить 5 часов
-class "time_rewind_timer" (ogse_qt.quick_timer)
-function time_rewind_timer:__init(game_time_to_rewind, real_time, phases_number) super()
-	ASSERT(game_time_to_rewind > 0, "time_rewind_timer:__init: game_time_to_rewind is negative")
-	self.normal_time_factor = level.get_time_factor()
-	self.start_sleep_time = game.get_game_time()
-	self.end_sleep_time = self.start_sleep_time + seconds2ctime(game_time_to_rewind * 3600.0)
-	self.real_time = real_time or 3 -- время, за которое прокрутим, по умолчанию 3 секунды
-	local ph_num = phases_number or 3 -- количество периодов
-	-- на каждом периоде скорость течения времени уменьшается в 10 раз по отношению к предыдущему
-	-- таким образом повышается точность выставления времени
-	self.real_phase_time = self.real_time / ph_num -- длительность одной фазы
-	self:set_phase(ph_num)
-end
-function time_rewind_timer:set_phase(phase_num)
-	self.phase = phase_num
-	local current_game_time = game.get_game_time()
-	self.phase_begin = current_game_time
-	local time_left = self.end_sleep_time:diffSec(current_game_time) -- оставшееся время сна в секундах
-	if self.phase == 1 then -- последняя фаза, отдаём под неё всё оставшееся время
-		self.phase_end_time = self.end_sleep_time
-	else -- обычная фаза, отдаём под неё время 0.9 * <оставшееся время ожидания>
-		self.phase_end_time = self.phase_begin + seconds2ctime(time_left*0.9)
-	end
-	local tf = self.phase_end_time:diffSec(self.phase_begin) / self.real_phase_time
-	level.set_time_factor(tf)
-end
-function time_rewind_timer:condition()
-	if game.get_game_time() > self.phase_end_time then
-		if self.phase == 1 then return true end
-		self:set_phase(self.phase - 1)
-	end
-	return false
-end
-function time_rewind_timer:action()
-	local s_time_factor = get_float("alife","time_factor")
-	ASSERT(s_time_factor, "time_rewind_timer:action: parameter 'time_factor' was not found in the section 'alife'")
-	level.set_time_factor(s_time_factor)
-	--level.set_time_factor(self.normal_time_factor)
-end
-
+--****************************************************************************************************************************************
 
 function fix_restrictors(npc)
-	
-	if not npc then return end
-	
-	local t = parse_names(npc:in_restrictions())
 
---	print_table_inlog_v2(t, "RESTR_IN for ["..npc:name().."]")
+	if not npc then return end
+
+	local t = parse_names(npc:in_restrictions())
 
 	local pk = nil
 	local sObj = alife():object(npc:id())
 	if sObj then
 		pk = xs_netpk.stalker(sObj)
 	end
-	
+
 	for k, v in pairs(t) do
 		if not xr_gulag.valid_restrictors[v] then
 			npc:remove_restrictions("", v)
@@ -2941,10 +2261,8 @@ function fix_restrictors(npc)
 			end
 		end
 	end
-		
+
 	t = parse_names(npc:out_restrictions())
-	
---	print_table_inlog_v2(t, "RESTR_OUT for ["..npc:name().."]")
 	
 	for k, v in pairs(t) do
 		if not xr_gulag.valid_restrictors[v] then
@@ -2986,7 +2304,7 @@ function transfer_items_to_box(box_sid, remove_quest_items, exclude_sections, ex
 		-- фильтр по запрещенным секциям
 		if not exclude_sections or exclude_sections[sect] ~= true then
 		-- фильтр по квестовым вещам
-		if not remove_quest_items or not (system_ini():line_exist(sect, "quest_item") and system_ini():r_bool(sect, "quest_item")) then
+		if not remove_quest_items or not (sys_ini:line_exist(sect, "quest_item") and sys_ini:r_bool(sect, "quest_item")) then
 			-- особая обработка метки
 			if sect == "amk_metka" then
 				ogse_metka.dropped_to_box = ogse_metka.dropped_to_box + 1
