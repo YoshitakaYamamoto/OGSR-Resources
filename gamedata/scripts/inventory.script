@@ -1,6 +1,6 @@
 function attach(sm)
 	sm:subscribe({signal = "on_spawn",        fun = this.on_spawn})
-	sm:subscribe({signal = "on_update",       fun = this.on_update})
+	sm:subscribe({signal = "on_update",       fun = this.on_update, queued = true}) --KRodin: �� � ���� ��������� hit_from_arts �� ������ �������
 	sm:subscribe({signal = "on_update",       fun = this.on_update_lp, queued = true})
 	sm:subscribe({signal = "on_drop",         fun = this.on_item_drop})
 	sm:subscribe({signal = "on_item_to_slot", fun = this.on_item_to_slot})
