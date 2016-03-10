@@ -587,6 +587,7 @@ function musicbox_base:onStop()
 end
 
 function musicbox_base:onPlayAll()
+    soundtrack.mbox_button_press()
     self.checkedPlayAll = not self.checkedPlayAll
     if self.checkedPlayAll then
         self.play_all = this.co_create()
