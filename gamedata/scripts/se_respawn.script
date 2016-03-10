@@ -6,7 +6,7 @@ by Stohe (Диденко Руслан)
 --------------------------------------------------------------------------------------------------------------------]]
 -- Доработано под нужды мода OGSE 0.6.9.2 KamikaZze
 --------------------------------------------------------------------------------------------------------------------]]
-local t_common = system_ini():r_s32("options","t_common")
+local t_common = sys_ini:r_s32("options","t_common")
 
 
 local section_name = "respawn"
@@ -604,13 +604,12 @@ function r_spawns( spawn_ini, section, line, sectSpawnProps)
   
       -- Вычитываем настройки секций респавна и кешируем их.
       if sectSpawnProps[spawn.section] == nil then
-        local respawn_ini = system_ini()
-
-        local community = r_str(respawn_ini, spawn.section, "community", "nil")
-        local rank = r_str(respawn_ini, spawn.section, "spec_rank", "nil")
+        local community = r_str(sys_ini, spawn.section, "community", "nil")
+        local rank = r_str(sys_ini, spawn.section, "spec_rank", "nil")
         local check = true
-        local custom_data = r_str(respawn_ini, spawn.section, "custom_data")
-        if custom_data ~= nil then
+        local custom_data = r_str(sys_ini, spawn.section, "custom_data")
+        if custom_data ~= nil and (tostring(custom_data) ~= "stalker_custom_data.ltx") then --KRodin: ни к чему несколько раз подряд читать один и тот же пустой конфиг!
+log1("SE_RESPAWN - CUSTOM_DATA: "..tostring(custom_data))
           local custom_data_ltx = ini_file(custom_data)
           if custom_data_ltx:section_exist("smart_terrains") then
             if custom_data_ltx:line_exist("smart_terrains", "none") then
@@ -618,11 +617,11 @@ function r_spawns( spawn_ini, section, line, sectSpawnProps)
                 check = false
               end 
             end
-                        if custom_data_ltx:line_exist("smart_terrains", "respawn_check") then
-                            if r_str(custom_data_ltx, "smart_terrains", "respawn_check") == "false" then
-                                check = false
-                            end
-                        end                        
+            if custom_data_ltx:line_exist("smart_terrains", "respawn_check") then
+				if r_str(custom_data_ltx, "smart_terrains", "respawn_check") == "false" then
+					check = false
+				end
+			end                        
           end
         end
         
@@ -1044,9 +1043,7 @@ end
 
 
 function create_ammo(section, position, lvi, gvi, pid, num)
-	local ini = system_ini()
-
-	local num_in_box = ini:r_u32(section, "box_size")
+	local num_in_box = sys_ini:r_u32(section, "box_size")
 
 	while num > num_in_box do
 		local sitem = alife():create_ammo(section, position, lvi, gvi, pid, num_in_box)
