@@ -1,18 +1,14 @@
 -----------------------------------------------------------------------
---- ogse_random_task_reward.script                                       
---- ћодуль рандомных наград за однотипные квесты                      
---- Mixser (c) OGS Evolution Team                                      
---- version 1.61 (18/11/2011)                                             
+--- ogse_random_task_reward.script
+--- ћодуль рандомных наград за однотипные квесты
+--- Mixser (c) OGS Evolution Team
+--- version 1.61 (18/11/2011)
 -----------------------------------------------------------------------
 
 class "random_task_reward"
 
 function random_task_reward:__init(trader_name, task_name)
 	--self.cycle_count = 0
-	self.path = "misc\\random_task_reward.ltx" 
-	self.ltx = ini_file(self.path)
-	self.ini = system_ini()
-
 	self.random_task_reward_accept = 1 -- 1 - включены, 0 - отключены
 		
 		
@@ -64,10 +60,10 @@ end
 function random_task_reward:get_trader_list()
 	--self:print_cycle_count("start get_trader_list")
 	local time_array = {}
-	local n = self.ltx:line_count("trader_list")
+	local n = sys_ini:line_count("rndm_tsk_rwrd_trader_list")
 	
 	for i=0,n-1 do
-		result, id, value = self.ltx:r_line("trader_list",i,"","")
+		result, id, value = sys_ini:r_line("rndm_tsk_rwrd_trader_list",i,"","")
 		time_array[id] = true
 		--self:inc_cycle_count()
 	end
@@ -79,10 +75,10 @@ end
 function random_task_reward:get_difficult_list()
 	--self:print_cycle_count("start get_difficult_list")
 	local time_array = {}
-	local n = self.ltx:line_count("difficult_list")
+	local n = sys_ini:line_count("rndm_tsk_rwrd_difficult_list")
 	
 	for i=0,n-1 do
-		result, id, value = self.ltx:r_line("difficult_list",i,"","")
+		result, id, value = sys_ini:r_line("rndm_tsk_rwrd_difficult_list",i,"","")
 		time_array[id] = value
 		--self:inc_cycle_count()
 	end
@@ -107,9 +103,9 @@ end
 function random_task_reward:get_eliminate_type()
 	--self:print_cycle_count("start get_eliminate_type")
 	local monster_lager = {}
-	local n = self.ltx:line_count("monster_lair")
+	local n = sys_ini:line_count("rndm_tsk_rwrd_monster_lair")
 	for i=0, n-1 do
-		local result, id, value = self.ltx:r_line("monster_lair",i,"","")
+		local result, id, value = sys_ini:r_line("rndm_tsk_rwrd_monster_lair",i,"","")
 		monster_lager[id] = true
 		--self:inc_cycle_count()
 	end
@@ -131,24 +127,24 @@ end
 -- ѕолучение информации об денежной награде дл€ текущей схемы
 function random_task_reward:get_money_by_type()
 	if self.task_info.type == "artefact" or self.task_info.type == "find_item" or self.task_info.type == "monster_part" then 
-		if self.task_info.type == "artefact" then self.money_koef = self.ltx:r_float("money_koef", "art")
-			elseif self.task_info.type == "monster_part" then self.money_koef = self.ltx:r_float("money_koef", "monster_part")
-				elseif self.task_info.type == "find_item" then self.money_koef = self.ltx:r_float("money_koef", "find_item")
+		if self.task_info.type == "artefact" then self.money_koef = sys_ini:r_float("rndm_tsk_rwrd_money_koef", "art")
+			elseif self.task_info.type == "monster_part" then self.money_koef = sys_ini:r_float("rndm_tsk_rwrd_money_koef", "monster_part")
+				elseif self.task_info.type == "find_item" then self.money_koef = sys_ini:r_float("rndm_tsk_rwrd_money_koef", "find_item")
 		end
-		return self.money_koef*self.ini:r_u32(self:get_quest_target(self.task_info.task_name), "cost")
+		return self.money_koef*sys_ini:r_u32(self:get_quest_target(self.task_info.task_name), "cost")
 	else
-		return self.ltx:r_u32(self.trader.."_"..self.task_info.type.."_money", self.task_info.difficult.."_money")
+		return sys_ini:r_u32("rndm_tsk_rwrd_"..self.trader.."_"..self.task_info.type.."_money", self.task_info.difficult.."_money")
 	end
 end
 
 -- ѕолучение схемы, по которой будут генеритс€ вещи
 function random_task_reward:get_scheme_by_type()
 	--self:print_cycle_count("start get_scheme_by_type")
-	local n = self.ltx:line_count(self.trader.."_"..self.task_info.type.."_"..self.task_info.difficult.."_scheme")
+	local n = sys_ini:line_count("rndm_tsk_rwrd_"..self.trader.."_"..self.task_info.type.."_"..self.task_info.difficult.."_scheme")
 	local time_array = {}
 	
 	for i=0,n-1 do
-		result, id, value = self.ltx:r_line(self.trader.."_"..self.task_info.type.."_"..self.task_info.difficult.."_scheme",i,"","")
+		result, id, value = sys_ini:r_line("rndm_tsk_rwrd_"..self.trader.."_"..self.task_info.type.."_"..self.task_info.difficult.."_scheme",i,"","")
 		if math.random(100) <= tonumber(value) then table.insert(time_array, id) end
 		--self:inc_cycle_count()
 	end
@@ -165,7 +161,7 @@ function random_task_reward:get_trader_items()
 	
 	for k,v in pairs(self.items_list) do
 		--self:inc_cycle_count()
-		time_array[v] = self:get_array_from_string(self.ltx:r_string(self.trader.."_"..v, self.task_info.difficult.."_task"))
+		time_array[v] = self:get_array_from_string(sys_ini:r_string("rndm_tsk_rwrd_"..self.trader.."_"..v, self.task_info.difficult.."_task"))
 	end
 	
 	--self:print_cycle_count("finish get_trader_items")
@@ -174,14 +170,12 @@ end
 
 -- ¬озращение типа задани€
 function random_task_reward:get_task_type(task_name)
-	local ltx = ini_file("misc\\task_manager.ltx")
-	return ltx:r_string(task_name, "type")
+	return sys_ini:r_string(task_name, "type")
 end
 
 -- ¬озращение цели задани€ (дл€ квестов "принеси вещь")
 function random_task_reward:get_quest_target(task_name)
-	local ltx = ini_file("misc\\task_manager.ltx")
-	return ltx:r_string(task_name, "target")
+	return sys_ini:r_string(task_name, "target")
 end
 
 
@@ -226,7 +220,7 @@ function random_task_reward:generate_art()
 			local k = math.random(table.getn(self.trader_items["art"]))
 			time_array["name"] = self.trader_items["art"][k]
 			time_array["count"] = 1
-			time_array["price"] = self.money_koef*self.ini:r_u32(time_array["name"], "cost") -- нужно больше денег, мой лорд! =)
+			time_array["price"] = self.money_koef*sys_ini:r_u32(time_array["name"], "cost") -- нужно больше денег, мой лорд! =)
 			if time_array["price"] > self.money_max then time_array["price"] = self.money_max end
 			table.insert(money_info, time_array)
 			self:check_table(time_array) -- проверка на вхождение элемента (если элемент уже есть в итоговой таблице, то просто увеличиваем count)
@@ -238,8 +232,7 @@ end
 
 -- ”даление арта из таблицы (случай, когда арт, который npc забрал в качестве награды, выставл€ет арт как награду)
 function random_task_reward:delete_art()	
-	local task_ini = ini_file("misc\\task_manager.ltx")
-	local name = task_ini:r_string(self.task_info.task_name, "target") -- название арта
+	local name = sys_ini:r_string(self.task_info.task_name, "target") -- название арта
 	local t = 0
 	
 	for k,v in pairs(self.trader_items["art"]) do
@@ -274,7 +267,7 @@ function random_task_reward:generate_weapon()
 	time_array["name"] = self.trader_items["weapon"][math.random(table.getn(self.trader_items["weapon"]))]
 	weapon = time_array["name"] -- дл€ аддона
 	time_array["count"] = 1
-	time_array["price"] = self.ini:r_u32(time_array["name"], "cost")
+	time_array["price"] = sys_ini:r_u32(time_array["name"], "cost")
 --	if time_array["price"] > self.money_max then time_array["price"] = self.money_max end		-- это нахера вообще было сделано???
 	if time_array["price"] > self.money_max then return end
 	table.insert(money_info, time_array)
@@ -290,7 +283,7 @@ function random_task_reward:generate_weapon()
 		}
 		time_array["name"] = help:get_addon_to_weapon()
 		time_array["count"] = 1
-		time_array["price"] = self.ini:r_u32(time_array["name"], "cost")
+		time_array["price"] = sys_ini:r_u32(time_array["name"], "cost")
 --		if time_array["price"] > self.money_max then time_array["price"] = self.money_max end
 		if time_array["price"] > self.money_max then return end
 		table.insert(money_info, time_array)
@@ -309,7 +302,7 @@ function random_task_reward:generate_device()
 	time_array["name"] = self.trader_items["device"][math.random(table.getn(self.trader_items["device"]))]
 	device = time_array["name"] -- дл€ аддона
 	time_array["count"] = 1
-	time_array["price"] = self.ini:r_u32(time_array["name"], "cost")
+	time_array["price"] = sys_ini:r_u32(time_array["name"], "cost")
 --	if time_array["price"] > self.money_max then time_array["price"] = self.money_max end		-- это нахера вообще было сделано???
 	if time_array["price"] > self.money_max then return end
 	table.insert(money_info, time_array)
@@ -322,7 +315,7 @@ function random_task_reward:generate_outfit()
 	local money_info = {}
 	time_array["name"] = self.trader_items["outfit"][math.random(table.getn(self.trader_items["outfit"]))]
 	time_array["count"] = 1
-	time_array["price"] = self.ini:r_u32(time_array["name"], "cost")
+	time_array["price"] = sys_ini:r_u32(time_array["name"], "cost")
 	table.insert(money_info, time_array)
 --	if time_array["price"] > self.money_max then time_array["price"] = self.money_max end
 	if time_array["price"] > self.money_max then return end
@@ -341,7 +334,7 @@ function random_task_reward:generate_ammo()
 			time_array = {}
 			local k = math.random(table.getn(self.trader_items["ammo"]))
 			time_array["name"] = self.trader_items["ammo"][k]
-			time_array["price"] = self.ini:r_u32(time_array["name"], "cost")
+			time_array["price"] = sys_ini:r_u32(time_array["name"], "cost")
 --			if time_array["price"] > self.money_max then time_array["price"] = self.money_max end
 			if time_array["price"] > self.money_max then return end
 			time_array["count"] = math.ceil(money_piece/time_array["price"]) -- получаем количество пачек
@@ -366,7 +359,7 @@ function random_task_reward:generate_other()
 			time_array = {}
 			local k = math.random(table.getn(self.trader_items["other"]))
 			time_array["name"] = self.trader_items["other"][k]
-			time_array["price"] = self.ini:r_u32(time_array["name"], "cost")
+			time_array["price"] = sys_ini:r_u32(time_array["name"], "cost")
 --			if time_array["price"] > self.money_max then time_array["price"] = self.money_max end
 			if time_array["price"] > self.money_max then return end
 			time_array["count"] = math.ceil(money_piece/time_array["price"]) 

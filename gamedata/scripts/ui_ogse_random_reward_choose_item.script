@@ -77,8 +77,7 @@ function random_reward_get_hud(npc, task_name)
 end
 
 function choose_item:get_trader_name(task_name)
-	local ltx = ini_file("misc\\task_manager.ltx")
-	return ltx:r_string(task_name, "parent")
+	return sys_ini:r_string(task_name, "parent")
 end
 
 function choose_item:Get_Data()
@@ -217,7 +216,7 @@ function choose_item:AddItemToList1(item_num, item_name, item_price, item_count)
 	itm.itmnum:SetText (item_num)
 	itm.itmn:SetText (game.translate_string(get_inv_name(item_name)))
 	itm.itmcost:SetText (tostring(item_price)..game.translate_string("rub_string"))
-	if string.find(item_name, "ammo_") then itm.itmcount:SetText (item_count*system_ini():r_u32(item_name, "box_size")) else itm.itmcount:SetText(item_count) end
+	if string.find(item_name, "ammo_") then itm.itmcount:SetText (item_count*sys_ini:r_u32(item_name, "box_size")) else itm.itmcount:SetText(item_count) end
 	local list_box = self:GetListWnd("list_window")
 	list_box:AddItem (itm)
 end
@@ -235,13 +234,13 @@ function choose_item:AddItemToList2(item_num, item_name, item_price, item_count)
 	itm.itmnum:SetText (item_num)
 	itm.itmn:SetText (game.translate_string(get_inv_name(item_name)))
 	itm.itmcost:SetText (tostring(item_price)..game.translate_string("rub_string"))
-	if string.find(item_name, "ammo_") then itm.itmcount:SetText (item_count*system_ini():r_u32(item_name, "box_size")) else itm.itmcount:SetText(item_count) end
+	if string.find(item_name, "ammo_") then itm.itmcount:SetText (item_count*sys_ini:r_u32(item_name, "box_size")) else itm.itmcount:SetText(item_count) end
 	local list_box = self:GetListWnd("list2_window")
 	list_box:AddItem (itm)
 end
 
 function get_inv_name(item_name)
-	return system_ini():r_string(item_name, "inv_name")
+	return sys_ini:r_string(item_name, "inv_name")
 end
 
 function choose_item:OnListItemClicked()
@@ -312,7 +311,7 @@ function choose_item:take_item()
 	if not item then return end
 	
 		-- Сперва посмотрим, если в self.reward_items предмет, который мы хотим передать
-	if self.current_money - self.trader_items[index+1].price >= 0 then -- system_ini():r_s32(self.trader_items[index+1].name, "cost")
+	if self.current_money - self.trader_items[index+1].price >= 0 then -- sys_ini:r_s32(self.trader_items[index+1].name, "cost")
 		local already_have = false
 		local reward_items_index = 0
 		
@@ -354,7 +353,7 @@ end
 function choose_item:update_data(index1)
 	-- Уменьшаем count предмета в self.trader_items, если count = 0, то удаляем всякое напоминание о предмете
 	
-	self.current_money = self.current_money - self.trader_items[index1+1].price --system_ini():r_u32(self.trader_items[index1+1].name, "cost")
+	self.current_money = self.current_money - self.trader_items[index1+1].price --sys_ini:r_u32(self.trader_items[index1+1].name, "cost")
 	
 	self.trader_items[index1+1].count = self.trader_items[index1+1].count - 1
 	
@@ -395,7 +394,7 @@ function choose_item:return_item()
 	
 	if not item then return end
 	
-	self.current_money = self.current_money + self.reward_items[index+1].price --system_ini():r_u32(self.reward_items[index+1].name, "cost")
+	self.current_money = self.current_money + self.reward_items[index+1].price --sys_ini:r_u32(self.reward_items[index+1].name, "cost")
 		
 	-- Сперва посмотрим, если в self.trader_items предмет, который мы хотим передать
 	
@@ -460,27 +459,19 @@ function choose_item:OnMsgYes()
 end
 
 function get_x(item)
-	local ini = system_ini()
-	tx = ini:r_u32(item, "inv_grid_x")
-	return tx
+	return sys_ini:r_u32(item, "inv_grid_x")
 end
 
 function get_y(item)
-	local ini = system_ini()
-    ty = ini:r_u32(item, "inv_grid_y")
-	return ty
+	return sys_ini:r_u32(item, "inv_grid_y")
 end
 
 function get_w(item)
-	local ini = system_ini()
-	tw = ini:r_u32(item, "inv_grid_width")
-	return tw
+	return sys_ini:r_u32(item, "inv_grid_width")
 end
 
 function get_h(item)
-	local ini = system_ini()
-    th = ini:r_u32(item, "inv_grid_height")
-	return th
+	return sys_ini:r_u32(item, "inv_grid_height")
 end
 
 --Рисуем ремонтируемый предмет
@@ -504,7 +495,6 @@ if y == nil then y = 0 end
 	local isSilencer=false
 	
 	local a = self.cur_rem_textur
-	local sys = system_ini()
 	if not a then
 		self.cur_rem_textur = CUIStatic()
 		a = self.cur_rem_textur
@@ -583,7 +573,6 @@ if y == nil then y = 0 end
 	local isSilencer=false
 	
 	local a = self.cur_rem_textur2
-	local sys = system_ini()
 	if not a then
 		self.cur_rem_textur2 = CUIStatic()
 		a = self.cur_rem_textur2
@@ -702,7 +691,6 @@ function choose_item:DrawTraderIcon(trader, x, y)
    if y == nil then y = 0 end
 
    local a = self.trader_textur
-   local sys = system_ini()
     
    if not a then
       self.trader_textur = CUIStatic()
