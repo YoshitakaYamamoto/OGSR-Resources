@@ -6,10 +6,6 @@
 -----------------------------------------------------------------------
 -- Количество предметов для выдачи
 
-local path = "misc\\items_of_tr_man.ltx"
-local ltx = ini_file(path)
-local ini = system_ini()
-
 local prob_checking_table = 
 {
 	["outfit"] 		= 1,
@@ -57,9 +53,9 @@ function get_special_treasure()
 	
 	for k,v in pairs(st) do
 		a = {}
-		n = ltx:line_count(v)
+		n = sys_ini:line_count(v)
 		for i=0,n-1 do
-			result, id, value = ltx:r_line(v,i,"","")
+			result, id, value = sys_ini:r_line(v,i,"","")
 			a[i+1] = id
 		end
 		time_array[v] = a
@@ -109,8 +105,8 @@ function random_treasure:get_level_chance(level)
 			
 	for k,v in pairs(treasure_scheme) do
 		local b = {}
-		b["min"] = ltx:r_u32(level.."_"..v, "min")
-		b["max"] = ltx:r_u32(level.."_"..v, "max")
+		b["min"] = sys_ini:r_u32(level.."_"..v, "min")
+		b["max"] = sys_ini:r_u32(level.."_"..v, "max")
 		time_array[v] = b
 	end
 	
@@ -190,7 +186,7 @@ end
 
 -- Функция получения "цены" тайника по уровню
 function random_treasure:get_price_by_level(level)
-	return ltx:r_u32("level_price", level)
+	return sys_ini:r_u32("level_price", level)
 end
 
 -- Функция получения шаблона по уровню
@@ -258,10 +254,10 @@ end
 -- Функция получения массива из string'а из постороннего файла
 function random_treasure:get_mas(sec1, sec2)
 	local tbl = {}
-	local list = ltx:r_string(sec1, sec2) -- где,что
+	local list = sys_ini:r_string(sec1, sec2) -- где,что
 	local num = nil
 		
-	if ltx:r_string(sec1,sec2) then 
+	if sys_ini:r_string(sec1,sec2) then 
 		for num in string.gfind(list,"([%w_%-.\\]+)%p*") do 
 			if not (self.current_template == "arts" or self.current_template == "weapons" or self.current_template == "outfits" or self.current_template == "devices") then table.insert(tbl, num) 
 			else if self:include_item_in_treasure_items(num) == false then table.insert(tbl, num) end -- проверяем присуствие предметов в прошлых тайниках
@@ -280,10 +276,10 @@ end
 -- Функция получения массива из string'а из system_ini()
 function random_treasure:get_mas_ini(sec1, sec2)
 	local tbl = {}
-	local list = ini:r_string(sec1, sec2) -- где,что
+	local list = sys_ini:r_string(sec1, sec2) -- где,что
 	local num = nil
 	
-	if ini:r_string(sec1,sec2) then for num in string.gfind(list,"([%w_%-.\\]+)%p*") do table.insert(tbl, num) end end 
+	if sys_ini:r_string(sec1,sec2) then for num in string.gfind(list,"([%w_%-.\\]+)%p*") do table.insert(tbl, num) end end 
 	
 	return tbl
 end
@@ -301,7 +297,7 @@ function random_treasure:get_item(item)
 			time_array["prob"] = self:get_prob(time_array["section"])
 		else
 
-			local num_in_box = ini:r_u32(time_array["section"], "box_size")
+			local num_in_box = sys_ini:r_u32(time_array["section"], "box_size")
 
 			local h = 0
 									
@@ -329,13 +325,13 @@ function random_treasure:get_addon_to_weapon()
 	local weapon = self.current_reward[1].section
 	local addons = {}
 	
-	if ini:line_exist(weapon, "scope_status") and ini:r_u32(weapon, "scope_status") == 2 then table.insert(addons, ini:r_string(weapon, "scope_name")) end
+	if sys_ini:line_exist(weapon, "scope_status") and sys_ini:r_u32(weapon, "scope_status") == 2 then table.insert(addons, sys_ini:r_string(weapon, "scope_name")) end
 
-	if ini:line_exist(weapon, "silencer_status") and ini:r_u32(weapon, "silencer_status") == 2 then table.insert(addons, ini:r_string(weapon, "silencer_name")) end
-	if ini:line_exist(weapon, "grenade_launcher_status") and ini:r_u32(weapon, "grenade_launcher_status") == 2 then table.insert(addons, ini:r_string(weapon, "grenade_launcher_name")) end
+	if sys_ini:line_exist(weapon, "silencer_status") and sys_ini:r_u32(weapon, "silencer_status") == 2 then table.insert(addons, sys_ini:r_string(weapon, "silencer_name")) end
+	if sys_ini:line_exist(weapon, "grenade_launcher_status") and sys_ini:r_u32(weapon, "grenade_launcher_status") == 2 then table.insert(addons, sys_ini:r_string(weapon, "grenade_launcher_name")) end
 	
 	for k,v in pairs(changeble_addons) do
-		if ini:line_exist(weapon, v) then table.insert(addons, v) end
+		if sys_ini:line_exist(weapon, v) then table.insert(addons, v) end
 	end
 	
 	--print_table_inlog(addons, "addons->")
@@ -345,7 +341,6 @@ function random_treasure:get_addon_to_weapon()
 end
 
 function random_treasure:get_ammo_to_weapon()
-	local ini = system_ini()
 	local weapon = self.current_reward[1].section
 	local ammo_list = self:get_mas_ini(weapon, "ammo_class")
 
