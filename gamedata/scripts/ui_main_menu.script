@@ -34,10 +34,6 @@ end
 
 local screen_aspect_ratio = 1.34
 
-function integ_init()
-	ogse_integrity.main()	
-end
-
 function main_menu:InitBackground(xml)
 	local night
 	if level and level.present() then
