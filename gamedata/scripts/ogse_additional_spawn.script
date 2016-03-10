@@ -9,10 +9,7 @@
 class "additional_spawn"
 
 function additional_spawn:__init()
-	self.path = "misc\\additional_spawn.ltx"
-	self.ltx = ini_file(self.path)
-	self.ini = system_ini()
-	self.additional_spawn_accept = self.ini:r_s32("options","additional_spawn") -- опция в конфигураторе (1 - включено, 0 - выключено)
+	self.additional_spawn_accept = sys_ini:r_s32("options","additional_spawn") -- опция в конфигураторе (1 - включено, 0 - выключено)
 	
 	self.creatures = {"human","mutant"} -- список существ
 	self.human_list = {"bandits", "army", "dolg", "freedom", "mercenary", "zombied", "monolith"} -- наименование группировок
@@ -34,10 +31,10 @@ end
 
 function additional_spawn:get_level_list()
 	local time_array = {}
-	local n = self.ltx:line_count("level_list")
+	local n = sys_ini:line_count("level_list")
 	
 	for i=0,n-1 do
-		result, id, value = self.ltx:r_line("level_list",i,"","")
+		result, id, value = sys_ini:r_line("level_list",i,"","")
 
 		time_array[i+1] = id
 	end
@@ -54,9 +51,9 @@ function additional_spawn:get_level_spawn()
 		a = {}
 		for k1,v1 in pairs(self.creatures) do
 			b = {}
-			n = self.ltx:line_count(v.."_"..v1)
+			n = sys_ini:line_count(v.."_"..v1)
 			for i=0,n-1 do
-				result, id, value = self.ltx:r_line(v.."_"..v1,i,"","")
+				result, id, value = sys_ini:r_line(v.."_"..v1,i,"","")
 				b[i+1] = id
 			end
 			a[v1] = b
@@ -69,11 +66,11 @@ end
 
 function additional_spawn:get_spawn_count()
 	local time_array = {}
-	local n = self.ltx:line_count("spawn_count")
+	local n = sys_ini:line_count("spawn_count")
 	local a = {}
 	
 	for i=0,n-1 do
-		result, id, value = self.ltx:r_line("spawn_count",i,"","")
+		result, id, value = sys_ini:r_line("spawn_count",i,"","")
 		local help = {}
 		local num = nil
 		a = {}
@@ -92,15 +89,15 @@ function additional_spawn:get_human_info()
 	local a,b,c,d = {}
 
 	for k,v in pairs (self.human_list) do
-		n = self.ltx:r_u32("human_info_count",v)
+		n = sys_ini:r_u32("human_info_count",v)
 		a = {}
 		for i=1,n do
 			b = {}
-			b.name = self.ltx:r_string(v.."_info_"..tostring(i),"name")
-			b.cond1 = self.ltx:r_string(v.."_info_"..tostring(i),"cond1")
-			b.cond2 = self.ltx:r_string(v.."_info_"..tostring(i),"cond2")
-			if self.ltx:line_exist(v.."_info_"..tostring(i),"nospawn_level") then
-				local s = self.ltx:r_string(v.."_info_"..tostring(i),"nospawn_level")
+			b.name = sys_ini:r_string(v.."_info_"..tostring(i),"name")
+			b.cond1 = sys_ini:r_string(v.."_info_"..tostring(i),"cond1")
+			b.cond2 = sys_ini:r_string(v.."_info_"..tostring(i),"cond2")
+			if sys_ini:line_exist(v.."_info_"..tostring(i),"nospawn_level") then
+				local s = sys_ini:r_string(v.."_info_"..tostring(i),"nospawn_level")
 				local num = nil
 				c = {}
 				for num in string.gfind(s,"([%w_%-.\\]+)%p*") do table.insert(c, num) end
@@ -122,13 +119,13 @@ function additional_spawn:get_mutant_info()
 	local a,b = {}
 	
 	for k,v in pairs (self.mutant_list) do
-		n = self.ltx:r_u32("mutant_info_count",v)
+		n = sys_ini:r_u32("mutant_info_count",v)
 		a = {}
 		for i=1,n do
 			b = {}
-			b.name = self.ltx:r_string(v.."_info_"..tostring(i),"name")
-			b.cond1 = self.ltx:r_string(v.."_info_"..tostring(i),"cond1")
-			b.cond2 = self.ltx:r_string(v.."_info_"..tostring(i),"cond2")
+			b.name = sys_ini:r_string(v.."_info_"..tostring(i),"name")
+			b.cond1 = sys_ini:r_string(v.."_info_"..tostring(i),"cond1")
+			b.cond2 = sys_ini:r_string(v.."_info_"..tostring(i),"cond2")
 			a[i] = b
 		end
 		time_array[v] = a
@@ -139,15 +136,15 @@ end
 
 function additional_spawn:get_human_count()
 	local time_array = {}
-		time_array.min = self.ltx:r_u32("human_count","min")
-		time_array.max = self.ltx:r_u32("human_count","max")
+		time_array.min = sys_ini:r_u32("human_count","min")
+		time_array.max = sys_ini:r_u32("human_count","max")
 	return math.random(time_array.min, time_array.max)
 end
 
 function additional_spawn:get_mutant_count()
 	local time_array = {}
-		time_array.min = self.ltx:r_u32("mutant_count","min")
-		time_array.max = self.ltx:r_u32("mutant_count","max")
+		time_array.min = sys_ini:r_u32("mutant_count","min")
+		time_array.max = sys_ini:r_u32("mutant_count","max")
 	return math.random(time_array.min, time_array.max)
 end
 
@@ -206,15 +203,12 @@ end
 --- перебирает координаты вертексов столько раз сколько указано в count, пока координаты не окажутся не менее 100 метров в радиусе от ГГ
 --- затем спавнит по ним (автор Kamikazze)
 function additional_spawn:proceed_npc_spawn(section, count)
-
-local respawn_ini = system_ini()
-
 for ind = 1, count do
 
 	local pos, new_lv, new_gv = ogse_anomaly.anomaly_position_choice(level.name(), false)
 
-    local community = r_str(respawn_ini, section, "community", "nil")
-    local rank = r_str(respawn_ini, section, "spec_rank", "nil")
+    local community = r_str(sys_ini, section, "community", "nil")
+    local rank = r_str(sys_ini, section, "spec_rank", "nil")
 	local check_1 =  se_respawn.check_npc_spawn_allowed(section, community, rank)
 	local check_2 =  se_respawn.check_monster_spawn_allowed(section, community, rank)
 	if check_1 == true or check_2 == true then
