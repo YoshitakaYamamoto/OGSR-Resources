@@ -1,560 +1,889 @@
---/ remkit_main.script /--
---/ Repair kit module /--
---/ OGS Evolution Team 2009 /--
---/ version 0.9 /--
+--[[----------------------------------------------------------------------------
+-|remkit_main.script
+-|РњРѕРґСѓР»СЊ РїРѕС…РѕРґРЅРѕРіРѕ СЂРµРјРѕРЅС‚РЅРѕРіРѕ РєРѕРјРїР»РµРєС‚Р°
+-|KRodin В© 2016
+-|Version: 2.0 (РџРµСЂРµРґРµР»Р°РЅРѕ РѕС‡РµРЅСЊ РјРЅРѕРіРѕ, СЃРѕР±СЂР°РЅРѕ РёР· С‚СЂРµС… СЃРєСЂРёРїС‚РѕРІ РІ РѕРґРёРЅ Рё Р°РґР°РїС‚РёСЂРѕРІР°РЅРѕ РїРѕРґ РЅРѕРІСѓСЋ СЃРёСЃС‚РµРјСѓ Р°РґРґРѕРЅРѕРІ)
+-|Р”Р»СЏ СЂР°Р±РѕС‚С‹ РЅСѓР¶РµРЅ РјРѕРґСѓР»СЊ С„СѓРЅРєС†РёР№ СЂР°Р±РѕС‚С‹ СЃ РѕСЂСѓР¶РёРµРј ogse_wpn_utils.script
+------------------------------------------------------------------------------]]
+--[[
+РќРѕРІС‹Р№ РїСЂРёРЅС†РёРї СЂР°Р±РѕС‚С‹ СЂРµРјРєРёС‚Р°:
+РџРѕС‡РёРЅРёС‚СЊ РјРѕР¶РЅРѕ РІРµС‰СЊ, СЃРѕСЃС‚РѕСЏРЅРёРµ РєРѕС‚РѕСЂРѕР№ РІС‹С€Рµ 10% (СѓР±Р°РІРёР» РѕРіСЂР°РЅРёС‡РµРЅРёРµ, РІ РѕСЂРёРіРёРЅР°Р»Рµ Р±С‹Р»Рѕ Р±РѕР»СЊС€Рµ)
+РџРѕСЃР»Рµ СЂРµРјРѕРЅС‚Р° РІРµС‰СЊ СЂРµРјРѕРЅС‚РёСЂСѓРµС‚СЃСЏ РџРћР›РќРћРЎРўР¬Р®! (С‚.Рµ РґРѕ 100% СЃРѕСЃС‚РѕСЏРЅРёСЏ), Рё СЂРµРјРєРёС‚ СѓРґР°Р»СЏРµС‚СЃСЏ.
+РўСЂР°РЅСЃРїРѕСЂС‚ С‡РёРЅРёС‚СЃСЏ РїРѕ СЃС‚Р°СЂРѕР№ СЃС…РµРјРµ. РўР°Рј РЅРёС‡РµРіРѕ РЅРµ РјРµРЅСЏР».
+]]
 
---/ Модуль походного ремонтного комплекта, основной скрипт /--
-
-transp = 0
-
-
-function use_repair_kit(repaired_slot, destr_item)
-local result = "without_changes"
-if db.actor:item_in_slot(repaired_slot) ~= nil then
-	local repair_item = db.actor:item_in_slot(db.repaired_slot)
-	local repair_item_section = repair_item:section()
-	local repair_item_condition = repair_item:condition()
-	local destr_item_section = destr_item:section()
-	local destr_item_condition = destr_item:condition()
-	
-	local actor_rank = db.actor:character_rank()
-	if actor_rank > 1000 then actor_rank = 1000 end
--- ogse.send_tip("Ранг: " .. actor_rank)
-
-	local tech_complication = technical_complication(repair_item)
--- ogse.send_tip("Сложность: " .. tech_complication)
-	local amendment = (math.random((actor_rank - tech_complication), (actor_rank - tech_complication + 300)))/1000
-	if amendment > 0 then amendment = 0 end
-	if repair_item_section == destr_item_section then amendment = amendment*0.7 end
--- ogse.send_tip("Поправка: " .. amendment)
-
-	local size_of_repair = (destr_item_condition - 0.15) * (1 - ((1 - db.cond_rk) / 3))
-	local repared_condition = repair_item_condition + size_of_repair
-	local dif_repared_condition = repared_condition + amendment
-
-	if repared_condition > 0.98 then
-		repared_condition = 0.98
-		size_of_repair = repared_condition - repair_item_condition
-	end
-
-	if dif_repared_condition > 0.98 then
-		dif_repared_condition = 0.98
-	elseif (dif_repared_condition > 0) and (dif_repared_condition < 0.98) then
-		if dif_repared_condition < repair_item_condition then
--- ogse.send_tip("Похоже, мы испортили вещь...")
-			dif_repared_condition = repair_item_condition - ((repair_item_condition - dif_repared_condition)*((1000 - actor_rank)/1000))
-			if dif_repared_condition < 0 then dif_repared_condition = 0 end
-		end
-	elseif dif_repared_condition <= 0 then
-		if dif_repared_condition < repair_item_condition then
--- ogse.send_tip("Ты сломал это!!!")
-			dif_repared_condition = repair_item_condition - ((repair_item_condition + dif_repared_condition)*((1000 - actor_rank)/1000))
-			if dif_repared_condition < 0 then dif_repared_condition = 0 end
-		end
-	end
-
-	if dif_repared_condition > repair_item_condition then
---		ogse.send_tip("Вам удалось улучшить состояние предмета.")
-		result = "success"
-	elseif dif_repared_condition == repair_item_condition then
---		ogse.send_tip("Вам не удалось улучшить состояние предмета.")
-		result = "without_changes"
-	else
---		ogse.send_tip("По неопытности Вы ухудшили состояние предмета.")
-		result = "failure"
-	end
-
-	repair_item:set_condition(dif_repared_condition)
-
-	if system_ini():r_string(destr_item_section, "slot") == "1" or system_ini():r_string(destr_item_section, "slot") == "2" then
-
-	if system_ini():line_exist(destr_item_section, "ammo_class") then
--- Разрядим оружие и снимем с него аддоны
--- -- log1("Разрядим разбираемое оружие")
-
-		local destr_item_state = get_weapon_data(alife():object(destr_item:id()))
-
-		local w_ammo_num = destr_item:get_ammo_in_magazine()
--- -- log1("Оружие снаряжено " .. w_ammo_num .. " патронами")
-		local w_ammo_type = destr_item_state.ammo_type
-		local ammo_list = system_ini():r_string(destr_item_section, "ammo_class")
-		local num = nil
-		local ammo_tbl = {}
-		for num in string.gfind(ammo_list,"([%w_%-.\\]+)%p*" ) do
-			table.insert(ammo_tbl, num)
-		end
-		local w_ammo_name = ammo_tbl[w_ammo_type+1]
-		ogse.spawn_ammo_in_inv(w_ammo_name, w_ammo_num)
-
--- Разберёмся с аддонами
-		local scope = 0
-		local launcher = 0
-		local silence = 0
-
-		if 	system_ini():line_exist(destr_item_section, "scope_status") then
-			scope = system_ini():r_u32(destr_item_section, "scope_status")
-		end
-		if 	system_ini():line_exist(destr_item_section, "grenade_launcher_status") then
-			launcher = system_ini():r_u32(destr_item_section, "grenade_launcher_status")
-		end
-		if 	system_ini():line_exist(destr_item_section, "silencer_status") then
-			silence = system_ini():r_u32(destr_item_section, "silencer_status")
-		end
-
-		if scope == 2 and bit_and(destr_item_state.addon_flags, 1) == 1 then
-			local inst_scope = system_ini():r_string(destr_item_section,"scope_name")
-			ogse.spawn_item_in_inv(inst_scope)
-		end
-		if launcher == 2 and bit_and(destr_item_state.addon_flags, 2) == 2 then
-			local inst_launcher = system_ini():r_string(destr_item_section,"grenade_launcher_name")
-			ogse.spawn_item_in_inv(inst_launcher)
-		end
-		if silence == 2 and bit_and(destr_item_state.addon_flags, 4) == 4 then 	
-			local inst_silence = system_ini():r_string(destr_item_section,"silencer_name")
-			ogse.spawn_item_in_inv(inst_silence)
-		end
-	end
-	end
-	ogse.remove_item_from_inventory(destr_item)
-	db.cond_rk_dif = size_of_repair * repair_item_condition
-	play_repair_sound()
-end
-	return result
+function attach(sm)
+	sm:subscribe({signal = "on_use",	fun = this.check_use_repair_kit})
 end
 
-
-function check_use_repair_kit(p_obj) 
-	if p_obj == nil or alife():object(p_obj:id()) == nil then return end
-	if p_obj and p_obj:section() == "repair_kit" and transp == 0 then
-		db.cond_rk_dif = 0
-		db.cond_rk = p_obj:condition()
-		call_menu_repair_kit()
-	else	
-		transp = 0		
-	end
-end
-
-
-function create_repair_kit()
--- -- log1("Спавним в инвентарь новый ремкит")
-	local new_rep_kit = ogse.spawn_item_in_inv("repair_kit")
--- -- log1("Запускаем таймер для ожидания появления предмета")
-	ogse.start_timer("rkc", 0.05)
-
-end
-
-
-function call_menu_repair_kit()
-
-	local is_enemy_around = false
-	for id in pairs(db.creature) do
-	if id ~= nil then
-		local obj=level.object_by_id(id)
-		if obj and obj:is_custom_monster() and obj:alive() then
-			local is_stalker = IsStalker(obj)
-			local dist = obj:position():distance_to(db.actor:position())
-			local is_enemy_to_actor = ogse.get_npc_relation(obj,db.actor) == "enemy"
-			if ((is_stalker and is_enemy_to_actor) or IsMonster(obj)) and (dist < 5 or obj:see(db.actor)) then
-				is_enemy_around = true
-				break
-			end
-		end
-	end end	
-	
-	if is_enemy_around == true then
-		ogse.autohiding_msg("remkit_main_msg_1_text", 1500)
-		-- ogse.send_tip("Вы не можете заниматься ремонтом, когда рядом враги.","Сообщение",nil,5)
--- log1("Рядом враги - ремонт невозможен")
-		create_repair_kit()
-	elseif db.cond_rk < 0.15 then
-		ogse.autohiding_msg("remkit_main_msg_2_text", 1500)
-		-- ogse.send_tip("Инструмент пришёл в негодность.","Сообщение",nil,5)
-		create_repair_kit()
-	else
-		local spwn=ui_remkit.remkit(get_hud())
+function check_use_repair_kit(p_obj) --РґРµР№СЃС‚РІРёРµ РїСЂРё Р·Р°РїСѓСЃРєРµ СЂРµРјРєРёС‚Р° РёР· РёРЅРІРµРЅС‚Р°СЂСЏ.
+	if p_obj and p_obj:section() == "repair_kit" then
+		local spwn = remkit(get_hud())
 		level.start_stop_menu(spwn,true)
 	end
 end
 
-
-function search_repair_kit()
-	db.use_rk = 0
-	db.actor:inventory_for_each(set_condition_repair_kit)
-	if db.use_rk == 0 then
--- -- log1("Предмет ещё не появился, ждём дальше")
-		ogse.start_timer("rkc", 0.05)
-	end
+function create_repair_kit()
+	ogse.spawn_item_in_inv("repair_kit")
 end
 
+function dismantle_wpn(destr_item) --РџРѕР»РЅРѕСЃС‚СЊСЋ СЂР°Р·РѕР±СЂР°С‚СЊ РѕСЂСѓР¶РёРµ - СЃРЅСЏС‚СЊ РІСЃРµ Р°РґРґРѕРЅС‹, РјР°РіР°Р·РёРЅ, РіСЂР°РЅР°С‚С‹ РёР· РїРѕРґСЃС‚РІРѕР»Р°, РїР°С‚СЂРѕРЅС‹ Рё С‚Рґ.
+--------------------------------------РЎРЅРёРјР°РµРј СЃРѕ СЃС‚РІРѕР»Р° Р°РґРґРѕРЅС‹:------------------------------------------
+	local dest_itm_sect = destr_item:section()
+	local has_gl, has_scope, has_sil, has_grip, has_scope_mount, has_magazine = false, false, false, false, false, false
+	if ogse_wpn_utils.get_grenade_launcher_status( destr_item ) == 2 and ogse_wpn_utils.get_grenade_launcher_flag( destr_item )	then has_gl				= true end
+	if ogse_wpn_utils.get_scope_status( destr_item )			== 2 and ogse_wpn_utils.get_scope_flag( destr_item )			then has_scope			= true end
+	if ogse_wpn_utils.get_silencer_status( destr_item )			== 2 and ogse_wpn_utils.get_silencer_flag( destr_item )			then has_sil			= true end
+	if get_u32(dest_itm_sect, "grip_status", 0)					== 2 and ogse_wpn_utils.get_grip_flag( destr_item )				then has_grip			= true end
+	if get_u32(dest_itm_sect, "scope_mount_status", 0)			== 2 and ogse_wpn_utils.get_scope_mount_flag( destr_item )		then has_scope_mount	= true end
+	if get_u32(dest_itm_sect, "magazine_status", 0)				== 2 and ogse_wpn_utils.get_magazine_flag( destr_item )			then has_magazine		= true end
 
-function set_condition_repair_kit(item)
-	if item and item.id and item.section then
-		local item_sobj = alife():object(item:id())
-		if item_sobj and item_sobj:section_name() == "repair_kit" and db.use_rk == 0 then
-			local id = item:id()
-			if item:condition() == 1 then
-
-				db.use_rk = 1
-					
-				local new_repair_kit = item
-				local s_obj = alife():object(new_repair_kit:id())
-
-				if s_obj then
-				-- -- log1("Прочитаем текущие параметры ремкита в нет-пакет")
-					local rep_kit_params = read_cse_item_params(alife():object(new_repair_kit:id()))
-				-- -- log1("Сбросим таблицу нет-пакета в лог: " .. rep_kit_params.gvid .. " / " .. rep_kit_params.obf32u1 .. " / " .. rep_kit_params.obs32u2 .. " / " .. rep_kit_params.lvid .. " / " .. rep_kit_params.oflags .. " / " .. rep_kit_params.custom .. " / " .. rep_kit_params.sid .. " / " .. rep_kit_params.obs32u3 .. " / " .. rep_kit_params.visual .. " / " .. rep_kit_params.vsu8u1 .. " / " .. rep_kit_params.condition .. " / " .. rep_kit_params.updnum_items--[[ .. " / " .. rep_kit_params.updcse_alife_item__unk1_q8v4 .. " / " .. rep_kit_params.updcse_alife_item__unk2_q8v3 .. " / " .. rep_kit_params.updcse_alife_item__unk3_q8v3]])
-
-					
-
-					local new_rep_kit_cond = db.cond_rk - db.cond_rk_dif
-				-- -- log1("Запомненная кондиция ремкита " .. db.cond_rk .. " Разница после ремонта составила " .. db.cond_rk_dif)
-				-- -- log1("Кондиция обновлённого ремкита будет " .. new_rep_kit_cond)
-					if new_rep_kit_cond < 0 then new_rep_kit_cond = 0 end
-				-- -- log1("Назначаем новую кондицию новому ремкиту")
-					new_repair_kit:set_condition(new_rep_kit_cond)
-					if new_repair_kit:condition() < 0.15 and db.cond_rk_dif ~= 0 then
-						ogse.autohiding_msg("remkit_main_msg_3_text", 1500)
-						-- ogse.send_tip("Инструмент пришёл в негодность.")
-					end
-
-				-- -- log1("Изменим параметры ремкита в таблице нет-пакета")
-					rep_kit_params.custom = new_rep_kit_cond
-				-- -- log1("Запишем нет-пакет в объект")
-					write_cse_item_params(rep_kit_params,alife():object(new_repair_kit:id()))
-
-				else
-					log1("!!ERROR! Remkit not found to set condition")			
-				end
-			end
+	if has_scope		then ogse.spawn_item_in_inv(get_string(dest_itm_sect,"scope_name"))				end
+	if has_gl			then ogse.spawn_item_in_inv(get_string(dest_itm_sect,"grenade_launcher_name"))	end
+	if has_sil			then ogse.spawn_item_in_inv(get_string(dest_itm_sect,"silencer_name"))			end
+	if has_grip			then ogse.spawn_item_in_inv(get_string(dest_itm_sect,"grip_name"))				end
+	if has_scope_mount	then ogse.spawn_item_in_inv(get_string(dest_itm_sect,"scope_mount_name"))		end
+	if has_magazine		then ogse.spawn_item_in_inv(get_string(dest_itm_sect,"magazine_name"))			end
+---------------------------------------------------------------------------------------------------------
+--------------------------------------Р Р°Р·СЂСЏР¶Р°РµРј СЂР°Р·Р±РёСЂР°РµРјРѕРµ РѕСЂСѓР¶РёРµ:--------------------------------------
+	local hidden_t, cur_t, hidden_n, cur_n
+	if destr_item:is_weapon_gl() and ogse_wpn_utils.get_gl_mode( destr_item ) then --РµСЃР»Рё СЂР°Р·Р±РёСЂР°РµРјРѕРµ РѕСЂСѓР¶РёРµ РЅР°С…РѕРґРёС‚СЃСЏ РІ СЂРµР¶РёРјРµ РїРѕРґСЃС‚РІРѕР»СЊРЅРёРєР°:
+		cur_t = ogse_wpn_utils.get_hidden_ammo_type( destr_item )
+		cur_n = ogse_wpn_utils.get_ammo_elapsed2( destr_item )
+		hidden_t = ogse_wpn_utils.get_active_ammo_type( destr_item )
+		hidden_n = destr_item:get_ammo_in_magazine()
+	else --РµСЃР»Рё РќР• РІ СЂРµР¶РёРјРµ РїРѕРґСЃС‚РІРѕР»Р°:
+		cur_t = ogse_wpn_utils.get_active_ammo_type( destr_item )
+		cur_n = destr_item:get_ammo_in_magazine()
+		if destr_item:is_weapon_gl() then --РЅРѕ РµСЃР»Рё РїРѕРґСЃС‚РІРѕР» С‚Р°РєРё РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ (РїСѓСЃС‚СЊ РґР°Р¶Рµ РЅРµ РІ Р°РєС‚РёРІРЅРѕРј СЂРµР¶РёРјРµ):
+			hidden_t = ogse_wpn_utils.get_hidden_ammo_type( destr_item )
+			hidden_n = ogse_wpn_utils.get_ammo_elapsed2( destr_item )
 		end
 	end
-end
 
-
-function reset_condition_repair_kit(item)
-	if alife():object(item:id()) ~= nil then
-		if item:section() == "repair_kit" then
-			local new_repair_kit = item
-			local new_repair_kit_condition = new_repair_kit:condition()
-		-- -- log1("Прочитаем текущие параметры ремкита в нет-пакет")
-			local rep_kit_params = read_cse_item_params(alife():object(new_repair_kit:id()))
-		-- -- log1("Сбросим таблицу нет-пакета в лог: " .. rep_kit_params.gvid .. " / " .. rep_kit_params.obf32u1 .. " / " .. rep_kit_params.obs32u2 .. " / " .. rep_kit_params.lvid .. " / " .. rep_kit_params.oflags .. " / " .. rep_kit_params.custom .. " / " .. rep_kit_params.sid .. " / " .. rep_kit_params.obs32u3 .. " / " .. rep_kit_params.visual .. " / " .. rep_kit_params.vsu8u1 .. " / " .. rep_kit_params.condition .. " / " .. rep_kit_params.updnum_items--[[ .. " / " .. rep_kit_params.updcse_alife_item__unk1_q8v4 .. " / " .. rep_kit_params.updcse_alife_item__unk2_q8v3 .. " / " .. rep_kit_params.updcse_alife_item__unk3_q8v3]])
-
-			if rep_kit_params.custom ~= nil then
-				if rep_kit_params.custom ~= "" then
-		-- -- log1("В кастом_дате у него что-то есть. Вот это 'что-то' и выставляем как его кондицию")
-					new_repair_kit:set_condition(rep_kit_params.custom)
-				elseif new_repair_kit_condition ~= 1 then
-		-- -- log1("Ремкит поюзан, но не обработан. Исправляем это безобразие.")
-					rep_kit_params.custom = new_repair_kit_condition
-					write_cse_item_params(rep_kit_params,alife():object(new_repair_kit:id()))
-				end
-			end
-		end
+	if (hidden_t and hidden_n) and hidden_n > 0 then --Р•СЃР»Рё РІ РїРѕРґСЃС‚РІРѕР»Рµ РµСЃС‚СЊ РіСЂР°РЅР°С‚С‹, СЂР°Р·СЂСЏР¶Р°РµРј РёС…:
+		local ammo_sections_hidden = get_names( dest_itm_sect, "grenade_class" )
+		local ammo_sect_hidden = ammo_sections_hidden[ hidden_t + 1 ]
+		ogse.spawn_ammo_in_inv(ammo_sect_hidden, hidden_n)
 	end
-end
-
-skip_updates = 0 
-
--- Перепаковка патронов и обновление ремкита не должны никогда попадать на один и тот же апдейт. 
--- Иначе перепакованная пачка не успеет удалиться и вызовет вылет, попав в функцию ниже.
--- Поэтому в перепаковке патронов мы поставим таймаут обновления ремкита в пару циклов.
-
-function update_repair_kit()
-	-- if skip_updates > 0 then 
-		-- skip_updates = skip_updates - 1
-		-- return
-	-- end --- вроде бы это более не нужно
-	check_inventory_for_remkits(db.actor)
-end
-
-function check_inventory_for_remkits(npc)
-    npc:iterate_inventory(check_kit, npc)
-end
-function check_kit(npc, item)
- 	local sobj = nil
-	if item and item.id and item.section then
-		sobj = alife():object(item:id())
-	end	
-	if sobj then
-		if sobj:section_name() == "repair_kit" then
-			--log1("REMKIT_CHECK")
-			reset_condition_repair_kit(item)
-		end	
+	if (cur_t and cur_n) and cur_n > 0 then --Р•СЃР»Рё РІ РјР°РіР°Р·РёРЅРµ РµСЃС‚СЊ РїР°С‚СЂРѕРЅС‹, СЂР°Р·СЂСЏР¶Р°РµРј РёС…:
+		local ammo_sections_cur = get_names( dest_itm_sect, "ammo_class" )
+		local ammo_sect_cur = ammo_sections_cur[ cur_t + 1 ]
+		ogse.spawn_ammo_in_inv(ammo_sect_cur, cur_n)
 	end
+-----------------------------------------------------------------------------------------------------------
 end
 
+function use_repair_kit(repaired_slot, destroy_item)
+	local repair_item = db.actor:item_in_slot(repaired_slot)
+	if not repair_item then return false end --РЅР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№: Р•СЃР»Рё СЂРµРјРѕРЅС‚РёСЂСѓРµРјРѕРіРѕ РїСЂРµРґРјРµС‚Р° РЅРµС‚ РІ СЃР»РѕС‚Рµ, С‚Рѕ РЅРёС‡РµРіРѕ РЅРµ РґРµР»Р°РµРј.
 
-
-function technical_complication(item)
-
-	local complication = 400
-	if item == nil or alife():object(item:id()) == nil then return complication end
-	local item_name = item:section()
-	
--- Прямая вычитка параметра с наследованием
-	if system_ini():line_exist(item_name, "tech_complication") then
-		complication = system_ini():r_s32(item_name, "tech_complication")
-		return complication
-	end
-	
--- Прямая вычитка параметра с наследованием
-
-	if system_ini():line_exist((item_name .. "_repair"), "tech_complication") then
--- log1("Параметр 'Сложность' найден.")
-		complication = system_ini():r_s32((item_name .. "_repair"), "tech_complication")
--- log1("Прочитали и присвоили значение.")
-	elseif system_ini():line_exist(item_name, "repair") then
--- log1("Параметр 'Сложность' не найден. Ищем по родителю.")
-		local repair_section = system_ini():r_string(item_name, "repair")
-		if system_ini():line_exist(repair_section, "tech_complication") then
-			complication = system_ini():r_s32(repair_section, "tech_complication")
-		end
-	end
-	return complication
-
+	if destroy_item:is_weapon() then dismantle_wpn(destroy_item) end --РµСЃР»Рё СЂР°Р·Р±РёСЂР°РµРјС‹Р№ РЅР° Р·Р°РїС‡Р°СЃС‚Рё РїСЂРµРґРјРµС‚ СЏРІР»СЏРµС‚СЃСЏ РѕСЂСѓР¶РёРµРј, СЂР°Р·СЂСЏРґРёРј РµРіРѕ Рё СЃРЅРёРјРµРј СЃ РЅРµРіРѕ Р°РґРґРѕРЅС‹.
+	ogse.remove_item_from_inventory(destroy_item) --СѓРґР°Р»СЏРµРј РёР· РёРЅРІРµРЅС‚Р°СЂСЏ СЂР°Р·РѕР±СЂР°РЅРЅС‹Р№ РїСЂРµРґРјРµС‚
+	repair_item:set_condition( 1 ) -- Р РµРјРѕРЅС‚РёСЂСѓРµРј РїСЂРµРґРјРµС‚ РІ РїРѕР»РЅРѕСЃС‚СЊСЋ РёСЃРїСЂР°РІРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ.
+	play_repair_sound() --РёРіСЂР°РµРј Р·РІСѓРє СЂРµРјРѕРЅС‚Р°
+	return true
 end
 
-
-function compatibility_item(item, repaired_item)
-
+function compatibility_item(item, repaired_item) --РџСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё СЂРµРјРѕРЅС‚РёСЂСѓРµРјРѕРіРѕ РїСЂРµРґРјРµС‚Р° Рё РїСЂРµРґРјРµС‚Р°, СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ РЅР° Р·Р°РїС‡Р°СЃС‚Рё
 	if item == nil or repaired_item == nil then return false end
 	if alife():object(item:id()) == nil or alife():object(repaired_item:id()) == nil then return false end
--- log1("Сравнение...")
+
 	local itm_name = item:section()
 	local rprd_itm_name = repaired_item:section()
 	local itm_compat = ""
 	local rep_itm_compat = ""
-	local compatibility = false
-	
-	if system_ini():line_exist(itm_name, "repair_compatibility") then
--- Прямая вычитка параметра с наследованием
-		itm_compat = system_ini():r_string(itm_name, "repair_compatibility")
--- Прямая вычитка параметра с наследованием
-	elseif system_ini():line_exist(itm_name.."_repair", "repair_compatibility") then
--- log1("Параметр 'Совместимость' найден.")
-		itm_compat = system_ini():r_string(itm_name.."_repair", "repair_compatibility")
--- log1("Прочитали и присвоили значение.")
-	elseif system_ini():line_exist(itm_name, "repair") then
-		local repair_section = system_ini():r_string(itm_name, "repair")
-		if system_ini():line_exist(repair_section, "repair_compatibility") then
-			itm_compat = system_ini():r_string(repair_section, "repair_compatibility")
-		end
-	end
-	if system_ini():line_exist(rprd_itm_name, "repair_compatibility") then
--- Прямая вычитка параметра с наследованием
-		rep_itm_compat = system_ini():r_string(rprd_itm_name, "repair_compatibility")
--- Прямая вычитка параметра с наследованием
-	elseif system_ini():line_exist(rprd_itm_name.."_repair", "repair_compatibility") then
--- log1("Параметр 'Совместимость' найден.")
-		rep_itm_compat = system_ini():r_string(rprd_itm_name.."_repair", "repair_compatibility")
--- log1("Прочитали и присвоили значение.")
-	elseif system_ini():line_exist(rprd_itm_name, "repair") then
-		local rprd_repair_section = system_ini():r_string(rprd_itm_name, "repair")
-		if system_ini():line_exist(rprd_repair_section, "repair_compatibility") then
-			rep_itm_compat = system_ini():r_string(rprd_repair_section, "repair_compatibility")
-		end
-	end
-	if itm_compat == rep_itm_compat and rep_itm_compat ~= "" then compatibility = true end
-	return compatibility			
 
+	if sys_ini:line_exist(itm_name, "repair_compatibility") then
+		itm_compat = sys_ini:r_string(itm_name, "repair_compatibility")
+	elseif sys_ini:line_exist(itm_name.."_repair", "repair_compatibility") then
+		itm_compat = sys_ini:r_string(itm_name.."_repair", "repair_compatibility")
+	elseif sys_ini:line_exist(itm_name, "repair") then
+		local repair_section = sys_ini:r_string(itm_name, "repair")
+		if sys_ini:line_exist(repair_section, "repair_compatibility") then
+			itm_compat = sys_ini:r_string(repair_section, "repair_compatibility")
+		end
+	end
+
+	if sys_ini:line_exist(rprd_itm_name, "repair_compatibility") then
+		rep_itm_compat = sys_ini:r_string(rprd_itm_name, "repair_compatibility")
+	elseif sys_ini:line_exist(rprd_itm_name.."_repair", "repair_compatibility") then
+		rep_itm_compat = sys_ini:r_string(rprd_itm_name.."_repair", "repair_compatibility")
+	elseif sys_ini:line_exist(rprd_itm_name, "repair") then
+		local rprd_repair_section = sys_ini:r_string(rprd_itm_name, "repair")
+		if sys_ini:line_exist(rprd_repair_section, "repair_compatibility") then
+			rep_itm_compat = sys_ini:r_string(rprd_repair_section, "repair_compatibility")
+		end
+	end
+
+	if itm_compat == rep_itm_compat and rep_itm_compat ~= "" then return true end
+---------------Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅР°СЏ РїСЂРѕРІРµСЂРєР°, РґР»СЏ РЅРѕРІС‹С… СЃС‚РІРѕР»РѕРІ, РЅР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№--------------------
+	if not item:is_weapon() or not repaired_item:is_weapon() then return false end
+	local ammo_1 = get_string_wq(item:section(), "ammo_class", nil)
+	local ammo_2 = get_string_wq(repaired_item:section(), "ammo_class", nil)
+	if not ammo_1 or not ammo_2 then return false end
+	if ammo_1 == ammo_2 then return true else return false end
+-----------------------------------------------------------------------------------------------
 end
-
 
 function play_repair_sound()
-local rnd = math.random(1, 7)
-if rnd == 1 then 
-	soundtrack.s_play_no_feedback([[scripts\remkit\ui_repairweapon_01]])
-elseif rnd == 2 then 
-	soundtrack.s_play_no_feedback([[scripts\remkit\ui_repairweapon_02]])
-elseif rnd == 3 then 
-	soundtrack.s_play_no_feedback([[scripts\remkit\ui_repairweapon_03]])
-elseif rnd == 4 then 
-	soundtrack.s_play_no_feedback([[scripts\remkit\ui_repairweapon_04]])
-elseif rnd == 5 then 
-	soundtrack.s_play_no_feedback([[scripts\remkit\ui_repairweapon_05]])
-elseif rnd == 6 then 
-	soundtrack.s_play_no_feedback([[scripts\remkit\ui_repairweapon_06]])
-elseif rnd == 7 then 
-	soundtrack.s_play_no_feedback([[scripts\remkit\ui_repairweapon_07]])
-end
+	local remkit_sounds = {
+		[1] = [[scripts\remkit\ui_repairweapon_01]],
+		[2] = [[scripts\remkit\ui_repairweapon_02]],
+		[3] = [[scripts\remkit\ui_repairweapon_03]],
+		[4] = [[scripts\remkit\ui_repairweapon_04]],
+		[5] = [[scripts\remkit\ui_repairweapon_05]],
+		[6] = [[scripts\remkit\ui_repairweapon_06]],
+		[7] = [[scripts\remkit\ui_repairweapon_07]],
+	}
+	local rnd = math.random(1, 7)
+	soundtrack.s_play_no_feedback(remkit_sounds[rnd])
 end
 
+--========================================РћРЎРќРћР’РќРћР• РњР•РќР®, Р—РђРџРЈРЎРљРђР•РўРЎРЇ РЎР РђР—РЈ РџРћРЎР›Р• Р—РђРџРЈРЎРљРђ Р Р•РњРљРРўРђ===========================================
+rep_slot = 0 --РёР±Рѕ РЅРµС„РёРі РІС‹Р·С‹РІР°С‚СЊ РёР· db. РџСѓСЃС‚СЊ С‚СѓС‚ Р±СѓРґРµС‚.
 
-function get_x(item)
-	if item == nil or alife():object(item:id()) == nil then return 0 end
-	local ini = system_ini()
-	sect_inv=item:section()
-	tx = ini:r_u32(sect_inv, "inv_grid_x")
-	return tx
+class "remkit" (CUIScriptWnd)
+
+function remkit:__init(owner) super()
+	self.dlg = self
+	self.owner = owner
+	self:InitControls()
+	self:InitCallBacks()
 end
 
-function get_y(item)
-	if item == nil or alife():object(item:id()) == nil then return 0 end
-	local ini = system_ini()
-	sect_inv=item:section()
-    ty = ini:r_u32(sect_inv, "inv_grid_y")
-	return ty
+function remkit:__finalize() end
+
+function remkit:InitControls()
+	self:Init(50,50,550,450) --Р·РґРµСЃСЊ РѕРїСЂРµРґРµР»СЏРµРј РєРѕРѕСЂРґРёРЅР°С‚С‹ Р»РµРІРѕРіРѕ РІРµСЂС…РЅРµРіРѕ СѓРіР»Р° Рё С€РёСЂРёРЅСѓ-РІС‹СЃРѕС‚Сѓ
+
+	local xml = CScriptXmlInit() --С„Р°Р№Р»-РѕРїРёСЃР°С‚РµР»СЊ РЅР°С€РёС… СЌР»РµРјРµРЅС‚РѕРІ
+	xml:ParseFile("ui_remkit_wnd.xml")
+	xml:InitStatic("back_video", self) --РІРёРґРµРѕ РЅР° Р·Р°РґРЅРµРј РїР»Р°РЅРµ
+	xml:InitStatic("background", self) --СЂР°РјРєР°
+---------------------------------РљРЅРѕРїРєРё----------------------------------
+	self:Register(xml:Init3tButton("window_name", self),"window_name")
+	self:Register(xml:Init3tButton("caption", self),"caption")
+	self.btn_1 = xml:Init3tButton("btn_1", self)
+	self:Register(self.btn_1, "btn_1")
+	self.btn_1:Enable(false)	
+	self.btn_2 = xml:Init3tButton("btn_2", self)
+	self:Register(self.btn_2, "btn_2")
+	self.btn_2:Enable(false)	
+	self.btn_3 = xml:Init3tButton("btn_3", self)
+	self:Register(self.btn_3, "btn_3")
+	self.btn_3:Enable(false)	
+	self.btn_4 = xml:Init3tButton("btn_4", self)
+	self:Register(self.btn_4, "btn_4")
+	self.btn_4:Enable(false)	
+	self:Register(xml:Init3tButton("btn_quit", self),"btn_quit") --РєРЅРѕРїРєР° РІС‹С…РѕРґР°
+-------------------------------------------------------------------------
+---------------------РѕРїСЂРµРґРµР»СЏРµРј РґРѕСЃС‚СѓРїРЅРѕСЃС‚СЊ РєРЅРѕРїРѕРє---------------------
+	if db.actor:item_in_slot(1) then
+		self.btn_1:Enable(true)
+	end
+	if db.actor:item_in_slot(2) then
+		self.btn_2:Enable(true)
+	end
+	if db.actor:item_in_slot(6) then
+		self.btn_3:Enable(true)
+	end
+	if trunk_inv.get_car_nearby() and not ogse_car_control.current_car then
+		local car = trunk_inv.get_car_nearby()
+		local script_car = car:get_car()
+		local car_state = script_car:GetfHealth()
+		if car_state < 0.85 then
+			self.btn_4:Enable(true)
+		end
+	end
+-------------------------------------------------------------------------
+	self.message_box = CUIMessageBoxEx()
+	self:Register(self.message_box,"message_box")
 end
 
-function get_w(item)
-	if item == nil or alife():object(item:id()) == nil then return 0 end
-	local ini = system_ini()
-	sect_inv=item:section()
-	tw = ini:r_u32(sect_inv, "inv_grid_width")
-	return tw
+function remkit:InitCallBacks()
+	self:AddCallback("btn_1", ui_events.BUTTON_CLICKED, self.rep_s1, self)
+	self:AddCallback("btn_2", ui_events.BUTTON_CLICKED, self.rep_s2, self)
+	self:AddCallback("btn_3", ui_events.BUTTON_CLICKED, self.rep_s6, self)
+	self:AddCallback("btn_4", ui_events.BUTTON_CLICKED, self.rep_trans, self)
+	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_quit, self) --РєРЅРѕРїРєР° РІС‹С…РѕРґР°
+	self:AddCallback("message_box", ui_events.MESSAGE_BOX_OK_CLICKED, self.OnMsgYes, self) --РєРЅРѕРїРєР° РћРљ РІРѕ РІСЃРїР»С‹РІР°СЋС‰РёС… СЃРѕРѕР±С‰РµРЅРёСЏС…
 end
 
-function get_h(item)
-	if item == nil or alife():object(item:id()) == nil then return 0 end
-	local ini = system_ini()
-	sect_inv=item:section()
-    th = ini:r_u32(sect_inv, "inv_grid_height")
-	return th
+function remkit:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then --РЅР° РІС‹С…РѕРґ РїРѕРІРµСЃРёРј Esc
+			self:on_quit()
+		end
+	end
+	return true
+end
+
+function remkit:cheat_main()
+	local act_item = db.actor:item_in_slot(rep_slot)
+	if not act_item then return end
+	if not act_item:is_outfit() and not act_item:is_weapon() then --РџСЂРµРґРјРµС‚ РЅРµ РїРѕРґРґР°С‘С‚СЃСЏ СЂРµРјРѕРЅС‚Сѓ, С‚.Рє. РЅРµ СЏРІР»СЏРµС‚СЃСЏ РЅРё РєРѕСЃС‚СЋРјРѕРј, РЅРё РѕСЂСѓР¶РёРµРј.
+		self.msgbox_id = 1
+		self.message_box:Init("message_box_item_not_repaireble")
+		self:GetHolder():start_stop_menu(self.message_box, true)
+	else
+		local rep_item_cond = act_item:condition()
+		if rep_item_cond >= 0.95 then --РџСЂРµРґРјРµС‚ РЅРµ РЅСѓР¶РґР°РµС‚СЃСЏ РІ СЂРµРјРѕРЅС‚Рµ, С‚.Рє РёСЃРїСЂР°РІРµРЅ РЅР° Р±РѕР»РµРµ С‡РµРј 95%
+			self.msgbox_id = 1
+			self.message_box:Init("message_box_item_not_wanted")
+			self:GetHolder():start_stop_menu(self.message_box, true)
+			return
+		elseif rep_item_cond <= 0.1 then --Р­С‚Рѕ СѓР¶Рµ РЅРµ РїРѕС‡РёРЅРёС‚СЊ.
+			self.msgbox_id = 1
+			self.message_box:Init("message_box_item_not_repaireble")
+			self:GetHolder():start_stop_menu(self.message_box, true)
+			return
+		elseif self.remkit_sel == nil then
+			self.remkit_sel = repair_dialog()
+			self.remkit_sel.owner = self
+		end
+		self:GetHolder():start_stop_menu(self.remkit_sel, true)
+		self:GetHolder():start_stop_menu(self, true)
+		self:Show(false)
+	end
+end
+
+function remkit:rep_s1() --СЂРµРјРѕРЅС‚ СЃС‚РІРѕР»Р° РІ РїРµСЂРІРѕРј СЃР»РѕС‚Рµ
+	rep_slot = 1
+	self:cheat_main()
+end
+
+function remkit:rep_s2() --СЂРµРјРѕРЅС‚ СЃС‚РІРѕР»Р° РІРѕ РІС‚РѕСЂРѕРј СЃР»РѕС‚Рµ
+	rep_slot = 2
+	self:cheat_main()
+end
+
+function remkit:rep_s6() --СЂРµРјРѕРЅС‚ Р±СЂРѕРЅРё
+	rep_slot = 6
+	self:cheat_main()
+end
+-------------------------Р РµРјРѕРЅС‚ С‚СЂР°РЅСЃРїРѕСЂС‚Р°-------------------------
+function remkit:rep_trans()
+	local car = trunk_inv.get_car_nearby()
+	if car and not ogse_car_control.current_car then
+		local s_car = car:get_car()
+		local car_state = s_car:GetfHealth()
+		local new_state = tonumber(car_state) + 0.5
+		if new_state > 1 then
+			s_car:SetfHealth(1)
+			s_car:SetExplodeTime(120000)
+		else
+			s_car:SetfHealth(new_state)
+			s_car:SetExplodeTime(120000)
+		end
+		play_repair_sound()
+	end
+	self:GetHolder():start_stop_menu (self,true)
+	self.dlg = nil
+	collectgarbage("collect")
+end
+--------------------------------------------------------------------
+function remkit:on_quit()
+	self:GetHolder():start_stop_menu (self,true)
+	create_repair_kit() 
+	self.dlg = nil
+	collectgarbage("collect")	
+end
+
+function remkit:OnMsgYes()
+	if self.msgbox_id == 1 then return end
+	self.msgbox_id = 0
+end
+--=============================================================================================================================================
+
+--======================================================РњР•РќР® Р Р•РњРћРќРўРђ Р‘Р РћРќР Р РћР РЈР–РРЇ============================================================
+local successful_repair --РќР• РЈР”РђР›РЇРўР¬!
+local repaired_item = 0
+local item_table
+local item_table_index = 0
+local need_close = 0
+
+function shorten_name(str)
+	if str then
+		local out_str = string.gsub(str, game.translate_string("remkit_string1"), game.translate_string("remkit_string2"))
+		out_str = string.gsub(out_str, game.translate_string("remkit_string3"), game.translate_string("remkit_string2"))
+		out_str = string.gsub(out_str, game.translate_string("remkit_string4"), game.translate_string("remkit_string6"))
+		out_str = string.gsub(out_str, game.translate_string("remkit_string5"), game.translate_string("remkit_string7"))
+		out_str = string.gsub(out_str, game.translate_string("remkit_string8"), game.translate_string("remkit_string10"))
+		out_str = string.gsub(out_str, game.translate_string("remkit_string9"), game.translate_string("remkit_string10"))
+		out_str = string.gsub(out_str, game.translate_string("remkit_string11"), game.translate_string("remkit_string13"))
+		out_str = string.gsub(out_str, game.translate_string("remkit_string12"), game.translate_string("remkit_string14"))
+		return out_str
+	end
 end
 
 
-function read_cse_item_params(sobj)
-  if sobj == nil then return end
-  local stpk=net_packet()
-  local uppk=net_packet()
-  sobj:STATE_Write(stpk)
-  sobj:UPDATE_Write(uppk)
-  local size=stpk:w_tell()
-  local size1=uppk:w_tell()
--- -- log1("rsp "..size.." "..size1)
-  stpk:r_seek(0)
-  uppk:r_seek(0)
-  local tbl=parse_cse_object_packet({},stpk,uppk)
--- -- log1("rsp "..size.." "..size1.." "..stpk:r_tell())
-  return tbl
-end
+class "select_repair_items" (CUIListItemEx)
 
-function parse_cse_object_packet(ret,stpk,updpk)
-  ret.gvid=stpk:r_u16()
-  ret.obf32u1=stpk:r_float()
-  ret.obs32u2=stpk:r_s32()
-  ret.lvid=stpk:r_s32()
-  ret.oflags=stpk:r_s32()
-  ret.custom=stpk:r_stringZ()
-  ret.sid=stpk:r_s32()
-  ret.obs32u3=stpk:r_s32()
-  ret.visual=stpk:r_stringZ()
-  ret.vsu8u1=stpk:r_u8()
-  ret.condition=stpk:r_float()
-  ret.updnum_items=updpk:r_u8()
-  ret.updpos={}
-  ret.updpos.x=updpk:r_float()
-  ret.updpos.y=updpk:r_float()
-  ret.updpos.z=updpk:r_float()
-  return ret
-end
+function select_repair_items:__init() super()
+	self.item_name		= "itemname"
+	self:SetWndRect		(0,0,320,22)
+	
+	local ca = 255
+	local cr = 216
+	local cg = 186
+	local cb = 140
+	
+	self.itmnum				= CUIStatic	()
+	self.itmnum:SetAutoDelete	(true)
+	self:AttachChild		(self.itmnum)
+	self.itmnum:SetWndRect	(0,0,10,22)
+	self.itmnum:SetText		("itemnum")
+	self.itmnum:SetFont		(GetFontLetterica16Russian())
+	self.itmnum:SetTextColor	(ca,cr,cg,cb)
 
-function write_cse_item_params(tbl,sobj)
-  if sobj == nil then return end
-  local stpk=net_packet()
-  local uppk=net_packet()
-  fill_cse_object_packet(tbl,stpk,uppk)
-  local size=stpk:w_tell()
-  local size1=uppk:w_tell()
--- -- log1("wsp "..size.." "..size1)
-  stpk:r_seek(0)
-  uppk:r_seek(0)
-  sobj:STATE_Read(stpk,size)
-  sobj:UPDATE_Read(uppk)
-end
+	self.itmn					= CUIStatic	()
+	self.itmn:SetAutoDelete	(true)
+	self:AttachChild		(self.itmn)
+	self.itmn:SetWndRect		(12,0,150,22)
+	self.itmn:SetText			("itemname")
+	self.itmn:SetFont			(GetFontLetterica18Russian())
+	self.itmn:SetTextColor	(ca,cr,cg,cb)
 
-function fill_cse_object_packet(ret,stpk,updpk)
-  stpk:w_u16(ret.gvid)
-  stpk:w_float(ret.obf32u1)
-  stpk:w_s32(ret.obs32u2)
-  stpk:w_s32(ret.lvid)
-  stpk:w_s32(ret.oflags)
-  stpk:w_stringZ(ret.custom)
-  stpk:w_s32(ret.sid)
-  stpk:w_s32(ret.obs32u3)
-  stpk:w_stringZ(ret.visual)
-  stpk:w_u8(ret.vsu8u1)
-  stpk:w_float(ret.condition)
-  updpk:w_u8(ret.updnum_items)
-  updpk:w_float(ret.updpos.x)
-  updpk:w_float(ret.updpos.y)
-  updpk:w_float(ret.updpos.z)
+	self.itmage				= CUIStatic	()
+	self.itmage:SetAutoDelete	(true)
+	self:AttachChild		(self.itmage)
+	self.itmage:SetWndRect	(250,0,40,22)
+	self.itmage:SetText		("itemage")
+	self.itmage:SetFont		(GetFontLetterica16Russian())
+	self.itmage:SetTextColor	(ca,cr,cg,cb)
 end
 
 
-function get_weapon_data(sobj)
-  if sobj == nil then return end
-  local stpk=net_packet()
-  local uppk=net_packet()
-  sobj:STATE_Write(stpk)
-  sobj:UPDATE_Write(uppk)
-  local size=stpk:w_tell()
-  local size1=uppk:w_tell()
--- -- log1("rsp "..size.." "..size1)
-  stpk:r_seek(0)
-  uppk:r_seek(0)
-  local ret={}
-  parse_object_packet(ret,stpk,uppk,size)
-  parse_visual_packet(ret,stpk,uppk,size)
-  parse_item_packet(ret,stpk,uppk,size)
-  parse_item_weapon_packet(ret,stpk,uppk,size)
--- -- log1("rsp "..size.." "..size1.." "..stpk:r_tell())
-  return ret
+class "repair_dialog" (CUIScriptWnd)
+
+function repair_dialog:__init() super()
+	successful_repair = false
+	self.dlg = self
+	self:InitControls()
+	self:InitCallBacks()
+	self:FillList()
+	if not repaired_item then return end
+
+	local repaired_item_name = game.translate_string(get_inv_name_short(repaired_item:section()))
+	repaired_item_name = shorten_name(repaired_item_name)
+	self:DrawCurItem(repaired_item, 100, 90)
+	self:DrawConditionBar(repaired_item, 100, 130)
+	self:DrawCurItemName(repaired_item_name, 100, 45)
 end
 
-function parse_object_packet(ret,stpk,updpk)
-  ret.gvid=stpk:r_u16()
-  ret.obf32u1=stpk:r_float()
-  ret.obs32u2=stpk:r_s32()
-  ret.lvid=stpk:r_s32()
-  ret.oflags=stpk:r_s32()
-  ret.custom=stpk:r_stringZ()
-  ret.sid=stpk:r_s32()
-  ret.obs32u3=stpk:r_s32()
-  return ret
+function repair_dialog:__finalize() end
+
+function repair_dialog:InitControls() --РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј СѓРїСЂР°РІР»РµРЅРёРµ С„РѕСЂРјРѕР№
+	self:Init(50,50,550,450) --Р·РґРµСЃСЊ РѕРїСЂРµРґРµР»СЏРµРј РєРѕРѕСЂРґРёРЅР°С‚С‹ Р»РµРІРѕРіРѕ РІРµСЂС…РЅРµРіРѕ СѓРіР»Р° Рё С€РёСЂРёРЅСѓ-РІС‹СЃРѕС‚Сѓ
+	local xml = CScriptXmlInit()  --С„Р°Р№Р»-РѕРїРёСЃР°С‚РµР»СЊ РЅР°С€РёС… СЌР»РµРјРµРЅС‚РѕРІ
+	xml:ParseFile("ui_remkit_sel.xml")
+	xml:InitStatic("back_video", self) --РІРёРґРµРѕ РЅР° Р·Р°РґРЅРµРј РїР»Р°РЅРµ
+	xml:InitStatic("background", self) --СЂР°РјРєР°
+	xml:InitStatic("item_frame1", self) --СЂР°РјРєР° РїСЂРµРґРјРµС‚Р° 1
+	xml:InitStatic("bar_frame1", self) --РєРѕР»Р±Р° РїСЂРµРґРјРµС‚Р° 1
+	xml:InitStatic("item_frame2", self) --СЂР°РјРєР° РїСЂРµРґРјРµС‚Р° 2
+	xml:InitStatic("bar_frame2", self) --РєРѕР»Р±Р° РїСЂРµРґРјРµС‚Р° 2
+	xml:InitFrame("list_frame", self) --СЃРїРёСЃРѕРє РїСЂРµРґРјРµС‚РѕРІ
+	local ctrl
+	ctrl = xml:InitList("list", self)
+	ctrl:ShowSelectedItem(true)
+	self:Register(ctrl, "list_window")
+----------------------------------РєРЅРѕРїРєРё----------------------------------
+	self:Register(xml:Init3tButton("window_name", self),"window_name")
+	self:Register(xml:Init3tButton("caption1", self),"caption1")
+	self:Register(xml:Init3tButton("caption2", self),"caption2")
+	self:Register(xml:Init3tButton("caption4", self),"caption4")
+	self.btn_4 = xml:Init3tButton("btn_4", self)
+	self:Register(self.btn_4, "btn_4")
+	self.btn_4:Enable(false)
+	self:Register(xml:Init3tButton("btn_quit", self),"btn_quit") --РєРЅРѕРїРєР° РІС‹С…РѕРґР°
+--------------------------------------------------------------------------
+	self.message_box = CUIMessageBoxEx()
+	self:Register(self.message_box,"message_box")
 end
 
-function parse_visual_packet(ret,stpk,updpk)
-  ret.visual=stpk:r_stringZ()
-  ret.vsu8u1=stpk:r_u8()
-  return ret
+function repair_dialog:InitCallBacks()
+	self:AddCallback("btn_4", ui_events.BUTTON_CLICKED, self.rep_btn, self)
+	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_quit, self)
+	self:AddCallback("list_window", ui_events.LIST_ITEM_CLICKED, self.OnListItemClicked, self)
+	self:AddCallback("list_window", ui_events.WINDOW_LBUTTON_DB_CLICK, self.OnListItemDbClicked, self)
+	self:AddCallback("message_box",	ui_events.MESSAGE_BOX_OK_CLICKED, self.OnMsgYes, self)
 end
 
-function parse_item_packet(ret,stpk,updpk)
-	ret.condition=stpk:r_float()
-	ret.updnum_items=updpk:r_u8()
-	ret.updpos={} -- или поставить вектор? ладно потом
-	ret.updpos.x=updpk:r_float()
-	ret.updpos.y=updpk:r_float()
-	ret.updpos.z=updpk:r_float()
-	ret.updcse_alife_item__unk1_q8v4=readvu8uN(updpk,4)
-	ret.updcse_alife_item__unk2_q8v3=readvu8uN(updpk,3)
-	ret.updcse_alife_item__unk3_q8v3=readvu8uN(updpk,3)
-  return ret
+function repair_dialog:FillList()
+	if db.actor:item_in_slot(rep_slot) then
+		repaired_item = db.actor:item_in_slot(rep_slot)
+	end
+
+	item_table = 0
+	item_table = {}
+	item_table_index = 0
+	db.actor:iterate_inventory(item_for_repair, db.actor) --РїРµСЂРµР±РёСЂР°РµРј РёРЅРІРµРЅС‚Р°СЂСЊ РІ РїРѕРёСЃРєРµ СЃРѕРІРјРµСЃС‚РёРјС‹С… СЃС‚РІРѕР»РѕРІ РґР»СЏ СЂРµРјРѕРЅС‚Р°
+
+	local i = 1
+	while (item_table[i]) do
+		local s_item = item_table[i]
+		local s_item_section = s_item:section()
+		local _item_num = "" .. i .. ""
+		local name_to_cut = game.translate_string(get_inv_name_short(s_item_section))
+		local _item_name = shorten_name(name_to_cut)
+		
+		local len_point = 29
+		
+		if string.len(_item_name)>len_point then
+			_item_name=string.sub(_item_name,1,len_point)
+			_item_name=_item_name.."..."
+		end
+		
+		if s_item:id() == item_in_slot_1 
+		or s_item:id() == item_in_slot_2 then
+			_item_name = _item_name.." (РІ СЂСѓРєР°С…)"
+		elseif s_item:id() == item_in_slot_6 then
+			_item_name = _item_name.." (РѕРґРµС‚)"
+		end
+		
+		local _item_cond = s_item:condition()*100
+		if _item_cond ~= 100 then _item_cond = string.format("%.1f", _item_cond) end
+		_item_cond = "[" .. _item_cond .. "%]"
+		self:AddItemToList(_item_num, _item_name, _item_cond)
+		i = i+1
+	end
 end
 
-function parse_item_weapon_packet(ret,stpk,updpk)
-	ret.ammo_current = stpk:r_u16()
-	ret.ammo_elapsed = stpk:r_u16()
-	ret.weapon_state = stpk:r_u8()
-	ret.addon_flags = stpk:r_u8()
-	ret.ammo_type = stpk:r_u8()
-	ret.updcondition = updpk:r_u8()
-	ret.updweapon_flags = updpk:r_u8()
-	ret.updammo_elapsed = updpk:r_u16()
-	ret.updaddon_flags = updpk:r_u8()
-	ret.updammo_type = updpk:r_u8()
-	ret.updweapon_state = updpk:r_u8()
-	ret.updweapon_zoom = updpk:r_u8()
-	ret.updcurrent_fire_mode = updpk:r_u8()
-  return ret
+function item_for_repair(npc, item) --РЎСЂР°РІРЅРёРІР°РµРј РїСЂРµРґРјРµС‚ СЃ СЂРµРјРѕРЅС‚РёСЂСѓРµРјС‹Рј
+	if item == nil or alife():object(item:id()) == nil then return end
+	if item:id() == repaired_item:id() then return end
+
+	if item:section() == repaired_item:section() then --РµСЃР»Рё СЃРµРєС†РёРё РїСЂРµРґРјРµС‚Р° СЃРѕРІРїР°РґР°СЋС‚, С‚Рѕ РґРѕРї. РїСЂРѕРІРµСЂРєР° РЅРµ РЅСѓР¶РЅР°.
+		item_table_index = item_table_index + 1
+		item_table[item_table_index] = item
+	elseif compatibility_item(item, repaired_item) then --РµСЃР»Рё РЅРµ СЃРѕРІРїР°РґР°СЋС‚, РїСЂРѕРІРµСЂСЏРµРј РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕ.
+		item_table_index = item_table_index + 1
+		item_table[item_table_index] = item
+	end
 end
 
-function readvu8uN(packet,n)
-  local v={}
-  for i=1,n,1 do
-    table.insert(v,packet:r_u8())
-  end
-  return v
+function repair_dialog:OnListItemClicked()
+	local list_box = self:GetListWnd("list_window")
+	if list_box:GetSize() == 0 then return end
+	local itm_index = list_box:GetSelectedItem()
+	local item = list_box:GetItem(itm_index)
+	if not item then return end
+
+	self.btn_4:Enable(true)
+
+	local destr_item_name = item.itmn:GetText()
+	local destr_item_index = tonumber(item.itmnum:GetText())
+	local destr_item_st = item_table[destr_item_index]
+
+	self:DrawConditionRemBar(destr_item_st, 300, 130)
+	self:DrawCurRemItemName(destr_item_name, 300, 45)
+	self:DrawCurRemItem(destr_item_st, 300, 90)
 end
+
+function repair_dialog:OnListItemDbClicked()
+	self:rep_btn()
+end
+
+function repair_dialog:rep_btn()
+	local list = self:GetListWnd("list_window")	
+	if list:GetSize()==0 then --РќРµС‚ РїСЂРµРґРјРµС‚РѕРІ РґР»СЏ СЂР°Р·Р±РѕСЂР° РЅР° Р·Р°РїС‡Р°СЃС‚Рё.
+		self.msgbox_id = 1
+		self.message_box:Init("message_box_out_of_item")
+		self:GetHolder():start_stop_menu(self.message_box, true)
+		return
+	end
+	local index = list:GetSelectedItem()
+	if index == -1 then --Р’С‹Р±РµСЂРёС‚Рµ РїСЂРµРґРјРµС‚ РґР»СЏ СЂР°Р·Р±РѕСЂР° РЅР° Р·Р°РїС‡Р°СЃС‚Рё.
+		self.msgbox_id = 1
+		self.message_box:Init("message_box_select_item")
+		self:GetHolder():start_stop_menu(self.message_box, true)
+		return
+	end
+
+	local item = list:GetItem(index)
+	local destr_item_index = tonumber(item.itmnum:GetText())
+	local destr_item = item_table[destr_item_index]
+	if destr_item:condition() < 0.1 then --РІРµС‰СЊ СЂР°Р·Р±РёС‚Р° РІ С…Р»Р°Рј, РЅРµ РїРѕРґС…РѕРґРёС‚.
+		self.msgbox_id = 1
+		self.message_box:Init("message_box_invalid_item")
+		self:GetHolder():start_stop_menu(self.message_box, true)
+		return
+	else
+	log1(tostring(rep_slot))
+		if use_repair_kit(rep_slot,destr_item) then --РµСЃР»Рё СЂРµРјРѕРЅС‚ РїСЂРѕС€РµР» СѓРґР°С‡РЅРѕ
+			successful_repair = true
+			self.msgbox_id = 1
+			self.message_box:Init("message_box_repair_success")
+			self:GetHolder():start_stop_menu(self.message_box, true)
+		else --РµСЃР»Рё РЅРµСѓРґР°С‡РЅРѕ
+			self.msgbox_id = 1
+			self.message_box:Init("message_box_item_not_repaireble")
+			self:GetHolder():start_stop_menu(self.message_box, true)
+		end
+		need_close = 1
+	end
+end	
+
+function repair_dialog:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then --РЅР° РІС‹С…РѕРґ РїРѕРІРµСЃРёРј Esc
+			self:on_quit()
+		end
+	end
+	return true
+end
+
+function repair_dialog:on_quit()
+	self:GetHolder():start_stop_menu (self,true)
+	if not successful_repair then --РµСЃР»Рё СЂРµРјРѕРЅС‚ РЅРµ СѓРґР°Р»СЃСЏ, РІРµСЂРЅРµРј СЂРµРјРєРёС‚ РІ РёРЅРІРµРЅС‚Р°СЂСЊ.
+		create_repair_kit() 
+	end
+	self.dlg = nil
+	collectgarbage("collect")	
+end
+
+function repair_dialog:OnMsgYes()
+	if self.msgbox_id == 1 then 
+		if need_close == 1 then
+			need_close = 0
+			self:on_quit()
+		end
+		return
+	end
+	self.msgbox_id = 0
+end
+
+function repair_dialog:AddItemToList(item_num, item_name, item_cond) --РґРѕР±Р°РІР»РµРЅРёРµ РїСЂРµРґРјРµС‚Р° РІ СЃРїРёСЃРѕРє СЂР°Р·Р±РёСЂР°РµРјС‹С…
+	local _itm = select_repair_items()
+	_itm.itmnum:SetText (item_num)
+	_itm.itmn:SetText (item_name)
+	_itm.itmage:SetText (item_cond)
+	local list_box = self:GetListWnd("list_window")
+	list_box:AddItem (_itm)
+end
+
+function get_inv_name_short(section)
+	return get_string(section,"inv_name_short")
+end
+
+--***********************************************Р РёСЃСѓРµРј СЂРµРјРѕРЅС‚РёСЂСѓРµРјС‹Р№ РїСЂРµРґРјРµС‚***************************************************
+---------------------РќР°Р·РІР°РЅРёРµ РїСЂРµРґРјРµС‚Р°, РєРѕС‚РѕСЂС‹Р№ СЂРµРјРѕРЅС‚РёСЂСѓРµРј--------------------
+function repair_dialog:DrawCurItemName(item, x, y)
+	local w = self.item_name
+	if not w then
+		self.item_name = CUI3tButton()
+		w = self.item_name
+		w:SetWindowName("item_name")
+		w:SetAutoDelete(true)
+		self:AttachChild(w) 
+	end
+	w:SetFont(GetFontLetterica16Russian())
+	w:SetTextColor (255,216,186,140)
+	local len_point = 25
+	if string.len(item)>len_point then
+		item=string.sub(item,1,len_point)
+		item=item.."..."
+	end	
+	w:SetText(item)
+	w:Init(x-100,y,200,10)
+end
+--------------------------------------------------------------------------------
+function repair_dialog:DrawCurItem(item, x, y)
+	local item_section = item:section()
+	local x_g,y_g,x_sco,y_sco,x_sil,y_sil
+	local xa,ya,wa,ha
+	local sect_addon
+	local has_gl, has_scope, has_sil = false, false, false
+
+	if item:is_weapon() then
+		if ogse_wpn_utils.get_grenade_launcher_status( item )	== 2 and ogse_wpn_utils.get_grenade_launcher_flag( item )	then has_gl		= true end
+		if ogse_wpn_utils.get_scope_status( item )				== 2 and ogse_wpn_utils.get_scope_flag( item )				then has_scope	= true end
+		if ogse_wpn_utils.get_silencer_status( item )			== 2 and ogse_wpn_utils.get_silencer_flag( item )			then has_sil	= true end
+	end
+------------------------------Р РёСЃСѓРµРј СЃР°Рј СЃС‚РІРѕР»---------------------------
+	local tx,ty,tw,th
+	tx=get_u32(item_section, "inv_grid_x")*50
+	ty=get_u32(item_section, "inv_grid_y")*50
+	tw=get_u32(item_section, "inv_grid_width")*50
+	th=get_u32(item_section, "inv_grid_height")*50
+	x = x-(tw/4)
+	y = y-(th/4)
+
+	local a = self.cur_textur
+	if not a then
+		self.cur_textur = CUIStatic()
+		a = self.cur_textur
+		a:SetWindowName("cur_textur")
+		a:SetAutoDelete(true)  
+		a:InitTexture("ui\\ui_icon_equipment")   
+		a:SetStretchTexture(true)
+		self:AttachChild(a)
+	end
+    a:SetOriginalRect(tx,ty,tw,th)
+	a:Init(x,y,tw/2,th/2)
+---------------------------------------------------------------------------
+--------------------------Р РёСЃСѓРµРј РїРѕРґСЃС‚РІРѕР»СЊРЅРёРє------------------------------
+	if has_gl then
+		sect_addon = get_string(item_section,"grenade_launcher_name")
+		x_g=x+(get_u32(item_section, "grenade_launcher_x")/2)
+		y_g=y+(get_u32(item_section, "grenade_launcher_y")/2)
+		xa=get_u32(sect_addon, "inv_grid_x")*50
+		ya=get_u32(sect_addon, "inv_grid_y")*50
+		wa=get_u32(sect_addon, "inv_grid_width")*50
+		ha=get_u32(sect_addon, "inv_grid_height")*50
+
+		local b = self.grenade_textur
+		if not b then
+			self.grenade_textur=CUIStatic()
+			b = self.grenade_textur
+			b:SetWindowName("grenade_textur")
+			b:SetAutoDelete(true)  
+			b:InitTexture("ui\\ui_icon_equipment")   
+			b:SetStretchTexture(true)
+			self:AttachChild(b)
+		end
+		b:SetOriginalRect(xa,ya,wa,ha)
+		b:Init(x_g,y_g,wa/2,ha/2)
+	end
+---------------------------------------------------------------------------
+--------------------------Р РёСЃСѓРµРј РѕРїС‚РёС‡РµСЃРєРёР№ РїСЂРёС†РµР»-------------------------
+	if has_scope then
+		sect_addon=get_string(item_section,"scope_name")
+		x_sco=x+(get_u32(item_section, "scope_x")/2)
+		y_sco=y+(get_u32(item_section, "scope_y")/2)
+		xa=get_u32(sect_addon, "inv_grid_x")*50
+		ya=get_u32(sect_addon, "inv_grid_y")*50
+		wa=get_u32(sect_addon, "inv_grid_width")*50
+		ha=get_u32(sect_addon, "inv_grid_height")*50
+  
+		local b = self.scope_textur
+		if not b then
+			self.scope_textur=CUIStatic()
+			b = self.scope_textur
+			b:SetWindowName("scope_textur")
+			b:SetAutoDelete(true)  
+			b:InitTexture("ui\\ui_icon_equipment")   
+			b:SetStretchTexture(true)
+			self:AttachChild(b)
+		end
+		b:SetOriginalRect(xa,ya,wa,ha)
+		b:Init(x_sco,y_sco,wa/2,ha/2)
+	end
+---------------------------------------------------------------------------
+----------------------------Р РёСЃСѓРµРј РіР»СѓС€РёС‚РµР»СЊ-------------------------------
+	if has_sil then 	
+		sect_addon=get_string(item_section,"silencer_name")
+		x_sil=x+(get_u32(item_section, "silencer_x")/2)
+		y_sil=y+(get_u32(item_section, "silencer_y")/2)
+		xa=get_u32(sect_addon, "inv_grid_x")*50
+		ya=get_u32(sect_addon, "inv_grid_y")*50
+		wa=get_u32(sect_addon, "inv_grid_width")*50
+		ha=get_u32(sect_addon, "inv_grid_height")*50
+
+		local b = self.silencer_textur
+		if not b then
+			self.silencer_textur=CUIStatic()
+			b = self.silencer_textur
+			b:SetWindowName("silencer_textur")
+			b:SetAutoDelete(true)  
+			b:InitTexture("ui\\ui_icon_equipment")   
+			b:SetStretchTexture(true)
+			self:AttachChild(b)
+		end
+		b:SetOriginalRect(xa,ya,wa,ha)
+		b:Init(x_sil,y_sil,wa/2,ha/2)
+	end
+end
+---------------------------------------------------------------------------
+-------------------РџРѕР»РѕСЃРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕСЂСѓР¶РёСЏ, РєРѕС‚РѕСЂРѕРµ С‡РёРЅРёРј-------------------
+function repair_dialog:DrawConditionBar(item, x, y)
+	local cond_bar_width = (math.floor(item:condition()*100)*1.1)
+	x = x - 55
+	local c = self.cond_bar
+	if not c then
+		self.cond_bar = CUIStatic()
+		c = self.cond_bar
+		c:SetWindowName("cond_bar")
+		c:SetAutoDelete(true)
+		c:InitTexture("ui\\ui_hud")
+		c:SetOriginalRect(347,207,110,10)   
+		c:SetStretchTexture(true)
+		self:AttachChild(c) 
+	end
+	if cond_bar_width > 109 then
+		cond_bar_width = 109
+	elseif cond_bar_width <= 0 then
+		cond_bar_width = 1
+	end
+    c:SetOriginalRect(346+cond_bar_width,207,1,10)   
+	c:Init(x,y,cond_bar_width,10)
+end
+------------------------------------------------------------------------------
+--*********************************************************************************************************************
+
+--********************************************Р РёСЃСѓРµРј СЂР°Р·Р±РёСЂР°РµРјС‹Р№ РїСЂРµРґРјРµС‚***********************************************
+---------------------РќР°Р·РІР°РЅРёРµ РїСЂРµРґРјРµС‚Р°, РєРѕС‚РѕСЂС‹Р№ СЂР°Р·Р±РёСЂР°РµРј-----------------------
+function repair_dialog:DrawCurRemItemName(de_item, x, y)
+	local w = self.item_name_rem
+	if not w then
+		self.item_name_rem = CUI3tButton()
+		w = self.item_name_rem
+		w:SetWindowName("item_name_rem")
+		w:SetAutoDelete(true)
+		self:AttachChild(w) 
+	end
+	w:SetFont(GetFontLetterica16Russian())
+	w:SetTextColor (255,216,186,140)
+	local len_point = 25
+	if string.len(de_item)>len_point then
+		de_item=string.sub(de_item,1,len_point)
+		de_item=de_item.."..."
+	end		
+	w:SetText(de_item)
+	w:Init(x-100,y,200,10)
+end
+--------------------------------------------------------------------------------
+function repair_dialog:DrawCurRemItem(de_item, x, y)
+	local di_section = de_item:section()
+	local x_g,y_g,x_sco,y_sco,x_sil,y_sil
+	local xa,ya,wa,ha
+	local sect_addon
+	local has_gl, has_scope, has_sil = false, false, false
+
+	if de_item:is_weapon() then
+		if ogse_wpn_utils.get_grenade_launcher_status( de_item )== 2 and ogse_wpn_utils.get_grenade_launcher_flag( de_item ) then has_gl	= true end
+		if ogse_wpn_utils.get_scope_status( de_item )			== 2 and ogse_wpn_utils.get_scope_flag( de_item )			 then has_scope	= true end
+		if ogse_wpn_utils.get_silencer_status( de_item )		== 2 and ogse_wpn_utils.get_silencer_flag( de_item )		 then has_sil	= true end
+	end
+------------------------------Р РёСЃСѓРµРј СЃР°Рј СЃС‚РІРѕР»---------------------------
+	tx=get_u32(di_section, "inv_grid_x")*50
+	ty=get_u32(di_section, "inv_grid_y")*50
+	tw=get_u32(di_section, "inv_grid_width")*50
+	th=get_u32(di_section, "inv_grid_height")*50
+	x = x-(tw/4)
+	y = y-(th/4)
+
+	local a = self.cur_rem_textur
+	if not a then
+		self.cur_rem_textur = CUIStatic()
+		a = self.cur_rem_textur
+		a:SetWindowName("cur_rem_textur")
+		a:SetAutoDelete(true)  
+		a:InitTexture("ui\\ui_icon_equipment")   
+		a:SetStretchTexture(true)
+		self:AttachChild(a)
+	end
+	a:SetOriginalRect(tx,ty,tw,th)
+	a:Init(x,y,tw/2,th/2)
+-----------------------------------------------------------------------------
+------------------------------Р РёСЃСѓРµРј РїРѕРґСЃС‚РІРѕР»СЊРЅРёРє----------------------------
+	if has_gl then
+		sect_addon=get_string(di_section,"grenade_launcher_name")
+		x_g=x+(get_u32(di_section, "grenade_launcher_x")/2)
+		y_g=y+(get_u32(di_section, "grenade_launcher_y")/2)
+		xa=get_u32(sect_addon, "inv_grid_x")*50
+		ya=get_u32(sect_addon, "inv_grid_y")*50
+		wa=get_u32(sect_addon, "inv_grid_width")*50
+		ha=get_u32(sect_addon, "inv_grid_height")*50
+
+		local b = self.grenade_rem_textur
+		if not b then
+			self.grenade_rem_textur=CUIStatic()
+			b = self.grenade_rem_textur
+			b:SetWindowName("grenade_rem_textur")
+			b:SetAutoDelete(true)  
+			b:InitTexture("ui\\ui_icon_equipment")   
+			b:SetStretchTexture(true)
+			self:AttachChild(b)
+		end
+		b:SetOriginalRect(xa,ya,wa,ha)
+		b:Init(x_g,y_g,wa/2,ha/2)
+	end
+------------------------------------------------------------------------------
+---------------------------Р РёСЃСѓРµРј РѕРїС‚РёС‡РµСЃРєРёР№ РїСЂРёС†РµР»---------------------------
+	if has_scope then
+		sect_addon=get_string(di_section,"scope_name")
+		x_sco=x+(get_u32(di_section, "scope_x")/2)
+		y_sco=y+(get_u32(di_section, "scope_y")/2)
+		xa=get_u32(sect_addon, "inv_grid_x")*50
+		ya=get_u32(sect_addon, "inv_grid_y")*50
+		wa=get_u32(sect_addon, "inv_grid_width")*50
+		ha=get_u32(sect_addon, "inv_grid_height")*50
+
+		local b = self.scope_rem_textur
+		if not b then
+			self.scope_rem_textur =CUIStatic()
+			b = self.scope_rem_textur 
+			b:SetWindowName("scope_rem_textur ")
+			b:SetAutoDelete(true)  
+			b:InitTexture("ui\\ui_icon_equipment")   
+			b:SetStretchTexture(true)
+			self:AttachChild(b)
+		end
+		b:SetOriginalRect(xa,ya,wa,ha)
+		b:Init(x_sco,y_sco,wa/2,ha/2)
+	end
+------------------------------------------------------------------------------
+------------------------------Р РёСЃСѓРµРј РіР»СѓС€РёС‚РµР»СЊ--------------------------------
+	if has_sil then 	
+		sect_addon=get_string(di_section,"silencer_name")
+		x_sil=x+(get_u32(di_section, "silencer_x")/2)
+		y_sil=y+(get_u32(di_section, "silencer_y")/2)
+		xa=get_u32(sect_addon, "inv_grid_x")*50
+		ya=get_u32(sect_addon, "inv_grid_y")*50
+		wa=get_u32(sect_addon, "inv_grid_width")*50
+		ha=get_u32(sect_addon, "inv_grid_height")*50
+
+		local b = self.silencer_rem_textur
+		if not b then
+			self.silencer_rem_textur=CUIStatic()
+			b = self.silencer_rem_textur
+			b:SetWindowName("silencer_rem_textur")
+			b:SetAutoDelete(true)  
+			b:InitTexture("ui\\ui_icon_equipment")   
+			b:SetStretchTexture(true)
+			self:AttachChild(b)
+		end
+		b:SetOriginalRect(xa,ya,wa,ha)
+		b:Init(x_sil,y_sil,wa/2,ha/2)
+	end
+
+	local d1 = self.grenade_rem_textur
+	local d2 = self.scope_rem_textur
+	local d3 = self.silencer_rem_textur
+
+	if d1 and not has_gl then d1:Init(0,0,0,0) end
+	if d2 and not has_scope then d2:Init(0,0,0,0) end
+	if d3 and not has_sil then d3:Init(0,0,0,0) end
+end
+-----------------------------------------------------------------------------
+-----------------РџРѕР»РѕСЃРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕСЂСѓР¶РёСЏ, РєРѕС‚РѕСЂРѕРµ СЂР°Р·Р±РёСЂР°РµРј------------------
+function repair_dialog:DrawConditionRemBar(de_item, x, y)
+	local cond_rem_bar_width = (math.floor(de_item:condition()*100)*1.1)
+	x = x - 55
+	local c = self.cond_rem_bar
+	if not c then
+		self.cond_rem_bar = CUIStatic()
+		c = self.cond_rem_bar
+		c:SetWindowName("cond_rem_bar")
+		c:SetAutoDelete(true)
+		c:InitTexture("ui\\ui_hud")
+		c:SetOriginalRect(347,207,110,10)   
+		c:SetStretchTexture(true)
+		self:AttachChild(c) 
+	end
+	if cond_rem_bar_width > 109 then
+		cond_rem_bar_width = 109
+	elseif cond_rem_bar_width <= 0 then
+		cond_rem_bar_width = 1
+	end
+	c:SetOriginalRect(346+cond_rem_bar_width,207,1,10)   
+	c:Init(x,y,cond_rem_bar_width,10)
+end
+-------------------------------------------------------------------------------
+--**************************************************************************************************************************
+--=============================================================================================================================================
