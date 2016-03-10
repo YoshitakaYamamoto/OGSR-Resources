@@ -284,12 +284,12 @@ function on_key_down(key, bind)
 				detector_hud_active = true
 				upgrade_mode_active = false
 			end
-		elseif key == DIK_keys.DIK_1 
-		or key == DIK_keys.DIK_2 
-		or key == DIK_keys.DIK_3 
-		or key == DIK_keys.DIK_4 
-		or key == DIK_keys.DIK_5 
-		or key == DIK_keys.DIK_6 
+		elseif bind == key_bindings.kWPN_1
+		or bind == key_bindings.kWPN_2
+		or bind == key_bindings.kWPN_3
+		or bind == key_bindings.kWPN_4
+		or bind == key_bindings.kWPN_5
+		or bind == key_bindings.kWPN_6
 		then	
 			detector_hud_active = false
 			upgrade_mode_active = false
