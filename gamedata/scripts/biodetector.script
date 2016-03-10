@@ -3,6 +3,12 @@
 -- Автор Charsi
 -- Data 29.11.2012
 -- переработка для OGSE KamikaZze 2012-2014
+
+function attach(sm)
+	sm:subscribe({ signal = "on_update",	fun = this.update })
+	sm:subscribe({ signal = "on_use",		fun = this.on_use_item })
+end
+
 -------------- настройки -----------
 local biomap_sweep_enabled = true -- включить волну
 local fading = true               -- затухание точек
@@ -230,7 +236,7 @@ end
 local old_angle = 0
 -- вызывается из update биндера актора
 -- обновление положения точек и/или волны
-function update(mode)
+function update()
 
 	local bio_belt = nil
 	local bio_in_slot = db.actor:item_in_slot(12)
@@ -238,7 +244,7 @@ function update(mode)
         bio_belt = bio_in_slot:section()
     end
 
-	if not (bio_belt and bio_belt == "bioradar") or (mode and mode == "off") or level.main_input_receiver() then bioradar_hide() return end
+	if not (bio_belt and bio_belt == "bioradar") then bioradar_hide() return end
 	
 	for k,v in pairs(bio_marked)do
 		if not has_alife_info(k) then
