@@ -388,7 +388,7 @@ function motivator_binder:reinit()
     -- КОЛЛБЕКИ ЗДЕСЬ СТАВИТЬ НЕЛЬЗЯ! Здесь еще неизвестна активная схема.
     -- Ставьте коллбеки в методе update в отмеченном комментарием месте.
 
-    local char_ini = self.object:spawn_ini() or ini_file("scripts\\dummy.ltx")
+    local char_ini = self.object:spawn_ini() or sys_ini
 
 ----------------------------------------------------------------------------------------------------------------------
 -- Общие скрипты
@@ -433,8 +433,6 @@ function motivator_binder:net_spawn(sobject)
 	ogse_debug.process_npc(self.object, "s_spw", 1)
 
 	ogse.fix_restrictors(self.object)
-	
-	ogse_debug.process_npc(self.object, "s_spw", 100001)
 	
 	ogse_debug.process_npc(self.object, "s_spw", 2)
 
@@ -489,7 +487,7 @@ function motivator_binder:net_spawn(sobject)
 
     --' Загрузка историй для лагеря.
 	if self.loaded == false then
-		local char_ini = self.object:spawn_ini() or ini_file("scripts\\dummy.ltx")
+		local char_ini = self.object:spawn_ini() or sys_ini
 		xr_info.loadInfo(self.object, char_ini)
 	end
 	
@@ -809,16 +807,10 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 			end				
 		end
 	end
-	
-	ogse_debug.process_npc(self.object, "hit", 8)
-	
 
-	
 	ogse_debug.process_npc(self.object, "hit", 10)
 
 	if checker_minefield then checker_minefield.mine_hit(obj,who) end
-	
-	ogse_debug.process_npc(self.object, "hit", 11)
 	
 	ogse_debug.process_npc(self.object, "hit", 12)
 	
@@ -960,12 +952,6 @@ function motivator_binder:death_callback(victim, who)
 --	if who:id() == db.actor:id() then
 		xr_statistic.addKillCount(who, self.object)
 --	end
-
-	ogse_debug.process_npc(victim, "dth", 12)
-
-    --новости 
-	news_amk_core.on_death(victim, who) -- скажем о смерти
-    death_news.on_death(victim, who) -- и прокомментируем её
 	
 	ogse_debug.process_npc(victim, "dth", 13)
 
@@ -1030,11 +1016,11 @@ function motivator_binder:death_callback(victim, who)
 	end	
 	
 	ogse_debug.process_npc(victim, "dth", 21)
-	
+
+	ogse_signals.get_mgr():call("on_npc_death", victim, who)
 	event("npc_death"):trigger({victim = self.object, who = who})
 
 	ogse_debug.process_npc(victim, "dth", 0)
-	
 end
 
 function motivator_binder:use_callback(obj, who)
