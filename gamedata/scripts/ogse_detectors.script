@@ -400,11 +400,10 @@ function on_update()
 	
 	-- проверка на секцию
 	local sect = det:section()
-	local ini = system_ini()
 	if sect == "interactive_detector_simple" or sect == "interactive_detector_advanced" or sect == "interactive_detector_elite" then
 		-- перебор онлайновых артефактов в таблице
 		local act_pos = db.actor:position()
-		local det_radius = aem_manager.read_number(ini, sect, "detection_radius", true, 0)
+		local det_radius = get_u32(sect, "detection_radius", 0)
 		local i = 0
 		for id, art in pairs (db.artefacts) do
 			-- проверяем, не в рюкзаке ли артефакт. Их детектировать не надо
