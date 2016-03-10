@@ -34,8 +34,8 @@ on_update -- при переходе через границу погодного фрейма выполняет обновление пр
 
 function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_init", fun = this.on_actor_init})
-	sm:subscribe({signal = "on_update", fun = this.on_update})
-	sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
+	--sm:subscribe({signal = "on_update", fun = this.on_update})
+	--sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
 	sm:subscribe({signal = "on_first_update", fun = this.on_first_update})
 	sm:subscribe({signal = "on_save", fun = this.on_save})
 end
@@ -261,7 +261,7 @@ local function is_scenario(level_name)
     return (( level_name == "l12_stancia" or level_name == "l12_stancia_2") and not has_alife_info("pri_what_the_fuck"))	
 end
 
-local weather_ini = sys_ini --пїЅ system.ltx пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ weathers\\environment.ltx. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ini_file?
+local weather_ini = sys_ini --в system.ltx есть инклуд weathers\\environment.ltx. Зачем надо было использовать здесь тормознутый ini_file?
 
 local function read_cycle_points(cycle_section, points_table)
 	for line = 0, weather_ini:line_count(cycle_section) - 1 do
