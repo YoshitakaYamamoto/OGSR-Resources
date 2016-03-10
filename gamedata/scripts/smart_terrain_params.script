@@ -24,17 +24,15 @@ local presets = {}
 
 -- возвращает таблицу с предустановкой или false
 function read_preset( preset_name )
-	local ltx = ini_file( "misc\\smart_terrain_presets.ltx" )
-
-	if ltx and ltx:section_exist( preset_name ) then
+	if sys_ini:section_exist( "smrt_trn_presets_"..preset_name ) then
 		local preset = {}
 		local result, field, str
 		local t
-		local n = ltx:line_count( preset_name )
+		local n = sys_ini:line_count( "smrt_trn_presets_"..preset_name )
 		local rank_min, rank_max, rank_interval
 
 		for i = 0, n-1 do
-			result, field, str = ltx:r_line( preset_name, i, "", "" )
+			result, field, str = sys_ini:r_line( "smrt_trn_presets_"..preset_name, i, "", "" )
 
 			t = parse_names( str )
 
@@ -64,16 +62,13 @@ end
 -- загрузить различные общие для всех смартов настройки
 function load_params()
 	params_loaded = true
-
-	local ltx = system_ini()
-
 	stay_times = {}
 
 	local result, field, str
-	local n = ltx:line_count( "smart_terrain_stay_time" )
+	local n = sys_ini:line_count( "smart_terrain_stay_time" )
 
 	for i = 0, n-1 do
-		result, field, str = ltx:r_line( "smart_terrain_stay_time", i, "", "" )
+		result, field, str = sys_ini:r_line( "smart_terrain_stay_time", i, "", "" )
 
 		stay_times[field] = parse_nums( str )
 	end
