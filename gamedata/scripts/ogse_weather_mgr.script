@@ -142,7 +142,7 @@ local K0 = 0.6     -- размах дневных колебаний, чем выше, тем более длинные пери
 local T1 = 1.2   -- период погодных смещений, несколько дней
 local S1 = 0.0   -- смещение по фазе большого цикла, при старте игры задаётся случайным образом в диапазоне [0 - T1]
 local K1 = 0.7   -- размах погодных смещений (0 - колебание только дневного цикла)
-local weather_preset = system_ini():r_s32("options","weather_type")
+local weather_preset = sys_ini:r_s32("options","weather_type")
 
 -- по значению абстрактной интенсивности получить имя погодного цикла
 -- интенсивность меняется от 0 до 1. 0 - ясная погода, 1 - шторм
@@ -261,7 +261,7 @@ local function is_scenario(level_name)
     return (( level_name == "l12_stancia" or level_name == "l12_stancia_2") and not has_alife_info("pri_what_the_fuck"))	
 end
 
-local weather_ini = ini_file("weathers\\environment.ltx")
+local weather_ini = sys_ini --пїЅ system.ltx пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ weathers\\environment.ltx. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ini_file?
 
 local function read_cycle_points(cycle_section, points_table)
 	for line = 0, weather_ini:line_count(cycle_section) - 1 do
