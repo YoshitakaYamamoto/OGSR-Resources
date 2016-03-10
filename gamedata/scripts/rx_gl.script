@@ -2,10 +2,10 @@
 -- создано на базе схемы метания гранат от   xStream  (xrs_grenade.script)
 
 
-function printf(s, ...)
+--function printf(s, ...)
 --	rx_ai.printf("gl:"..s,...)
 --	get_console():execute("flush")
-end
+--end
 
 function read_from_ini(ini,sec,val,def,typ,sub)
 	local res = rx_utils.read_from_ini(ini,sec,val,def,typ)
@@ -18,17 +18,16 @@ function read_from_ini(ini,sec,val,def,typ,sub)
 	return res
 end
 
-local gl_ini = ini_file("misc\\rx_gl.ltx")
 local temp = {fms = {},npcs = {},rem = {}}
 local gl_sets = {forbiddens = {weapons = {},factions = {},npcs = {}},
 				weapons = {},
 				ranks = {},
 				fms = {},
-				min_dist = read_from_ini(gl_ini,"main","min_dist",5),
-				max_dist = read_from_ini(gl_ini,"main","max_dist",90),
-				enabled = read_from_ini(gl_ini,"main","enabled",true,0),
-				check_prd = read_from_ini(gl_ini,"main","check_period",2000),
-				spawn_prd = read_from_ini(gl_ini,"main","spawn_period",180)}
+				min_dist = read_from_ini(sys_ini,"rx_gl_main","min_dist",5),
+				max_dist = read_from_ini(sys_ini,"rx_gl_main","max_dist",90),
+				enabled = read_from_ini(sys_ini,"rx_gl_main","enabled",true,0),
+				check_prd = read_from_ini(sys_ini,"rx_gl_main","check_period",2000),
+				spawn_prd = read_from_ini(sys_ini,"rx_gl_main","spawn_period",180)}
 
 local bad_acts = {xr_actions_id.stohe_meet_base+1,
 				watcher_act and watcher_act.actid_reach_item,
@@ -42,11 +41,12 @@ local count_update = {}
 function init()
 	local ranks = {"novice","experienced","veteran","master"}
 	for k,v in ipairs(ranks) do
-		gl_sets.ranks[v] = {aim = read_from_ini(gl_ini,v,"aim_time",100),reload = read_from_ini(gl_ini,v,"reload_time",3200)}
+		local s = "rx_gl_"..v
+		gl_sets.ranks[v] = {aim = read_from_ini(sys_ini,s,"aim_time",100),reload = read_from_ini(sys_ini,s,"reload_time",3200)}
 	end
-	gl_sets.forbiddens.weapons = rx_utils.parse_list(gl_ini,"main","forbidden_weapons",true)
-	gl_sets.forbiddens.factions = rx_utils.parse_list(gl_ini,"main","forbidden_factions",true)
-	gl_sets.forbiddens.npcs = rx_utils.parse_list(gl_ini,"main","forbidden_npcs",true)
+	gl_sets.forbiddens.weapons = rx_utils.parse_list(sys_ini,"rx_gl_main","forbidden_weapons",true)
+	gl_sets.forbiddens.factions = rx_utils.parse_list(sys_ini,"rx_gl_main","forbidden_factions",true)
+	gl_sets.forbiddens.npcs = rx_utils.parse_list(sys_ini,"rx_gl_main","forbidden_npcs",true)
 	gl_sets.inited = true
 end
 
@@ -554,9 +554,8 @@ function check_weapon(wpn)
 				end
 				local vel =	read_from_ini(nil,launcher,"grenade_vel",76)
 				local shells = {}
-				local ini = system_ini()
-				for i,s in ipairs(rx_utils.parse_list(ini,sec,"grenade_class")) do
-					if ini:section_exist("gl_test_shell_"..s) and ini:section_exist("gl_fake_missile_"..s) then
+				for i,s in ipairs(rx_utils.parse_list(sys_ini,sec,"grenade_class")) do
+					if sys_ini:section_exist("gl_test_shell_"..s) and sys_ini:section_exist("gl_fake_missile_"..s) then
 						table.insert(shells,s)
 					else
 						printf("not found gl sections for shell [%s]",s)
