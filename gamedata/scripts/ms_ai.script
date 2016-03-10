@@ -6,6 +6,22 @@ Copyright : 2009 ©ÃÂ˜ÂÌ˚È(—ÚÂÎÓÍ)
 Author : ÃÂ˜ÂÌ˚È(—ÚÂÎÓÍ) 
 Author's Optimization : OGS Evolution - team(http://deathdoor.ru/) 
 ]] ---------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+function attach(sm)
+	if sys_ini:r_s32("options","npc_sleep") == 1 then
+		sm:subscribe({ signal = "on_update",	fun = this.on_update, queued = true })
+	end
+end
+
+local sleep_timer = time_global()
+
+function on_update()
+	if time_global() > sleep_timer then
+		update()
+		sleep_timer = sleep_timer + math.random(120000, 180000)
+	end
+end
+------------------------------------------------------------------------------------------
 
 local t_upd = 0
 --Á¿œŒÃ»Õ¿≈Ã ¬—≈ ¿…ƒ» À¿√≈–≈…
@@ -111,14 +127,12 @@ function forbidden_npc(npc)
 end
 
 function update()
-   if system_ini():r_s32("options","npc_sleep") == 1 then
-		local htime = level.get_time_hours()
-		if (htime <= 5 or htime >= 23) and not (has_alife_info("pre_blowout") or has_alife_info("blowout")) then
-			sleep_npc()
-		else	
-			unsleep_npc()
-		end
-   end
+	local htime = level.get_time_hours()
+	if (htime <= 5 or htime >= 23) and not (has_alife_info("pre_blowout") or has_alife_info("blowout")) then
+		sleep_npc()
+	else	
+		unsleep_npc()
+	end
 end
 
 function unsleep_npc()
