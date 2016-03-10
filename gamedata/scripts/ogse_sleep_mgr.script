@@ -9,7 +9,7 @@
 function attach(sm)
 	sm:subscribe({signal = "on_spawn", fun = this.on_spawn})
 	sm:subscribe({signal = "on_use", fun = this.on_item_use})
-	sm:subscribe({signal = "on_update", fun = this.on_update, queued = true}) --KRodin: пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	sm:subscribe({signal = "on_update", fun = this.on_update, queued = true}) --KRodin: перевел на низкий приоритет
 	sm:subscribe({signal = "on_save", fun = this.on_save})
 end
 --auto_attach = true
@@ -93,10 +93,8 @@ function begin_sleep(desired_sleep_time)
 		--actor_binder:update(0) -- бесполезно делать из-за работающей системы распределения нагрузки
 		-- приходится явно обновлять каждую подсистему, требующую обновления
 		-- при необходимости расширить список!
-		ogse.check_timers()
 		ogse_signals.get_mgr():call("on_update", 0)
 		event("actor_update"):trigger({delta = 0})
-		ogse_actor_conditions_mgr.on_update()
 
 		-- проверяем останов по разным событиям
 		if break_sleep_request then -- кто-то запросил останов сна
