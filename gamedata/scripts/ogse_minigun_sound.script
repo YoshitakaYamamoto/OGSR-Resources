@@ -1,7 +1,16 @@
 --- ogse_minigun_sound.script
---- ������� ��������� ��������
+--- Озвучка раскрутки минигана
 --- KamikaZze (c) OGS Evolution Team 2011
 --- version 0.5 (11.03.2011)
+
+function attach(sm)
+	sm:subscribe({ signal = "on_key_down",		fun = this.chek_keys })
+	sm:subscribe({ signal = "on_key_up",		fun = this.chek_keys_free })
+	sm:subscribe({ signal = "on_key_hold",		fun = this.chek_keys_hold })
+	sm:subscribe({ signal = "on_item_to_slot",	fun = this.remove_m134 }) --Перенос М134 в слот.
+	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.remove_m134 }) --Ситуация, когда снимаем надетый костюм в инвентарь, при находящемся м134 во втором слоте.
+	sm:subscribe({ signal = "on_drop",			fun = this.remove_m134 }) --Ситуация, когда выбрасываем надетый костюм прямо из слота, при находящемся м134 во втором слоте.
+end
 
 local on_sound = xr_sound.get_safe_sound_object([[weapons\m134\m134_on]])
 local off_sound = xr_sound.get_safe_sound_object([[weapons\m134\m134_off]])
@@ -9,8 +18,8 @@ local spin_sound = xr_sound.get_safe_sound_object([[weapons\m134\m134_spin]])
 local spin_runing = false
 
 function chek_keys(key, bind)
+	if level.main_input_receiver() then return end
 	if bind == key_bindings.kWPN_ZOOM then
-		if level.main_input_receiver() then return end
 		local act_itm = db.actor:active_item()
 		if act_itm and act_itm:section() == "wpn_m_134" then
 			on_sound:play_at_pos(db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
@@ -28,7 +37,7 @@ function chek_keys_free(key, bind)
 	if bind == key_bindings.kWPN_ZOOM then
 		local act_itm = db.actor:active_item()
 		if act_itm and act_itm:section() == "wpn_m_134" then
-			if spin_runing == true then
+			if spin_runing then
 				if on_sound:playing() then
 					on_sound:stop()
 				end
@@ -46,7 +55,7 @@ end
 function chek_keys_hold(key, bind)
 	if bind == key_bindings.kWPN_ZOOM then
 		if level.main_input_receiver() then
-			if spin_runing == true then
+			if spin_runing then
 				chek_keys_free(key, bind)
 				return
 			end
@@ -56,6 +65,22 @@ function chek_keys_hold(key, bind)
 			if not on_sound:playing() then
 				spin_sound.volume = 0.4
 			end			
+		end
+	end
+end
+
+local counter = 0
+function remove_m134() --Чтобы М134 можно было использовать только при надетом экзоскелете.
+	local m134 = db.actor:item_in_slot(2)
+	if (m134 and m134:section() == "wpn_m_134") then
+		local outfit = db.actor:get_current_outfit()
+		if not ( outfit and string.find( outfit:section(), "_exo" ) ) then
+			db.actor:move_to_ruck(m134) --db.actor:mark_item_dropped( m134 )
+			if counter == 0 then
+				news_text = game.translate_string("dinhud_gatling_text")
+				db.actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(0,188,83,47), 0, 3000)
+				counter = counter + 1
+			end
 		end
 	end
 end
