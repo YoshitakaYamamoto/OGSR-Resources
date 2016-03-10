@@ -145,10 +145,10 @@ local intros_by_diff = {
 		["master"]		= 200
 	},
 	["gd_master"] = {
-		["novice"]		= 400,
-		["experienced"]	= 300,
-		["veteran"]		= 200,
-		["master"]		= 100
+		["novice"]		= 100, --400,
+		["experienced"]	= 75, --300,
+		["veteran"]		= 50, --200,
+		["master"]		= 25 --100
 	}
 }
 
