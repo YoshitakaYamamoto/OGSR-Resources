@@ -1,38 +1,60 @@
--- список явно подключаемых модулей
--- здесь надо регистрировать модули, которые не будут подключаться автоматически
--- например те, у которых имя модуля не начинается на ogse
+-- СЃРїРёСЃРѕРє СЏРІРЅРѕ РїРѕРґРєР»СЋС‡Р°РµРјС‹С… РјРѕРґСѓР»РµР№
+-- Р·РґРµСЃСЊ РЅР°РґРѕ СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ РјРѕРґСѓР»Рё, РєРѕС‚РѕСЂС‹Рµ РЅРµ Р±СѓРґСѓС‚ РїРѕРґРєР»СЋС‡Р°С‚СЊСЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё
+-- РЅР°РїСЂРёРјРµСЂ С‚Рµ, Сѓ РєРѕС‚РѕСЂС‹С… РёРјСЏ РјРѕРґСѓР»СЏ РЅРµ РЅР°С‡РёРЅР°РµС‚СЃСЏ РЅР° ogse
+
 addons = {
-	"ogse_misc_item_usage",
-	"tasks_functor",
-	"trunk_inv",
-	"ogse_car_control",
+------------------------------------------
+	"dsh_restore_active_slot", --Р”РѕР»Р¶РЅРѕ Р±С‹С‚СЊ РіРґРµ-РЅРёР±СѓРґСЊ РІ РЅР°С‡Р°Р»Рµ, РЅР°РјРЅРѕРіРѕ СЂР°РЅСЊС€Рµ ogse_night_vision!!!
+------------------------------------------
 	"ogse_addons",
-	"ogse_car_trade",
+	"ogse_bind_weapon",
 	"ogse_unist",
 	"ogse_st_mgr",
+	"ogse_detectors",
+	"ogse_car_control",
+	"ogse_relations",
 	"ogse_grenade_switcher",
-	"ogse_actor_conditions_mgr",
 	"ogse_sleep_mgr",
-	"ogse_hideouts",
-	"inventory",
-	"ogse_lights_mgr",
-	"ogse_autodoc",
-	"ogse_healing",
-	"jekan_update",
-	--"sr_sound_env",
 	"ogse_weather_mgr",
 	"ogse_surge_mgr",
-	"bind_statpkm",
-	--"ogse_raining_fx", -- более не используется, реализовано шейдерами
-	"ogse_trade_precondition",
+	"ogse_hideouts",
+	"ogse_lights_mgr",
+	"ogse_actor_conditions_mgr",
+	"ogse_healing",
+	"ogse_autodoc",
+	"ogse_campfire",
+	"ogse_car_trade",
 	"ogse_lc_mngr",
-	"ogse_detectors",
-	"ui_handradio",
-	"ogse_relations",
-	--"ogse_dynamic_hud",
-	"xr_sound",
-	"ogse_night_vision",
+	"ogse_musicbox",
 	"ogse_metka",
-	"ogse_bind_weapon",
+	"ogse_misc_item_usage",
+	"ogse_lang_switch",
+	"ogse_psycho_fov",
+	"ogse_benchmark",
+	"ogse_trade_precondition",
+	"ogse_dbg_teleport",
+	--"ogse_zones_editor",
+	"ogse_night_vision", --РџРћР”РљР›Р®Р§РђРўР¬ Р‘Р›РР–Р• Рљ РљРћРќР¦РЈ, РџРћР”РђР›Р¬РЁР• РћРў  dsh_restore_active_slot!!!
+----------KRodin:----------
+	"ogse_quests",
+	"ogse_minigun_sound",
+	"ogse_news_and_off_alife_proxy",
+	"ogse_hud_control",
+	"ogse_dynamic_hud",
+	"biodetector",
+	"ui_rad",
+	"ui_ogse_exo_control",
+	"remkit_main",
+	"ms_ai",
+	"horror_time",
+---------------------------
+	"ui_handradio",
+	"bind_statpkm",
+	"trunk_inv",
+	"inventory",
+	"xr_sound",
+	"tasks_functor",
+-----------------------------------------------
+	"dsh_memuse", --РџРћР”РљР›Р®Р§РђРўР¬ Р’ РЎРђРњРћРњ РљРћРќР¦Р•!
+-----------------------------------------------
 }
-

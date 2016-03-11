@@ -84,7 +84,7 @@ function signals_mgr:__init(name, modules_list, scan_for_autoattaching_modules)
 	self.signals = {}
 	if modules_list then -- если задали список модулей, то начинаем их подключение
 		local registered_modules = {}
-		if scan_for_autoattaching_modules then -- только если вообще подключаем модули, тогда проверяем опцию автоподключения 
+		--[[if scan_for_autoattaching_modules then -- только если вообще подключаем модули, тогда проверяем опцию автоподключения 
 			-- ищем и регистрируем все автоподключаемые плагины
 			local fs = getFS()
 			local flist = fs:file_list_open_ex("$game_scripts$", FS.FS_ListFiles + FS.FS_ClampExt, "ogse_*.script")
@@ -98,7 +98,7 @@ function signals_mgr:__init(name, modules_list, scan_for_autoattaching_modules)
 					registered_modules[fname] = true
 				end
 			end
-		end
+		end]] --KRodin: автоподключение отключено.
 		-- регистрируем все явно подключаемые плагины
 		for _,fname in ipairs(modules_list) do
 			if not registered_modules[fname] then
