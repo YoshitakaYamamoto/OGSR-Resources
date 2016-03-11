@@ -1639,6 +1639,43 @@ function on_actor_first_update()
 	if bug then
 		alife():release(bug, true)
 	end
+
+	-- баг с лианами
+	local obj = alife():object("liana_00")
+	if obj then
+		alife():release(obj, true)
+	end
+	obj = alife():object("liana_01")
+	if obj then
+		alife():release(obj, true)
+	end
+	obj = alife():object("liana_02")
+	if obj then
+		alife():release(obj, true)
+	end
+	obj = alife():object("liana_03")
+	if obj then
+		alife():release(obj, true)
+	end
+	obj = alife():object("liana_04")
+	if obj then
+		alife():release(obj, true)
+	end
+	obj = alife():object("liana_05")
+	if obj then
+		alife():release(obj, true)
+	end
+	obj = alife():object("liana_06")
+	if obj then
+		alife():release(obj, true)
+	end
+	alife():create(5928)
+	alife():create(5929)
+	alife():create(5930)
+	alife():create(5931)
+	alife():create(5932)
+	alife():create(5933)
+	alife():create(5934)
 end
 
 -- Коллбэк на нажатие клавиши
