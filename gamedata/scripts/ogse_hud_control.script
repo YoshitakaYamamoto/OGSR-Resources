@@ -1,0 +1,107 @@
+--[[----------------------------------------------------------------------
+-|ogse_hud_control.script
+-|Управление элементами худа.
+-|KRodin © 2016
+-|Version: 2.0 (Всё переделано и вынесено полностью в отдельный скрипт)
+-|Для работы нужен модуль функций работы с оружием ogse_wpn_utils.script
+------------------------------------------------------------------------]]
+
+function attach(sm)
+	sm:subscribe({ signal = "on_key_down",	fun = this.check_keys })
+	sm:subscribe({ signal = "on_key_up",	fun = this.check_keys_free })
+	sm:subscribe({ signal = "on_update",	fun = this.update_hud_control }) --На низкий приоритет НЕ ПЕРЕВОДИТЬ НИ В КОЕМ СЛУЧАЕ!!!
+end
+
+local need_sniper_check = false --флаг для проверки, нажал ли игрок кнопку зума (ПКМ по умолчанию)
+
+function check_keys(key, bind) --Проверка нажатия клавиш
+	if bind ~= key_bindings.kWPN_ZOOM
+	or level.main_input_receiver() then return end
+
+	need_sniper_check = true
+end
+
+function check_keys_free(key, bind) --Проверка отпускания клавиш
+	if bind ~= key_bindings.kWPN_ZOOM
+	or level.main_input_receiver() then return end
+
+	need_sniper_check = false
+end
+
+function check_sniper(act_it) --Проверка, смотрит ли актор в прицел. Если смотрит - проверка возвращает true, если нет - false.
+	if not need_sniper_check --если игрок не нажал кнопку зума (ПКМ), то возвращаем false и на этом заканчиваем.
+	or not zoom_mode() then return false end --специальная проверка на зум во время прицеливания.
+
+	if act_it:clsid() == clsid.wpn_binocular_s then return true end --Если в руках бинокль (или оружие на классе бинокля), то сразу возвращаем true и на этом заканчиваем
+
+	local scope = ogse_wpn_utils.get_scope_flag(act_it) --Есть ли на оружии прицел (true/false)
+	local gl_mode
+	if act_it:is_weapon_gl() then gl_mode = ogse_wpn_utils.get_gl_mode(act_it) else gl_mode = false end --Находится ли оружие в режиме стрельбы из ПГ (true/false)
+	if scope and not gl_mode then return true else return false end --Если на оружии есть прицел и при этом оружие не находится в режиме стрельбы из ПГ - то true, в противном случае - false.
+end
+
+
+local show_indicators = true --нужно для правильного убирания худа при прицеливании.
+local aiming_complete = false --нужно для правильного "наезжания" прицела.
+local sm = ogse_signals.get_mgr() --Вызов менеджера сигналов
+
+function update_hud_control() --Собственно, управление элементами худа.
+	if not db.actor then return end --Если актор ещё не появился, то ничего не делаем.
+	if db.actor:alive() then --Если актор жив
+		if level.main_input_receiver() then --Если открыли инвентарь, пда или любое другое окно
+			if aiming_complete then
+				sm:call("off_sniper_mode") --Багфикс. Отключаем пнв в прицеле
+				aiming_complete = false
+			end
+			return --и на этом заканчиваем.
+		end
+		local act_it = db.actor:active_item() --Проверяем что в руках у актора
+		if act_it and act_it:is_weapon() then --Если в руках оружие
+			if check_sniper(act_it) then --Если смотрим в прицел
+				local nv_lock = true --параметр, с помошью которого будем определять, целимся в закрытую, или же открытую оптику
+				local scope_section = get_string_wq(act_it:section(), "scope_name", nil) --Пытаемся прочитать из конфига ствола название прицела
+				if scope_section then --Если прочитали название прицела
+					nv_lock = get_bool(scope_section, "nightvision_lock", true) --если в конфиге прицела nightvision_lock=false то, в виде исключения, разрешаем использовать ПНВ с оптикой (z.b., коллиматоры)
+				else --Если в конфиге ствола нет строки scope_name (например в стволах с встроенными прицелами, типа G36), то:
+					nv_lock = get_bool(act_it:section(), "nightvision_lock", true) --ищем в конфиге ствола строку nightvision_lock. Если нашли и nightvision_lock = false, то, в виде исключения, разрешаем использовать ПНВ с оптикой (z.b., коллиматоры)
+				end
+------------------------------------------------------------------------------------------------
+				if nv_lock then --Если оптика закрытая
+					if show_indicators then
+						level.hide_indicators() --убираем худ
+						show_indicators = false
+					end
+					if ogse_wpn_utils.is_aiming_complete(act_it) then --Ждём, пока завершится "наезжание" прицела
+						if not aiming_complete then
+							sm:call("on_sniper_mode", scope_section) --Разрешаем включение пнв в прицеле.
+							aiming_complete = true
+						end
+					else
+						aiming_complete = false
+					end
+------------------------------------------------------------------------------------------------
+				elseif not show_indicators then --Если оптика открытая (целимся в колиматор)
+					level.show_indicators() --покажем худ
+					sm:call("off_sniper_mode")
+					show_indicators = true
+				end
+-----------------------------------------------------------------------------------------------
+			elseif not show_indicators then --Если в руках есть оружие, но мы не прицеливаемся.
+				level.show_indicators()
+				sm:call("off_sniper_mode")
+				show_indicators = true
+			end
+-----------------------------------------------------------------------------------------------
+		elseif not show_indicators then --Если в руках нет оружия
+			level.show_indicators()
+			sm:call("off_sniper_mode")
+			show_indicators = true
+		end
+----------------------------------------------------------------------------------------
+	elseif show_indicators then --Если актор мертв
+		level.disable_input() --игнор нажатия кнопок клавиатуры/мыши (можно только выйти в меню)
+		level.hide_indicators()
+		show_indicators = false
+	end
+----------------------------------------------------------------------------------------
+end
