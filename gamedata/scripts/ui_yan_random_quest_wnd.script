@@ -196,7 +196,7 @@ function yan_random_quest_wnd:transfer_items_to_npc()
 			if sum_i and sum_i > 0 then 
 				log1(self["a"..tostring(i)].." ".."sum_i = "..tostring(sum_i)) 
 				if sum_i > self["count"..tostring(i)] then sum_i = self["count"..tostring(i)] end
-				sum = sum + math.ceil(system_ini():r_u32(self["a"..tostring(i)], "cost")*money_koef*sum_i)
+				sum = sum + math.ceil(sys_ini:r_u32(self["a"..tostring(i)], "cost")*money_koef*sum_i)
 				relocate_item(self.npc, self["a"..tostring(i)], sum_i)
 				self:delete_item_by_num(self["a"..tostring(i)], sum_i)
 			else 
@@ -212,7 +212,7 @@ function yan_random_quest_wnd:transfer_items_to_npc()
 			if sum_i and sum_i > 0 then 
 				log1(self["m"..tostring(i)].." ".."sum_i = "..tostring(sum_i)) 
 				if sum_i > self["count"..tostring(i+3)] then sum_i = self["count"..tostring(i+3)] end
-				sum = sum + math.ceil(system_ini():r_u32(self["m"..tostring(i)], "cost")*money_koef*sum_i)
+				sum = sum + math.ceil(sys_ini:r_u32(self["m"..tostring(i)], "cost")*money_koef*sum_i)
 				relocate_item(self.npc, self["m"..tostring(i)], sum_i)
 				self:delete_item_by_num(self["m"..tostring(i)], sum_i)
 			else 
@@ -242,7 +242,7 @@ function relocate_item(actor, item, count)
 	local task_texture, task_rect = get_texture_info("ui_iconsTotal_lost_thing")
 	local s = ""
 	if string.find(item, "af_") or item == "mutant_izlom_hand" then 
-		s = game.translate_string(system_ini():r_string(item, "inv_name"))
+		s = game.translate_string(sys_ini:r_string(item, "inv_name"))
 	else
 		s = game.translate_string(item)
 	end
@@ -338,7 +338,7 @@ function yan_random_quest_wnd:DrawCurItemName(de_item, x, y, t)
 		w:SetTextColor (255,255,255,255)
 		self["count"..tostring(t)] = self:get_item_num(de_item)
 		if string.find(de_item, "af_") or de_item == "mutant_izlom_hand" then 
-			de_item = game.translate_string(system_ini():r_string(de_item, "inv_name"))
+			de_item = game.translate_string(sys_ini:r_string(de_item, "inv_name"))
 		else
 			de_item = game.translate_string(de_item)
 		end
@@ -368,7 +368,7 @@ function yan_random_quest_wnd:DrawCurItemCost(de_item, x, y, t)
 	if de_item then
 		w:SetFont(GetFontLetterica16Russian())
 		w:SetTextColor (255,255,255,0) -- зелёный цвет
-		w:SetText(tostring(math.ceil(system_ini():r_u32(de_item, "cost")*money_koef)).."р.")
+		w:SetText(tostring(math.ceil(sys_ini:r_u32(de_item, "cost")*money_koef)).."р.")
 		w:Init(x-100,y,200,10)
 	else
 		w:SetText("")
@@ -377,25 +377,17 @@ function yan_random_quest_wnd:DrawCurItemCost(de_item, x, y, t)
 end
 
 function get_x(item)
-	local ini = system_ini()
-	tx = ini:r_u32(item, "inv_grid_x")
-	return tx
+	return sys_ini:r_u32(item, "inv_grid_x")
 end
 
 function get_y(item)
-	local ini = system_ini()
-    ty = ini:r_u32(item, "inv_grid_y")
-	return ty
+	return sys_ini:r_u32(item, "inv_grid_y")
 end
 
 function get_w(item)
-	local ini = system_ini()
-	tw = ini:r_u32(item, "inv_grid_width")
-	return tw
+	return sys_ini:r_u32(item, "inv_grid_width")
 end
 
 function get_h(item)
-	local ini = system_ini()
-    th = ini:r_u32(item, "inv_grid_height")
-	return th
+	return sys_ini:r_u32(item, "inv_grid_height")
 end

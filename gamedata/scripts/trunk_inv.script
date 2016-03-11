@@ -13,7 +13,6 @@ function attach(sm) -- для менеджера сигналов
 end
 
 local sim
-local sys_ini = system_ini()
 
 function on_spawn() -- при появлении актора проинитить используемые в будущем глобальные переменные
 	log1("trunk_inv.on_spawn")

@@ -126,9 +126,9 @@ function wpn_binder:initialize()
 	self.managed_bones = split_comma_separated_list(get_string(obj_section, "managed_bones", ""))
 	self.addon_descriptors = {}
 	for _,desc_info in ipairs(addon_templates) do
-		if system_ini():line_exist(obj_section, desc_info.section_param) then
+		if sys_ini:line_exist(obj_section, desc_info.section_param) then
 			local addon_sect = get_string(obj_section, desc_info.section_param)
-			ASSERT(system_ini():section_exist(addon_sect), "[wpn_binder:net_spawn] section does not exist '%s'", addon_sect)
+			ASSERT(sys_ini:section_exist(addon_sect), "[wpn_binder:net_spawn] section does not exist '%s'", addon_sect)
 			local addon_desc = {}
 			self.addon_descriptors[desc_info.descname] = addon_desc
 			for param_name,reader_func in pairs(desc_info.params) do

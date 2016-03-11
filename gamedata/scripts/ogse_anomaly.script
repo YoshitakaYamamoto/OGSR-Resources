@@ -18,8 +18,8 @@ local lc = {}
 local cur_level = nil	  
 local anom_to_del_exist = false
 local console = get_console()
-local spawn_anom_prob = system_ini():r_s32("options","spawn_anom_prob") -- Коэффициент кол-ва аномалий
-local spawn_blow_art_probe = system_ini():r_s32("options","spawn_blow_art_probe") -- Коэффициент вероятности попытки рождения артефакта аномалией в Выброс
+local spawn_anom_prob = sys_ini:r_s32("options","spawn_anom_prob") -- Коэффициент кол-ва аномалий
+local spawn_blow_art_probe = sys_ini:r_s32("options","spawn_blow_art_probe") -- Коэффициент вероятности попытки рождения артефакта аномалией в Выброс
 
 loc = {
 	l01_escape = 1,
@@ -302,7 +302,7 @@ function check_artefact_activation(obj)
 		return
 	end
 	local section = sobj:section_name()
-	if system_ini():line_exist(section, "artefact_activation_seq") then
+	if sys_ini:line_exist(section, "artefact_activation_seq") then
 		dangerous_acivated_arts[sobj.id] = time_global() + 12000
 	end
 end
@@ -888,11 +888,7 @@ function get_lists()
 	end
 end
 
-
-local sysconfig = system_ini()
-
 local wait_for_actor = {}
-
 
 -- Учитываем аномалии на локациях
 function get_anom(sobj, lname)
@@ -933,8 +929,8 @@ function get_anom(sobj, lname)
 		local rads_mul = 1
 		local rads = 1
 		
-		if sysconfig:section_exist(sect) then
-			rads_mul = sysconfig:r_float(sect, "effective_radius")
+		if sys_ini:section_exist(sect) then
+			rads_mul = sys_ini:r_float(sect, "effective_radius")
 		end
 		
 		local packet = m_net_utils.get_anomaly_data(sobj)
@@ -1725,7 +1721,7 @@ function spawn_blow_art(obj_id)
 		anom_sect = "zone_"..anom_sect
 --	log1("ARTF_D Dinamic anomaly found - restored its parent: "..tostring(anom_sect))
 	end		
-	local rand_chk = utils.cfg_get_number(system_ini(), anom_sect, "artefact_spawn_probability", an_obj, false, 0.1)
+	local rand_chk = utils.cfg_get_number(sys_ini, anom_sect, "artefact_spawn_probability", an_obj, false, 0.1)
 --	log1("Проверим, будет ли пробовать рожать артефакт аномалия: "..tostring(anom_sect))
 	if math.random() <= rand_chk * spawn_blow_art_probe then
 --	log1("Вызов парсера секции...")
@@ -1955,8 +1951,8 @@ function anomaly_section_choice(levelname)
 	end
 
 	local coef_effective_radius = 1
-	if 	system_ini():line_exist(anom_to_spawn, "effective_radius") then
-		coef_effective_radius = system_ini():r_string(anom_to_spawn, "effective_radius")
+	if 	sys_ini:line_exist(anom_to_spawn, "effective_radius") then
+		coef_effective_radius = sys_ini:r_string(anom_to_spawn, "effective_radius")
 	end
 -- log1("Коэффициент эффективного радиуса выбран: " .. coef_effective_radius)
 

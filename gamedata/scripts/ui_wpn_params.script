@@ -23,7 +23,7 @@ function read_if_exist(ltx, section, value, default)
 end
 
 function GetRPM(section)
-	local ltx = system_ini()
+	local ltx = sys_ini
 	
 -- НАДЕЖНЕЙ local rpm = read_if_exist(ltx, section,"rpm", 1)
 	local rpm = ltx:r_float(section,"rpm")
@@ -43,7 +43,7 @@ function GetRPM(section)
 end
 
 function GetDamage(section)
-	local ltx = system_ini()
+	local ltx = sys_ini
 	local val = ltx:r_float(section,"hit_power")
 	
 
@@ -57,7 +57,7 @@ function GetDamage(section)
 end
 
 function GetDamageMP(section)
-	local ltx = system_ini()
+	local ltx = sys_ini
 	local val = ltx:r_float(section,"hit_power")
 		
 	if val < 1.05 then
@@ -71,7 +71,7 @@ end
 
 function GetHandling(section)
 --надёжность
-	local ltx = system_ini()
+	local ltx = sys_ini
 
 	local misfire_probability	= ltx:r_float(section,"misfire_probability")			-- вероятность осечки при максимальном износе
 	--local misfire_condition_k = ltx:r_float(section,"misfire_condition_k")
@@ -106,7 +106,7 @@ function GetHandling(section)
 end
 
 function GetAccuracy(section)
-	local ltx = system_ini()
+	local ltx = sys_ini
 			
 	local fire_dispersion_base	= ltx:r_float(section,"fire_dispersion_base")
 	local cam_dispersion		= ltx:r_float(section,"cam_dispersion")

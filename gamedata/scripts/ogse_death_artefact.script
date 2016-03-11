@@ -89,7 +89,7 @@ function spawn_art(killer_)
 					end					
 					if victim_pos and victim_pos:distance_to(pos) <= radius+offset then
 						-- log1("Обнаружена смерть существа в аномалии, будет произведен спавн если успешно выбросим рандом.")
-						local rand_chk = utils.cfg_get_number(system_ini(), anom_sect, "artefact_spawn_rnd", obj, false, 40)
+						local rand_chk = utils.cfg_get_number(sys_ini, anom_sect, "artefact_spawn_rnd", obj, false, 40)
 						local rnd_1 = math.random(70)
 						-- log1("Извлекаем из конфига аномалии контроль. Рандом должен быть меньше или равен: "..tostring(rand_chk))
 						-- log1("Выбрасываем рандом. Получено значение: "..tostring(rnd_1))
@@ -132,10 +132,10 @@ end
 function parse_string_arts(obj_sect)
 -- arts_table
 local arts_table = {}
-if not system_ini():section_exist(obj_sect) then 
+if not sys_ini:section_exist(obj_sect) then 
 	log1("АНОМАЛИЯ С ТАКОЙ СЕКЦИЕЙ НЕ ОБНАРУЖЕНА "..tostring(obj_sect)) 
 return nil end
-local line = system_ini():r_string(obj_sect,"artefacts")
+local line = sys_ini:r_string(obj_sect,"artefacts")
 
 	if line then
 		for key, value, dec in string.gfind( line, "%s*([%w_%-.\\]+)%s*,%s*(%d).(%d)%s*" ) do

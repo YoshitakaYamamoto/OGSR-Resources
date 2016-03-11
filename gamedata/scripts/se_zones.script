@@ -32,8 +32,8 @@ function se_zone_anom:on_register()
 		level_tasks.add_location_by_id(self.id, "anomaly_zone_location", "anom: " .. self:name())
 	end
 	
-	self.artefact_spawn_idle = 60*60*1000*utils.cfg_get_number(system_ini(), self:section_name(), "artefact_spawn_idle", self, false, 24)
-	self.artefact_spawn_rnd = utils.cfg_get_number(system_ini(), self:section_name(), "artefact_spawn_rnd", self, false, 100)	
+	self.artefact_spawn_idle = 60*60*1000*utils.cfg_get_number(sys_ini, self:section_name(), "artefact_spawn_idle", self, false, 24)
+	self.artefact_spawn_rnd = utils.cfg_get_number(sys_ini, self:section_name(), "artefact_spawn_rnd", self, false, 100)	
 	
 	if self.id ~= 65535 then
 		if ogse_anomaly then
@@ -136,8 +136,8 @@ end
 function se_zone_visual:on_register()
 	cse_zone_visual.on_register(self)
 	
-	self.artefact_spawn_idle = 60*60*1000*utils.cfg_get_number(system_ini(), self:section_name(), "artefact_spawn_idle", self, false, 24)
-	self.artefact_spawn_rnd = utils.cfg_get_number(system_ini(), self:section_name(), "artefact_spawn_rnd", self, false, 100)	
+	self.artefact_spawn_idle = 60*60*1000*utils.cfg_get_number(sys_ini, self:section_name(), "artefact_spawn_idle", self, false, 24)
+	self.artefact_spawn_rnd = utils.cfg_get_number(sys_ini, self:section_name(), "artefact_spawn_rnd", self, false, 100)	
 end
 function se_zone_visual:update()
 	cse_zone_visual.update(self)

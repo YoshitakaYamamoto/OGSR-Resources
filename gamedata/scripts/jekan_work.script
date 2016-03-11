@@ -825,7 +825,7 @@ function spawn_items_in_treasure_box(story_id, item_table)
 				rx_utils.switch_offline(pid)
 			end
 			for k,v in pairs(item_table) do
-				if system_ini():section_exist(k) and type(v) == "number" then
+				if sys_ini:section_exist(k) and type(v) == "number" then
 					for i=1, v do
 						alife():create(k, pos, lvid, gvid, pid)
 					end

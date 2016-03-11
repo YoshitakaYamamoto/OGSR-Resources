@@ -16,7 +16,6 @@ function attach(sm)
 end
 
 local sim = alife()
-local sys_ini = system_ini()
 
 function on_spawn() -- при появлении актора проинитить используемые в будущем глобальные переменные
 	sim = alife()

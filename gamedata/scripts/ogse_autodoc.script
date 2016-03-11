@@ -8,17 +8,17 @@
 ----------------------------------------------------------------------------------------------------
 
 -- Global healing params of autodoctor / Параметры ИДЛК
-local full_charges 		= system_ini():r_s32("autodoctor", "ad_full_charges")	-- Макс. кол-во зарядов в подсистемах ИДЛК
-local health_dlt		= system_ini():r_float("autodoctor", "ad_health_dlt")	-- Шаг лечения
-local stamina_dlt		= system_ini():r_float("autodoctor", "ad_stamina_dlt")	-- Шаг восстановления энергии
-local radiation_dlt		= system_ini():r_float("autodoctor", "ad_radiation_dlt")-- Шаг уменьшения радиации
-local threshold_h		= system_ini():r_float("autodoctor", "ad_threshold_h")	-- Порог включения процедуры лечения
-local threshold_s		= system_ini():r_float("autodoctor", "ad_threshold_s")	-- Порог включения процедуры энергонакачки
-local threshold_r		= system_ini():r_float("autodoctor", "ad_threshold_r")	-- Порог срабатывания процедуры ввода антирада
+local full_charges 		= sys_ini:r_s32("autodoctor", "ad_full_charges")	-- Макс. кол-во зарядов в подсистемах ИДЛК
+local health_dlt		= sys_ini:r_float("autodoctor", "ad_health_dlt")	-- Шаг лечения
+local stamina_dlt		= sys_ini:r_float("autodoctor", "ad_stamina_dlt")	-- Шаг восстановления энергии
+local radiation_dlt		= sys_ini:r_float("autodoctor", "ad_radiation_dlt")-- Шаг уменьшения радиации
+local threshold_h		= sys_ini:r_float("autodoctor", "ad_threshold_h")	-- Порог включения процедуры лечения
+local threshold_s		= sys_ini:r_float("autodoctor", "ad_threshold_s")	-- Порог включения процедуры энергонакачки
+local threshold_r		= sys_ini:r_float("autodoctor", "ad_threshold_r")	-- Порог срабатывания процедуры ввода антирада
 -- Макс. время воздействия радиации, превышающей значение threshold_r_min
-local max_rad_seconds 	= system_ini():r_s32("autodoctor", "ad_max_rad_seconds")
+local max_rad_seconds 	= sys_ini:r_s32("autodoctor", "ad_max_rad_seconds")
 -- Мин. доза радиации, при воздействии которой дольше времени max_radiated_seconds, ИДЛК введёт антирад
-local threshold_r_min 	= system_ini():r_float("autodoctor", "ad_threshold_r_min")
+local threshold_r_min 	= sys_ini:r_float("autodoctor", "ad_threshold_r_min")
 
 charges = {["h"] = 0, ["s"] = 0, ["r"] = 0}
 switch_on = {["ad"]	= false, ["h"] = false, ["s"] = false, ["r"] = false}

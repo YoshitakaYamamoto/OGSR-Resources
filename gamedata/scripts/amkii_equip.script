@@ -460,7 +460,7 @@ function CAmkDisguise:Update(oNpc, oItem)
 	local sVis = aOutfitsList[oItem:section()]
 	log1("!!DEBUG_REFIT_4 "..tostring(sVis)) 
 	local aVisList = aVisualList[sVis]
-	local iCost = system_ini():r_float(sSect, "cost")
+	local iCost = sys_ini:r_float(sSect, "cost")
 
 	print_table_inlog_v2(aAvailableVis, "aAvailableVis:")
 

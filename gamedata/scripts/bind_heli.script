@@ -89,9 +89,7 @@ function heli_binder:reinit()
 	
 	self.last_hit_snd_timeout = 0
 
-	local ltx = system_ini()
-
-	self.flame_start_health   = utils.cfg_get_number( ltx, "helicopter", "flame_start_health", self.object, true )
+	self.flame_start_health   = utils.cfg_get_number( sys_ini, "helicopter", "flame_start_health", self.object, true )
 	self.st.flame_start_snd   = xr_sound.get_sound_object("heli_explosion", "random")
 
 	-- на случай загрузки

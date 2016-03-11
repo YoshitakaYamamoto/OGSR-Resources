@@ -6,7 +6,7 @@ if level.present() then
 	--log1("spawn_for_test")
     for sec, num in pairs(what_to_create) do
 		--log1(tostring(sec).."        :"..tostring(num))
-		if system_ini():section_exist(sec) and type(num) == "number" then
+		if sys_ini:section_exist(sec) and type(num) == "number" then
 			for i=1,num do
 				ogse.spawn_item_in_inv(sec)
 			end

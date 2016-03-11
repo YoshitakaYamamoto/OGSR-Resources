@@ -626,7 +626,6 @@ function car_trade_dialog:DrawCurCar(car, x, y)
 	if y == nil then y = 0 end
 
 	local a = self.car_textur
-	local sys = system_ini()
 	if not a then
 		self.car_textur = CUIStatic()
 		a = self.car_textur

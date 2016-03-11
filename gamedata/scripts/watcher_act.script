@@ -176,8 +176,8 @@ function do_not_touch(item)
 	end	
 	if item then
 		section = item:section()
-		if system_ini():line_exist(section, "quest_item") then
-			quest_itm = system_ini():r_bool(section,"quest_item")
+		if sys_ini:line_exist(section, "quest_item") then
+			quest_itm = sys_ini:r_bool(section,"quest_item")
 		end
 	else
 		return false
@@ -214,7 +214,7 @@ function max_weight(npc)
 		npc:iterate_inventory(function (dummy, item)
 			if item then
 				local section = item:section()
-				local item_wt = system_ini():r_float(section,"inv_weight")
+				local item_wt = sys_ini:r_float(section,"inv_weight")
 				total_weight = total_weight + item_wt
 			end
 		end, nil)
@@ -527,8 +527,8 @@ function objValue(obj)
 	elseif sec == "vodka" then
 		multiplier = 20
 	end
-	if system_ini():section_exist(sec) and system_ini():line_exist(sec,"cost") then
-		return system_ini():r_float(sec,"cost")*multiplier
+	if sys_ini:section_exist(sec) and sys_ini:line_exist(sec,"cost") then
+		return sys_ini:r_float(sec,"cost")*multiplier
 	end
 	return 0
 end

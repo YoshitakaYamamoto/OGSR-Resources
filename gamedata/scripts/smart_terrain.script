@@ -347,10 +347,8 @@ function se_smart_terrain:read_params()
 		end
 	end
 
-	local ltx = system_ini()
-
-	self.rank_inc_min = ltx:r_u32( "smart_terrain_rank_change", "min" )
-	self.rank_inc_max = ltx:r_u32( "smart_terrain_rank_change", "max" )
+	self.rank_inc_min = sys_ini:r_u32( "smart_terrain_rank_change", "min" )
+	self.rank_inc_max = sys_ini:r_u32( "smart_terrain_rank_change", "max" )
 
 	self.population_locked = false
 

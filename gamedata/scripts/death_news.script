@@ -4,9 +4,9 @@
 --- FEAR93, Dusty79 (c) OGS Evolution Team 2010, sokol_jack
 --- version 0.4 (30.01.2011)
 
-local news_showtime = system_ini():r_s32("options","news_showtime") -- стандартное врем€ показа сообщени€
+local news_showtime = sys_ini:r_s32("options","news_showtime") -- стандартное врем€ показа сообщени€
 local post_message_prob = 0.6 -- ¬еро€тность того, что будет комментарий к смерти.
-local random_news = system_ini():r_s32("options","random_news")
+local random_news = sys_ini:r_s32("options","random_news")
 local message_death = 1 -- —ообщени€ о смерти
 local extra_debug = false -- ќтладочный режим
 

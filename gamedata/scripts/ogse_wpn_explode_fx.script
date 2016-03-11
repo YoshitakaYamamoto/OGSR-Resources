@@ -158,8 +158,8 @@ end
 
 function identy_type_of_visual(act_item_section)
 	local type_of_visualise = 2			-- определяем тип визуализации по умолчанию на тот случай, когда тип боеприпаса не определится 
-	if system_ini():line_exist(act_item_section, "ammo_class") then
-		local ammo_list = system_ini():r_string(act_item_section, "ammo_class")
+	if sys_ini:line_exist(act_item_section, "ammo_class") then
+		local ammo_list = sys_ini:r_string(act_item_section, "ammo_class")
 		if string.find(ammo_list, "ammo_9x18") or 
 				string.find(ammo_list, "ammo_9x19") then
 			type_of_visualise = 1

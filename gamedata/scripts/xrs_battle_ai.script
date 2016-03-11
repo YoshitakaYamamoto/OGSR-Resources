@@ -1419,13 +1419,12 @@ function hit_fx(e)
 	local amount = e.amount
 	local bone_index = e.bone	
 	
-	local ini = system_ini()
 	local sect = active_item:section()
 	
 	local weap_class = 0
 	
-	if ini:section_exist(sect) and ini:line_exist(sect, "ef_weapon_type") then
-		weap_class = ini:r_s32(sect,"ef_weapon_type")
+	if sys_ini:section_exist(sect) and sys_ini:line_exist(sect, "ef_weapon_type") then
+		weap_class = sys_ini:r_s32(sect,"ef_weapon_type")
 	end
 	
 	if weap_class == 0 or weap_class == 1 then
@@ -2249,9 +2248,9 @@ function is_hostile_armor(comm,target)
 			t_comm = "military"
 		end
 	end
-	local hostile_treshold = tonumber(system_ini():r_string("game_relations", "attitude_neutal_threshold"))
-	local comm_attitude = parse_data(system_ini():r_string("communities_relations", comm))
-	local comm_list = parse_data(system_ini():r_string("game_relations", "communities"))
+	local hostile_treshold = tonumber(sys_ini:r_string("game_relations", "attitude_neutal_threshold"))
+	local comm_attitude = parse_data(sys_ini:r_string("communities_relations", comm))
+	local comm_list = parse_data(sys_ini:r_string("game_relations", "communities"))
 	for k,v in pairs (comm_list) do
 		if t_comm == tostring(v) then
 			t_comm_number = (k+1)/2
@@ -2355,15 +2354,14 @@ function get_max_weapon_range(npc)
 	-- служебная для проверки достанет ли оружие
 	if npc then
 		local act_item = npc:item_in_slot(npc:active_slot())
-		local ini = system_ini()
 		if act_item then
 			local sect = act_item:section()
-			if ini:section_exist(sect) and ini:line_exist(sect, "max_radius") then
-				return ini:r_float(sect, "max_radius")
-			elseif not ini:section_exist(sect) then	
+			if sys_ini:section_exist(sect) and sys_ini:line_exist(sect, "max_radius") then
+				return sys_ini:r_float(sect, "max_radius")
+			elseif not sys_ini:section_exist(sect) then	
 				write_log("!!XRS_COMBAT_AI: WEAPON SECTION NOT EXIST ["..tostring(sect).."]")
 				return 36.0
-			elseif not ini:line_exist(sect, "max_radius") then	
+			elseif not sys_ini:line_exist(sect, "max_radius") then	
 				write_log("!!XRS_COMBAT_AI: WEAPON RADIUS NOT EXIST ["..tostring(sect).."]")
 				return 36.0
 			end

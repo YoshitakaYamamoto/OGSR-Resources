@@ -109,7 +109,7 @@ function restrictor_teleport:__init(obj, char_ini) super(obj)
 end
 
 function restrictor_teleport:net_spawn(data)
-	local char_ini = system_ini()
+	local char_ini = sys_ini
 
 	-- ≈сли это телепорт то занесем его в специальный список телепортов
 	if self.teleport == true then
@@ -154,11 +154,9 @@ function restrictor_teleport:net_destroy()
 end
 
 function restrictor_teleport:reload(section)
-	local char_ini = system_ini()
-
 	self.section = section
 	-- ≈сли это телепорт то 
-	if char_ini ~= nil and char_ini:line_exist(self.section, "teleport") then
+	if sys_ini ~= nil and sys_ini:line_exist(self.section, "teleport") then
 		self["teleport"] = true
 	end
 end

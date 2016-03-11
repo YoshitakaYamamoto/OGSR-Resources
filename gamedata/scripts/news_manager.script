@@ -1,5 +1,5 @@
 -- за счЄт отложенной загрузки звуков экономитс€ примерно 4.5 ћб пам€ти.
-local news_showtime = system_ini():r_s32("options","news_showtime") -- стандартное врем€ показа сообщени€
+local news_showtime = sys_ini:r_s32("options","news_showtime") -- стандартное врем€ показа сообщени€
 local snds = {
 	tips_esc_trader_about_anomalies	= [[characters_voice\scenario\trader\trader_tutorial_anomalies_1]],
 	gar_dolg_warning				= [[characters_voice\scenario\duty\duty_warning1]],
@@ -302,7 +302,7 @@ function send_treasure(name)
 end
 
 function get_inv_name(section)
-	return system_ini():r_string(section,"inv_name")
+	return sys_ini:r_string(section,"inv_name")
 end
 
 function relocate_item(actor, type, item)

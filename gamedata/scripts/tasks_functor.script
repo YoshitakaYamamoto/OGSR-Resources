@@ -2733,8 +2733,8 @@ function rob_actor (item)
 		return
 	end
 
-	if system_ini():line_exist(section, "quest_item") then
-		if system_ini():r_bool(section, "quest_item") then
+	if sys_ini:line_exist(section, "quest_item") then
+		if sys_ini:r_bool(section, "quest_item") then
 			return
 		end
 	end
@@ -2768,7 +2768,7 @@ function actor_look_at_sitnik_hit_to_actor_2()
 			if obj and alife():object(obj:id()) then
 				local sect = obj:section()
 				if obj 
-					and not (system_ini():line_exist(sect, "quest_item") and system_ini():r_bool(sect, "quest_item")) 
+					and not (sys_ini:line_exist(sect, "quest_item") and sys_ini:r_bool(sect, "quest_item")) 
 					and not string.find(sect, "hand_radio_f") 
 					and not string.find(sect, "device_pda") 
 					and not string.find(sect, "device_torch") 

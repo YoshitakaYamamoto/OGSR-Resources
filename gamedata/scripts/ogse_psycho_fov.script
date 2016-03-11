@@ -6,7 +6,7 @@ end
 
 auto_attach = true
 
-local fov_vol = system_ini():r_s32("options","fov_volume")
+local fov_vol = sys_ini:r_s32("options","fov_volume")
 local max_alarm_fov_vol = 90
 local min_alarm_fov_vol = 30
 

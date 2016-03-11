@@ -104,8 +104,7 @@ end
 function create_ammo_in_inv(create_item,number,npc)
 	if npc then
 		if number > 0 then
-			local sys = system_ini()
-			box = sys:r_u32(create_item, "box_size")
+			box = sys_ini:r_u32(create_item, "box_size")
 			return se_respawn.create_ammo(create_item, npc.position, npc.m_level_vertex_id, npc.m_game_vertex_id, npc.id, number*box)
 		end
 	end

@@ -563,7 +563,6 @@ end
 
 local imm_names = {"rad_immunity", "rad_food_immunity", "psy_immunity"}
 local function get_immunities_effects(section)
-	local sys_ini = system_ini()
 	local res = {}
 	for _,imm_name in ipairs(imm_names) do
 		if sys_ini:line_exist(section, imm_name) then

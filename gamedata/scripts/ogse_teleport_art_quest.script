@@ -338,22 +338,20 @@ function spawn_dead_zone()
 		local obj = ogse.quest_spawn_ex(anom_section, 1, spawn_item)
 		table.insert(dead_zone_id, obj.id)
 		
-		local ini = system_ini()
-		
 		local packet = xs_netpk.anomaly(obj) 
 		if packet:isOk() then
 			local my_table = packet:get()
 			
 			local coef_effective_radius = 1
-			if ini:line_exist(anom_section, "effective_radius") then coef_effective_radius = ini:r_float(anom_section, "effective_radius") end
+			if sys_ini:line_exist(anom_section, "effective_radius") then coef_effective_radius = sys_ini:r_float(anom_section, "effective_radius") end
 			
 			write_log("coef_effective_radius = "..coef_effective_radius)
 			write_log("new_radius = "..anom_rad*coef_effective_radius)
-			write_log("power = "..ini:r_float(anom_section, "max_start_power"))
+			write_log("power = "..sys_ini:r_float(anom_section, "max_start_power"))
 			
 			
 			my_table.shapes:addSphere(anom_rad*coef_effective_radius, vector():set(0,0,0))
-			my_table.max_power = ini:r_float(anom_section, "max_start_power")
+			my_table.max_power = sys_ini:r_float(anom_section, "max_start_power")
 			packet:set(my_table)
 		else write_log("packet fail in deadzone")
 		end

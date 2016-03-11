@@ -122,8 +122,8 @@ function get_target_priority(obj)
 		local wpn = obj:item_in_slot(obj:active_slot())
 		if wpn then
 			local ammo, fm
-			if system_ini():line_exist(wpn:section(), "ammo_class") then
-				ammo = system_ini():r_string(wpn:section(), "ammo_class")
+			if sys_ini:line_exist(wpn:section(), "ammo_class") then
+				ammo = sys_ini:r_string(wpn:section(), "ammo_class")
 				if (string.find(ammo, "9x18") -- пистолетные патроны
 					or string.find(ammo, "9x19")
 					or string.find(ammo, "7.62x25")
@@ -147,8 +147,8 @@ function get_target_priority(obj)
 					prior = prior + 4
 				end
 			end
-			if system_ini():line_exist(wpn:section(), "fire_modes") then
-				fm = system_ini():r_string(wpn:section(), "fire_modes")
+			if sys_ini:line_exist(wpn:section(), "fire_modes") then
+				fm = sys_ini:r_string(wpn:section(), "fire_modes")
 				if string.sub(fm,-2,-1) == "-1" then
 					prior = prior + 1 -- автоматическое оружие - приоритет цели выше на 1
 				end

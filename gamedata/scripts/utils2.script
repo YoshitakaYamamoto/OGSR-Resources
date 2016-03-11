@@ -56,11 +56,10 @@ local function load_communities_relations()
 	communities_relations = {}
 	community_for_index = {}
 
-	local ini = system_ini()
-	local communities = ini:r_string("game_relations", "communities")
+	local communities = sys_ini:r_string("game_relations", "communities")
 	for comm,id in string.gfind(communities, "([%w_]+)%s*,%s*([%d%.%-]+)%,*") do
 		local t = {}
-		local relations = ini:r_string("communities_relations", comm)
+		local relations = sys_ini:r_string("communities_relations", comm)
 		for rel in string.gfind(relations, "([%d%.%-]+)%,*") do
 			table.insert(t, tonumber(rel))
 		end

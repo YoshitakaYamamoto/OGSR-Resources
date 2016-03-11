@@ -64,7 +64,7 @@ function heli_combat:__init( object, heliObject )
 -------------------------------------	
 	self.level_max_y           = level.get_bounding_volume().max.y
 
-	local ltx                  = system_ini()
+	local ltx                  = sys_ini
 
 	self.flyby_attack_dist     = utils.cfg_get_number( ltx, "helicopter", "flyby_attack_dist",    self.object, true )
 	self.search_attack_dist    = utils.cfg_get_number( ltx, "helicopter", "search_attack_dist",   self.object, true )
@@ -281,9 +281,9 @@ function is_hostile(comm,target)
 		t_comm = "military"
 	end
 
-	local hostile_treshold = tonumber(system_ini():r_string("game_relations", "attitude_neutal_threshold"))
---[[	local comm_attitude = parse_data(system_ini():r_string("communities_relations", comm))
-	local comm_list = parse_data(system_ini():r_string("game_relations", "communities"))
+	local hostile_treshold = tonumber(sys_ini:r_string("game_relations", "attitude_neutal_threshold"))
+--[[	local comm_attitude = parse_data(sys_ini:r_string("communities_relations", comm))
+	local comm_list = parse_data(sys_ini:r_string("game_relations", "communities"))
 	for k,v in pairs (comm_list) do
 		if t_comm == tostring(v) then
 			t_comm_number = (k+1)/2

@@ -258,8 +258,6 @@ function gen_custom_data(tbl)
 	return str
 end
 
-local respawn_ini = system_ini()
-
 -- Обобщенная процедура спавна
 function proceed_spawn(p_name, p_vector, p_lv, p_gv, p_count, p_port, p_fake)
 	local cnt = 0
@@ -283,8 +281,8 @@ function proceed_spawn(p_name, p_vector, p_lv, p_gv, p_count, p_port, p_fake)
 
 	if qnt>=1 then
 		for ind = 1, qnt do
-			local community = r_str(respawn_ini, p_name, "community", "nil")
-			local rank = r_str(respawn_ini, p_name, "spec_rank", "nil")	
+			local community = r_str(sys_ini, p_name, "community", "nil")
+			local rank = r_str(sys_ini, p_name, "spec_rank", "nil")	
 			if se_respawn.check_monster_spawn_allowed(p_name, community, rank) then
 				local sp_ob = alife():create(p_name, p_vector, p_lv, p_gv)
 				sp_ob.ogsm_portion = p_port

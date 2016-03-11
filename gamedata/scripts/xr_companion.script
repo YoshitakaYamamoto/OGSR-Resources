@@ -283,8 +283,8 @@ function check_weapon(weapon_section, npc_id)
 		w_cl = get_parameters_from_table(weapon_section)
 		if w_cl == 0 then
 			log1("!!!ERROR - Companion weapon selector cannot find ammo class or mode for "..weapon_section.."!!! Will use configs instead!")
-			if system_ini():line_exist(weapon_section, "ammo_class") then
-				local ammo = system_ini():r_string(weapon_section, "ammo_class")
+			if sys_ini:line_exist(weapon_section, "ammo_class") then
+				local ammo = sys_ini:r_string(weapon_section, "ammo_class")
 				for k, v in pairs(ammo_types) do
 					local search_patterns = v
 					if search_patterns then
@@ -301,8 +301,8 @@ function check_weapon(weapon_section, npc_id)
 					end
 				end
 			end			
-			if system_ini():line_exist(weapon_section, "fire_modes") then
-				local fm = system_ini():r_string(weapon_section, "fire_modes")
+			if sys_ini:line_exist(weapon_section, "fire_modes") then
+				local fm = sys_ini:r_string(weapon_section, "fire_modes")
 				if string.find(fm,"-1") then
 					fire_mode = 1 -- автоматическое оружие
 				else	
@@ -379,8 +379,8 @@ function search_weapon(npc, item)
 		w_cl = get_parameters_from_table(weapon_section)
 		if w_cl == 0 then
 			log1("!!!ERROR - Companion weapon selector cannot find ammo class or mode for "..weapon_section.."!!!")
-			if system_ini():line_exist(weapon_section, "ammo_class") then
-				local ammo_string = system_ini():r_string(weapon_section, "ammo_class")
+			if sys_ini:line_exist(weapon_section, "ammo_class") then
+				local ammo_string = sys_ini:r_string(weapon_section, "ammo_class")
 				for k, v in pairs(ammo_types) do
 					local search_patterns = v
 					if search_patterns then
@@ -397,8 +397,8 @@ function search_weapon(npc, item)
 					end
 				end
 			end		
-			if system_ini():line_exist(weapon_section, "fire_modes") then
-				local fm = system_ini():r_string(weapon_section, "fire_modes")
+			if sys_ini:line_exist(weapon_section, "fire_modes") then
+				local fm = sys_ini:r_string(weapon_section, "fire_modes")
 				if string.find(fm,"-1") then
 					mode = 1
 				else	
@@ -993,8 +993,8 @@ function get_max_weapon_range(npc)
 		local act_item = npc:active_item()
 		if act_item and isWeapon(act_item) then
 			local sect = act_item:section()
-			if system_ini():line_exist(sect, "max_radius") then
-				local radius = system_ini():r_s32(sect, "max_radius")
+			if sys_ini:line_exist(sect, "max_radius") then
+				local radius = sys_ini:r_s32(sect, "max_radius")
 				return radius
 			end
 		else	

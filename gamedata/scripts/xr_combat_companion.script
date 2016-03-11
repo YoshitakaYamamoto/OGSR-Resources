@@ -478,15 +478,14 @@ function get_max_weapon_range(companion)
 	-- служебная для проверки достанет ли оружие
 	if companion then
 		local act_item = companion:item_in_slot(companion:active_slot())
-		local ini = system_ini()
 		if act_item then
 			local sect = act_item:section()
-			if ini:section_exist(sect) and ini:line_exist(sect, "max_radius") then
-				return ini:r_float(sect, "max_radius")
-			elseif not ini:section_exist(sect) then	
+			if sys_ini:section_exist(sect) and sys_ini:line_exist(sect, "max_radius") then
+				return sys_ini:r_float(sect, "max_radius")
+			elseif not sys_ini:section_exist(sect) then	
 				write_log("!!XR_COMBAT_COMP: WEAPON SECTION NOT EXIST ["..tostring(sect).."]")
 				return 36.0
-			elseif not ini:line_exist(sect, "max_radius") then	
+			elseif not sys_ini:line_exist(sect, "max_radius") then	
 				write_log("!!XR_COMBAT_COMP: WEAPON RADIUS NOT EXIST ["..tostring(sect).."]")
 				return 36.0
 			end
