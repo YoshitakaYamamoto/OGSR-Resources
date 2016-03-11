@@ -100,11 +100,6 @@ function have_a_vodka (stalker, player)
     return db.actor:object ("vodka") ~= nil
 end
 
-function actor_punch (first_speaker, second_speaker)
-	dialogs.break_dialog (first_speaker, second_speaker, 0)
-    set_sleep_relocate(patrol ("mil_actor_path"):point(0), patrol ("mil_actor_path"):point(1), 60)
-end
-
 function send_ammo_for_AK (actor, npc)
     dialogs.relocate_item_section(npc, "ammo_5.56x45_ap", "in")
 end
