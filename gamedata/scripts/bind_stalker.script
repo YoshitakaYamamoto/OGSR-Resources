@@ -175,8 +175,6 @@ function actor_binder:reinit()
 	self.st = db.storage[npc_id]
 	self.st.pstor = nil
 
-	self.next_restrictors_update_time = -10000
-
 	self.object:set_callback(callback.inventory_info, self.info_callback, self)
 	self.object:set_callback(callback.article_info, self.article_callback, self)
 	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
@@ -534,44 +532,6 @@ function actor_binder:update(delta)
 		if self.weapon_hide == true then
 			self.object:restore_weapon()
 			self.weapon_hide = false
-		end
-	end
-
-	ogse_debug.process_actor("upd", 8) --перевести это всё на сигналы на низкий приоритет. как раз подходит по частоте апов.
-	if self.next_restrictors_update_time < time_global() then --обновление рестрикторов, которые под логикой, срабатывает через интервалы времени
-		ogse_debug.process_actor("upd", 811)
-		bind_restrictor.actor_update(delta)
-
-		ogse_debug.process_actor("upd", 812)
-		bind_mteleport.actor_update(delta) --Апдейтим наш телепорт
-
-		ogse_debug.process_actor("upd", 813)
-		task_manager.actor_update()
-
-		ogse_debug.process_actor("upd", 814)
-		ogse_water_restrictor.actor_update(delta)
-
-		self.next_restrictors_update_time = time_global() + 200
-	end
-	
-	ogse_debug.process_actor("upd", 10)
-	if sr_psy_antenna.psy_antenna and level.name() == "l10_radar" then --обновление пси-антенны апдейтиться будет только если актор находится на радаре.
-		sr_psy_antenna.psy_antenna:update(delta)
-	end
-
-	ogse_debug.process_actor("upd", 11)
-	if self.object.radiation >= 0.7 then --Вывод сообщения о большой радиации
-		local hud = get_hud()
-		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
-		if custom_static == nil then
-			hud:AddCustomStatic("cs_radiation_danger", true)
-			hud:GetCustomStatic("cs_radiation_danger"):wnd():SetTextST("st_radiation_danger")
-		end
-	else
-		local hud = get_hud()
-		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
-		if custom_static ~= nil then
-			hud:RemoveCustomStatic("cs_radiation_danger")
 		end
 	end
 	

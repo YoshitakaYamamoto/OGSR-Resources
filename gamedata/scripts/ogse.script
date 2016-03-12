@@ -1302,7 +1302,7 @@ local loot_timer = time_global()
 local buggy_timer = time_global()
 local anom_enum = time_global()
 local watchdog = 0
-local watchdog_max = 42
+local watchdog_max = 48
 --------------------------------------------------------------------
 function on_actor_update(obj) --Колбэк на апдейт ГГ
 ---------------------АПДЕЙТЫ С ВЫСОКИМ ПРИОРИТЕТОМ ПОМЕЩАТЬ СЮДА!---------------------
@@ -1594,6 +1594,50 @@ if watchdog == 41 then
 end
 --==============================================================
 ------------------------------------------Конец квестовых апдейтов--------------------------------------------
+if watchdog == 42 then
+	ogse_debug.process_actor("upd", 811)
+	bind_restrictor.actor_update(delta)
+end
+
+if watchdog == 43 then
+	ogse_debug.process_actor("upd", 812)
+	bind_mteleport.actor_update(delta) --Апдейтим наш телепорт
+end
+
+if watchdog == 44 then
+	ogse_debug.process_actor("upd", 813)
+	task_manager.actor_update()
+end
+
+if watchdog == 45 then
+	ogse_debug.process_actor("upd", 814)
+	ogse_water_restrictor.actor_update(delta)
+end
+
+if watchdog == 46 then
+	ogse_debug.process_actor("upd", 10)
+	if sr_psy_antenna.psy_antenna and level.name() == "l10_radar" then --обновление пси-антенны апдейтиться будет только если актор находится на радаре.
+		sr_psy_antenna.psy_antenna:update(delta)
+	end
+end
+
+if watchdog == 47 then
+	ogse_debug.process_actor("upd", 11)
+	if db.actor.radiation >= 0.7 then --Вывод сообщения о большой радиации
+		local hud = get_hud()
+		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
+		if custom_static == nil then
+			hud:AddCustomStatic("cs_radiation_danger", true)
+			hud:GetCustomStatic("cs_radiation_danger"):wnd():SetTextST("st_radiation_danger")
+		end
+	else
+		local hud = get_hud()
+		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
+		if custom_static ~= nil then
+			hud:RemoveCustomStatic("cs_radiation_danger")
+		end
+	end
+end
 
 -- НЕ ТРОГАТЬ!!! БИБЛИОТЕЧНАЯ КОНСТРУКЦИЯ! ДОЛЖНО ЗАМЫКАТЬ ФУНКЦИЮ!
 watchdog = watchdog + 1
