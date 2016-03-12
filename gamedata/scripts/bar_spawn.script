@@ -140,7 +140,10 @@ function spawn_barman_document()
 end
 
 function spawn_cherep_svd()
-	ogse.spawn_object(spawn_db.spawn_cherep_svd)
+	local wpn = ogse.spawn_object(spawn_db.spawn_cherep_svd)
+	local wpndata = m_net_utils.get_weapon_data(wpn)
+	wpndata.addon_flags = wpndata.addon_flags + 1
+	m_net_utils.set_weapon_data(wpndata, wpn)
 end
 -------------------------------------------------------
 ---' Массивы атакующих
