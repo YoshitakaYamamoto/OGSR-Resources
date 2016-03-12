@@ -73,6 +73,8 @@ function actor_binder:net_spawn(data)
 
 	set_extensions_flags(15)
 
+	level.enable_input()
+
 	ogse_debug.process_actor("a_spw", 7)
 
 	if(actor_stats.add_to_ranking~=nil)then
