@@ -2403,3 +2403,18 @@ function transfer_items_to_box(box_sid, remove_quest_items, exclude_sections, ex
 		end
 	end
 end
+
+function transfer_items_from_box(box_sid, remove_quest_items, exclude_sections, exclude_clsids)
+	local box = level_object_by_sid(box_sid)
+	if not box then return end
+	local cnt = box:inv_box_count()
+	for i=0, cnt-1 do
+		local obj = box:object_from_inv_box(i)
+		-- есть ли объект
+		if obj then
+			local sect = obj:section()
+			-- передаем предмет
+			box:transfer_item(obj, db.actor)
+		end
+	end
+end

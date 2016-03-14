@@ -213,7 +213,7 @@ local aVisualList = {
 	},
 	["ecolog"] = {
 		[[actors\ecolog\stalker_ecolog_live]],
-		[[actors\ecolog\stalker_ecolog_military_live]]
+		[[actors\ecolog\stalker_ecolog_military]]
 	}
 }
 
@@ -344,7 +344,7 @@ local aExactEquip = {
 	["ecolog"] = {
 		["ecolog_outfit"] = [[actors\ecolog\stalker_ecolog_live]],
 		["scientific_outfit"]  = [[actors\neytral\stalker_neytral_nauchniy]],
-		["protection_outfit"] = [[actors\ecolog\stalker_ecolog_military_live]],
+		["protection_outfit"] = [[actors\ecolog\stalker_ecolog_military]],
 	},
 }
 

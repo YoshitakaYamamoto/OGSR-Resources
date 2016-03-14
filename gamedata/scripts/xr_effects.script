@@ -1372,7 +1372,7 @@ function bar_arena_teleport ( actor, npc)
     in_object  = inv_box_1
 		actor:inventory_for_each(transfer_object_item) ]]
 		
-	ogse.transfer_items_to_box(story_ids.bar_arena_inventory_box, true, items_no_transfer, nil)
+	ogse.transfer_items_to_box(story_ids.bar_arena_inventory_box_2, true, items_no_transfer, nil)
 
 	local spawn_items = {}	
 
@@ -1458,11 +1458,7 @@ function bar_arena_teleport_2 ( actor, npc)
 		local dir = patrol("t_look_2"):point(0):sub(patrol("t_walk_2"):point(0))
 		db.actor:set_actor_direction(-dir:getH())
 	
-	inv_box_2 = level_object_by_sid (574)
-
-	out_object = actor
-    in_object  = inv_box_2
-		actor:inventory_for_each(transfer_object_item) 
+		ogse.transfer_items_from_box(story_ids.bar_arena_inventory_box_2, true, nil, nil)
 end
 
 function barman_give_extra_task (actor, npc)
