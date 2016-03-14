@@ -18,3 +18,22 @@ function fix_pri_battle_sounds() --Убрать из припяти постоя
 		end
 	end
 end
+
+function fix_btr_mass() --На будущее. Попытка увеличить массу БТР'а. Как дойду по сюжету, буду тестить.
+	local sobj = level_object_by_sid(story_ids.dead_city_btr_real) --Внимание! Объект НЕ серверный! (вроде бы)
+	if sobj and sobj:alive() then
+		--[[local sid = sobj.m_story_id
+		alife():release( sobj )
+		sobj = alife():create( alife():spawn_id( sid ) )]]
+		pk = xs_netpk.stalker( sobj ) --БТР НЕ является сталкером. Надо что-то другое тут использовать.
+		if pk:isOk() then
+			local data = pk:get()
+			data.mass = "10000"
+			pk:set( data )
+		else
+			ogse.send_tip("ERROR! BTR NETPK IS NOT OK!!!!")
+		end
+	else
+		ogse.send_tip("ERROR! NO BTR!!!!")
+	end
+end
