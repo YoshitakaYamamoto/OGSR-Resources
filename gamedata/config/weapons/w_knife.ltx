@@ -17,7 +17,7 @@ ef_weapon_type				= 1
 
 class						= WP_KNIFE
 
-visual				= weapons\knife\wpn_knife.ogf
+visual				= weapons\swmt\knife\wpn_knife_world.ogf
 inv_name					= st_knife
 
 inv_name_short				= st_knife
@@ -85,10 +85,10 @@ rpm                      	= 1000;600; end ttc
 normal                   	= 0, 1, 0
 
 ;ОПРЕДЕЛЕНИЕ РАСПОЛОЖЕНИЯ В ПРОСТРАНСТВЕ ОТНОСИТЕЛЬНО РУКИ ПРИ ВЗГЛЯДЕ СО СТОРОНЫ
-position                 	= -0.013, -0.084, 0.026 
+position                 	= -0.031, -0.078, 0.030
 
 ;НА СКОЛЬКО ПОВЕРНУТ САМ ОБЪЕКТ ПРИ ВЗГЛЯДЕ СО СТОРОНЫ
-orientation              	= -50,90,0
+orientation              	= 0,90,0
 
 startup_ammo             	= 1000
 wm_size                  	= 0.10
@@ -120,20 +120,20 @@ snd_shoot2					= weapons\knife\knife_3
 [wpn_knife_hud]
 shell_point					= 0.0, 0.0, 0.0
 fire_point          		= 0.05, 0.0, 0.1
-fire_bone           		= wpn_knife_0
+fire_bone           		= wpn_body
 
 orientation         		= 0,0,0
 position            		= 0,0,0
-visual              		= weapons\knife\wpn_knife_hud.ogf
+visual              		= weapons\swmt\knife\wpn_knife_hud.ogf
 
 anim_idle					= idle
 anim_draw					= draw
-anim_hide					= hide
-anim_shoot1_start			= shoot1_start
-anim_shoot2_start			= shoot2_start
-anim_shoot1_end				= shoot1_end
-anim_shoot2_end				= shoot2_end
-anim_idle_sprint			= idle_sprint
+anim_hide					= holster
+anim_shoot1_start			= attack1_1_start
+anim_shoot2_start			= attack2_1_start
+anim_shoot1_end				= attack1_2_end
+anim_shoot2_end				= attack2_2_end
+anim_idle_sprint			= idle
 
 ;нож Сереги Маньяка
 [wpn_knife_m1]:wpn_knife
@@ -144,7 +144,7 @@ inv_name			= st_knife_m1
 inv_name_short		= st_knife_m1
 inv_grid_x			= 21
 inv_grid_y			= 3
-hud				    = wpn_knife_m1_hud
+hud				    = wpn_knife_hud
 hit_power                	= 1.7
 hit_impulse		         	= 10
 hit_type				 	= wound
@@ -153,10 +153,6 @@ hit_impulse_2	         	= 5
 hit_type_2				 	= wound
 
 ;fake_item_section			= fake_wpn_knife_m1
-
-[wpn_knife_m1_hud]:wpn_knife_hud
-visual              = weapons\knife\wpn_knife_m1_hud.ogf
-
 
 ;монтировка Фримена
 [wpn_montirovka]:wpn_knife
@@ -207,38 +203,89 @@ hud				    = wpn_montirovka_weak_hud
 [wpn_montirovka_weak_hud]
 shell_point			= 0.0, 0.0, 0.0
 fire_point          = 0.05, 0.0, 0.1
-fire_bone           = wpn_strike
+fire_bone           = wpn_body
 
 orientation             = 0, 0, 0		
-position                = 0.05,-0.10,0.42 ; первая влево\вправо ; вторая вверх\вниз ;третья fov 0, 0, 0	
-visual              = weapons\knife_crowbar_weak\wpn_crowbar_weak_hud.ogf
+position                = 0.0,0.0,0.0 ; первая влево\вправо ; вторая вверх\вниз ;третья fov 0, 0, 0	
+visual              = weapons\swmt\crowbar\wpn_crowbar_hud.ogf
 
 anim_idle			= idle
 anim_draw			= draw
-anim_hide			= hide
-anim_shoot1_start	= shoot1_start
-anim_shoot2_start	= shoot2_start
-anim_shoot1_end		= shoot1_end
-anim_shoot2_end		= shoot2_end
-anim_idle_sprint	= idle_sprint
+anim_hide			= holster
+anim_shoot1_start	= attack1_1_start
+anim_shoot2_start	= attack1_1_start
+anim_shoot1_end		= attack1_2_end
+anim_shoot2_end		= attack1_2_end
+anim_idle_sprint	= idle
 
 [wpn_montirovka_hud]
 shell_point			= 0.0, 0.0, 0.0
 fire_point          = 0.05, 0.0, 0.1
-fire_bone           = wpn_strike
+fire_bone           = wpn_body
 
 orientation             = 0, 0, 0		
-position                = 0.05,-0.10,0.42 ; первая влево\вправо ; вторая вверх\вниз ;третья fov 0, 0, 0	
-visual              = weapons\knife_crowbar\wpn_crowbar_hud.ogf
+position                = 0.0,0.0,0.0 ; первая влево\вправо ; вторая вверх\вниз ;третья fov 0, 0, 0	
+visual              = weapons\swmt\crowbar\wpn_crowbar_hud.ogf
 
 anim_idle			= idle
 anim_draw			= draw
-anim_hide			= hide
-anim_shoot1_start	= shoot1_start
-anim_shoot2_start	= shoot2_start
-anim_shoot1_end		= shoot1_end
-anim_shoot2_end		= shoot2_end
-anim_idle_sprint	= idle_sprint
+anim_hide			= holster
+anim_shoot1_start	= attack1_1_start
+anim_shoot2_start	= attack1_1_start
+anim_shoot1_end		= attack1_2_end
+anim_shoot2_end		= attack1_2_end
+anim_idle_sprint	= idle
+
+
+[wpn_machete]:wpn_montirovka
+visual				= weapons\swmt\machete\wpn_machete_world.ogf
+
+description			= "Обычное мачете"
+
+inv_name			= "Мачете"
+inv_name_short		= "Мачете"
+
+inv_grid_width		= 4
+inv_grid_height		= 1
+inv_grid_x			= 13
+inv_grid_y			= 40
+
+hud				    = wpn_machete_hud
+
+
+hit_power                	= 1.8
+hit_impulse		         	= 5
+hit_type				 	= wound
+
+hit_power_2                	= 1.8
+hit_impulse_2	         	= 5
+hit_type_2				 	= wound
+
+fire_distance            	= 3.2
+
+;ОПРЕДЕЛЕНИЕ РАСПОЛОЖЕНИЯ В ПРОСТРАНСТВЕ ОТНОСИТЕЛЬНО РУКИ ПРИ ВЗГЛЯДЕ СО СТОРОНЫ
+position                 	= -0.031, -0.078, 0.030
+
+;НА СКОЛЬКО ПОВЕРНУТ САМ ОБЪЕКТ ПРИ ВЗГЛЯДЕ СО СТОРОНЫ
+orientation              	= 0,90,0
+
+[wpn_machete_hud]
+shell_point			= 0.0, 0.0, 0.0
+fire_point          = 0.05, 0.0, 0.1
+fire_bone           = wpn_body
+
+orientation             = 0, 0, 0		
+position                = 0.0,0.0,0.0 ; первая влево\вправо ; вторая вверх\вниз ;третья fov 0, 0, 0	
+visual              = weapons\swmt\machete\wpn_machete_hud.ogf
+
+anim_idle			= idle
+anim_draw			= draw
+anim_hide			= holster
+anim_shoot1_start	= attack_1_start
+anim_shoot2_start	= attack_1_start
+anim_shoot1_end		= attack_2_end
+anim_shoot2_end		= attack_2_end
+anim_idle_sprint	= idle
 
 [fake_wpn_knife]:identity_immunities
 GroupControlSection	= spawn_group

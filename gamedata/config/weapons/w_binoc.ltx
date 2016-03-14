@@ -45,7 +45,7 @@ attach_position_offset		= 0.080000,0.021273,0.100000
 attach_bone_name			= bip01_r_hand
 auto_attach					= false
 
-visual						= weapons\binoculars\wpn_binoculars.ogf
+visual						= weapons\swmt\binoc\wpn_binoculars_world.ogf
 hand_dependence		 		= 1
 single_handed				= 0
 
@@ -86,7 +86,7 @@ grenade_launcher_status		= 0
 zoom_enabled				= true
 ;scope_texture				= wpn\scopes\scope_bino
 scope_texture				= wpn\scopes\scope_bino_bpo
-scope_zoom_factor			= 10						;8.5		;5.0
+scope_zoom_factor			= 10
 
 fire_dispersion_base		= 0.1
 
@@ -135,14 +135,14 @@ found_snd				    = detectors\DA-2_beep1
 [wpn_binoc_hud]
 shell_point			        = 0.0, 0.0, 0.0
 fire_point              	= 0.05, 0.0, 0.1
-fire_bone               	= binoculars
-orientation             	= 10, 0, -2
-position                	= 0.18, -0.07, 0.25
-visual                  	= weapons\binoculars\wpn_binoculars_hud.ogf
+fire_bone               	= wpn_body
+orientation             	= 0, 0, 0
+position                	= 0.0, 0.0, 0.0
+visual                  	= weapons\swmt\binoc\wpn_binoculars_hud
 
-zoom_offset				    = -0.238600,0.153600,0.000000
-zoom_rotate_x				= -0.014000
-zoom_rotate_y				= 0.324000
+zoom_offset				    = 0.0,0.153600,0.000000
+zoom_rotate_x				= 0.014000
+zoom_rotate_y				= 0.0
 
 anim_idle				    = idle
 anim_reload				    = idle
@@ -153,23 +153,18 @@ anim_idle_aim				= idle
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
-;Yukon NVB Tracker 3x42 (есть 3.5x40 RX) на основе ЭОП первого поколения
+;Yukon NVB Tracker
 [wpn_binoc_m1]:wpn_binoc
 $spawn						= "weapons\binocular_m1"
 visual						= weapons\binoculars\wpn_binoculars.ogf
-hud							= wpn_binoc_m1_hud
+hud							= wpn_binoc_hud
 ammo_class		 	= ammo_binocular_dummy
 inv_name		 			= addon_bino_nv
 inv_name_short				= addon_bino_nv_s
 description					= enc_addon_bino_nv
-inv_grid_x					= 16
-inv_grid_y					= 8
 inv_weight		 			= 0.7
 scope_texture				= wpn\scopes\scope_bino
-scope_zoom_factor			= 3
 ;vision_present				= false
 nightvision_sect			= effector_nightvision_bad
+;Ночные бинокли обычно выполнены на основе ЭОП-ов первого поколения
 cost						= 1500
-
-[wpn_binoc_m1_hud]:wpn_binoc_hud
-visual                  	= weapons\binoculars\wpn_binoculars_hud.ogf
