@@ -1098,11 +1098,6 @@ function CArenaext:start_stake()
 	-- отключаем отложенный старт 
 	db.actor:disable_info_portion("aem_fight_wait")
 
-	-- 'волшебный' ящичек
---	local box = level_object_by_sid(story_ids.bar_arena_inventory_box_2)
-	-- отнимем у ГГ всё, кроме самого необходимого, дабы он не вмешивался в ход боя
---	put_items_to_box_exept(box, self.keep_items)
-
 	ogse.transfer_items_to_box(story_ids.bar_arena_inventory_box_2, true, self.keep_items, item_clsids_no_transfer)
 
 	-- ГГ временно пополняет ряды торговцев
@@ -1848,25 +1843,6 @@ function put_items_to_box(box, items)
 		if obj and items[obj:section()] == true then
 			--printf(" section='%s'", obj:section())
 			db.actor:transfer_item(obj, box)
-		end
-	end
-end
-
--------
--- переносит все вещи, кроме заданных, из инвентаря ГГ в ящик
--- void put_items_to_box_exept(game_object box, {["section1"]=true, ["section2"]=true, ...} exept)
--------
-function put_items_to_box_exept(box, exept)
-	--printf("put_items_to_box_exept('%s')", box:name())
-	local obj
-	local cnt = db.actor:object_count()
-	for i=0, cnt-1 do
-		obj = db.actor:object(i)
-		if obj and obj:clsid() ~= clsid.equ_stalker_s then -- оставить ГГ костюм
-			if exept[obj:section()] ~= true then
-				--printf(" section='%s'", obj:section())
-				db.actor:transfer_item(obj, box)
-			end
 		end
 	end
 end
