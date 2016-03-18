@@ -187,7 +187,8 @@ end
 function use_musicbox()
     local mbox = musicbox_mem.obj
     if mbox then
-        soundtrack.musicbox_activate()
+		local snd_mbox_activate = xr_sound.get_safe_sound_object([[weapons\nv_off]])
+		snd_mbox_activate:play_at_pos(db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
         mbox.isClosed = false
         mbox:IterateInv()
         mbox:Bind()
@@ -258,6 +259,7 @@ function musicbox_base:__init(obj) super()
     }
     self:InitLuaXml()
     self:InitApp()
+	self.mbox_button_press = xr_sound.get_safe_sound_object([[detectors\contact_8]])
 end
 
 function musicbox_base:__finalize() end
@@ -534,7 +536,7 @@ function musicbox_base:InitApp()
 end
 
 function musicbox_base:OnPlateButtonClicked(i)
-    soundtrack.mbox_button_press()
+	self.mbox_button_press:play_at_pos(self.spawn_obj, self.spawn_obj:position(), 0, sound_object.s3d)
     self.checkedPlate = i
     if self.actionPlate == i then
         self.checkedTrack = self.actionTrack
@@ -544,7 +546,7 @@ function musicbox_base:OnPlateButtonClicked(i)
 end
 
 function musicbox_base:OnTrackButtonClicked(i)
-    soundtrack.mbox_button_press()
+	self.mbox_button_press:play_at_pos(self.spawn_obj, self.spawn_obj:position(), 0, sound_object.s3d)
     self:onStop()
     --------------------------------
     local sec  = self.changer[self.checkedPlate].section
@@ -571,7 +573,7 @@ function musicbox_base:OnTrackButtonClicked(i)
 end
 
 function musicbox_base:onStop()
-    soundtrack.mbox_button_press()
+	self.mbox_button_press:play_at_pos(self.spawn_obj, self.spawn_obj:position(), 0, sound_object.s3d)
     
     if not self.snd_obj then return end
     self.timer_static:SetText('')
@@ -587,7 +589,7 @@ function musicbox_base:onStop()
 end
 
 function musicbox_base:onPlayAll()
-    soundtrack.mbox_button_press()
+	self.mbox_button_press:play_at_pos(self.spawn_obj, self.spawn_obj:position(), 0, sound_object.s3d)
     self.checkedPlayAll = not self.checkedPlayAll
     if self.checkedPlayAll then
         self.play_all = this.co_create()
@@ -698,6 +700,7 @@ end
 
 
 function musicbox_base:onExit()
+	self.mbox_button_press:play_at_pos(self.spawn_obj, self.spawn_obj:position(), 0, sound_object.s3d)
     self.isClosed = true
     self:unBind()
     self:GetHolder():start_stop_menu(self,true)

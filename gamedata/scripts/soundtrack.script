@@ -429,8 +429,6 @@ function ds_zapravka_port_signal2() s_play([[characters_voice\scenario\ds_zaprav
 function ds_zapravka_port_action()  s_play([[anomaly\anomaly_gravy_blast00]]) end
 function af_mayatnik_travel()       s_play([[anomaly\teleport_incoming]]) end
 function ds_dolg_zapravka_signal()  s_play([[characters_voice\scenario\ds_dolg_zapravka_signal]]) end
-function mbox_button_press()        s_play([[detectors\contact_8]]) end
-function musicbox_activate()        s_play([[weapons\nv_off]]) end
 function pkm_activate()             s_play([[weapons\pkm\pkm_reload]]) end
 function pkm_deactivate()           s_play([[scripts\remkit\ui_repairweapon_07]]) end
 function towerbox_btn_press()       s_play([[weapons\gauss\gauss_empty]]) end
