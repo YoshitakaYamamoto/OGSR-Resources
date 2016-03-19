@@ -1301,6 +1301,7 @@ local mine_timer = time_global()
 local loot_timer = time_global()
 local buggy_timer = time_global()
 local anom_enum = time_global()
+local mteleport_update_time = time_global()
 local watchdog = 0
 local watchdog_max = 48
 --------------------------------------------------------------------
@@ -1329,6 +1330,12 @@ function on_actor_update(obj) --Колбэк на апдейт ГГ
 
 	ogse_debug.process_actor("upd_a", 15)
 	ogse_wpn_explode_fx.update() -- Подрыв ствола в руках
+
+	if mteleport_update_time < time_global() then --Телепорты апдейтить только так и никак больше! При переносе в ватчдоги, телепорты вообще переставали работать!
+		ogse_debug.process_actor("upd", 812)
+		bind_mteleport.actor_update(delta) --Апдейтим наш телепорт
+		mteleport_update_time = time_global() + 200
+	end
 --------------------------КОНЕЦ АПДЕЙТОВ С ВЫСОКИМ ПРИОРИТЕТОМ-------------------------
 
 if watchdog == 1 then
@@ -1597,11 +1604,6 @@ end
 if watchdog == 42 then
 	ogse_debug.process_actor("upd", 811)
 	bind_restrictor.actor_update(delta)
-end
-
-if watchdog == 43 then
-	ogse_debug.process_actor("upd", 812)
-	bind_mteleport.actor_update(delta) --Апдейтим наш телепорт
 end
 
 if watchdog == 44 then
