@@ -906,7 +906,7 @@
 	<objective>
 		 <icon>ui_iconsTotal_find_item</icon>
 		 <text>bar_kvest_sdelka_dolg_and_killers_slezhka_text_task</text>
-		<map_location_type hint="bar_barman">blue_location</map_location_type>
+		<map_location_type hint="bar_barmen_name">blue_location</map_location_type>
 		<object_story_id>bar_Barman</object_story_id>
 		 <infoportion_complete>bar_kvest_sdelka_dolg_and_killers_slezhka_complete</infoportion_complete>
 		 <infoportion_fail>bar_kvest_sdelka_dolg_and_killers_plennik_death</infoportion_fail>
@@ -926,7 +926,7 @@
     </objective>
 	<objective>
 		<text>bar_kvest_sdelka_dolg_and_killers_slezhka_text_task</text>
-		<map_location_type hint="bar_barman">blue_location</map_location_type>
+		<map_location_type hint="bar_barmen_name">blue_location</map_location_type>
 		<object_story_id>bar_Barman</object_story_id>
 		<infoportion_complete>bar_kvest_sdelka_dolg_and_killers_slezhka_complete</infoportion_complete>
 		<infoportion_fail>bar_kvest_sdelka_dolg_and_killers_plennik_death</infoportion_fail>
@@ -974,7 +974,7 @@
 		</objective>
 		<objective>
 			<text>captive_on_agr_mill_base_save_return_to_barman</text>
-			<map_location_type hint="bar_barman">blue_location</map_location_type>
+			<map_location_type hint="bar_barmen_name">blue_location</map_location_type>
 			<object_story_id>bar_Barman</object_story_id>
 			<infoportion_complete>captive_on_agr_mill_base_complete</infoportion_complete>
 		</objective>
@@ -1181,7 +1181,7 @@
 	<objective>
 		<icon>ui_iconsTotal_find_item</icon>
 		<text>esc_kvest_qest_on_elevator_text6_task</text>
-		<map_location_type hint="bar_barman">blue_location</map_location_type>
+		<map_location_type hint="bar_barmen_name">blue_location</map_location_type>
 		<object_story_id>bar_Barman</object_story_id>
 		<infoportion_complete>esc_kvest_qest_on_elevator_kill_sniper_complete</infoportion_complete>
 		<function_fail>tasks_functor.esc_qest_on_elevator_kill_sniper_fail</function_fail>
@@ -1197,7 +1197,7 @@
 	</objective>
 	<objective>
 		<text>esc_kvest_qest_on_elevator_text6_task</text>
-		<map_location_type hint="bar_barman">blue_location</map_location_type>
+		<map_location_type hint="bar_barmen_name">blue_location</map_location_type>
 		<object_story_id>bar_Barman</object_story_id>
 		<infoportion_complete>esc_kvest_qest_on_elevator_kill_sniper_complete</infoportion_complete>
 		<infoportion_fail>esc_kvest_qest_on_elevator_kill_sniper_fail</infoportion_fail>

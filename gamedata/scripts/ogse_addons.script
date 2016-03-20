@@ -235,6 +235,12 @@ end
 function is_grenade_launcher_installed(obj)
 	return is_addon_installed(obj, addons_flags.gl)
 end
+function is_silencer_installed(obj)
+	return is_addon_installed(obj, addons_flags.silencer)
+end
+function is_grip_installed(obj)
+	return is_addon_installed(obj, addons_flags.grip)
+end
 function is_scope_mount_installed(obj)
 	return is_addon_installed(obj, addons_flags.scope_mount)
 end

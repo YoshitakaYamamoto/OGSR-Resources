@@ -7,7 +7,7 @@ local bInit = false
 local timer_check_freq 			= 5 	-- Как часто проверять новости и выдавать сгруппированные, в игровых минутах
 
 local timer_stalker_death 		= 3  	-- Сообщение о смерти сталкера
-local timer_corpse 				= 400 -- 40 	-- Сообщение о найденом трупе
+local timer_corpse 				= 40 -- 40 	-- Сообщение о найденом трупе
 local timer_hear 				= 60  --15	-- Сообщение о услышанном
 local timer_spawn 				= 90  --20 	-- Сообщение о увиденном
 local timer_general 			= 60  --20	-- Прочее

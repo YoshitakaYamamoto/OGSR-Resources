@@ -1709,6 +1709,30 @@ function on_actor_first_update()
 		db.actor:give_info_portion("OGSE_LIANA_PATCH_3_FIX")
 	end
 
+	if not db.actor:has_info("OGSE_KOLYA_PATCH_6_FIX") then
+		-- варианты: 
+		-- 1)  ол€ еще не заспавнен
+		-- 2)  ол€ заспавнен, есть, еще не найден
+		-- 3)  ол€ заспавнен, пропал, еще не найден
+		-- 4)  ол€ найден, квест закончен
+		if db.actor:dont_has_info("cheb_found_kolya") then
+		-- не вариант 4
+			-- в вариантах 1 и 3 надо всего лишь заспавнить колю и все
+			local kolya = alife():story_object(story_ids.stalker_kolya)
+			if kolya then
+			-- вариант 2. ”дал€ем колю, снима€ с него метку
+				level_tasks.remove_location_by_sid(story_ids.stalker_kolya, "crlc_big")
+				alife():release(kolya)
+			end
+			alife():create(11268)
+			if db.actor:has_info("deadcity_first_enter") then
+				level_tasks.add_location_by_sid(story_ids.stalker_kolya, "crlc_big", "find_kolya")
+			end
+		end
+		
+		db.actor:give_info_portion("OGSE_KOLYA_PATCH_6_FIX")
+	end
+
 	-- ”становка FOV
 	db.actor:set_camera_fov(fov_vol)
 

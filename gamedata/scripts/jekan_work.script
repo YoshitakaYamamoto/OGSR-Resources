@@ -3245,9 +3245,9 @@ end
 function give_cheb_deadcity_msg()
 	news_manager.send_tip(db.actor, "cheb_tip_about_kolya", nil, "chebur1", 10000, nil)
 	soundtrack.cheb_talking()
-	local kolya = ogse.spawn_object(spawn_db.stalker_kolya)
-	ogse.kill_offline_npc(kolya)
-	level_tasks.add_location_by_id(kolya.id, "crlc_big", "find_kolya")
+--	local kolya = ogse.spawn_object(spawn_db.stalker_kolya)
+--	ogse.kill_offline_npc(kolya)
+	level_tasks.add_location_by_sid(story_ids.stalker_kolya, "crlc_big", "find_kolya")
 end
 
 function cheb_ready_msg()

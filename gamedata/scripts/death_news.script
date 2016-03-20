@@ -155,8 +155,9 @@ function on_stalker_death(victim_, killer_)
 	
 	if (m_post_message ~= "" and community_filter(victim)==true) then
 		local from = news_main_new.gen_names_strings()
-		local news_text = "%c[255,160,160,160]"..from..":\\n".."%c[default]"..m_post_message
-		db.actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(498,47,83,47), math.random(8000,12000), news_showtime)	
+		local news_text = "%c[default]"..m_post_message
+		news_amk_core.do_news(news_text, from, 0, news_showtime/1000, "death", nil, 1)
+		--db.actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(498,47,83,47), math.random(8000,12000), news_showtime)	
 	end
 end
 

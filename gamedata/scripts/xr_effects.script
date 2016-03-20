@@ -1458,6 +1458,12 @@ function bar_arena_teleport_2 ( actor, npc)
 		local dir = patrol("t_look_2"):point(0):sub(patrol("t_walk_2"):point(0))
 		db.actor:set_actor_direction(-dir:getH())
 	
+		-- удаляем то, что у актора есть
+		db.actor:inventory_for_each(function(item, npc)
+										if not item then return end
+										if items_no_transfer[item:section()] ~= true then ogse.remove_item_from_inventory(item, npc) end
+									end)
+		-- переносим к нему его барахло
 		ogse.transfer_items_from_box(story_ids.bar_arena_inventory_box_2, true, nil, nil)
 end
 

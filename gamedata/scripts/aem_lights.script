@@ -111,7 +111,7 @@ function create_lamp(pos, dir, visual, brightness, shadow, color)
 	local lvid = ogse_spawn_db.script_spawn_registry.aem_lights.lamp.lvid
 	local gvid = ogse_spawn_db.script_spawn_registry.aem_lights.lamp.gvid
 	
-	local light_flags = 56				-- 0x38==56, 0x1c==28
+	local light_flags = 184				-- 0x38==56, 0x1c==28
 	if shadow then light_flags = light_flags + 2 end
 
 	local packet = net_packet()

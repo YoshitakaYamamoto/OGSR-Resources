@@ -686,13 +686,16 @@ function weapon_manager:get_weapon_prior(wpn,addonf)
 		if addonf then
 			addonf = addonf-rx_utils.get_addon_flag(wpn)+rx_utils.get_addon_flag(wpn,true)
 		end
-		if rx_utils.addon_attached(wpn,"sc",addonf) then
+		if ogse_addons.is_scope_installed(wpn) then
 			pr = pr + prm*self.modes.scope/100
 		end
-		if rx_utils.addon_attached(wpn,"sl",addonf) then
+		if ogse_addons.is_silencer_installed(wpn) then
 			pr = pr + prm*self.modes.silencer/100
 		end
-		if rx_utils.addon_attached(wpn,"gl",addonf) then
+		if ogse_addons.is_grip_installed(wpn) then
+			pr = pr + prm*self.modes.grip/100
+		end
+		if ogse_addons.is_grenade_launcher_installed(wpn) then
 			pr = pr + prm*self.modes.grenadelauncher/100
 		end
 		for k,v in ipairs(self.modes.types) do
