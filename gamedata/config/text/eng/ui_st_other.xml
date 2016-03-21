@@ -817,7 +817,7 @@
 		<text>This option controls angle of view in which shadows are rendered properly. Cause strange triangle shadows when value of this angle isn't enough. It's recommended to max this option.</text>
 	</string>
 	<string id="video_settings_desc_24">
-		<text>This option enables shadow rendering from real sun position. Shadows will be true, but FPS can be reduced when sun rises or sets.</text>
+		<text>This option enables shadow rendering from real sun position. WARNING! Shadows will be true, but FPS can be greatly reduced when sun rises or sets.</text>
 	</string>
 	<string id="video_settings_desc_25">
 		<text>This option enables High Dynamic Range effect. It can enhance image by mapping frame, rendered in full range into monitor color range.</text>
