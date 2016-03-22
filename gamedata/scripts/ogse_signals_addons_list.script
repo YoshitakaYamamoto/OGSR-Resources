@@ -3,9 +3,6 @@
 -- например те, у которых имя модуля не начинается на ogse
 
 addons = {
-------------------------------------------
-	"dsh_restore_active_slot", --Должно быть где-нибудь в начале, намного раньше ogse_night_vision!!!
-------------------------------------------
 	"ogse_addons",
 	"ogse_bind_weapon",
 	"ogse_unist",
@@ -33,20 +30,21 @@ addons = {
 	"ogse_benchmark",
 	"ogse_trade_precondition",
 	"ogse_dbg_teleport",
-	"ogse_night_vision", --ПОДКЛЮЧАТЬ БЛИЖЕ К КОНЦУ, ПОДАЛЬШЕ ОТ  dsh_restore_active_slot!!!
+	"ogse_night_vision",
 ----------KRodin:----------
 	"ogse_quests",
 	"ogse_minigun_sound",
 	"ogse_news_and_off_alife_proxy",
-	"ogse_hud_control",
-	"ogse_dynamic_hud",
 	"ogse_fixes",
+	"ogse_dynamic_hud",
+	"ogse_hud_control",
 	"biodetector",
 	"ui_rad",
 	"ui_ogse_exo_control",
 	"remkit_main",
 	"ms_ai",
 	"horror_time",
+	"dsh_restore_active_slot",
 ---------------------------
 	"ui_handradio",
 	"bind_statpkm",

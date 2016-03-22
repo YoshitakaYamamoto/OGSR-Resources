@@ -8,10 +8,10 @@
 
 function attach(sm)
 	sm:subscribe({ signal = "on_spawn",			fun = this.on_spawn })
-	sm:subscribe({ signal = "on_first_update",	fun = this.on_first_update })
+	sm:subscribe({ signal = "on_first_update",	fun = this.try_to_restart_nv_fx })
 	sm:subscribe({ signal = "on_key_down",		fun = this.call_pnv })
 	sm:subscribe({ signal = "on_take",			fun = this.on_take })
-	sm:subscribe({ signal = "on_item_to_slot",	fun = this.chek_outfit_double_pnv })
+	sm:subscribe({ signal = "on_item_to_slot",	fun = this.on_item_to_slot })
 	sm:subscribe({ signal = "on_sniper_mode",	fun = this.on_sniper_mode })
 	sm:subscribe({ signal = "off_sniper_mode",	fun = this.off_sniper_mode })
 	sm:subscribe({ signal = "on_show_car_hud",	fun = this.on_show_car_hud })
@@ -83,11 +83,6 @@ function on_destroy() --При смерти актора, отключаются
 	cmd("r2_render_mode normal")
 end
 
-function on_first_update() --На первом апдейте актора:
-	try_to_restart_nv_fx()
-	caching_scope_after_load() --Обязательно вызывать ПОСЛЕ восстановления активного слота!
-end
-
 function try_to_restart_nv_fx() --Попытаемся восстановить работу ПНВ после загрузки сейва
 	nv_scope_fx_autoenable = ogse.load_var( "pnv_scope", true ) --ПНВ/Подсветка прицела
 	if ogse.load_var( "pnv", false ) then
@@ -97,6 +92,11 @@ function try_to_restart_nv_fx() --Попытаемся восстановить 
 			nv_fx_on() --включаем обычный ПНВ
 		end
 	end
+end
+
+function on_item_to_slot(obj)
+	chek_outfit_double_pnv(obj)
+	caching_scope(obj)
 end
 
 function on_show_car_hud() --Залезли в БТР.
@@ -381,15 +381,13 @@ function get_active_scope_section( wpn ) --получение секции пр�
 	end
 end
 
-function caching_scope_after_load() --Кэширование текстуры подсветки прицела оружия в руках после загрузки сейва (только если прицел есть в таблице tbl_sights_lighting)
-	local scope_sect = get_active_scope_section()
+function caching_scope(obj) --Кэширование текстуры подсветки прицела оружия в руках после загрузки сейва (только если прицел есть в таблице tbl_sights_lighting)
+	local scope_sect = get_active_scope_section(obj)
 	if not scope_sect then return end --если не получили секцию прицела, то ничего не делаем.
 
-	log1(tostring("На оружии найден прицел: "..scope_sect))
 	local texture = tbl_sights_lighting[scope_sect]
 	if texture then
 		get_highlight_wnd( texture )
-		log1("Текстура подсветки прицела '"..tostring(texture).."' кэширована!")
 	end
 end
 --********************************************************************************************************************************************
@@ -405,7 +403,6 @@ function turn_on_scope_color() --Включаем цветокоррекцию.
 
 	local scope_color = get_string_wq( scope_section, "scope_color_sect", "0,0,0,0" )
 	cmd( "r2_color_grading", scope_color )
-	log1("В конфиге прицела '"..tostring(scope_section).."' найден параметр scope_color_sect: "..tostring(scope_color).." Цветокоррекция включена!")
 	scope_colored = true
 end
 
@@ -413,7 +410,6 @@ function turn_off_scope_color() --Выключаем цветокоррекци�
 	if not scope_colored then return end --Если цветокоррекция уже выключена, то ничего не делаем.
 
 	cmd( "r2_color_grading", "0,0,0,0" )
-	log1("Цветокоррекция отключена!")
 	scope_colored = false
 end
 --********************************************************************************************************************************************
