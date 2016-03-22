@@ -1,6 +1,7 @@
 
 function attach(sm)
 	sm:subscribe({ signal = "on_first_update",	fun = this.del_buggy_objects })
+	sm:subscribe({ signal = "on_first_update",	fun = this.del_buggy_mapspots })
 end
 
 function del_buggy_objects() --Удаление из игры глючных объектов
@@ -22,6 +23,23 @@ function del_buggy_objects() --Удаление из игры глючных о�
 	end
 end
 
+function del_buggy_mapspots() --Удаление глючных меток с карты
+	if has_alife_info("agr_find_gunslinger_cache_final") then
+		if level_tasks.is_map_spot_present(story_ids.agr_zaz, "green_location") then
+			level_tasks.remove_location_by_sid(story_ids.agr_zaz, "green_location") --Глючная метка "Выбраться из подземелья" на Агро.
+		end
+	end
+	if has_alife_info("gar_free_pass") then
+		if level_tasks.is_map_spot_present(115, "green_location") then
+			level_tasks.remove_location_by_sid(115, "green_location") --Вечная метка на Прапора на свалке
+		end
+	end
+end
+
+--[[Также увеличить массу у:
+	story_ids.military_btr_freedom
+	story_ids.gen_btr_monolith
+]]
 function fix_btr_mass() --На будущее. Попытка увеличить массу БТР'а. Как дойду по сюжету, буду тестить.
 	local sobj = level_object_by_sid(story_ids.dead_city_btr_real) --Внимание! Объект НЕ серверный! (вроде бы)
 	if sobj and sobj:alive() then
