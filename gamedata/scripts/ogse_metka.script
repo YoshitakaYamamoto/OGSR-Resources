@@ -26,11 +26,11 @@ end
 function gps_drop_timer:condition()
 	local parent = self.gps_obj:parent()
 	if parent == nil then  -- если родителя нет, значит просто выкинули на землю
-		level.start_stop_menu(setup_gps_beacon(self.gps_obj), true) -- ставим метку
+		level.start_stop_menu(setup_gps_beacon(self.gps_obj:id()), true) -- ставим метку
 		return true 
 	else -- в противном случае
 		if not parent:alive() then -- если выложили в ящик или труп
-			level.start_stop_menu(setup_gps_beacon(self.gps_obj), true) -- ставм метку
+			level.start_stop_menu(setup_gps_beacon(self.gps_obj:id()), true) -- ставм метку
 			return true 
 		elseif parent:id() ~= db.actor:id() then -- если отдали или продали живому персонажу
 			return true -- то просто ничего не делаем
@@ -140,7 +140,7 @@ function setup_gps_beacon:OnKeyboard(dik, keyboard_action)
 end
 
 function setup_gps_beacon:set_gps()
-	level_tasks.add_location_by_id(self.gps_obj:id(),"red_location",self.edit_box:GetText())
+	level_tasks.add_location_by_id(self.gps_obj,"red_location",self.edit_box:GetText())
 	self:on_quit()
 end
 

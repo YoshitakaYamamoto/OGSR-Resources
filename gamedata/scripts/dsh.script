@@ -1,0 +1,990 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+--local mobs_smart_terrain = {}
+
+--[[function attach( sm )
+  sm:subscribe({ signal = "on_spawn", fun = this.on_before_spawn })
+end
+
+function init()
+  event( "se_monster:on_before_register" ):register( se_on_before_register )
+  event( "se_stalker:on_before_register" ):register( se_on_before_register )
+end
+
+
+function on_before_spawn()
+ -- db.actor:disable_info_portion( "biznes_remove_special_item" )
+  build_ru_upper_to_lower()
+end]]
+
+
+class "timeout_timer" ( ogse_qt.quick_timer )
+function timeout_timer:__init( delay, fun) super( delay )
+  self.fun = fun
+end
+function timeout_timer:taction()
+  self.fun()
+end
+
+function timeout( delay, fun )
+  local tmout = timeout_timer( delay, fun )
+  tmout:start()
+  return tmout
+end
+
+
+function set_condition( item, cond )
+  item:set_condition( cond )
+  --[[local sobj = alife():object( item:id() )
+  if sobj then
+    local tbl = amk.get_item_params( sobj )
+    tbl.condition = cond
+    amk.set_item_params( tbl, sobj )
+  end]]
+end
+
+
+-- http://www.amk-team.ru/forum/index.php?showtopic=6458&p=937442
+--[=[
+
+local lname = level.name()
+local lvtab = GetLevelVertexes( lname )
+local lvx = math.max( unpack( lvtab ) )
+local lv  = math_random( 1, lvx )
+
+local gvtab  = GetGameVertexes( lname )
+local gv_min = math.min( unpack( gvtab ) )
+local gv_max = math.max( unpack( gvtab ) )
+
+--]=]
+--[==[function GetLevelVertexes( level )
+  local lvtab ={}
+  local i = 0
+  while game_graph():valid_vertex_id( i ) do
+    local lv = game_graph():vertex( i ):level_vertex_id()
+    local ln = alife():level_name( game_graph():vertex( i ):level_id() )
+    if not lvtab[ ln ] then
+      lvtab[ ln ] = {}
+    end
+    table.insert( lvtab[ ln ], lv )
+    i = i + 1
+  end
+  return lvtab[ level ]
+end
+
+function GetGameVertexes( level )
+  local gvtab ={}
+  local i = 0
+  while game_graph():valid_vertex_id( i ) do
+    local ln = alife():level_name( game_graph():vertex( i ):level_id() )
+    if not gvtab[ ln ] then
+      gvtab[ ln ] = {}
+    end
+    table.insert( gvtab[ ln ], i )
+    i = i + 1
+  end
+  return gvtab[ level ]
+end
+
+
+function is_enemy_around()
+  for id in pairs( db.creature ) do
+    if id then
+      local obj = level.object_by_id( id )
+      if obj and obj:is_custom_monster() and obj:alive() then
+        local is_stalker = IsStalker(obj)
+        local dist = obj:position():distance_to( db.actor:position() )
+        local is_enemy_to_actor =
+          ogse.get_npc_relation( obj, db.actor ) == "enemy"
+        if
+          ( ( is_stalker and is_enemy_to_actor ) or IsMonster( obj ) )
+          and
+          ( dist < 5 or obj:see( db.actor ) )
+        then
+          return true
+        end
+      end
+    end
+  end
+  return false
+end
+
+
+-- http://www.amk-team.ru/forum/index.php?showtopic=10339&page=47#entry910319
+function get_actor_values(type, cycle_length)
+  if cycle_length then
+    if type == "float" then
+      get_console():execute("clear_log")
+      for i = 1, cycle_length do
+        local value = db.actor:get_actor_float(i)
+        if value then log1("Float value = "..value.."; Position = "..i) end
+      end
+      flush_log()
+    elseif type == "integer" then
+      get_console():execute("clear_log")
+      for i = 1, cycle_length do
+        local value = db.actor:get_actor_int(nil, i)
+        if value then log1("Integer value = "..value.."; Position = "..i) end
+      end
+      flush_log()
+    end
+  end
+end
+
+function get_actor_condition_values(cycle_length)
+  get_console():execute("clear_log")
+  for i = 1, cycle_length do
+    local value = db.actor:get_actor_condition_float(i)
+    if value then log1("Float value = "..value.."; Position = "..i) end
+  end
+  flush_log()
+end
+]==]
+
+function remove_quotes( s )
+  local  s2 = string.gsub( s, "[«»\"\']", "" )
+  return s2
+end
+
+function strip_quotes( s )
+  return string.gsub( s, "^%s*[«»\"\']+%s*(.+)%s*[«»\"\']+%s*$", "%1" )
+end
+
+
+--[==[function is_artefact( sect )
+  return (
+    string.find( sect, "^af_" )
+    or
+    get_bool( sect, "dsh_is_artefact", false )
+  )
+end
+
+
+-- Список артефактов, которые можно сварить.
+function get_creatable_arts()
+  local arts = {}
+  for anomaly, info in pairs( amk_mod.anom_recept_komp.anomalii ) do
+    for info_key, recept in pairs( info.recepti ) do
+      if recept.cel and recept.komp then
+        local targets = {}
+        local parts   = {}
+        for k, _ in pairs( recept.cel  ) do
+          table.insert( targets, k )
+        end
+        for k, _ in pairs( recept.komp ) do
+          table.insert( parts, k   )
+        end
+        if
+          table.getn( targets ) == 1
+          and
+          is_artefact( targets[ 1 ] )
+          and
+          table.getn( parts ) > 0
+        then
+          local tgt = targets[ 1 ]
+          arts[ tgt ] = {
+            [ "next" ] = {},
+            [ "prev" ] = parts,
+          }
+        end
+      end
+    end
+  end
+  return arts
+end
+
+
+function get_art_levels()
+  local arts = {}
+  for k, v in pairs( get_creatable_arts() ) do
+    if table.getn( v.prev ) == 1 then
+      arts[ k ] = v
+    end
+  end
+
+  for af, data in pairs( arts ) do
+    local next_arts = { af }
+    local process   = { data.prev[ 1 ] }
+    while table.getn( process ) > 0 do
+      local af_prev = table.remove( process, 1 )
+      if arts[ af_prev ] then
+        for _, k in ipairs( next_arts ) do
+          table.insert( arts[ af_prev ].next, k )
+        end
+        table.insert( next_arts, 1, af_prev )
+        table.insert( process,   arts[ af_prev ].prev[ 1 ] )
+        table.insert( data.prev, arts[ af_prev ].prev[ 1 ] )
+      end
+    end
+  end
+
+  -- Для Симбиона сделано исключение. Т.к. он не является модификацией
+  -- какого-то одного артефакта, он будет считаться артефактом первого
+  -- уровня. Поэтому, принудительно сделаю его артефактом третьего
+  -- уровня.
+  if not arts[ "af_simbion" ] then
+    arts[ "af_simbion" ] = {
+      [ "next" ] = { "af_arhara_globus" },
+      [ "prev" ] = { "", "" },
+    }
+  end
+
+  return arts
+end
+
+
+function set_inv_item_weight( obj, weight )
+  obj:set_inventory_item_float( nil, weight, 164 )
+end
+
+
+function change_inv_item_weight( id, weight )
+  local obj = level.object_by_id( id )
+  if obj then
+    local cur_weight = obj:get_inventory_item_float( 164 )
+    set_inv_item_weight( obj, cur_weight + weight )
+  end
+end
+
+
+function actor_get_art_check( f )
+  local arts = get_art_levels()
+  for i = 0, db.actor:object_count() - 1 do
+    local obj  = db.actor:object( i )
+    local sect = obj:section()
+    if arts[ sect ] and f( arts[ sect ] ) then
+      if db.actor:is_in_ruck( obj ) then return obj end
+    end
+  end
+  return nil
+end
+
+function actor_get_art_abs()
+  return actor_get_art_check(
+    function( art )
+      return ( table.getn( art.prev ) > 0 and table.getn( art.next ) == 0 )
+    end
+  )
+end
+
+function actor_has_art_abs()
+  if actor_get_art_abs() then return true else return false end
+end
+
+function actor_give_art_abs()
+  local obj = actor_get_art_abs()
+  if obj then
+    ogse.remove_item_from_inventory( obj )
+    news_manager.relocate_item( db.actor, "out", obj:section() )
+  end
+end
+
+function actor_get_art_ln( level )
+  return actor_get_art_check(
+    function( art )
+      return ( table.getn( art.prev ) == level and table.getn( art.next ) > 0 )
+    end
+  )
+end
+
+function actor_has_art_l1()
+  if actor_get_art_ln( 1 ) then return true else return false end
+end
+
+function actor_give_art_l1()
+  local obj = actor_get_art_ln( 1 )
+  if obj then
+    ogse.remove_item_from_inventory( obj )
+    news_manager.relocate_item( db.actor, "out", obj:section() )
+  end
+end
+
+function actor_has_art_l2()
+  if actor_get_art_ln( 2 ) then return true else return false end
+end
+
+function actor_give_art_l2()
+  local obj = actor_get_art_ln( 2 )
+  if obj then
+    ogse.remove_item_from_inventory( obj )
+    news_manager.relocate_item( db.actor, "out", obj:section() )
+  end
+end
+
+function actor_has_art_l3()
+  if actor_get_art_ln( 3 ) then return true else return false end
+end
+
+function actor_give_art_l3()
+  local obj = actor_get_art_ln( 3 )
+  if obj then
+    ogse.remove_item_from_inventory( obj )
+    news_manager.relocate_item( db.actor, "out", obj:section() )
+  end
+end
+
+
+-- Заспаунить на АТП артефакты, которые требует Калинин, что бы рассказать о
+-- переходе на Свалку.
+function spawn_arts_for_kalinin()
+  local arts = {
+    "af_dummy_glassbeads",  -- мамины бусы
+    "af_electra_moonlight", -- лунный свет
+    "af_electra_flash",     -- вспышка
+  }
+  local radius = 200
+  for _, sect in ipairs( arts ) do
+    local sobj
+    while not sobj do
+      sobj = amk_anoms.generate_art(
+        level.name(), sect, function( maybe_pos )
+          if db.actor:position():distance_to( maybe_pos ) < radius then
+            return false
+          else
+            return true
+          end
+        end
+      )
+    end
+  end
+end
+
+
+local is_creating_free_mob = false
+function se_on_before_register( e )
+  local sobj = e.sobj
+  if is_creating_free_mob then
+    is_creating_free_mob = false
+    set_none_smart_terrain( sobj )
+  end
+end
+
+function set_none_smart_terrain( sobj )
+  local pk = xs_netpk.monster( sobj )
+  if not pk:isOk() then
+    pk = xs_netpk.stalker( sobj )
+  end
+  if pk:isOk() then
+    local data = pk:get()
+    local cd   = data.custom_data:getTable()
+    if cd.smart_terrains then
+      for k, _ in pairs( cd.smart_terrains ) do
+        return
+      end
+    end
+    cd.smart_terrains = {
+      [ "none" ] = "true",
+    }
+    data.custom_data:set( cd )
+    pk:set( data )
+  end
+end
+
+-- Создать свободного моба, которого не затянет в какой-нибудь гулаг.
+function create_free_mob( ... )
+  is_creating_free_mob = true
+  return alife():create( ... )
+end
+
+function create_free_monster( ... )
+  return create_free_mob( ... )
+end
+
+function create_free_npc( ... )
+  return create_free_mob( ... )
+end
+
+
+-- Условие, при котором будут выполняться модификации логики
+-- гулагов. См. xr_gulag.script.
+function is_gulag_fixes_enabled()
+  return true -- alife():switch_distance() > 160
+end
+
+
+function actor_has_cnt_items( looking_sect, check_cnt_func )
+  local cnt = 0
+  for i = 0, db.actor:object_count() - 1 do
+    local obj  = db.actor:object( i )
+    local sect = obj:section()
+    if looking_sect == sect then
+      cnt = cnt + 1
+      if check_cnt_func( cnt ) then return true end
+    end
+  end
+  return false
+end
+
+
+function actor_has_conserva_ge_4()
+  return actor_has_cnt_items(
+    "conserva", function( cnt ) return cnt >= 4 end
+  )
+end
+
+
+function actor_change_items( give_sect, give_num, take_sect, take_num )
+  local give_objs = {}
+  for i = 0, db.actor:object_count() - 1 do
+    local obj  = db.actor:object( i )
+    local sect = obj:section()
+    if sect == give_sect then
+      table.insert( give_objs, obj )
+    end
+  end
+  local base_cnt = math.floor( table.getn( give_objs ) / give_num )
+  local add_cnt  = base_cnt * take_num
+  local del_cnt  = base_cnt * give_num
+  if del_cnt > 0 then
+    for _, obj in ipairs( give_objs ) do
+      ogse.remove_item_from_inventory( obj )
+      del_cnt = del_cnt - 1
+      if del_cnt == 0 then break end
+    end
+    news_manager.relocate_item( db.actor, "out", give_sect )
+  end
+  if add_cnt > 0 then
+    for i = 1, add_cnt do
+      ogse.spawn_item_in_inv( take_sect )
+    end
+    news_manager.relocate_item( db.actor, "in",  take_sect )
+  end
+end
+
+
+function actor_change_2conserva_1vodka()
+  actor_change_items( "conserva", 2, "vodka", 1 )
+end
+
+
+function actor_has_energy_drink_ge_6()
+  return actor_has_cnt_items(
+    "energy_drink", function( cnt ) return cnt >= 6 end
+  )
+end
+
+
+function actor_change_3energy_drink_1repair_item_outfit()
+  actor_change_items( "energy_drink", 3, "repair_item_outfit", 1 )
+end
+
+
+function actor_has_bread_ge_10()
+  return actor_has_cnt_items(
+    "bread", function( cnt ) return cnt >= 10 end
+  )
+end
+
+
+function actor_change_5bread_1repair_item_weapon()
+  actor_change_items( "bread", 5, "repair_item_weapon", 1 )
+end
+
+
+function actor_change_5bread_1grenade_f1()
+  actor_change_items( "bread", 5, "grenade_f1", 1 )
+end
+
+
+function actor_has_vodka_ge_2()
+  return actor_has_cnt_items(
+    "vodka", function( cnt ) return cnt >= 2 end
+  )
+end
+
+function actor_has_vodka_ge_4()
+  return actor_has_cnt_items(
+    "vodka", function( cnt ) return cnt >= 4 end
+  )
+end
+
+
+function actor_change_1vodka_2medkit_army()
+  actor_change_items( "vodka", 1, "medkit_army", 2 )
+end
+
+
+function actor_change_1vodka_1grenade_f1()
+  actor_change_items( "vodka", 1, "grenade_f1", 1 )
+end
+
+function actor_change_2vodka_1grenade_f1()
+  actor_change_items( "vodka", 2, "grenade_f1", 1 )
+end
+
+
+function actor_has_kolbasa_ge_4()
+  return actor_has_cnt_items(
+    "kolbasa", function( cnt ) return cnt >= 4 end
+  )
+end
+
+
+function actor_change_2kolbasa_1grenade_rgd()
+  actor_change_items( "kolbasa", 2, "grenade_rgd5", 1 )
+end
+
+
+-- Проверить расстояние от гулага до ГГ, если меньше.
+function gulag_distance_to_actor_lt( gulag_name, check_dist )
+  if db.zone_by_name[ gulag_name ] then
+    local sobj = alife():object( gulag_name )
+    if sobj then
+      local obj = level.object_by_id( sobj.id )
+      if obj then
+        local dist = obj:position():distance_to( db.actor:position() )
+        return dist < check_dist
+      end
+    end
+  end
+  return false
+end
+
+
+-- Проверка, могут ли мутанты на АС начинать рейд на Барьер. Нужна для
+-- того, что бы нападение начиналось не раньше, чем игрок дойдет до
+-- Барьера.  С увеличенным алайфом все это начинается слишком рано.
+function lets_mil_monster_begin()
+  return gulag_distance_to_actor_lt( "mil_monster", 250 )
+end
+]==]
+------------------------------------------------------------------------
+-- 'string.lower' с поддержкой кириллицы.
+-- взято из http://www.amk-team.ru/forum/index.php?showtopic=13216&p=959306
+local ru_lower = [[йцукенгшщзхъфывапролджэячсмитьбюё]]
+local ru_upper = [[ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮЁ]]
+local ru_upper_to_lower = {}
+function string_lower_ru( str )
+  ASSERT( str, "str is nil" )
+  local ret = ""
+  for s in string.gmatch( string.lower( str ), "." ) do
+    ret = ret .. ( ru_upper_to_lower[ s ] or s )
+  end
+  return ret
+end
+
+function build_ru_upper_to_lower()
+  local l = {}
+  for s in string.gmatch( ru_lower, "." ) do
+    table.insert( l, s )
+  end
+  local i = 1;
+  for s in string.gmatch( ru_upper, "." ) do
+    ru_upper_to_lower[ s ] = l[ i ]
+    i = i + 1
+  end
+end
+--------------------------------------------------------------------------
+
+--[===[function remember_mobs_smart_terrain( id, sobj, remember )
+  if remember then
+    mobs_smart_terrain[ id ] = sobj.id
+  else
+    mobs_smart_terrain[ id ] = nil
+  end
+end
+
+
+function is_free_logic_mob( sobj )
+  local strn_id
+  if sobj.smart_terrain_id then
+    strn_id = sobj:smart_terrain_id()
+  else
+    strn_id = 65535
+  end
+  if strn_id == 65535 then
+    return mobs_smart_terrain[ sobj.id ]
+  end
+  return nil
+end
+
+
+function bar_priemnik_off()
+  return ogse.save_var( "bar_priemnik.quiet", true, "bool" )
+end
+function bar_priemnik_on()
+  return ogse.delete_var( "bar_priemnik.quiet" )
+end
+
+
+local ini_file_cache = {}
+function cached_ini_file( fname )
+  if not ini_file_cache[ fname ] then
+    ini_file_cache[ fname ] = ini_file( fname )
+  end
+  return ini_file_cache[ fname ]
+end
+
+
+function start_gtimerDHMS( name, d, h, m, s, fname, ... )
+  return ogse_st_mgr.delayed_fun_start( name )
+    :set_gdelayDHMS( d, h, m, s )
+    :init( fname, ... )
+    :start()
+end
+
+
+function begin_af_transform( d, h, m, t )
+  local result = {}
+  for k, v in pairs( t.result ) do
+    table.insert( result, k )
+  end
+  local from_komp = {}
+  for k, v in pairs( t.komp ) do
+    table.insert( from_komp, k )
+  end
+  start_gtimerDHMS(
+    nil, d, h, m, 0,
+    ( script_name() .. ".end_af_transform" ),
+    table.concat( result, "," ),
+    t.udacha,
+    t.pos.x, t.pos.y, t.pos.z, t.gv, t.lv,
+    t.info_portion,
+    table.concat( from_komp, "," ),
+    t.remove_anomaly,
+    t.remove_anomaly_id,
+    level.name()
+  )
+end
+
+
+function end_af_transform( result, udacha, x, y, z, gv, lv, info, komp, rm_anom, rm_anom_id, lname )
+  local t = {
+    [ "udacha" ] = udacha,
+    [ "pos"    ] = {
+      [ "x" ] = tonumber( x ),
+      [ "y" ] = tonumber( y ),
+      [ "z" ] = tonumber( z ),
+    },
+    [ "gv"     ] = tonumber( gv ),
+    [ "lv"     ] = tonumber( lv ),
+    [ "info_portion" ] = info,
+    [ "remove_anomaly"    ] = rm_anom,
+    [ "remove_anomaly_id" ] = tonumber( rm_anom_id ),
+    [ "lname"  ] = lname,
+  }
+  if result then
+    t.result = split_comma_separated_list( result )
+  else
+    t.result = {}
+  end
+  if komp then
+    t.komp = split_comma_separated_list( komp )
+  else
+    t.komp = {}
+  end
+  amk_mod.af_transform_universal_end( t )
+end
+
+
+function is_this_monster_section( sect, monster_classes )
+  local comm = get_string( sect, "community" )
+  if
+    comm
+    and ( monster_classes[ comm ] or comm == "zombied" or comm == "rat" )
+  then
+    return true
+  end
+  return false
+end
+
+
+local spawn_all_respawners_list = {}
+
+function spawn_all_respawners( next_id )
+  if table.getn( spawn_all_respawners_list ) == 0 then
+    local monsters = {}
+    for k, v in pairs( smart_terrain.get_monster_classes() ) do
+      monsters[ v ] = true
+    end
+    local found = false
+    if next_id then
+      next_id = tonumber( next_id )
+    else
+      found = true
+    end
+    se_respawn.iterate_respawners(
+      function( respawner )
+        if respawner.parent then return end
+        if respawner.already_once_spawned then return end
+        --' Выходим, если у нас установлен событийный спавн.
+        if respawner.idle_spawn_min == -1 then return end
+        local first = respawner.respawn_section[ 1 ]
+        if is_this_monster_section( first.section, monsters ) then
+          if found then
+            table.insert( spawn_all_respawners_list, respawner.id )
+          elseif respawner.id == next_id then
+            table.insert( spawn_all_respawners_list, respawner.id )
+            found = true
+          end
+        end
+      end
+    )
+  end
+  next_id = table.remove( spawn_all_respawners_list, 1 )
+  local sobj = alife():object( next_id )
+  if sobj then
+    sobj:spawn()
+  end
+  if table.getn( spawn_all_respawners_list ) > 0 then
+    next_id = spawn_all_respawners_list[ 1 ]
+    ogse_st_mgr.start_timer(
+      nil, 3, ( script_name() .. ".spawn_all_respawners" ), next_id
+    )
+  else
+    ogse_st_mgr.start_timer(
+      nil, 3, ( script_name() .. ".spawn_dsh_respawners" )
+    )
+  end
+end
+
+
+local spawn_dsh_respawners_list = {}
+
+function spawn_dsh_respawners( next_name )
+  if table.getn( spawn_dsh_respawners_list ) == 0 then
+    local monsters = {}
+    for k, v in pairs( smart_terrain.get_monster_classes() ) do
+      monsters[ v ] = true
+    end
+    local found = false
+    if not next_name then
+      found = true
+    end
+    dsh_respawn.iterate_respawners(
+      function( respawner )
+        local first = respawner.respawn_section[ 1 ]
+        if is_this_monster_section( first.section, monsters ) then
+          if found then
+            table.insert( spawn_dsh_respawners_list, respawner )
+          elseif respawner.name == next_name then
+            table.insert( spawn_dsh_respawners_list, respawner )
+            found = true
+          end
+        end
+      end
+    )
+  end
+  local respawn = table.remove( spawn_dsh_respawners_list, 1 )
+  respawn:do_refresh_spawned_obj()
+  if table.getn( spawn_dsh_respawners_list ) > 0 then
+    next_name = spawn_dsh_respawners_list[ 1 ].name
+    ogse_st_mgr.start_timer(
+      nil, 3, ( script_name() .. ".spawn_dsh_respawners" ), next_name
+    )
+  end
+end
+
+
+function map_add_treasure( id, icon, text )
+  local sobj = alife():object( id )
+  if sobj then
+    local spot
+    if isIndoor( object_level_name( sobj ) ) then
+      spot = icon
+    else
+      spot = "crlc_big_treasure" .. math.random( 1, 4 )
+    end
+    level.map_add_object_spot_ser( id, spot, text )
+  end
+end
+
+
+function map_remove_treasure( id )
+  level.map_remove_object_spot( id, "treasure" )
+  for spot = 1, 4 do
+    level.map_remove_object_spot( id, "crlc_big_treasure" .. spot )
+  end
+end
+
+
+function map_remove_treasure_inv( sect )
+  db.actor:iterate_inventory(
+    function( npc, item )
+      if item:section() == sect then
+        map_remove_treasure( item:id() )
+      end
+    end,
+    db.actor
+  )
+end
+
+
+function create_and_map_treasure( name, descr, sect, pos, lvid, gvid )
+  local sobj = alife():create( sect, pos, lvid, gvid )
+  if ui_mm_opt_main.GetOption( "map_some_treasures" ) then
+    local text = "%c[255,238,155,23]" .. name .. "\\n"
+      .. "%c[default]" .. descr
+    map_add_treasure( sobj.id, "treasure", text )
+  end
+  return sobj
+end
+
+
+function can_map_fraer()
+  local sobj = alife():object( "sim_stalker_fraer" )
+  if sobj then
+    if level.map_has_object_spot( sobj.id, "blue_location" ) == 0 then
+      return sobj
+    end
+  end
+  return false
+end
+
+function take_fraer_spot()
+  local sobj = can_map_fraer()
+  if sobj then
+    local pk = xs_netpk.stalker( sobj )
+    if pk:isOk() then
+      local data = pk:get()
+      level.map_add_object_spot_ser(
+        sobj.id, "blue_location", data.character_name
+      )
+    end
+  end
+end
+
+
+function join_stalker_delayed( actor, npc )
+  return ogse_st_mgr.delayed_fun_start( name )
+    :set_delay( 3 )
+    :init( "arhara_dialog.join_stalker" )
+    :start( true )
+end
+
+
+function black_doc_exo_start_sms_delayed()
+  if
+    db.actor:has_info( "yan_scientist_books_done" )
+    and db.actor:has_info( "tel_dcity_kanaliy" )
+    and db.actor:dont_has_info( "info_angel_start" )
+  then
+    return ogse_st_mgr.delayed_fun_start()
+      :set_delay( 10 )
+      :init( script_name() .. ".black_doc_exo_start_sms" )
+      :start()
+  end
+end
+
+function black_doc_exo_start_sms()
+  news_manager.send_tip(
+    db.actor,
+    "%c[255,160,160,160]"
+    .. "ВОЛК:" .. "\\n"
+    .. "%c[255,255,128,128]Стрелок, как освободишься, походи, обсудим наше дело. Ты знаешь где меня искать." .. "" .. "\n",
+    nil, nil, 30000
+  )
+end
+
+
+function blowout_modif_arts()
+  local arts = get_art_levels()
+  local step = ( 1 + level.get_game_difficulty() ) / 10
+  for i = 1, 65534 do
+    local sobj = alife():object( i )
+    if
+      sobj
+      and arts[ sobj:section_name() ]
+      and table.getn( arts[ sobj:section_name() ].next ) < 2
+    then
+      local cond, pk, data
+      local obj = level.object_by_id( sobj.id )
+      if obj then
+        cond = obj:condition()
+      else
+        pk = xs_netpk.net_alife_item_artefact( sobj )
+        if pk:isOk() then
+          data = pk:get()
+          cond = data.condition
+        end
+      end
+      local make_buliz = true
+      if cond then
+        if cond >= 0.01 then
+          make_buliz = false
+          cond = cond - ( math.random() * step )
+          if cond <= 0 then cond = 0 end
+          if obj then
+            dsh.set_condition( obj, cond )
+          else
+            data.condition = cond
+            pk:set( data )
+          end
+        end
+      end
+      if make_buliz then
+        if sobj.parent_id == 65535 then
+          alife():create(
+            "af_buliz", sobj.position,
+            sobj.m_level_vertex_id, sobj.m_game_vertex_id
+          )
+        else
+          alife():create(
+            "af_buliz", sobj.position,
+            sobj.m_level_vertex_id, sobj.m_game_vertex_id,
+            sobj.parent_id
+          )
+        end
+        alife():release( sobj )
+      end
+    end
+  end
+end
+
+
+function get_next_random( vname, ... )
+  local args = { ... }
+  local min, max
+  if table.getn( args ) == 1 then
+    min, max = 1, args[ 1 ]
+  elseif table.getn( args ) > 1 then
+    min, max = unpack( args )
+  end
+  if min and max and min == max then return min end
+  local nums = ogse.load_var( vname, {} )
+  while table.getn( nums ) < 100 do
+    table.insert( nums, math.random() )
+  end
+  local cur_num = tonumber( table.remove( nums, 1 ) )
+  table.insert( nums, math.random() )
+  ogse.save_var( vname, nums, "array" )
+  if table.getn( args ) > 0 then
+    cur_num = min + round( cur_num * ( max - min ) )
+  end
+  local tname = script_name() .. ".change_next_random_delayed." .. vname
+  if not ogse_st_mgr.timer_exists( tname ) then
+    start_gtimerDHMS(
+      tname, 0, math.random( 20, 48 ), 0, 0,
+      script_name() .. ".change_next_random_delayed", vname
+    )
+  end
+  return cur_num
+end
+
+
+function change_next_random_delayed( vname )
+  get_next_random( vname )
+end
+
+
+-- сделать врагами группу Черепа, что бы долговцы в Баре не краснели,
+-- после их убийства.
+function mil_dolg_enemy()
+  local strn = alife():object( "mil_dolg" )
+  if strn then
+    for id, v in pairs( strn.npc_info ) do
+      local npc = alife():object( id )
+      if npc then
+        relation_registry.set_goodwill( npc.id, db.actor:id(), -5000 )
+      end
+    end
+  end
+end
+
+
+function say_blin()
+  local snd = sound_object(
+    "scripts\\nlc6\\matches_no_light_" .. math.random( 3 )
+  )
+  snd:play( db.actor, 0, sound_object.s2d )
+end
+--]===]

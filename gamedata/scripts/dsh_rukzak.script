@@ -1,0 +1,1322 @@
+--[[
+Скрипт связан с:
+dsh.script
+ogse.script
+ogse_metka.script
+ogse_wpn_utils.script
+se_item.script
+dunin_ammo.script
+----------------------------
+TODO:
+Разобраться с типами вещей для сортировки, исключения и тд.
+]]
+
+function attach( sm )
+  sm:subscribe({ signal = "on_drop", fun = this.on_drop })
+  sm:subscribe({ signal = "on_use",  fun = this.on_use })
+  sm:subscribe({ signal = "on_rukzak_use", fun = this.on_rukzak_use })
+end
+
+
+function on_drop( obj, sobj )
+  if not sobj then return end
+  local sect = obj:section()
+  if sect == "treasure_item" and sobj.parent_id == 65535 then
+    ogse.remove_item( obj )
+    spawn_magic_rukzak( sect )
+    local input = level.main_input_receiver()
+    if input then level.start_stop_menu( input, true ) end
+    return true
+  end
+end
+
+
+function on_use( obj, sobj )
+  local sect = obj:section()
+  if sect == "treasure_item" then
+    spawn_magic_rukzak( sect )
+    level.start_stop_menu( level.main_input_receiver(), true )
+    return true
+  end
+end
+
+
+function spawn_magic_rukzak( sect )
+    local real = get_string( sect, "real_item" )
+    local pos  = db.actor:position()
+    local new  = alife():create(
+      real, pos, db.actor:level_vertex_id(), db.actor:game_vertex_id()
+    )
+end
+
+
+function on_rukzak_use( obj )
+  local rukzak = ui_rukzak( obj:id() )
+  level.start_stop_menu( rukzak, true )
+end
+
+
+local game_types_cache = {}
+
+function override_game_type( sect )
+  if not game_types_cache[ sect ] then
+    local gtype --[[= get_string( sect, script_name() .. ".override_game_type" )
+    if gtype then
+      gtype = gtype == "other" and "" or gtype
+    else]]
+	if string.find( sect, "^fake_wpn_" ) then --Из за этого аддоны могут попасть не туда. Надо будет потестить.
+      gtype = "knife"
+    elseif string.find( sect, "^mutant_" ) then
+      gtype = "mutant_part"
+    elseif
+      --string.find( sect, "bomba" )
+      --or string.find( sect, "detonator" )
+      --or string.find( sect, "teleporter" )
+      --[[or]] string.find( sect, "^wpn_binoc" )
+      --or string.find( sect, "^ogg_flash_" )
+      --or spawn_level_changer.teleports[ sect ] --можно брать и из другого скрипта названия!
+    then
+      gtype = ""
+    end
+    if gtype then game_types_cache[ sect ] = gtype end
+  end
+  return game_types_cache[ sect ]
+end
+
+
+function load_rukzak( id )
+  local prefix     = "dsh_rukzak." .. id
+  local sections   = ogse.load_var( prefix .. ".sections", {}, "array" )
+  local conds      = ogse.load_var( prefix .. ".conds",    {}, "array" )
+  local game_types = ogse.load_var( prefix .. ".types",    {}, "array" )
+  local counts     = ogse.load_var( prefix .. ".counts",   {}, "array" )
+  local infos      = ogse.load_var( prefix .. ".infos",    {}, "array" )
+  local data = {}
+  for i, sect in ipairs( sections ) do
+    local cond = conds[ i ]
+    local info = infos[ i ] or ""
+    local key  = sect .. ":" .. cond .. ":" .. info
+    local item = {
+      [ "section"   ] = sect,
+      [ "condition" ] = tonumber( cond ),
+      [ "game_type" ] = ( override_game_type( sect ) or game_types[ i ] ),
+      [ "count"     ] = tonumber( counts[ i ] ),
+      [ "info"      ] = info,
+      [ "key"       ] = key,
+    }
+    table.insert( data, item )
+  end
+  return data
+end
+
+
+function save_rukzak( id, data )
+  local prefix = "dsh_rukzak." .. id
+  local sections   = {}
+  local conds      = {}
+  local game_types = {}
+  local counts     = {}
+  local infos      = {}
+  for _, item in ipairs( data ) do
+    if item.count > 0 then
+      table.insert( sections,   item.section )
+      table.insert( conds,      string.format( "%.2f", item.condition ) )
+      table.insert( game_types, ( item.game_type or "" ) )
+      table.insert( counts,     item.count   )
+      table.insert( infos,      item.info    )
+    end
+  end
+  if table.getn( sections ) > 0 then
+    ogse.save_var( prefix .. ".sections", sections,   "array" )
+    ogse.save_var( prefix .. ".conds",    conds,      "array" )
+    ogse.save_var( prefix .. ".types",    game_types, "array" )
+    ogse.save_var( prefix .. ".counts",   counts,     "array" )
+    ogse.save_var( prefix .. ".infos",    infos,      "array" )
+  else
+    ogse.delete_var( prefix .. ".sections" )
+    ogse.delete_var( prefix .. ".conds"    )
+    ogse.delete_var( prefix .. ".types"    )
+    ogse.delete_var( prefix .. ".counts"   )
+    ogse.delete_var( prefix .. ".infos"    )
+  end
+end
+
+
+function get_item_info( obj )
+  local sect = obj:section()
+  local info
+  if obj:is_weapon_magazined() then
+    info = get_wpn_info( obj )
+  else
+    info = ""
+  end
+  return info
+end
+
+
+function get_wpn_info( wpn )
+  local info = {}
+  local gl_status, has_gl = 0, false
+  if wpn:is_weapon_gl() then
+    if
+      ogse_wpn_utils.get_grenade_launcher_status( wpn ) == 2
+      and
+      ogse_wpn_utils.get_grenade_launcher_flag( wpn )
+    then
+      gl_status = 1
+    end
+    has_gl = (
+      ogse_wpn_utils.get_grenade_launcher_status( wpn ) == 1
+      or
+      gl_status == 1
+    )
+  end
+  if has_gl and ogse_wpn_utils.get_gl_mode( wpn ) then
+    local hidden_t = ogse_wpn_utils.get_hidden_ammo_type( wpn )
+    local hidden_n = ogse_wpn_utils.get_ammo_elapsed2( wpn )
+    table.insert( info, hidden_t )
+    table.insert( info, hidden_n )
+    local cur_t = ogse_wpn_utils.get_active_ammo_type( wpn )
+    table.insert( info, cur_t    )
+    local cur_n = wpn:get_ammo_in_magazine()
+    table.insert( info, cur_n    )
+  else
+    local cur_t = ogse_wpn_utils.get_active_ammo_type( wpn )
+    table.insert( info, cur_t )
+    local cur_n = wpn:get_ammo_in_magazine()
+    table.insert( info, cur_n )
+    if has_gl then
+      local hidden_t = ogse_wpn_utils.get_hidden_ammo_type( wpn )
+      local hidden_n = ogse_wpn_utils.get_ammo_elapsed2( wpn )
+      table.insert( info, hidden_t )
+      table.insert( info, hidden_n )
+    else
+      table.insert( info, 0 )
+      table.insert( info, 0 )
+    end
+  end
+  local scope_status = 0
+  if
+    ogse_wpn_utils.get_scope_status( wpn ) == 2
+    and
+    ogse_wpn_utils.get_scope_flag( wpn )
+  then
+    scope_status = 1
+  end
+  local silencer_status = 0
+  if
+    ogse_wpn_utils.get_silencer_status( wpn ) == 2
+    and
+    ogse_wpn_utils.get_silencer_flag( wpn )
+  then
+    silencer_status = 1
+  end
+  table.insert( info, scope_status    )
+  table.insert( info, gl_status       )
+  table.insert( info, silencer_status )
+  return table.concat( info, "," )
+end
+
+function spawn_ammo_in_inv( sect, box_size, who )
+  if not who then who = db.actor end
+  local pos, lvid, gvid, id
+  if type( who.id ) == "function" then
+    pos, lvid, gvid, id = 
+      who:position(),
+      who:level_vertex_id(),
+      who:game_vertex_id(),
+      who:id()
+  else
+    pos, lvid, gvid, id = 
+      who.position,
+      who.m_level_vertex_id,
+      who.m_game_vertex_id,
+      who.id
+  end
+  return alife():create_ammo( sect, pos, lvid, gvid, id, box_size )
+end
+
+
+function spawn_item_in_inv( sect, who )
+  if not who then who = db.actor end
+  local pos, lvid, gvid, id
+  if type( who.id ) == "function" then
+    pos, lvid, gvid, id = 
+      who:position(),
+      who:level_vertex_id(),
+      who:game_vertex_id(),
+      who:id()
+  else
+    pos, lvid, gvid, id =
+      who.position,
+      who.m_level_vertex_id,
+      who.m_game_vertex_id,
+      who.id
+  end
+  return alife():create( sect, pos, lvid, gvid, id )
+end
+
+
+function parse_weapon_info_str( info_str )
+  local ammo1_t, ammo1_n, ammo2_t, ammo2_n, scope, gl, silencer =
+    unpack( split_comma_separated_list( info_str ) )
+  ammo1_t = tonumber( ammo1_t )
+  ammo1_n = tonumber( ammo1_n )
+  ammo2_t = tonumber( ammo2_t )
+  ammo2_n = tonumber( ammo2_n )
+  if scope    == "1" then scope    = true else scope    = false end
+  if gl       == "1" then gl       = true else gl       = false end
+  if silencer == "1" then silencer = true else silencer = false end
+  return ammo1_t, ammo1_n, ammo2_t, ammo2_n, scope, gl, silencer
+end
+
+
+local addons_flags = {
+  scope    = 1,
+  gl       = 2,
+  silencer = 4,
+}
+
+function spawn_weapon_in_inv( sect, info_str, who, override, modified_params )
+  if not who then who = db.actor end
+  local ammo1_t, ammo1_n, ammo2_t, ammo2_n, scope, gl, silencer =
+    parse_weapon_info_str( info_str )
+  if override then
+    if override.scope ~= nil then scope = override.scope end
+  end
+  if ammo1_t > 10   then ammo1_t = 0 end
+  if ammo1_n > 1000 then ammo1_n = 0 end
+  local addons = 0
+  if scope    then addons = addons + addons_flags.scope    end
+  if gl       then addons = addons + addons_flags.gl       end
+  if silencer then addons = addons + addons_flags.silencer end
+  if not modified_params then modified_params = {} end
+  modified_params.addon_flags  = addons
+  modified_params.ammo_type    = ammo1_t
+  modified_params.ammo_elapsed = ammo1_n
+  se_item.modified_params = modified_params
+  local s_new_weapon = spawn_item_in_inv( sect, who )
+  if ammo2_n > 0 then
+    local ammo_sections = get_names( sect, "grenade_class" )
+    local ammo_sect     = ammo_sections[ ammo2_t + 1 ]
+    spawn_ammo_in_inv( ammo_sect, ammo2_n, who )
+  end
+  return s_new_weapon
+end
+
+
+function get_ammo_box_size( sect )
+  local box_size
+  if dunin_ammo.ammo[ sect ] then
+    box_size = dunin_ammo.ammo[ sect ].box
+  else
+    box_size = get_u32( sect, "box_size" )
+  end
+  return box_size
+end
+
+
+function get_actor_items( check_f )
+  local items_our = {}
+  local by_key    = {}
+  if not check_f then check_f = this.can_include_into_actor_items end
+  for i = 0, db.actor:object_count() - 1 do
+    local obj = db.actor:object( i )
+    if check_f( obj ) then
+      local sect = obj:section()
+      local cond = string.format( "%.2f", obj:condition() * 100 )
+      local info = get_item_info( obj )
+      local key  = sect .. ":" .. cond .. ":" .. info
+      local item = by_key[ key ]
+      if item then
+        table.insert( by_key[ key ].game_objs, obj )
+      else
+        item = {
+          [ "section"   ] = sect,
+          [ "condition" ] = tonumber( cond ),
+          [ "game_objs" ] = { obj },
+          [ "game_type" ] = get_game_type( obj ),
+          [ "info"      ] = info,
+          [ "key"       ] = key,
+        }
+        by_key[ key ] = item
+        table.insert( items_our, item )
+      end
+      if item.game_type == "ammo" then
+        if item.count then
+          item.count = item.count + dunin_ammo.get_ammo_size( obj )
+        else
+          item.count = dunin_ammo.get_ammo_size( obj )
+        end
+      end
+    end
+  end
+  return items_our
+end
+
+
+function can_include_into_actor_items( item )
+  if db.actor:is_in_ruck( item ) then
+    local sect = item:section()
+    if not get_bool( sect, "quest_item" ) then
+      local igw = get_u32( sect, "inv_grid_width",  0 )
+      local igh = get_u32( sect, "inv_grid_height", 0 )
+      if igw > 0 and igh > 0 then
+        return true
+      end
+    end
+  end
+  return false
+end
+
+
+function get_game_type( obj )
+  local game_type
+  local sect          = obj:section()
+  local override_type = override_game_type( sect )
+  if override_type then
+    game_type = override_type
+  elseif obj:is_ammo() then
+    game_type = "ammo"
+  elseif obj:is_knife() then
+    game_type = "knife"
+  elseif obj:is_weapon_magazined() then
+    game_type = "weapon"
+  elseif obj:is_outfit() then
+    game_type = "outfit"
+  elseif obj:is_artefact() then
+    game_type = "artefact"
+  elseif obj:is_grenade() then
+    game_type = "grenade"
+  elseif obj:is_missile() then
+    game_type = "missile"
+  elseif obj:is_scope() then
+    game_type = "scope"
+  elseif obj:is_silencer() then
+    game_type = "silencer"
+  elseif obj:is_grenade_launcher() then
+    game_type = "gl"
+  elseif obj:is_medkit() then
+    game_type = "medkit"
+  elseif obj:is_antirad() then
+    game_type = "antirad"
+  elseif obj:is_food_item() then
+    game_type = "food"
+  elseif obj:is_bottle_item() then
+    game_type = "bottle"
+  elseif obj:is_eatable_item() then
+    game_type = "eatable"
+  end
+  return game_type or ""
+end
+
+
+local af_actor_cond = {
+  [ "health_restore_speed"    ] = get_float( "actor_condition", "satiety_health_v", 0 ),
+  [ "radiation_restore_speed" ] = get_float( "actor_condition", "radiation_v", 0 ),
+  [ "satiety_restore_speed"   ] = get_float( "actor_condition", "satiety_v", 0 ),
+  [ "power_restore_speed"     ] = get_float( "actor_condition", "satiety_power_v", 0 ),
+  [ "bleeding_restore_speed"  ] = get_float( "actor_condition", "wound_incarnation_v", 0 ),
+}
+local af_absorbs = {
+  "burn_immunity",
+  "strike_immunity",
+  "shock_immunity",
+  "wound_immunity",
+  "radiation_immunity",
+  "telepatic_immunity",
+  "chemical_burn_immunity",
+  "explosion_immunity",
+  "fire_wound_immunity",
+}
+local af_ui_name = {
+  [ "health_restore_speed"    ] = "ui_inv_health",
+  [ "radiation_restore_speed" ] = "ui_inv_radiation",
+  [ "satiety_restore_speed"   ] = "ui_inv_satiety",
+  [ "power_restore_speed"     ] = "ui_inv_power",
+  [ "bleeding_restore_speed"  ] = "ui_inv_bleeding",
+  [ "burn_immunity"           ] = "ui_inv_outfit_burn_protection",
+  [ "strike_immunity"         ] = "ui_inv_outfit_strike_protection",
+  [ "shock_immunity"          ] = "ui_inv_outfit_shock_protection",
+  [ "wound_immunity"          ] = "ui_inv_outfit_wound_protection",
+  [ "radiation_immunity"      ] = "ui_inv_outfit_radiation_protection",
+  [ "telepatic_immunity"      ] = "ui_inv_outfit_telepatic_protection",
+  [ "chemical_burn_immunity"  ] = "ui_inv_outfit_chemical_burn_protection",
+  [ "explosion_immunity"      ] = "ui_inv_outfit_explosion_protection",
+  [ "fire_wound_immunity"     ] = "ui_inv_outfit_fire_wound_protection",
+}
+function get_art_info_text( sect )
+  local texts = {}
+  for k, v in pairs( af_actor_cond ) do
+    local af_val = get_float( sect, k, 0 )
+    if af_val ~= 0 then
+      af_val = af_val / v * 100
+      local sn = "%"
+      if k == "radiation_restore_speed" or k == "power_restore_speed" then
+        af_val = af_val / 100
+        sn     = ""
+      end
+      local color
+      if af_val > 0 then
+        color = "%c[green]"
+      else
+        color = "%c[red]"
+      end
+      if k == "bleeding_restore_speed" then
+        af_val = af_val * -1
+      end
+      if k == "bleeding_restore_speed" or k == "radiation_restore_speed" then
+        if af_val > 0 then
+          color = "%c[red]"
+        else
+          color = "%c[green]"
+        end
+      end
+      table.insert(
+        texts,
+        string.format(
+          "%%c[default]Х %-12s %s%+.0f %s",
+          game.translate_string( af_ui_name[ k ] ), color, af_val, sn
+        )
+      )
+    end
+  end
+  local absorb_sect = get_string( sect, "hit_absorbation_sect" )
+  if sys_ini:section_exist( absorb_sect ) then
+    for _, k in ipairs( af_absorbs ) do
+      local af_val = get_float( absorb_sect, k, 0 )
+      if af_val ~= 1 then
+        af_val = ( 1 - af_val ) * 100
+        local color
+        if af_val > 0 then
+          color = "%c[green]"
+        else
+          color = "%c[red]"
+        end
+        table.insert(
+          texts,
+          string.format(
+            "%%c[default]Х %-12s %s%+.0f %s",
+            game.translate_string( af_ui_name[ k ] ), color, af_val, "%"
+          )
+        )
+      end
+    end
+  end
+  if table.getn( texts ) > 0 then
+    return table.concat( texts, "\\n" )
+  end
+end
+
+
+function bind( obj )
+  local new_binder = generic_rukzak_binder( obj )
+  obj:bind_object( new_binder )
+end
+
+
+class "generic_rukzak_binder" ( object_binder )
+function generic_rukzak_binder:__init( obj ) super( obj )
+  self.am = ogse_signals.get_mgr()
+  self.object:set_nonscript_usable( true )
+end
+
+
+function generic_rukzak_binder:net_spawn( data )
+  if not object_binder.net_spawn( self, data ) then
+    return false
+  end
+
+  self.object:set_tip_text( "st_search_treasure" )
+  return true
+end
+
+
+function generic_rukzak_binder:update( delta )
+  object_binder.update( self, delta )
+  self.object:set_callback(
+    callback.use_object, generic_rukzak_binder.use_callback, self
+  )
+end
+
+
+function generic_rukzak_binder:net_destroy()
+  self.object:set_callback( callback.use_object, nil )
+  object_binder.net_destroy( self )
+end
+
+
+function generic_rukzak_binder:use_callback( obj, who )
+  self.am:call( "on_rukzak_use", self.object )
+end
+
+
+class "rukzak_item" ( CUIListItemEx )
+function rukzak_item:__init( name, cond, cnt ) super()
+  self:SetWndRect( 0, 0, 475, 22 )
+  local ca = 255
+  local cr = 216
+  local cg = 186
+  local cb = 140
+
+  self.item_cnt = CUIStatic()
+  self.item_cnt:SetAutoDelete( true )
+  self:AttachChild( self.item_cnt )
+  self.item_cnt:SetWndRect( 0, 0, 15, 22 )
+  self.item_cnt:SetText( cnt )
+  self.item_cnt:SetTextAlign( CGameFont.alRight )
+  self.item_cnt:SetFont( GetFontLetterica16Russian() )
+  self.item_cnt:SetTextColor( ca, cr, cg, cb )
+
+  self.item_name = CUIStatic()
+  self.item_name:SetAutoDelete( true )
+  self:AttachChild( self.item_name )
+  self.item_name:SetWndRect( 20, 0, 415, 22 )
+  self.item_name:SetText( name )
+  self.item_name:SetFont( GetFontLetterica18Russian() )
+  self.item_name:SetTextColor( ca, cr, cg, cb )
+
+  self.item_cond = CUIStatic()
+  self.item_cond:SetAutoDelete( true )
+  self:AttachChild( self.item_cond )
+  self.item_cond:SetWndRect( 415, 0, 40, 22 )
+  self.item_cond:SetText( string.format( "%.1f%%", cond ) )
+  self.item_cond:SetTextAlign( CGameFont.alRight )
+  self.item_cond:SetFont( GetFontLetterica16Russian() )
+  self.item_cond:SetTextColor( ca, cr, cg, cb )
+end
+
+
+class "ui_rukzak_other" ( CUIWindow )
+function ui_rukzak_other:__init() super() end
+function ui_rukzak_other:__finalize()     end
+
+
+function ui_rukzak_other:InitControls( x, y, xml, handler )
+  self:Init( x, y, 485, 500 )
+  self:SetAutoDelete( true )
+
+  self.bk = xml:InitFrame( "list_frame", self )
+
+  handler.ui_list_other = xml:InitList( "tab_other:list", self )
+  handler.ui_list_other:ShowSelectedItem( true )
+  handler:Register( handler.ui_list_other, "list_other" )
+end
+
+
+class "ui_rukzak_our" ( CUIWindow )
+function ui_rukzak_our:__init() super() end
+function ui_rukzak_our:__finalize()     end
+
+
+function ui_rukzak_our:InitControls( x, y, xml, handler )
+  self:Init( x, y, 485, 500 )
+  self:SetAutoDelete( true )
+
+  self.bk = xml:InitFrame( "list_frame", self )
+
+  handler.ui_list_our = xml:InitList( "tab_our:list", self )
+  handler.ui_list_our:ShowSelectedItem( true )
+  handler:Register( handler.ui_list_our, "list_our" )
+end
+
+
+class "ui_rukzak" ( CUIScriptWnd )
+function ui_rukzak:__init( owner_id ) super()
+  self.changed   = false
+  self.index_other = {}
+  self.index_our   = {}
+  self.owner_id  = owner_id
+  self.xml_fname = "ui_dsh_rukzak.xml"
+  self:InitControls()
+  self:InitCallBacks()
+  self:FillOtherList()
+  self:FillOurList()
+end
+function ui_rukzak:__finalize() end
+
+
+function ui_rukzak:InitControls()
+  self:Init( 50, 9, 620, 750 )
+  self:Enable( true )
+
+  local xml = CScriptXmlInit()
+  xml:ParseFile( self.xml_fname )
+  self.xml = xml
+
+  self.dialog = xml:InitFrame( "main_dialog:dialog", self )
+
+  self.dlg_other = ui_rukzak_other()
+  self.dlg_other:InitControls( 10, 200, xml, self )
+  self.dialog:AttachChild( self.dlg_other )
+
+  self.dlg_our = ui_rukzak_our()
+  self.dlg_our:InitControls( 10, 200, xml, self )
+  self.dlg_our:Show( false )
+  self.dialog:AttachChild( self.dlg_our )
+
+  self.edit_amount = xml:InitEditBox( "main_dialog:edit_amount", self.dialog )
+  self:reset_edit_amount()
+  self:Register( self.edit_amount, "edit_amount" )
+
+  self.btn_4 = xml:Init3tButton( "main_dialog:btn_4", self.dialog )
+  self:Register( self.btn_4, "btn_4" )
+  self.btn_4:Enable( false )
+
+  self.btn_move_all = xml:Init3tButton(
+    "main_dialog:btn_move_all", self.dialog
+  )
+  self:Register( self.btn_move_all, "btn_move_all" )
+  self.btn_move_all:Enable( false )
+
+  self.label_weight = xml:InitStatic( "main_dialog:label_weight", self.dialog )
+  self:show_cur_weight()
+
+  self:Register(
+    xml:Init3tButton( "main_dialog:btn_quit", self.dialog ),
+   "btn_quit"
+  )
+
+  self.tab = xml:InitTab( "main_dialog:tab", self.dialog )
+  self:Register( self.tab, "tab" )
+
+  xml:InitStatic( "main_dialog:label_filter", self.dialog )
+  self.edit_filter = xml:InitEditBox( "main_dialog:edit_filter", self.dialog )
+  self:Register( self.edit_filter, "edit_filter" )
+
+  xml:InitStatic( "main_dialog:label_show", self.dialog )
+  self.radio_show = xml:InitTab( "main_dialog:radio_show", self.dialog )
+  self:Register( self.radio_show, "radio_show" )
+
+  xml:InitStatic( "main_dialog:label_sort", self.dialog )
+  self.radio_sort = xml:InitTab( "main_dialog:radio_sort", self.dialog )
+  self:Register( self.radio_sort, "radio_sort" )
+
+  self.descr_scroll = xml:InitScrollView(
+    "main_dialog:descr_scroll", self.dialog
+  )
+end
+
+
+function ui_rukzak:InitCallBacks()
+  self:AddCallback( "tab", ui_events.TAB_CHANGED, self.OnTabChange, self )
+  self:AddCallback( "btn_4", ui_events.BUTTON_CLICKED, self.rep_btn, self )
+  self:AddCallback( "btn_quit", ui_events.BUTTON_CLICKED, self.on_quit, self )
+  self:AddCallback(
+    "list_other", ui_events.LIST_ITEM_CLICKED, self.OnListItemClicked, self
+  )
+  self:AddCallback(
+    "list_other", ui_events.WINDOW_LBUTTON_DB_CLICK, self.OnListItemDbClicked,
+    self
+  )
+  self:AddCallback(
+    "list_our", ui_events.LIST_ITEM_CLICKED, self.OnListItemClicked, self
+  )
+  self:AddCallback(
+    "list_our", ui_events.WINDOW_LBUTTON_DB_CLICK, self.OnListItemDbClicked,
+    self
+  )
+  self:AddCallback(
+    "edit_amount", ui_events.EDIT_TEXT_COMMIT, self.rep_btn, self
+  )
+  self:AddCallback(
+    "edit_filter", ui_events.EDIT_TEXT_COMMIT, self.OnSearchEnter, self
+  )
+  self:AddCallback(
+    "radio_show", ui_events.TAB_CHANGED, self.OnShowChange, self
+  )
+  self:AddCallback(
+    "radio_sort", ui_events.TAB_CHANGED, self.OnSortChange, self
+  )
+  self:AddCallback(
+    "btn_move_all", ui_events.BUTTON_CLICKED, self.OnMoveAllClicked, self
+  )
+end
+
+
+function ui_rukzak:OnKeyboard( dik, keyboard_action )
+  CUIScriptWnd.OnKeyboard( self, dik, keyboard_action )
+  if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+    if dik == DIK_keys.DIK_ESCAPE then
+      self:on_quit()
+    end
+  end
+  return true
+end
+
+
+function ui_rukzak:OnTabChange()
+  self.dlg_other:Show( false )
+  self.dlg_our:Show( false )
+  local i = self.tab:GetActiveIndex()
+  if     i == 0 then
+    self.dlg_other:Show( true )
+  elseif i == 1 then
+    self.dlg_our:Show( true )
+  end
+  self:reset_edit_amount()
+  self.btn_4:Enable( false )
+  self.btn_move_all:Enable( false )
+end
+
+
+function ui_rukzak:rep_btn()
+  local amount = tonumber( self.edit_amount:GetText() ) or 1
+  self:move_items( amount )
+end
+
+
+function ui_rukzak:OnMoveAllClicked()
+  local ui_item = self:get_selected_item()
+  if ui_item then
+    local amount = tonumber( ui_item.item_cnt:GetText() ) or 1
+    self:move_items( amount )
+  end
+end
+
+
+function ui_rukzak:move_items( amount )
+  local ui_item = self:get_selected_item()
+  if not ui_item then return end
+  self.changed = true
+  if ui_item.data.game_objs then
+    self:move_by_amount(
+      function()
+        return self:move_from_our( ui_item )
+      end,
+      amount
+    )
+  else
+    self:move_by_amount(
+      function()
+        return self:move_from_other( ui_item )
+      end,
+      amount
+    )
+    if self:is_rukzak_empty( self.items_other ) then
+      spawn_item_in_inv( "treasure_item" )
+      local obj = level.object_by_id( self.owner_id )
+      ogse.remove_item( obj )
+      return self:on_quit()
+    end
+  end
+  self:reset_edit_amount()
+  self:show_cur_weight_delay()
+end
+
+
+function ui_rukzak:is_rukzak_empty( items )
+  for _, item in ipairs( items ) do
+    if item.count > 0 then return false end
+  end
+  return true
+end
+
+
+function ui_rukzak:move_by_amount( f, amount )
+  while amount > 0 do
+    local moved = f()
+    if moved == 0 then moved = amount end
+    amount = amount - moved
+  end
+end
+
+
+function ui_rukzak:move_from_other( ui_item )
+  local item = ui_item.data
+  local ui_our = self.index_our[ item.key ]
+  local our
+  if ui_our then
+    our = ui_our.data
+  else
+    our = {
+      [ "section"   ] = item.section,
+      [ "condition" ] = item.condition,
+      [ "game_type" ] = item.game_type,
+      [ "game_objs" ] = {},
+      [ "info"      ] = item.info,
+      [ "key"       ] = item.key,
+      [ "name"      ] = item.name,
+    }
+  end
+  local size, sobj
+  if our.game_type == "ammo" then
+    if not our.count then our.count = 0 end
+    local box_size = get_ammo_box_size( item.section )
+    if item.count > box_size then
+      sobj = spawn_ammo_in_inv( item.section, box_size )
+      size       = box_size
+      item.count = item.count - box_size
+      our.count  = our.count  + box_size
+    else
+      sobj = spawn_ammo_in_inv( item.section, item.count )
+      size       = item.count
+      our.count  = our.count  + item.count
+      item.count = 0
+    end
+  else
+    if our.game_type == "weapon" then
+      sobj = spawn_weapon_in_inv( item.section, item.info )
+    else
+      sobj = spawn_item_in_inv( item.section )
+    end
+    item.count = item.count - 1
+    size       = 1
+  end
+  if ui_our then
+    ui_our.item_cnt:SetText(
+      our.count or table.getn( our.game_objs )
+    )
+  else
+    ui_our = rukzak_item(
+      ui_item.item_name:GetText(), our.condition,
+      ( our.count or table.getn( our.game_objs ) )
+    )
+    ui_our.data = our
+    self.index_our[ our.key ] = ui_our
+    self.ui_list_our:AddItem( ui_our )
+  end
+  level.client_spawn_manager():add(
+    sobj.id, -1, function( id, obj )
+      if our.condition < 100 then
+        dsh.set_condition( obj, our.condition / 100 )
+      end
+      table.insert( our.game_objs, obj )
+      ui_our.item_cnt:SetText(
+        our.count or table.getn( our.game_objs )
+      )
+    end
+  )
+  if item.count > 0 then
+    ui_item.item_cnt:SetText( item.count )
+  else
+    local pos = self.ui_list_other:GetItemPos( ui_item )
+    self.ui_list_other:RemoveItem( pos )
+    self.index_other[ item.key ] = nil
+    if item.section == "amk_metka" then
+      if level.map_has_object_spot( self.owner_id, "red_location" ) == 1 then
+        level.map_remove_object_spot( self.owner_id, "red_location" )
+      end
+    end
+    size = 0
+  end
+  return size
+end
+
+
+function ui_rukzak:move_from_our( ui_item )
+  local item = ui_item.data
+  local obj  = table.remove( item.game_objs, 1 )
+  local ui_other = self.index_other[ item.key ]
+  local other
+  if ui_other then
+    other = ui_other.data
+  else
+    other = {
+      [ "section"   ] = item.section,
+      [ "condition" ] = item.condition,
+      [ "game_type" ] = item.game_type,
+      [ "count"     ] = 0,
+      [ "info"      ] = item.info,
+      [ "key"       ] = item.key,
+      [ "name"      ] = item.name,
+    }
+    table.insert( self.items_other, other )
+  end
+  local size
+  if item.game_type == "ammo" then
+    size = dunin_ammo.get_ammo_size( obj )
+    item.count = item.count - size
+  else
+    size = 1
+  end
+  other.count = other.count + size
+  if ui_other then
+    ui_other.item_cnt:SetText( other.count )
+  else
+    ui_other = rukzak_item(
+      ui_item.item_name:GetText(), other.condition, other.count
+    )
+    ui_other.data = other
+    self.index_other[ other.key ] = ui_other
+    self.ui_list_other:AddItem( ui_other )
+  end
+  if table.getn( item.game_objs ) > 0 then
+    ui_item.item_cnt:SetText(
+      item.count or table.getn( item.game_objs )
+    )
+  else
+    local pos = self.ui_list_our:GetItemPos( ui_item )
+    self.ui_list_our:RemoveItem( pos )
+    self.index_our[ item.key ] = nil
+    size = 0
+  end
+  ogse.remove_item_from_inventory( obj )
+  if other.count == 1 then
+	if other.section == "amk_metka" then
+		level.start_stop_menu(ogse_metka.setup_gps_beacon(self.owner_id), true)
+    end
+  end
+  return size
+end
+
+
+function ui_rukzak:get_current_list_box()
+  local list_box
+  local i = self.tab:GetActiveIndex()
+  if     i == 0 then
+    list_box = self.ui_list_other
+  elseif i == 1 then
+    list_box = self.ui_list_our
+  end
+  return list_box
+end
+
+
+function ui_rukzak:get_selected_item()
+  local list_box = self:get_current_list_box()
+  local item
+  if list_box:GetSize() > 0 then
+    local itm_index = list_box:GetSelectedItem()
+    if itm_index >= 0 then
+      item = list_box:GetItem( itm_index )
+    end
+  end
+  return item
+end
+
+
+function ui_rukzak:on_quit()
+  if self.changed then
+    save_rukzak( self.owner_id, self.items_other )
+  end
+  if self.weight_timer then self.weight_timer:stop() end
+  self:GetHolder():start_stop_menu( self, true )
+  --set_input_language( 0 )
+  collectgarbage( "collect" )
+end
+
+
+function ui_rukzak:OnListItemClicked()
+  local item = self:get_selected_item()
+  if not item then return end
+  self:show_item_descr( item )
+  self:reset_edit_amount()
+  self.btn_4:Enable( true )
+  self.btn_move_all:Enable( true )
+end
+
+
+function ui_rukzak:OnListItemDbClicked()
+  self:rep_btn()
+end
+
+
+function ui_rukzak:FillOtherList()
+  self.items_other = load_rukzak( self.owner_id )
+  self:FillList( self.items_other, self.ui_list_other, self.index_other )
+end
+
+
+function ui_rukzak:FillList( items, ui_list, index )
+  for _, item in ipairs( items ) do
+    if
+      ( item.count and item.count > 0 )
+      or
+      ( item.game_objs and table.getn( item.game_objs ) > 0 )
+    then
+      if not item.name then
+        local sect = item.section
+        local name = get_string(
+          sect, "inv_name", get_string( sect, "inv_name_short" )
+        )
+        item.name = dsh.strip_quotes( game.translate_string( name ) )
+      end
+      local ui_item = rukzak_item(
+        item.name, item.condition, ( item.count or table.getn( item.game_objs ) )
+      )
+      ui_item.data      = item
+      index[ item.key ] = ui_item
+      ui_list:AddItem( ui_item )
+    end
+  end
+end
+
+
+function ui_rukzak:FillOurList()
+  self.items_our = get_actor_items()
+  self:FillList( self.items_our, self.ui_list_our, self.index_our )
+end
+
+
+function ui_rukzak:show_cur_weight()
+  local inv_weight = db.actor:get_inventory_weight()
+  local max_weight = db.actor:get_actor_max_weight()
+  local outfit     = db.actor:item_in_slot( 6 )
+  if outfit then
+    local addl_weight = get_float(
+      outfit:section(), "additional_inventory_weight2", 0
+    )
+    max_weight = max_weight + addl_weight
+  end
+  if inv_weight > max_weight then
+    self.label_weight:SetTextColor( 255, 255,  50,  0 )
+  else
+    self.label_weight:SetTextColor( 255, 238, 153, 26 )
+  end
+  self.label_weight:SetText( string.format( "Вес: %.1f кг.", inv_weight ) )
+end
+
+
+function ui_rukzak:show_cur_weight_delay()
+  if not self.weight_timer then
+    self.weight_timer = dsh.timeout(
+      500, function()
+        self:show_cur_weight()
+        self.weight_timer = nil
+      end
+    )
+  end
+end
+
+
+function ui_rukzak:reset_edit_amount()
+  self.edit_amount:SetText( "1" )
+end
+
+
+function ui_rukzak:OnSearchEnter()
+  self:show_filtered_items( true )
+end
+
+
+function ui_rukzak:search_items( items )
+  local term = dsh.string_lower_ru( self.edit_filter:GetText() )
+  if term ~= "" then
+    items = self:grep_items_by( items, function( item )
+      return string.find( dsh.string_lower_ru( item.name ), term, 1, true )
+    end )
+  end
+  return items
+end
+
+
+function ui_rukzak:clear_all_lists()
+  self.index_other = {}
+  self.index_our   = {}
+  self.ui_list_other:RemoveAll()
+  self.ui_list_our:RemoveAll()
+end
+
+
+function ui_rukzak:grep_items_by( items, f )
+    local filtered = {}
+    for _, item in pairs( items ) do
+      if f( item ) then
+        table.insert( filtered, item )
+      end
+    end
+    return filtered
+end
+
+
+function ui_rukzak:sort_items( items )
+  local sort_idx = self.radio_sort:GetActiveIndex()
+  local sort_func
+  if     sort_idx == 1 then
+    sort_func = function( a, b )
+      return dsh.remove_quotes( dsh.string_lower_ru( a.name ) ) < dsh.remove_quotes( dsh.string_lower_ru( b.name ) )
+    end
+  elseif sort_idx == 2 then
+    sort_func = function( a, b )
+      return dsh.remove_quotes( dsh.string_lower_ru( a.name ) ) > dsh.remove_quotes( dsh.string_lower_ru( b.name ) )
+    end
+  elseif sort_idx == 3 then
+    sort_func = function( a, b )
+      return a.condition < b.condition
+    end
+  elseif sort_idx == 4 then
+    sort_func = function( a, b )
+      return a.condition > b.condition
+    end
+  elseif sort_idx == 5 then
+    sort_func = function( a, b )
+      local cnt_a = a.count or table.getn( a.game_objs )
+      local cnt_b = b.count or table.getn( b.game_objs )
+      return cnt_a < cnt_b
+    end
+  elseif sort_idx == 6 then
+    sort_func = function( a, b )
+      local cnt_a = a.count or table.getn( a.game_objs )
+      local cnt_b = b.count or table.getn( b.game_objs )
+      return cnt_a > cnt_b
+    end
+  end
+  if sort_func then
+    items = table.clone_simple( items )
+    table.sort( items, sort_func )
+  end
+  return items
+end
+
+
+function ui_rukzak:OnShowChange()
+  self.filtered_other = nil
+  self.filtered_our   = nil
+  self:show_filtered_items()
+end
+
+
+function ui_rukzak:show_filtered_items( keep_search )
+  self:clear_all_lists()
+  local show_idx = self.radio_show:GetActiveIndex()
+  local filtered_other = self.filtered_other
+  local filtered_our   = self.filtered_our
+  if not ( filtered_other and filtered_our ) then
+    local by_type;
+    if     show_idx == 1 then   -- оружие
+      by_type = function( item )
+        return item.game_type == "weapon" or item.game_type == "knife"
+      end
+    elseif show_idx == 2 then   -- патроны
+      by_type = function( item )
+        return item.game_type == "ammo"
+      end
+    elseif show_idx == 3 then   -- гранаты
+      by_type = function( item )
+        return item.game_type == "grenade" or item.game_type == "missile"
+      end
+    elseif show_idx == 4 then   -- обвесы на оружие
+      by_type = function( item )
+        return
+          item.game_type == "scope"
+          or
+          item.game_type == "silencer"
+          or
+          item.game_type == "gl"
+      end
+    elseif show_idx == 5 then   -- броня
+      by_type = function( item )
+        return item.game_type == "outfit"
+      end
+    elseif show_idx == 6 then   -- артефакты
+      by_type = function( item )
+        return item.game_type == "artefact"
+      end
+    elseif show_idx == 7 then   -- еда
+      by_type = function( item )
+        return
+          item.game_type == "food"
+          or
+          item.game_type == "bottle"
+          or
+          item.game_type == "eatable"
+      end
+    elseif show_idx == 8 then   -- медицина
+      by_type = function( item )
+        return item.game_type == "medkit" or item.game_type == "antirad"
+      end
+    elseif show_idx == 9 then   -- части мутантов
+      by_type = function( item )
+        return item.game_type == "mutant_part"
+      end
+    elseif show_idx > 0 then
+      by_type = function( item )
+        return item.game_type == ""
+      end
+    end
+    if by_type then
+      filtered_other = self:grep_items_by( self.items_other, by_type )
+      filtered_our   = self:grep_items_by( self.items_our,   by_type )
+    else
+      filtered_other = self.items_other
+      filtered_our   = self.items_our
+    end
+    self.filtered_other = filtered_other
+    self.filtered_our   = filtered_our
+  end
+  if keep_search then
+    filtered_other = self:search_items( filtered_other )
+    filtered_our   = self:search_items( filtered_our   )
+  else
+    self.edit_filter:SetText( "" )
+  end
+  filtered_other = self:sort_items( filtered_other )
+  filtered_our   = self:sort_items( filtered_our   )
+  self:FillList( filtered_other, self.ui_list_other, self.index_other )
+  self:FillList( filtered_our,   self.ui_list_our,   self.index_our   )
+end
+
+
+function ui_rukzak:OnSortChange()
+  self:show_filtered_items( true )
+end
+
+
+function ui_rukzak:show_item_descr( ui_item )
+  if not self.item_icon then
+    self.item_icon = CUIStatic()
+    self.item_icon:SetWindowName( "cur_item_textur" )
+    self.item_icon:SetAutoDelete( true )
+    self.item_icon:InitTexture( "ui\\ui_icon_equipment" )
+    self.dialog:AttachChild( self.item_icon )
+  end
+  local x =  10
+  local y =  10
+  local w = 230
+  local h = 150
+  local sect = ui_item.data.section
+  local tx = get_u32( sect, "inv_grid_x"      ) * 50
+  local ty = get_u32( sect, "inv_grid_y"      ) * 50
+  local tw = get_u32( sect, "inv_grid_width"  ) * 50
+  local th = get_u32( sect, "inv_grid_height" ) * 50
+  self.item_icon:SetOriginalRect( tx, ty, tw, th )
+  local nw, nh
+  if tw > w or th > h then
+    local rw = tw / w
+    local rh = th / h
+    if rw > rh then
+      nh = math.round( th / rw )
+      nw = w
+    else
+      nw = math.round( tw / rh )
+      nh = h
+    end
+    self.item_icon:SetStretchTexture( true )
+  else
+    nw = tw
+    nh = th
+    self.item_icon:SetStretchTexture( false )
+  end
+  self.item_icon:Init(
+    x + math.round( ( w - nw ) / 2 ),
+    y + math.round( ( h - nh ) / 2 ),
+    nw, nh
+  )
+  if self.item_descr then
+    self.descr_scroll:Clear()
+    self.item_descr:DetachFromParent()
+  end
+  self.item_descr = self.xml:InitStatic(
+    "main_dialog:descr_text", self.descr_scroll
+  )
+  self.item_descr:SetText( self:get_item_description( ui_item.data ) )
+  self.item_descr:AdjustHeightToText()
+end
+
+
+function ui_rukzak:get_item_description( item )
+  local sect = item.section
+  local text = dsh.strip_quotes( game.translate_string(
+    get_string( sect, "description" )
+  ))
+  if get_string( sect, "af_actor_properties" ) then
+    if item.condition >= 1 then
+      local af_text = get_art_info_text( sect )
+      if af_text then
+        text = af_text .. "\\n%c[default]" .. text
+      end
+    end
+  end
+  return text
+end
