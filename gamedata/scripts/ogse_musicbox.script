@@ -241,7 +241,6 @@ function musicbox_base:__init(obj) super()
     self.changer    = {}
     self.isClosed   = true
     self.snd_obj    = nil
-    self.play_all   = nil
     self.sm_update  = nil
     self.objCTime   = nil
     self.play_all   = nil
@@ -291,10 +290,14 @@ function musicbox_base:onUpdate()
                 ---------------------------
                 self.time_1000 = current_time + 1000
             elseif self.checkedPlayAll then
-                if coroutine.status(self.play_all) ~= 'dead' then
-                    coroutine.resume(self.play_all, self)
+				if not self.play_all or (coroutine.status(self.play_all) == 'dead') then --Если вдруг, self.play_all == nil или подпрограмма перестала работать (ОЧЕНЬ редкие баги)
+					log1("!!! MBOX: self.play_all is nil or coroutine is dead!!!")
+					ogse.send_tip("MUSICBOX: Произошла ошибка, необходимо перезапустить проигрывание музыки!") --Сообщим об ошибке
+					self.checkedPlayAll = false --Запрещаем "Играть Все"
+					self:onStop() --Останавливаем всё, что можно остановить и отписываем onUpdate от менеджера сигналов
+					return --на этом заканчиваем
                 else
-                    self:onStop()
+                    coroutine.resume(self.play_all, self)
                 end
             else
                 self:onStop()
@@ -582,8 +585,8 @@ function musicbox_base:onStop()
     self.actionTrack  = 0
     self.checkedTrack = 0
     self.snd_obj      = nil
-    
-    if (self.isClosed and not self.checkedPlayAll) then --Fix by KRodin. 13.01.2016
+
+    if self.isClosed and ( not self.play_all or coroutine.status(self.play_all) == 'dead' or not self.checkedPlayAll ) then --Проверки, находящиеся в скобках, должны быть ТОЛЬКО в таком порядке, иначе будут проблемы!!!
 		self:unBind()
     end
 end
