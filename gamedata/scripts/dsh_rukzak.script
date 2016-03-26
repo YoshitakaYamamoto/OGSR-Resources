@@ -6,9 +6,6 @@ ogse_metka.script
 ogse_wpn_utils.script
 se_item.script
 dunin_ammo.script
-----------------------------
-TODO:
-Разобраться с типами вещей для сортировки, исключения и тд.
 ]]
 
 function attach( sm )
@@ -55,26 +52,44 @@ function on_rukzak_use( obj )
   level.start_stop_menu( rukzak, true )
 end
 
+local override_game_types = {
+	[ "treasure_item" ] = "",
+	[ "af_mine" ] = "",
+	[ "amk_metka" ] = "",
+	[ "bioradar" ] = "",
+	[ "device_termovizor" ] = "",
+	[ "repair_kit" ] = "",
+	[ "hand_radio_f" ] = "",
+	[ "matras" ] = "",
+	[ "autodoctor" ] = "medkit",
+	[ "dix" ] = "medkit",
+	[ "bipsizon" ] = "medkit",
+	[ "yod" ] = "medkit",
+}
 
 local game_types_cache = {}
 
 function override_game_type( sect )
   if not game_types_cache[ sect ] then
-    local gtype --[[= get_string( sect, script_name() .. ".override_game_type" )
+    local gtype = override_game_types[ sect ]
     if gtype then
       gtype = gtype == "other" and "" or gtype
-    else]]
-	if string.find( sect, "^fake_wpn_" ) then --Из за этого аддоны могут попасть не туда. Надо будет потестить.
+    elseif string.find( sect, "^fake_wpn_" ) then --фейк-предметы
       gtype = "knife"
-    elseif string.find( sect, "^mutant_" ) then
+    elseif string.find( sect, "^mutant_" ) then --части монстров
       gtype = "mutant_part"
-    elseif
-      --string.find( sect, "bomba" )
-      --or string.find( sect, "detonator" )
-      --or string.find( sect, "teleporter" )
-      --[[or]] string.find( sect, "^wpn_binoc" )
-      --or string.find( sect, "^ogg_flash_" )
-      --or spawn_level_changer.teleports[ sect ] --можно брать и из другого скрипта названия!
+    elseif string.find( sect, "^af_maska_" ) then --противогазы
+	  gtype = "outfit"
+    elseif string.find( sect, "^cartridge_" ) then --картриджи для автодоктора
+	  gtype = "medkit"
+    elseif string.find( sect, "^wpn_addon_mag_" ) then --магазины для оружия
+	  gtype = "gl"
+    elseif string.find( sect, "^wpn_binoc" )
+      or string.find( sect, "detector" ) --детекторы артефактов, мин и тд.
+      or string.find( sect, "^firmware_" ) --прошивки для биорадара
+      or string.find( sect, "^device_pnv_" ) --ПНВ
+      or string.find( sect, "^book_" ) --Книжки
+      or string.find( sect, "^sigaret" ) --сигареты
     then
       gtype = ""
     end
