@@ -28,15 +28,17 @@ function del_buggy_objects() --Удаление из игры глючных о�
 end
 
 function del_buggy_mapspots() --Удаление глючных меток с карты
-	if has_alife_info("agr_find_gunslinger_cache_final") then
-		if level_tasks.is_map_spot_present(story_ids.agr_zaz, "green_location") then
-			level_tasks.remove_location_by_sid(story_ids.agr_zaz, "green_location") --Глючная метка "Выбраться из подземелья" на Агро.
-		end
+	if has_alife_info("agr_find_gunslinger_cache_final")
+	and level_tasks.is_map_spot_present(story_ids.agr_zaz, "green_location") then
+		level_tasks.remove_location_by_sid(story_ids.agr_zaz, "green_location") --Глючная метка "Выбраться из подземелья" на Агро.
 	end
-	if has_alife_info("gar_free_pass") then
-		if level_tasks.is_map_spot_present(115, "green_location") then
-			level_tasks.remove_location_by_sid(115, "green_location") --Вечная метка на Прапора на свалке
-		end
+	if has_alife_info("gar_free_pass")
+	and level_tasks.is_map_spot_present(115, "green_location") then
+		level_tasks.remove_location_by_sid(115, "green_location") --Вечная метка на Прапора на свалке
+	end
+	if has_alife_info("labx16_find")
+	and level_tasks.is_map_spot_present(story_ids.yan_mapspot_from_vasilyev, "green_location") then
+		level_tasks.remove_location_by_sid(story_ids.yan_mapspot_from_vasilyev, "green_location") --Вечная метка "Проникнуть в лабораторию X-16" на янтаре
 	end
 end
 
