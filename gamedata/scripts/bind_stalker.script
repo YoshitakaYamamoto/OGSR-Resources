@@ -40,7 +40,6 @@ class "actor_binder" (object_binder)
 function actor_binder:__init(obj) super(obj)
 	self.object:disable_info_portion("ui_inventory")
 	sim = alife()
-	self.bCheckStart = false
 	self.am = ogse_signals.get_mgr()
 	self.am:call("on_load_before_all")
 	self.am:call("on_init", obj)
@@ -61,7 +60,6 @@ function actor_binder:net_spawn(data)
 	
 	ogse_debug.process_actor("a_spw", 2)
 
-	self.bCheckStart = true
 	self.weapon_hide = false -- спрятано или нет оружие при разговоре.
 	weapon_hide = false -- устанавливаем глобальный дефолтовый флаг.
 
@@ -541,21 +539,17 @@ function actor_binder:update(delta)
 			end
 		end
 
-		if self.bCheckStart then --KRodin перенес на первый апдейт.
-			if not has_alife_info("storyline_actor_start") and (level.name() == "l01_escape") then
-				self.am:call("on_storyline_start")
-				self.object:give_info_portion("storyline_actor_start")
-			end
-			if not has_alife_info("global_dialogs") then
-				self.object:give_info_portion("global_dialogs")
-			end
-			if not has_alife_info("level_changer_icons") then
-				self.object:give_info_portion("level_changer_icons")
-			end
-			ogse_lc_mngr.lc_restore_location()
-
-			self.bCheckStart = false
+		if not has_alife_info("storyline_actor_start") and (level.name() == "l01_escape") then
+			self.am:call("on_storyline_start")
+			self.object:give_info_portion("storyline_actor_start")
 		end
+		if not has_alife_info("global_dialogs") then
+			self.object:give_info_portion("global_dialogs")
+		end
+		if not has_alife_info("level_changer_icons") then
+			self.object:give_info_portion("level_changer_icons")
+		end
+		ogse_lc_mngr.lc_restore_location()
 --==================================================================
 		ogse_debug.process_actor("upd", 16)
 		self.am:call("on_first_update")
