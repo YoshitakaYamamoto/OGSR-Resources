@@ -1231,10 +1231,11 @@ function load_variable(variable_name, value_if_not_found)
 		return load_var("ogse."..variable_name)
 	elseif value_if_not_found ~= nil then
 		return value_if_not_found
+	else
+		log3("!!!ньхайю!!! оепелеммюъ: ogse."..tostring(variable_name).." ме мюидемю б упюмхкхые х value_if_not_found = nil !!!")
+		send_tip("!!!ньхайю!!! оепелеммюъ: ogse."..tostring(variable_name).." ме мюидемю б упюмхкхые х value_if_not_found = nil !!!")
+		return nil
 	end
-	log3("!!!ньхайю!!! оепелеммюъ: ogse."..tostring(variable_name).." ме мюидемю б упюмхкхые х value_if_not_found = nil !!!")
-	send_tip("!!!ньхайю!!! оепелеммюъ: ogse."..tostring(variable_name).." ме мюидемю б упюмхкхые х value_if_not_found = nil !!!")
-	return nil
 end
 
 function del_variable(variable_name)
