@@ -400,7 +400,8 @@ function check_zone_population()
 		end
 	end
 	
-	if deadcity_zombies < base_deadcity_zombies and not utils.is_day() then
+	if deadcity_zombies < base_deadcity_zombies and not utils.is_day() 
+	and not db.actor:has_info("master_quest_soup_ready") then
 		local num = base_deadcity_zombies - deadcity_zombies
 		add_deadcity_zombies(num)
 	end

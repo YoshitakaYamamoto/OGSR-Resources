@@ -5,6 +5,18 @@
 ----------------------------------------------------------------------------------------------------
 -- Класс, отвечающий за постпроцесс
 ----------------------------------------------------------------------------------------------------
+function check_on_generators()
+	if not ogse.check_game() then 
+		return false 
+	end
+	lname = level.name()
+	if lname == "l13_generators_ogse" then
+		return true
+	end
+	return false
+end
+
+
 -------------------
 class "PPEffector" (effector)
 -------------------
@@ -33,7 +45,7 @@ function action_postprocess:__init (obj, storage)
 end
 -------------------
 function action_postprocess:reset_scheme ()
-	if not has_alife_info("pri_what_the_fuck") then
+	if not has_alife_info("pri_what_the_fuck") or check_on_generators() then
 		self.actor_inside = false
 	-- ----------------------------------------------------------------------------------------
 	-- postprocess
@@ -65,7 +77,7 @@ function action_postprocess:reset_scheme ()
 end
 -------------------
 function action_postprocess:deactivate()
-if not has_alife_info("pri_what_the_fuck") then
+if not has_alife_info("pri_what_the_fuck") or check_on_generators() then
 	if self.state == state_inside then
        self.pp:finish 	    ()
 	   level.set_snd_volume (self.snd_volume)
@@ -75,7 +87,7 @@ end
 end
 -------------------
 function action_postprocess:update_params ()
-if not has_alife_info("pri_what_the_fuck") then    
+if not has_alife_info("pri_what_the_fuck") or check_on_generators() then    
 	local c_time = (time_global () - self.old_time) * 0.001
 	self.old_time = time_global ()
 	
@@ -121,7 +133,7 @@ function action_postprocess:update (delta)
 end
 -------------------
 function action_postprocess:update_hit		(delta)
-if not has_alife_info("pri_what_the_fuck") then    
+if not has_alife_info("pri_what_the_fuck") or check_on_generators() then    
 
     if self.actor_inside == false then
        self.hit_power = 0

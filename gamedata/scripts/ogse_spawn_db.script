@@ -10,7 +10,7 @@ script_spawn_registry = {
 		key2               = {pos = {-7.49, 2.479, 62.04}, y_offs = 11, lvid = 2528, gvid = 1174},
 		rat74              = {pos = {12.52, -16.34, 39.24}, y_offs =  5, lvid = 5093, gvid = 1172},
 		rat75              = {pos = {-0.025, -10.81, -7.797}, y_offs =  5, lvid = 2963, gvid = 1146},
-		dead_stalker       = {sec = "dead_stalker", pos = {22.29, -10.06, -26.11}, lvid = 6443, gvid = 1151},
+		dead_stalker       = {sec = "dead_stalker", pos = {36.99, -5.26, -31.81}, lvid = 7995, gvid = 1154},
 	},
 	yantar_spawn = {
 		zombied501         = {pos = {-18.97, 2, -153.6}, y_offs =  3, lvid = 38257, gvid = 1470},
@@ -244,24 +244,8 @@ script_spawn_registry = {
 		voice_combat = {sec = "master_controller", pos = {-236.40452575684,-19.807167053223,52.896137237549}, lvid = 108215, gvid = 3546},
 	},
 	aem_manager = {
-		side1_01 = {pos = {151.2141, -21.0374, 129.5184}, lvid = 53954, gvid = 1302},
-		side1_02 = {pos = {149.8551, -20.999, 131.6488}, lvid = 53635, gvid = 1302},
-		side1_03 = {pos = {152.6738, -20.9972, 131.75}, lvid = 54231, gvid = 1302},
-		side1_04 = {pos = {151.2744, -20.9973, 131.7438}, lvid = 53958, gvid = 1302},
-		side1_05 = {pos = {154.0509, -21.0114, 130.9617}, lvid = 54491, gvid = 1302},
-		side1_06 = {pos = {148.4156, -21.0248, 130.8685}, lvid = 53354, gvid = 1302},
-		side1_07 = {pos = {163.4, -21.1, 121},          lvid = 56134, gvid = 1224},
-		side1_08 = {pos = {161.3, -21.1, 121},          lvid = 55753, gvid = 1224},
-		side1_09 = {pos = {152.9, -21.1, 117.2},          lvid = 54194, gvid = 1224},
-		side1_10 = {pos = {150.5, -21.1, 117.2},          lvid = 53771, gvid = 1217},
-		side1_11 = {pos = {138.7, -21.1, 114.6},          lvid = 50782, gvid = 1217},
-		side1_12 = {pos = {137.9, -21.1, 110.4},          lvid = 50609, gvid = 1217},
-		side2_01 = {pos = {153.8811, -21.0583, 80.6816},  lvid = 54410, gvid = 1193},
-		side2_02 = {pos = {155.5218, -21.059, 78.9473},  lvid = 54669, gvid = 1193},
-		side2_03 = {pos = {152.2952, -21.059, 78.6739},  lvid = 54144, gvid = 1193},
-		side2_04 = {pos = {153.8811, -21.059, 78.4681},  lvid = 54407, gvid = 1193},
-		side2_05 = {pos = {156.8257, -21.059, 79.4296},  lvid = 54942, gvid = 1193},
-		side2_06 = {pos = {150.9364, -21.059, 79.4296},  lvid = 53872, gvid = 1193},
+		-- координаты точек спавна монстров и т.п. наход€тс€ в config/misc/aem_manager.ltx
+		-- они Ќ≈ переведены на новую систему спавна
 		aem_arny  = {sec = "aem_arny",  pos = {149.5616, 0.429975, 69.23088}, lvid = 53540, gvid = 1192},
 		aem_admin = {sec = "aem_admin", pos = {153.451, -0.00164, 42.0269}, lvid = 54385, gvid = 1242},
 	},
@@ -1289,7 +1273,7 @@ script_spawn_registry = {
 		atp_helper = {sec = "atp_helper", pos = {118.75, -7.49, 9.81}, lvid = 419588, gvid = 116}, -- sid = story_ids.atp_helper
 		kommander_box2 = {sec = "kommander_box2", pos = {34.23, -11.73, -272.63}, lvid = 67068, gvid = 1504},
 		stalker_hvost = {sec = "stalker_hvost", pos = {129.49, 0.1, 61.499}, lvid = 49266, gvid = 1239, sid = story_ids.stalker_hvost},
-		--stalker_kolya = {sec = "stalker_kolya", pos = {-174.65, 11.273, 407.248}, lvid = 210238, gvid = 3299, sid = story_ids.stalker_kolya},
+--		stalker_kolya = {sec = "stalker_kolya", pos = {-174.65, 11.273, 407.248}, lvid = 210238, gvid = 3299, sid = story_ids.stalker_kolya},
 		radist_shron = {
 			{sec = "radist_shron", pos = {-270.657,0.776,40.149}, lvid = 4477, gvid = 1412},
 			{sec = "radist_shron", pos = {-231.378, -4.995, 79.543}, lvid = 18129, gvid = 1394},

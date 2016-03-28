@@ -8,7 +8,13 @@ local news_showtime = sys_ini:r_s32("options","news_showtime") -- стандартное вр
 local post_message_prob = 0.6 -- Вероятность того, что будет комментарий к смерти.
 local random_news = sys_ini:r_s32("options","random_news")
 local message_death = 1 -- Сообщения о смерти
-local extra_debug = false -- Отладочный режим
+local total_debug = false -- Отладочный режим
+
+function write_log(msg)
+	if total_debug then
+		log1(msg)
+	end
+end
 
 function printf(fmt, ...)
 	ogse.send_tip(fmt)
@@ -62,23 +68,23 @@ for i=1,32 do
 end
 
 function on_death(victim, killer)
-	if extra_debug == true then printf("Сообщения о смерти. Погиб сталкер.") end
 	if isIndoor(level.name()) or news_main_data.chk_Vibros() then return end
+	write_log("Сообщения о смерти. Погиб сталкер.")
 	if random_news == 1 and message_death == 1 then
-	if extra_debug == true then printf("Сообщения о смерти. Все проверки пройдены, идём дальше") end	
+		write_log("Сообщения о смерти. Все проверки пройдены, идём дальше")
 		if (victim ~= nil) then
-		if extra_debug == true then printf("Сообщения о смерти. victim не равен нулю.") end
+			write_log("Сообщения о смерти. victim не равен нулю.")
 			if (IsStalker(victim)) then	
-				if extra_debug == true then printf("Сообщения о смерти. Это npc.") end
+				write_log("Сообщения о смерти. Это npc.")
 				local m_obj
 				if (isGameObject(victim)) then
-					if extra_debug == true then printf("Сообщения о смерти. Это игровой объект.") end
+					write_log("Сообщения о смерти. Это игровой объект.")
 					m_obj = victim
 				else
 					m_obj = get_obj(victim.id)				
 				end
-				if (m_obj) then	
-					if extra_debug == true then printf("Сообщения о смерти. Всё отлично, вызываем генерирование сообщения.") end
+				if m_obj and news_amk_core.IsNpcStalker(m_obj) then	
+					write_log("Сообщения о смерти. Всё отлично, вызываем генерирование сообщения.")
 					on_stalker_death(victim, killer)
 				end	
 			end		
@@ -89,38 +95,38 @@ end
 
 function on_stalker_death(victim_, killer_)
 	
-	if extra_debug == true then printf("Сообщения о смерти.  Вызвали on_stalker_death") end
+	if total_debug == true then printf("Сообщения о смерти.  Вызвали on_stalker_death") end
 	
 	if (victim_ == nil) then return	end
 	
 	if (xs_stor.get("need_shutdown_stalker_news", false) == true) then return end
 	
-	if extra_debug == true then printf("Сообщения о смерти. victim_  не равно нулю.") end
+	if total_debug == true then printf("Сообщения о смерти. victim_  не равно нулю.") end
 	
 	local m_victim = ""
 	local victim
 		if (isGameObject(victim_)) then
 			victim = victim_
 			
-			if extra_debug == true then printf("Сообщения о смерти. victim_  - игровой объект.") end
+			if total_debug == true then printf("Сообщения о смерти. victim_  - игровой объект.") end
 		
 		else
 			victim = get_obj(victim_.id)
 		end
 		
-		if extra_debug == true then printf("Сообщения о смерти. Переходим к генерированию") end
+		if total_debug == true then printf("Сообщения о смерти. Переходим к генерированию") end
 		
 		--if (IsActor(killer)) then
 		--	add_killed_by_actor(victim) -- Отметим, что это ГГ постарался.
-		--	if extra_debug == true then printf("Отметим, что это ГГ постарался.") end
+		--	if total_debug == true then printf("Отметим, что это ГГ постарался.") end
 		--end
 		
 		if community_filter(victim) == false then 
-			if extra_debug == true then printf("Сообщения о смерти. Проверка на фильтр группировок НЕ пройдена.") end
+			if total_debug == true then printf("Сообщения о смерти. Проверка на фильтр группировок НЕ пройдена.") end
 			return 
 		end
 		
-		if extra_debug == true then printf("Сообщения о смерти. Проверка на фильтр группировок пройдена.") end	
+		if total_debug == true then printf("Сообщения о смерти. Проверка на фильтр группировок пройдена.") end	
 		
 		if (isGameObject(killer_)) then
 				killer = killer_
@@ -130,11 +136,11 @@ function on_stalker_death(victim_, killer_)
 			
 	
 	local m_name  = get_npc_name(victim)
-	if extra_debug == true then printf("Сообщения о смерти. Имя покойного - " .. m_name) end
+	if total_debug == true then printf("Сообщения о смерти. Имя покойного - " .. m_name) end
 	local m_level = get_level_name(get_object_levelname(victim), 1)
-	if extra_debug == true then printf("Сообщения о смерти. Локация покойного - " .. m_level) end
+	if total_debug == true then printf("Сообщения о смерти. Локация покойного - " .. m_level) end
 	local m_comm  = get_npc_community(victim)
-	if extra_debug == true then printf("Сообщения о смерти. Группировка покойного - " .. m_comm) end
+	if total_debug == true then printf("Сообщения о смерти. Группировка покойного - " .. m_comm) end
 	local s_comm = ""
 	local m_post_message = ""
 		if m_comm and community[m_comm] then
@@ -143,7 +149,7 @@ function on_stalker_death(victim_, killer_)
 			s_comm = ""
 		end
 	local m_string = m_name..s_comm..". "..m_level.."."
-	if extra_debug == true then printf("Сообщения о смерти. Сообщение сгенерировано, можно выдавать.") end
+	if total_debug == true then printf("Сообщения о смерти. Сообщение сгенерировано, можно выдавать.") end
 	
 	local news_text = "%c[255,160,160,160]".."Погиб сталкер:".."\\n".."%c[default]"..m_string
 	-- db.actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(0,658,83,47), 7000, 5000)
@@ -280,7 +286,9 @@ function community_filter(obj)
 		    community == "bandit" or
 			community == "zombied" or 
 			community == "military" or 
-			community == "ecolog") then			
+			community == "ecolog" or
+			community == "kulg_band" or
+			community == "kulg_band_2") then			
 			return false
 		end
 	end
