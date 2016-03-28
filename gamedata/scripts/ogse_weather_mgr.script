@@ -261,7 +261,7 @@ local function is_scenario(level_name)
     return (( level_name == "l12_stancia" or level_name == "l12_stancia_2") and not has_alife_info("pri_what_the_fuck"))	
 end
 
-local weather_ini = sys_ini --в system.ltx есть инклуд weathers\\environment.ltx. «ачем надо было использовать здесь тормознутый ini_file?
+local weather_ini = sys_ini --KRodin: в system.ltx есть инклуд weathers\\environment.ltx. «ачем надо было использовать здесь тормознутый ini_file?
 
 local function read_cycle_points(cycle_section, points_table)
 	for line = 0, weather_ini:line_count(cycle_section) - 1 do
@@ -1344,7 +1344,7 @@ function WeatherManager:update()
 	if not enabled then return end
 	local current_time = game.get_game_time()
 	if self.next_update and current_time < self.next_update then return end -- ещЄ рано
-	
+
 	ogse_surge_mgr.surge_log("WeatherManager:update - new point")
 	self:update_forecast() -- обновл€ем прогноз независимо от того, используем ли эту погоду
 	-- провер€ем начало выброса, первый кадр имеет флажок surge_start = true
