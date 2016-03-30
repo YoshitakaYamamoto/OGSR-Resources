@@ -552,10 +552,10 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 	s_new_weapon.blow_cond = modified_params.blow_cond
 	
 	-- выставляем зум фактор для стволов с прицелом с регулируемой кратностью. Зум похоже не инитится в движке для таких
-	if get_string(new_wpn_section, "scope_removed_section") and bit_and(cur_weapon_data.addon_flags, addons_flags.scope) then
---		log1("YES!")
+	--[[if get_string(new_wpn_section, "scope_removed_section") and bit_and(cur_weapon_data.addon_flags, addons_flags.scope) then
+		log1("YES!")
 		level.client_spawn_manager():add(s_new_weapon.id, -1, set_zoom_factor)
-	end
+	end]]
 	
 	soundtrack.s_play_no_feedback([[interface\inv_attach_addon]])
 	-- удаляем  фейковый аддон, если не снимали
@@ -564,10 +564,10 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 	end
 end
 
-function set_zoom_factor(obj_id, obj)
---	log1("SETTING ZOOM FACTOR "..tostring(get_float(obj:section(), "scope_zoom_factor")))
+--[[function set_zoom_factor(obj_id, obj)
+	log1("SETTING ZOOM FACTOR "..tostring(get_float(obj:section(), "scope_zoom_factor")))
 	obj:set_wpn_float(vector():set(0,0,0), get_float(obj:section(), "scope_zoom_factor"), 2000)
-end
+end]]
 
 -- элемент управления - надстройка для окна инвентаря
 -- представляет собой кнопки "присоединить" и "Х" (отменить), 

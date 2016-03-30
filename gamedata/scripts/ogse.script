@@ -1666,7 +1666,7 @@ function on_actor_first_update()
 		alife():release(bug, true)
 	end
 	
-	if not db.actor:has_info("OGSE_LIANA_PATCH_3_FIX") then
+	if db.actor:dont_has_info("OGSE_LIANA_PATCH_3_FIX") then
 		if level.name() ~= "l08u_brainlab" then
 			-- баг с лианами
 			local obj = alife():object("liana_00")
@@ -1708,7 +1708,7 @@ function on_actor_first_update()
 		db.actor:give_info_portion("OGSE_LIANA_PATCH_3_FIX")
 	end
 
-	if not db.actor:has_info("OGSE_KOLYA_PATCH_6_FIX") then
+	if db.actor:dont_has_info("OGSE_KOLYA_PATCH_6_FIX") then
 		-- варианты: 
 		-- 1) Коля еще не заспавнен
 		-- 2) Коля заспавнен, есть, еще не найден
@@ -1732,6 +1732,17 @@ function on_actor_first_update()
 		db.actor:give_info_portion("OGSE_KOLYA_PATCH_6_FIX")
 	end
 
+	if db.actor:dont_has_info("OGSE_PATCH_8_FIX") then
+		if db.actor:dont_has_info("dead_stalker_start_dialog_2") then
+			local obj = alife():story_object(story_ids.x18_death_stalker)
+			if obj then
+				alife():release(obj, true)
+				dark_valley_u_spawn.dead_stalker()
+			end
+		end
+		db.actor:give_info_portion("OGSE_PATCH_8_FIX")
+	end
+
 	-- Установка FOV
 	db.actor:set_camera_fov(fov_vol)
 
@@ -1751,7 +1762,8 @@ function on_actor_first_update()
 		torch:switch_torch(not torch:is_torch_enabled())
 	end
 
-	if ammo_on_belt then
+	-- патроны на поясе
+	if ammo_on_belt == 1 then
 		cmd("g_ammunition_on_belt on")
 	else
 		cmd("g_ammunition_on_belt off")	

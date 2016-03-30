@@ -91,6 +91,13 @@ function add_addon_flags(wpn, flags)
 	local new_flags = bit_or(old_flags, flags)
 	wpn:set_wpn_int8(936, new_flags)
 end
+function set_extra_addon_flags(wpn, flags)
+	ASSERT(wpn:is_weapon(), "[set_extra_addon_flags] not weapon object!")
+	local old_flags = wpn:get_wpn_int8(nil, 936) -- получаем текущие флаги
+	local base_flags = bit_and(old_flags, 7) -- оставляем только младшие три бита - базовые флаги
+	local new_flags = bit_or(base_flags, flags) -- комбинируем с дополнительными флагами
+	wpn:set_wpn_int8(936, new_flags)
+end
 -----------------------------------------------------------------------
 -- Установка данных:
 -----------------------------------------------------------------------
@@ -146,4 +153,16 @@ end
 -- получение состояния прицеливания
 function is_aiming_complete(wpn)
 	return wpn:get_wpn_float(1016) > 0.9
+end
+
+-- функции получения и установки текущего увеличения для бинокля
+function get_binoc_rt_zoom_factor(obj)
+	local cls = get_clsid(obj)
+	ASSERT(cls == clsid.wpn_binocular or cls == clsid.wpn_binocular_s, "[get_binoc_rt_zoom_factor] object is not a binocular class")
+	return obj:get_wpn_float(2000)
+end
+function set_binoc_rt_zoom_factor(obj, value)
+	local cls = get_clsid(obj)
+	ASSERT(cls == clsid.wpn_binocular or cls == clsid.wpn_binocular_s, "[set_binoc_rt_zoom_factor] object is not a binocular class")
+	obj:set_wpn_float(vector(), value, 2000)
 end

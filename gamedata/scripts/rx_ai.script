@@ -344,7 +344,7 @@ function look_into_optical_sight(npc)
 	local act = false
 	local weapon = npc:active_item()
 	if weapon == nil or alife():object(weapon:id()) == nil then return end
-	if rx_utils.item_is_fa(weapon) and rx_utils.addon_attached(weapon,"sc") then
+	if rx_utils.item_is_fa(weapon) and ogse_addons.is_scope_installed(weapon) then
 --		printf("[%s]have os",npc:character_name())
 		local move_type,mental_state = npc:movement_type(),npc:mental_state()
 		if (move_type == move.stand or move_type == move.walk) and mental_state == anim.danger then

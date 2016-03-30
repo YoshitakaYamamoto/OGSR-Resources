@@ -1,5 +1,10 @@
-prefetch("ogse_wpn_utils")
+-----------------------------------------------------------------------
+--- ogse_bind_weapon.script
+--- Биндер для оружия со скриптовым управлением аддонами
+--- OGS Evolution Team 2016
+-----------------------------------------------------------------------
 
+prefetch("ogse_wpn_utils")
 
 function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_item_to_slot", fun = this.on_item_to_slot})
@@ -100,28 +105,26 @@ function wpn_binder:__init (obj) super(obj)
 	--self:dbg_log("wpn_binder:__init: sec = '%s', name = '%s', id = %d", self.object:section(), self.object:name(), self.object:id())
 	--self.spawned = false
 	self.wpn_binder = true
-end
-----------------------------------------------------------------------------------------------------------------------
-function wpn_binder:reinit()
-	--self.object:set_callback(callback_ex.update_addons_visibility,     self.update_addons_visibility,    self)
-	--self:dbg_log("wpn_binder:reinit")
-end
-----------------------------------------------------------------------------------------------------------------------
-function wpn_binder:initialize()
-	--self:dbg_log("wpn_binder:initialize")
-	--self.initialized = true
-	self.is_gl = self.object:is_weapon_gl()
-	local obj_section = self.object:section()
+	local obj_section = obj:section()
+	-- читаем единожды все данные, связанные с секцией
+	self.is_gl = obj:is_weapon_gl()
+	local cls = get_clsid(obj)
+	self.is_binoc = (cls == clsid.wpn_binocular or cls == clsid.wpn_binocular_s)
+	if self.is_binoc then
+		self.scope_zoom_factor = get_float(obj_section, "scope_zoom_factor")
+		ASSERT(self.scope_zoom_factor, "[wpn_binder:__init] scope_zoom_factor is not defined in section '%s'", obj_section)
+		log3("scope_zoom_factor = %5.2f", self.scope_zoom_factor)
+	end
+	self.extra_addon_flags = 0
 	if get_string(obj_section, "scope_mount_name") then
-		ogse_wpn_utils.add_addon_flags(self.object, ogse_wpn_utils.addons_flags.scope_mount)
+		self.extra_addon_flags = self.extra_addon_flags + ogse_wpn_utils.addons_flags.scope_mount
 	end
 	if get_string(obj_section, "grip_name") then
-		ogse_wpn_utils.add_addon_flags(self.object, ogse_wpn_utils.addons_flags.grip)
+		self.extra_addon_flags = self.extra_addon_flags + ogse_wpn_utils.addons_flags.grip
 	end
 	if get_string(obj_section, "magazine_name") then
-		ogse_wpn_utils.add_addon_flags(self.object, ogse_wpn_utils.addons_flags.magazine)
+		self.extra_addon_flags = self.extra_addon_flags + ogse_wpn_utils.addons_flags.magazine
 	end
-	--
 	self.change_safe_cntr = get_u32(obj_section, "change_safe_cntr", 15) -- сколько раз включаем кости, максимальное число поверхностей, навешанных на управляемые кости
 	self.managed_bones = split_comma_separated_list(get_string(obj_section, "managed_bones", ""))
 	self.addon_descriptors = {}
@@ -149,9 +152,31 @@ function wpn_binder:initialize()
 		sd.default_hud_rotate = {def_zrx, def_zry}
 		--sd.ironsight_desc = {}
 	end
+end
+----------------------------------------------------------------------------------------------------------------------
+function wpn_binder:reinit()
+	self.object:set_callback(158, self.init_addons, self)
 	self.object:set_callback(callback_ex.update_hud_addons_visibility, self.update_hud_addons_visibility, self)
+	--self.object:set_callback(callback_ex.update_addons_visibility,     self.update_addons_visibility,    self)
+	--self:dbg_log("wpn_binder:reinit")
+end
+----------------------------------------------------------------------------------------------------------------------
+function wpn_binder:init_addons(a,b)
+	if a == 1 and self.object:is_weapon_gl() then
+		log1("skip")
+		return
+	end
+	if self.extra_addon_flags ~= 0 then
+		ogse_wpn_utils.set_extra_addon_flags(self.object, self.extra_addon_flags)
+	end
+	log3("wpn_binder:ini_addons - %d, %d", a,b)
+	for des_name,desc in pairs(self.addon_descriptors) do
+		if desc.extra_actions then desc.extra_actions(self.object, desc) end
+	end
+	if self.is_binoc then
+		ogse_wpn_utils.set_binoc_rt_zoom_factor(self.object, self.scope_zoom_factor)
+	end
 	ogse_wpn_utils.activate_visibility_updates(self.object, true)
-	--self:dbg_log("wpn_binder:initialize - end")
 end
 
 function wpn_binder:net_spawn(data)
@@ -162,18 +187,14 @@ end
 function wpn_binder:net_destroy()
 	--self:dbg_log("wpn_binder:net_destroy")
 	self.object:set_callback(callback_ex.update_hud_addons_visibility, nil)
+	self.object:set_callback(158, nil)
 end
 
 function wpn_binder:update()
-	if not self.initialized then
-		--self:dbg_log("wpn_binder:update - first")
-		self:initialize()
-		self.initialized = true
-	end
 	--self:dbg_log("wpn_binder:update: %s, %s", tostring(ogse_wpn_utils.get_visibility_updates_activated(self.object)), type(self.managed_bones))
 	
 	local p = self.object:parent()
-	if not p or p:is_stalker() then -- валяется на земле или у сталкера в инвентаре
+	if not (p and p:is_actor()) then -- если не у актора в инвентаре
 		self:update_addons_visibility()
 		--self:dbg_log("wpn_binder:update")
 	end
@@ -224,6 +245,7 @@ function wpn_binder:update_addons_visibility(arg1, arg2)
 end
 
 function wpn_binder:update_hud_addons_visibility(arg1, arg2)
+	--log1("wpn_binder:update_hud_addons_visibility")
 	--self:dbg_log("wpn_binder:update_hud_addons_visibility")
 	
 	--self:dbg_log("forced_notex_scope: %s", tostring(ogse_wpn_utils.get_forced_notex_scope(self.object)))
@@ -236,14 +258,14 @@ function wpn_binder:update_hud_addons_visibility(arg1, arg2)
 		self:set_hud_bones_visibility(self.managed_bones, false)
 	end
 	for des_name,desc in pairs(self.addon_descriptors) do
-		if self.is_gl and desc.extra_actions then -- восстанавливаем смещение худа после выхода из режима подствольника
+		--[[if self.is_gl and desc.extra_actions then -- восстанавливаем смещение худа после выхода из режима подствольника
 			local gl_mode = ogse_wpn_utils.get_gl_mode(self.object)
 			-- на первом апдейте после перехода в обычный режим
 			if not gl_mode and self.gl_mode ~= gl_mode then
 				desc.extra_actions(self.object, desc)
 			end
 			self.gl_mode = gl_mode
-		end
+		end]]
 		local addon_attached = desc.addon_attached_fun(self.object)
 		if desc.hud_attached ~= addon_attached or need_initialize_hud then
 			--print_table_inlog(desc)

@@ -15,9 +15,9 @@ end
 local sim
 
 function on_spawn() -- при появлении актора проинитить используемые в будущем глобальные переменные
-	log1("trunk_inv.on_spawn")
+	--log1("trunk_inv.on_spawn")
 	sim = alife()
-	log3("sim=%s", type(sim))
+	--log3("sim=%s", type(sim))
 end
 -- имеет структуру {<car_id> = {}, ...}
 local registry = nil

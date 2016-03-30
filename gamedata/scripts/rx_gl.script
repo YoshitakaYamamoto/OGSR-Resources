@@ -542,7 +542,7 @@ function check_weapon(wpn)
 	if wpn == nil or alife():object(wpn:id()) == nil then return false end
 	local sec = wpn:section()
 	if rx_utils.item_is_fa(wpn) and gl_sets.forbiddens.weapons[sec] ~= true then
-		if rx_utils.addon_attached(wpn,"gl") then
+		if ogse_addons.is_grenade_launcher_installed(wpn) then
 			if not gl_sets.weapons[sec] then
 				local particles = read_from_ini(nil,sec,"grenade_flame_particles","weapons\\generic_weapon01",2)
 				local sound_shoot = read_from_ini(nil,sec,"snd_shoot_grenade","weapons\\gen_grenshoot",2,',')

@@ -501,7 +501,7 @@
 		<text>30: 7.62x39 mm</text>
 	</string>
 	<string id="enc_addon_mag_akm30">
-		<text>7.62x39 mm d'une capacité de 30-Munitions pour l'AKM (6L10). Interchangeable avec les chargeurs de 40-Munitions et de 75-Munitions.</text>
+		<text>7.62x39 mm d'une capacité de 30-Munitions pour l'AKM (6L10). Interchangeable avec les chargeurs de 40-Munitions et de 75-Munitions. Compatible avec toute la famille des fusils d'assaut AKM.</text>
 	</string>
 <!-- // -->
 	<string id="addon_mag_rpk40">
@@ -511,7 +511,7 @@
 		<text>40: 7.62x39 mm</text>
 	</string>
 	<string id="enc_addon_mag_rpk40">
-		<text>Chargeur 7.62x39 mm d'une capacité de 40-Munitions pour le RPK. Interchangeable avec les chargeurs de 30-Munitions (6L10) et de 75-Munitions.</text>
+		<text>Chargeur 7.62x39 mm d'une capacité de 40-Munitions pour le RPK. Interchangeable avec les chargeurs de 30-Munitions (6L10) et de 75-Munitions. Compatible avec toute la famille des fusils d'assaut AKM.</text>
 	</string>
 <!-- // -->
 	<string id="addon_mag_rpk75">
@@ -521,7 +521,7 @@
 		<text>75: 7.62x39 mm</text>
 	</string>
 	<string id="enc_addon_mag_rpk75">
-		<text>Chargeur 7.62x39 mm tambour, d'une capacité de 75-Munitions pour le RPK. Interchangeable avec les chargeurs de 40-Munitions et de 30-Munitions (6L10).</text>
+		<text>Chargeur 7.62x39 mm tambour, d'une capacité de 75-Munitions pour le RPK. Interchangeable avec les chargeurs de 40-Munitions et de 30-Munitions (6L10). Compatible avec toute la famille des fusils d'assaut AKM.</text>
 	</string>
 <!-- // -->
 	<string id="addon_mag_ak7430">
@@ -531,7 +531,7 @@
 		<text>30: 5.45x39 mm</text>
 	</string>
 	<string id="enc_addon_mag_ak7430">
-		<text>Chargeur 5.45x39 mm d'une capacité de 30-Munitions pour l'AK74 (6L20). Interchangeable avec les chargeurs de 45-Munitions (6L18) et de 60-Munitions (6L31).</text>
+		<text>Chargeur 5.45x39 mm d'une capacité de 30-Munitions pour l'AK74 (6L20). Interchangeable avec les chargeurs de 45-Munitions (6L18) et de 60-Munitions (6L31). Compatible avec toute la famille des fusils d'assaut AK74.</text>
 	</string>
 <!-- // -->
 	<string id="addon_mag_rpk7445">
@@ -541,7 +541,7 @@
 		<text>45: 5.45x39 mm</text>
 	</string>
 	<string id="enc_addon_mag_rpk7445">
-		<text>Chargeur 5.45x39 mm d'une capacité de 45-Munitions pour le RPK74 (6L18). Interchangeable avec les chargeurs de 30-Munitions (6L20) et 60-Munitions (6L31).</text>
+		<text>Chargeur 5.45x39 mm d'une capacité de 45-Munitions pour le RPK74 (6L18). Interchangeable avec les chargeurs de 30-Munitions (6L20) et 60-Munitions (6L31). Compatible avec toute la famille des fusils d'assaut AK74.</text>
 	</string>
 	<!-- // -->
 	<string id="addon_mag_ak10560">
@@ -551,7 +551,7 @@
 		<text>60: 5.45x39 mm</text>
 	</string>
 	<string id="enc_addon_mag_ak10560">
-		<text>Chargeur 5.45x39 mm d'une capacité de 60-Munitions pour l'AK74M et l'AK105 (6L31). Interchangeable avec les chargeurs de 30-Munitions (6L20) et 45-Munitions (6L18).</text>
+		<text>Chargeur 5.45x39 mm d'une capacité de 60-Munitions pour l'AK74M et l'AK105 (6L31). Interchangeable avec les chargeurs de 30-Munitions (6L20) et 45-Munitions (6L18). Compatible avec toute la famille des fusils d'assaut AK74.</text>
 	</string>
 <!-- // -->
 	<string id="addon_mag_ak10230">
@@ -591,7 +591,7 @@
 		<text>20: 7.62x54 mm</text>
 	</string>
 	<string id="enc_addon_mag_svd20">
-		<text>Chargeur expérimental 20-Cartouches 7.62x54 mm.</text>
+		<text>Chargeur expérimental 20-Cartouches 7.62x54 mm. Compatible avec un fusil SVD.</text>
 	</string>
 <!-- // -->
 
@@ -657,5 +657,13 @@
 		<text>Jumelles de vision nocturne Yukon NVB Tracker.</text>
 	</string>
 <!-- // -->	
-
+	<string id="st_tail_desc">
+		<text>rail</text>
+	</string>
+	<string id="st_mag_desc">
+		<text>mag.</text>
+	</string>
+	<string id="st_grip_desc">
+		<text>grip</text>
+	</string>
 </string_table>

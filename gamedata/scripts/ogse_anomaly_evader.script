@@ -9,10 +9,10 @@
 local debug_flag = false
 local monsters_too = false
 local turn_off_restrictors = false	-- выключить рестрикторную часть
-local turn_off_path_around = true	-- выключить часть обхода по путям
+local turn_off_path_around = false	-- выключить часть обхода по путям
 local transit_coeff = 1.4 	-- Коэффициент, на который умножается радиус аномалии для получения транзитных точек. Нельзя выставлять менее 1.2 - будет зацеплять аномалию
 --local exit_coeff = 7		-- Коэффициент, на который умножается радиус аномалии для получения точки выхода из маршрута. Имеет смысл ставить побольше, чтобы непись не отирался около аномалии на выходе.
-local timeout = 3000		-- Время в миллисекундах, на которое NPC забывает об аномалии после успешного её обхода. Нужно обязательно, чтобы непись не застрял вокруг аномалии, иначе схема может отправить его обходить её бесконечно.
+local timeout = 30000		-- Время в миллисекундах, на которое NPC забывает об аномалии после успешного её обхода. Нужно обязательно, чтобы непись не застрял вокруг аномалии, иначе схема может отправить его обходить её бесконечно.
 local timeout_to_evade = 20000 -- Время на обход, предельное
 -----------------------------------------------------------------------
 local count_update 			= 0	-- Счетчик апдейтов. Нельзя чтобы схема стартовала включенной сразу же, иначе 
@@ -121,9 +121,9 @@ function update_norm(e)
 	
 	if not npc:alive() then return end
 
-	--[[if is_alife_controlled(npc) and not xr_companion.is_companion(npc:id()) then
+	if is_alife_controlled(npc) and not xr_companion.is_companion(npc:id()) then
 		return
-	end]]
+	end
 	
 	local profile = npc:profile_name()
 	local name = npc:name()
@@ -480,6 +480,12 @@ function action_evade_anomaly:execute ()
 				if not check_arrival(npc_pos, progress.transit_1a) then
 					proceed_movement(self.object, progress.transit_1a)
 					if debug_flag then db.actor:give_game_news(self.object:name().."proceed_movement_0 "..self.anomid, "ui\\ui_iconsTotal", Frect():set(498,47,83,47),0, 1000) end
+					if debug_flag then -- пометим дорожку :)
+						local part_pos = level.vertex_position(progress.transit_1a)
+						local Particle = particles_object("explosions\\campfire_blowout")
+						Particle:play_at_pos(part_pos)
+						Particle:move_to(part_pos, part_pos)
+					end
 				else
 					progress.stage = 1
 					if debug_flag then db.actor:give_game_news(self.object:name().."switch_1 "..self.anomid, "ui\\ui_iconsTotal", Frect():set(498,47,83,47),0, 1000) end
@@ -488,6 +494,12 @@ function action_evade_anomaly:execute ()
 				if not check_arrival(npc_pos, progress.transit_1b) then
 					proceed_movement(self.object, progress.transit_1b)
 					if debug_flag then db.actor:give_game_news(self.object:name().."proceed_movement_0A "..self.anomid, "ui\\ui_iconsTotal", Frect():set(498,47,83,47),0, 1000) end
+					if debug_flag then -- пометим дорожку :)
+						local part_pos = level.vertex_position(progress.transit_1b)
+						local Particle = particles_object("explosions\\campfire_blowout")
+						Particle:play_at_pos(part_pos)
+						Particle:move_to(part_pos, part_pos)
+					end					
 				else
 					progress.stage = 1
 					if debug_flag then db.actor:give_game_news(self.object:name().."switch_1 "..self.anomid, "ui\\ui_iconsTotal", Frect():set(498,47,83,47),0, 1000) end
@@ -498,6 +510,12 @@ function action_evade_anomaly:execute ()
 				if not check_arrival(npc_pos, progress.transit_2a) then
 					proceed_movement(self.object, progress.transit_2a)
 					if debug_flag then db.actor:give_game_news(self.object:name().."proceed_movement_1 "..self.anomid, "ui\\ui_iconsTotal", Frect():set(498,47,83,47),0, 1000) end
+					if debug_flag then -- пометим дорожку :)
+						local part_pos = level.vertex_position(progress.transit_2a)
+						local Particle = particles_object("explosions\\campfire_blowout")
+						Particle:play_at_pos(part_pos)
+						Particle:move_to(part_pos, part_pos)
+					end					
 				else
 					progress.stage = 2
 					if debug_flag then db.actor:give_game_news(self.object:name().."switch_2 "..self.anomid, "ui\\ui_iconsTotal", Frect():set(498,47,83,47),0, 1000) end
@@ -506,6 +524,12 @@ function action_evade_anomaly:execute ()
 				if not check_arrival(npc_pos, progress.transit_2b) then
 					proceed_movement(self.object, progress.transit_2b)
 					if debug_flag then db.actor:give_game_news(self.object:name().."proceed_movement_1A "..self.anomid, "ui\\ui_iconsTotal", Frect():set(498,47,83,47),0, 1000) end
+					if debug_flag then -- пометим дорожку :)
+						local part_pos = level.vertex_position(progress.transit_2b)
+						local Particle = particles_object("explosions\\campfire_blowout")
+						Particle:play_at_pos(part_pos)
+						Particle:move_to(part_pos, part_pos)
+					end					
 				else
 					progress.stage = 2
 					if debug_flag then db.actor:give_game_news(self.object:name().."switch_2 "..self.anomid, "ui\\ui_iconsTotal", Frect():set(498,47,83,47),0, 1000) end
@@ -532,16 +556,15 @@ function action_evade_anomaly:execute ()
 		local sobj = alife():object(self.anomid)
 	
 		local vector_to_anomaly = self.object:direction()
-		vector_to_anomaly:invert()
-		
+
 		vector_to_anomaly.y = 0
 		vector_to_anomaly:normalize()
 		
 		local vector_to_transit_1a = vector_rotate_y(vector_to_anomaly,45)
-		local vector_to_transit_2a = vector_rotate_y(vector_to_anomaly,135)
+		local vector_to_transit_2a = vector_rotate_y(vector_to_anomaly,110)
 		
 		local vector_to_transit_1b = vector_rotate_y(vector_to_anomaly,-45)
-		local vector_to_transit_2b = vector_rotate_y(vector_to_anomaly,-135)	
+		local vector_to_transit_2b = vector_rotate_y(vector_to_anomaly,-110)	
 		
 		local vector_to_exit = self.object:direction()
 		
@@ -581,24 +604,6 @@ function action_evade_anomaly:execute ()
 		
 		escape_paths[nid] = temp_table
 		
-		if debug_flag then -- пометим дорожку :)
-			local points = {
-				transit_point_1a,
-				transit_point_2a,
-				transit_point_1b,
-				transit_point_2b,
-				--exit_point,
-				}
-			for i,pt in ipairs(points) do
-				if not ready[i] then
-					local part_pos = level.vertex_position(transit_point_1a)
-					local Particle = particles_object("explosions\\campfire_blowout")
-					Particle:play_at_pos(part_pos)
-					Particle:move_to(part_pos, part_pos)	
-					ready[i] = true
-				end
-			end
-		end
 	end
 end
 
