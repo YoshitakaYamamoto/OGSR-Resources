@@ -258,14 +258,14 @@ function wpn_binder:update_hud_addons_visibility(arg1, arg2)
 		self:set_hud_bones_visibility(self.managed_bones, false)
 	end
 	for des_name,desc in pairs(self.addon_descriptors) do
-		--[[if self.is_gl and desc.extra_actions then -- восстанавливаем смещение худа после выхода из режима подствольника
+		if self.is_gl and desc.extra_actions then -- восстанавливаем смещение худа после выхода из режима подствольника
 			local gl_mode = ogse_wpn_utils.get_gl_mode(self.object)
 			-- на первом апдейте после перехода в обычный режим
 			if not gl_mode and self.gl_mode ~= gl_mode then
 				desc.extra_actions(self.object, desc)
 			end
 			self.gl_mode = gl_mode
-		end]]
+		end
 		local addon_attached = desc.addon_attached_fun(self.object)
 		if desc.hud_attached ~= addon_attached or need_initialize_hud then
 			--print_table_inlog(desc)
