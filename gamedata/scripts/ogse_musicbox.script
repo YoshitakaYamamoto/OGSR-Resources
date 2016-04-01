@@ -276,34 +276,37 @@ function musicbox_base:unBind()
 end
 
 function musicbox_base:onUpdate()
-    local current_time = time_global()
-    if self.time_1000 < current_time then
-        if self.snd_obj then
-            if self.snd_obj:playing() then
-                ---------------------------
-                local text = self.objCTime:timeToString(game.CTime.TimeToSeconds)
-                text = text:match('%d+%:%d+$')
-                self.timer_static:SetText(text)  
-                local dt = game.CTime()
-                dt:setHMS(0,0,1)
-                self.objCTime:sub(dt)
-                ---------------------------
-                self.time_1000 = current_time + 1000
-            elseif self.checkedPlayAll then
-				if not self.play_all or (coroutine.status(self.play_all) == 'dead') then --Если вдруг, self.play_all == nil или подпрограмма перестала работать (ОЧЕНЬ редкие баги)
-					log1("!!! MBOX: self.play_all is nil or coroutine is dead!!!")
-					ogse.send_tip("MUSICBOX: Произошла ошибка, необходимо перезапустить проигрывание музыки!") --Сообщим об ошибке
-					self.checkedPlayAll = false --Запрещаем "Играть Все"
-					self:onStop() --Останавливаем всё, что можно остановить и отписываем onUpdate от менеджера сигналов
-					return --на этом заканчиваем
-                else
-                    coroutine.resume(self.play_all, self)
-                end
-            else
-                self:onStop()
-            end
-        end
-    end
+	if self.snd_obj then
+		if self.snd_obj:playing() then
+			---------------------------
+			local current_time = time_global()
+			if self.time_1000 > current_time then return end
+			local text = self.objCTime:timeToString(game.CTime.TimeToSeconds)
+			text = text:match('%d+%:%d+$')
+			self.timer_static:SetText(text)  
+			local dt = game.CTime()
+			dt:setHMS(0,0,1)
+			self.objCTime:sub(dt)
+			self.time_1000 = current_time + 1000
+			---------------------------
+		elseif self.checkedPlayAll then
+			if not self.play_all then --нужно для вывода в лог, чтобы отследить ситуации, при которых именно self.play_all == nil. В будущем - удалить этот кусок кода.
+				log1("!!! MBOX: self.play_all is nil!!!")
+			end
+			if not self.play_all or (coroutine.status(self.play_all) == 'dead') then --Если вдруг, self.play_all == nil или подпрограмма перестала работать (ОЧЕНЬ редкие баги)
+				log1("!!! MBOX: self.play_all is nil or coroutine is dead!!!")
+				ogse.send_tip("Произошла ошибка, необходимо перезапустить проигрывание музыки!", "МУЗЫКАЛЬНЫЙ АВТОМАТ", nil, 40) --Сообщим об ошибке
+				self.checkedPlayAll = false --Запрещаем "Играть Все"
+				self:onStop() --Останавливаем всё, что можно остановить и отписываем onUpdate от менеджера сигналов
+			else
+				coroutine.resume(self.play_all, self)
+			end
+		else
+			self:onStop()
+		end
+	elseif self.checkedPlayAll then --Если музыка по какой-то причине не играет, и  при этом кнопка "Играть Все" нажата, то
+		self.checkedPlayAll = false --запрещаем "Играть Все".
+	end
 end
 
 function musicbox_base:IterateInv()
