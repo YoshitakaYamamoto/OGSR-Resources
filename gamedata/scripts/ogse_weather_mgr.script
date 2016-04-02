@@ -116,7 +116,7 @@ end
 function on_key_down(key, bind)
 	local lalt_pressed = GetLAlt()
 	-- local ralt_pressed = GetRAlt()
-	if key == DIK_keys.DIK_O then
+	if key == DIK_keys.DIK_O and not level.main_input_receiver() then
 		if not lalt_pressed then
 			forecast_shown = not forecast_shown
 			get_weather_mgr():show_active_forecast()
