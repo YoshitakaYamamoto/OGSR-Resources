@@ -84,7 +84,7 @@ function override_game_type( sect )
 	  gtype = "outfit"
     elseif string.find( sect, "^cartridge_" ) then --картриджи для автодоктора
 	  gtype = "medkit"
-    elseif string.find( sect, "^wpn_addon_mag_" ) then --магазины для оружия
+    elseif string.find( sect, "^wpn_addon_" ) then --аддоны для оружия
 	  gtype = "gl"
     elseif string.find( sect, "^wpn_binoc" )
       or string.find( sect, "detector" ) --детекторы артефактов, мин и тд.
