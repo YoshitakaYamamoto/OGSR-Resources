@@ -1307,7 +1307,7 @@ local mteleport_update_time = time_global()
 local watchdog = 0
 local watchdog_max = 45
 --------------------------------------------------------------------
-function on_actor_update(obj) --Колбэк на апдейт ГГ
+function on_actor_update(delta) --Колбэк на апдейт ГГ
 ---------------------АПДЕЙТЫ С ВЫСОКИМ ПРИОРИТЕТОМ ПОМЕЩАТЬ СЮДА!---------------------
 	ogse_debug.process_actor("upd_a", 2)
 	on_actor_updating_start() -- Перехват события начала апдейта актора
@@ -1327,7 +1327,7 @@ function on_actor_update(obj) --Колбэк на апдейт ГГ
 	ui_ogse_quicklaunch.check_quicklaunch_hint() --Подсказки по кнопке быстрого доступа. надо перевести на сигналы
 
 	ogse_debug.process_actor("upd_a", 13)
-	if xrs_ai then xrs_ai.actor_update(delta) end -- Обновление АИ-пака
+	if xrs_ai then xrs_ai.actor_update(--[[delta]]) end -- Обновление АИ-пака
 	if rx_ai then rx_ai.actor_update() end --обновление AI управления оружием
 
 	ogse_debug.process_actor("upd_a", 15)
@@ -1617,7 +1617,7 @@ end
 
 if watchdog == 43 then
 	ogse_debug.process_actor("upd", 10)
-	if sr_psy_antenna.psy_antenna and level.name() == "l10_radar" then --обновление пси-антенны апдейтиться будет только если актор находится на радаре.
+	if sr_psy_antenna.psy_antenna --[[and level.name() == "l10_radar"]] then --обновление пси-антенны апдейтиться будет только если актор находится на радаре.
 		sr_psy_antenna.psy_antenna:update(delta)
 	end
 end

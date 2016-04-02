@@ -522,7 +522,7 @@ function actor_binder:update(delta)
 	end
 	
 	ogse_debug.process_actor("upd", 13)
-	ogse.on_actor_update() --Обновление актора
+	ogse.on_actor_update(delta) --Обновление актора
 	
 	ogse_debug.process_actor("upd", 14)
 	_sdata.vis_int()
