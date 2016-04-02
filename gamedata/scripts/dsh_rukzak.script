@@ -78,7 +78,9 @@ function override_game_type( sect )
       gtype = "knife"
     elseif string.find( sect, "^mutant_" ) then --части монстров
       gtype = "mutant_part"
-    elseif string.find( sect, "^af_maska_" ) then --противогазы
+    elseif string.find( sect, "^af_maska_" ) --противогазы
+	  or string.find( sect, "exo" ) --экзоскелеты
+	then
 	  gtype = "outfit"
     elseif string.find( sect, "^cartridge_" ) then --картриджи для автодоктора
 	  gtype = "medkit"
