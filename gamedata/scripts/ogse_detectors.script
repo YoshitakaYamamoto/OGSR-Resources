@@ -160,7 +160,7 @@ end
 
 function actor_has_detector()
 	if not db.actor or not db.actor:alive() then return false end -- нет актора - нечего делать
-	if level.main_input_receiver() then return false end
+	--if level.main_input_receiver() then return false end
 	local detector_in_slot = db.actor:item_in_slot(8)
 	if detector_in_slot and string.find(detector_in_slot:section(), "interactive_detector") then
 		last_detector_sect = detector_in_slot:section()
@@ -171,7 +171,7 @@ end
 
 function actor_has_elite_detector()
 	if not db.actor or not db.actor:alive() then return false end -- нет актора - нечего делать
-	if level.main_input_receiver() then return false end
+	--if level.main_input_receiver() then return false end
 	local detector_in_slot = db.actor:item_in_slot(8)
 	if detector_in_slot and string.find(detector_in_slot:section(), "interactive_detector_elite") then
 		last_detector_sect = detector_in_slot:section()
