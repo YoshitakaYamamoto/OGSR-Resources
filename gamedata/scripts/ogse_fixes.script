@@ -40,6 +40,10 @@ function del_buggy_mapspots() --Удаление глючных меток с к
 	and level_tasks.is_map_spot_present(story_ids.yan_mapspot_from_vasilyev, "green_location") then
 		level_tasks.remove_location_by_sid(story_ids.yan_mapspot_from_vasilyev, "green_location") --Вечная метка "Проникнуть в лабораторию X-16" на янтаре
 	end
+	if has_alife_info("mil_dolg_dead")
+	and level_tasks.is_map_spot_present(story_ids.Mil_Dolg_Zoneguard, "crlc_mdl") then
+		level_tasks.remove_location_by_sid(story_ids.Mil_Dolg_Zoneguard, "crlc_mdl") --Вечная метка "Уничтожить отряд Долга" на АС
+	end
 end
 
 --[[Также увеличить массу у:
