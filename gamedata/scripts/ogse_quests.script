@@ -3,8 +3,9 @@
 turn_pnv_off = ogse_night_vision.turn_pnv_off --KRodin: НЕ УДАЛЯТЬ! Вызывается из многих мест.
 
 function attach(sm)
-	sm:subscribe({ signal = "on_show_car_hud",	fun = this.set_btr_nonworking }) --действие при влезании в БТР
-	sm:subscribe({ signal = "on_show_car_hud",	fun = this.set_btr_fuel_empty }) --действие при влезании в БТР
+	sm:subscribe({ signal = "on_show_car_hud",	fun = this.set_btr_fuel_empty })
+	sm:subscribe({ signal = "on_show_car_hud",	fun = this.set_btr_nonworking })
+	sm:subscribe({ signal = "on_hide_car_hud",	fun = this.set_btr_working })
 end
 
 --/ спавн квестовых предметов для OGSE и скриптовые квесты /--
@@ -379,8 +380,7 @@ function remove_mark_shurup()
 	level_tasks.remove_location_by_sid(story_ids.Mil_Engineer,"green_location", true)
 end
 
-function set_btr_fuel_empty()
-	-- при появлении квестового БТР установим топливо в ноль и здоровье в треть
+function set_btr_fuel_empty() --при влезании в квестовый БТР установим топливо в ноль и здоровье в треть
 	if not db.actor:has_info("btr_fuel_empty_set") then
 		local btr = level_object_by_sid(story_ids.dead_city_btr_real)
 		if btr then
@@ -393,33 +393,27 @@ function set_btr_fuel_empty()
 	end
 end
 
-local unbinded = false
+function set_btr_nonworking() --при отсутствии у ГГ аккумулятора, при влезании в БТР, блокируем старт двигателя
+	if db.actor:has_info("btr_get_accum_set") then return end
 
-function set_btr_nonworking()
-	-- при отсутствии у ГГ аккумулятора блокируем старт двигателя БТР
-	if not db.actor:has_info("btr_get_accum_set") then
-		if ogse_car_control.current_car and ogse_car_control.in_btr then
-			local btr = level_object_by_sid(story_ids.dead_city_btr_real)
-			if btr and btr:id() == ogse_car_control.current_car:id() then
-				if unbinded == false then
-					ogse.save_variable("turn_engine_key", bind_to_dik(key_bindings.kENGINE))
-					cmd("unbind", "turn_engine")
-					unbinded = true
-				end
-			else
-				if unbinded == true then
-					local eng_key = ogse.load_variable("turn_engine_key", DIK_keys.kNUMPAD0)
-					cmd("bind",  "turn_engine", ogse_rebind_key.dik_to_name(eng_key))
-					unbinded = false
-				end				
-			end
-		else	
-			if unbinded == true then
-				local eng_key = ogse.load_variable("turn_engine_key", DIK_keys.kNUMPAD0)
-				cmd("bind",  "turn_engine", ogse_rebind_key.dik_to_name(eng_key))
-				unbinded = false
-			end				
-		end	
+	local btr = level_object_by_sid(story_ids.dead_city_btr_real)
+	if btr and btr:id() == ogse_car_control.current_car:id() then
+		local var = bind_to_dik(15) --клавиша запуска двигателя.
+		if var then
+			ogse.save_var("turn_engine_key", var) --сохраняем её в хранилище
+			cmd("unbind", "turn_engine") --и разбиндиваем, чтобы сидя в неисправном бтр нельзя было запустить движок
+		end
+	end
+end
+
+function set_btr_working() --при вылезании из БТР, возвращаем все как было
+	if ogse.var_exists("turn_engine_key") or (not db.actor:has_info("btr_get_accum_set")) then
+		local eng_key = ogse.load_var("turn_engine_key") --грузим клавишу из хранилища
+		local dik_key = ogse_rebind_key.dik_to_name(eng_key) --конвертируем
+		cmd("bind", "turn_engine", dik_key) --биндим
+	end
+	if db.actor:has_info("btr_get_accum_set") and ogse.var_exists("turn_engine_key") then --Если бтр уже исправен,
+		ogse.delete_var("turn_engine_key") --удаляем сохраненную клавишу из хранилища. Больше она не нужна.
 	end
 end
 

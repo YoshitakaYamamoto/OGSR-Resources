@@ -1,1 +1,0 @@
-ogse.spawn_item_in_inv("treasure_item")
