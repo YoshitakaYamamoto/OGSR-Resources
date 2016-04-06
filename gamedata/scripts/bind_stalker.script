@@ -232,6 +232,8 @@ function actor_binder:actor_death_callback(victim, who)
 			end
 		end
 	end
+
+	self.am:call("on_actor_death", victim, who)
 end
 
 function actor_binder:debug_monster_follow_path(id, params)

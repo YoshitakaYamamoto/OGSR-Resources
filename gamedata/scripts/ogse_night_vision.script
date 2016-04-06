@@ -3,7 +3,7 @@
 -|Модуль приборов ночного видения
 -|version 2.5 : OGS Evolution Team © 2010
 -|version 3.0 : KRodin, Dsh © 2015 - 2016
--|Для работы нужен модуль управления элементами худа ogse_hud_control.script
+-|Для работы нужен модуль управления худом ogse_hud_control.script
 ---------------------------------------------------------------------------]]
 
 function attach(sm)
@@ -23,7 +23,7 @@ function attach(sm)
 end
 
 --==========================================================Настройки=================================================================
-local scope_section							-- Секция прицела в строковом виде. Передаётся из ogse_hud_control.script
+local scope_section							-- Секция прицела в строковом виде.
 
 --флаги
 local nv_scope_fx_autoenable				-- Автовключение пнв/подсветки в прицеле. Только булевое значение (true/false)!
@@ -131,20 +131,20 @@ end
 
 --==========================================Режим прицеливания через оптику===========================================
 local night_vision_fx_store = false --с помощью этого флага будем восстанавливать работу прибора ПНВ после прицеливания.
-function on_sniper_mode(scope) --Вошли в режим прицеливания. Вызывается из ogse_hud_control.update_hud_elements()
+function on_sniper_mode() --Вошли в режим прицеливания. Вызывается из ogse_hud_control.update_hud_control()
 	if night_vision_fx_on then --Если пнв включен, запомним что он был включен и выключим.
 		night_vision_fx_store = true
 		turn_off_nv_fx()
 	end
 	night_vision_fx_not_sniper = false --С помощью этого флага будем определять, находимся ли в режиме прицеливания.
-	scope_section = scope --получаем секцию прицела
+	scope_section = get_active_scope_section() --получаем секцию прицела
 	if nv_scope_fx_autoenable then --если задано автовключение пнв в прицеле, то:
 		turn_on_scope_sights_lighting() --включаем подсветку в прицеле.
 		nv_scope_fx_on()	--включаем пнв в прицеле
 	end
 end
 
-function off_sniper_mode() --Вышли из режима прицеливания. Вызывается из ogse_hud_control.update_hud_elements()
+function off_sniper_mode() --Вышли из режима прицеливания. Вызывается из ogse_hud_control.update_hud_control()
 	if highlight_wnd then turn_off_scope_sights_lighting() end --выключаем подсветку в прицеле
 	if night_vision_scope_fx_on then turn_off_nv_scope_fx()	end -- вырубаем пнв в прицеле
 	scope_section = nil --переводим в nil, на всякий случай
@@ -366,22 +366,19 @@ function on_take( obj ) --при взятии прицела, если он ес
 	end
 end
 
-function get_active_scope_section( wpn ) --получение секции прицела находящегося в руках оружия или просто любого оружия.
+function get_active_scope_section( wpn ) --Вызывать только будучи уверенным, что объект является оружием и существует на момент вызова!
 	if not wpn then wpn = db.actor:active_item() end
-	if not wpn or not wpn:is_weapon() then return end
 
-	if		ogse_wpn_utils.get_scope_status( wpn ) == 1 then return wpn:section()
-	elseif	ogse_wpn_utils.get_scope_status( wpn ) == 2 then
-		local scope_status = ogse_wpn_utils.get_scope_flag( wpn )
-		if scope_status then
-			local sect       = wpn:section()
-			local scope_sect = get_string_wq( sect, "scope_name" )
-			if scope_sect then return scope_sect end
-		end
+	local scope_status = ogse_wpn_utils.get_scope_flag( wpn )
+	if scope_status then
+		local sect       = wpn:section()
+		local scope_sect = get_string_wq( sect, "scope_name", nil )
+		if scope_sect then return scope_sect end
 	end
 end
 
 function caching_scope(obj) --Кэширование текстуры подсветки прицела оружия в руках после загрузки сейва (только если прицел есть в таблице tbl_sights_lighting)
+	if not obj:is_weapon() then return end --если объект - не оружие, то ничего не делаем
 	local scope_sect = get_active_scope_section(obj)
 	if not scope_sect then return end --если не получили секцию прицела, то ничего не делаем.
 
