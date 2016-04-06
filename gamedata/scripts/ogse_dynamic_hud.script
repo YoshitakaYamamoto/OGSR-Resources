@@ -16,46 +16,13 @@ local bleed_enable = (sys_ini:r_s32("options","bleed_enable") == 1) --Эффек
 -----------------------------------------------------------------------------------------------------
 
 function attach(sm)
-	sm:subscribe({ signal = "on_update",		fun = this.upd_shader_effects, queued = true }) --Худ противогаза (шейдерный эффекты, включаемые в настройках графики)
-	sm:subscribe({ signal = "on_show_car_hud",	fun = this.on_show_car_hud }) --действие при влезании в БТР
-	sm:subscribe({ signal = "on_hide_car_hud",	fun = this.on_hide_car_hud }) --действие при вылезании из БТР
 	sm:subscribe({ signal = "on_item_to_slot",	fun = this.check_remove_gasmask }) --проверка надевания противогаза на костюм с худом
 	if bleed_enable then
 		sm:subscribe({ signal = "on_update",		fun = this.bleed_condition, queued = true }) --Эффект плохого самочувствия
 	end
 end
 
---**************Убирание/возвращение худа противогаза при влезании/вылезании из БТР***************
-
-local suithud_enable = 1 --когда садимся/выходим из БТР, этот параметр убирает/возвращает худ
-
-function on_show_car_hud() -- залезли в БТР.
-	suithud_enable = 0 --Запрещаем апдейтить худ противогаза
-end
-
-function on_hide_car_hud() --вылезли из БТР.
-	suithud_enable = 1 --–Разрешаем апдейтить худ противогаза
-end
---************************************************************************************************
-
---**********************************Управление шейдерными эффектами динамического худа************************************
-function upd_shader_effects()
-	if suithud_enable ~= 1 --если сели в бтр, то ничего не делаем
-	or not db.actor:alive() then
-		switch_shader_effects("off")
-		return
-	end
-
-	local gmask = db.actor:item_in_slot(10)
-	if gmask and (gmask:section() ~= "bad_psy_helmet" and gmask:section() ~= "good_psy_helmet") then --если в слоте есть противогаз
-		switch_shader_effects("on")
-	elseif have_gasmask() then --если есть противогаз костюма
-		switch_shader_effects("on")
-	else --если нет никакого противогаза
-		switch_shader_effects("off")
-	end
-end
-
+--**********************************Проверка надевания противогаза на костюм с худом************************************
 function have_gasmask() --проверка, имеет ли костюм встроенный противогаз
 	local armor = db.actor:get_current_outfit()
 	if not armor then return false end
@@ -75,17 +42,6 @@ function have_gasmask() --проверка, имеет ли костюм вст�
 	end
 end
 
-local last_shader_mode-- = "off"
-function switch_shader_effects(mode)
-	if mode ~= last_shader_mode then
-		cmd("r2_rain_drops_control "..mode)
-		cmd("r2_lens_dirt_control "..mode)
-		last_shader_mode = mode
-	end
-end
---**********************************************************************************************************************
-
---**********************************Проверка надевания противогаза на костюм с худом************************************
 local counter = 0
 function check_remove_gasmask()
 	local bio_belt = db.actor:item_in_slot(10)
