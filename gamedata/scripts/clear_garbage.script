@@ -1,186 +1,87 @@
---плюс схема удаления бесхозного оружия --- применять при загрузке игры
-local summ_weapons = 10 --общее допустимое число бесхозного оружия на всех локациях. старое значение 10
-local dist_to_weapons = 10 --расстояние от ГГ, свыше которого считается оружие. старое значение 10
-local tabl_weapons={}
-----------------------------------------------------------------------------------------------------------------------------
---' Не включать remove_invalid_obj без острой необходимости! При включении через 20 секунд после загрузки игры произойдёт следующее:
---' Если задан параметр remove_obj то будет удалён объект с соотв. именем - параметр remove_obj - строка имени в кавычках
---' если он не задан, то удалятся все арты с "неверными" вертексами - при этом удалится много лишних, возможно так же и из тайников
-----------------------------------------------------------------------------------------------------------------------------
-local remove_invalid_obj = false 
-local remove_obj = nil 
+--[[--------------------------------------------------------
+-|clear_garbage.script
+-|РЈР±РѕСЂС€РёРє Р±РµСЃС…РѕР·РЅРѕРіРѕ РѕСЂСѓР¶РёСЏ.
+-|KRodin В© 2016
+-|Version: 2.0
+-|РњР°РєСЃРёРјР°Р»СЊРЅРѕ СѓРїСЂРѕСЃС‚РёР» СЂР°Р±РѕС‚Сѓ СЃРєСЂРёРїС‚Р°, РІС‹СЂРµР·Р°Р» РІРµСЃСЊ РјСѓСЃРѕСЂ.
+-|РўРµРїРµСЂСЊ РѕСЂСѓР¶РёРµ СЃ Р»РѕРєР°С†РёРё СѓРґР°Р»СЏРµС‚СЃСЏ РїСЂРё СѓС…РѕРґРµ СЃ РЅРµС‘.
+-|РџРѕРєР° Р°РєС‚РѕСЂ РЅРµ СѓС€С‘Р» СЃ Р»РѕРєР°С†РёРё - РЅРёС‡РµРіРѕ РЅРµ СѓРґР°Р»СЏРµС‚СЃСЏ.
+----------------------------------------------------------]]
+
+function attach(sm)
+	sm:subscribe({ signal = "on_spawn",	fun = this.remove_guns })
+end
+
+local protected_objects = { --РРјРµРЅР° РѕР±СЉРµРєС‚РѕРІ, РєРѕС‚РѕСЂС‹Рµ Р·Р°РїСЂРµС‰РµРЅРѕ СѓРґР°Р»СЏС‚СЊ
+	[ "esc_wpn_ak74u" ] = true,
+	[ "esc_wpn_pm" ] = true,
+	[ "esc_wpn_bm16" ] = true,
+	[ "aes_grenade_f_0001" ] = true,
+	[ "aes_grenade_f_0000" ] = true,
+	[ "aes_grenade_f_0002" ] = true,
+	[ "aes_grenade_f_0003" ] = true,
+	[ "aes_wpn_binoc" ] = true,
+	[ "aes_wpn_rpg7" ] = true,
+	[ "dar_wpn_ak74" ] = true,
+	[ "dar_wpn_rpg7" ] = true,
+	[ "gar_grenade_f_0000" ] = true,
+	[ "gar_grenade_f_0001" ] = true,
+	[ "val_wpn_ak74u" ] = true,
+	[ "val_wpn_ak74u_0000" ] = true,
+	[ "val_wpn_ak74u_0001" ] = true,
+	[ "val_wpn_mp5" ] = true,
+	[ "val_wpn_mp5_0000" ] = true,
+	[ "val_wpn_rpg_0000" ] = true,
+	[ "yan_grenade_rgd5" ] = true,
+	[ "mil_grenade_f_0016" ] = true,
+	[ "mil_grenade_f_0017" ] = true,
+	[ "mil_grenade_f_0018" ] = true,
+	[ "mil_grenade_f_0019" ] = true,
+	[ "mil_grenade_rgd5" ] = true,
+	[ "mil_grenade_rgd_0000" ] = true,
+	[ "mil_wpn_pm_0000" ] = true,
+	[ "mil_wpn_ak74u" ] = true,
+	[ "mil_wpn_ak0001" ] = true,
+	[ "mil_wpn_ak0002" ] = true,
+	[ "mil_wpn_bm16" ] = true,
+	[ "mil_wpn_pm" ] = true,
+	[ "mil_wpn_vintorez" ] = true,
+	[ "kat_wpn_ak74u" ] = true,
+	[ "level_prefix_wpn_groza" ] = true,
+	[ "bun_grenade_f1_0001" ] = true,
+	[ "bun_grenade_f1_0005" ] = true,
+	[ "bun_grenade_f1_0006" ] = true,
+	[ "bun_grenade_f1_0007" ] = true,
+	[ "bun_grenade_f1_0008" ] = true,
+}
+
+local protected_sections = { --РЎРµРєС†РёРё РѕР±СЉРµРєС‚РѕРІ, РєРѕС‚РѕСЂС‹Рµ Р·Р°РїСЂРµС‰РµРЅРѕ СѓРґР°Р»СЏС‚СЊ
+	[ "hunters_toz" ] = true, --РўРћР— РћС…РѕС‚РЅРёРєР° РЅР° Р”Рў
+	[ "cherep_svd" ] = true, --РЎР’Р” Р§РµСЂРµРїР° РІ Р±Р°СЂРµ
+	[ "wpn_montirovka" ] = true, --РњРѕРЅС‚РёСЂРѕРІРєР° Р¤СЂРёРјРµРЅР°
+	[ "wpn_crossbow" ] = true, --РРіР»РѕРјС‘С‚ РїРѕ РЅР°РІРѕРґРєРµ РўРѕР»РёРєР° РЅР° Р”Рў
+	[ "wpn_fort_m1" ] = true, --Р¤РѕСЂС‚ РљСѓР·РЅРµС†РѕРІР°
+	[ "wpn_eagle_m1" ] = true, --Р”РµСЃРµСЂС‚ РРіР» Р¤СЂР°РµСЂР°
+	[ "wpn_colt_m1" ] = true, --РљРѕР»СЊС‚ РЅР°С‘РјРЅРёРєРѕРІ РЅР° РђРЎ
+	[ "wpn_m_134" ] = true, --РњРёРЅРёРіР°РЅ РІ РєРѕРјРЅР°С‚Рµ Р·Р° РєРѕРґРѕРІРѕР№ РґРІРµСЂСЊСЋ РЅР° Р Р°РґР°СЂРµ
+}
 
 function remove_guns()
-	for a=1,65535,1 do
-	local obj = alife():object(a)
+local actor_level = level.name()
+	for a = 1, 65534 do
+		local obj = alife():object(a)
 		if obj then
-			local posobj = obj.position
-			local actorpos = db.actor:position()
 			local wpn_name = obj:name()
-			if (obj.parent_id and obj.parent_id == 65535 
-			and not string.find(wpn_name,"_m1") 
-			and not string.find(wpn_name,"_m2") 
-			and not string.find(wpn_name,"hunters_toz") 
-			and not string.find(wpn_name,"wpn_gauss") 
-			and not string.find(wpn_name,"wpn_montirovka")
-			and not string.find(wpn_name,"wpn_knife") 
-			and not string.find(wpn_name,"wpn_binoc") 
-			and not string.find(wpn_name,"wpn_flame") 
-			and not string.find(wpn_name,"cherep_svd") 
-			and not string.find(wpn_name,"wpn_crossbow") 
-			and wpn_name~="esc_wpn_ak74u" 
-			and wpn_name~="esc_wpn_pm" 
-			and wpn_name~="esc_wpn_bm16" 
-			and wpn_name~="aes_grenade_f_0001" 
-			and wpn_name~="aes_grenade_f_0000" 
-			and wpn_name~="aes_grenade_f_0002" 
-			and wpn_name~="aes_grenade_f_0003" 
-			and wpn_name~="aes_wpn_rpg7" 
-			and wpn_name~="dar_wpn_ak74" 
-			and wpn_name~="dar_wpn_rpg7" 
-			and wpn_name~="gar_grenade_f_0000" 
-			and wpn_name~="gar_grenade_f_0001" 
-			and wpn_name~="val_wpn_ak74u" 
-			and wpn_name~="val_wpn_ak74u_0000" 
-			and wpn_name~="val_wpn_ak74u_0001" 
-			and wpn_name~="val_wpn_mp5" 
-			and wpn_name~="val_wpn_mp5_0000" 
-			and wpn_name~="val_wpn_rpg_0000" 
-			and wpn_name~="yan_grenade_rgd5" 
-			and wpn_name~="mil_grenade_f_0016" 
-			and wpn_name~="mil_grenade_f_0017" 
-			and wpn_name~="mil_grenade_f_0018" 
-			and wpn_name~="mil_grenade_f_0019" 
-			and wpn_name~="mil_grenade_rgd5" 
-			and wpn_name~="mil_grenade_rgd_0000" 
-			and wpn_name~="mil_wpn_pm_0000" 
-			and wpn_name~="mil_wpn_ak74u" 
-			and wpn_name~="mil_wpn_ak0001" 
-			and wpn_name~="mil_wpn_ak0002" 
-			and wpn_name~="mil_wpn_bm16" 
-			and wpn_name~="mil_wpn_pm" 
-			and wpn_name~="mil_wpn_vintorez" 
-			and wpn_name~="kat_wpn_ak74u" 
-			and wpn_name~="level_prefix_wpn_groza" 
-			and wpn_name~="bun_grenade_f1_0001" 
-			and wpn_name~="bun_grenade_f1_0005" 
-			and wpn_name~="bun_grenade_f1_0006" 
-			and wpn_name~="bun_grenade_f1_0007" 
-			and wpn_name~="bun_grenade_f1_0008") then
-				if string.find(obj:name(),"wpn_") or string.find(obj:name(),"grenade_") then 
-					if (posobj:distance_to(actorpos) > dist_to_weapons) then 
-						table.insert(tabl_weapons, obj)
-					end
-				end
-			end
-		end
-	end
-
-	if table.getn(tabl_weapons) > summ_weapons then
-		table.sort(tabl_weapons,max_comp)
-		local twa = table.getn(tabl_weapons)
-		while twa > summ_weapons do
-			local wpn = tabl_weapons[twa]
-			local wpn_name = wpn:name()
-			if not string.find(wpn_name,"wpn_gauss") 
-			and not string.find(wpn_name,"wpn_swd") 
-			and not string.find(wpn_name,"wpn_vintorez") 
-			and not string.find(wpn_name,"wpn_svu") 
-			and not string.find(wpn_name,"wpn_fn2000") 
-			and not string.find(wpn_name,"wpn_saiga12c") 
-			and not string.find(wpn_name,"wpn_rpg7") 
-			and not string.find(wpn_name,"wpn_desert_eagle") 
-			and not string.find(wpn_name,"wpn_toz34") then
-				local weapon = tabl_weapons[twa]
-				if weapon then
-					alife():release(weapon,true)
-					table.remove(tabl_weapons,twa)
-				end
-			end
-			twa=twa-1
-		end
-		if table.getn(tabl_weapons) > summ_weapons then 
-			local twb = table.getn(tabl_weapons)
-			while twb > summ_weapons do
-				local wpn = tabl_weapons[twb]
-				local wpn_name = wpn:name()
-				if  not string.find(wpn_name,"wpn_swd") 
-				and not string.find(wpn_name,"wpn_vintorez") 
-				and not string.find(wpn_name,"wpn_svu") 
-				and not string.find(wpn_name,"wpn_rpg7") then 
-					local weapon = tabl_weapons[twb]
-					if weapon then
-						alife():release(weapon,true)
-						table.remove(tabl_weapons,twb)
-					end
-				end
-				twb=twb-1
-			end
-			if table.getn(tabl_weapons) > summ_weapons then
-				local twc = table.getn(tabl_weapons)
-				while twc > summ_weapons do
-					local weapon = tabl_weapons[twc]
-					if weapon then
-						alife():release(weapon,true)
-						table.remove(tabl_weapons,twc)
-					end
-					twc=twc-1
-				end
-			end
-		end
-	end
-end 
-
-function max_comp(i1,i2) -- возвращает true если i1 меньше i2
-	local actorpos = db.actor:position()
-	return i1.position:distance_to(actorpos) < i2.position:distance_to(actorpos)
-end
-
-function dbglog(fmt,...)    
-local msg = string.format(fmt, ...)    
-local msg_no_ws = string.gsub(msg, "%s", "_" )    
-get_console():execute("dbg:" .. msg_no_ws)
-end
-
-function check_vertexes()
-	if remove_invalid_obj == true then
-		local actor_vid = game_graph():vertex(alife():actor().m_game_vertex_id):level_id()
-		local a_vid  = db.actor:level_vertex_id()
-		local a_gvid = db.actor:game_vertex_id()		
-		for id=1,65535, 1 do
-			local object = alife():object(id)
-			if object then
-				local object_vid = game_graph():vertex(object.m_game_vertex_id):level_id()	
-				if actor_vid == object_vid then
-					local sect = object:section_name()
-					local name_obj = object:name()
-					local gvid = object.m_game_vertex_id
-					local lvid = object.m_level_vertex_id				
-					local g_valid = game_graph():valid_vertex_id(gvid)
-					local l_valid = game_graph():valid_vertex_id(lvid)	
-					if not remove_obj then
-						if string.find(sect, "af_") and gvid ~= a_gvid and lvid ~= a_vid then
-							if g_valid == false then
-								log1("ОБЪЕКТ: "..tostring(name_obj).." удаляется - неверный g_vid: "..tostring(gvid))
-								if object then
-									alife():release(object, true)
-								end
-							end
-							if l_valid == false then
-								log1("ОБЪЕКТ: "..tostring(name_obj).." удаляется - неверный l_vid: "..tostring(lvid))
-								if object then
-									alife():release(object, true)
-								end
-							end
-						end
-					else
-						if string.find(name_obj, remove_obj) then
-							log1("ОБЪЕКТ: "..tostring(name_obj).." удаляется по запросу!")
-							if object then
-								alife():release(object, true)
-							end
-						end
-					end
+			local wpn_sect = obj:section_name()
+			if	obj.parent_id == 65535
+				and isWeapon(obj)
+				and not protected_objects[wpn_name]
+				and not protected_sections[wpn_sect]
+			then
+				local wpn_level = object_level_name(obj)
+				if wpn_level ~= actor_level then
+					--log3("!!!Clear_garbage!!! Deleting wpn: %s , Section: %s , level: %s", wpn_name, wpn_sect, wpn_level)
+					alife():release(obj,true)
 				end
 			end
 		end

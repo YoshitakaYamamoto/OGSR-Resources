@@ -1297,7 +1297,6 @@ end
 
 ------------------Переменные для апдейта актора--------------------
 local psyzones_flag = sys_ini:r_s32("options","psyzones_flag")
-local vertexes_checked = false
 local ids_timer = time_global()
 local mine_timer = time_global()
 local loot_timer = time_global()
@@ -1454,11 +1453,6 @@ if watchdog == 11 then
 	ogse_debug.process_actor("upd_a", 45)
 -- Периодическая проверка численности
 	if glob_time > anom_enum then
-		if vertexes_checked == false then
-			clear_garbage.check_vertexes()
-			vertexes_checked = true
-		end
-		-- Проверим численность
 		se_respawn.check_zone_population()
 		anom_enum = glob_time + math.random(60000, 80000)
 	end
@@ -1858,12 +1852,9 @@ function on_game_load()
 
 	-- проверка мин
 
-	checker_minefield.startup()
-
 	ogse_debug.process_actor("a_spw", 120)
 
-	-- чистим уровень от лишних стволов
-	clear_garbage.remove_guns()
+	checker_minefield.startup()
 
 	ogse_debug.process_actor("a_spw", 1110)
 
