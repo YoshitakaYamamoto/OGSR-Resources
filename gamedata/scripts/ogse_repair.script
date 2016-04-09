@@ -221,7 +221,7 @@ function repair_dialog:FillList() --Наполняем список предме
 end
 
 function item_for_repair(npc, item)
-	if item:condition() < max_condition and item:condition() > min_condition and (item:is_weapon() or isOutfit(item)) then
+	if item:condition() < max_condition and item:condition() > min_condition and (item:is_weapon_magazined() or isOutfit(item)) then
 		item_table_index = item_table_index + 1
 		item_table[item_table_index] = item
 	end
@@ -241,7 +241,7 @@ function repair_dialog:OnListItemClicked()
 	local destr_item_index = tonumber(item.itmnum:GetText())
 	local destr_item_st = item_table[destr_item_index]
 
-	if destr_item_st:is_weapon() then
+	if destr_item_st:is_weapon_magazined() then
 		if ogse_wpn_utils.get_grenade_launcher_status( destr_item_st )	== 2 and ogse_wpn_utils.get_grenade_launcher_flag( destr_item_st )	then self.has_gl	= true else self.has_gl		= false end
 		if ogse_wpn_utils.get_scope_status( destr_item_st )				== 2 and ogse_wpn_utils.get_scope_flag( destr_item_st )				then self.has_scope	= true else self.has_scope	= false end
 		if ogse_wpn_utils.get_silencer_status( destr_item_st )			== 2 and ogse_wpn_utils.get_silencer_flag( destr_item_st )			then self.has_sil	= true else self.has_sil	= false end

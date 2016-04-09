@@ -55,7 +55,7 @@ function update()
 		or not (get_hud():GetCustomStatic("gun_jammed") and not wpn_is_jammed)
 		or not active_item --если в руках ничего нет
 		or (db.actor:active_slot() ~= 1 and db.actor:active_slot() ~= 2) --или предмет в руках неходится НЕ в 1 и НЕ в 2 слоте.
-		or not active_item:is_weapon() --или в руках предмет, не являющийся оружием
+		or not active_item:is_weapon_magazined() --или в руках предмет, не являющийся оружием
 	then
 		wpn_is_jammed = false
 		current_blow_limit = -1.0

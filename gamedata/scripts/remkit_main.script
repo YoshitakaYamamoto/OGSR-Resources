@@ -78,7 +78,7 @@ function use_repair_kit(repaired_slot, destroy_item)
 	local repair_item = db.actor:item_in_slot(repaired_slot)
 	if not repair_item then return false end --на всякий случай: Если ремонтируемого предмета нет в слоте, то ничего не делаем.
 
-	if destroy_item:is_weapon() then dismantle_wpn(destroy_item) end --если разбираемый на запчасти предмет является оружием, разрядим его и снимем с него аддоны.
+	if destroy_item:is_weapon_magazined() then dismantle_wpn(destroy_item) end --если разбираемый на запчасти предмет является оружием, разрядим его и снимем с него аддоны.
 	ogse.remove_item_from_inventory(destroy_item) --удаляем из инвентаря разобранный предмет
 	repair_item:set_condition( 1 ) -- Ремонтируем предмет в полностью исправное состояние.
 	play_repair_sound() --играем звук ремонта
@@ -118,7 +118,7 @@ function compatibility_item(item, repaired_item) --Проверка совмес
 
 	if itm_compat == rep_itm_compat and rep_itm_compat ~= "" then return true end
 ---------------Дополнительная проверка, для новых стволов, на всякий случай--------------------
-	if not item:is_weapon() or not repaired_item:is_weapon() then return false end
+	if not item:is_weapon_magazined() or not repaired_item:is_weapon_magazined() then return false end
 	local ammo_1 = get_string_wq(item:section(), "ammo_class", nil)
 	local ammo_2 = get_string_wq(repaired_item:section(), "ammo_class", nil)
 	if not ammo_1 or not ammo_2 then return false end
@@ -223,7 +223,7 @@ end
 function remkit:cheat_main()
 	local act_item = db.actor:item_in_slot(rep_slot)
 	if not act_item then return end
-	if not act_item:is_outfit() and not act_item:is_weapon() then --Предмет не поддаётся ремонту, т.к. не является ни костюмом, ни оружием.
+	if not act_item:is_outfit() and not act_item:is_weapon_magazined() then --Предмет не поддаётся ремонту, т.к. не является ни костюмом, ни оружием.
 		self.msgbox_id = 1
 		self.message_box:Init("message_box_item_not_repaireble")
 		self:GetHolder():start_stop_menu(self.message_box, true)
@@ -599,7 +599,7 @@ function repair_dialog:DrawCurItem(item, x, y)
 	local sect_addon
 	local has_gl, has_scope, has_sil = false, false, false
 
-	if item:is_weapon() then
+	if item:is_weapon_magazined() then
 		if ogse_wpn_utils.get_grenade_launcher_status( item )	== 2 and ogse_wpn_utils.get_grenade_launcher_flag( item )	then has_gl		= true end
 		if ogse_wpn_utils.get_scope_status( item )				== 2 and ogse_wpn_utils.get_scope_flag( item )				then has_scope	= true end
 		if ogse_wpn_utils.get_silencer_status( item )			== 2 and ogse_wpn_utils.get_silencer_flag( item )			then has_sil	= true end
@@ -754,7 +754,7 @@ function repair_dialog:DrawCurRemItem(de_item, x, y)
 	local sect_addon
 	local has_gl, has_scope, has_sil = false, false, false
 
-	if de_item:is_weapon() then
+	if de_item:is_weapon_magazined() then
 		if ogse_wpn_utils.get_grenade_launcher_status( de_item )== 2 and ogse_wpn_utils.get_grenade_launcher_flag( de_item ) then has_gl	= true end
 		if ogse_wpn_utils.get_scope_status( de_item )			== 2 and ogse_wpn_utils.get_scope_flag( de_item )			 then has_scope	= true end
 		if ogse_wpn_utils.get_silencer_status( de_item )		== 2 and ogse_wpn_utils.get_silencer_flag( de_item )		 then has_sil	= true end

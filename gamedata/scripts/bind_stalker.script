@@ -390,9 +390,7 @@ function actor_binder:on_item_take(obj)
 
 	ogse_debug.process_actor("itm_t", 2)
 	
-	local need_return = check_pickup_fake_gren(obj, sobj)
-	
-	if need_return then
+	if check_pickup_fake_gren(obj, sobj) then
 		ogse_debug.process_actor("itm_t", 0)
 		return
 	end
@@ -528,11 +526,13 @@ function actor_binder:update(delta)
 	
 	ogse_debug.process_actor("upd", 14)
 	_sdata.vis_int()
-------------------------------------------------------
+
 	ogse_debug.process_actor("upd", 15)
 	self.am:call("on_update", delta)	
+	event("actor_update"):trigger({delta = delta})
+
+--=====================================================================================================
 	if update_was_never_called then
---==================================================================
 		for k, v in pairs(xr_companion.companions) do
 			if xr_companion.companions[k] == "companion" then
 				if not ogse_car_control.current_car then
@@ -551,14 +551,15 @@ function actor_binder:update(delta)
 		if not has_alife_info("level_changer_icons") then
 			self.object:give_info_portion("level_changer_icons")
 		end
+
 		ogse_lc_mngr.lc_restore_location()
---==================================================================
+
 		ogse_debug.process_actor("upd", 16)
 		self.am:call("on_first_update")
 		update_was_never_called = false
 	end
-	event("actor_update"):trigger({delta = delta})
------------------------------------------------------
+--=====================================================================================================
+
 	ogse_debug.process_actor("upd", 18)
 	dunin_ammo.on_update() --Обновление упаковщика патронов -- должно быть предпоследним на апе актора!
 	

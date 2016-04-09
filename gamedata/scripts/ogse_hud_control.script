@@ -56,7 +56,7 @@ function update_hud_control() --Собственно, управление эл�
 	if not db.actor:alive() then return end
 
 	local act_it = db.actor:active_item() --Проверяем что в руках у актора
-	if act_it and act_it:is_weapon() and check_sniper(act_it) then --Если в руках оружие с оптикой и актор целится в него
+	if act_it and act_it:is_weapon_magazined() and check_sniper(act_it) then --Если в руках оружие с оптикой и актор целится в него
 		if show_indicators then
 			level.hide_indicators() --убираем худ
 			show_indicators = false
