@@ -517,7 +517,6 @@ function timer_new:save(packet)
 	packet:w_stringZ(self.action)
 end
 function timer_new:taction()
-	log1("timer_new: Timer ending. Ekshn doing: __do_timer_action("..self.name..","..self.action..")")
 	__do_timer_action(self.name,self.action)
 end
 
@@ -525,12 +524,10 @@ function start_timer(name,delay,action)
 	if not delay then return end
 	if not action then action = "" end
 
-	log1("timer_new: Timer in real time starting: "..tostring(name.."_"..action.."_"..delay))
 	local t = timer_new(tostring(name.."_"..action.."_"..delay)) --Нужно сложное имя, чтобы не было повторов в названиях таймеров
 	t:set_data(name,action)
 	t:set_delay(delay)
 	t:start()
-	log1("timer_new: Timer Started!")
 end
 
 function g_start_timer(name,delay_d,delay_h,delay_m,action)
@@ -539,12 +536,10 @@ function g_start_timer(name,delay_d,delay_h,delay_m,action)
 
 	local delay_general = delay_d * 24 * 3600 + delay_h * 3600 + delay_m * 60 --переводим в секунды
 
-	log1("timer_new: Timer in game time starting: "..tostring(name.."_"..action.."_"..delay_general))
 	local t = timer_new(tostring(name.."_"..action.."_"..delay_general)) --Нужно сложное имя, чтобы не было повторов в названиях таймеров
 	t:set_data(name,action)
 	t:set_gdelay(delay_general)
 	t:start()
-	log1("timer_new: Timer starting!")
 end
 
 local selector = {
@@ -1033,9 +1028,6 @@ function __do_timer_action(select_string, params_string)
 	local action = selector[select_string]
 	if action ~= nil then
 		action(params_string)
-	else
-		send_tip("ERROR!!! Wrong select string!!! [%s] [%s]", select_string, params_string)
-		log3("ERROR!!! Wrong select string!!! [%s] [%s]", select_string, params_string)
 	end
 end
 --****************************************ТАЙМЕРЫ - КОНЕЦ.*************************************************
@@ -1232,8 +1224,6 @@ function load_variable(variable_name, value_if_not_found)
 	elseif value_if_not_found ~= nil then
 		return value_if_not_found
 	else
-		log3("!!!ОШИБКА!!! ПЕРЕМЕННАЯ: ogse."..tostring(variable_name).." НЕ НАЙДЕНА В ХРАНИЛИЩЕ И value_if_not_found = nil !!!")
-		send_tip("!!!ОШИБКА!!! ПЕРЕМЕННАЯ: ogse."..tostring(variable_name).." НЕ НАЙДЕНА В ХРАНИЛИЩЕ И value_if_not_found = nil !!!")
 		return nil
 	end
 end

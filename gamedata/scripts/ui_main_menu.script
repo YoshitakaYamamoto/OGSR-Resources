@@ -403,125 +403,33 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 			end
 		end
 		
-	--/* Для универсализации, вызов скрипта персонального.
-	-- запускается без проверки alife, ввиду некоторых оссобеностей функциональной проверки в игре, так-же удален выход из главного меню, ввиду возможной специфики проводимых тестов.  */
+-----------------------------------------------------------
 		if dik == DIK_keys.DIK_N then
 			self.personal_test()
 		end
-	--// Phoenix
-
-		--[[if dik == DIK_keys.DIK_F6 then
-			if level.present() and (db.actor ~= nil) and db.actor:alive() then
-				cmd("main_menu", "off")
-				device():pause(true)
-				cmd("save", "pseudoquicksave")
-				device():pause(false)
-			end
-		end
-
-		if dik == DIK_keys.DIK_F7 then
-			if ui_load_dialog.file_exist("pseudoquicksave.sav") then
-				if (alife() == nil) then
-					cmd("disconnect")	
-					cmd("start", "server(" .. "pseudoquicksave" .. "/single/alife/load) client(localhost)")	
-				else
-					cmd("load", "pseudoquicksave")
-				end
-			end
-		end
-
-		if dik == DIK_keys.DIK_F8 then
-			if level.present() and (db.actor ~= nil) and db.actor:alive() then
-				cmd("main_menu", "off")
-				device():pause(true)
-				cmd(string.format("save pqs_%s_%02d_%02d_%02d", 
-					level.name(),
-					level.get_time_days(),
-					level.get_time_hours(),
-					level.get_time_minutes()))
-				device():pause(false)
-			end
-		end]]
-------------KRodin: разблокирован тестовый спавн---------
-		--[[if dik == DIK_keys.DIK_S then
+-----------------------------------------------------------
+--[[--------------------Тестовый спавн---------------------
+		if dik == DIK_keys.DIK_S then
 			self:test_spawn()
 			cmd("main_menu", 0)
-		end]]
----------------------------------------------------------
-
---// Читерские, тестовые вызовы.
---[[		if level.present() and db.actor and db.actor:alive() then
-			-- Управление ходом игрового времени
-			if dik == DIK_keys.DIK_NUMPAD1 then
-				dec_time()
-			elseif dik == DIK_keys.DIK_NUMPAD2 then
-				ret_time()
-			elseif dik == DIK_keys.DIK_NUMPAD3 then
-				acc_time()
-			
-			-- Тестовый спавн
-			elseif dik == DIK_keys.DIK_S then
-					self:test_spawn()
-					cmd("main_menu", 0)
-			
-			-- Показать текущие координаты
-			else]]
-
-			if dik == DIK_keys.DIK_F3 then
-				self:main_cheat_f3() end
-
-			--[[
-			-- Стать зомбированным
-			elseif dik == DIK_keys.DIK_Z then
-				dialogs.actor_set_zombied(actor, npc)
-				]]
-			--[[else]]
-
-			if dik == DIK_keys.DIK_P then
-				if _sdata.GlobalEnable == false then
-					_sdata.GlobalEnable = true
-				else
-					_sdata.GlobalEnable = false
-					_sdata.switch_off()
-				--_sdata.GlobalEnable = not _sdata.GlobalEnable --почему-то это перестало работать...
-			end end
-
-			--[[
-			-- Очистить комьюнити
-			elseif dik == DIK_keys.DIK_X then
-				dialogs.actor_clear_community(actor, npc)
-			
-			-- Запустить пси-выброс
-			elseif dik == DIK_keys.DIK_H then
-				horror_time.horror_begin()
-			
-
-			-- Открыть все нестандартные переходы
-			elseif dik == DIK_keys.DIK_U then
-				ogse_lc_mngr.lc1_agr_esc()
-				ogse_lc_mngr.lc2_yan_agr() 
-				ogse_lc_mngr.lc3_mil_ros()
-				ogse_lc_mngr.lc4_mil_val()
-				ogse_lc_mngr.lc5_yan_val_rad()
-				ogse_lc_mngr.lc6_esc_dscape()
-				ogse_lc_mngr.lc7_aes_pripyat()]]
-			--[[end	
-		else 
-			--log1("Game not start or actor died")
-		end]]
-
-	-- Быстрый выход из игры по клавише "Q"
---[[
-		if dik == DIK_keys.DIK_Q then
-			self:OnMessageQuitWin()
 		end
-		if dik == DIK_keys.DIK_W then
-			--news_manager.send_tip(db.actor, jekan_work.check_anom_house_items(), nil, nil, 30000)
-			jekan_work.krot_ammo_box_st()
-		end]]
-		
+--]]-------------------------------------------------------
+----------------Показать текущие координаты----------------
+		if dik == DIK_keys.DIK_F3 then
+			self:main_cheat_f3()
+		end
+-----------------------------------------------------------
+--------------------------SDATA----------------------------
+		if dik == DIK_keys.DIK_P then
+			if _sdata.GlobalEnable == false then
+				_sdata.GlobalEnable = true
+			else
+				_sdata.GlobalEnable = false
+				_sdata.switch_off()
+			end
+		end
+-----------------------------------------------------------
 	end
-   
 	return true
 end
 

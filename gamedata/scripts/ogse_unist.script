@@ -226,7 +226,7 @@ function on_load()
 		ASSERT(ready, "[ogse_unist.on_load] cannot load game_id. Check the logic!")
 	end
 	--ASSERT(ready, "ogse_unist.on_init: storage was not succesfully created")
-	ogse_unist.print_storage()
+	ogse_unist.print_storage_usage()
 end
 
 function on_save(--[[packet]]) -- аргумент не используем

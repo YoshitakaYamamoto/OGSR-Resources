@@ -636,8 +636,6 @@ function actor_binder:save(packet)
 	task_manager.save(packet)
 	sr_psy_antenna.save(packet)
 
-	log1("~~Actor netpacket size "..packet:w_tell())
-
 	self.am:call("on_save", packet)
 	event("actor_save"):trigger({packet = packet})
 	self.am:call("on_save_after_all")

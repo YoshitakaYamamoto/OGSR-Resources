@@ -290,9 +290,6 @@ function musicbox_base:onUpdate()
 			self.time_1000 = current_time + 1000
 			---------------------------
 		elseif self.checkedPlayAll then
-			if not self.play_all then --нужно для вывода в лог, чтобы отследить ситуации, при которых именно self.play_all == nil. В будущем - удалить этот кусок кода.
-				log1("!!! MBOX: self.play_all is nil!!!")
-			end
 			if not self.play_all or (coroutine.status(self.play_all) == 'dead') then --Если вдруг, self.play_all == nil или подпрограмма перестала работать (ОЧЕНЬ редкие баги)
 				log1("!!! MBOX: self.play_all is nil or coroutine is dead!!!")
 				ogse.send_tip("Произошла ошибка, необходимо перезапустить проигрывание музыки!", "МУЗЫКАЛЬНЫЙ АВТОМАТ", nil, 40) --Сообщим об ошибке
