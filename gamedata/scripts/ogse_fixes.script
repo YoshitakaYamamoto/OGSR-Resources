@@ -56,4 +56,20 @@ function del_buggy_mapspots() --Удаление глючных меток с к
 	and db.actor:object("quest_btr_keys") then
 		ogse.remove_inv_items_by_section("quest_btr_keys", 1) --удаляем ключ от БТРа из инвентаря актора (который почему-то вовремя не удалился)
 	end
+	if has_alife_info("pri_stadium_reached")
+	and level_tasks.is_map_spot_present(story_ids.pri_stadium_entrance, "green_location") then
+		level_tasks.remove_location_by_sid(story_ids.pri_stadium_entrance, "green_location") --Вечная метка "Найти выход на ЧАЭС"
+	end
+	if has_alife_info("aes_found_sarcofag")
+	and level_tasks.is_map_spot_present(story_ids.aes_sarcofag, "green_location") then
+		level_tasks.remove_location_by_sid(story_ids.aes_sarcofag, "green_location") --Вечная метка "Вход в Саркофаг"
+	end
+	if has_alife_info("sar_enter_command_center")
+	and level_tasks.is_map_spot_present(story_ids.sar_monolith, "green_location") then
+		level_tasks.remove_location_by_sid(story_ids.sar_monolith, "green_location") --Вечная метка "Исполнитель желаний"
+	end
+	if has_alife_info("sar_finish_decoding")
+	and level_tasks.is_map_spot_present(story_ids.sar_secret_door, "green_location") then
+		level_tasks.remove_location_by_sid(story_ids.sar_secret_door, "green_location") --Вечная метка на кодовую дверь в саркофаге
+	end
 end
