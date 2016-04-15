@@ -19,19 +19,13 @@ local aiming_complete = false --нужно для правильного "нае
 local sm = ogse_signals.get_mgr() --Вызов менеджера сигналов
 
 function check_keys(key, bind) --Проверка нажатия клавиш
-	if bind ~= key_bindings.kWPN_ZOOM
-	or level.main_input_receiver() then
-		return
-	end
+	if bind ~= key_bindings.kWPN_ZOOM or level.main_input_receiver() then return end
 
 	need_sniper_check = true
 end
 
 function check_keys_free(key, bind) --Проверка отпускания клавиш
-	if bind ~= key_bindings.kWPN_ZOOM
-	or level.main_input_receiver() then
-		return
-	end
+	if bind ~= key_bindings.kWPN_ZOOM or level.main_input_receiver() then return end
 
 	need_sniper_check = false
 end
@@ -44,7 +38,7 @@ function check_sniper(wpn) --Проверка, смотрит ли актор в
 		return false --возвращаем false и на этом заканчиваем
 	end
 
-	if wpn:is_binoculars() then return true end --Если в руках оружие на классе бинокля, то возвращаем true и на этом заканчиваем
+	if wpn:clsid() == clsid.wpn_binocular_s then return true end --Если в руках оружие на классе бинокля, то возвращаем true и на этом заканчиваем
 
 	local scope = ogse_wpn_utils.get_scope_flag(wpn) --Есть ли на оружии прицел (true/false)
 	local gl_mode = false
