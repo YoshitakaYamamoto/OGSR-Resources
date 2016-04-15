@@ -2,7 +2,7 @@
 ------------------------- Copyright 2007-2008 DEXXX ---------------------------
 ------------------------- Copyright 2009-2013 OGSETeam ------------------------
 
-local body_counter = 0
+--local body_counter = 0
 
 -- Создание "убийственной зоны" на радаре
 function check_radar_off()
@@ -31,7 +31,7 @@ end
 
 -- Удаление трупов в Припяти во фриплее
 function clean_level()
-	if has_alife_info("pri_what_the_fuck") and level.name()=="l11_pripyat" and body_counter == 0 then 
+	if has_alife_info("pri_what_the_fuck") and level.name()=="l11_pripyat" --[[and body_counter == 0]] then 
 		for k, v in pairs(db.creature) do
 			local obj = level.object_by_id(k)
 			if obj and not obj:alive() then
@@ -41,7 +41,7 @@ function clean_level()
 				end
 			end
 		end
-		body_counter = 1
+		--body_counter = 1
 	end
 end
 
