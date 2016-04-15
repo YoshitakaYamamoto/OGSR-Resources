@@ -72,4 +72,19 @@ function del_buggy_mapspots() --Удаление глючных меток с к
 	and level_tasks.is_map_spot_present(story_ids.sar_secret_door, "green_location") then
 		level_tasks.remove_location_by_sid(story_ids.sar_secret_door, "green_location") --Вечная метка на кодовую дверь в саркофаге
 	end
+
+	if has_alife_info("freeplay") then
+		if level_tasks.is_map_spot_present(story_ids.warlab_dolg_commander, "green_location") then
+			level_tasks.remove_location_by_sid(story_ids.warlab_dolg_commander, "green_location") --Вечная метка на командира отряда Долга на Генераторах
+		end
+		if level_tasks.is_map_spot_present(story_ids.warlab_freedom_commander, "green_location") then
+			level_tasks.remove_location_by_sid(story_ids.warlab_freedom_commander, "green_location") --Вечная метка на командира отряда Свободы на Генераторах
+		end
+		if level_tasks.is_map_spot_present(story_ids.warlab_heli_commander, "green_location") then
+			level_tasks.remove_location_by_sid(story_ids.warlab_heli_commander, "green_location") --Вечная метка на ударную группу вертолётов на Генераторах
+		end
+		if level_tasks.is_map_spot_present(story_ids.warlab_secret_entrance, "green_location") then
+			level_tasks.remove_location_by_sid(story_ids.warlab_secret_entrance, "green_location") --Вечная метка на дренажную трубу комплекса на Генераторах
+		end
+	end
 end
