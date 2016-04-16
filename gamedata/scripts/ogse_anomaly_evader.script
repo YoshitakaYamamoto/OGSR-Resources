@@ -306,7 +306,10 @@ function evaluator_anomaly:evaluate()
 	
 	local profile = self.npc:profile_name()
 	local name = self.npc:name()
-	if excluded_npc[profile] or excluded_npc[name] or excluded_comms[self.npc:character_community()] then
+	if excluded_npc[profile] or excluded_npc[name] 
+	or excluded_comms[self.npc:character_community()] 
+	or xr_companion.is_companion(nid)
+	then
 		return false
 	end		
 	

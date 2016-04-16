@@ -134,6 +134,9 @@ end
 function act_state_mgr_animation_start:initialize()
 	action_base.initialize(self)
 	ogse_debug.add_active_anim( self.object, "start["..tostring(state_lib.states[self.st.target_state].animation).."]" )
+	if state_lib.states[self.st.target_state].animation == nil then
+		write_log_3(self.object, "~~STMGR: WARNING NIL START %s", utils.to_str(self.st.target_state))
+	end
 	self.st.animation:set_state(state_lib.states[self.st.target_state].animation)
 end
 function act_state_mgr_animation_start:execute()
@@ -150,6 +153,9 @@ end
 function act_state_mgr_animation_reset:initialize()
 	action_base.initialize(self)
 	ogse_debug.add_active_anim( self.object, "reset["..tostring(state_lib.states[self.st.target_state].animation).."]" )
+	if state_lib.states[self.st.target_state].animation == nil then
+		write_log_3(self.object, "~~STMGR: WARNING NIL RESET %s", utils.to_str(self.st.target_state))
+	end	
 	self.st.animation:set_state(state_lib.states[self.st.target_state].animation, true)
 	self.st.reset_state = false
 end
@@ -265,7 +271,9 @@ function animation:set_state(id, reset)
 					if a then 
 						if a.out then
 							anima = self:anim_for_slot(wpn_slot,a.out)
+							write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_out_2DA ["..tostring(anima).."] slot ["..tostring(wpn_slot).."]")
 							if anima then
+								write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2DE")
 								add_anim(self.npc, anima, true)							
 							end
 						end
@@ -279,16 +287,20 @@ function animation:set_state(id, reset)
 			local a = state_mgr_animation_list.animations[self.states.target_state]
 			if a.out ~= nil then
 				anima = self:anim_for_slot(wpn_slot, a.out)
+				write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_out_2EA slot ["..tostring(wpn_slot).."]")
 				if anima then
 					if type(anima) == "table" then
 						for k,v in pairs(anima) do
 							if type(v) == "table" then
+								write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2EA1")
 								self:set_anim_callback(v)
 							else
+								write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2EA2")
 								add_anim(self.npc, v, true)
 							end
 						end
 					else
+						write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2EA3")
 						add_anim(self.npc, anima, true)
 					end
 					nn = nn +1
@@ -307,6 +319,7 @@ function animation:set_state(id, reset)
 			local t = self.npc:object(k)
 			if t then
 				if v.mode == "attach" then
+					write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_3DETACH")
 					t:enable_attachable_item(false)
 				end
 			end
@@ -331,6 +344,7 @@ function animation:set_state(id, reset)
 					if type(v) == "table" then
 						self:set_anim_callback(v)
 					else
+						write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5A ["..tostring(v).."]")
 						add_anim(self.npc, v, true)
 					end
 				end
@@ -352,6 +366,7 @@ function animation:set_state(id, reset)
 		if a.idle ~= nil then
 			anima = self:anim_for_slot(wpn_slot,a.idle)
 			if anima then
+				write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5C ["..tostring(anima).."]")
 				add_anim(self.npc, anima, true)
 			end
 			nn = nn + 1
@@ -359,7 +374,7 @@ function animation:set_state(id, reset)
 			-- Для политкорректности просим анимстейт отыграть свою айдловую анимацию
 			self.mgr.animstate:add_idle_animation()
 		end
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5C")
+		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5CA")
 	else
 		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5D")
 		-- Для политкорректности просим анимстейт отыграть свою айдловую анимацию
@@ -672,7 +687,19 @@ function animation:callback_init(recall)
 		   self.mgr.callback.begin == nil
 		then
 				self.mgr.callback.begin = time_global()
-				write_log_3(self.npc, "~~STMGR: 		Callback initialized %s", time_global())				
+				write_log_3(self.npc, "~~STMGR: 		Callback initialized %s", time_global())
+		else
+			if not self.mgr.callback then
+				write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_callback_not_init_1 [nil]")
+			else
+				if not self.mgr.callback.func then
+					write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_callback_not_init_2 [nil]")
+				end
+			end
+			write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_callback_not_init_3 ["..tostring(recall).."]")
+			if self.mgr.callback and self.mgr.callback.begin then
+				write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_callback_not_init_4 ["..tostring(self.mgr.callback.begin).."]")
+			end
 		end
 end
 --' обработка колбека на время

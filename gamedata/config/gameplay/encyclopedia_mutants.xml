@@ -18,11 +18,21 @@
         <texture>ui_npc_monster_zombie_rusty</texture>
         <text>enc_mutant_zombie_rusty</text>
     </article>
+	
+    <article id="enc_zombie_rusty" name="Zombie_plague" group="Mutants">
+        <texture>ui_npc_monster_zombie_plague</texture>
+        <text>enc_mutant_zombie_plague</text>
+    </article>	
 
     <article id="mutant_zombie_plague" name="Zombie_plague" group="Mutants">
         <texture>ui_npc_monster_zombie_plague</texture>
         <text>enc_mutant_zombie_plague</text>
     </article>
+	
+    <article id="enc_zombie_plague" name="Zombie_plague" group="Mutants">
+        <texture>ui_npc_monster_zombie_plague</texture>
+        <text>enc_mutant_zombie_plague</text>
+    </article>	
 
     <!--CHIMERA-->
 

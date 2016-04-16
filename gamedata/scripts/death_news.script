@@ -151,7 +151,7 @@ function on_stalker_death(victim_, killer_)
 	local m_string = m_name..s_comm..". "..m_level.."."
 	if total_debug == true then printf("Сообщения о смерти. Сообщение сгенерировано, можно выдавать.") end
 	
-	local news_text = "%c[255,160,160,160]".."Погиб сталкер:".."\\n".."%c[default]"..m_string
+	local news_text = "%c[255,160,160,160]"..game.translate_string("stalker_is_dead_news_string").."\\n".."%c[default]"..m_string
 	-- db.actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(0,658,83,47), 7000, 5000)
 	-- это не нужно, это будет из амк_news
 	

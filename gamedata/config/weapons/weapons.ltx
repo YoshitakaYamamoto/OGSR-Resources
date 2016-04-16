@@ -176,23 +176,29 @@ wm_size         = 0.05
 
 ;------------------------------
 ;фейк-боеприпас для бинокля
-[ammo_binoc_dummy]:ammo_base
+[ammo_binoc_01_dummy]:ammo_base
 $spawn			= "weapons\ammo\ammo_binoc_dummy" ; option for Level Editor
 description		= binocular
 
 cost			= 0
 box_size		= 0
 
-inv_name		= binocular
-inv_name_short	= binocular
+inv_name		= addon_bino
+inv_name_short	= addon_bino_s
 inv_weight		= 0.1
 
 inv_grid_width	= 2
 inv_grid_height	= 1
-inv_grid_x		= 16
-inv_grid_y		= 8
+inv_grid_x		= 74
+inv_grid_y		= 10
 
 wm_size         = 0.01
+
+[ammo_binoc_02_dummy]:ammo_binoc_01_dummy
+inv_grid_x		= 16
+inv_grid_y		= 8
+inv_name		= addon_bino_nv
+inv_name_short	= addon_bino_nv_s
 
 ;фейк-боеприпас для бинокля ТЧ
 ;[ammo_binocular_dummy]:ammo_binoc_dummy

@@ -1,4 +1,4 @@
-; Охотничий нож
+; Штык модели 6Х4
 ;--------------------------------------
 [wpn_knife]:identity_immunities
 GroupControlSection			= spawn_group
@@ -144,7 +144,7 @@ inv_name			= st_knife_m1
 inv_name_short		= st_knife_m1
 inv_grid_x			= 21
 inv_grid_y			= 3
-hud				    = wpn_knife_hud
+hud				    = wpn_knife_m1_hud
 hit_power                	= 1.7
 hit_impulse		         	= 10
 hit_type				 	= wound
@@ -153,6 +153,10 @@ hit_impulse_2	         	= 5
 hit_type_2				 	= wound
 
 ;fake_item_section			= fake_wpn_knife_m1
+
+[wpn_knife_m1_hud]:wpn_knife_hud
+;visual              = weapons\knife\wpn_knife_m1_hud.ogf
+
 
 ;монтировка Фримена
 [wpn_montirovka]:wpn_knife
@@ -234,57 +238,6 @@ anim_shoot1_start	= attack1_1_start
 anim_shoot2_start	= attack1_1_start
 anim_shoot1_end		= attack1_2_end
 anim_shoot2_end		= attack1_2_end
-anim_idle_sprint	= idle
-
-
-[wpn_machete]:wpn_montirovka
-visual				= weapons\swmt\machete\wpn_machete_world.ogf
-
-description			= "Обычное мачете"
-
-inv_name			= "Мачете"
-inv_name_short		= "Мачете"
-
-inv_grid_width		= 4
-inv_grid_height		= 1
-inv_grid_x			= 13
-inv_grid_y			= 40
-
-hud				    = wpn_machete_hud
-
-
-hit_power                	= 1.8
-hit_impulse		         	= 5
-hit_type				 	= wound
-
-hit_power_2                	= 1.8
-hit_impulse_2	         	= 5
-hit_type_2				 	= wound
-
-fire_distance            	= 3.2
-
-;ОПРЕДЕЛЕНИЕ РАСПОЛОЖЕНИЯ В ПРОСТРАНСТВЕ ОТНОСИТЕЛЬНО РУКИ ПРИ ВЗГЛЯДЕ СО СТОРОНЫ
-position                 	= -0.031, -0.078, 0.030
-
-;НА СКОЛЬКО ПОВЕРНУТ САМ ОБЪЕКТ ПРИ ВЗГЛЯДЕ СО СТОРОНЫ
-orientation              	= 0,90,0
-
-[wpn_machete_hud]
-shell_point			= 0.0, 0.0, 0.0
-fire_point          = 0.05, 0.0, 0.1
-fire_bone           = wpn_body
-
-orientation             = 0, 0, 0		
-position                = 0.0,0.0,0.0 ; первая влево\вправо ; вторая вверх\вниз ;третья fov 0, 0, 0	
-visual              = weapons\swmt\machete\wpn_machete_hud.ogf
-
-anim_idle			= idle
-anim_draw			= draw
-anim_hide			= holster
-anim_shoot1_start	= attack_1_start
-anim_shoot2_start	= attack_1_start
-anim_shoot1_end		= attack_2_end
-anim_shoot2_end		= attack_2_end
 anim_idle_sprint	= idle
 
 [fake_wpn_knife]:identity_immunities

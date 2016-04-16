@@ -1,146 +1,141 @@
-; јвтомат специальный ј— "¬ал" (6ѕ30)
+;--------------------------------------
+; автомат специальный ј— "¬јЋ" (6ѕ30)
 ;--------------------------------------
 [wpn_val]:identity_immunities,base_wpn_zoom
-GroupControlSection			= spawn_group
-discovery_dependency 		= 
-$spawn                  	= "weapons\val"					; option for Level Editor
-$npc			 			= on				; option for Level Editor
-$prefetch 					= 8
-scheduled            		= off              ; option for ALife Simulator
-cform                		= skeleton
-class                		= WP_VAL
-min_radius		= 0
-max_radius					= 150
-description					= enc_weapons1_wpn-val
+GroupControlSection		= spawn_group
+discovery_dependency		= 
+$spawn				= "weapons\val"					; option for Level Editor
+$npc				= on						; option for Level Editor
+$prefetch			= 8
+scheduled			= off						; option for ALife Simulator
+cform				= skeleton
+class				= WP_VAL
+min_radius			= 0
+max_radius			= 150
+description			= enc_weapons1_wpn-val
 
-ef_main_weapon_type			= 2
-ef_weapon_type				= 6
+ef_main_weapon_type		= 2
+ef_weapon_type			= 6
 
 ;-----------------------------------------------------------------------------------
-holder_range_modifier	= 1.0
+holder_range_modifier		= 1.0
 holder_fov_modifier		= 1.0
 ;-----------------------------------------------------------------------------------
 
-cost		 	 			= 7900
-weapon_class				= assault_rifle
+cost				= 12200
+weapon_class			= assault_rifle
 
-ammo_elapsed				= 20
-ammo_mag_size				= 20
-ammo_class		 			= ammo_9x39_pab9, ammo_9x39_ap  
-fire_modes					= 1, -1
-		
-hand_dependence		 		= 1
-single_handed				= 0
-	
-slot 				 		= 2		; // secondary
-animation_slot		 		= 2		; type of the animation that will be used
+ammo_elapsed			= 20
+ammo_mag_size			= 20
+ammo_class			= ammo_9x39_pab9, ammo_9x39_ap  
+fire_modes			= 1, -1
 
-inv_name	         		= wpn-val
-inv_name_short		 		= wpn-val
-inv_weight		 			= 2.66
+inv_name			= wpn-val
+inv_name_short			= wpn-val
+inv_weight			= 2.5
 
-inv_grid_width				= 5
-inv_grid_height				= 2
-inv_grid_x					= 0
-inv_grid_y					= 26
+inv_grid_width		= 5
+inv_grid_height		= 2
+inv_grid_x		= 0
+inv_grid_y		= 26
 
-kill_msg_x			= 0
-kill_msg_y			= 154
+kill_msg_x		= 0
+kill_msg_y		= 154
 kill_msg_width		= 78
 kill_msg_height		= 21
 
+hand_dependence			= 1
+single_handed			= 0
+	
+slot				= 2						; // secondary
+animation_slot			= 2						; type of the animation that will be used
+
 ;-----------------------------------------------------------------------------------
 ;базова€ дисперси€
-fire_dispersion_base		= 0.14	;угол (в градусах) базовой дисперсии оружи€ (оружи€ зажатого в тисках)
-control_inertion_factor		= 1.04f
-disp_rate 			= 1.75
+fire_dispersion_base			= 0.12		;угол (в градусах) базовой дисперсии оружи€ (оружи€ зажатого в тисках)
+control_inertion_factor			= 1.04f
+disp_rate				= 1.75
 
-;отдача
-cam_relax_speed         	= 5	;скорость возврата в исходное положение
-cam_relax_speed_ai        	= 120.75
-cam_dispersion          	= 0.3	;увеличени€ угла (в градусах) с каждым выстрелом
-cam_dispersion_inc		= 0.05	;увеличениe cam_dispersion с каждым выстрелом
-cam_dispertion_frac		= 1.0	;ствол будет подыматьс€ на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
-cam_max_angle			= 7.0	;максимальный угол отдачи
-cam_max_angle_horz		= 10.0	;(degree) maximum shot horizontal degree 
-cam_step_angle_horz		= 0.5;0.4	;(degree) size of step camera moved in horizontal position while shooting
-
-fire_dispersion_condition_factor = 4.2	;увеличение дисперсии в процентах при максимальном износе 
-misfire_probability 	= 0.002	;веро€тность осечки при максимальном износе 
-misfire_condition_k		= 0.05
-condition_shot_dec 		= 0.0003 ;увеличение износа при каждом выстреле
+cam_relax_speed				= 5		;скорость возврата в исходное положение
+cam_relax_speed_ai			= 120.75
+cam_dispersion				= 0.3		;увеличени€ угла (в градусах) с каждым выстрелом
+cam_dispersion_inc			= 0.05		;увеличениe cam_dispersion с каждым выстрелом
+cam_dispertion_frac			= 1.0		;ствол будет подыматьс€ на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+cam_max_angle				= 7.0		;максимальный угол отдачи
+cam_max_angle_horz			= 10.0		;(degree) maximum shot horizontal degree 
+cam_step_angle_horz			= 0.5;0.4	;(degree) size of step camera moved in horizontal position while shooting
+fire_dispersion_condition_factor	= 4.2		;увеличение дисперсии в процентах при максимальном износе 
+misfire_probability			= 0.002		;веро€тность осечки при максимальном износе 
+misfire_condition_k			= 0.05
+condition_shot_dec			= 0.00021 	;увеличение износа при каждом выстреле
 ;-----------------------------------------------------------------------------------
 
+direction			= 0, 0, 1
 
-direction            	    = 0, 0, 1
+fire_point			= 0.000, 0.127, 0.570
 
-fire_point           	    = 0.0, 0.174, 0.562
+smoke_particles			= weapons\generic_shoot_00
 
-smoke_particles				= weapons\generic_shoot_00
+shell_point			= 0.000, 0.127, 0.100
+shell_dir			= 0.0, 1.0, 0.0
+shell_particles			= weapons\arsenal_shells1
 
-shell_point		 			= 0.0, 0.174, 0.078
-shell_dir		 			= 0.0, 1.0, 0.0
-shell_particles	 			= weapons\generic_shells
-
-PDM_disp_base 			= 1.2
-PDM_disp_vel_factor 		= 1.2
-PDM_disp_accel_factor 		= 1.2
-PDM_crouch	 		= 1.0
-PDM_crouch_no_acc 		= 1.0
+PDM_disp_base			= 1.2
+PDM_disp_vel_factor		= 1.2
+PDM_disp_accel_factor		= 1.2
+PDM_crouch			= 1.0
+PDM_crouch_no_acc		= 1.0
 
 ; ttc
-hit_power        	= 0.73
+hit_power			= 0.80
 hit_impulse		 	= 25
 hit_type 			= fire_wound
 hit_rate			= 1.95
-
-fire_distance   	    = 250
-bullet_speed			= 370	;начальна€ скорость пули (реальна€ скорость 290 м/с)
-rpm                     = 700
-rpm_empty_click 		= 400
+fire_distance			= 250
+bullet_speed			= 290						;начальна€ скорость пули (реальна€ скорость 290 м/с)
+rpm				= 900
 ; end ttc
 
-use_aim_bullet			= false			;ѕоддерживаетс€ ли перва€ суппер пул€
-time_to_aim					= 1.0	
+rpm_empty_click 		= 400
 
-hud             	        = wpn_val_hud
-normal          	        = 0, 1, 0
+use_aim_bullet			= false						;ѕоддерживаетс€ ли перва€ суппер пул€
+time_to_aim			= 1.0	
 
-;----------------------------------------------------------
-position        	        = -0.026, -0.131, 0.0
-orientation     	        = 0, 0, 0
+hud				= wpn_val_hud
+normal				= 0, 1, 0
+position			= -0.026, -0.084, 0.000
+orientation			= 0, 0, 0
 
 ;--STRAP PARAMETERS-----------------------------------------------------------------
-;под мишкой
-strap_position         		= -0.26,-0.11,0.25			; position (offset) and orientation of the weapon when it is strapped
-strap_orientation      		= -15,-9,110				; (3rd person view in degrees)
-strap_bone0					= bip01_spine2
-strap_bone1					= bip01_spine1
+strap_position			= -0.13, -0.27, 0.12				; position (offset) and orientation of the weapon when it is strapped
+strap_orientation		= -5, 0, 0					; (3rd person view in degrees)
+strap_bone0				= bip01_spine2
+strap_bone1				= bip01_spine1
 
-visual          	        = weapons\val\wpn_val.ogf
+visual				= weapons\val\wpn_val.ogf
 
-light_disabled				= true
+light_disabled			= true
 
 ;addons
-scope_status			= 0
+scope_status			= 2
 silencer_status			= 1
-grenade_launcher_status	= 0
+grenade_launcher_status		= 0
 
 zoom_enabled			= true
 
-scope_name 			= wpn_addon_scope
-scope_x 			= 37						; offset in inventory icon
-scope_y 			= 0
-;------------------------------ O.G.S.E. sound remake -----------------------
-;звуки
+scope_name					= wpn_addon_scope
+scope_x						= 62				; offset in inventory icon
+scope_y						= 5
+
+;------------------------------ O.G.S.E. sound remake ------------------------
 snd_draw					= weapons\val\val_draw
 snd_holster					= weapons\generic_rifle_holster
-snd_shoot					= weapons\val\val_shoot      
+snd_shoot					= weapons\val\val_shoot
 snd_shoot1					= weapons\val\val_shoot1
-snd_shoot2					= weapons\val\val_shoot2
-snd_shoot3					= weapons\val\val_shoot3
+snd_shoot2					= weapons\val\val_shoot
+snd_shoot3					= weapons\val\val_shoot1
 snd_empty					= weapons\val\val_empty
-snd_reload					= weapons\val\val_reload, 1.0, 0.5
+snd_reload					= weapons\val\val_reload, 0.8
 snd_close					= weapons\generic_close
 ;-----------------------------------------------------------------------------
 
@@ -148,49 +143,48 @@ snd_close					= weapons\generic_close
 ;-- HUD DESCRIPTION
 ;-----------------------------------------------------------------------------
 [wpn_val_hud]
-
 allow_inertion			= true
 
-shell_point			= -0.030000, -0.020000, 0.050000
+shell_point			= 0.00, 0.00, -0.90
 shell_dir			= 0.0, 1.0, 0.0
 
-fire_point 	 		= 0.200000, 0.020000, 0.060000
-fire_bone 	 		= wpn_body
+fire_point			= 0.00, 0.01, -0.70
+fire_bone			= muzzle
 
-orientation 			= 4, 2, 0
-position			= 0, 0, 0
-visual 	 			= weapons\val\wpn_val_hud.ogf
+orientation			= 0, 1, 0
+position			= 0.13, -0.06, -0.03
+visual				= weapons\val\wpn_val_hud.ogf
 
-anim_idle			= idle
-anim_reload			= reload
-anim_draw			= draw
-anim_holster			= holster
-anim_shoot			= shoot1
-anim_idle_aim			= idle_aim
-anim_idle_sprint		= idle_sprint
+anim_idle				= idle
+anim_idle_aim				= idle_aim
+anim_reload				= reload
+anim_draw				= draw
+anim_holster				= holster
+anim_shoot				= shoot
+anim_idle_sprint			= idle_sprint
 
 ;-----------------------------------------------------------------------------
 ;смещени€ HUD дл€ режима приближени€
-zoom_offset			= -0.132450,0.054700,-0.080700
-zoom_rotate_x			= 0.058900
-zoom_rotate_y			= 0.086000
-
+zoom_offset			= -0.1338, 0.0418, -0.1000
+zoom_rotate_x			= 0.0020
+zoom_rotate_y			= 0.0015
 ;-----------------------------------------------------------------------------
+
 ;пр€чем перекрестие прицела в зуме
 zoom_hide_crosshair		= true
 
 ;врем€ поворота HUD (сек)
 zoom_rotate_time		= 0.3
-rotate_time			= 0.3
+rotate_time			= 0.2
 
 [wpn_val_repair]
-tech_complication = 500
+tech_complication = 700
 repair_compatibility = val
 
 ;-----------------------------------------------------------------------------
 ;ћодифицированный ¬ал
 ;-----------------------------------------------------------------------------
-[wpn_val_m1]:wpn_val	
+[wpn_val_m1]:wpn_val
 $spawn             				= "weapons\uniq\wpn_val_m1"	
 description						= enc_weapons1_wpn-val_m1
 inv_name						= wpn-val_m1

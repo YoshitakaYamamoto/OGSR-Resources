@@ -428,9 +428,9 @@ function give_knife_to_actor(first_speaker, second_speaker)
 	if not db.actor:object("harmonica_f") then
 		dialogs.relocate_item_section(first_speaker, "harmonica_f", "in")
 	end
-	if not db.actor:object("wpn_binoc") then
-		dialogs.relocate_item_section(first_speaker, "wpn_binoc", "in")
-	end
+--' 	if not db.actor:object("wpn_binoc") then
+--' 		dialogs.relocate_item_section(first_speaker, "wpn_binoc", "in")
+--' 	end
 end
 
 --' Escape bandits factory
