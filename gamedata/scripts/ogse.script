@@ -1297,8 +1297,8 @@ local loot_timer = time_global()
 local buggy_timer = time_global()
 local anom_enum = time_global()
 local mteleport_update_time = time_global()
-local watchdog = 1
-local watchdog_max = 43
+local watchdog = 0
+local watchdog_max = 44
 --------------------------------------------------------------------
 function on_actor_update(delta) --йНКАЩЙ МЮ ЮОДЕИР цц
 ---------------------юодеирш я бшянйхл опхнпхрернл онлеыюрэ ячдю!---------------------
