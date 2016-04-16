@@ -433,37 +433,7 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 	return true
 end
 
-
-k = 1000
-
-function acc_time()
-	t = xr_logic.pstor_retrieve(db.actor, "t", 0)
-	t = t + k
-	level.set_time_factor(t)
-	xr_logic.pstor_store(db.actor, "t", t)
-	news_manager.send_tip(db.actor, "%c[25,240,25,25]Таймфактор увеличен до "..t.."", nil, nil, 20000)
-end
-
-function ret_time()
-	level.set_time_factor(10)
-	xr_logic.pstor_store(db.actor, "t", 0)
-	news_manager.send_tip(db.actor, "%c[0,0,255,25]Таймфактор стандартный", nil, nil, 20000)
-end
-
-function dec_time()
-	t = xr_logic.pstor_retrieve(db.actor, "t", 0)
-	t = t - k
-	if t <= 0 then
-		ret_time()
-	else
-		level.set_time_factor (t)
-		xr_logic.pstor_store(db.actor, "t", t)
-		news_manager.send_tip(db.actor, "%c[255,240,155,25]Таймфактор уменьшен до "..t.."", nil, nil, 20000)
-	end	
-end
-
 -------------------->> CoP style load mod
-
 class "show_start_screen" (ogse_qt.quick_timer)
 function show_start_screen:__init(time)
 	self.counter = 0
