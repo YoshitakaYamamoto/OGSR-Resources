@@ -6,6 +6,40 @@ end
 function on_first_update()
 	del_buggy_objects()
 	del_buggy_mapspots()
+
+	aem_fix() --Удалить по окончании игры нахер! С НИ ЭТО НЕ НУЖНО!
+end
+
+function aem_fix() --Удалить по окончании игры нахер! С НИ ЭТО НЕ НУЖНО!
+	if not ogse.var_exists("AEM_FIX") then
+
+		log1("PRINTING PSTOR - START")
+		print_table_inlog_v2( db.storage[db.actor:id()].pstor )
+		log1("PRINTING PSTOR - END")
+
+		for k, v in pairs( db.storage[db.actor:id()].pstor ) do
+			if string.find(k, "aem") then
+				if db.storage[db.actor:id()].pstor[k] then
+					log3("finded, deleting: [%s]", k)
+					db.storage[db.actor:id()].pstor[k] = nil
+					log1("deleted!")
+				end
+			end
+		end
+
+		for a = 1, 65534 do
+			local obj = alife():object(a)
+			if obj then
+				local wpn_name = obj:name()
+				if string.find(wpn_name, "aem_arny") then
+					log1("!!!release obj!")
+					alife():release(obj,true)
+				end
+			end
+		end
+
+		ogse.save_var("AEM_FIX", true)
+	end
 end
 
 function del_buggy_objects() --Удаление из игры глючных объектов

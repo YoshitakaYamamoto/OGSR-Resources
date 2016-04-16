@@ -8,7 +8,7 @@
 ;--------------------------------------
 ; инфопоршены мода (основные)
 ;--------------------------------------
-[aem_mgr_info]
+[info]
 aem_startup			; мод инициализирован
 aem_open			; арена открыта
 aem_ready			; бои сгенерились 
@@ -55,7 +55,7 @@ aem_arny_dis_2			; инфо отсутствия Арни по причине разрыва в аномалии
 ;($) - постоянно находятся в хранилище
 ;(*) - удаляются из хранилища
 ;--------------------------------------
-[aem_mgr_pstor]
+[pstor]
 aem_lt			; num	"aem_last_time" время последнего обновления (update)($)
 aem_nt			; num	"aem_next_time" время последнего/следующего открытия арены($)
 aem_it			; num	"aem_init_time" время последней реальной активации($)
@@ -73,7 +73,7 @@ aem_ct			; num	время закрытия арены в минутах(*)
 ;--------------------------------------
 ; звуковое вступление к бою (aem\sound.ltx)
 ;--------------------------------------
-;[aem_mgr_intro]
+;[intro]
 ;*		- И так, гонг, бой начался
 ;fight1		- сегодня на арене два свежайших куска мяса, кто-то из них станет мясом на корм собакам в буквальном смысле, начнём
 ;fight2		- два претиндента на цинковый дом, оба прошли первый круг, так покажите чему вы научились, поехали
@@ -93,7 +93,7 @@ aem_ct			; num	время закрытия арены в минутах(*)
 ;--------------------------------------
 ; звуковое оформление окончания боя (aem\sound.ltx)
 ;--------------------------------------
-;[aem_mgr_extro]
+;[extro]
 ;*		- победа
 ;fight1		- выпустите собак, одним неудачником стало меньше
 ;fight2		- врача, врача, хотя ему уже не поможешь, мясник
@@ -108,7 +108,7 @@ aem_ct			; num	время закрытия арены в минутах(*)
 ;--------------------------------------
 ; аренное оружее, убираемое из инвентаря ГГ по завершению боя
 ;--------------------------------------
-[aem_mgr_arena_items]
+[arena_items]
 wpn_pm_arena
 wpn_mp5_arena
 wpn_toz34_arena
@@ -125,7 +125,7 @@ wpn_g36_arena
 ;--------------------------------------
 ; вещи, запрещённые для боя на арене
 ;--------------------------------------
-[aem_mgr_remove_items]
+[remove_items]
 grenade_rgd5
 grenade_f1
 wpn_rpg7
@@ -139,7 +139,7 @@ wpn_addon_grenade_launcher_m203
 ;--------------------------------------
 ; вещи, которые оставляются ГГ при тотализаторе
 ;--------------------------------------
-[aem_mgr_keep_items]
+[keep_items]
 bolt
 detector_simple
 device_torch
@@ -167,33 +167,32 @@ bar_lucky_pda
 ;--------------------------------------
 ; места спавна на арене
 ;--------------------------------------
-[aem_mgr_places]
+[places]
 ;--SPAWN_V1
-side1_01		= 151.2141, -21.0374, 129.5184,  40396, 1291
-side1_02		= 149.8551, -20.9990, 131.6488,  40125, 1291
-side1_03		= 152.6738, -20.9972, 131.7500,  40642, 1291
-side1_04		= 151.2744, -20.9973, 131.7438,  40400, 1291
-side1_05		= 154.0509, -21.0114, 130.9617,  40883, 1291
-side1_06		= 148.4156, -21.0248, 130.8685,  39884, 1291
-side1_07		= 163.4, -21.1, 121.0, 42388, 1212
-side1_08		= 161.3, -21.1, 121.0, 42036, 1212
-side1_09		= 152.9, -21.1, 117.2, 40605, 1212
-side1_10		= 150.5, -21.1, 117.2, 40242, 1205
-side1_11		= 138.7, -21.1, 114.6, 37408, 1205
-side1_12		= 137.9, -21.1, 110.4, 37235, 1205
+side1_01 = 151.2141, -21.0374, 129.5184, 53954, 1302
+side1_02 = 149.8551, -20.999, 131.6488, 53635, 1302
+side1_03 = 152.6738, -20.9972, 131.75, 54231, 1302
+side1_04 = 151.2744, -20.9973, 131.7438, 53958, 1302
+side1_05 = 154.0509, -21.0114, 130.9617, 54491, 1302
+side1_06 = 148.4156, -21.0248, 130.8685, 53354, 1302
+side1_07 = 164.01463317871,-21.059213638306,121.03875732422, 56254, 1195
+side1_08 = 161.17163085938,-21.058824539185,121.33232879639, 55753, 1224
+side1_09 = 152.1978302002,-21.059213638306,117.76689147949, 54063, 1224
+side1_10 = 150.04598999023,-21.059213638306,117.86529541016, 53601, 1217
+side1_11 = 138.1353302002,-21.058824539185,114.51142883301, 50617, 1217
+side1_12 = 139.88655090332,-21.058824539185,116.54931640625, 51163, 1217
 
-side2_01		= 153.8811, -21.0583, 80.6816,  40175, 1181
-side2_02		= 155.5218, -21.0590, 78.9473,  41040, 1181
-side2_03		= 152.2952, -21.0590, 78.6739,  40317, 1181
-side2_04		= 153.8811, -21.0590, 78.4681,  40680, 1181
-side2_05		= 156.8257, -21.0590, 79.4296,  40676, 1181
-side2_06		= 150.9364, -21.0590, 79.4296,  41289, 1181
-
+side2_01 = 153.47901916504,-20.933946609497,76.790229797363, 54274, 1193
+side2_02 = 150.77351379395,-21.066175460815,77.194114685059, 53699, 1193
+side2_03 = 151.42037963867,-21.066270828247,79.606620788574, 53873, 1193
+side2_04 = 155.16046142578,-21.058963775635,78.878547668457, 54669, 1193
+side2_05 = 155.78215026855,-21.059701919556,81.967376708984, 54807, 1223
+side2_06 = 150.88903808594,-21.061052322388,82.936317443848, 53877, 1193
 
 ;--------------------------------------
 ; команды
 ;--------------------------------------
-;[aem_mgr_name]
+;[name]
 ;name			= "aem_" .. name
 ;name1			= "aem_" .. name .. "1"
 ;name2			= "aem_" .. name .. "2"
@@ -209,7 +208,7 @@ side2_06		= 150.9364, -21.0590, 79.4296,  41289, 1181
 ;extro			= nil
 ;--------------------------------------
 
-[aem_mgr_teams]
+[teams]
 team_military
 team_killer
 team_freedom
@@ -225,90 +224,90 @@ team_chimera
 team_burer
 team_gigant
 
-[aem_mgr_team_places]
+[team_places]
 place1			= side1_01, side1_02, side1_03, side1_04, side1_05, side1_06
 place2			= side2_01, side2_02, side2_03, side2_04, side2_05, side2_06
 
-[aem_mgr_team_military]:aem_mgr_team_places
+[team_military]:team_places
 spawn1			= aem_military_t1_1_1, aem_military_t1_2_1, aem_military_t1_2_2, aem_military_t1_3_1, aem_military_t1_3_2, aem_military_t1_3_3
 spawn2			= aem_military_t2_1_1, aem_military_t2_2_1, aem_military_t2_2_2, aem_military_t2_3_1, aem_military_t2_3_2, aem_military_t2_3_3
 extro			= fight5
 
-[aem_mgr_team_killer]:aem_mgr_team_places
+[team_killer]:team_places
 spawn1			= aem_killer_t1_1_1, aem_killer_t1_2_1, aem_killer_t1_2_2, aem_killer_t1_3_1, aem_killer_t1_3_2, aem_killer_t1_3_3
 spawn2			= aem_killer_t2_1_1, aem_killer_t2_2_1, aem_killer_t2_2_2, aem_killer_t2_3_1, aem_killer_t2_3_2, aem_killer_t2_3_3
 extro			= fight6
 
-[aem_mgr_team_freedom]:aem_mgr_team_places
+[team_freedom]:team_places
 spawn1			= aem_freedom_t1_1_1, aem_freedom_t1_2_1, aem_freedom_t1_2_2, aem_freedom_t1_3_1, aem_freedom_t1_3_2, aem_freedom_t1_3_3
 spawn2			= aem_freedom_t2_1_1, aem_freedom_t2_2_1, aem_freedom_t2_2_2, aem_freedom_t2_3_1, aem_freedom_t2_3_2, aem_freedom_t2_3_3
 extro			= fight3
 
-[aem_mgr_team_dolg]:aem_mgr_team_places
+[team_dolg]:team_places
 spawn1			= aem_dolg_t1_1_1, aem_dolg_t1_2_1, aem_dolg_t1_2_2, aem_dolg_t1_3_1, aem_dolg_t1_3_2, aem_dolg_t1_3_3
 spawn2			= aem_dolg_t2_1_1, aem_dolg_t2_2_1, aem_dolg_t2_2_2, aem_dolg_t2_3_1, aem_dolg_t2_3_2, aem_dolg_t2_3_3
 extro			= fight4
 
-[aem_mgr_team_neutral]:aem_mgr_team_places
+[team_neutral]:team_places
 spawn1			= aem_neutral_t1_1_1, aem_neutral_t1_2_1, aem_neutral_t1_2_2, aem_neutral_t1_3_1, aem_neutral_t1_3_2, aem_neutral_t1_3_3
 spawn2			= aem_neutral_t2_1_1, aem_neutral_t2_2_1, aem_neutral_t2_2_2, aem_neutral_t2_3_1, aem_neutral_t2_3_2, aem_neutral_t2_3_3
 extro			= fight2
 
-[aem_mgr_team_bandit]:aem_mgr_team_places
+[team_bandit]:team_places
 spawn1			= aem_bandit_t1_1_1, aem_bandit_t1_2_1, aem_bandit_t1_2_2, aem_bandit_t1_3_1, aem_bandit_t1_3_2, aem_bandit_t1_3_3
 spawn2			= aem_bandit_t2_1_1, aem_bandit_t2_2_1, aem_bandit_t2_2_2, aem_bandit_t2_3_1, aem_bandit_t2_3_2, aem_bandit_t2_3_3
 extro			= fight1
 
-[aem_mgr_team_pseudodog]:aem_mgr_team_places
+[team_pseudodog]:team_places
 mutants_min			= 5
 mutants_max			= 6
 humans_min			= 3
 humans_max			= 4
 spawn1				= aem_pseudodog_stk_1, aem_pseudodog_stk_2, aem_pseudodog_stk_3, aem_pseudodog_stk_4, aem_pseudodog_stk_1, aem_pseudodog_stk_2
 
-[aem_mgr_team_boar]:aem_mgr_team_places
+[team_boar]:team_places
 mutants_min			= 4
 mutants_max			= 5
 humans_min			= 3
 humans_max			= 4
 spawn1				= aem_boar_stk_1, aem_boar_stk_2, aem_boar_stk_3, aem_boar_stk_4, aem_boar_stk_5, aem_boar_stk_6
 
-[aem_mgr_team_snork]:aem_mgr_team_places
+[team_snork]:team_places
 mutants_min			= 3
 mutants_max			= 5
 humans_min			= 3
 humans_max			= 4
 spawn1				= aem_snork_stk_1, aem_snork_stk_2, aem_snork_stk_3, aem_snork_stk_1, aem_snork_stk_2
 
-[aem_mgr_team_bloodsucker]:aem_mgr_team_places
+[team_bloodsucker]:team_places
 mutants_min			= 1
 mutants_max			= 1
 humans_min			= 3
 humans_max			= 4
 spawn1				= aem_bloodsucker_stk_1
 
-[aem_mgr_team_zombie]:aem_mgr_team_places
+[team_zombie]:team_places
 mutants_min			= 5
 mutants_max			= 6
 humans_min			= 4
 humans_max			= 4
 spawn1				= aem_zombie_stk_1, aem_zombie_stk_2, aem_zombie_stk_3, aem_zombie_stk_4, aem_zombie_stk_5,	aem_zombie_stk_6
 
-[aem_mgr_team_chimera]:aem_mgr_team_places
+[team_chimera]:team_places
 mutants_min			= 1
 mutants_max			= 1
 humans_min			= 3
 humans_max			= 4
 spawn1				= aem_chimera_stk_1
 
-[aem_mgr_team_burer]:aem_mgr_team_places
+[team_burer]:team_places
 mutants_min			= 1
 mutants_max			= 1
 humans_min			= 3
 humans_max			= 4
 spawn1				= aem_burer_stk_1
 
-[aem_mgr_team_gigant]:aem_mgr_team_places
+[team_gigant]:team_places
 mutants_min			= 1
 mutants_max			= 1
 humans_min			= 5
@@ -318,42 +317,42 @@ spawn1				= aem_gigant_stk_1
 ;--------------------------------------
 ; порядок следования групп
 ;--------------------------------------
-[aem_mgr_groups]
+[groups]
 order			= mutants, military, killer, freedom, dolg, neutral, bandit, special
 
 
 ;--------------------------------------
 ; описания групп
 ;--------------------------------------
-;[aem_mgr_name]
+;[name]
 ;title			= "aem_" .. name
 ;info			= "aem_" .. name .. "_info"
 ;done			= "aem_" .. name .. "_done"
 ;fights			= *
 ;--------------------------------------
 
-[aem_mgr_mutants]
+[mutants]
 fights			= mutants_dog, mutants_boar, mutants_tushkano, mutants_snork, mutants_bloodsucker, mutants_zombie, mutants_chimera, mutants_burer, mutants_gigant
 
-[aem_mgr_military]
+[military]
 fights			= military_1, military_2, military_3, military_6
 
-[aem_mgr_killer]
+[killer]
 fights			= killer_1, killer_2, killer_3, killer_6
 
-[aem_mgr_freedom]
+[freedom]
 fights			= freedom_1, freedom_2, freedom_3, freedom_6
 
-[aem_mgr_dolg]
+[dolg]
 fights			= dolg_1, dolg_2, dolg_3, dolg_6
 
-[aem_mgr_neutral]
+[neutral]
 fights			= neutral_1, neutral_2, neutral_3, neutral_6
 
-[aem_mgr_bandit]
+[bandit]
 fights			= bandit_1, bandit_2, bandit_3, bandit_6
 
-[aem_mgr_special]
+[special]
 fights			= special_1
 
 
@@ -361,7 +360,7 @@ fights			= special_1
 ;--------------------------------------
 ; описание боёв
 ;--------------------------------------
-;[aem_mgr_name]
+;[name]
 ;title			= "aem_" .. name
 ;done			= "aem_" .. name .. "_done"
 ;intro			= nil
@@ -384,16 +383,16 @@ fights			= special_1
 ; mutants
 ;--------------------------------------
 
-[aem_mgr_mutants_dog]
+[mutants_dog]
 intro			= pseudodog
 spawn			= aem_pseudodog_1,	aem_pseudodog_2,	aem_pseudodog_1,	aem_dog_1,	aem_dog_2,	aem_dog_3
-place			= side1_01,		side1_02,		side1_03,	side1_04,	side1_05,	side1_06
+place			= side1_01,	side1_02,	side1_03,	side1_04,	side1_05,	side1_06
 money			= 2000
 bonus_15s		= 2000
 bonus_20s		= 1000
 bonus_30s		= 500
 
-[aem_mgr_mutants_boar]
+[mutants_boar]
 spawn			= aem_boar_1,	aem_boar_2,	aem_boar_3,	aem_boar_4
 place			= side1_01,	side1_02,	side1_03,	side1_04
 money			= 2000
@@ -401,15 +400,15 @@ bonus_15s		= 2000
 bonus_20s		= 1000
 bonus_30s		= 500
 
-[aem_mgr_mutants_tushkano]
+[mutants_tushkano]
 spawn			= aem_tushkano_1,	aem_tushkano_2,	aem_tushkano_3,	aem_tushkano_4,	aem_tushkano_5,	aem_tushkano_6,	aem_tushkano_7,	aem_tushkano_8,	aem_tushkano_9,	aem_tushkano_10,	aem_tushkano_11,	aem_tushkano_12
-place			= side1_01,		side1_02,	side1_03,	side1_04,	side1_05,	side1_06,	side1_07,	side1_08,	side1_09,	side1_10,		side1_11,		side1_12
+place			= side1_01,	side1_02,	side1_03,	side1_04,	side1_05,	side1_06,	side1_07,	side1_08,	side1_09,	side1_10,side1_11,side1_12
 money			= 2000
 bonus_20s		= 2000
 bonus_30s		= 1000
 bonus_40s		= 500
 
-[aem_mgr_mutants_snork]
+[mutants_snork]
 intro			= snork
 spawn			= aem_snork_1,	aem_snork_2,	aem_snork_3
 place			= side1_01,	side1_02,	side1_03
@@ -418,7 +417,7 @@ bonus_20s		= 3000
 bonus_30s		= 1500
 bonus_40s		= 750
 
-[aem_mgr_mutants_bloodsucker]
+[mutants_bloodsucker]
 intro			= bloodsucker
 spawn			= aem_bloodsucker_1
 place			= side1_01
@@ -427,15 +426,15 @@ bonus_10s		= 3000
 bonus_15s		= 1500
 bonus_20s		= 750
 
-[aem_mgr_mutants_zombie]
+[mutants_zombie]
 spawn			= aem_controller_1,	aem_zombie_1,	aem_zombie_2,	aem_zombie_3,	aem_zombie_4,	aem_zombie_5
-place			= side1_01,		side1_02,	side1_03,	side1_04,	side1_05,	side1_06
+place			= side1_01,	side1_02,	side1_03,	side1_04,	side1_05,	side1_06
 money			= 5000
 bonus_20s		= 5000
 bonus_30s		= 2000
 bonus_40s		= 750
 
-[aem_mgr_mutants_chimera]
+[mutants_chimera]
 spawn			= aem_chimera_1
 place			= side1_01
 money			= 5000
@@ -443,7 +442,7 @@ bonus_15s		= 5000
 bonus_20s		= 2000
 bonus_30s		= 750
 
-[aem_mgr_mutants_burer]
+[mutants_burer]
 intro			= burer
 spawn			= aem_burer_1
 place			= side1_01
@@ -452,7 +451,7 @@ bonus_10s		= 5000
 bonus_15s		= 1000
 bonus_20s		= 750
 
-[aem_mgr_mutants_gigant]
+[mutants_gigant]
 intro			= savage
 spawn			= aem_gigant_1
 place			= side1_01
@@ -464,20 +463,20 @@ bonus_40s		= 750
 
 ;--------------------------------------
 
-[aem_mgr_fight_1on1]
+[fight_1on1]
 title			= aem_fight_1on1
 place			= side1_01
 money			= 1500
 bonus_10s		= 500
 
-[aem_mgr_fight_1on2]
+[fight_1on2]
 title			= aem_fight_1on2
 place			= side1_02, side1_03
 money			= 2000
 bonus_10s		= 1500
 bonus_15s		= 750
 
-[aem_mgr_fight_1on3]
+[fight_1on3]
 title			= aem_fight_1on3
 place			= side1_04, side1_05, side1_06
 money			= 3000
@@ -485,7 +484,7 @@ bonus_10s		= 3000
 bonus_15s		= 1000
 bonus_20s		= 750
 
-[aem_mgr_fight_1on6]
+[fight_1on6]
 title			= aem_fight_1on6
 place			= side1_01, side1_02, side1_03, side1_04, side1_05, side1_06
 money			= 5000
@@ -498,22 +497,22 @@ bonus_30s		= 750
 ; military
 ;--------------------------------------
 
-[aem_mgr_military_1]:aem_mgr_fight_1on1
+[military_1]:fight_1on1
 intro			= fight1
 extro			= fight2
 spawn			= aem_military_t1_1_1
 
-[aem_mgr_military_2]:aem_mgr_fight_1on2
+[military_2]:fight_1on2
 intro			= fight5
 extro			= fight5
 spawn			= aem_military_t1_2_1, aem_military_t1_2_2
 
-[aem_mgr_military_3]:aem_mgr_fight_1on3
+[military_3]:fight_1on3
 intro			= fight5
 extro			= fight5
 spawn			= aem_military_t1_3_1, aem_military_t1_3_2, aem_military_t1_3_3
 
-[aem_mgr_military_6]:aem_mgr_fight_1on6
+[military_6]:fight_1on6
 intro			= fight5
 extro			= fight5
 spawn			= aem_military_t1_1_1, aem_military_t1_2_1, aem_military_t1_2_2, aem_military_t1_3_1, aem_military_t1_3_2, aem_military_t1_3_3
@@ -523,20 +522,20 @@ spawn			= aem_military_t1_1_1, aem_military_t1_2_1, aem_military_t1_2_2, aem_mil
 ; killer
 ;--------------------------------------
 
-[aem_mgr_killer_1]:aem_mgr_fight_1on1
+[killer_1]:fight_1on1
 intro			= fight1
 extro			= fight1
 spawn			= aem_killer_t1_1_1
 
-[aem_mgr_killer_2]:aem_mgr_fight_1on2
+[killer_2]:fight_1on2
 intro			= fight2
 extro			= fight3
 spawn			= aem_killer_t1_2_1, aem_killer_t1_2_2
 
-[aem_mgr_killer_3]:aem_mgr_fight_1on3
+[killer_3]:fight_1on3
 spawn			= aem_killer_t1_3_1, aem_killer_t1_3_2, aem_killer_t1_3_3
 
-[aem_mgr_killer_6]:aem_mgr_fight_1on6
+[killer_6]:fight_1on6
 intro			= fight6
 extro			= fight6
 spawn			= aem_killer_t1_1_1, aem_killer_t1_2_1, aem_killer_t1_2_2, aem_killer_t1_3_1, aem_killer_t1_3_2, aem_killer_t1_3_3
@@ -546,20 +545,20 @@ spawn			= aem_killer_t1_1_1, aem_killer_t1_2_1, aem_killer_t1_2_2, aem_killer_t1
 ; freedom
 ;--------------------------------------
 
-[aem_mgr_freedom_1]:aem_mgr_fight_1on1
+[freedom_1]:fight_1on1
 intro			= fight1
 extro			= fight1
 spawn			= aem_freedom_t1_1_1
 
-[aem_mgr_freedom_2]:aem_mgr_fight_1on2
+[freedom_2]:fight_1on2
 intro			= fight2
 extro			= fight3
 spawn			= aem_freedom_t1_2_1, aem_freedom_t1_2_2
 
-[aem_mgr_freedom_3]:aem_mgr_fight_1on3
+[freedom_3]:fight_1on3
 spawn			= aem_freedom_t1_3_1, aem_freedom_t1_3_2, aem_freedom_t1_3_3
 
-[aem_mgr_freedom_6]:aem_mgr_fight_1on6
+[freedom_6]:fight_1on6
 intro			= fight6
 extro			= fight3
 spawn			= aem_freedom_t1_1_1, aem_freedom_t1_2_1, aem_freedom_t1_2_2, aem_freedom_t1_3_1, aem_freedom_t1_3_2, aem_freedom_t1_3_3
@@ -569,20 +568,20 @@ spawn			= aem_freedom_t1_1_1, aem_freedom_t1_2_1, aem_freedom_t1_2_2, aem_freedo
 ; dolg
 ;--------------------------------------
 
-[aem_mgr_dolg_1]:aem_mgr_fight_1on1
+[dolg_1]:fight_1on1
 intro			= fight1
 extro			= fight2
 spawn			= aem_dolg_t1_1_1
 
-[aem_mgr_dolg_2]:aem_mgr_fight_1on2
+[dolg_2]:fight_1on2
 intro			= fight2
 extro			= fight4
 spawn			= aem_dolg_t1_2_1, aem_dolg_t1_2_2
 
-[aem_mgr_dolg_3]:aem_mgr_fight_1on3
+[dolg_3]:fight_1on3
 spawn			= aem_dolg_t1_3_1, aem_dolg_t1_3_2, aem_dolg_t1_3_3
 
-[aem_mgr_dolg_6]:aem_mgr_fight_1on6
+[dolg_6]:fight_1on6
 extro			= fight4
 spawn			= aem_dolg_t1_1_1, aem_dolg_t1_2_1, aem_dolg_t1_2_2, aem_dolg_t1_3_1, aem_dolg_t1_3_2, aem_dolg_t1_3_3
 
@@ -591,20 +590,20 @@ spawn			= aem_dolg_t1_1_1, aem_dolg_t1_2_1, aem_dolg_t1_2_2, aem_dolg_t1_3_1, ae
 ; neutral
 ;--------------------------------------
 
-[aem_mgr_neutral_1]:aem_mgr_fight_1on1
+[neutral_1]:fight_1on1
 intro			= fight1
 extro			= fight2
 spawn			= aem_neutral_t1_1_1
 
-[aem_mgr_neutral_2]:aem_mgr_fight_1on2
+[neutral_2]:fight_1on2
 intro			= fight2
 extro			= fight3
 spawn			= aem_neutral_t1_2_1, aem_neutral_t1_2_2
 
-[aem_mgr_neutral_3]:aem_mgr_fight_1on3
+[neutral_3]:fight_1on3
 spawn			= aem_neutral_t1_3_1, aem_neutral_t1_3_2, aem_neutral_t1_3_3
 
-[aem_mgr_neutral_6]:aem_mgr_fight_1on6
+[neutral_6]:fight_1on6
 extro			= fight7
 spawn			= aem_neutral_t1_1_1, aem_neutral_t1_2_1, aem_neutral_t1_2_2, aem_neutral_t1_3_1, aem_neutral_t1_3_2, aem_neutral_t1_3_3
 
@@ -613,20 +612,20 @@ spawn			= aem_neutral_t1_1_1, aem_neutral_t1_2_1, aem_neutral_t1_2_2, aem_neutra
 ; bandit
 ;--------------------------------------
 
-[aem_mgr_bandit_1]:aem_mgr_fight_1on1
+[bandit_1]:fight_1on1
 intro			= fight1
 extro			= fight1
 spawn			= aem_bandit_t1_1_1
 
-[aem_mgr_bandit_2]:aem_mgr_fight_1on2
+[bandit_2]:fight_1on2
 intro			= fight2
 extro			= fight3
 spawn			= aem_bandit_t1_2_1, aem_bandit_t1_2_2
 
-[aem_mgr_bandit_3]:aem_mgr_fight_1on3
+[bandit_3]:fight_1on3
 spawn			= aem_bandit_t1_3_1, aem_bandit_t1_3_2, aem_bandit_t1_3_3
 
-[aem_mgr_bandit_6]:aem_mgr_fight_1on6
+[bandit_6]:fight_1on6
 intro			= fight6
 extro			= fight6
 spawn			= aem_bandit_t1_1_1, aem_bandit_t1_2_1, aem_bandit_t1_2_2, aem_bandit_t1_3_1, aem_bandit_t1_3_2, aem_bandit_t1_3_3
@@ -636,13 +635,13 @@ spawn			= aem_bandit_t1_1_1, aem_bandit_t1_2_1, aem_bandit_t1_2_2, aem_bandit_t1
 ; special
 ;--------------------------------------
 
-[aem_mgr_special_1]
+[special_1]
 bonus			= aem_special_warning
 unlimit			= aem_special_continue
 intro			= fight8
 extro			= fight7
 spawn			= aem_military_t1_1_1,	aem_military_t1_2_1,	aem_military_t1_2_2,		aem_killer_t1_3_1,		aem_killer_t1_3_2,	aem_killer_t1_3_3,	aem_freedom_sp1,	aem_freedom_sp2,	aem_dolg_sp1,	aem_dolg_sp2,	aem_neutral_sp1,	aem_neutral_sp2
-place			= side1_01,		side1_02,		side1_03,		side1_04,		side1_05,		side1_06,		side1_07,	side1_08,	side1_09,		side1_10,		side1_11,	side1_12
+place			= side1_01,side1_02,side1_03,side1_04,side1_05,side1_06,side1_07,	side1_08,	side1_09,side1_10,side1_11,	side1_12
 money			= 10000
 
 
@@ -662,7 +661,7 @@ money			= 10000
 ;fights			= *
 ;--------------------------------------
 
-[aem_mgr_stakes]
+[stakes]
 teams1			= team_pseudodog, team_boar, team_snork, team_bloodsucker, team_zombie, team_chimera, team_burer, team_gigant
 teams2			= team_dolg, team_neutral,team_military, team_killer, team_freedom, team_bandit
 fights			= stakes_1, stakes_2, stakes_3, stakes_4, stakes_5
@@ -670,7 +669,7 @@ fights			= stakes_1, stakes_2, stakes_3, stakes_4, stakes_5
 ;--------------------------------------
 ; описание боя для stakes
 ;--------------------------------------
-;[aem_mgr_name]
+;[name]
 ;done			= "aem_" .. name .. "_done"
 ;intro			= nil
 ;extro			= nil
@@ -678,15 +677,15 @@ fights			= stakes_1, stakes_2, stakes_3, stakes_4, stakes_5
 ;team2			= "aem_" .. name .. "_2"
 ;--------------------------------------
 
-[aem_mgr_stakes_1]
+[stakes_1]
 
-[aem_mgr_stakes_2]
+[stakes_2]
 
-[aem_mgr_stakes_3]
+[stakes_3]
 
-[aem_mgr_stakes_4]
+[stakes_4]
 
-[aem_mgr_stakes_5]
+[stakes_5]
 
 
 
@@ -703,14 +702,14 @@ fights			= stakes_1, stakes_2, stakes_3, stakes_4, stakes_5
 ;fights			= *
 ;--------------------------------------
 
-[aem_mgr_turnament]
+[turnament]
 teams			= team_military, team_killer, team_freedom, team_dolg, team_neutral, team_bandit
 fights			= turnament_1, turnament_2, turnament_3
 
 ;--------------------------------------
 ; описание боя для turnament
 ;--------------------------------------
-;[aem_mgr_name]
+;[name]
 ;done			= "aem_" .. name .. "_done"
 ;intro			= nil
 ;extro			= nil
@@ -719,10 +718,10 @@ fights			= turnament_1, turnament_2, turnament_3
 ;winer			= nil
 ;--------------------------------------
 
-[aem_mgr_turnament_1]
+[turnament_1]
 winer			= aem_turnament_3_1
 
-[aem_mgr_turnament_2]
+[turnament_2]
 winer			= aem_turnament_3_2
 
-[aem_mgr_turnament_3]
+[turnament_3]
