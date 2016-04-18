@@ -705,10 +705,6 @@ function see_actor(npc)
 	return npc:alive() and npc:see(db.actor)
 end
 
-function cond_name(cond, etalon)
-	return string.find( cond, "^"..etalon.."%d*$" ) ~= nil
-end
-
 function try_switch_to_another_section(npc, st, actor)
 	if not actor then return end
 
@@ -719,92 +715,49 @@ function try_switch_to_another_section(npc, st, actor)
 
 	local npc_id = npc:id()
 
-	local switched = false
-	for n, c in pairs(l) do
-		--printf("_bp: %d: %s", time_global(), c.name)
-		if cond_name(c.name, "on_actor_dist_le") then
-			--printf("_bp: dist=%d (need <= %d), see_actor: %s", distance_between(actor, npc), c.v1, utils.to_str(see_actor(npc)))
-			if see_actor(npc) and distance_between(actor, npc) <= c.v1 then
-				--printf("_bp: conditions met")
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
-		elseif cond_name(c.name, "on_actor_dist_le_nvis") then
-			if distance_between(actor, npc) <= c.v1 then
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
-		elseif cond_name(c.name, "on_actor_dist_ge") then
-			--printf("_bp: dist=%d (need <= %d), see_actor: %s", distance_between(actor, npc), c.v1, utils.to_str(see_actor(npc)))
-			-- ТУТ УМЫШЛЕННО >, А НЕ >=, потому что оно составляет пару с on_actor_dist_le, где <=
-			if see_actor(npc) and distance_between(actor, npc) > c.v1 then
-				--printf("_bp: conditions met")
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
-		elseif cond_name(c.name, "on_actor_dist_ge_nvis") then
-			-- ТУТ УМЫШЛЕННО >, А НЕ >=, потому что оно составляет пару с on_actor_dist_le_nvis, где <=
-			if distance_between(actor, npc) > c.v1 then
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
-		elseif cond_name(c.name, "on_signal") then
-			--printf("_bp: on_signal (c.v1 = %s)", c.v1)
-			if st.signals and st.signals[c.v1] then
-          -- printf("_bp: on_signal (c.v1 = %s) signalled [%s]", c.v1, npc:name())
-				--printf("_bp: signalled")
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
-		-- FIXME: не дублировать тут имена, оставить один on_info, но добавлять несколько его экземпляров в список
-		elseif cond_name(c.name, "on_info") then
-			switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-		elseif cond_name(c.name, "on_timer") then
-			--printf("_bp: on_timer: %d >= %d", time_global(),
-			--	db.storage[npc_id].activation_time + c.v1)
-			if time_global() >= db.storage[npc_id].activation_time + c.v1 then
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
+	local sw = false
 
-		-- GAMETIME added by Stohe.
-		elseif cond_name(c.name, "on_game_timer") then
-			if  game.get_game_time():diffSec(db.storage[npc_id].activation_game_time) >= c.v1 then
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
+	for _, c in pairs(l) do
+		local name = string.match(c.name, '[%w_]+')
 
-		elseif cond_name(c.name, "on_actor_in_zone") then
-			if utils.npc_in_zone(actor, db.zone_by_name[c.v1]) then
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
-		elseif cond_name(c.name, "on_actor_not_in_zone") then
-			if not utils.npc_in_zone(actor, db.zone_by_name[c.v1]) then
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
-		elseif cond_name(c.name, "on_npc_in_zone") then
-			if utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2]) then
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
-		elseif cond_name(c.name, "on_npc_not_in_zone") then
-			if not utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2]) then
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
-		elseif cond_name(c.name, "on_actor_inside") then
-			if utils.npc_in_zone(actor, npc) then
---				printf("_bp: TRUE")
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
-		elseif cond_name(c.name, "on_actor_outside") then
-			if not utils.npc_in_zone(actor, npc) then
-				switched = switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
-			end
+		if name == "on_actor_dist_le" then
+			sw = see_actor(npc) and distance_between(actor, npc) <= c.v1
+		elseif name == "on_actor_dist_le_nvis" then
+			sw = distance_between(actor, npc) <= c.v1
+		elseif name == "on_actor_dist_ge" then
+			sw = see_actor(npc) and distance_between(actor, npc) > c.v1
+		elseif name == "on_actor_dist_ge_nvis" then
+			sw = distance_between(actor, npc) > c.v1
+		elseif name == "on_signal" then
+			sw = st.signals and st.signals[c.v1]
+		elseif name == "on_info" then
+			sw = true
+		elseif name == "on_timer" then
+			sw = time_global() >= db.storage[npc_id].activation_time + c.v1
+		elseif name == "on_game_timer" then
+			sw = game.get_game_time():diffSec(db.storage[npc_id].activation_game_time) >= c.v1
+		elseif name == "on_actor_in_zone" then
+			sw = utils.npc_in_zone(actor, db.zone_by_name[c.v1])
+		elseif name == "on_actor_not_in_zone" then
+			sw = not utils.npc_in_zone(actor, db.zone_by_name[c.v1])
+		elseif name == "on_npc_in_zone" then
+			sw = utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2])
+		elseif name == "on_npc_not_in_zone" then
+			sw = not utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2])
+		elseif name == "on_actor_inside" then
+			sw = utils.npc_in_zone(actor, npc)
+		elseif name == "on_actor_outside" then
+			sw = not utils.npc_in_zone(actor, npc)
 		else
-			abort(
-				"WARNING: object '%s': try_switch_to_another_section: unknown condition '%s' encountered",
-				npc:name(), c.name)
+			abort("try_switch_to_another_section: invalid condition: [%s] (%s)", c.name, npc:name())
 		end
 
-		if switched then
-			--printf("_SWITCHED")
-			break
+		if sw then
+			return switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
 		end
 	end
 
-	return switched
+	return false
 end
 
 function is_active(npc, st)
