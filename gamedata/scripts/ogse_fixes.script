@@ -50,16 +50,16 @@ function del_buggy_objects() --Удаление из игры глючных о�
 		"pri_ambient_battle_sound_zone_0002",
 		"pri_ambient_battle_sound_zone_0003",
 --------------------------------------------------------
-		"bar_radio", --Радиоприёмник в баре. Не работает, да и нафиг не нужен, есть же музавтомат.
 -----Рестрикторы постоянных звуков стрельбы на ЧАЭС-----
 		"aes_space_restrictor_sound_battle_0000",
 		"aes_space_restrictor_sound_battle_0001",
 --------------------------------------------------------
+		"sar_enter_zone", --Рестриктор, воспроизводящий "зов Монолита" в Саркофаге
 	}
 	for _, n in ipairs( names ) do
 		local sobj = alife():object( n )
 		if sobj then
-			log2( "KRodin: found %s, removing...", sobj:name() )
+			log2( "KRodin: found [%s], removing...", sobj:name() )
 			alife():release( sobj )
 		end
 	end
