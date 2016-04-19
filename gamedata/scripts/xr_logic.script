@@ -705,55 +705,70 @@ function see_actor(npc)
 	return npc:alive() and npc:see(db.actor)
 end
 
+local sect_tbl = {
+	["on_actor_dist_le"] =		function(npc, actor, c)
+		return see_actor(npc) and distance_between(actor, npc) <= c.v1
+	end,
+	["on_actor_dist_le_nvis"] =	function(npc, actor, c)
+		return distance_between(actor, npc) <= c.v1
+	end,
+	["on_actor_dist_ge"] =		function(npc, actor, c)
+		return see_actor(npc) and distance_between(actor, npc) > c.v1
+	end,
+	["on_actor_dist_ge_nvis"] =	function(npc, actor, c)
+		return distance_between(actor, npc) > c.v1
+	end,
+	["on_signal"] =				function(npc, actor, c, st)
+		return st.signals and st.signals[c.v1]
+	end,
+	["on_info"] =				function()
+		return true
+	end,
+	["on_timer"] =				function(npc, actor, c)
+		local npc_id = npc:id()
+		return time_global() >= db.storage[npc_id].activation_time + c.v1
+	end,
+	["on_game_timer"] =			function(npc, actor, c)
+		local npc_id = npc:id()
+		return game.get_game_time():diffSec(db.storage[npc_id].activation_game_time) >= c.v1
+	end,
+	["on_actor_in_zone"] =		function(npc, actor, c)
+		return utils.npc_in_zone(actor, db.zone_by_name[c.v1])
+	end,
+	["on_actor_not_in_zone"] =	function(npc, actor, c)
+		return not utils.npc_in_zone(actor, db.zone_by_name[c.v1])
+	end,
+	["on_npc_in_zone"] =		function(npc, actor, c)
+		local npc_id = npc:id()
+		return utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2])
+	end,
+	["on_npc_not_in_zone"] =	function(npc, actor, c)
+		local npc_id = npc:id()
+		return not utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2])
+	end,
+	["on_actor_inside"] =		function(npc, actor)
+		return utils.npc_in_zone(actor, npc)
+	end,
+	["on_actor_outside"] =		function(npc, actor)
+		return not utils.npc_in_zone(actor, npc)
+	end
+}
+
 function try_switch_to_another_section(npc, st, actor)
 	if not actor then return end
 
-	local l = st.logic
-	if not l then
-		abort("Can't find script switching information in storage, scheme '%s'", st.active_scheme)
-	end
-
-	local npc_id = npc:id()
-
-	local sw = false
+	local l = st.logic or abort("try_switch_to_another_section, invalid logic, scheme: [%s] (%s)",
+		st.active_scheme or "none", ( npc and npc:name() ) or "script")
 
 	for _, c in pairs(l) do
-		local name = string.match(c.name, '[%w_]+')
+		local chk = sect_tbl[string.match(c.name, '[%w_]+')] --паттерн DC: "^([%D]+)", если этот будет вылетать
 
-		if name == "on_actor_dist_le" then
-			sw = see_actor(npc) and distance_between(actor, npc) <= c.v1
-		elseif name == "on_actor_dist_le_nvis" then
-			sw = distance_between(actor, npc) <= c.v1
-		elseif name == "on_actor_dist_ge" then
-			sw = see_actor(npc) and distance_between(actor, npc) > c.v1
-		elseif name == "on_actor_dist_ge_nvis" then
-			sw = distance_between(actor, npc) > c.v1
-		elseif name == "on_signal" then
-			sw = st.signals and st.signals[c.v1]
-		elseif name == "on_info" then
-			sw = true
-		elseif name == "on_timer" then
-			sw = time_global() >= db.storage[npc_id].activation_time + c.v1
-		elseif name == "on_game_timer" then
-			sw = game.get_game_time():diffSec(db.storage[npc_id].activation_game_time) >= c.v1
-		elseif name == "on_actor_in_zone" then
-			sw = utils.npc_in_zone(actor, db.zone_by_name[c.v1])
-		elseif name == "on_actor_not_in_zone" then
-			sw = not utils.npc_in_zone(actor, db.zone_by_name[c.v1])
-		elseif name == "on_npc_in_zone" then
-			sw = utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2])
-		elseif name == "on_npc_not_in_zone" then
-			sw = not utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2])
-		elseif name == "on_actor_inside" then
-			sw = utils.npc_in_zone(actor, npc)
-		elseif name == "on_actor_outside" then
-			sw = not utils.npc_in_zone(actor, npc)
+		if chk then
+			if chk(npc, actor, c, st) then
+				return switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
+			end
 		else
 			abort("try_switch_to_another_section: invalid condition: [%s] (%s)", c.name, npc:name())
-		end
-
-		if sw then
-			return switch_to_section(npc, st, pick_section_from_condlist(actor, npc, c.condlist))
 		end
 	end
 
