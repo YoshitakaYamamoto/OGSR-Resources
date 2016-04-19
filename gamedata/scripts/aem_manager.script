@@ -190,7 +190,7 @@ function CArenaext:__init()
 	self.mk_all = 0
 
 	-- чтение LTX
-	local ini = ini_file("misc\\aem_manager.ltx")
+	local ini = dsh.cached_ini_file("misc\\aem_manager.ltx")
 
 	-- вещи, которые нельзя выносить с арены (удаляются при выходе с арены)
 	self.arena_items = {}
@@ -635,7 +635,7 @@ function CArenaext:cleanup()
 	--printf("CArenaext:cleanup()")
 	
 	-- чтение LTX
-	local ini = ini_file("misc\\aem_manager.ltx")
+	local ini = dsh.cached_ini_file("misc\\aem_manager.ltx")
 	
 	-- возврат стандартного освещения на арене
 	aem_lights.remove_all_aem_lamps()

@@ -611,7 +611,7 @@ function r_spawns( spawn_ini, section, line, sectSpawnProps)
         local custom_data = r_str(sys_ini, spawn.section, "custom_data")
         if custom_data ~= nil and (tostring(custom_data) ~= "stalker_custom_data.ltx") then --KRodin: ни к чему несколько раз подряд читать один и тот же пустой конфиг!
 		--log1("SE_RESPAWN - CUSTOM_DATA: "..tostring(custom_data))
-          local custom_data_ltx = ini_file(custom_data)
+          local custom_data_ltx = dsh.cached_ini_file(custom_data)
           if custom_data_ltx:section_exist("smart_terrains") then
             if custom_data_ltx:line_exist("smart_terrains", "none") then
               if r_str(custom_data_ltx, "smart_terrains", "none") == "true" then

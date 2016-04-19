@@ -604,7 +604,7 @@ end
 function bar_priemnik_on()
   return ogse.delete_var( "bar_priemnik.quiet" )
 end
-
+--]===]
 
 local ini_file_cache = {}
 function cached_ini_file( fname )
@@ -614,7 +614,7 @@ function cached_ini_file( fname )
   return ini_file_cache[ fname ]
 end
 
-
+--[===[
 function start_gtimerDHMS( name, d, h, m, s, fname, ... )
   return ogse_st_mgr.delayed_fun_start( name )
     :set_gdelayDHMS( d, h, m, s )

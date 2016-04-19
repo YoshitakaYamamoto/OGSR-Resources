@@ -59,7 +59,7 @@ function light_binder:update(delta)
 			-- инициализируем остальное
 			local light_config_fname = get_string("light_config", "cfg", nil, self.object:spawn_ini())
 			ASSERT(light_config_fname, "[light_binder:update] parameter 'cfg' in 'light_config' section in object '%s' is not defined", self.object:name())
-			self.light_config = ini_file(light_config_fname)
+			self.light_config = dsh.cached_ini_file(light_config_fname)
 			self.st.light_config = {}
 			ASSERT(self.light_config, "[light_binder:update] can not create config file '%s'", light_config_fname)
 			if self.light_config:line_exist("light_config", "schedule") then -- если присутствует собственное расписание
