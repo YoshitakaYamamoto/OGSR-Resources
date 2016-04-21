@@ -204,7 +204,8 @@ function PsyAntenna:update_postprocess(pp)
 	level.set_pp_effector_factor(pp.idx, pp.intensity, 0.3)
 	return true
 end
-function PsyAntenna:update(dt)
+function PsyAntenna:update()
+	local dt = 35
 	self.eff_time					= self.eff_time + dt
 
 	function update_intensity(intensity_base, intensity)

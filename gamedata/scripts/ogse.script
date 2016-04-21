@@ -1289,87 +1289,60 @@ function use_inventory_item(obj)
 	jekan_update.on_use_item(obj)
 end
 
-------------------Переменные для апдейта актора--------------------
+--*****************************************************[Переменные для апдейта актора]******************************************************
 local psyzones_flag = sys_ini:r_s32("options","psyzones_flag")
 local ids_timer = time_global()
 local mine_timer = time_global()
 local loot_timer = time_global()
 local buggy_timer = time_global()
 local anom_enum = time_global()
-local mteleport_update_time = time_global()
-local watchdog = 0
-local watchdog_max = 44
---------------------------------------------------------------------
-function on_actor_update(delta) --Колбэк на апдейт ГГ
----------------------АПДЕЙТЫ С ВЫСОКИМ ПРИОРИТЕТОМ ПОМЕЩАТЬ СЮДА!---------------------
-	ogse_debug.process_actor("upd_a", 2)
-	on_actor_updating_start() -- Перехват события начала апдейта актора
 
-	ogse_debug.process_actor("upd_a", 3)
-	game_time_factor = level.get_time_factor() -- Проверка таймфактора
-
-	local glob_time = time_global()
-
-	ogse_debug.process_actor("upd_a", 4)
-	ogse_scripted_btr.update() --Охранный БТР. надо перевести на сигналы
-
-	ogse_debug.process_actor("upd_a", 10)
-	ogsm_quests.wounded_pp() --эффекты ранения актора
-
-	ogse_debug.process_actor("upd_a", 12)
-	ui_ogse_quicklaunch.check_quicklaunch_hint() --Подсказки по кнопке быстрого доступа. надо перевести на сигналы
-
-	ogse_debug.process_actor("upd_a", 13)
-	if xrs_ai then xrs_ai.actor_update() end -- Обновление АИ-пака
-	if rx_ai then rx_ai.actor_update() end --обновление AI управления оружием
-
-	if mteleport_update_time < time_global() then --Эти функции апдейтить только так и никак больше! При переносе в ватчдоги, они вообще переставали работать!
-		ogse_debug.process_actor("upd", 811)
-		bind_restrictor.actor_update(delta)
-
-		ogse_debug.process_actor("upd", 812)
-		bind_mteleport.actor_update(delta) --Апдейтим наш телепорт
-
-		ogse_debug.process_actor("upd", 814)
-		ogse_water_restrictor.actor_update(delta)
-
-		mteleport_update_time = time_global() + 200
+local watchdog --НЕ ТРОГАТЬ! Здесь не должно быть никакого значения!
+local watchdog_tbl = { --АПДЕЙТЫ С НИЗКИМ ПРИОРИТЕТОМ ПОМЕЩАТЬ СЮДА!
+function()
+	ogse_debug.process_actor("upd", 11)
+	if db.actor.radiation >= 0.7 then --Вывод сообщения о большой радиации
+		local hud = get_hud()
+		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
+		if custom_static == nil then
+			hud:AddCustomStatic("cs_radiation_danger", true)
+			hud:GetCustomStatic("cs_radiation_danger"):wnd():SetTextST("st_radiation_danger")
+		end
+	else
+		local hud = get_hud()
+		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
+		if custom_static ~= nil then
+			hud:RemoveCustomStatic("cs_radiation_danger")
+		end
 	end
---------------------------КОНЕЦ АПДЕЙТОВ С ВЫСОКИМ ПРИОРИТЕТОМ-------------------------
-
-if watchdog == 1 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 23)
 	if ogse_anomaly then
 		ogse_anomaly.lvl_anomaly_disable() -- Предохранительное отключение аномалий
 	end
-end
-
-if watchdog == 2 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 24)
 	show_time() -- Выводим время на HUD
-end
-
-if watchdog == 3 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 19)
 	check_doa_kills() -- Проверка убиванцев по выходу в оффлайн
-end
-
-if watchdog == 4 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 28)
 	treasure_manager.get_treasure_manager():loss_workaround() -- Запускаем затычку от возможной потери содержимого тайников
-end
-
-if watchdog == 5 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 30)
 	aem_manager.get_aem():update() -- Обновление арены
-end
-
-if watchdog == 6 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 37)
 	xr_companion.check_in_car() -- Поездки в машине с напарником
-end
-
-if watchdog == 7 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 39)
 -- зачистка таблички сохраненных трупиков
 	if not deadmans_table then deadmans_table = {} end
@@ -1399,20 +1372,18 @@ if watchdog == 7 then
 		end
 	end
 -- зачистка таблички сохраненных трупиков
-end
-
-if watchdog == 8 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 40)
-	if glob_time > loot_timer then
+	if time_global() > loot_timer then
 		db.remove_deadman() -- Уборка трупов и лута
 		loot_timer = loot_timer + math.random(500, 800)
 	end
-end
-
-if watchdog == 9 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 41)
 -- Обновление баг-таймера
-	if glob_time > buggy_timer then
+	if time_global() > buggy_timer then
 		for k, v in pairs(db.creature) do
 			local obj = level.object_by_id(k)
 			local sobj = alife():object(k)
@@ -1426,13 +1397,12 @@ if watchdog == 9 then
 	end
 -- Обновление баг-таймера
 	db.remove_delayed() -- Удаление глючных трупов с битым пстором
-end
-
-if watchdog == 10 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 44)
 -- периодическая проверка количества идентификаторов
 	if id_cleaner and id_cleaner.check_ids_flag == 1 then
-		if glob_time > ids_timer then
+		if time_global() > ids_timer then
 			id_cleaner.check_ids()
 			--- снятие флага атаки на актора
 			xr_companion.actor_attacked = false
@@ -1441,201 +1411,162 @@ if watchdog == 10 then
 		end
 	end
 -- периодическая проверка количества идентификаторов
-end
-
-if watchdog == 11 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 45)
 -- Периодическая проверка численности
-	if glob_time > anom_enum then
+	if time_global() > anom_enum then
 		se_respawn.check_zone_population()
-		anom_enum = glob_time + math.random(60000, 80000)
+		anom_enum = time_global() + math.random(60000, 80000)
 	end
 -- Периодическая проверка численности
-end
-
-if watchdog == 12 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 46)
 	if checker_minefield then
-		if glob_time > mine_timer then
+		if time_global() > mine_timer then
 			checker_minefield.delete_mines() -- Обработка мин
 			mine_timer = mine_timer + math.random(15000, 20000)
 		end
 	end
-end
-
-if watchdog == 13 then
+end,
+function()
 	ogse_debug.process_actor("upd_a", 36087)
 	ogsm_quests.actor_zombied_fx() -- Постэффект зомбирования актора
-end
-
-------------------------------------------------Квестовые апдейты---------------------------------------------
-if watchdog == 14 then
-	ogse_debug.process_actor("upd_a", 36088)
-	ogse_quests.transponder_on_belt() -- Проверка транспондера на поясе
-end
-
-if watchdog == 15 then
-	ogse_debug.process_actor("upd_a", 48)
-	quest_deadcity.check_first_enter()
-end
-
-if watchdog == 16 then
-	ogse_debug.process_actor("upd_a", 481)
-	ogse_quests.check_gorkom_books()
-end
-
-if watchdog == 17 then
-	ogse_debug.process_actor("upd_a", 482)
-	ogse_quests.check_colonel_dead()
-end
-
-if watchdog == 18 then
-	ogse_debug.process_actor("upd_a", 29)
-	ogse_quests_fix.check_radar_off() -- Багфикс радара
-end
-
-if watchdog == 19 then
-	ogse_debug.process_actor("upd_a", 36)
-	ogsm_quests.actor_af_transmut_8_fx() -- Постэффект ношения "Ока" актором
-end
-
-if watchdog == 20 then
-	ogse_debug.process_actor("upd_a", 42)
-	jekan_work.check_bind_avail_six_anom_house_items()
-end
-
-if watchdog == 21 then
-	ogse_debug.process_actor("upd_a", 5)	
-	ogse_quests.play_digger_motor_sound()	
-end
-
-if watchdog == 22 then
-	ogse_debug.process_actor("upd_a", 8)
-	ogse_teleport_art_quest.check_actor_leave_zone()
-end
-
-if watchdog == 23 then
-	ogse_debug.process_actor("upd_a", 14)
-	ogse_quests.make_colonel_follow()
-end
-
-if watchdog == 24 then
-	ogse_debug.process_actor("upd_a", 22)
-	PMA_escape.show_heli_scene() -- Сценка с вертушкой на Кордоне
-end
-
---===========Перенесено из jekan_update.script==================
-if watchdog == 25 then
-	jekan_update.dolg_zahvat()
-end
-
-if watchdog == 26 then
-	jekan_update.af_puzir_destroy()
-end
-
-if watchdog == 27 then
-	jekan_update.af_light_destroy()
-end
-
-if watchdog == 28 then
-	jekan_update.af_uley_packed()
-end
-
-if watchdog == 29 then
-	jekan_update.af_mayatnik_effect()
-end
-
-if watchdog == 30 then
-	jekan_update.af_ray_travel()
-end
-
-if watchdog == 31 then
-	jekan_update.cheburashka_greeting()
-end
-
-if watchdog == 32 then
-	jekan_update.fake_arts_delete()
-end
-
-if watchdog == 33 then
-	jekan_update.magnit_part_work_from_belt()
-end
-
-if watchdog == 34 then
-	jekan_update.magnit_part_work_on_take()
-end
-
-if watchdog == 35 then
-	xr_effects.af_uley_effect()
-end
-
-if watchdog == 36 then
-	jekan_update.thunderbird_visual_effect()
-end
-
-if watchdog == 37 then
-	jekan_update.rustyfield_effect1()
-end
-
-if watchdog == 38 then
-	jekan_update.rustyfield_effect2()
-end
-
-if watchdog == 39 then
-	jekan_update.rustyfield_effect3()
-end
-
-if watchdog == 40 then
-	jekan_update.strange_zone_actor_particle()
-end
---==============================================================
-------------------------------------------Конец квестовых апдейтов--------------------------------------------
-if watchdog == 41 then
+end,
+function()
 	ogse_debug.process_actor("upd", 813)
 	task_manager.actor_update()
-end
-
-if watchdog == 42 then
+end,
+function()
 	ogse_debug.process_actor("upd", 10)
 	if sr_psy_antenna.psy_antenna then --обновление пси-антенны
-		sr_psy_antenna.psy_antenna:update(delta)
+		sr_psy_antenna.psy_antenna:update()
 	end
-end
+end,
+------------------------------------------------Квестовые апдейты---------------------------------------------
+function()
+	ogse_debug.process_actor("upd_a", 36088)
+	ogse_quests.transponder_on_belt() -- Проверка транспондера на поясе
+end,
+function()
+	ogse_debug.process_actor("upd_a", 48)
+	quest_deadcity.check_first_enter()
+end,
+function()
+	ogse_debug.process_actor("upd_a", 481)
+	ogse_quests.check_gorkom_books()
+end,
+function()
+	ogse_debug.process_actor("upd_a", 482)
+	ogse_quests.check_colonel_dead()
+end,
+function()
+	ogse_debug.process_actor("upd_a", 29)
+	ogse_quests_fix.check_radar_off() -- Багфикс радара
+end,
+function()
+	ogse_debug.process_actor("upd_a", 36)
+	ogsm_quests.actor_af_transmut_8_fx() -- Постэффект ношения "Ока" актором
+end,
+function()
+	ogse_debug.process_actor("upd_a", 42)
+	jekan_work.check_bind_avail_six_anom_house_items()
+end,
+function()
+	ogse_debug.process_actor("upd_a", 5)	
+	ogse_quests.play_digger_motor_sound()	
+end,
+function()
+	ogse_debug.process_actor("upd_a", 8)
+	ogse_teleport_art_quest.check_actor_leave_zone()
+end,
+function()
+	ogse_debug.process_actor("upd_a", 14)
+	ogse_quests.make_colonel_follow()
+end,
+function()
+	ogse_debug.process_actor("upd_a", 22)
+	PMA_escape.show_heli_scene() -- Сценка с вертушкой на Кордоне
+end,
+--=====================Перенесено из jekan_update.script=======================
+function()
+	jekan_update.dolg_zahvat()
+end,
+function()
+	jekan_update.af_puzir_destroy()
+end,
+function()
+	jekan_update.af_light_destroy()
+end,
+function()
+	jekan_update.af_uley_packed()
+end,
+function()
+	jekan_update.af_mayatnik_effect()
+end,
+function()
+	jekan_update.af_ray_travel()
+end,
+function()
+	jekan_update.cheburashka_greeting()
+end,
+function()
+	jekan_update.fake_arts_delete()
+end,
+function()
+	jekan_update.magnit_part_work_from_belt()
+end,
+function()
+	jekan_update.magnit_part_work_on_take()
+end,
+function()
+	xr_effects.af_uley_effect()
+end,
+function()
+	jekan_update.thunderbird_visual_effect()
+end,
+function()
+	jekan_update.rustyfield_effect1()
+end,
+function()
+	jekan_update.rustyfield_effect2()
+end,
+function()
+	jekan_update.rustyfield_effect3()
+end,
+function()
+	jekan_update.strange_zone_actor_particle()
+end,
+--=============================================================================
+------------------------------------------Конец квестовых апдейтов--------------------------------------------
+}
+--*******************************************************************************************************************************************
 
-if watchdog == 43 then
-	ogse_debug.process_actor("upd", 11)
-	if db.actor.radiation >= 0.7 then --Вывод сообщения о большой радиации
-		local hud = get_hud()
-		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
-		if custom_static == nil then
-			hud:AddCustomStatic("cs_radiation_danger", true)
-			hud:GetCustomStatic("cs_radiation_danger"):wnd():SetTextST("st_radiation_danger")
-		end
-	else
-		local hud = get_hud()
-		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
-		if custom_static ~= nil then
-			hud:RemoveCustomStatic("cs_radiation_danger")
-		end
-	end
-end
+function on_actor_update() --Колбэк на апдейт ГГ
+---------------------АПДЕЙТЫ С ВЫСОКИМ ПРИОРИТЕТОМ ПОМЕЩАТЬ СЮДА!---------------------
+	ogse_debug.process_actor("upd_a", 3)
+	game_time_factor = level.get_time_factor() -- Проверка таймфактора
 
--- НЕ ТРОГАТЬ!!! БИБЛИОТЕЧНАЯ КОНСТРУКЦИЯ! ДОЛЖНО ЗАМЫКАТЬ ФУНКЦИЮ!
-watchdog = watchdog + 1
-if watchdog >= watchdog_max then
-	watchdog = 1
-end
+	ogse_debug.process_actor("upd_a", 4)
+	ogse_scripted_btr.update() --Охранный БТР. надо перевести на сигналы
 
-ogse_debug.process_actor("upd_a", 0)
-end
+	ogse_debug.process_actor("upd_a", 10)
+	ogsm_quests.wounded_pp() --эффекты ранения актора
 
--- Перехват события начала апдейта актора
-local actor_updating_not_started = true
-function on_actor_updating_start()
-	if actor_updating_not_started then
-		actor_updating_not_started = false
-		on_actor_first_update()
-	end
+	ogse_debug.process_actor("upd_a", 12)
+	ui_ogse_quicklaunch.check_quicklaunch_hint() --Подсказки по кнопке быстрого доступа. надо перевести на сигналы
+
+	ogse_debug.process_actor("upd_a", 13)
+	if xrs_ai then xrs_ai.actor_update() end -- Обновление АИ-пака
+	if rx_ai then rx_ai.actor_update() end --обновление AI управления оружием
+--------------------------КОНЕЦ АПДЕЙТОВ С ВЫСОКИМ ПРИОРИТЕТОМ-------------------------
+
+	local index, func = next(watchdog_tbl, watchdog)
+	watchdog = index
+	if func then func() end
+
+	ogse_debug.process_actor("upd_a", 0)
 end
 
 -- Запуск вызовов при первом апдейта актора

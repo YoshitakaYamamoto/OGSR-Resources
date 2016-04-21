@@ -493,9 +493,9 @@ function actor_binder:task_callback(_task, _objective, _state)
 	self.am:call("on_task", _task, _objective, _state)
 	event("actor_task"):trigger({task = _task, objective = _objective, state = _state})
 end
-
-local update_was_never_called = true
 ----------------------------------------------------------------------------------------------------------------------
+local update_was_never_called = true
+local mteleport_update_time = time_global()
 function actor_binder:update(delta)
 	--// Для персональных функций, в обновлениях. Phoenix
 	--personal_update.main()
@@ -520,9 +520,22 @@ function actor_binder:update(delta)
 			self.weapon_hide = false
 		end
 	end
-	
+
+	if mteleport_update_time < time_global() then --Эти функции апдейтить только так и никак больше! При переносе в ватчдоги, они вообще переставали работать!
+		ogse_debug.process_actor("upd", 811)
+		bind_restrictor.actor_update(delta)
+
+		ogse_debug.process_actor("upd", 812)
+		bind_mteleport.actor_update(--[[delta]]) --Апдейтим наш телепорт
+
+		ogse_debug.process_actor("upd", 814)
+		ogse_water_restrictor.actor_update(--[[delta]])
+
+		mteleport_update_time = mteleport_update_time + 200
+	end
+
 	ogse_debug.process_actor("upd", 13)
-	ogse.on_actor_update(delta) --Обновление актора
+	ogse.on_actor_update() --Обновление актора
 	
 	ogse_debug.process_actor("upd", 14)
 	_sdata.vis_int()
@@ -553,6 +566,8 @@ function actor_binder:update(delta)
 		end
 
 		ogse_lc_mngr.lc_restore_location()
+
+		ogse.on_actor_first_update()
 
 		ogse_debug.process_actor("upd", 16)
 		self.am:call("on_first_update")
