@@ -632,14 +632,9 @@ function ev_see_stuff:evaluate()
 				---->>> local function check_item(o)
 				local function check_item(o)
 					local obj = o:object()
-					
-					if obj and obj.clsid then
-						-- it's OK
-					else
-						-- else exit
-						return
-					end
-					
+
+					if not obj or not obj.clsid or not alife():object(obj:id()) then return end
+
 					if obj_owner[obj:id()] and 
 						(level.object_by_id(obj_owner[obj:id()])==nil 
 						or level.object_by_id(obj_owner[obj:id()]):alive()==false) then
