@@ -203,14 +203,6 @@ function generic_object_binder:update(delta)
 		
 	ogse_debug.process_monster(self.object, "upd", 5)
 
-     --' Суперконтролёр
-	if self.object:alive() and (string.find(self.object:section(), "m_controller_special")) then
-		local posit = self.object:position()
-		if posit:distance_to(db.actor:position()) < 85 then
-			jekan_update.controller_special_effect(p_obj)
-			jekan_update.actor_weapon_drop()
-		end
-	end
 	
 	ogse_debug.process_monster(self.object, "upd", 6)
           
@@ -233,6 +225,15 @@ function generic_object_binder:update(delta)
 	ogse_debug.process_monster(self.object, "upd", 8)
 
 	if self.object:alive() then
+		--' Суперконтролёр
+		if self.object:section() == "m_controller_special" then
+			local posit = self.object:position()
+			if posit:distance_to(db.actor:position()) < 85 then
+				jekan_update.controller_special_effect(p_obj)
+				jekan_update.actor_weapon_drop()
+			end
+		end
+
 		if self.object:is_talk_enabled() then
 			self.object:set_tip_text("character_use")
 		else
