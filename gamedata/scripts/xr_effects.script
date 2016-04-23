@@ -2824,17 +2824,6 @@ jekan_work.kulg_band_ambush()
 end
 
 
--- Эффект от артефакта "Улей" ---------------------------------------------------------------------------
-
-function af_uley_effect()
-	if has_alife_info("izgoy_doctor_reward") then
-		return
-	end
-	if db.actor:dont_has_info("af_uley_reaction") and has_alife_info("af_uley_spawn") and db.actor:object("af_container_full") then
-		jekan_update.af_uley_effect()
-	end
-end
-
 -- Сейфы ----------------------------------------------------------------------------------------------------------------------
 local function open_safe(info, sid, fun)
     if has_alife_info(info) then

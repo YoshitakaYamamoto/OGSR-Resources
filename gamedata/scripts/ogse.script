@@ -1286,7 +1286,6 @@ end
 -- Колбэк на использование предмета в инвентаре ГГ
 function use_inventory_item(obj)
 	jekan_books.on_use_item(obj)
-	jekan_update.on_use_item(obj)
 end
 
 --*****************************************************[Переменные для апдейта актора]******************************************************
@@ -1446,14 +1445,6 @@ function()
 end,
 ------------------------------------------------Квестовые апдейты---------------------------------------------
 function()
-	ogse_debug.process_actor("upd_a", 36088)
-	ogse_quests.transponder_on_belt() -- Проверка транспондера на поясе
-end,
-function()
-	ogse_debug.process_actor("upd_a", 48)
-	quest_deadcity.check_first_enter()
-end,
-function()
 	ogse_debug.process_actor("upd_a", 481)
 	ogse_quests.check_gorkom_books()
 end,
@@ -1489,56 +1480,6 @@ function()
 	ogse_debug.process_actor("upd_a", 22)
 	PMA_escape.show_heli_scene() -- Сценка с вертушкой на Кордоне
 end,
---=====================Перенесено из jekan_update.script=======================
-function()
-	jekan_update.dolg_zahvat()
-end,
-function()
-	jekan_update.af_puzir_destroy()
-end,
-function()
-	jekan_update.af_light_destroy()
-end,
-function()
-	jekan_update.af_uley_packed()
-end,
-function()
-	jekan_update.af_mayatnik_effect()
-end,
-function()
-	jekan_update.af_ray_travel()
-end,
-function()
-	jekan_update.cheburashka_greeting()
-end,
-function()
-	jekan_update.fake_arts_delete()
-end,
-function()
-	jekan_update.magnit_part_work_from_belt()
-end,
-function()
-	jekan_update.magnit_part_work_on_take()
-end,
-function()
-	xr_effects.af_uley_effect()
-end,
-function()
-	jekan_update.thunderbird_visual_effect()
-end,
-function()
-	jekan_update.rustyfield_effect1()
-end,
-function()
-	jekan_update.rustyfield_effect2()
-end,
-function()
-	jekan_update.rustyfield_effect3()
-end,
-function()
-	jekan_update.strange_zone_actor_particle()
-end,
---=============================================================================
 ------------------------------------------Конец квестовых апдейтов--------------------------------------------
 }
 --*******************************************************************************************************************************************
@@ -1681,6 +1622,8 @@ function on_actor_first_update()
 	end
 
 	ogse_quests_fix.clean_level() -- Очищаем уровни от трупов во фриплее
+
+	quest_deadcity.check_first_enter()
 end
 
 -- Коллбэк на нажатие клавиши

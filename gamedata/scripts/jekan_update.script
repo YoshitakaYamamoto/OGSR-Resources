@@ -16,6 +16,23 @@
 	-- вызов_вашей_функции2()
 -- end,
 
+function attach(sm)
+	sm:subscribe({ signal = "on_use",			fun = this.on_use_item })
+	sm:subscribe({ signal = "on_update",		fun = this.upd_strange_zone_effects })
+	sm:subscribe({ signal = "on_update",		fun = this.thunderbird_visual_effect, queued = true })
+	sm:subscribe({ signal = "on_take",			fun = this.cheburashka_greeting })
+	sm:subscribe({ signal = "on_take",			fun = this.fake_arts_delete })
+	sm:subscribe({ signal = "on_take",			fun = this.dolg_zahvat })
+	sm:subscribe({ signal = "on_take",			fun = this.af_ray_travel })
+	sm:subscribe({ signal = "on_take",			fun = this.af_uley_packed })
+	sm:subscribe({ signal = "on_take",			fun = this.af_uley_effect })
+	sm:subscribe({ signal = "on_item_to_belt",	fun = this.af_mayatnik_effect })
+	sm:subscribe({ signal = "on_take",			fun = this.magnit_part_work_on_take })
+	sm:subscribe({ signal = "on_item_to_belt",	fun = this.magnit_part_work_from_belt })
+	sm:subscribe({ signal = "on_take",			fun = this.af_puzir_destroy })
+	sm:subscribe({ signal = "on_take",			fun = this.af_light_destroy })
+end
+
 local pda =
 {
 	-- ѕервач Ћесника:	
@@ -118,7 +135,6 @@ local pda =
 ----------------------------------------------------------------------------------------------------
 
 function on_use_item(obj)
-	if obj == nil or alife():object(obj:id()) == nil then return end
 	local portion = pda[obj:section()]
 	if portion ~= nil then 
 		if type(portion) == "string" then
@@ -133,18 +149,21 @@ end
 
 ----------------------------------------------------------------------------------------------------
 
-function magnit_part_work_from_belt()
-	if db.actor and inventory.belt["af_magnit_part1"] then
+function magnit_part_work_from_belt(obj)
+	if obj:section() == "af_magnit_part1" then
 		jekan_work.teleport_to_magnit()
 	end
 end
 
-function magnit_part_work_on_take()
-	if db.actor:object("af_magnit_part1") ~= nil  and db.actor:object("af_magnit_part2") ~= nil  then
-		ogse.remove_item_from_inventory(db.actor:object("af_magnit_part1"), db.actor)
-		ogse.remove_item_from_inventory(db.actor:object("af_magnit_part2"), db.actor)
-		ogse.spawn_item_in_inv("magnit_full")
-		news_manager.send_tip(db.actor, "af_magnit_is_full", nil, "anomal", 3000, nil)
+function magnit_part_work_on_take(obj)
+	if obj:section() == "af_magnit_part1" or obj:section() == "af_magnit_part2" then
+		if db.actor:object("af_magnit_part1") ~= nil  and db.actor:object("af_magnit_part2") ~= nil  then
+			ogse.remove_item_from_inventory(db.actor:object("af_magnit_part1"), db.actor)
+			ogse.remove_item_from_inventory(db.actor:object("af_magnit_part2"), db.actor)
+			ogse.spawn_item_in_inv("magnit_full")
+			news_manager.send_tip(db.actor, "af_magnit_is_full", nil, "anomal", 3000, nil)
+		end
+		return true
 	end
 end
 
@@ -163,30 +182,30 @@ end
 		["fake_art2"] = "af_sparks",
 		["fake_art3"] = "af_resine",
 	}
-	
---TODO: висит на апдейте, может перенести в коллбек получени€ предмета?
-function fake_arts_delete()
 
-	for fake_art, real_art in pairs(dz_arts) do
-		if db.actor:object(fake_art) then
-			for zone, zone_params in pairs(dz_zones) do
-				if xr_conditions.actor_in_zone(nil,nil,{zone}) then
-					ogse.remove_item_from_inventory_by_name(fake_art, db.actor)
-					ogse.spawn_item_in_inv(real_art, db.actor)
-					db.actor:give_info_portion(zone_params.sig_off)
-					news_manager.send_tip(db.actor, "strange_zone_af_gathered", nil, "anomal", 5000, nil)
-					db.actor:disable_info_portion(zone_params.sig_birth)
-					ogse.g_start_timer(unpack(zone_params.timer))					
+function fake_arts_delete(obj)
+	if dz_arts[obj:section()] then
+		for fake_art, real_art in pairs(dz_arts) do
+			if db.actor:object(fake_art) then
+				for zone, zone_params in pairs(dz_zones) do
+					if xr_conditions.actor_in_zone(nil,nil,{zone}) then
+						ogse.remove_item_from_inventory_by_name(fake_art, db.actor)
+						ogse.spawn_item_in_inv(real_art, db.actor)
+						db.actor:give_info_portion(zone_params.sig_off)
+						news_manager.send_tip(db.actor, "strange_zone_af_gathered", nil, "anomal", 5000, nil)
+						db.actor:disable_info_portion(zone_params.sig_birth)
+						ogse.g_start_timer(unpack(zone_params.timer))					
+					end
 				end
 			end
 		end
-	end
-	
-	if db.actor:object("cheb_fakeart") ~= nil then
+		return true
+	elseif obj:section() == "cheb_fakeart" then
 		jekan_work.delete_cheb_fakeart()
 		jekan_work.give_cheb_realart()
 		ogse.start_timer("cheb_art",1800)
 		soundtrack.cheb_fakeart_konteiner_open()
+		return true
 	end
 end
 
@@ -259,34 +278,37 @@ function on_timer_cheb1(params_string)
 		ogse.start_tmr("cheb2", 7, script_name()..".on_timer_cheb2")
 	end
 end
-	
-function cheburashka_greeting()
-	if db.actor and db.actor:object("cheb") ~= nil and db.actor:dont_has_info("cheb_greeting") then
+
+function cheburashka_greeting(obj)
+	if obj:section() == "cheb" and db.actor:dont_has_info("cheb_greeting") then
 		ogse.start_tmr("cheb1", 7, script_name()..".on_timer_cheb1")
 		db.actor:give_info_portion ("cheb_greeting")
+		return true
 	end
 end
 
-function dolg_zahvat()
-	if db.actor and db.actor:object("klondaik_flash_2_fake") ~= nil then
+function dolg_zahvat(obj)
+	if obj:section() == "klondaik_flash_2_fake" then
 		jekan_work.actor_dolg_zahvat()
-		ogse.remove_item_from_inventory(db.actor:object("klondaik_flash_2_fake"), db.actor)
+		ogse.remove_item_from_inventory(db.actor:object("klondaik_flash_2_fake"))
+		return true
 	end
 end
 
-function af_ray_travel()
-	if db.actor and db.actor:object("af_ray") ~= nil and db.actor:dont_has_info("have_af_ray") then
+function af_ray_travel(obj)
+	if obj:section() == "af_ray" and db.actor:dont_has_info("have_af_ray") then
 		db.actor:set_actor_position(vector():set(149.91,0.43,71.97))
 		db.actor:give_info_portion ("have_af_ray")
 		jekan_work.get_items_from_arena_box()
 		-- news_manager.send_tip(db.actor, "voronin_after_arena_tip", nil)
 		jekan_work.voronin_after_arena_tip()
-		ogse.remove_item_from_inventory(db.actor:object("wpn_knife_arena"), db.actor)
+		ogse.remove_item_from_inventory(db.actor:object("wpn_knife_arena"))
+		return true
 	end
 end
 
-function af_mayatnik_effect()
-	if db.actor and inventory.belt["af_mayatnik"] then
+function af_mayatnik_effect(obj)
+	if obj:section() == "af_mayatnik" then
 		level.add_pp_effector("snd_shock.ppe", 999, false)
 		ogse.remove_item_from_inventory(db.actor:object("af_mayatnik"), db.actor)
 		db.actor:set_actor_position(vector():set(423.17,-2.06,-363.09))
@@ -301,23 +323,25 @@ function af_mayatnik_effect()
 end
 
 
-function af_puzir_destroy()
-	if db.actor:object("af_puzir") ~= nil and db.actor:dont_has_info("have_af_puzir") then
+function af_puzir_destroy(obj)
+	if obj:section() == "af_puzir" and db.actor:dont_has_info("have_af_puzir") then
 		ogse.remove_item_from_inventory_by_name("af_puzir",db.actor)
 		soundtrack.af_puzir_destroy()
 		news_manager.send_tip(db.actor, "af_puzir_destroyed", nil)
 		db.actor:give_info_portion ("af_puzir_destroyed")
+		return true
 	end
 end
 
 ----------------------------------------------------------------------------------------------------
 
-function af_light_destroy()
-	if db.actor:object("af_light") ~= nil and db.actor:dont_has_info("af_light_have") then
+function af_light_destroy(obj)
+	if obj:section() == "af_light" and db.actor:dont_has_info("af_light_have") then
 		ogse.remove_item_from_inventory_by_name("af_light",db.actor)
 		soundtrack.af_puzir_destroy()
 		news_manager.send_tip(db.actor, "af_puzir_destroyed", nil)
 		db.actor:give_info_portion ("af_light_destroyed")
+		return true
 	end
 end
 
@@ -426,8 +450,7 @@ end
 
 function actor_weapon_drop()
 	local active_item = db.actor:active_item()
-	if active_item and active_item:section()~= "bolt" and active_item:section()~= "wpn_knife" 
-	and active_item:section()~= "wpn_knife_m1" and active_item:section()~= "wpn_montirovka" then
+	if active_item and active_item:section()~= "bolt" and not isKnife(active_item) then
 		db.actor:drop_item(active_item)
 	end
 end
@@ -516,52 +539,7 @@ function spawn_gg_clone()
 	end
 end
 
---  нижќнки н-н-н-ада? -----------------------------------------------------------------------------
-
-function book_using(sm)
-   sm:subscribe({signal = "on_use", fun = this.on_item_use})
-end
-
---TODO: странный код, он работает? что вообще хотели делать с "книжонками"?
-local book_sections = { 
-	section1 = book_1,
-	section2 = book_2,
-	section3 = book_3,
-	section4 = book_4,
-	section5 = book_5
-}
-
-function on_item_use(item)
-	if item == nil or alife():object(item:id()) == nil then return end
-	local sec = item:section()
-	if book_sections[sec] then
-		return true
-	end
-end
-
 -- Ёффекты от артефакта "”лей" ---------------------------------------------------------------------
-
-function af_uley_death_effect()
-	if has_alife_info("izgoy_doctor_reward") then
-		return
-	end
-	level.add_pp_effector("monolith_off.ppe", 999, false)
-	level.add_cam_effector("camera_effects\\head_shot.anm", 999, false, "")
-	soundtrack.pain1()
-	ogse.start_timer("uley_1",10)
-	db.actor:give_info_portion ("af_uley_reaction") 
-	jekan_work.uley_zaraza_message()
-end
-
-function af_uley_live_effect()
-	if has_alife_info("izgoy_doctor_reward") then
-		return
-	end
-	if db.actor.health > 0.1 then
-		db.actor.health = - 0.0005
-	end
-end
-
 function uley_timer_1()
 	if db.actor:dont_has_info("izgoy_doctor_reward") then
 		ogse.start_timer("uley_2",5)
@@ -579,49 +557,52 @@ function uley_timer_2()
 end
 
 function uley_pain_1()
-	if has_alife_info("izgoy_doctor_reward") then
-		return
-	end
 	if db.actor:alive() then
 		soundtrack.pain1()
 	end
 end
 
 function uley_pain_2()
-	if has_alife_info("izgoy_doctor_reward") then
-		return
-	end
 	if db.actor:alive() then
 		soundtrack.pain2()
 	end
 end
 
-function af_uley_effect()
-	if has_alife_info("izgoy_doctor_reward") then
+function af_uley_effect(obj)
+	if	obj:section() ~= "af_container_full"
+		or has_alife_info("izgoy_doctor_reward")
+		or has_alife_info("af_uley_reaction")
+		or not has_alife_info("af_uley_spawn")
+	then
 		return
 	end
-	local scientvisuals =
-	{
+
+	local scientvisuals = {
 		["scientific_outfit"] = true,
 		["ecolog_outfit"] = true,
 		["protection_outfit"] = true
-	} 
-	if db.actor:item_in_slot(6) and scientvisuals[db.actor:item_in_slot(6):section()] then
-		jekan_update.af_uley_live_effect()
-	else
-		jekan_update.af_uley_death_effect()
+	}
+	if not db.actor:item_in_slot(6) or not scientvisuals[db.actor:item_in_slot(6):section()] then
+		level.add_pp_effector("monolith_off.ppe", 999, false)
+		level.add_cam_effector("camera_effects\\head_shot.anm", 999, false, "")
+		soundtrack.pain1()
+		ogse.start_timer("uley_1",10)
+		db.actor:give_info_portion ("af_uley_reaction") 
+		jekan_work.uley_zaraza_message()
 	end
+	return true
 end
 
 -- ”паковываем "”лей" в контейнер ------------------------------------------------------------------
 
-function af_uley_packed()
-	if db.actor:object("af_uley") ~= nil then
+function af_uley_packed(obj)
+	if obj:section() == "af_uley" then
 		ogse.remove_item_from_inventory_by_name("af_container_empt", db.actor)
 		ogse.remove_item_from_inventory_by_name("af_uley", db.actor)
 		ogse.spawn_item_in_inv("af_container_full", db.actor)
 		soundtrack.af_uley_packed()
 		news_manager.send_tip(db.actor, "af_uley_packed", nil)
+		return true
 	end
 end
 
@@ -656,11 +637,13 @@ end
 -- јртефакт ѕогодник -------------------------------------------------------------------------------
 
 function thunderbird_visual_effect()
+	if not inventory.belt["af_thunderbird"] then return end
+
 	local hud = get_hud()
 	if db.actor then
 		local next_time = ogse_weather_mgr.get_surge_time()
 		local need_show_static = next_time < 2
-		if inventory.belt["af_thunderbird"] and need_show_static then
+		if need_show_static then
 			hud:AddCustomStatic("blow", true)
 			local cs = hud:GetCustomStatic("blow"):wnd()
 			if cs then
@@ -682,52 +665,57 @@ function thunderbird_visual_effect()
 end
 
 -- –жавчина ----------------------------------------------------------------------------------------
+local hit_time = 0
+function upd_strange_zone_effects()
+	if hit_time > time_global() then return end
+
+	if in_strange_zone() then
+		strange_zone_actor_particle()
+		rustyfield_effect1()
+		rustyfield_effect2()
+		rustyfield_effect3()
+	end
+	hit_time = time_global() + 1000
+end
 
 function rustyfield_effect1()
 	local outfit = db.actor:item_in_slot(6)
-	local h = hit()
-	h.power = 0.07
-	h.direction = vector():set (0, 0, 0)
-	h.impulse = 0
-	h.draftsman = db.actor
-	h.type = hit.chemical_burn
-	if outfit ~= nil and outfit:condition() >=0.30 and in_strange_zone() then
+	if outfit and outfit:condition() >=0.30 then
+		local h = hit()
+		h.power = 0.07
+		h.direction = vector():set (0, 0, 0)
+		h.impulse = 0
+		h.draftsman = db.actor
+		h.type = hit.chemical_burn
+
 		outfit:hit(h)
-	elseif outfit == nil then 
-		return false
 	end
 end
 
 function rustyfield_effect2()
-	local gun1 = db.actor:item_in_slot(2)
-	local h = hit()
-	h.power = 0.05
-	h.direction = vector():set (0, 0, 0)
-	h.impulse = 0
-	h.draftsman = db.actor
-	h.type = hit.explosion
-	if gun1 ~= nil and gun1:condition() >=0.30 and in_strange_zone() then
-		gun1:hit(h)
-	elseif gun1 == nil then
-		return false
+	local gun1 = db.actor:item_in_slot(1)
+	if gun1 and gun1:condition() >=0.30 then
+		wpn_hit(gun1)
 	end
 end
 
 function rustyfield_effect3()
-	local gun2 = db.actor:item_in_slot(3)
+	local gun2 = db.actor:item_in_slot(2)
+	if gun2 and gun2:condition() >=0.30 then
+		wpn_hit(gun2)
+	end
+end
+
+function wpn_hit(wpn)
 	local h = hit()
 	h.power = 0.05
 	h.direction = vector():set (0, 0, 0)
 	h.impulse = 0
 	h.draftsman = db.actor
 	h.type = hit.explosion
-	if gun2 ~= nil and gun2:condition() >=0.30 and in_strange_zone() then
-		gun2:hit(h)
-	elseif gun2 == nil then
-		return false
-	end
-end
 
+	wpn:hit(h)
+end
 
 function in_strange_zone()
 	return xr_conditions.actor_in_zone(nil,nil,{"strange_zone1"}) or xr_conditions.actor_in_zone(nil,nil,{"strange_zone2"}) or 
@@ -737,23 +725,15 @@ function in_strange_zone()
 end
 
 -- периодическое срабатывание странных аномалий
-local last_strange_zone_actor_time = 0
 function strange_zone_actor_particle()
-	if in_strange_zone() then
-		local t = time_global()
-		if t - last_strange_zone_actor_time > 5 then
-			last_strange_zone_actor_time = t
-			--
-			local pos = db.actor:position()
-			-- local fx_particle_name = "anomaly\\a-03-growing-sparks_old00"
-			local fx_particle_name = "anomaly\\a-03-sparks-03_old00"
-			local fx_particle = particles_object(fx_particle_name)
-			fx_particle:play_at_pos(pos)
-			--
-			local snd_obj = xr_sound.get_safe_sound_object([[anomaly\anomaly_gravy_blast00]])
-			snd_obj:play_at_pos(db.actor, pos, 0, sound_object.s3d)
-		end
-	end
+	local pos = db.actor:position()
+	-- local fx_particle_name = "anomaly\\a-03-growing-sparks_old00"
+	local fx_particle_name = "anomaly\\a-03-sparks-03_old00"
+	local fx_particle = particles_object(fx_particle_name)
+	fx_particle:play_at_pos(pos)
+
+	local snd_obj = xr_sound.get_safe_sound_object([[anomaly\anomaly_gravy_blast00]])
+	snd_obj:play_at_pos(db.actor, pos, 0, sound_object.s3d)
 end
 --[[
 local last_playing_time = game.get_game_time()

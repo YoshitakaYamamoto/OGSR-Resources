@@ -6,6 +6,9 @@ function attach(sm)
 	sm:subscribe({ signal = "on_show_car_hud",	fun = this.set_btr_fuel_empty })
 	sm:subscribe({ signal = "on_show_car_hud",	fun = this.set_btr_nonworking })
 	sm:subscribe({ signal = "on_hide_car_hud",	fun = this.set_btr_working })
+-------------------
+	sm:subscribe({ signal = "on_item_to_belt",	fun = this.on_transponder_to_belt })
+	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.on_transponder_to_ruck })
 end
 
 --/ спавн квестовых предметов для OGSE и скриптовые квесты /--
@@ -911,9 +914,11 @@ local books = {
 }
 
 function check_gorkom_books()
+	if not db.actor:has_info("kpss_quest_begin") then return end
+
 	local safe = level_object_by_sid(story_ids.gorkom_safe)
 	local monster = level_object_by_sid(story_ids.gorkom_librarian)
-	if safe and db.actor:has_info("kpss_quest_begin") then
+	if safe then
 		if monster then
 		--	monster:add_restrictions("deadcity_gorkom_1", "")
 		end	
@@ -1789,7 +1794,7 @@ function deadly_blowout()
 		level.add_cam_effector("camera_effects\\fusker.anm",959,false,"")
 		
 		local active_item = db.actor:active_item()
-		if active_item and active_item:section()~= "bolt" and active_item:section()~= "wpn_knife" then
+		if active_item and active_item:section()~= "bolt" and not isKnife(active_item) then
 			db.actor:drop_item(active_item)
 		end		
 		
@@ -1871,23 +1876,28 @@ local return_functions = {
 	["actor_prebandit"]	= dialogs.set_actor_prebandit,
 }
 
-function transponder_on_belt()
-	if db.actor and db.actor:alive() then
-		if inventory.belt["mil_transponder"] then
-			if not db.actor:has_info("actor_set_milstalker") and not db.actor:has_info("actor_set_zombied") then
-				local comm = db.actor:character_community()
-				ogse.save_variable("actor_orig_comm", comm)
-				dialogs.set_actor_milstalker()
-			end
-			if not db.actor:has_info("esc_bridge_pass_on") then
-				db.actor:give_info_portion("esc_bridge_pass_on")
-			end		
-		else
-			if db.actor:has_info("actor_set_milstalker") and not db.actor:has_info("actor_set_zombied") then
-				local comm = ogse.load_variable("actor_orig_comm", "actor")
-				local run_funct = return_functions[comm]
-				run_funct()		
-			end
+function on_transponder_to_belt(obj)
+	if obj:section() == "mil_transponder" then
+		if not db.actor:has_info("actor_set_milstalker") and not db.actor:has_info("actor_set_zombied") then
+			local comm = db.actor:character_community()
+			ogse.save_variable("actor_orig_comm", comm)
+			dialogs.set_actor_milstalker()
+		end
+		if not db.actor:has_info("esc_bridge_pass_on") then
+			db.actor:give_info_portion("esc_bridge_pass_on")
+		end
+	end
+end
+
+function on_transponder_to_ruck(obj)
+	if obj:section() == "mil_transponder" then
+		if db.actor:has_info("actor_set_milstalker") and not db.actor:has_info("actor_set_zombied") then
+			local comm = ogse.load_variable("actor_orig_comm", "actor")
+			local run_funct = return_functions[comm]
+			run_funct()		
+		end
+		if db.actor:has_info("esc_bridge_pass_on") then
+			db.actor:disable_info_portion("esc_bridge_pass_on")
 		end
 	end
 end
