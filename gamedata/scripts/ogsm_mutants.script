@@ -312,7 +312,7 @@ function MutantManager:update(param)
 
 					local active_item = db.actor:active_item()
 
-					if active_item and active_item:section() ~= "bolt" and active_item:section() ~= "wpn_knife" and math.random(1, 100) / 100 > db.actor.psy_health then
+					if active_item and active_item:section() ~= "bolt" and not isKnife(active_item) and math.random(1, 100) / 100 > db.actor.psy_health then
 						db.actor:drop_item(active_item)
 					end
 				end
@@ -332,7 +332,7 @@ function MutantManager:update(param)
 					if get_random_real() > db.actor.power and get_random_real() > db.actor.health then
 						if distance_to_actor < math.random(v.min, v.max) then
 							local active_item = db.actor:active_item()
-							if active_item and active_item:section() ~= "bolt" and active_item:section() ~= "wpn_knife" then db.actor:drop_item(active_item) end
+							if active_item and active_item:section() ~= "bolt" and not isKnife(active_item) then db.actor:drop_item(active_item) end
 						end
 					end
 				end

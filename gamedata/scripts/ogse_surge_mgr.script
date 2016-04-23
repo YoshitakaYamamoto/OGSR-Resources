@@ -760,7 +760,7 @@ function deadly_blowout()
 		level.add_cam_effector("camera_effects\\fusker.anm",959,false,"")
 		
 		local active_item = db.actor:active_item()
-		if active_item and active_item:section()~= "bolt" and active_item:section()~= "wpn_knife" then
+		if active_item and active_item:section()~= "bolt" and not isKnife(active_item) then
 			db.actor:drop_item(active_item)
 		end		
 		
