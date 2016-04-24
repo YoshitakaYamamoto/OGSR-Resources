@@ -1790,27 +1790,25 @@ function give_reward_on_kvest_make_meet_dolg_freedom_2(first_speaker, second_spe
 end
 
 ----------------------- Квест "Спасти свободовца на радаре" -----------------------
-function spawn_feedomer_on_radar()
-    db.actor:give_info_portion("mil_kvest_spasti_freedomer_on_radar_spawn_freedomer")
-	ogse.spawn_object(spawn_db.rad_freedomer_on_vetr)
-	local obj = ogse.spawn_object(spawn_db.spawn_feedomer_on_radar_kolbasa)
-	add_map_spot(obj.id, "radar_freedomer_spot", "spawn_feedomer_on_radar_text")
-end
-
 function on_spot_feedomer_on_radar()
 	local obj = ogse.spawn_object(spawn_db.on_spot_feedomer_on_radar_kolbasa)
-	add_map_spot(obj.id, "radar_freedomer_spot", "spawn_feedomer_on_radar_text")
+	add_map_spot(obj.id, "radar_vert_spot", "spawn_feedomer_on_radar_text")
+end
+
+function spawn_feedomer_on_radar()
+    db.actor:give_info_portion("mil_kvest_spasti_freedomer_on_radar_spawn_freedomer")
+	delete_map_spot("radar_vert_spot", true)
+	local obj = ogse.spawn_object(spawn_db.rad_freedomer_on_vetr)
+	add_map_spot(obj.id, "radar_freedomer_spot", "task_functor_mil_show_max_kvests_1_text")
 end
 
 function save_id_feedomer_on_radar(a, n)
 	ogse.save_variable("RadarFreedomerId", n:id())
-
 end
 
 function rad_search_feedomer_complete()
     if db.actor:position():distance_to_sqr(vector():set(354.13,-42.17,-225.98),96916,2080) < 7^2 then
 		db.actor:give_info_portion("mil_kvest_spasti_freedomer_on_radar_search_complete")
-		delete_map_spot("radar_freedomer_spot", false, "green_location")
 		return true
 	end
 	if not has_alife_info("mil_kvest_spasti_freedomer_on_radar_spawn_freedomer") then
@@ -1832,6 +1830,7 @@ function mil_guid_feedomer_to_base()
 			dialogs.companion_stop_following(level.object_by_id(FreedomerId), db.actor)
 			local text = game.translate_string("mil_guid_feedomer_to_base_text")
 			ogse.send_tip(text, game.translate_string(level.object_by_id(FreedomerId):character_name())..":", 0, 10, "freedom", "task")
+			delete_map_spot("radar_freedomer_spot", false)
 			delete_when_offline(FreedomerId):start()
 		    return true
         end
