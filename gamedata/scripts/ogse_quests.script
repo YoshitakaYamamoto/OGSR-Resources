@@ -1265,6 +1265,10 @@ function master_dying()
 	if has_alife_info("actor_set_zombied") then
 		tasks_functor.make_actor_normal()
 	end		
+
+	if level_tasks.is_map_spot_present(story_ids.mg_barman, "green_location") then
+		level_tasks.remove_location_by_sid(story_ids.mg_barman, "green_location") --Удаляем метку с бара в МГ
+	end
 end
 
 function check_total_fail()
