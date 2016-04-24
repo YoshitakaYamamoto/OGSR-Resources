@@ -5,7 +5,7 @@
 --- 2009-2013 (c) OGS Evolution Team
 -----------------------------------------------------------------------
 
-game_time_factor = level.get_time_factor()
+game_time_factor = 0
 local fov_vol = sys_ini:r_s32("options","fov_volume")
 local max_alarm_fov_vol = sys_ini:r_s32("options","max_fov_volume")
 local min_alarm_fov_vol = sys_ini:r_s32("options","min_fov_volume")
@@ -1456,10 +1456,10 @@ function()
 	ogse_debug.process_actor("upd_a", 29)
 	ogse_quests_fix.check_radar_off() -- Багфикс радара
 end,
-function()
+--[[function()
 	ogse_debug.process_actor("upd_a", 36)
 	ogsm_quests.actor_af_transmut_8_fx() -- Постэффект ношения "Ока" актором
-end,
+end,]]
 function()
 	ogse_debug.process_actor("upd_a", 42)
 	jekan_work.check_bind_avail_six_anom_house_items()
@@ -1486,9 +1486,6 @@ end,
 
 function on_actor_update() --Колбэк на апдейт ГГ
 ---------------------АПДЕЙТЫ С ВЫСОКИМ ПРИОРИТЕТОМ ПОМЕЩАТЬ СЮДА!---------------------
-	ogse_debug.process_actor("upd_a", 3)
-	game_time_factor = level.get_time_factor() -- Проверка таймфактора
-
 	ogse_debug.process_actor("upd_a", 4)
 	ogse_scripted_btr.update() --Охранный БТР. надо перевести на сигналы
 
@@ -1512,13 +1509,7 @@ end
 
 -- Запуск вызовов при первом апдейта актора
 function on_actor_first_update()
-	-- здесь удаляется глючно заспавненная модель автомата
-	local bug = alife():object("mil_physic_object_0127")
-	if bug then
-		alife():release(bug, true)
-	end
-	
-	if db.actor:dont_has_info("OGSE_LIANA_PATCH_3_FIX") then
+	--[=[if db.actor:dont_has_info("OGSE_LIANA_PATCH_3_FIX") then
 		if level.name() ~= "l08u_brainlab" then
 			-- баг с лианами
 			local obj = alife():object("liana_00")
@@ -1593,7 +1584,7 @@ function on_actor_first_update()
 			end
 		end
 		db.actor:give_info_portion("OGSE_PATCH_8_FIX")
-	end
+	end]=]
 
 	-- Установка FOV
 	db.actor:set_camera_fov(fov_vol)
@@ -1649,11 +1640,6 @@ function on_game_load()
 	ogse_debug.process_actor("a_spw", 113)
 
 	deadmans_table = load_var( "ogse.deadmans_table", {}, "table" )
-
-	ogse_debug.process_actor("a_spw", 114)
-
-	-- Определяем текущий тайм-фактор
-	game_time_factor = level.get_time_factor()
 
 	ogse_debug.process_actor("a_spw", 115)
 
