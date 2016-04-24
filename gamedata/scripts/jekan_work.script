@@ -436,45 +436,30 @@ end
 --Бандиты и искатели на Лесопилке-------------------------------------------------------------------
 
 function kill_lesop_bandits()
-	if has_alife_info("ds_nalet_band_1_dead") and
+	return has_alife_info("ds_nalet_band_1_dead") and
 		has_alife_info("ds_nalet_band_2_dead") and
 		has_alife_info("ds_nalet_band_3_dead") and
 		has_alife_info("ds_nalet_band_4_dead") and
 		has_alife_info("ds_nalet_band_5_dead") and
 		has_alife_info("ds_nalet_band_6_dead") and
 		has_alife_info("ds_nalet_band_7_dead")
-	then
-		return true
-	else
-		return false
-	end
 end
 
 function dont_kill_lesop_bandits()
-	if db.actor:dont_has_info("ds_nalet_band_1_dead") and
+	return db.actor:dont_has_info("ds_nalet_band_1_dead") and
 		db.actor:dont_has_info("ds_nalet_band_2_dead") and
 		db.actor:dont_has_info("ds_nalet_band_3_dead") and
 		db.actor:dont_has_info("ds_nalet_band_4_dead") and
 		db.actor:dont_has_info("ds_nalet_band_5_dead") and
 		db.actor:dont_has_info("ds_nalet_band_6_dead") and
 		db.actor:dont_has_info("ds_nalet_band_7_dead")
-	then
-		return true
-	else
-		return false
-	end
 end
 
 function some_iskatel_dead()
-	if has_alife_info("ahmet_dead") or
+	return has_alife_info("ahmet_dead") or
 		has_alife_info("bacha_dead") or
 		has_alife_info("dusty_dead") or
 		has_alife_info("shaman_dead")
-	then
-		return true
-	else
-		return false
-	end
 end
 
 function yuriy_reward_bad(first_speaker, second_speaker)
@@ -508,29 +493,19 @@ function lesop_iskatel_signal_2()
 end
 
 function kill_iskateli()
-	if has_alife_info("yuriy_dead") and
+	return has_alife_info("yuriy_dead") and
 		has_alife_info("shaman_dead") and
 		has_alife_info("dusty_dead") and
 		has_alife_info("bacha_dead") and
 		has_alife_info("ahmet_dead")
-	then
-		return true
-	else
-		return false
-	end
 end
 
 function iskateli_not_dead()
-	if db.actor:dont_has_info("yuriy_dead") or
+	return db.actor:dont_has_info("yuriy_dead") or
 		db.actor:dont_has_info("shaman_dead") or
 		db.actor:dont_has_info("dusty_dead") or
 		db.actor:dont_has_info("bacha_dead") or
 		db.actor:dont_has_info("ahmet_dead")
-	then
-		return true
-	else
-		return false
-	end
 end
 
 function lesop_band_iskatel_fight(actor, npc)
@@ -687,10 +662,7 @@ end
 ----------------------------------------------------------------------------------------------------
 
 function fleshka_1_failure()
-	if db.actor:has_info("digger_dead") or db.actor:has_info("arthunter_dead") then
-		return true
-	end
-	return false
+	return db.actor:has_info("digger_dead") or db.actor:has_info("arthunter_dead")
 end
 
 function fleshka_1_find()
@@ -842,9 +814,7 @@ function go_offline_set_online:__init(treasure_id) super()
 end
 
 function go_offline_set_online:condition()
-	if level.object_by_id(self.treasure_id) == nil then return true end
-	return false
-	--return (not level.object_by_id(self.treasure_id))
+	return level.object_by_id(self.treasure_id) == nil
 end
 
 function go_offline_set_online:action()
@@ -1249,39 +1219,24 @@ function set_zomb_company_neutral(actor, npc)
 end
 
 function kill_radar_wave_1()
-	if has_alife_info("rad_attack_boar_1wave_1_dead") and
+	return has_alife_info("rad_attack_boar_1wave_1_dead") and
 		has_alife_info("rad_attack_boar_glavar_dead") and
 		has_alife_info("rad_attack_boar_1wave_3_dead") and
 		has_alife_info("rad_attack_boar_1wave_2_dead")
-	then
-		return true
-	else
-		return false
-	end
 end
 
 function kill_radar_wave_2()
-	if has_alife_info("rad_attack_snork_1_dead") and
+	return has_alife_info("rad_attack_snork_1_dead") and
 		has_alife_info("rad_attack_snork_2_dead") and
 		has_alife_info("rad_attack_snork_3_dead") and
 		has_alife_info("rad_attack_snork_4_dead") and
 		has_alife_info("rad_attack_snork_5_dead")
-	then
-		return true
-	else
-		return false
-	end
 end
 
 function kill_radar_wave_3()
-	if has_alife_info("rad_attack_pseudogig_1_dead") and
+	return has_alife_info("rad_attack_pseudogig_1_dead") and
 		has_alife_info("rad_attack_pseudogig_2_dead") and
 		has_alife_info("rad_attack_pseudogig_dead")
-	then
-		return true
-	else
-		return false
-	end
 end
 
 function mikluha_give_mines()
@@ -1354,10 +1309,7 @@ function lukash_scalp_reward(first_speaker, second_speaker)
 end
 
 function actor_has_scalp(first_speaker, second_speaker)
-	if db.actor:object("af_skull") then
-		return true
-	end
-	return false
+	return db.actor:object("af_skull") ~= nil
 end
 
 -- Грабим нашего несчастного Меченого --------------------------------------------------------------
@@ -2193,7 +2145,7 @@ function give_af_light_task()
 end
 
 function all_dik_bandits_dead()
-	if has_alife_info("kulg_zasada_1_boets_1_dead") and
+	return has_alife_info("kulg_zasada_1_boets_1_dead") and
 		has_alife_info("kulg_zasada_1_boets_2_dead") and
 		has_alife_info("kulg_zasada_1_boets_3_dead") and
 		has_alife_info("kulg_zasada_2_boets_1_dead") and
@@ -2202,11 +2154,6 @@ function all_dik_bandits_dead()
 		has_alife_info("kulg_zasada_3_boets_2_dead") and
 		has_alife_info("kulg_zasada_3_1_boets_1_dead") and
 		has_alife_info("kulg_zasada_3_1_boets_2_dead")
-	then
-		return true
-	else
-		return false
-	end
 end
 
 function hawe_af_light(stalker, player)
@@ -3262,10 +3209,7 @@ function give_hvost_reward(first_speaker, second_speaker)
 end
 
 function actor_has_cheb()
-	if db.actor:object("cheb") ~= nil then
-		return true
-	end
-	return false
+	return db.actor:object("cheb") ~= nil
 end
 
 function actor_has_no_cheb()
@@ -3412,10 +3356,7 @@ function give_yan_captain_reward_no_flash(npc, actor)
 end
 
 function actor_already_has_flash_3()
-	if db.actor:object("klondaik_flash_3") or db.actor:has_info("fleshka_3_find") then
-		return true
-	end
-	return false
+	return db.actor:object("klondaik_flash_3") ~= nil or db.actor:has_info("fleshka_3_find")
 end
 
 function actor_has_no_flash_3()
@@ -3975,10 +3916,7 @@ end
 -- Спасение рядового Шустрилы ----------------------------------------------------------------------
 
 function can_talk_with_atp_leader()
-	if xr_conditions.actor_in_zone(nil,nil,{"esc_fabrika_bandit_space_restrictor"}) and db.actor:object("petruha_zapis") then
-		return true
-	end
-	return false
+	return xr_conditions.actor_in_zone(nil,nil,{"esc_fabrika_bandit_space_restrictor"}) and db.actor:object("petruha_zapis") ~= nil
 end
 
 function spawn_atp_helper()
@@ -4813,20 +4751,12 @@ end
 
 function check_20_anom_bolts()
 local n=check_anom_bolts()
-	if n > 19 then 
-		return true 
-	else 
-		return false 
-	end
+	return n > 19
 end
 
 function check_avail_anom_bolts()
 local n=check_anom_bolts()
-	if n > 0 then 
-		return true 
-	else 
-		return false 
-	end
+	return n > 0
 end
 
 function check_anom_bolts()
@@ -4870,13 +4800,6 @@ function money_give_anom_house_items(first_speaker, second_speaker)
 	db.actor:give_info_portion("yan_anom_house_items_complete")
 end
 
-function check_bind_anom_house_items()
-	if db.actor:dont_has_info("yan_anom_house_items_start") and check_avail_anom_house_items() == true then
---		db.actor:give_info_portion("yan_anom_house_items_start")
-		db.actor:give_info_portion("yan_anom_house_items_find")
-	end
-end
-
 function check_bind_avail_six_anom_house_items()
 	if db.actor:dont_has_info("yan_anom_house_items_continue") and check_avail_six_anom_house_items() == true then
 		db.actor:give_info_portion("yan_anom_house_items_continue")
@@ -4885,32 +4808,22 @@ end
 
 function check_avail_anom_house_items()
 local n=check_anom_house_items()
-	if n > 0 then 
-		return true 
-	else 
-		return false 
-	end
+	return n > 0
 end
 
 function check_avail_1to6_anom_house_items()
 local n=check_anom_house_items()
-	if n > 1 and n < 6 then
-		return true 
-	else 
-		return false 
-	end
+	return n > 1 and n < 6
 end
 
 function check_avail_six_anom_house_items()
 local n=check_anom_house_items()
-	if n == 6 then 
-		return true 
-	else 
-		return false 
-	end
+	return n == 6
 end
 
 function check_anom_house_items()
+if db.actor:dont_has_info("deadcity_first_enter") then return 0 end --до первого входа в МГ проверка не имеет смысла
+
 local n = 0
 	if db.actor then	db.actor:iterate_inventory(function (dummy,item) 
 		for k, v in pairs(house_items) do
@@ -4975,11 +4888,7 @@ end
 
 function check_avail_ammo_box()
 local n=check_ammo_box()
-	if n > 0 then 
-		return true 
-	else 
-		return false 
-	end
+	return n > 0
 end
 
 function check_remove_ammo_box()
