@@ -695,7 +695,10 @@ function actor_punch(npc)
 	end
 
 	level.disable_input()
-	ogse.start_tmr("xr_effects.actor_punch", 5, script_name()..".enable_input")
+
+	dsh.timeout( 5000, function()
+		level.enable_input()
+	end )
 
 	local snd_obj = xr_sound.get_safe_sound_object([[affects\hit_fist]])
 	if snd_obj then
@@ -705,9 +708,6 @@ function actor_punch(npc)
 	level.add_cam_effector("camera_effects\\fusker.anm", 999, false, "")		
 end
 
-function enable_input()
-	level.enable_input()
-end
 
 -- ѕринудительное усыпание игрока на радаре.
 function force_actor_sleep(npc)
