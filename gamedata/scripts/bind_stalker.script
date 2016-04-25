@@ -524,10 +524,10 @@ function actor_binder:update(delta)
 		bind_restrictor.actor_update(delta)
 
 		ogse_debug.process_actor("upd", 812)
-		bind_mteleport.actor_update(--[[delta]]) --Апдейтим наш телепорт
+		bind_mteleport.actor_update() --Апдейтим наш телепорт
 
 		ogse_debug.process_actor("upd", 814)
-		ogse_water_restrictor.actor_update(--[[delta]])
+		ogse_water_restrictor.actor_update()
 
 		mteleport_update_time = mteleport_update_time + 200
 	end

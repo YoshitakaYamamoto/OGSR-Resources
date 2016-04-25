@@ -5,15 +5,8 @@
 
 --/ Модуль подрыва патрона в стволе при значительном износе оружия /--
 
-
--- Параметры
-local fx_is_enable = true									-- "true"-обработка подрыва патрона включена, "false"-выключена
-local wpn_is_jammed = false
-
 function attach(sm)
-	if fx_is_enable then
-		sm:subscribe({ signal = "on_update",	fun = this.update })
-	end
+	sm:subscribe({ signal = "on_update",	fun = this.update })
 end
 
 -- Малый калибр (пистолеты, пистолеты-пулемёты)
@@ -47,29 +40,15 @@ local explode_impulse_5 = 0.5
 local explode_power_5 = 1.2
 -- Параметры
 
-local current_blow_limit = -1.0 -- критическое состояние для текущего предмета
+local current_blow_limit = math.random(5, 25)*0.01
 
 function update()
-	local active_item = db.actor:active_item()
-	if	not db.actor:alive()
-		or not (get_hud():GetCustomStatic("gun_jammed") and not wpn_is_jammed)
-		or not active_item --если в руках ничего нет
-		or (db.actor:active_slot() ~= 1 and db.actor:active_slot() ~= 2) --или предмет в руках неходится НЕ в 1 и НЕ в 2 слоте.
-		or not active_item:is_weapon_magazined() --или в руках предмет, не являющийся оружием
-	then
-		wpn_is_jammed = false
-		current_blow_limit = -1.0
-		return --ничего не делаем
-	end
+	if not get_hud():GetCustomStatic("gun_jammed") or not db.actor:alive() then return end
 
+	local active_item = db.actor:active_item()
+	if not active_item then return end
 	local s_wpn = alife():object(active_item:id())
 	if s_wpn then
-		wpn_is_jammed = true
-		current_blow_limit = s_wpn.blow_cond
-		if not current_blow_limit or (current_blow_limit < 0.05 or current_blow_limit > 0.25) then
-			current_blow_limit = math.random(5, 25)*0.01
-			s_wpn.blow_cond = current_blow_limit
-		end
 		if active_item:condition() < current_blow_limit then
 			make_boom(active_item)
 		end
