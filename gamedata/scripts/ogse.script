@@ -169,11 +169,7 @@ function art_accesible(item)
 	local art_level = art_levels[section]
 	local loc_level = loc_levels[level_name]
 	if art_level and loc_level then
-		if art_level <= loc_level then
-			return true
-		else
-			return false
-		end
+		return art_level <= loc_level
 	else
 		return true
 	end
@@ -204,10 +200,7 @@ local x1 = pos_psy_x
 local x2 = pos_psy_y
 local y1 = size_psy_x
 local y2 = size_psy_y
-if (pos.x >= x1 and pos.x <= x2) and (pos.z >= y1 and pos.z <= y2) and (pos.y >= z1) and (pos.y <= z2) then
-	return true
-end
-return false
+return (pos.x >= x1 and pos.x <= x2) and (pos.z >= y1 and pos.z <= y2) and (pos.y >= z1) and (pos.y <= z2)
 end
 
 local quest_profiles = {
@@ -389,7 +382,7 @@ function is_quest_npc(npc)
 			end
 		end
 	end
-	if story ~= 4294967296 then return true else return false end
+	return story ~= 4294967296
 end
 
 -- телепортация NPC в пределах уровня
@@ -1136,7 +1129,7 @@ end
 function get_npc_relation(obj,target)
 	local rel = obj:relation(target)
 	if rel ~= nil then
-		return (rel==game_object.neutral and "neutral" or rel==game_object.friend and "friend" or rel==game_object.enemy and "enemy") or false
+		return (rel==game_object.neutral and "neutral" or rel==game_object.friend and "friend" or rel==game_object.enemy and "enemy")
 	end
 end
 
@@ -1205,10 +1198,7 @@ end
 
 -- Проверка, запущена ли игра
 function check_game()
-	if level.present() and (db.actor ~= nil) and db.actor:alive() then
-		return true
-	end
-	return false
+	return level.present() and (db.actor ~= nil) and db.actor:alive()
 end
 
 --**********************************************************************************************************
@@ -1236,24 +1226,16 @@ end
 -- Определяем находится ли ГГ в определенной зоне
 function check_npc_in_box(npc, p1,p2)
 	local pos=npc:position()
-	if is_point_inside_interval(pos.x,p1.x,p2.x) and
+	return is_point_inside_interval(pos.x,p1.x,p2.x) and
 		is_point_inside_interval(pos.y,p1.y,p2.y) and
-		is_point_inside_interval(pos.z,p1.z,p2.z) then
-		return true
-	else
-		return false
-	end
+		is_point_inside_interval(pos.z,p1.z,p2.z)
 end
 function is_point_inside_interval(x,p1,p2)
 	if p1>p2 then
 		p1,p2 = p2,p1
 	end
 
-	if x>p1 and x<p2 then
-		return true
-	else
-		return false
-	end
+	return x>p1 and x<p2
 end
 
 -- Получаем инвентарное название объекта
@@ -1549,7 +1531,7 @@ function on_actor_first_update()
 			alife():create(5934)
 		end
 		db.actor:give_info_portion("OGSE_LIANA_PATCH_3_FIX")
-	end
+	end--]=]
 
 	if db.actor:dont_has_info("OGSE_KOLYA_PATCH_6_FIX") then
 		-- варианты: 
@@ -1566,7 +1548,7 @@ function on_actor_first_update()
 				level_tasks.remove_location_by_sid(story_ids.stalker_kolya, "crlc_big")
 				alife():release(kolya)
 			end
-			alife():create(11268)
+			alife():create(11269)
 			if db.actor:has_info("deadcity_first_enter") then
 				level_tasks.add_location_by_sid(story_ids.stalker_kolya, "crlc_big", "find_kolya")
 			end
@@ -1575,7 +1557,7 @@ function on_actor_first_update()
 		db.actor:give_info_portion("OGSE_KOLYA_PATCH_6_FIX")
 	end
 
-	if db.actor:dont_has_info("OGSE_PATCH_8_FIX") then
+	--[=[if db.actor:dont_has_info("OGSE_PATCH_8_FIX") then
 		if db.actor:dont_has_info("dead_stalker_start_dialog_2") then
 			local obj = alife():story_object(story_ids.x18_death_stalker)
 			if obj then
@@ -1839,11 +1821,7 @@ function check_offline_npc(obj)
 		
 		local data = pk:get()
 		local health = data.health
-		if health > 0 then
-			return true
-		else
-			return false
-		end
+		return health > 0
 	end
 end
 
