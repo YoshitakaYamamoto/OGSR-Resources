@@ -2681,7 +2681,7 @@ function voronin_after_arena_tip()
 end
 
 function check_kaligula()
-	if db.actor:has_info("kaligula_dead") then
+	--[[if db.actor:has_info("kaligula_dead") then
 		return true
 	else	
 		local npc = alife():story_object(story_ids.bar_arena_kaligula)
@@ -2698,7 +2698,9 @@ function check_kaligula()
 		end
 		
 	end
-	return false
+	return false]]
+
+	return db.actor:has_info("kaligula_dead")
 end
 
 -- Мужик-излом -------------------------------------------------------------------------------------

@@ -2918,13 +2918,13 @@ end
 ------------------------------------------------------------------------------------------------------------------------------------
 
 function kaligula_wound_effect()
-	local fx_particle = "explosions\\group_items\\expl_car_sparks_00"
+	--[=[local fx_particle = "explosions\\group_items\\expl_car_sparks_00"
 	local obj = level_object_by_sid(623)
 	local pos = obj:position()
 	snd = sound_object([[sounds\anomaly\buzz_hit]])
 	fx_particle = particles_object(fx_particle)
 	fx_particle:play_at_pos(pos)
-	snd:play_no_feedback(obj, sound_object.s3d, 0, obj:position(), 1.0)
+	snd:play_no_feedback(obj, sound_object.s3d, 0, obj:position(), 1.0)]=]
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
