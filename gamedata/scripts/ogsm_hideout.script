@@ -15,7 +15,7 @@ act_inhide = act_base+3
 act_psyzoned = act_base+4
 
 local debug_flag = false
-local restrictions_off = false
+local restrictions_off = true --false
 
 local locked_vertexes 		= {}		-- занятые вертексы
 

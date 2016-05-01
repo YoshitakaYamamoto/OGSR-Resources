@@ -58,7 +58,7 @@ local game_difficulty = level.get_game_difficulty()
 local diff_level = game_difficulty_by_num[game_difficulty]	
 
 -- рестрикшены, которые нельзя восстанавливать если они были сняты, находятся в скриптe _g
-local restrictions_off = false
+local restrictions_off = true --false
 
 local low_range_npc_aggr = 30
 local far_range_mon_aggr = 25
