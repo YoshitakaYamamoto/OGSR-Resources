@@ -1451,7 +1451,9 @@ function get_inventory_icon_rect(sect)
 end
 -- получить номер локации по номеру глобального вертекса
 function location_id_by_gvid(gvid)
-	return game_graph():vertex(gvid):level_id()
+	if gvid and game_graph():valid_vertex_id( gvid ) then
+		return game_graph():vertex( gvid ):level_id()
+	end
 end
 -- получить номер локации для клиентского объекта
 function object_location_id(obj)
@@ -1459,10 +1461,15 @@ function object_location_id(obj)
 	return location_id_by_gvid(gvid)
 end
 function object_level_name(obj)
-	return level_system_name_by_lid(object_location_id(obj))
+	local lid = object_location_id( obj )
+	if lid then
+		return level_system_name_by_lid( lid )
+	end
 end
 function level_system_name_by_lid(lid)
-	return alife():level_name(lid)
+	if lid then
+		return alife():level_name( lid )
+	end
 end
 function level_name_by_level_system_name(lname)
 	return game.translate_string(lname)
