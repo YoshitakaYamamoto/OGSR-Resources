@@ -30,11 +30,6 @@ artefacts			= {}
 FlagEsc = 0
 Flag2 = 0
 Dead2 = 0
-use_rk = 0
-cond_rk = 0
-cond_rk_dif = 0
-repaired_slot = 0
-check_lc_flag = 0
 
 function add_obj( obj )
 	if IsStalker(obj) then

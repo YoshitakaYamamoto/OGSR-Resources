@@ -8,11 +8,11 @@
 function attach(sm)
 	sm:subscribe({signal = "on_take",     fun = this.on_item_take})
 	sm:subscribe({signal = "on_drop",     fun = this.on_item_drop})
-	sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
+	--sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
 end
 
-function on_key_down(key, bind)
-end
+--function on_key_down(key, bind)
+--end
 
 local setup_gps_beacon_wnd = nil
 
