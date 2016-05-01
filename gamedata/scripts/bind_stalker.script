@@ -451,7 +451,7 @@ function actor_binder:use_inventory_item(obj)
 
 	ogse.use_inventory_item(obj)
 	ogse_debug.process_actor("itm_u", 0)
-	self.am:call("on_use", obj, alife():object(obj:id()))
+	self.am:call("on_use", obj, sobj)
 	event("actor_use_inventory_item"):trigger({what = obj})
 end
 ----------------------------------------------------------------------------------------------------------------------

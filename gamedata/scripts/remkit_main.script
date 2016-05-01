@@ -16,8 +16,10 @@ function attach(sm)
 	sm:subscribe({signal = "on_use",	fun = this.check_use_repair_kit})
 end
 
-function check_use_repair_kit(p_obj) --действие при запуске ремкита из инвентаря.
-	if p_obj:section() == "repair_kit" then
+function check_use_repair_kit(obj, sobj) --действие при запуске ремкита из инвентаря.
+	if not obj or not sobj then return end
+
+	if obj:section() == "repair_kit" then
 		local spwn = remkit(get_hud())
 		level.start_stop_menu(spwn,true)
 		return true
