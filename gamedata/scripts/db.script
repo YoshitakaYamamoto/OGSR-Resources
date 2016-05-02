@@ -123,115 +123,51 @@ function remove_delayed()
 		end
 end
 
-local remove_this_shit_immediately = {
-	["fake_grenades_base"] = true,
-	["grenade_f1_fake"] = true,
-	["grenade_rgd5_fake"] = true,
-	["grenade_gd-05_fake"] = true,
-	["grenade_light_fake"] = true,
-	["grenade_f1_test"] = true,
-	["grenade_rgd5_test"] = true,
-	["grenade_gd-05_test"] = true,
-	["grenade_light_test"] = true,
-	["gl_test_shell"] = true,
-	["wpn_fake_missile"] = true,
-	["gl_test_shell_ammo_vog-25"] = true,
-	["gl_test_shell_ammo_vog-25p"] = true,
-	["gl_test_shell_ammo_m209"] = true,
-	["gl_test_shell_ammo_m208a"] = true,
-	["gl_fake_missile"] = true,
-	["gl_fake_missile_ammo_vog-25"] = true,
-	["gl_fake_missile_ammo_vog-25p"] = true,
-	["gl_fake_missile_ammo_m209"] = true,
-	["gl_fake_missile_ammo_m208a"] = true,
-}
-
 function recheck(npc, item)
-
-	if item == nil then return end
+	if not item then return end
 	local s_obj = alife():object(item:id())
 	if not s_obj then return end
-	
-    local section = s_obj:section_name()
-	
-	if remove_this_shit_immediately[section] then
-		local s_obj = alife():object(item:id())
-		if s_obj then
-			alife():release(s_obj, true)
-		end
-		return false	
-	end		
-	
-	if string.find(section,"arena") then
-		return false
-	end	
-	
-	if string.find(npc:name(), "aem_") then
-		return false
-	end	
 
-	if string.find(section,"af_") then
+    local section = s_obj:section_name()
+
+	if death_manager.remove_this_shit_immediately[section] then
+		alife():release(s_obj, true)
+		return false
+	elseif string.find(section,"arena") or string.find(npc:name(), "aem_") then
+		return false
+	elseif item:is_weapon_magazined() and item:condition() > 0.90 then
+		if math.random(1,100) > 40 then item:unload_magazine() end
+		if death_manager.rare_item and death_manager.rare_item[section] and death_manager.rare_item[section] == true then
+			item:set_condition(math.random(65,95)/100)
+		else
+			item:set_condition(math.random(death_manager.damage_boundaries(npc))/100)
+		end
+	elseif string.find(section,"af_") then
 		if ogse.art_accesible(item) then
 			return true
-		else	
+		else
 			local community = npc:character_community()
 			if community == "bandit" and math.random() > 0.5 then
 				return true
 			end
 			alife():release(s_obj, true)
-			return false				
+			return false
 		end
-	end
-	
-	if string.find(section,"wpn_binoc") 
-	or string.find(section,"binocular") 
-	or string.find(section,"hand_radio") 
-	or string.find(section,"device_pda") 
-	or string.find(section,"kolbasa_a") 
-	or string.find(section,"vodka_a") 
-	or string.find(section,"psy_helmet_a")
-	or string.find(section,"bread_a") 
-	or string.find(section,"guitar") 
-	or string.find(section,"yad") 
-	or string.find(section,"device_torch")
-	or string.find(section,"wpn_knife") then
-		alife():release(s_obj, true)
-		return false	
-	end	
-	
-	if string.find(section,"grenade_f1") then
-		if math.random() > 0.8 then 
+	elseif section == "grenade_f1" then
+		if math.random() > 0.8 then
 			return true
 		else
 			alife():release(s_obj, true)
 			return false
 		end
-	end	
-	
-	if string.find(section,"medkit") then
+	elseif string.find(section,"medkit") then
 		if math.random() > 0.95 then 
 			return true
 		else
 			alife():release(s_obj, true)
 			return false
 		end
-	end		
-	
-	if string.find(section,"wpn_") and 
-	not string.find(section,"scope") and
-	not string.find(section,"addon") and
-	not string.find(section,"zf4") and
-	not string.find(section,"_sil") and
-	not string.find(section,"grenade_launcher") and
-	item:condition() > 0.90 then
-		if math.random(1,100) > 40 then item:unload_magazine() end
-		if death_manager.rare_item and death_manager.rare_item[section] and death_manager.rare_item[section] == true then
-			item:set_condition(math.random(65,95)/100)						
-		else	
-			item:set_condition(math.random(death_manager.damage_boundaries(npc))/100)
-		end	
 	end
-
 end
 
 function add_zone( zone )

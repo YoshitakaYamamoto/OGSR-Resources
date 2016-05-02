@@ -545,11 +545,6 @@ local selector = {
 		end
 	end,
 
-	["otf"] = function(params_string)
-		local a = level.object_by_id(tonumber(params_string))
-		if a ~= nil then a:set_condition((10+math.random(6,65))/100) end
-	end,
-
 	["men"] = function(params_string)
 		del_variable("smn")
 	end,
