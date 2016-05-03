@@ -1688,11 +1688,6 @@ function on_game_load()
 
 	db.register_all_quest_zones()
 
-	ogse_debug.process_actor("a_spw", 1111)
-
-	-- рандомный спавн лута в сталкеров
-	trick_sr.art_and_ammo_random()
-
 	ogse_debug.process_actor("a_spw", 1112)
 
 	anom_enum = anom_enum + 15000
