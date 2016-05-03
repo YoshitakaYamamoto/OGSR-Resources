@@ -30,7 +30,7 @@ local pri_m_count = 0
 local particles={}
 
 local watchdog = {}
-local watchdog_max = 8
+local watchdog_max = 7
 
 ----------------------------------------------------------------------------------------------------------------------
 function protected_loot(object, backup)
@@ -316,7 +316,7 @@ function check_art_weapon(npc)
 	if act_item and item_in_slot and act_item:id() == item_in_slot:id() then
 		local item_in_slot_sec = act_item:section()
 		local item_in_slot_id = act_item:id()
-		if item_in_slot_sec and item_in_slot_id and string.find(item_in_slot_sec, "af_") then
+		if item_in_slot_sec and item_in_slot_id and act_item:is_artefact() --[[string.find(item_in_slot_sec, "af_")]] then
 			--' Если непись получил арт в слот по ошибке при загрузке игры, мы просто
 			--' обновим ему оружие в руках и всё. Иначе, если он взял арт в руки и отказывается
 			--' его убирать, а лучшее оружие получить не удаётся, придётся арт выбросить, отрелизить и вернуть ему в рюкзак.
@@ -332,7 +332,7 @@ function check_art_weapon(npc)
 				alife():release(s_obj, true)
 				alife():create(item_in_slot_sec,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 			end			
-			if bw and string.find(bw:section(), "wpn_") then
+			if bw and bw:is_weapon() then --if bw and string.find(bw:section(), "wpn_") then
 				-- log1("TOSS WEAPON TO "..bw:section().." FROM "..tostring(rem_id))
 				if be then
 					npc:set_item(object.fire1, bw)
@@ -1226,7 +1226,7 @@ function motivator_binder:update(delta)
 		end
 		-- Апдейт торговли
 	end
-	if watchdog[self.object:id()] == 4 then
+	if watchdog[self.object:id()] == 3 then
 		-- Обновление схем гранатометания, медика и переодевания
 		ogse_debug.process_npc(self.object, "upd", 12)
 		if self.object:alive() then
@@ -1234,7 +1234,7 @@ function motivator_binder:update(delta)
 		end
 		-- Обновление схем гранатометания, медика и переодевания
 	end
-	if watchdog[self.object:id()] == 5 then
+	if watchdog[self.object:id()] == 4 then
 		-- Обновление оружейного менеджера
 		ogse_debug.process_npc(self.object, "upd", 13)
 		if self.object:alive() then
@@ -1242,7 +1242,7 @@ function motivator_binder:update(delta)
 		end
 		-- Обновление оружейного менеджера
 	end
-	if watchdog[self.object:id()] == 6 then
+	if watchdog[self.object:id()] == 5 then
 		-- Проверка артефакта в руках
 		ogse_debug.process_npc(self.object, "upd", 14)
 		if self.object:alive() then
@@ -1250,7 +1250,7 @@ function motivator_binder:update(delta)
 		end
 		-- Проверка артефакта в руках
 	end
-	if watchdog[self.object:id()] == 7 then
+	if watchdog[self.object:id()] == 6 then
 		-- Проверка брони
 		ogse_debug.process_npc(self.object, "upd", 15)
 		if self.object:alive() then
