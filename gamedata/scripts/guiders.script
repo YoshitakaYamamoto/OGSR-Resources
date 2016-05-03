@@ -7,10 +7,6 @@
  Last update : 7.11.2010 
 --]]----------------------------------------------------------------------------------------------------
 
-function attach(sm) -- для менеджера сигналов
-	sm:subscribe({signal = "on_spawn",           fun = this.on_spawn})
-end
-
 local locations_db = ogse_spawn_db.script_spawn_registry.guiders
 
 --------------- Можно менять ---------------

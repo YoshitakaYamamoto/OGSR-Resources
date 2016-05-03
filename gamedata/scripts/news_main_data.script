@@ -36,7 +36,6 @@ local ft={}
 --Главная функция
 
 function show_news_main()
-if random_news == 1 then
 	if isIndoor(level.name()) or chk_Vibros() or xs_stor.get("need_shutdown_stalker_news", false) == true then return end
 	local t_duwn = 60000 -- стандартный диапазон времени выдачи сообщений
 	local t_up = 180000
@@ -105,7 +104,6 @@ if random_news == 1 then
 	end
 	ft[math.random(table.getn(ft))]()
 end
-end
 
 --"Статус соединения:"
 local connect_templates = {
@@ -173,7 +171,6 @@ if has_alife_info("no_net_signal") then return true else return false end
 end
 
 function message_filter()
-if random_news == 1 then
 local level_name = level.name()
 if db.actor ~= nil and level_name ~= nil then
 	if check_news_flag == 1 and not isIndoor(level_name) then
@@ -182,7 +179,6 @@ if db.actor ~= nil and level_name ~= nil then
 		on_disconnect()
 	end
 end 
-end
 end
 
 
