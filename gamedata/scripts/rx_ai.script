@@ -184,9 +184,9 @@ function load_schemes()
 	if rx_bandage then
 		load_scheme("rx_bandage","bandage",stype_stalker)
 	end
-	if rx_ff then
+	--if rx_ff then
 	-- load_scheme("rx_ff","rx_ff",stype_stalker)
-	end
+	--end
 end
 
 function disable_schemes(npc)
@@ -212,9 +212,9 @@ function enable_schemes(ini,npc)
 	if rx_bandage then
 		rx_bandage.set_scheme(npc,ini,"bandage","bandage")
 	end
-	if rx_ff then
+	--if rx_ff then
 	--	rx_ff.set_scheme(npc,ini,"rx_ff","rx_ff")
-	end
+	--end
 end
 
 function addCommonPrecondition(action)
