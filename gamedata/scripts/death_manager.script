@@ -81,9 +81,6 @@ local deferred_release = {}
 --' Ключем является группировка персонажа. Значением является таблица, содержашая имена секций предметов.
 local item_by_community = {}
 
---' Зависимости в спауне предметов. Предмет спауниться только если есть хотя бы один из зависимых.
-local item_dependence = {}
-
 --' Множители и минимаксы для выпадения вещей в зависимости от уровня
 local mul_by_level = {}
 local count_by_level = {}
@@ -93,9 +90,6 @@ local always_keep_item = {}
 
 --' Предметы, которые нельзя сильно портить
 rare_item = {}
-
---' Предметы, относящиеся к патронам. Их надо спаунить другим методом.
-local ammo_sections = {}
 
 --' Табличка дубликатов - незачем спавнить километр одинаковых стволов и артов
 local duplicates = {}
@@ -165,18 +159,6 @@ function init_drop_settings()
         end
     end
 
-    --' Заполняем таблицу зависимостей
-	local n = sys_ini:line_count("death_gen_item_dependence")
-	local id, value = "", ""
-	for i=0,n-1 do
-		result, id, value	= sys_ini:r_line("death_gen_item_dependence",i,"","")
-		item_dependence[id] = {}
-		local vvv = parse_names(value)
-		for k,v in pairs(vvv) do
-			item_dependence[id][v] = true
-		end
-	end
-
 	--' Множители и минимаксы для выпадения вещей в зависимости от уровня
     local level_name = level.name()
 	
@@ -219,7 +201,7 @@ function init_drop_settings()
             always_keep_item[id] = true
         end
     end
-	
+
  	--' Предметы, которые нельзя сильно портить
     local n = sys_ini:line_count("death_gen_rare_items")
 	for i=0,n-1 do
@@ -228,15 +210,6 @@ function init_drop_settings()
             rare_item[id] = true
         end
     end
-
-	--' Предметы, относящиеся к патронам. Их надо спаунить другим методом.
-    ammo_sections = {}
-    local n = sys_ini:line_count("death_gen_ammo_sections")
-	local id, value = "", ""
-	for i=0,n-1 do
-		result, id, value	= sys_ini:r_line("death_gen_ammo_sections",i,"","")
-        ammo_sections[id] = true
-	end
 end
 
 -- Добавление в таблицу
@@ -313,24 +286,19 @@ function drop_manager:create_release_item()
 
     --' Доспавниваем необходимое количество итемов:
     --' Необходимо составить список объектов которые могут быть заспавнены для персонажа
-
     local spawn_items = item_by_community[self.npc:character_community()]    
     for k,v in pairs(spawn_items) do
-        --' По каждому объекту необходимо получить зависимости		
-        if check_item_dependence(self.npc, k) == true then
-			if not duplicates[k] then 
-				--' По каждому объекту необходимо получить количество
-				local number = math.ceil(math.random(count_by_level[k].min, count_by_level[k].max))
-				--' Необходимо заспавнить нужное количество.
-				create_items(self.npc, k, number, v)
-			end
+		if not duplicates[k] then
+			--' По каждому объекту необходимо получить количество
+			local number = math.ceil(math.random(count_by_level[k].min, count_by_level[k].max))
+			--' Необходимо заспавнить нужное количество.
+			create_items(self.npc, k, number, v)
 		end
     end
 
 	duplicates = {}
 
-	-- RealArmor by KamikaZze
-	local sect = ogse_real_armor.vis_to_armor(self.npc)
+	local sect = ogse_real_armor.vis_to_armor(self.npc) --RealArmor by KamikaZze
 
 	if	sect
 		and not forbidden_npc_names[self.npc:name()]
@@ -340,7 +308,7 @@ function drop_manager:create_release_item()
 		if sect == "exo1" then rnd = exo_prob end
 		local otf = create_items(self.npc, sect, 1, rnd)
 		if otf then
-			dsh.timeout(1000, function()
+			dsh.timeout(300, function()
 				local a = level.object_by_id(otf.id)
 				if a then a:set_condition((10+math.random(6,65))/100) end
 			end)
@@ -350,15 +318,12 @@ function drop_manager:create_release_item()
 	if has_alife_info("pri_trader_arny_task") and string.find(self.npc:name(), "aem_arny") then 
 		ogse.spawn_item_in_inv("zapiska", self.npc) 
 	end
-
 	if has_alife_info("pri_trader_dolg_task") and self.npc:name()=="bar_dolg_leader" then 
 		ogse.spawn_item_in_inv("zapiska_m1", self.npc) 
 	end
-
 	if has_alife_info("pri_trader_freedom_task") and self.npc:name()=="mil_freedom_member0012" then 
 		ogse.spawn_item_in_inv("zapiska_m2", self.npc) 
 	end
-
 end
 
 function shedule_release(item)
@@ -380,7 +345,7 @@ function keep_item(npc, item)
 	if remove_this_shit_immediately[section] then
 		alife():release(srv_obj, true)
 		return false	
-	elseif always_keep_item[section] == true then
+	elseif always_keep_item[section] then
         return true
     elseif random_items_tbl[section] then
 		if not duplicates[section] then
@@ -395,8 +360,14 @@ function keep_item(npc, item)
 			alife():release(srv_obj, true)
 			return false			
 		end
-	elseif string.find(section,"ammo_") then
-		shedule_release(item)
+	elseif string.find(section,"ammo_") and item:is_ammo() then
+		local ammo_sz = dunin_ammo.get_ammo_size(item)
+		if ammo_sz >= 1 then
+			local ammo_new_sz = math.random(1, ammo_sz)
+			set_ammo_size(item, ammo_new_sz)
+		else
+			shedule_release(item)
+		end
 		return true
 	elseif item:is_weapon_magazined() then
 		local item_id = item:id()
@@ -500,42 +471,12 @@ end
 
 --' Функция спавнит необходимое число предметов
 function create_items(npc, section, number, rnd)
-local obj
---'    printf("create %s of %s", tostring(number), tostring(section))
-    if ammo_sections[section] == true then
-        if number > 0 then
-            se_respawn.create_ammo(section,	
-				    npc:position(),
-				    npc:level_vertex_id(),	
-				    npc:game_vertex_id(),
-				    npc:id(),
-                    number)
-        end
-    else
-        for i=1,number do
-			--' Проверяем вероятность появить каждый объект в отдельности
-			if math.random(100) <=  rnd and not string.find(section,"wpn_") then 
-				obj = alife():create(section, npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id()) 
-			end
-        end
-    end    
-	if obj then return obj end
-end
-
---' Функция проверяет есть ли хоть один из зависимых объектов у персонажа
-function check_item_dependence(npc, section)
-	if item_dependence[section] == nil then
-		return true
+	local obj
+	for i=1,number do
+		--' Проверяем вероятность появить каждый объект в отдельности
+		if math.random(100) <= rnd then
+			obj = alife():create(section, npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id())
+		end
 	end
-
-    local d_flag = true
-    for k,v in pairs(item_dependence[section]) do
-        local obj = npc:object(k)
-        if obj ~= nil and npc:marked_dropped(obj) ~= true then
-            return true
-        end
-        d_flag = false
-    end
-
-    return d_flag
+	if obj then return obj end
 end

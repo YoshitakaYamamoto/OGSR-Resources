@@ -11,7 +11,6 @@ items={}
 relation_matrix={}
 tables_ready = false
 local sell_table = {}
-local item_dependence = {}
 local always_keep_item = {}
 last_debug_message = ""
 local excluded_npcs = {
@@ -465,18 +464,6 @@ function build_tables()
 		end
 	end
 
-    --' Заполняем таблицу зависимостей
-	item_dependence = {}
-	local n = sys_ini:line_count("death_gen_item_dependence")
-	local id, value = "", ""
-	for i=0,n-1 do
-		result, id, value	= sys_ini:r_line("death_gen_item_dependence",i,"","")
-		item_dependence[id] = {}
-		local vvv = parse_names(value)
-		for k,v in pairs(vvv) do
-			item_dependence[id][v] = true
-		end
-	end
  	--' Предметы, которые нельзя продавать (квестовые например)
 	always_keep_item = {}
     local n = sys_ini:line_count("death_gen_keep_items")
@@ -1598,7 +1585,7 @@ end
 --[[
 	Уникальные предметы НЕ ПРОДАЕМ. Максимум - в новости.	
 	Отсортировали оружие по firepower (можем еще ef_weapon_type добавить.)
-	Оставили себе то, для которого есть патроны. (а) - wpn..ammo_class + item_dependence
+	Оставили себе то, для которого есть патроны. (а) - wpn..ammo_class
 	Оставили одно, которое лучше (а), но патронов нет (б) (%)
 	Одно, которое лучше (а), но хуже (б) - в новости на продажу
 	Остальное на продажу

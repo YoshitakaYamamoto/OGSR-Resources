@@ -1,4 +1,6 @@
 --************************************************* Инициализация расширений движка ************************************************
+log1("--...Инициализация расширений движка...")
+
 RvP()
 
 pairs_old = pairs
@@ -78,6 +80,8 @@ function sum_args_ex(base, offs)
 	--log3("sum_args_ex: %s, %x, %x", base_s, offs, res)
 	return res
 end
+
+log1("--Инициализация расширений движка закончена!")
 --******************************************** Инициализация расширений движка закончена ********************************************
 
 prefetch("luaxml")
@@ -2100,3 +2104,8 @@ function reset_actor_items_tradability()
 end
 
 get_game_id = ogse_unist.get_game_id
+
+--Задать кол-во патронов в пачке
+function set_ammo_size(item, size)
+	item:set_go_int16(476, size)
+end

@@ -51,7 +51,7 @@ function on_take(obj)
 				repack = true
 			end
 		end
-	else
+	--else
 		--dbglog("Dunin_ammo_pack: No ammo section for %s",obj:name())
 	end
 	return repack
