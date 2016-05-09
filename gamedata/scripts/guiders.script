@@ -57,15 +57,16 @@ end
 
 function show_awailable_locations(guider, actor, dialog_id, phrase_id)
 	log3("guider = %s, actor = %s, dialog_id = %s, phrase_id = %s", guider:name(), actor:name(), dialog_id, phrase_id)
-	local frase = ""
+	local frase = {}
 	for loc_id,loc_data in pairs(locations_db) do
 		loc_data.cl = loc_data.cl or xr_logic.parse_condlist(db.actor, "sec", "sec", loc_data.condlist or "true")
 		if xr_logic.pick_section_from_condlist(db.actor, db.actor, loc_data.cl) and level_system_name_by_gvid(loc_data.to.gvid) ~= level.name() then
 			local price = guidance_price(guider, loc_data)
-			frase = frase..string.format(game.translate_string("guiders_patterns_text"), game.translate_string(loc_data.desc), price).."\\n"
+			table.insert(frase,string.format(game.translate_string("guiders_patterns_text"), game.translate_string(loc_data.desc), price))
 		end
 	end
-	db.actor:give_talk_message(frase, "ui\\icon_guider", Frect():set(0,0,1,1), "misc_answer_item")
+	table.sort(frase) -- сортируем
+	db.actor:give_talk_message(table.concat(frase,"\\n"), "ui\\icon_guider", Frect():set(0,0,1,1), "misc_answer_item")
 end
 function destination_available(actor, guider, dialog_id, prev_phrase_id, loc_id)
 	local dest = locations_db[loc_id]
@@ -105,11 +106,16 @@ function init_guiders_dialog(dlg)
 	phr10 = dlg:AddPhrase("guider_dialog_phr_31", "10", "2", -10000)             -- -- -- "Я передумал."
 		phr10:GetPhraseScript():AddAction("dialogs.break_dialog")
 	-- добавляем все возможные варианты выбора с предусловиями. Видимость будет зависеть от доступности перехода у проводника.
+	local _locations_db = {}
 	for loc_id,loc_data in pairs(locations_db) do
-		phr3 = dlg:AddPhrase(string.format(game.translate_string("guiders_patterns_2_text"), game.translate_string(loc_data.desc)), loc_id, "2", -10000)	           -- -- -- "Проведи меня в..."
+		_locations_db[#_locations_db+1] = {loc_id = loc_id, text = string.format(game.translate_string("guiders_patterns_2_text"), game.translate_string(loc_data.desc))}
+	end
+	table.sort(_locations_db,function(a,b) return a.text < b.text end) -- сортируем
+	for _,data in ipairs(_locations_db) do
+		phr3 = dlg:AddPhrase(data.text, data.loc_id, "2", -10000)	           -- -- -- "Проведи меня в..."
 			phr3:GetPhraseScript():AddPrecondition(script.."destination_available")
 			phr3:GetPhraseScript():AddAction(script.."set_destination_and_price")
-		phr7 = dlg:AddPhrase("guider_dialog_phr_29", "3", loc_id, -10000)               -- -- -- -- -- -- "Ну что, готов выдвигаться?"
+		phr7 = dlg:AddPhrase("guider_dialog_phr_29", "3", data.loc_id, -10000)               -- -- -- -- -- -- "Ну что, готов выдвигаться?"
 	end
 	log1("init_guiders_dialog - 8") flush_log()
 
@@ -138,11 +144,16 @@ function init_guiders_dialog_pilot(dlg)
 	phr10 = dlg:AddPhrase("guider_dialog_phr_31", "10", "2", -10000)             -- -- -- "Я передумал."
 		phr10:GetPhraseScript():AddAction("dialogs.break_dialog")
 	-- добавляем все возможные варианты выбора с предусловиями. Видимость будет зависеть от доступности перехода у проводника.
+	local _locations_db = {}
 	for loc_id,loc_data in pairs(locations_db) do
-		phr3 = dlg:AddPhrase(string.format(game.translate_string("guiders_patterns_2_pilot_text"), game.translate_string(loc_data.desc)), loc_id, "2", -10000)	           -- -- -- "Проведи меня в..."
-			phr3:GetPhraseScript():AddPrecondition(script.."destination_available")
-			phr3:GetPhraseScript():AddAction(script.."set_destination_and_price")
-		phr7 = dlg:AddPhrase("guider_dialog_phr_pilot_29", "3", loc_id, -10000)               -- -- -- -- -- -- "Ну что, готов выдвигаться?"
+		_locations_db[#_locations_db+1] = {loc_id = loc_id, text = string.format(game.translate_string("guiders_patterns_2_pilot_text"), game.translate_string(loc_data.desc))}
+	end
+	table.sort(_locations_db,function(a,b) return a.text < b.text end) -- сортируем
+	for _,data in ipairs(_locations_db) do
+		phr3 = dlg:AddPhrase(data.text, data.loc_id, "2", -10000)	           -- -- -- "Проведи меня в..."
+		phr3:GetPhraseScript():AddPrecondition(script.."destination_available")
+		phr3:GetPhraseScript():AddAction(script.."set_destination_and_price")
+		phr7 = dlg:AddPhrase("guider_dialog_phr_pilot_29", "3", data.loc_id, -10000)               -- -- -- -- -- -- "Ну что, готов выдвигаться?"
 	end
 	log1("init_guiders_dialog - 8") flush_log()
 
