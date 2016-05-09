@@ -684,19 +684,14 @@ end
 -- Если section == nil, остается работать старая секция.
 function switch_to_section(npc, st, section)
 	if section == nil or section == "" then return false end
-
-    local npc_storage    = db.storage[npc:id()]
-    local active_section = npc_storage.active_section
-        
+	local active_section = db.storage[npc:id()].active_section
     if active_section == section then return false end
 
     if active_section then
-        issue_event(npc, npc_storage[npc_storage.active_scheme], "deactivate", npc)
+		issue_event(npc, db.storage[npc:id()][db.storage[npc:id()].active_scheme], "deactivate", npc)
     end
-        
-    npc_storage.active_section = nil
-    npc_storage.active_scheme  = nil
-
+	db.storage[npc:id()].active_section = nil
+	db.storage[npc:id()].active_scheme = nil
 	activate_by_section(npc, st.ini, section, false)
 	return true
 end
@@ -1416,17 +1411,9 @@ function load_obj(obj, reader)
 end
 
 function get_customdata_or_ini_file(npc, filename)
---	printf( "get_customdata_or_ini_file: filename=%s", filename )
-
 	if filename == "<customdata>" then
-		local ini = npc:spawn_ini()
-		if ini then
-			return ini
-		else
-			return sys_ini
-		end
-	elseif string.find( filename, "*" ) == 1 then
-		-- динамический ltx
+		return npc:spawn_ini() or sys_ini
+	elseif string.find( filename, "*" ) == 1 then --динамический ltx
 		local p = string.find( filename, "*", 2 )
 		return gulag_tasks.loadLtx( string.sub(filename, 2, p-1), string.sub(filename, p+1) )
 	elseif string.find( filename, "gulag_tasks" ) then --KRodin: если нашли в названии переменной "gulag_tasks", то будем использовать быстрый sys_ini
