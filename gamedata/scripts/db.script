@@ -64,7 +64,7 @@ function remove_deadman()
 			local obj = level.object_by_id(v)
 			if obj then
 				if xrs_ai then xrs_ai.npc_death_callback(obj) end
-				obj:iterate_inventory(recheck, obj)
+				obj:iterate_inventory(death_manager.keep_item, obj)
 				dead_bodies[k] = 0
 				break
 			end
@@ -121,53 +121,6 @@ function remove_delayed()
 				delayed[k] = nil
 			end
 		end
-end
-
-function recheck(npc, item)
-	if not item then return end
-	local s_obj = alife():object(item:id())
-	if not s_obj then return end
-
-    local section = s_obj:section_name()
-
-	if death_manager.remove_this_shit_immediately[section] then
-		alife():release(s_obj, true)
-		return false
-	elseif string.find(section,"arena") or string.find(npc:name(), "aem_") then
-		return false
-	elseif item:is_weapon_magazined() and item:condition() > 0.90 then
-		if math.random(1,100) > 40 then item:unload_magazine() end
-		if death_manager.rare_item and death_manager.rare_item[section] and death_manager.rare_item[section] == true then
-			item:set_condition(math.random(65,95)/100)
-		else
-			item:set_condition(math.random(death_manager.damage_boundaries(npc))/100)
-		end
-	elseif string.find(section,"af_") then
-		if ogse.art_accesible(item) then
-			return true
-		else
-			local community = npc:character_community()
-			if community == "bandit" and math.random() > 0.5 then
-				return true
-			end
-			alife():release(s_obj, true)
-			return false
-		end
-	elseif section == "grenade_f1" then
-		if math.random() > 0.8 then
-			return true
-		else
-			alife():release(s_obj, true)
-			return false
-		end
-	elseif string.find(section,"medkit") then
-		if math.random() > 0.95 then 
-			return true
-		else
-			alife():release(s_obj, true)
-			return false
-		end
-	end
 end
 
 function add_zone( zone )

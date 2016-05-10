@@ -39,10 +39,11 @@ remove_this_shit_immediately = { --Таблица с секциями предметов, которые надо уд
 	["bread_a"] = true,
 	["binocular_a"] = true,
 	["guitar_a"] = true,
+	["harmonica_a"] = true,
 	["yad"] = true,
 	["hand_radio"] = true,
-	--["device_torch"] = true,
-	--["wpn_knife"] = true,
+	["device_torch"] = true,
+	["wpn_knife"] = true,
 }
 
 local random_items_tbl = { --Таблица с предметами, которые удаляются из трупов с ~70% вероятностью. В ~30% случаев предмет не удалится.
@@ -53,6 +54,17 @@ local random_items_tbl = { --Таблица с предметами, которые удаляются из трупов с
 	["medkit"] = true,
 	["medkit_army"] = true,
 	["medkit_scientic"] = true,
+	["sigaret"] = true,
+	["conserva"] = true,
+	["conserva2"] = true,
+	["energy_drink"] = true,
+	["syrok"] = true,
+	["kartoshka"] = true,
+	["kefir"] = true,
+	["voda"] = true,
+	["bread"] = true,
+	["kolbasa"] = true,
+	["vodka"] = true,
 }
 
 local forbidden_npc_names = { --Таблица трупов, с которых запрещено снимать костюмы
@@ -76,7 +88,6 @@ local forbidden_npc_names = { --Таблица трупов, с которых запрещено снимать кост
 	["yantar_semenov"] = true,
 }
 
-
 local deferred_release = {}
 --' Ключем является группировка персонажа. Значением является таблица, содержашая имена секций предметов.
 local item_by_community = {}
@@ -90,9 +101,6 @@ local always_keep_item = {}
 
 --' Предметы, которые нельзя сильно портить
 rare_item = {}
-
---' Табличка дубликатов - незачем спавнить километр одинаковых стволов и артов
-local duplicates = {}
 
 --' Нижний/Верхний уровень износа редких стволов
 local low_damage_rar,high_damage_rar = 65, 95
@@ -161,7 +169,7 @@ function init_drop_settings()
 
 	--' Множители и минимаксы для выпадения вещей в зависимости от уровня
     local level_name = level.name()
-	
+
 	if not sys_ini:section_exist("death_gen_"..level_name) then
 		level_name = "default"
 	end
@@ -171,9 +179,9 @@ function init_drop_settings()
 	for i=0,n-1 do
 		result, id, value	= sys_ini:r_line("death_gen_"..level_name,i,"","")
         mul_by_level[id] = tonumber(value)
-	end        
+	end
 
-    local item_count_section = "item_count_" .. level.get_game_difficulty()
+    local item_count_section = "item_count"
     local n = sys_ini:line_count("death_gen_"..item_count_section)
 	for i=0,n-1 do
 		result, id, value	= sys_ini:r_line("death_gen_"..item_count_section,i,"","")
@@ -240,7 +248,7 @@ function keep_offline_item(npc, item)
     local section = item:section()
     if always_keep_item[section] == true then
         quest_needed[npc:id()] = true
-    end	
+    end
 end
 
 class "drop_manager"
@@ -286,17 +294,13 @@ function drop_manager:create_release_item()
 
     --' Доспавниваем необходимое количество итемов:
     --' Необходимо составить список объектов которые могут быть заспавнены для персонажа
-    local spawn_items = item_by_community[self.npc:character_community()]    
-    for k,v in pairs(spawn_items) do
-		if not duplicates[k] then
-			--' По каждому объекту необходимо получить количество
-			local number = math.ceil(math.random(count_by_level[k].min, count_by_level[k].max))
-			--' Необходимо заспавнить нужное количество.
-			create_items(self.npc, k, number, v)
-		end
-    end
-
-	duplicates = {}
+	local spawn_items = item_by_community[self.npc:character_community()]    
+	for k,v in pairs(spawn_items) do
+		--' По каждому объекту необходимо получить количество
+		local number = math.ceil(math.random(count_by_level[k].min, count_by_level[k].max))
+		--' Необходимо заспавнить нужное количество.
+		create_items(self.npc, k, number, v)
+	end
 
 	local sect = ogse_real_armor.vis_to_armor(self.npc) --RealArmor by KamikaZze
 
@@ -334,7 +338,7 @@ function shedule_release(item)
 	end
 end
 
---' Функция вызывается для каждого предмета, если вернет false то предмет удалится.
+--' Функция вызывается для каждого предмета в инвентаре убитого НПС
 function keep_item(npc, item)
 	if not item then return end
 	local srv_obj = alife():object(item:id())
@@ -344,23 +348,11 @@ function keep_item(npc, item)
 
 	if remove_this_shit_immediately[section] then
 		alife():release(srv_obj, true)
-		return false	
-	elseif always_keep_item[section] then
-        return true
-    elseif random_items_tbl[section] then
-		if not duplicates[section] then
-			insert_to_table(duplicates, section)
-			if math.random() > 0.7 then 
-				return true
-			else
-				alife():release(srv_obj, true)
-				return false
-			end
-		else	
+	elseif random_items_tbl[section] then
+		if math.random() < 0.7 then
 			alife():release(srv_obj, true)
-			return false			
 		end
-	elseif string.find(section,"ammo_") and item:is_ammo() then
+	elseif item:is_ammo() then
 		local ammo_sz = dunin_ammo.get_ammo_size(item)
 		if ammo_sz >= 1 then
 			local ammo_new_sz = math.random(1, ammo_sz)
@@ -368,56 +360,8 @@ function keep_item(npc, item)
 		else
 			shedule_release(item)
 		end
-		return true
 	elseif item:is_weapon_magazined() then
-		local item_id = item:id()
-		local item_in_slot1 = npc:item_in_slot(1)
-		local item_in_slot2 = npc:item_in_slot(2)
-
-		if not duplicates[section] then
-			insert_to_table(duplicates, section)
-			set_weapon_drop_condition(item,npc)
-			return true				
-		elseif ( item_in_slot1 and item_in_slot1:id() == item_id )
-			or ( item_in_slot2 and item_in_slot2:id() == item_id ) then
-			set_weapon_drop_condition(item,npc)
-			return true
-		else
-			alife():release(srv_obj, true)
-			return false			
-		end
-	elseif string.find(section,"af_") then
-		if not ogse.art_accesible(item) then
-			if npc:character_community() == "bandit" and math.random() < 0.4 then
-				return true
-			else	
-				alife():release(srv_obj, true)
-				return false					
-			end
-		else
-			if not duplicates[section] and math.random() > 0.5 then
-				insert_to_table(duplicates, section)
-				return true
-			else	
-				alife():release(srv_obj, true)
-				return false			
-			end
-		end
-	elseif section == "vodka" and npc:character_community() == "military" then --Удаляем водку из инвентаря вояк. FEAR93 11.03.11
-		alife():release(srv_obj, true)
-		return false
-	elseif string.find(section,"wpn_addon") then
-		if not duplicates[section] then
-			insert_to_table(duplicates, section)
-			return true
-		else	
-			alife():release(srv_obj, true)
-			return false			
-		end
-	elseif section == "bolt" then
-		return false
-	else
-		alife():release(srv_obj, true)
+		set_weapon_drop_condition(item,npc)
 	end
 end
 
@@ -453,7 +397,7 @@ function release_deferred_ammo()
 	end
 end
 
---' Функция вызывается для каждого предмета, если вернет false то предмет удалится.
+--' Функция вызывается для каждого предмета в инвентаре убитого напарника
 function companion_item(npc, item)
 	if not item then return end
 	local srv_obj = alife():object(item:id())
@@ -461,11 +405,8 @@ function companion_item(npc, item)
 
     local section = srv_obj:section_name()
 
-    if section == "bolt" then return false end	
-
 	if remove_this_shit_immediately[section] then
 		alife():release(srv_obj, true)
-		return false	
 	end	
 end
 
