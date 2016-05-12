@@ -316,7 +316,7 @@ function check_art_weapon(npc)
 	if act_item and item_in_slot and act_item:id() == item_in_slot:id() then
 		local item_in_slot_sec = act_item:section()
 		local item_in_slot_id = act_item:id()
-		if item_in_slot_sec and item_in_slot_id and act_item:is_artefact() --[[string.find(item_in_slot_sec, "af_")]] then
+		if item_in_slot_sec and item_in_slot_id and act_item:is_artefact() then
 			--' Если непись получил арт в слот по ошибке при загрузке игры, мы просто
 			--' обновим ему оружие в руках и всё. Иначе, если он взял арт в руки и отказывается
 			--' его убирать, а лучшее оружие получить не удаётся, придётся арт выбросить, отрелизить и вернуть ему в рюкзак.
@@ -332,7 +332,7 @@ function check_art_weapon(npc)
 				alife():release(s_obj, true)
 				alife():create(item_in_slot_sec,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 			end			
-			if bw and bw:is_weapon() then --if bw and string.find(bw:section(), "wpn_") then
+			if bw and bw:is_weapon() then
 				-- log1("TOSS WEAPON TO "..bw:section().." FROM "..tostring(rem_id))
 				if be then
 					npc:set_item(object.fire1, bw)
@@ -409,18 +409,15 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 
 local function del_zero_ammo(npc, item)
-	if item == nil then return end
-	local id = item:id()
-	local sobj = alife():object(id) 
-	if not sobj then return end	
-	local section = sobj:section_name()	
-	if string.find(section, "ammo") then
+	if not item then return end
+	local sobj = alife():object(item:id())
+	if not sobj then return end
+
+	local section = sobj:section_name()
+	if item:is_ammo() then
 		local size = dunin_ammo.get_ammo_size(item)
 		if size == 0 then
-			local del = alife():object(item:id())
-			if del then
-				death_manager.shedule_release(item)
-			end
+			death_manager.shedule_release(item)
 		end
 	end		
 end	
@@ -1142,7 +1139,7 @@ function motivator_binder:update(delta)
 	end
 	
 	ogse_debug.process_npc(self.object, "upd", 81)
-		if xr_companion.is_companion(self.object:id()) then
+	if xr_companion.is_companion(self.object:id()) then
 		if xr_combat_companion then
 			xr_combat_companion.reprioritize_targets(self.object)
 		else	
