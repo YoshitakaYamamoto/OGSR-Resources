@@ -1240,8 +1240,7 @@ end
 
 -- Колбэк на появление предмета в инвентаре ГГ
 function on_item_take(obj)
-	local level_name = level.name()
-	if db.actor and db.actor:dont_has_info("player_have_crowbar") and string.find(obj:section(), "wpn_montirovka") and level_name == "l06_rostok" then
+	if db.actor and db.actor:dont_has_info("player_have_crowbar") and obj:section() == "wpn_montirovka" and level.name() == "l06_rostok" then
 		soundtrack.rostok_gordon()
 		db.actor:give_info_portion("player_have_crowbar")
 	end
@@ -1825,13 +1824,6 @@ function show_time()
 	end
 	cs = hud:GetCustomStatic("hud_timer_text1"):wnd()
 	cs:SetText(time_h..":"..time_m)
-end
-
-function hide_time()
-	local hud = get_hud()
-	if hud:GetCustomStatic("hud_timer_text1") ~= nil then 
-		hud:RemoveCustomStatic("hud_timer_text1")
-	end
 end
 -----------------------------------------------------------
 
