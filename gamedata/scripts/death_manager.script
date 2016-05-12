@@ -220,15 +220,6 @@ function init_drop_settings()
     end
 end
 
--- Добавление в таблицу
-function insert_to_table(tbl, section)
-	if tbl[section] == nil then
-		tbl[section] = 1
-	else
-		tbl[section] = tbl[section] + 1
-	end
-end
-
 local quest_needed = {}
 
 function offline_dead_quest_check(npc)
