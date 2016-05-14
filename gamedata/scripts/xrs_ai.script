@@ -78,10 +78,6 @@ code: <<<END
 	if xrs_ai then xrs_ai.actor_item_take(obj) end
 END;
 ]]
-function actor_item_take(obj)
-	if xrs_grenade then xrs_grenade.fake_pickup(obj) end
-	if xrs_medic then xrs_medic.pickup(obj) end
-end
 
 --[[
 file: bind_stalker.script

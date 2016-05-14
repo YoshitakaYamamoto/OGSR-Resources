@@ -88,7 +88,7 @@ local cartriges_sections = {
 }
 
 function on_use(obj, sobj)
-	if not obj or not sobj then return end
+	--if not obj or not sobj then return end
 
 	local section = obj:section()
 	if section == "autodoctor" then
@@ -111,11 +111,12 @@ function on_use(obj, sobj)
 			restore_item = ad_recharge(par)
 		end
 		if restore_item then ogse.spawn_item_in_inv(section) end
+		return true
 	end
 end
 
 function on_to_belt(obj, sobj)
-	if not obj or not sobj then return end
+	--if not obj or not sobj then return end
 
 	if obj:section() == "autodoctor" and not ad_on_belt then
 		ad_on_belt = inventory.belt["autodoctor"]
@@ -124,7 +125,7 @@ function on_to_belt(obj, sobj)
 end
 
 function on_to_ruck(obj, sobj)
-	if not obj or not sobj then return end
+	--if not obj or not sobj then return end
 
 	if obj:section() == "autodoctor" then
 		ad_on_belt = inventory.belt["autodoctor"]

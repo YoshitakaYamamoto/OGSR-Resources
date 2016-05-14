@@ -1,3 +1,8 @@
+
+function attach(sm)
+	sm:subscribe({signal = "on_take", fun = this.on_take})
+end
+
 -- nv080209 - adjustments per Russian forum discussion
 ammo = {}
 local inited = false
@@ -27,34 +32,27 @@ end
 -- если перепаковку делать прям здесь, то будет глюк при загрузки и
 -- при взятии из нычки кучи патрон (взять всё)
 --------
-function on_take(obj)
-	if not inited then
-		init()
-	end
+function on_take(obj, s_obj)
+	if obj:clsid() ~= clsid.wpn_ammo then return end
 
-	local s_obj = alife():object(obj:id())
+	if not inited then init() end
 	
-	if not s_obj or not obj.section then
+	if not obj.section then
 		log1("##WARNING! Actor pickup buggy ammopack, removing it.")
 		db.actor:drop_item(obj)
-		return repack
+		return true --заканчиваем цепочку вызовов, т.к объект глючный.
 	end
 	
 	local section = s_obj:section_name()
-	--dbglog("on_take('%s')", section)
-
-	-- nv080209, 080426 prevent CTD if ammo section missing
-	if section ~= nil and ammo[section] ~= nil then
+	if ammo[section] ~= nil then
 		if ammo[section].repack == false then
 			if get_ammo_size(obj) < ammo[section].box then
 				ammo[section].repack = true
 				repack = true
 			end
 		end
-	--else
-		--dbglog("Dunin_ammo_pack: No ammo section for %s",obj:name())
+		return true --Вроде бы патроны более в on_take нигде не нужны, можно закончить цепочку вызовов.
 	end
-	return repack
 end
 
 --------

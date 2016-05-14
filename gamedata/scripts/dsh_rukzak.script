@@ -16,7 +16,7 @@ end
 
 
 function on_drop( obj, sobj )
-  if not sobj then return end
+  --if not sobj then return end
   local sect = obj:section()
   if sect == "treasure_item" and sobj.parent_id == 65535 then
     ogse.remove_item( obj )

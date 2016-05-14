@@ -3,6 +3,7 @@
 -- например те, у которых имя модуля не начинается на ogse
 
 addons = {
+	"dunin_ammo", --должен быть первым в on_take!
 	"ogse_addons",
 	"ogse_bind_weapon",
 	"ogse_unist",
@@ -13,6 +14,7 @@ addons = {
 	"ogse_grenade_switcher",
 	"ogse_sleep_mgr",
 	"ogse_weather_mgr",
+	"ogse_anomaly",
 	"ogse_surge_mgr",
 	"ogse_hideouts",
 	"ogse_lights_mgr",
@@ -29,7 +31,7 @@ addons = {
 	"ogse_psycho_fov",
 	"ogse_benchmark",
 	"ogse_night_vision",
-----------KRodin:----------
+	"ogse",
 	"ogse_wpn_explode_fx",
 	"ogse_quests",
 	"ogse_minigun_sound",
@@ -40,21 +42,24 @@ addons = {
 	"biodetector",
 	"ui_rad",
 	"ui_ogse_exo_control",
+	"ui_ogse_quicklaunch",
 	"remkit_main",
+	"ui_handradio",
+	"bind_statpkm",
 	"ms_ai",
 	"horror_time",
 	"dsh_restore_active_slot",
 	"dsh_rukzak",
 	"clear_garbage",
 	"trade_manager",
-	"jekan_update",
----------------------------
-	"ui_handradio",
-	"bind_statpkm",
-	"trunk_inv",
-	"inventory",
-	"xr_sound",
+	"quest_deadcity",
+	"jekan_books",
 	"tasks_functor",
+	"trunk_inv",
+	"jekan_update",
+	"jekan_work",
+	"xr_sound",
+	"inventory", --должен быть предпоследним!
 -----------------------------------------------
 	"dsh_memuse" --ПОДКЛЮЧАТЬ В САМОМ КОНЦЕ!
 -----------------------------------------------

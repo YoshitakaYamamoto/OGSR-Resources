@@ -5,6 +5,10 @@
 --- 2009-2013 (c) OGS Evolution Team
 -----------------------------------------------------------------------
 
+function attach(sm)
+	sm:subscribe({signal = "on_take", fun = this.on_item_take})
+end
+
 game_time_factor = 0
 local fov_vol = sys_ini:r_s32("options","fov_volume")
 local max_alarm_fov_vol = sys_ini:r_s32("options","max_fov_volume")
@@ -1240,28 +1244,14 @@ end
 
 -- Колбэк на появление предмета в инвентаре ГГ
 function on_item_take(obj)
-	if db.actor and db.actor:dont_has_info("player_have_crowbar") and obj:section() == "wpn_montirovka" and level.name() == "l06_rostok" then
+	if --[[db.actor and]] obj:section() == "wpn_montirovka" and db.actor:dont_has_info("player_have_crowbar") and level.name() == "l06_rostok" then
 		soundtrack.rostok_gordon()
 		db.actor:give_info_portion("player_have_crowbar")
-	end
-	-- квест чебурана и аномальные итемы
-	quest_deadcity.on_item_take(obj)
-	
-	if obj:section() == "book_1" then
+		return true
+	elseif obj:section() == "book_1" then
 		db.actor:give_info_portion ("prof_zapiska_find")
+		return true
 	end
-end
-
--- Колбэк на потерю предмета из инвентаря ГГ
-function on_item_drop(obj)
-	--генератор по квесту радиста
-	jekan_work.check_generator(obj)
-	ogse_anomaly.check_artefact_activation(obj)
-end
-
--- Колбэк на использование предмета в инвентаре ГГ
-function use_inventory_item(obj)
-	jekan_books.on_use_item(obj)
 end
 
 --*****************************************************[Переменные для апдейта актора]******************************************************
@@ -1591,12 +1581,6 @@ function on_actor_first_update()
 	ogse_quests_fix.clean_level() -- Очищаем уровни от трупов во фриплее
 
 	quest_deadcity.check_first_enter()
-end
-
--- Коллбэк на нажатие клавиши
-function on_key(key, bind)
-	-- Проверка клавиш быстрого меню
-	ui_ogse_quicklaunch.chek_keys(key, bind)
 end
 
 -- Колбэк на выдачу инфопоршена ГГ

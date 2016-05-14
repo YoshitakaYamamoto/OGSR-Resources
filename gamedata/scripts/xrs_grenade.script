@@ -4,6 +4,7 @@
 --' автор: xStream
 --' переработка, доработки алгоритма: KamikaZze
 ----------------------------------------------------------------------------------------------------------------------
+
 gr_types={
 	[1]="grenade_f1",
 	[2]="grenade_rgd5",
@@ -862,19 +863,6 @@ function net_spawn()
 					end
 					break
 				end
-			end
-		end
-	end
-end
-
-function fake_pickup(obj)
-	level_tasks.remove_location_by_id(obj:id(), "grenade_location")
-	for k,v in pairs(gr_types) do
-		local sobj = alife():object(obj:id())
-		if sobj then
-			if sobj:section_name()==v.."_test" or sobj:section_name()==v.."_fake" then
-				alife():release(sobj, true)
-				return
 			end
 		end
 	end

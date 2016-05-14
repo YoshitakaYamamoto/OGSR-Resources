@@ -7,6 +7,10 @@
 --- version 2.0 (08/08/2011)                                             
 -----------------------------------------------------------------------
 
+function attach(sm)
+	sm:subscribe({signal = "on_drop", fun = this.check_artefact_activation})
+end
+
 local list_anom_id = {}
 list_del_anom_id = {}
 local list_mob_id = {}
@@ -292,15 +296,15 @@ local not_anomal_zones = {
 
 dangerous_acivated_arts = {}
 
-function check_artefact_activation(obj)
-	if not obj then 
+function check_artefact_activation(obj, sobj)
+	--[[if not obj then 
 		return 
 	end
 	local id = obj:id()
 	local sobj = alife():object(id)
 	if not sobj then
 		return
-	end
+	end]]
 	local section = sobj:section_name()
 	if sys_ini:line_exist(section, "artefact_activation_seq") then
 		dangerous_acivated_arts[sobj.id] = time_global() + 12000

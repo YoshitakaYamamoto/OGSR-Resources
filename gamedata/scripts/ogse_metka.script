@@ -42,10 +42,10 @@ end
 dropped_to_box = 0
 
 function on_item_drop(obj, sobj)
-	if sobj and sobj:section_name() == "amk_metka" then
+	if sobj:section_name() == "amk_metka" then
 		if dropped_to_box > 0 then 
 			dropped_to_box = dropped_to_box - 1 
-			return 
+			return true
 		end
 		if trunk_inv.trunk_is_opened() then
 			-- сбрасываем в багажник - метка на тачку
@@ -60,7 +60,7 @@ function on_item_drop(obj, sobj)
 end
 
 function on_item_take(obj, sobj)
-	if sobj and sobj:section_name()=="amk_metka" then
+	if sobj:section_name()=="amk_metka" then
 		if trunk_inv.trunk_is_opened() then
 			-- берем из багажника - метка на тачке
 			local car = trunk_inv.get_car_nearby()

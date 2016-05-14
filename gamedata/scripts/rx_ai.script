@@ -74,12 +74,6 @@ function actor_net_spawn()
 	end
 end
 
-function actor_item_take(item)
-	if rx_gl then
-		rx_gl.fake_pickup(item)
-	end
-end
-
 function actor_save(p)
 	if rx_wmgr then
 		rx_wmgr.return_all()

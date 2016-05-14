@@ -15,9 +15,9 @@ function turret_mount_delay:taction()
 end
 
 function on_item_use(item)
-	if item == nil or alife():object(item:id()) == nil then return end
+	--if item == nil or alife():object(item:id()) == nil then return end
 	local section = item:section()
-	
+
 	if section == "turret_pkm" then -- если это турель
 		create_stat_pkm_on_actor()
 		soundtrack.pkm_activate()
@@ -25,6 +25,7 @@ function on_item_use(item)
 		wnd:GetHolder():start_stop_menu(wnd, true)
 		ogse.autohiding_msg("pkm_mounting", 5000)
 		turret_mount_delay(5000):start()
+		return true
 	end
 end
 

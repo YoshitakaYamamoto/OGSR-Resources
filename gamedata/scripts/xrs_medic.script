@@ -4,6 +4,7 @@
 --'	автор: xStream
 --'	TODO: 
 ----------------------------------------------------------------------------------------------------------------------
+
 local excluded_npcs={
 	["esc_fox"]						= true,
 	["esc_vagon_wounded"]			= true,
@@ -369,14 +370,4 @@ function npc_update(binder)
 		binder.medkit_update_time=time_global()+300000
 	end
 	
-end
-
-function pickup(obj)
-	if obj == nil or alife():object(obj:id()) == nil then return end
-	if obj:section()=="yad" then 
-		local sobj = alife():object(obj:id())
-		if sobj then
-			alife():release(sobj, true) 
-		end
-	end
 end

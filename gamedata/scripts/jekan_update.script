@@ -5,8 +5,8 @@ function attach(sm)
 	sm:subscribe({ signal = "on_use",			fun = this.on_use_item })
 	sm:subscribe({ signal = "on_update",		fun = this.upd_strange_zone_effects })
 	sm:subscribe({ signal = "on_update",		fun = this.thunderbird_visual_effect, queued = true })
-	sm:subscribe({ signal = "on_take",			fun = this.cheburashka_greeting })
 	sm:subscribe({ signal = "on_take",			fun = this.fake_arts_delete })
+	sm:subscribe({ signal = "on_take",			fun = this.cheburashka_greeting })
 	sm:subscribe({ signal = "on_take",			fun = this.dolg_zahvat })
 	sm:subscribe({ signal = "on_take",			fun = this.af_ray_travel })
 	sm:subscribe({ signal = "on_take",			fun = this.af_uley_packed })
@@ -135,7 +135,7 @@ local pda =
 ----------------------------------------------------------------------------------------------------
 
 function on_use_item(obj, sobj)
-	if not obj or not sobj then return end
+	--if not obj or not sobj then return end
 
 	local portion = pda[obj:section()]
 	if portion ~= nil then 
@@ -146,6 +146,7 @@ function on_use_item(obj, sobj)
 		elseif type(portion) == "function" then
 			portion()
 		end
+		return true
 	end
 end
 
@@ -153,7 +154,7 @@ end
 
 function magnit_part_work_from_belt(obj)
 	if obj:section() == "af_magnit_part1" then
-		jekan_work.teleport_to_magnit()
+		return jekan_work.teleport_to_magnit()
 	end
 end
 
@@ -321,6 +322,7 @@ function af_mayatnik_effect(obj)
 		ogse.spawn_item_in_inv("mayatnik_p3", db.actor)
 		ogse.spawn_item_in_inv("mayatnik_p4", db.actor)
 		news_manager.send_tip(db.actor, "af_mayatnik_destroy", nil, "anomal", 5000, nil)
+		return true
 	end
 end
 

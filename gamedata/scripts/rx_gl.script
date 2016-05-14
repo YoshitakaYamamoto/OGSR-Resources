@@ -1,7 +1,6 @@
 ---- Rulix aka Bak --- 8.5.2009
 -- создано на базе схемы метания гранат от   xStream  (xrs_grenade.script)
 
-
 --function printf(s, ...)
 --	rx_ai.printf("gl:"..s,...)
 --	get_console():execute("flush")
@@ -775,14 +774,6 @@ function net_spawn()
 				temp.rem[a] = true
 			end
 		end
-	end
-end
-
-function fake_pickup(obj)
-	local sec = obj:section()
-	if string.find(sec,"gl_test_shell") or string.find(sec,"gl_fake_missile") then
-		printf("fake_pickup:remove %s",obj:name())
-		temp.rem[obj:id()] = true
 	end
 end
 

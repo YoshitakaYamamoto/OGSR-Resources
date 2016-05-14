@@ -81,7 +81,7 @@ local monitored_addon_sections = {
 }
 -- колбек на использование инвентарного предмета
 function on_use(obj, sobj)
-	if sobj == nil then return end
+	--if sobj == nil then return end
 	--if not sys_ini:line_exist(obj:section(), "new_weapon") then return end
 	local real_addon_section = get_real_addon_section(obj) -- секция реального аддона для фейкового
 	if not real_addon_section then return end -- если её нет, значит это не аддон
@@ -767,12 +767,12 @@ function convert_addon_to_shg(saddon)
 end
 -- следим за попаданием в инвентарь ствола XM-26 LSS в режиме автономного оружия для конвертации в аддон
 function on_item_to_ruck(obj, sobj)
-	if not sobj then return true end
+	--if not sobj then return true end
 	
 	-- обработка всех полученных фейк-предметов при открытом инвентаре
 	if db.actor:has_info("ui_inventory") then
-		ASSERT(obj, "ogse_ui_item_effects.on_item_to_ruck: obj is a nil reference")
-		ASSERT(sobj, "ogse_ui_item_effects.on_item_to_ruck: sobj is a nil reference, name="..obj:name())
+		--ASSERT(obj, "ogse_ui_item_effects.on_item_to_ruck: obj is a nil reference")
+		--ASSERT(sobj, "ogse_ui_item_effects.on_item_to_ruck: sobj is a nil reference, name="..obj:name())
 		local sec = obj:section()
 		-- проверяем, а не прицел ли снимаем
 		if is_scope(sec) then
@@ -823,7 +823,7 @@ end
 -- 1. установка состояния аддонов в соответствии с данными из кастомдаты при их попадании в инвентарь
 -- 2. проверка того, что аддон сняли из ствола. В этом случае надо сконвертировать ствол в обычный
 function on_take(obj, sobj)
-	ASSERT(sobj, "ogse_addons.on_take: sobj is a nil reference. Probably was deleted, and call chain was not properly finished after that. Section of deleted object: "..obj:section())
+	--ASSERT(sobj, "ogse_addons.on_take: sobj is a nil reference. Probably was deleted, and call chain was not properly finished after that. Section of deleted object: "..obj:section())
 	--if not sys_ini:line_exist(obj:section(), "new_weapon") then return end
 	if get_sect_to_convert_after_shg_removed(obj) then
 		-- ствол с дробовиком и при этом с отнятым аддоном подствольника не должен существовать в игре

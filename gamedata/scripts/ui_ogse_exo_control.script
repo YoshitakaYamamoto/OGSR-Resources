@@ -23,7 +23,7 @@ local outfit_condition = 1.0
 
 -- Функции
 function use_exo(use_object)
-	if use_object == nil or alife():object(use_object:id()) == nil then return end
+	--if use_object == nil or alife():object(use_object:id()) == nil then return end
 	local use_obj_section = use_object:section()
 	if sys_ini:line_exist(use_obj_section, "exoskeleton_type") then
 		local exoskeleton_type = sys_ini:r_string(use_obj_section, "exoskeleton_type")
@@ -39,12 +39,13 @@ function use_exo(use_object)
 					convert_outfit(outfit_item, outfit_with_exo_section)
 					exo_condition = use_object:condition()
 					outfit_condition = outfit_item:condition()
-					return
+					return true
 				end
 			end
 		end
 		-- а если не получается сконвертировать, то вертаем броньку взад
 		ogse.spawn_item_in_inv(use_obj_section, db.actor)
+		return true
 	end
 end
 

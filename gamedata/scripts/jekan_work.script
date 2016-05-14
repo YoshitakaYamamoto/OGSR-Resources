@@ -1,6 +1,10 @@
 -- Здесь будут находиться вспомогательные функции для квестов --------------------------------------
 -- 03.02.2012 --------------------------------------------------------------------------------------
 
+function attach(sm)
+	sm:subscribe({signal = "on_drop", fun = this.check_generator})
+end
+
 local spawn_db = ogse_spawn_db.script_spawn_registry.jekan_quests
 
 function cheat_start()
@@ -3268,17 +3272,16 @@ function make_yan_soldier_enemy()
 	npc:set_relation(game_object.enemy, db.actor)
 end
 
-function check_generator(obj)
-	if not obj then 
-		return 
-	end
-	local id = obj:id()
-	local sobj = alife():object(id)
-	if not sobj then
-		return
-	end	
-	local section = sobj:section_name()
-	if sobj and string.find(section, "yan_sold_generator") and db.actor:has_info("yan_sold_go_to_dark_zone") and db.actor:dont_has_info("yan_sold_actor_paralyzed") then
+function check_generator(obj, sobj)
+	--if not obj then 
+	--	return 
+	--end
+	--local id = obj:id()
+	--local sobj = alife():object(id)
+	--if not sobj then
+	--	return
+	--end	
+	if sobj:section_name() == "yan_sold_generator" and db.actor:has_info("yan_sold_go_to_dark_zone") and db.actor:dont_has_info("yan_sold_actor_paralyzed") then
 		db.actor:hide_weapon()
 		actor_disable_inventory()
 		ogse_quests.turn_pnv_off()
@@ -3289,6 +3292,7 @@ function check_generator(obj)
 		soundtrack.pain1()
 		ogse.start_timer("yan_sold_move_actor",4)
 		ogse.start_timer("yan_sold_give_tip",7)
+		return true
 	end
 end
 
@@ -4069,6 +4073,7 @@ function teleport_to_magnit()
 		soundtrack.magnit_portal()
 		delete_magnit_part()
 		db.actor:set_actor_position(pos)
+		return true
 	end
 -- Не сработало
 	if actorlvl ~= sobjlvl then
@@ -4076,6 +4081,7 @@ function teleport_to_magnit()
 		ogse.spawn_item_in_inv("af_magnit_part1")
 		news_manager.send_tip(db.actor, "magnit_part_too_far", nil, "anomal", 6000, nil)
 		actor_disable_inventory()
+		return false
 	end
 -- Мы в танке
 	if ogse_car_control.current_car ~= nil then
@@ -4083,7 +4089,9 @@ function teleport_to_magnit()
 		ogse.spawn_item_in_inv("af_magnit_part1")
 		news_manager.send_tip(db.actor, "magnit_part_car_fail", nil, "anomal", 6000, nil)
 		actor_disable_inventory()
+		return false
 	end
+	return false
 end
 
 function spawn_magnit_part()

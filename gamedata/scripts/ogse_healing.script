@@ -496,7 +496,7 @@ local usable_sections = {
 -- Событие предшествующее использованию предмета. Используется для реализации
 -- иммунитетов, медленных аптечек и аптечек со сниженной эффективностью.
 function on_before_use_item(obj, sobj)
-	if sobj == nil then return true end
+	--if sobj == nil then return true end
 	local section = sobj:section_name()
 	local fun = usable_sections[section]
 	--log3("on_before_use_item, section: %s", section)

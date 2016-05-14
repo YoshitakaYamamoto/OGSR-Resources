@@ -1,8 +1,12 @@
+
+function attach(sm)
+	sm:subscribe({signal = "on_take", fun = this.on_item_take})
+end
+
 function main()
 	quest_escape3.main()
 	
 	db.actor:give_info_portion("cit_level_fake_start")
-
 end
 
 function check_first_enter()
@@ -19,16 +23,19 @@ function check_first_enter()
 end
 
 function on_item_take(obj)
-	if not obj then return end
+	--if not obj then return end
 	if db.actor and level.name() == "l09_deadcity_ogse" then
 		-- магия чебурана
-		if string.find(obj:section(), "af_kolya") and db.actor:object("cheb") then
-			db.actor:give_info_portion("cheb_found_kolya")	-- ЗАТЫЧКА!!! С новой игры удалить
-			level_tasks.remove_location_by_sid(story_ids.stalker_kolya, "crlc_big")
-			cheb_talk_timer(obj:id()):start()
-		end
-		if jekan_work.check_avail_anom_house_items() == true and db.actor:dont_has_info("yan_anom_house_items_find") then
+		if obj:section() == "af_kolya" then
+			if db.actor:object("cheb") then
+				db.actor:give_info_portion("cheb_found_kolya")	-- ЗАТЫЧКА!!! С новой игры удалить
+				level_tasks.remove_location_by_sid(story_ids.stalker_kolya, "crlc_big")
+				cheb_talk_timer(obj:id()):start()
+			end
+			return true
+		elseif jekan_work.check_avail_anom_house_items() == true and db.actor:dont_has_info("yan_anom_house_items_find") then
 			db.actor:give_info_portion("yan_anom_house_items_find")
+			return true
 		end
 	end
 end

@@ -158,7 +158,7 @@ end
 
 --******************************************************************Девайс ПНВ*************************************************************************
 function chek_drop_pnv(obj) --Проверка выкладывания работающего ПНВ
-	if not obj then return end
+	--if not obj then return end
 	
 	local outfit_slot = db.actor:item_in_slot(6) --предмет в слоте брони
 	local outfit_slot_nv = outfit_slot and sys_ini:line_exist(outfit_slot:section(), "nightvision_sect") --Проверка, есть ли в костюме встроенный ПНВ
@@ -172,7 +172,7 @@ function chek_drop_pnv(obj) --Проверка выкладывания рабо
 end
 
 function chek_outfit_double_pnv(obj) --Проверка "двойного" надевания ПНВ при смене костюма
-	if not obj then return end
+	--if not obj then return end
 
 	local is_nv_obj = sys_ini:line_exist(obj:section(), "nightvision_sect") --Проверка, есть ли в конфиге объекта строка nightvision_sect
 	local is_outfit_nv = isOutfit(obj) and is_nv_obj --проверка, является ли объект костюмом в котором есть встроенный ПНВ

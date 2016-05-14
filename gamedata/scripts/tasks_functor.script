@@ -19,7 +19,7 @@ function attach(sm) -- для менеджера сигналов
 end
 
 function on_take_from_box(box, item, sitem)
-	if sitem == nil then return end
+	--if sitem == nil then return end
 	if box:section() == "trunk_box" then
 		local car = level_object_by_sid(story_ids.esc_zaz_in_novice_lager)
 		if car and item:section() == "yashik_weapon" then
@@ -29,69 +29,87 @@ function on_take_from_box(box, item, sitem)
 end
 
 function on_take(obj, sobj)
-	if sobj == nil then return end
+	--if sobj == nil then return end
 	local sect = obj:section()
 	if sect == "pda_friend_barman" and not db.actor:has_info("bar_kvest_friend_of_barman_used_pda") then
 		db.actor:give_info_portion("bar_kvest_friend_of_barman_used_pda")
+		return true
 	elseif sect == "zapis_3_a_case" then
 		db.actor:give_info_portion("rad_kvest_dobrozhelatel_letter_get_letter")
 		xs_stor.set("help_to_svyaznoy", "cnfkrthrksr")
 		db.actor:give_info_portion("rad_kvest_dobrozhelatel_have_all_password")
+		return true
 	elseif sect == "pda_monolit" then
 		db.actor:give_info_portion("rad_kvest_dobrozhelatel_get_pda_monolit")
+		return true
 --[[	elseif sect == "crazy_flash" and db.actor:has_info("military_psycho_suicide") and db.actor:dont_has_info("military_psycho_deleted") then
 		military_psycho_surprise()]]
 	elseif sect == "crazy_flash" and db.actor:dont_has_info("mil_max_flash_get") then
 		db.actor:give_info_portion ("mil_max_flash_get")
+		return true
 	elseif sect == "af_muten" then
 		db.actor.radiation = 0.7
 		db.actor:give_info_portion("dead_stalker_question_of_immortality_get_muten")
 		if not db.actor:has_info("dead_stalker_question_of_immortality_delete_muten_trash") then
 			question_of_immortality_fisrt_part_delete_muten_trash()
 		end
+		return true
 	elseif sect == "af_firefly" then
 		db.actor:give_info_portion("dead_stalker_question_of_immortality_get_firefly")
 		if not db.actor:has_info("dead_stalker_question_of_immortality_delete_firefly_trash") then
 			question_of_immortality_fisrt_part_delete_firefly_trash()
 		end
+		return true
 	elseif sect == "af_chameleon" then
 		db.actor:give_info_portion("dead_stalker_question_of_immortality_get_chameleon")
 		xs_stor.set("art_chameleon_id", nil)
+		return true
 	elseif sect == "af_esc_anomaly" then
 		if not db.actor:has_info("af_esc_anomaly_off") then
 			db.actor.radiation = 0.7
 			delete_psy_art_trash("af_esc_anomaly")
 			ogse.give_info("af_esc_anomaly_off")
 		end
+		return true
 	elseif sect == "af_serdce_yantar" then
 		local artid = ogse.load_variable("ArtSerdceYantar")
 		if artid then
 			level_tasks.remove_location_by_id(artid, "green_location")
 		end
+		return true
 	elseif sect == "bomba" then
 		level.start_stop_menu(this.ui_neutralize_bomb(), true)
+		return true
 	elseif sect == "kid_zapisi" and not has_alife_info("kid_zapisi_read") then
 		db.actor:give_info_portion("kid_zapisi_read")
+		return true
 	end
 end
 
 function on_use(obj, sobj)
-	if sobj == nil then return end
+	--if sobj == nil then return end
 	local sect = obj:section()
 	if sect == "bp_mily_otschet" then
 		db.actor:give_info_portion("agr_dezerter_report_read")
+		return true
 	elseif sect == "psycho_military_note" then
 		db.actor:give_info_portion("military_psycho_surprise")
+		return true
 	elseif sect == "kolba_dummy" then
 		on_use_kolba_dummy()
+		return true
 	elseif sect == "kolba_zombie" then
 		on_use_kolba_zombie()
+		return true
 	elseif sect == "af_serdce_yantar" then
 		on_use_af_serdce_yantar()
+		return true
 	elseif sect == "case_use_rub" then
 		on_use_case_use_rub()
+		return true
 	elseif sect == "antena" then
 		on_use_mic()
+		return true
 	end
 end
 

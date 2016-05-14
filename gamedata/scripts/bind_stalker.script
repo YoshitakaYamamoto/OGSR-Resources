@@ -119,7 +119,7 @@ function actor_binder:net_destroy()
 	set_extensions_flags(0)
 	db.del_actor(self.object)
 
-    sr_light.clean_up ()
+    sr_light.clean_up()
 
 	self.object:set_callback(callback.inventory_info, nil)
 	self.object:set_callback(callback.article_info, nil)
@@ -246,11 +246,13 @@ function actor_binder:debug_monster_follow_path(id, params)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:take_item_from_box(box, item)
+	local sobj = alife():object(item:id())
 	local story_id = box:story_id()
-	if story_id == nil then return end
+	if not story_id or not sobj then return end
+
 	treasure_manager.take_item_from_box(box, story_id)
 
-	self.am:call("on_take_from_box", box, item, alife():object(item:id()))
+	self.am:call("on_take_from_box", box, item, sobj)
 	event("actor_take_item_from_box"):trigger({from = box, what = item})
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -359,6 +361,7 @@ local remove_this_shit_immediately = {
 	["gl_fake_missile_ammo_vog-25p"] = true,
 	["gl_fake_missile_ammo_m209"] = true,
 	["gl_fake_missile_ammo_m208a"] = true,
+	["yad"] = true,
 }
 
 function check_pickup_fake_gren(obj, srv_obj)
@@ -375,7 +378,6 @@ end
 function actor_binder:on_item_take(obj)
 
 	ogse_debug.process_actor("itm_t", 1)
-
 	if not obj then ogse_debug.process_actor("itm_t", 0) return end
 	local sobj = alife():object(obj:id())
 	if not sobj then
@@ -387,72 +389,56 @@ function actor_binder:on_item_take(obj)
 	end
 
 	ogse_debug.process_actor("itm_t", 2)
-	
 	if check_pickup_fake_gren(obj, sobj) then
 		ogse_debug.process_actor("itm_t", 0)
 		return
 	end
 
-	ogse_debug.process_actor("itm_t", 26662)
-	
-    if xrs_ai then xrs_ai.actor_item_take(obj) end	
-
-	ogse_debug.process_actor("itm_t", 3)
-	
-    if rx_ai then
-	   rx_ai.actor_item_take(obj)
-    end	
-
 	ogse_debug.process_actor("itm_t", 4)
-	
-    level_tasks.proceed(self.object)
-
-    ogse.on_item_take(obj)
-
-	ogse_debug.process_actor("itm_t", 6)
-
-    if obj:clsid() == clsid.wpn_ammo then
-        dunin_ammo.on_take(obj)
-    end
+    level_tasks.proceed()
 
 	ogse_debug.process_actor("itm_t", 7)
 
-	local sobj = alife():object(obj:id())
-	if sobj then --такое может быть если объект был удален в on_ruck
-		self.am:call("on_take", obj, sobj)
-		event("actor_item_take"):trigger({what = obj})
-	end
-	
+	self.am:call("on_take", obj, sobj)
+	event("actor_item_take"):trigger({what = obj})
+
 	ogse_debug.process_actor("itm_t", 0)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_item_drop(obj)
-	self.am:call("on_drop", obj, alife():object(obj:id()))
-	event("actor_item_drop"):trigger({what = obj})
-	
+	if not obj then ogse_debug.process_actor("itm_d", 0) return end
+	local sobj = alife():object(obj:id())
+	if not sobj then ogse_debug.process_actor("itm_d", 0) return end
+
 	ogse_debug.process_actor("itm_d", 1)
-	
-    level_tasks.proceed(self.object)
-	ogse_debug.process_actor("itm_d", 2)
-	ogse.on_item_drop(obj)
+
+    level_tasks.proceed()
+
+	self.am:call("on_drop", obj, sobj)
+	event("actor_item_drop"):trigger({what = obj})
+
 	ogse_debug.process_actor("itm_d", 0)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:before_use(item)
-	self.am:call("on_actor_before_use", item, alife():object(item:id()))
+	if not item then return end
+	local sobj = alife():object(item:id())
+	if not sobj then return end
+
+	self.am:call("on_actor_before_use", item, sobj)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:use_inventory_item(obj)
-	ogse_debug.process_actor("itm_u", 1)
-
 	if not obj then ogse_debug.process_actor("itm_u", 0) return end
 	local sobj = alife():object(obj:id())
 	if not sobj then ogse_debug.process_actor("itm_u", 0) return end
 
-	ogse.use_inventory_item(obj)
-	ogse_debug.process_actor("itm_u", 0)
+	ogse_debug.process_actor("itm_u", 1)
+
 	self.am:call("on_use", obj, sobj)
 	event("actor_use_inventory_item"):trigger({what = obj})
+
+	ogse_debug.process_actor("itm_u", 0)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:before_hit_callback(p_s_hit, p_ignore_flags)
@@ -583,9 +569,6 @@ function actor_binder:update(delta)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_key(key)
-	ogse_debug.process_actor("key", 1)
-	ogse.on_key(key, dik_to_bind(key))
-	ogse_debug.process_actor("key", 0)
 	self.am:call("on_key_down", key, dik_to_bind(key))
 	event("key_down"):trigger({key = key, bind = dik_to_bind(key)})
 end
