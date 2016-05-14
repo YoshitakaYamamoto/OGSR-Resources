@@ -299,7 +299,7 @@ local info2call = {
 function actor_binder:info_callback(npc, info_id)
 	ogse_debug.process_actor("inf", 1)
 	--' Сюжет
-	level_tasks.proceed(self.object)
+	level_tasks.proceed()
 	
 	ogse_debug.process_actor("inf", 2)
 	-- Отметки на карте

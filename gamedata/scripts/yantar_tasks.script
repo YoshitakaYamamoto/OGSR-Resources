@@ -1,8 +1,3 @@
-function proceed()
-
-end
-function process_info_portion(info_id)
-end
 function arrived_to_loschina()
 	if has_alife_info("loschina_task_start") and level.name() == "k01_darkscape_ogse" then
 		return true
