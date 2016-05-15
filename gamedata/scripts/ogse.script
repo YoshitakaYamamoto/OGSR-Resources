@@ -1452,14 +1452,13 @@ end,
 
 function on_actor_update() --Колбэк на апдейт ГГ
 ---------------------АПДЕЙТЫ С ВЫСОКИМ ПРИОРИТЕТОМ ПОМЕЩАТЬ СЮДА!---------------------
-	ogse_debug.process_actor("upd_a", 4)
-	ogse_scripted_btr.update() --Охранный БТР. надо перевести на сигналы
-
 	ogse_debug.process_actor("upd_a", 10)
 	ogsm_quests.wounded_pp() --эффекты ранения актора
 
 	ogse_debug.process_actor("upd_a", 13)
 	if xrs_ai then xrs_ai.actor_update() end -- Обновление АИ-пака
+
+	ogse_debug.process_actor("upd_a", 1488)
 	if rx_ai then rx_ai.actor_update() end --обновление AI управления оружием
 --------------------------КОНЕЦ АПДЕЙТОВ С ВЫСОКИМ ПРИОРИТЕТОМ-------------------------
 
@@ -1575,7 +1574,7 @@ function on_actor_first_update()
 end
 
 -- Колбэк на выдачу инфопоршена ГГ
-function on_info_update(info_id)
+function on_info_update(npc, info_id)
 	_sdata.infos(info_id)
 
 	pda_fx.on_pda_info(info_id) --"Выключение" PDA в Выброс

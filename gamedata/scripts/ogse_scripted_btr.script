@@ -4,6 +4,11 @@
 --- Авторы: KamikaZze
 --- version 1.0.00 (22/06/2014)
 -----------------------------------------------------------------------
+
+function attach(sm)
+	sm:subscribe({signal = "on_update", fun = this.update})
+end
+
 local car_btr = 0
 
 cars_by_location = {

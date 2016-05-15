@@ -76,7 +76,7 @@ function remove_m134() --Чтобы М134 можно было использов
 	local m134 = db.actor:item_in_slot(2)
 	if m134 and m134:section() == "wpn_m_134" then
 		local outfit = db.actor:get_current_outfit()
-		if not outfit and string.find( outfit:section(), "_exo" ) then
+		if not outfit or not string.find( outfit:section(), "_exo" ) then
 			db.actor:move_to_ruck(m134) --db.actor:mark_item_dropped( m134 )
 			if counter == 0 then
 				news_text = game.translate_string("dinhud_gatling_text")
@@ -84,6 +84,6 @@ function remove_m134() --Чтобы М134 можно было использов
 				counter = counter + 1
 			end
 		end
-		return true
+		--return true
 	end
 end
