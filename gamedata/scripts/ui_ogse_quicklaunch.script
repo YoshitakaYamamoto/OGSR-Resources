@@ -6,7 +6,8 @@
 -----------------------------------------------------------------------
 
 function attach(sm)
-	sm:subscribe({ signal = "on_key_down",		fun = this.chek_keys })
+	sm:subscribe({ signal = "on_key_down",	fun = this.chek_keys })
+	sm:subscribe({ signal = "on_update",	fun = this.check_quicklaunch_hint })
 end
 
 local strings = {}
@@ -98,9 +99,8 @@ function chek_keys(key, bind)
 				db.actor:eat(item)
 				ogse_screen_msg.show_message_use_item(item_section)
 			end
-			return
-		end
-		if key == ogse_rebind_key.get_key_preset_value("energy_drink_key") then
+			return true
+		elseif key == ogse_rebind_key.get_key_preset_value("energy_drink_key") then
 			local item = db.actor:object("energy_drink")
 			if item then
 				local item_section = item:section()
@@ -114,28 +114,26 @@ function chek_keys(key, bind)
 					ogse_screen_msg.show_message_use_item(item_section)
 				end
 			end				
-			return
-		end
-		if key == ogse_rebind_key.get_key_preset_value("yod_key") then
+			return true
+		elseif key == ogse_rebind_key.get_key_preset_value("yod_key") then
 			local item = db.actor:object("yod")
 			if item then
 				local item_section = item:section()
 				db.actor:eat(item)
 				ogse_screen_msg.show_message_use_item(item_section)
 			end			
-			return
-		end		
-		if key == ogse_rebind_key.get_key_preset_value("bipsizon_key") then
+			return true
+		elseif key == ogse_rebind_key.get_key_preset_value("bipsizon_key") then
 			local item = db.actor:object("bipsizon")
 			if item then
 				local item_section = item:section()
 				db.actor:eat(item)
 				ogse_screen_msg.show_message_use_item(item_section)
 			end			
-			return
-		end				
-		if key == ogse_rebind_key.get_key_preset_value("quicksave_key") then
+			return true
+		elseif key == ogse_rebind_key.get_key_preset_value("quicksave_key") then
 			cmd("ogse_quick_save")
+			return true
 		end				
 end
 

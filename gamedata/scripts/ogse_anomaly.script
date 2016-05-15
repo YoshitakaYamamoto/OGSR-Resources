@@ -8,7 +8,10 @@
 -----------------------------------------------------------------------
 
 function attach(sm)
-	sm:subscribe({signal = "on_drop", fun = this.check_artefact_activation})
+	sm:subscribe({signal = "on_spawn",			fun = this.anom_update})
+	sm:subscribe({signal = "on_first_update",	fun = this.emergency_restr_reset})
+	sm:subscribe({signal = "on_update",			fun = this.lvl_anomaly_disable, queued = true})
+	sm:subscribe({signal = "on_drop",			fun = this.check_artefact_activation})
 end
 
 local list_anom_id = {}

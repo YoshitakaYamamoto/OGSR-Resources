@@ -79,7 +79,7 @@ function on_save() --Сохраняем состояние работы пнв
 	ogse.save_var( "pnv_scope", nv_scope_fx_autoenable )
 end
 
-function on_destroy() --При смерти актора, отключаются шейдерные эффекты пнв/тепловизора
+function on_destroy() --отключаются шейдерные эффекты тепловизора
 	cmd("r2_render_mode normal")
 end
 
@@ -125,8 +125,10 @@ function call_pnv(key) --Действие при нажатии клавиши �
 	elseif not night_vision_fx_not_sniper then --если актор смотрит в прицел
 		if not night_vision_scope_fx_on then nv_scope_fx_on() else turn_off_nv_scope_fx() end --вкл/выкл ПНВ в прицеле, в том числе бинокля
 		if not highlight_wnd then turn_on_scope_sights_lighting() else turn_off_scope_sights_lighting() end --вкл/выкл подсветку прицельной сетки + цветокоррекцию.
-		if night_vision_scope_fx_on or highlight_wnd then nv_scope_fx_autoenable = true else nv_scope_fx_autoenable = false end --нужно для правильного сохранения состояния пнв/подсветки.
+		--if night_vision_scope_fx_on or highlight_wnd then nv_scope_fx_autoenable = true else nv_scope_fx_autoenable = false end --нужно для правильного сохранения состояния пнв/подсветки.
+		nv_scope_fx_autoenable = not nv_scope_fx_autoenable --нужно для правильного сохранения состояния пнв/подсветки.
 	end
+	return true
 end
 
 --==========================================Режим прицеливания через оптику===========================================

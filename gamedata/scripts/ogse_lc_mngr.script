@@ -1,9 +1,10 @@
 ----------------------- Менеджер level_changer --------------------------
 ------------------------- Copyright 20011-20011 OGSE, на основе концепции OGSM. ---------------------------
 function attach(sm)
-	sm:subscribe({signal = "on_storyline_start", fun = this.on_storyline_start})
-	sm:subscribe({signal = "on_info"           , fun = this.on_info           })
-	sm:subscribe({signal = "on_save"           , fun = this.on_save           })
+	sm:subscribe({signal = "on_storyline_start",	fun = this.on_storyline_start})
+	sm:subscribe({signal = "on_info",				fun = this.on_info})
+	sm:subscribe({signal = "on_save",				fun = this.on_save})
+	sm:subscribe({signal = "on_first_update",		fun = this.lc_restore_location})
 end
 
 local spawn_db = ogse_spawn_db.script_spawn_registry.ogse_lc_mngr

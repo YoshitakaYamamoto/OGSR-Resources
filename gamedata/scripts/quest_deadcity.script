@@ -1,6 +1,7 @@
 
 function attach(sm)
 	sm:subscribe({signal = "on_take", fun = this.on_item_take})
+	sm:subscribe({signal = "on_first_update", fun = this.check_first_enter})
 end
 
 function main()

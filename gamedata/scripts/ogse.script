@@ -6,7 +6,12 @@
 -----------------------------------------------------------------------
 
 function attach(sm)
-	sm:subscribe({signal = "on_take", fun = this.on_item_take})
+	sm:subscribe({signal = "on_take",			fun = this.on_item_take})
+	sm:subscribe({signal = "on_info",			fun = this.on_info_update})
+	sm:subscribe({signal = "on_update",			fun = this.on_actor_update})
+	sm:subscribe({signal = "on_first_update",	fun = this.on_actor_first_update})
+	sm:subscribe({signal = "on_save",			fun = this.on_game_save})
+	sm:subscribe({signal = "on_spawn",			fun = this.on_game_load})
 end
 
 game_time_factor = 0
@@ -1283,12 +1288,6 @@ function()
 	end
 end,
 function()
-	ogse_debug.process_actor("upd_a", 23)
-	if ogse_anomaly then
-		ogse_anomaly.lvl_anomaly_disable() -- Предохранительное отключение аномалий
-	end
-end,
-function()
 	ogse_debug.process_actor("upd_a", 24)
 	show_time() -- Выводим время на HUD
 end,
@@ -1459,9 +1458,6 @@ function on_actor_update() --Колбэк на апдейт ГГ
 	ogse_debug.process_actor("upd_a", 10)
 	ogsm_quests.wounded_pp() --эффекты ранения актора
 
-	ogse_debug.process_actor("upd_a", 12)
-	ui_ogse_quicklaunch.check_quicklaunch_hint() --Подсказки по кнопке быстрого доступа. надо перевести на сигналы
-
 	ogse_debug.process_actor("upd_a", 13)
 	if xrs_ai then xrs_ai.actor_update() end -- Обновление АИ-пака
 	if rx_ai then rx_ai.actor_update() end --обновление AI управления оружием
@@ -1558,9 +1554,6 @@ function on_actor_first_update()
 	-- Перехват хоткеев
 	ogse_rebind_key.unbind_key()
 
-	-- проверка валидности удаления телепортов
-	ogse_anomaly.emergency_restr_reset()
-
 	-- позволим актору выйти через тот же выход на Агро, что он пришел
 	agroprom_tasks.check_enter()
 
@@ -1579,42 +1572,32 @@ function on_actor_first_update()
 	end
 
 	ogse_quests_fix.clean_level() -- Очищаем уровни от трупов во фриплее
-
-	quest_deadcity.check_first_enter()
 end
 
 -- Колбэк на выдачу инфопоршена ГГ
 function on_info_update(info_id)
 	_sdata.infos(info_id)
 
--- "Выключение" PDA в Выброс
-	pda_fx.on_pda_info(info_id)
+	pda_fx.on_pda_info(info_id) --"Выключение" PDA в Выброс
 end
 
 -- Загружаем все переменные, которые нужно, вызывается при загрузке игры автоматически
 function on_game_load()
-	ogse_debug.process_actor("a_spw", 111)
 
+	ogse_debug.process_actor("a_spw", 111)
 	se_respawn.check_zone_population()
 
 	ogse_debug.process_actor("a_spw", 113)
-
 	deadmans_table = load_var( "ogse.deadmans_table", {}, "table" )
 
 	ogse_debug.process_actor("a_spw", 115)
-
-	-- Отключаем в PDA вкладку "Контакты"
-	get_console():execute("unbind contacts")
+	get_console():execute("unbind contacts") --Отключаем в PDA вкладку "Контакты"
 
 	ogse_debug.process_actor("a_spw", 117)
-
-	-- проверка количества идентификаторов
-	id_cleaner.check_ids()
+	id_cleaner.check_ids() --проверка количества идентификаторов
 
 	ogse_debug.process_actor("a_spw", 118)
-
-	-- Создаем хранилище актора
-	if db.storage[db.actor:id()].pstor == nil then
+	if db.storage[db.actor:id()].pstor == nil then	--Создаем хранилище актора
 		db.storage[db.actor:id()].pstor = {}
 	end
 
@@ -1622,11 +1605,9 @@ function on_game_load()
 
 	-- Первый запуск мода
 	if db.actor:dont_has_info("storyline_actor_start") then
-	
 		g_start_timer("rsp",0, 5+math.random(-1,1), 0)
 		ogsm_respawn.first_run()
 		ogse_spawns.traders_spawn()
-		ogse_quests.spawn_black_dealer()
 		ogse_spawns.sidr_guard_spawn()
 		checker_minefield.set_gsc_mine()
 		db.actor:give_info_portion("encyclopedy_tutorial_jump")
@@ -1635,13 +1616,9 @@ function on_game_load()
 		db.actor:give_info_portion("encyclopedy_tutorial_binocular")
 		db.actor:give_info_portion("encyclopedy_tutorial_relation")
 		db.actor:give_info_portion("encyclopedy_tutorial_wound")
-		
-		ogse_quests.scape_doors_start() -- двери в Лощине
-
 	end
-	 
-	--KD: установка настроек графики
 
+------------KD: установка настроек графики------------
 	-- шмапы
 	log1("[KD] applying graphics settings")
 	cmd("r2_ls_depth_bias -0.00005")
@@ -1653,54 +1630,30 @@ function on_game_load()
 	cmd("r2_sun_focus on")
 	cmd("r2_sun_near_border 1.")
 	-- избавляемся от пересвета поверхностей
-	-- -- блум
+	-- блум
 	cmd("r2_ls_bloom_threshold 1.")
-	-- -- мультипликатор цвета солнца (идиотская настройка)
+	-- мультипликатор цвета солнца (идиотская настройка)
 	cmd("r2_sun_lumscale 1.")
 	cmd("r2_rain_drops_control on") --капли на стекле
 	cmd("r2_lens_dirt_control on") --грязь на линзе
-	--KD: end	 
-
-	-- проверка мин
+-----------------------KD: end-------------------------
 
 	ogse_debug.process_actor("a_spw", 120)
-
-	checker_minefield.startup()
+	checker_minefield.startup() --Проверка мин
 
 	ogse_debug.process_actor("a_spw", 1110)
-
 	db.register_all_quest_zones()
-
-	ogse_debug.process_actor("a_spw", 1112)
 
 	anom_enum = anom_enum + 15000
 
 	ogse_debug.process_actor("a_spw", 1113)
-
-	-- проверка помощи Круглову
-	ogsm_quests.kruglov_help_chek()
-
-	ogse_debug.process_actor("a_spw", 1114)
-
-	-- проверка прохождения X-18
-	ogse_quests.dar_stalker_explorer_spawn()
+	ogsm_quests.kruglov_help_chek() --Проверка помощи Круглову
 
 	ogse_debug.process_actor("a_spw", 1117)
-
-	-- Получаем список всех монстров и укрытий
-	ogsm_respawn.get_level_mobs()
-
-	ogse_debug.process_actor("a_spw", 1118)
-
-	-- Обновление менеджера аномалий
-	if ogse_anomaly then
-		ogse_anomaly.anom_update()
-	end
+	ogsm_respawn.get_level_mobs() --Получаем список всех монстров и укрытий
 
 	ogse_debug.process_actor("a_spw", 1119)
-
-	-- Спавним, если надо, пси-зоны
-	if ogsm_psyzones then
+	if ogsm_psyzones then --Спавним, если надо, пси-зоны
 		if psyzones_flag ~= 0 then
 			ogsm_psyzones.spawn_on_load()
 		else
@@ -1716,12 +1669,10 @@ function on_game_load()
 	end
 
 	ogse_debug.process_actor("a_spw", 1120)
-	-- Квестовые умиранцы 
-	quest_dead_on_arrival = load_var("q_doa", {}, "array")
+	quest_dead_on_arrival = load_var("q_doa", {}, "array") --Квестовые умиранцы 
 
 	ogse_debug.process_actor("a_spw", 1127)
-	-- Восстановим сценку с вертолётом
-	if db.actor:has_info("esc_heli_go") and db.actor:dont_has_info("tutorial_wounded_start")  then
+	if db.actor:has_info("esc_heli_go") and db.actor:dont_has_info("tutorial_wounded_start") then --Восстановим сценку с вертолётом
 		local spw_1 = tonumber(load_variable("heli_quest_1",nil))
 		local spw_2 = tonumber(load_variable("heli_quest_2",nil))
 		local spw_3 = tonumber(load_variable("heli_quest_3",nil))

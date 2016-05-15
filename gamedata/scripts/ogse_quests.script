@@ -9,6 +9,10 @@ function attach(sm)
 -------------------
 	sm:subscribe({ signal = "on_item_to_belt",	fun = this.on_transponder_to_belt })
 	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.on_transponder_to_ruck })
+-------------------
+	sm:subscribe({ signal = "on_storyline_start", fun = this.spawn_black_dealer })
+	sm:subscribe({ signal = "on_storyline_start", fun = this.scape_doors_start })
+	sm:subscribe({ signal = "on_spawn",			fun = this.dar_stalker_explorer_spawn })
 end
 
 --/ спавн квестовых предметов для OGSE и скриптовые квесты /--

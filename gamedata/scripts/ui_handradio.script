@@ -26,11 +26,8 @@ function on_item_use(item)
 end
 
 function on_key_down(key, bind)
-	local wnd = level.main_input_receiver()
-	-- проверка на активное окно GPS-метки
-	if wnd and (wnd:WindowName() == "gps_metka" or wnd:WindowName() == "case_use_rub" or wnd:WindowName() == "ui_bun_comp") then
-		return
-	end
+	if level.main_input_receiver() then return end
+
 	if key == ogse_rebind_key.get_key_preset_value("handradio_key") then
 		if db.actor:object("hand_radio_f") then
 			open_radio_dialog()

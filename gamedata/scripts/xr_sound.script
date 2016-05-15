@@ -4,6 +4,8 @@
 --	update: Чугай Александр (Chugai)
 ----------------------------------------------------------------------------------------------------------------------
 function attach(sm)
+	sm:subscribe({signal = "on_destroy", fun = this.stop_all_sound_object})
+	sm:subscribe({signal = "on_update", fun = this.update_actor})
 	sm:subscribe({signal = "on_update", fun = this.actor_update_lp, queued = true})
 	--sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
 end
