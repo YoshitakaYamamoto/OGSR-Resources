@@ -64,20 +64,9 @@ code: <<<END
 	if xrs_ai then xrs_ai.actor_net_spawn(self) end
 END;
 ]]
-function actor_net_spawn(binder)
+function actor_net_spawn()
 	if xrs_grenade then xrs_grenade.net_spawn() end
 end
-
---[[
-file: bind_stalker.script
-function: actor_binder:on_item_take (obj)
-after: <<<END
-    level_tasks.proceed(self.object)
-END;
-code: <<<END
-	if xrs_ai then xrs_ai.actor_item_take(obj) end
-END;
-]]
 
 --[[
 file: bind_stalker.script
@@ -87,9 +76,9 @@ code: <<<END
 	if xrs_ai then xrs_ai.actor_update(delta) end
 END;
 ]]
-function actor_update(delta)
+function actor_update()
 	ogse_debug.process_actor("upd_a", 454)
-	if xrs_grenade then xrs_grenade.update(delta) end
+	if xrs_grenade then xrs_grenade.update() end
 end
 
 --[[

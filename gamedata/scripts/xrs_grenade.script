@@ -725,8 +725,8 @@ function get_grenade_radius(section)
 	return r,t
 end
 
-function update(delta)
-	
+function update()
+
 	for k,v in pairs(pseudo_grenades) do
 		local sobj = alife():object(k)
 		if sobj then
@@ -739,7 +739,7 @@ function update(delta)
 			pseudo_grenades[k]=nil
 		end
 	end
-	
+
 	for k,v in pairs(grenades) do
 		local sobj = alife():object(k)
 		if sobj then
@@ -761,7 +761,7 @@ function update(delta)
 			grenades[k]=nil
 		end
 	end
-	
+
 	for k,v in pairs(test_grenades) do
 		local sobj = alife():object(k)
 		if sobj then
@@ -858,10 +858,10 @@ function net_spawn()
 		if sobj then
 			for k,v in pairs(gr_types) do
 				if sobj:section_name()==v.."_test" or sobj:section_name()==v.."_fake" then
-					if sobj then
+					--if sobj then
 						alife():release(sobj, true)
-					end
-					break
+					--end
+					--break
 				end
 			end
 		end

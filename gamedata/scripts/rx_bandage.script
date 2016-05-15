@@ -293,6 +293,7 @@ function npc_update(npc)
 	end
 end
 
+--[[ --KRodin: не имеет смысла удалять yad из непися при его смерти. Этим занимается death manager!
 local trem = {}
 
 function npc_death(npc)
@@ -317,7 +318,7 @@ function update()
 	end
 	trem = {}
 	ogse_debug.process_actor("upd_a", 4572)
-end
+end]]
 
 function set_scheme(npc,ini,scheme,section)
 	local st = xr_logic.assign_storage_and_bind(npc,ini,scheme,section)

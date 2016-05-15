@@ -62,10 +62,10 @@ function actor_update()
 	if rx_gl then
 		rx_gl.update(tg)
 	end
-	ogse_debug.process_actor("upd_a", 457)
-	if rx_bandage then
-		rx_bandage.update(tg)
-	end
+	--ogse_debug.process_actor("upd_a", 457)
+	--if rx_bandage then
+	--	rx_bandage.update(tg)
+	--end
 end
 
 function actor_net_spawn()
@@ -74,7 +74,7 @@ function actor_net_spawn()
 	end
 end
 
-function actor_save(p)
+function actor_save()
 	if rx_wmgr then
 		rx_wmgr.return_all()
 	end
@@ -111,9 +111,9 @@ function npc_switch_offline(npc)
 	if rx_wmgr then
 		rx_wmgr.kill_wm(npc)
 	end
-	if rx_bandage then
-		rx_bandage.npc_switch_offline(npc)
-	end
+	--if rx_bandage then
+	--	rx_bandage.npc_switch_offline(npc)
+	--end
 	unsubscribe_from_events(npc)
 end
 
