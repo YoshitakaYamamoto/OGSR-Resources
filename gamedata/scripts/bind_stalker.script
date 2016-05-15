@@ -88,11 +88,10 @@ function actor_binder:net_spawn(data)
 	ui_main_menu.start()
 ------------------------------------
 
-	ogse_debug.process_actor("a_spw", 0)
-
 	self.am:call("on_spawn", data)
 	event("actor_spawn"):trigger({data = data})
 
+	ogse_debug.process_actor("a_spw", 0)
 	return true
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -300,6 +299,7 @@ function actor_binder:info_callback(npc, info_id)
 		self.am:call(sc, npc)
 		event(sc):trigger({who = npc})
 	end
+
 	ogse_debug.process_actor("inf", 0)
 end
 ----------------------------------------------------------------------------------------------------------------------
