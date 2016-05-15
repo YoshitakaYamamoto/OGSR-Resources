@@ -313,6 +313,7 @@ function info_about_npc()
 			local LogicText = "obj: section: "..tostring(target_obj:section()).."\\n"..
 						"obj: name: "..tostring(target_obj:name()).."\\n"..
 						"obj: id: "..tostring(target_obj:id()).."\\n"..
+						"story_id: "..tostring(target_obj:story_id()).." "..
 						"------------------\\n"..
 						"coords: X "..tostring(target_obj:position().x)..", Y "..tostring(target_obj:position().y)..", Z "..tostring(target_obj:position().z).."\\n"..
 						"dir: X "..tostring(target_obj:direction().x)..", Y "..tostring(target_obj:direction().y)..", Z "..tostring(target_obj:direction().z).."\\n"..
