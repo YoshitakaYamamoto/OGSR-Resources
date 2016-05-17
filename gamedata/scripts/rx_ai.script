@@ -62,10 +62,6 @@ function actor_update()
 	if rx_gl then
 		rx_gl.update(tg)
 	end
-	--ogse_debug.process_actor("upd_a", 457)
-	--if rx_bandage then
-	--	rx_bandage.update(tg)
-	--end
 end
 
 function actor_net_spawn()
@@ -111,9 +107,6 @@ function npc_switch_offline(npc)
 	if rx_wmgr then
 		rx_wmgr.kill_wm(npc)
 	end
-	--if rx_bandage then
-	--	rx_bandage.npc_switch_offline(npc)
-	--end
 	unsubscribe_from_events(npc)
 end
 
@@ -178,9 +171,6 @@ function load_schemes()
 	if rx_bandage then
 		load_scheme("rx_bandage","bandage",stype_stalker)
 	end
-	--if rx_ff then
-	-- load_scheme("rx_ff","rx_ff",stype_stalker)
-	--end
 end
 
 function disable_schemes(npc)
@@ -206,9 +196,6 @@ function enable_schemes(ini,npc)
 	if rx_bandage then
 		rx_bandage.set_scheme(npc,ini,"bandage","bandage")
 	end
-	--if rx_ff then
-	--	rx_ff.set_scheme(npc,ini,"rx_ff","rx_ff")
-	--end
 end
 
 function addCommonPrecondition(action)

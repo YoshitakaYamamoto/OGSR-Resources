@@ -418,7 +418,7 @@ function CAmkDisguise:Update(oNpc, oItem)
 		return
 	end
 	
-	print_table_inlog_v2(aVisual, "aVisual:")
+	--print_table_inlog_v2(aVisual, "aVisual:")
 	
 	if aVisualGroups[aVisual[2]]==nil then 
 		log1("VisualGroups==nil") 
@@ -462,7 +462,7 @@ function CAmkDisguise:Update(oNpc, oItem)
 	local aVisList = aVisualList[sVis]
 	local iCost = sys_ini:r_float(sSect, "cost")
 
-	print_table_inlog_v2(aAvailableVis, "aAvailableVis:")
+	--print_table_inlog_v2(aAvailableVis, "aAvailableVis:")
 
 	for k,v in pairs(aAvailableVis) do
 		if sVis == v then

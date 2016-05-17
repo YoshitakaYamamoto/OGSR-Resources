@@ -709,43 +709,6 @@ function near_point_with_bit(point, patrol_path, bit)
 end
 
 --/ Рекурсивная распечатка таблицы
-function print_table(table, subs) --ПООТРЫВАТЬ ВЫЗОВЫ И УДАЛИТЬ!
-	do return end -- всё равно это не работает, а вызывается много откуда
-end
-
---/ Рекурсивная распечатка таблицы --ПООТРЫВАТЬ ВЫЗОВЫ И УДАЛИТЬ! ЕСТЬ V2
-function print_table_inlog(table, subs)
-	local sub
-	if subs ~= nil then
-		sub = subs
-	else
-		sub = ""
-	end
-	for k,v in pairs(table) do
-		if type(v) == "table" then
-			log1(sub.." "..tostring(k)..": table")
-			print_table_inlog(v, sub.."    ")
-		elseif type(v) == "function" then
-			log1(sub.." "..tostring(k)..": function")
-		elseif type(v) == "userdata" then
-			log1(sub.." "..tostring(k)..": userdata")
-		elseif type(v) == "boolean" then
-			if v == true then
-				log1(sub.." "..tostring(k)..": true")
-			else
-				log1(sub.." "..tostring(k)..": false")
-			end
-		else
-			if v ~= nil then
-				log1(sub.." "..tostring(k)..": "..tostring(v))
-			else
-				log1(sub.." "..tostring(k)..": is NIL")
-			end
-		end
-	end
-end
-
---/ Рекурсивная распечатка таблицы --использовать это. остальное удалить.
 function print_table_inlog_v2(table, subs)
 	local sub
 	if subs ~= nil then
@@ -775,6 +738,14 @@ function print_table_inlog_v2(table, subs)
 			end
 		end
 	end
+end
+
+--TODO: ПООТРЫВАТЬ ВЫЗОВЫ И УДАЛИТЬ!
+function print_table(table, subs)
+end
+
+--TODO: ПООТРЫВАТЬ ВЫЗОВЫ И УДАЛИТЬ!
+function print_table_inlog(table, subs)
 end
 
 -------------------------------------------------------------------------------------------
@@ -809,53 +780,36 @@ local outfit_classes = {}
 local indoor_levels = {}
 -------------------------------------------------------------------------------------------
 function IsMonster (object, class_id)
-		local id = class_id or get_clsid(object)
-		if id then
-			return monster_classes[id] == true
-		end
-		return false
+	local id = class_id or get_clsid(object)
+	return (id and monster_classes[id] == true)
 end
 -------------------------------------------------------------------------------------------
 function IsStalker (object, class_id)
-		local id = class_id or get_clsid(object)
-		if id then
-			return stalker_classes[id] == true
-		end
-		return false
+	local id = class_id or get_clsid(object)
+	return (id and stalker_classes[id] == true)
 end
 -------------------------------------------------------------------------------------------
 function IsAnomaly (object, class_id)
-		local id = class_id or get_clsid(object)
-		if id then
-			return anomaly_classes[id] == true
-		end
-		return false
+	local id = class_id or get_clsid(object)
+	return (id and anomaly_classes[id] == true)
 end
 -------------------------------------------------------------------------------------------
 function isWeapon (object, class_id)
-		if object and string.find(object:name(), "wpn_binoc") then
-			return false end
-		local id = class_id or get_clsid(object)
-		if id then
-			return weapon_classes[id] == true
-		end
+	--[[if object and string.find(object:name(), "wpn_binoc") then
 		return false
+	end]]
+	local id = class_id or get_clsid(object)
+	return (id and weapon_classes[id] == true)
 end
 -------------------------------------------------------------------------------------------
 function isOutfit(object, class_id)
-		local id = class_id or get_clsid(object)
-		if id then
-			return outfit_classes[id] == true
-		end
-		return false
+	local id = class_id or get_clsid(object)
+	return (id and outfit_classes[id] == true)
 end
 -------------------------------------------------------------------------------------------
 function isKnife(object, class_id)
-		local id = class_id or get_clsid(object)
-		if id and (id == clsid.wpn_knife or id == clsid.wpn_knife_s) then
-			return true
-		end
-		return false
+	local id = class_id or get_clsid(object)
+	return (id and (id == clsid.wpn_knife or id == clsid.wpn_knife_s))
 end
 -------------------------------------------------------------------------------------------
 function isIndoor(level_name)
