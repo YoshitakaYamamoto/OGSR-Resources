@@ -2682,12 +2682,4 @@ function tower_box1_1()
 	level.start_stop_menu(spwn,true)
 end
 
-local function action(func, ...)
-    local arg = {...}
-    return  function (obj) func(obj, unpack(arg)) end
-end
-
-function CUIScriptWnd:Connect(name, event, func, obj, ...)
-    self:AddCallback(name, event, action(func, ...), obj)
-end
 --------------------------------------
