@@ -1,6 +1,6 @@
 
 function attach(sm)
-	sm:subscribe({signal = "on_take", fun = this.on_take})
+	sm:subscribe({signal = "on_take", fun = this.on_take}) --должен вызываться первым сигналом в on_take!
 end
 
 -- nv080209 - adjustments per Russian forum discussion
@@ -62,7 +62,7 @@ end
 local updates_count = 0
 local engage_after = 20
 
-function on_update()
+function on_update() --НЕ ПЕРЕВОДИТЬ НА СИГНАЛЫ! Вызывается из биндера актора предпоследним на апдейте!
 	if updates_count < engage_after then
 		updates_count = updates_count + 1
 		return
@@ -169,5 +169,5 @@ function get_ammo_size(obj)
 	ASSERT(obj, "[dunin_ammo.get_ammo_size] object is a nil reference!")
 	ASSERT(obj:is_ammo(), "[dunin_ammo.get_ammo_size] object '%s' is not an ammo!", obj:name())
 
-	return obj:get_go_int16( "", 476 ) --return obj:get_inventory_item_int16("", 692)
+	return obj:get_go_int16( "", 476 )
 end

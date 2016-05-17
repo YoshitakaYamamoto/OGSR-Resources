@@ -293,33 +293,6 @@ function npc_update(npc)
 	end
 end
 
---[[ --KRodin: не имеет смысла удалять yad из непися при его смерти. Этим занимается death manager!
-local trem = {}
-
-function npc_death(npc)
-	local obj = npc:object("yad")
-	if obj then
-		table.insert(trem,obj:id())
-	end
-end
-
-function npc_switch_offline(npc)
-	npc_death(npc)
-end
-
-function update()
-	ogse_debug.process_actor("upd_a", 4571)
-	for i,id in ipairs(trem) do
-		local sobj = alife():object(id)
-		if sobj and sobj:section_name() == "yad" then
-			ogse_debug.process_actor("upd_a", 45711)
-			alife():release(sobj,true)
-		end
-	end
-	trem = {}
-	ogse_debug.process_actor("upd_a", 4572)
-end]]
-
 function set_scheme(npc,ini,scheme,section)
 	local st = xr_logic.assign_storage_and_bind(npc,ini,scheme,section)
 end
@@ -330,4 +303,3 @@ function disable_scheme(npc,scheme)
 		st.enabled = false
 	end
 end
-

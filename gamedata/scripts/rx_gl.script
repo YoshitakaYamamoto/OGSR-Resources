@@ -759,10 +759,6 @@ function npc_update(npc,st)
 	end
 end
 
---function death(npc)
---- nothing is there -- all crap moved to death_manager
---end
-
 function net_spawn()
 	local sim = alife()
 	for a=0,65534 do
