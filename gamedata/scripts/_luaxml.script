@@ -1,22 +1,75 @@
 --[[ ----------------------------------------------------------------------------------------------
  File       : lua_xml.lua
- Copyright  : 2015 © Prosectors Mod
  Author     : Gerald Franz, www.viremo.de Copyright (C) 2007-2010 
  Editors    : Nazgool, nazgool@ukr.net
               Charsi
               OGSE Team
+              KRodin
  Description: Набор функций для работы с xml-файлами. В таблицу _G добавляется пространство _G.xml
                            (edition by Nazgool)
               Из оригинальной библиотеки удалена LuaXml_lib.dll.
               Функции из неё (за иключением registerCode) переписаны на lua.
- KRodin:	Вырезаны не работающие в ogse функции, удалена dll.
 --]] ----------------------------------------------------------------------------------------------
 
 module '_G'
 
 xml = {}
 
-function xml.eval (str)
+-- symbolic name for tag index, this allows accessing the tag by var[xml.TAG]
+xml.TAG = 0
+
+local symbols = {
+    ['\034'] = '&quot;', -- кавычка "
+    ['\038'] = '&amp;', -- амперсанд &
+    ['\060'] = '&lt;', -- левая угловая скобка <
+    ['\062'] = '&gt;', -- правая угловая скобка  >
+
+--[=[ --KRodin: эти символы после замены не работают, почему-то. Без замены работают нормально.
+    ['\160'] = '&nbsp;'  , -- неразрывный пробел
+    ['\161'] = '&iexcl;' , -- перевернутый восклицательный знак
+    ['\162'] = '&cent;'  , -- цент
+    ['\163'] = '&pound;' , -- фунт стерлингов
+    ['\164'] = '&curren;', -- знак денежной единицы ¤
+    ['\165'] = '&yen;'   , -- йена
+    ['\166'] = '&brvbar;', -- вертикальная черта ¦
+    ['\167'] = '&sect;'  , -- параграф §
+    ['\168'] = '&uml;'   , -- диереза
+    ['\169'] = '&copy;'  , -- знак авторского права ©
+    ['\170'] = '&ordf;'  , -- показатель женского рода
+    ['\171'] = '&laquo;' , -- открывающая двойная угловая кавычка «
+    ['\172'] = '&not;'   , -- знак отрицания ¬
+    ['\173'] = '&shy;'   , -- мягкий перенос
+    ['\174'] = '&reg;'   , -- охраняемый знак ®
+    ['\175'] = '&macr;'  , -- надчеркивание
+    ['\176'] = '&deg;'   , -- градус °
+    ['\177'] = '&plusmn;', -- плюс-минус ±
+    ['\178'] = '&sup2;'  , -- вторая степень
+    ['\179'] = '&sup3;'  , -- третья степень
+    ['\180'] = '&acute;' , -- острое ударение
+    ['\181'] = '&micro;' , -- знак микро µ
+    ['\182'] = '&para;'  , -- конец абзаца ¶
+    ['\183'] = '&middot;', -- средняя точка ·
+    ['\184'] = '&cedil;' , -- седиль
+    ['\185'] = '&sup1;'  , -- единица в верхнем индексе
+    ['\186'] = '&ordm;'  , -- показатель мужского рода
+    ['\187'] = '&raquo;' , -- закрывающая двойная угловая кавычка »
+    ['\188'] = '&frac14;', -- одна четвертая
+    ['\189'] = '&frac12;', -- одна вторая
+    ['\190'] = '&frac34;', -- три четверти
+    ['\191'] = '&iquest;', -- перевернутый вопросительный знак
+--]=]
+
+}
+
+function xml.encode(str) --KRodin: сталкерский lua не переваривает таблицу как аргумент в gsub. Переделал в функцию.
+    if type(str)~="string" then return end
+
+    return str:gsub('.', function(x)
+        return symbols[x] or x
+    end)
+end
+
+function xml.eval(str)
     if type(str)~="string" then return end
     local data = {}
     str = str:gsub('%s-<!%-%-.-%-%->', '') -- убрать комментарии
@@ -50,7 +103,7 @@ function xml.eval (str)
     return setmetatable(data[1],{__index=xml, __tostring=xml.str}) or nil
 end
 
-function xml.xr_load (root_alias, local_path)
+function xml.xr_load(root_alias, local_path)
     local fs   = getFS()
     local path = fs:update_path(root_alias, local_path)
     local file = io.open(path)
@@ -116,20 +169,20 @@ function xml.str(var,indent,tagValue)
             if type(k)=="string" then
                 if type(v)=="table" and k~="_M" then --  otherwise recursiveness imminent
                     tableStr = tableStr..xml.str(v,indent+1,k)
-                elseif v then
-                    s = s.." "..k.."=\""..tostring(v).."\""
+                else
+                    s = s.." "..k.."=\""..xml.encode(tostring(v)).."\""
                 end
             end
         end
         if #var==0 and #tableStr==0 then
             s = s.." />\n"
-        elseif #var==1 and var[1] and type(var[1])~="table" and #tableStr==0 then -- single element
-            s = s..">"..tostring(var[1]).."</"..tag..">\n"
+        elseif #var==1 and type(var[1])~="table" and #tableStr==0 then -- single element
+            s = s..">"..xml.encode(tostring(var[1])).."</"..tag..">\n"
         else
             s = s..">\n"
             for k,v in ipairs(var) do -- elements
                 if type(v)=="string" then
-                    s = s..indentStr.."  "..v.." \n"
+                    s = s..indentStr.."  "..xml.encode(v).." \n"
                 else
                     s = s..xml.str(v,indent+1)
                 end
@@ -139,7 +192,7 @@ function xml.str(var,indent,tagValue)
         return s
     else
         local tag = type(var)
-        return indentStr.."<"..tag.."> "..tostring(var).." </"..tag..">\n"
+        return indentStr.."<"..tag.."> "..xml.encode(tostring(var)).." </"..tag..">\n"
     end
 end
 
@@ -172,7 +225,7 @@ function xml.save(var, filename)
 end
 
 -- Function 'xml.find' ----------------------
-local function is_value (obj, value)
+local function is_value(obj, value)
     for _, v in pairs(obj) do
         if v == value then
             return true
@@ -227,7 +280,7 @@ end
 
 local thread = nil
 
-function xml.find (obj, tag, key, val)
+function xml.find(obj, tag, key, val)
     -- check input:
     if type(obj)~="table" then return nil end
     tag = (type(tag)=="string") and #tag>0 and tag
