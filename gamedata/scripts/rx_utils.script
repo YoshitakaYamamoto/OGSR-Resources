@@ -78,11 +78,6 @@ function str_explode(div,str,clear)
 	return t
 end
 
-function vec_to_str(vec)
-	if vec == nil then return "nil" end
-	return string.format("[%d:%d:%d]",vec.x,vec.y,vec.z)
-end
-
 --------------------------------------class---------------------------------------
 local weapon_classes_without_grenades = {
 		[clsid.wpn_ak74] 				= true,
@@ -121,10 +116,7 @@ local weapon_classes_without_grenades = {
 
 function item_is_fa(object, class_id)
 	local id = class_id or get_clsid(object)
-	if id then
-		return weapon_classes_without_grenades[id] == true
-	end
-	return false
+	return (id and weapon_classes_without_grenades[id] == true)
 end
 
 actor_clsid = clsid.actor
@@ -135,13 +127,6 @@ function is_actor(o,c)
 	return c == actor_clsid
 end
 
-restrictor_clsid = 115
-function is_restrictor(o,c)
-	if not c then
-		c = o and o:clsid()
-	end
-	return c == restrictor_clsid
-end
 --------------------------------------sch---------------------------------------
 function add_anim(npc,anim,move)
 	if anim then
@@ -169,18 +154,6 @@ function get_weapon_data(sobj)
 	parse_visual_packet(t,stpk)
 	parse_item_packet(t,stpk)
 	parse_item_weapon_packet(t,stpk)
-	return t
-end
-
-function get_restrictor_data(sobj)
-	local stpk = net_packet()
-	sobj:STATE_Write(stpk)
-	local size = stpk:w_tell()
-	stpk:r_seek(0)
-	local t = {}
-	parse_object_packet(t,stpk)
-	parse_shape_packet(t,stpk)	
-	t.restrictor_type = stpk:r_u8()
 	return t
 end
 
@@ -216,33 +189,6 @@ function parse_item_weapon_packet(ret,stpk)
 	return ret
 end
 
-function parse_shape_packet(t,stpk)
-	local shape_count = stpk:r_u8()
-	t.shapes = {}
-	for i=1,shape_count do
-		local shape_type = stpk:r_u8()
-		t.shapes[i] = {}
-		t.shapes[i].shtype = shape_type
-		if shape_type == 0 then
-			t.shapes[i].center = stpk:r_vec3()
-			t.shapes[i].radius = stpk:r_float()
-		else
-			t.shapes[i].v1 = stpk:r_vec3()
-			t.shapes[i].v2 = stpk:r_vec3()
-			t.shapes[i].v3 = stpk:r_vec3()
-			t.shapes[i].offset = stpk:r_vec3()
-		end
-	end
-end
-
-function readvu8uN(packet,n)
-	local v = {}
-	for i=1,n,1 do
-		table.insert(v,packet:r_u8())
-	end
-	return v
-end
-
 function set_weapon_data(t,sobj)
 	if sobj then
 		local stpk = net_packet()
@@ -254,16 +200,6 @@ function set_weapon_data(t,sobj)
 		stpk:r_seek(0)
 		sobj:STATE_Read(stpk,size)
 	end
-end
-
-function set_restrictor_data(t,sobj)
-	local stpk = net_packet()
-	fill_object_packet(t,stpk)
-	fill_shape_packet(t,stpk)
-	stpk:w_u8(t.restrictor_type)
-	local size = stpk:w_tell()
-	stpk:r_seek(0)
-	sobj:STATE_Read(stpk,size)
 end
 
 function fill_object_packet(ret,stpk)
@@ -294,29 +230,6 @@ function fill_item_weapon_packet(ret,stpk)
 	stpk:w_u8(ret.addon_flags)
 	stpk:w_u8(ret.ammo_type)
 	return ret
-end
-
-function fill_shape_packet(t,stpk)
-	stpk:w_u8(table.getn(t.shapes))
-	for i=1,table.getn(t.shapes) do
-		stpk:w_u8(t.shapes[i].shtype)
-		if t.shapes[i].shtype == 0 then
-			stpk:w_vec3(t.shapes[i].center)
-			stpk:w_float(t.shapes[i].radius)
-		else
-			stpk:w_vec3(t.shapes[i].v1)
-			stpk:w_vec3(t.shapes[i].v2)
-			stpk:w_vec3(t.shapes[i].v3)
-			stpk:w_vec3(t.shapes[i].offset)
-		end
-	end
-end
-
-function writevu8uN(pk,v)
-	local len = table.getn(v)
-	for i=1,len,1 do
-		pk:w_u8(v[i])
-	end
 end
 
 --------------------------------------addons---------------------------------------
@@ -356,16 +269,6 @@ function get_addon_flag(wpn,with_int)
 		rep_mem = {tg = tg,id = id,wi = with_int,fl = flag}
 		return flag
 	end
-end
-
-function addon_attached(wpn,addon,flag)
-	local ft = {sc = {[1] = true,[3] = true,[5] = true,[7] = true},
-				sl = {[4] = true,[5] = true,[6] = true,[7] = true},
-				gl = {[2] = true,[3] = true,[6] = true,[7] = true}}
-	if ft[addon] then
-		return ft[addon][flag or get_addon_flag(wpn,true)] == true
-	end
-	return false
 end
 
 --------------------------------------ai-----------------------------------------
