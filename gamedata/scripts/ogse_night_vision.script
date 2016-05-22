@@ -118,14 +118,13 @@ function call_pnv(key) --Действие при нажатии клавиши �
 	or level.main_input_receiver()
 	or not db.actor:alive() then return end
 
-	if not ogse_car_control.in_btr and night_vision_fx_not_sniper then --если актор НЕ в БТР и НЕ смотрит в прицел
-		if not night_vision_fx_on then nv_fx_on() else turn_off_nv_fx() end --вкл/выкл прибор ПНВ
-	elseif ogse_car_control.in_btr then --если актор находится в БТР
+	if ogse_car_control.in_btr then --если сидим в БТР'е
 		if not night_vision_btr_fx_on then turn_on_nv_btr_fx() else turn_off_nv_btr_fx() end --вкл/выкл ПНВ БТР
-	elseif not night_vision_fx_not_sniper then --если актор смотрит в прицел
+	elseif night_vision_fx_not_sniper then -- Если не смотрим в прицел
+		if not night_vision_fx_on then nv_fx_on() else turn_off_nv_fx() end --вкл/выкл прибор ПНВ
+	else --Если смотрим в прицел
 		if not night_vision_scope_fx_on then nv_scope_fx_on() else turn_off_nv_scope_fx() end --вкл/выкл ПНВ в прицеле, в том числе бинокля
 		if not highlight_wnd then turn_on_scope_sights_lighting() else turn_off_scope_sights_lighting() end --вкл/выкл подсветку прицельной сетки + цветокоррекцию.
-		--if night_vision_scope_fx_on or highlight_wnd then nv_scope_fx_autoenable = true else nv_scope_fx_autoenable = false end --нужно для правильного сохранения состояния пнв/подсветки.
 		nv_scope_fx_autoenable = not nv_scope_fx_autoenable --нужно для правильного сохранения состояния пнв/подсветки.
 	end
 	return true
