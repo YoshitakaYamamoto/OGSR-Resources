@@ -154,7 +154,56 @@
 	<string id="enc_weapons_ammo-7.62x54-7h14">
 		<text>Munition perforante de calibre 7H14 7.62x54R mm. En 1990, la Russie a lancé un programme de modernisation des cartouches 7.62x54R. L'objectif était d'obtenir une plus grande puissance de pénétration pour en faire une sorte de balle super-perforante. Ces cartouches anti-blindage sont destinées aux tireurs d'élite et elle sont dotées d'une balle traçante.</text>
 	</string>	
-<!-- // -->
+<!-- // --><!-- // --><!-- // -->
+	<string id="enc_weapons_ammo-7.62x25-dummy">
+		<text>Boîte vide de munitions 7,62x25 mm.</text>
+	</string>
+	<string id="ammo-7.62x25-dummy">
+		<text>Munitions 7,62x25</text>
+	</string>
+	<string id="ammo-7.62x25-dummy_s">
+		<text>7,62x25 mm</text>
+	</string>
+<!-- // --><!-- // --><!-- // -->
+	<string id="enc_weapons_ammo-9x18-dummy">
+		<text>Boîte vide de munitions 9x18 mm.</text>
+	</string>
+	<string id="ammo-9x18-dummy">
+		<text>Munitions 9x18</text>
+	</string>
+	<string id="ammo-9x18-dummy_s">
+		<text>9x18 mm</text>
+	</string>
+<!-- // --><!-- // --><!-- // -->
+	<string id="enc_weapons_ammo-9x19-dummy">
+		<text>Boîte vide de munitions 9x19 mm.</text>
+	</string>
+	<string id="ammo-9x19-dummy">
+		<text>Munitions 9x19</text>
+	</string>
+	<string id="ammo-9x19-dummy_s">
+		<text>9x19 mm</text>
+	</string>
+<!-- // --><!-- // --><!-- // -->
+	<string id="enc_weapons_ammo-11.43x23-dummy">
+		<text>Boîte vide de munitions .45 ACP.</text>
+	</string>
+	<string id="ammo-11.43x23-dummy">
+		<text>Munitions .45 ACP</text>
+	</string>
+	<string id="ammo-11.43x23-dummy_s">
+		<text>.45 ACP</text>
+	</string>
+<!-- // --><!-- // --><!-- // -->
+	<string id="enc_weapons_ammo-12x70-dummy">
+		<text>Boîte vide de munitions 12 calibre.</text>
+	</string>
+	<string id="ammo-12x70-dummy">
+		<text>Pack of 12 calibre</text>
+	</string>
+	<string id="ammo-12x70-dummy_s">
+		<text>12 calib.</text>
+	</string>
 	<string id="ammo-vog25">
 		<text>Grenade VOG-25</text>
 	</string>
@@ -199,7 +248,10 @@
 	</string>
 <!-- // -->
 
-<!-- This section is for Fusil d'assaults and submachine guns -->
+<!-- This section is for assault rifles and submachine guns -->
+	<string id="wpn-colt1911_s">
+		<text>Colt M1911 A1</text>
+	</string>
 <!-- // -->
 	<string id="wpn-akm">
 		<text>AKM</text>
@@ -214,6 +266,24 @@
 	<string id="wpn-akms">
 		<text>AKMS</text>
 	</string>
+<!-- // -->
+	<string id="wpn-oz33">
+		<text>OZ-33 «Pernach»</text>
+	</string>
+	<string id="wpn-oz33_s">
+		<text>OZ-33</text>
+	</string>
+	<string id="enc_weapons1_wpn-oz33_desc">
+		<text>9x18 mm pistolet automatique OZ-33 «Pernach» est un pistolet russe, qui a été développé dans le milieu des années 1990 par un groupe de designers du Design Bureau central du Sport et des armes de chasse dirigée par Stechkin APS de pistolet remplacement. Il a été connu comme récédemment AP SBZ-2 (pistolet automatique conçu par Stechkin, Baltzer, Zinchenko). Certains d'OZ-33 est utilisé par différentes unités du ministère russe de l'Intérieur. Par rapport à "Stechkin" pistolet OZ-33 a une conception simplifiée et une meilleure maniabilité.</text>
+	</string>
+<!-- // -->
+	<string id="wpn-gsh18">
+		<text>GSh-18</text>
+	</string>
+	<string id="enc_weapons1_wpn-gsh18_desc">
+		<text>9x19 mm pistolet GSh-18 leur chargement a été développé à la fin des années 1990 dans Instrument Design Bureau (Tula) par les concepteurs d'armes célèbres (principalement des armes à feu pour les avions) Gryazev et Shipunov. 18 est la capacité du magasin. GSh-18 a assez faible poids, grande capacité de magazine, profil bas baril et une bonne précision.</text>
+	</string>
+<!-- // -->
 	<string id="wpn-akms_s">
 		<text>AKMS</text>
 	</string>
@@ -634,7 +704,23 @@
 		<text>Accessoire de visée</text>
 	</string>
 	<string id="enc_addon_svd_scheek">
-		<text>Cet accessoire de visée pour SVD permet un usage plus confortable de l'arme quand elle est équipée d'une lunette. Elle se fixe sur la crosse du fusil.</text>
+		<text>Unadjustable cheek rest, can be attached on SVD. Makes sniper fire management more convenient. Can be mounted on the butt and fixed on it with a lock.</text>
+	</string>
+<!-- // -->
+	<string id="addon_usp_ck9">
+		<text>HK 9mm Conversion Kit</text>
+	</string>
+	<string id="addon_usp_ck9_s">
+		<text>HK 9mm CK</text>
+	</string>
+	<string id="addon_usp_ck45">
+		<text>HK .45 Caliber Conversion Kit</text>
+	</string>
+	<string id="addon_usp_ck45_s">
+		<text>HK .45 CK</text>
+	</string>
+	<string id="enc_addon_usp_ck">
+		<text>Kit de conversion Heckler & Koch est conçu pour la commutation de l'USP pistolet calibre avec le nouveau canon, le magazine et de l'obturateur.</text>
 	</string>
 <!-- // -->
 	<string id="addon_bino">

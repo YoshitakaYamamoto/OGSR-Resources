@@ -153,8 +153,57 @@
 	</string>
 	<string id="enc_weapons_ammo-7.62x54-7h14">
 		<text>7,62õ54 mm 7N14 AP armor-piercing sniper rifle cartridge. In 1990 there was a modernization program for 7.62x54R cartridges. One of the goals was to improve piercing ability for bullet. 7N14 sniper rifle cartridge has improved piercing ability and accuracy.</text>
+	</string>	
+<!-- // --><!-- // --><!-- // -->
+	<string id="enc_weapons_ammo-7.62x25-dummy">
+		<text>Empty pack of 7,62õ25 mm cartridges.</text>
 	</string>
-<!-- // -->
+	<string id="ammo-7.62x25-dummy">
+		<text>Pack of 7,62õ25</text>
+	</string>
+	<string id="ammo-7.62x25-dummy_s">
+		<text>7,62õ25 mm</text>
+	</string>
+<!-- // --><!-- // --><!-- // -->
+	<string id="enc_weapons_ammo-9x18-dummy">
+		<text>Empty pack of 9õ18 mm cartridges.</text>
+	</string>
+	<string id="ammo-9x18-dummy">
+		<text>Pack of 9õ18</text>
+	</string>
+	<string id="ammo-9x18-dummy_s">
+		<text>9õ18 mm</text>
+	</string>
+<!-- // --><!-- // --><!-- // -->
+	<string id="enc_weapons_ammo-9x19-dummy">
+		<text>Empty pack of 9õ19 mm cartridges.</text>
+	</string>
+	<string id="ammo-9x19-dummy">
+		<text>Pack of 9õ19</text>
+	</string>
+	<string id="ammo-9x19-dummy_s">
+		<text>9õ19 mm</text>
+	</string>
+<!-- // --><!-- // --><!-- // -->
+	<string id="enc_weapons_ammo-11.43x23-dummy">
+		<text>Empty pack of .45 ACP cartridges.</text>
+	</string>
+	<string id="ammo-11.43x23-dummy">
+		<text>Pack of .45 ACP</text>
+	</string>
+	<string id="ammo-11.43x23-dummy_s">
+		<text>.45 ACP</text>
+	</string>
+<!-- // --><!-- // --><!-- // -->
+	<string id="enc_weapons_ammo-12x70-dummy">
+		<text>Empty pack of 12 caliber cartridges.</text>
+	</string>
+	<string id="ammo-12x70-dummy">
+		<text>Pack of 12 caliber</text>
+	</string>
+	<string id="ammo-12x70-dummy_s">
+		<text>12 calib.</text>
+	</string>
 	<string id="ammo-vog25">
 		<text>VOG-25 rounds</text>
 	</string>
@@ -200,6 +249,9 @@
 <!-- // -->
 
 <!-- This section is for assault rifles and submachine guns -->
+	<string id="wpn-colt1911_s">
+		<text>Colt M1911 A1</text>
+	</string>
 <!-- // -->
 	<string id="wpn-akm">
 		<text>AKM</text>
@@ -214,6 +266,24 @@
 	<string id="wpn-akms">
 		<text>AKMS</text>
 	</string>
+<!-- // -->
+	<string id="wpn-oz33">
+		<text>OZ-33 «Pernach»</text>
+	</string>
+	<string id="wpn-oz33_s">
+		<text>OZ-33</text>
+	</string>
+	<string id="enc_weapons1_wpn-oz33_desc">
+		<text>9x18 mm automatic pistol OZ-33 «Pernach» is a russian pistol, which was developed in the mid of 1990s by group of designers of the Central Design Bureau of Sport and Hunting Weapons headed by Stechkin for APS pistol replacement. It was reviously known as AP SBZ-2 (automatic pistol designed by Stechkin, Baltzer, Zinchenko). Some of OZ-33 is used by various units of the Russian Ministry of Internal Affairs. Compared with "Stechkin" pistol OZ-33 has simplified design and improved handling.</text>
+	</string>
+<!-- // -->
+	<string id="wpn-gsh18">
+		<text>GSh-18</text>
+	</string>
+	<string id="enc_weapons1_wpn-gsh18_desc">
+		<text>9x19 mm selfloading pistol GSh-18 was developed in late 1990s in Instrument Design Bureau (Tula) by famous weapon designers (mainly guns for aircrafts) Gryazev and Shipunov. 18 is the capacity of the magazine. GSh-18 has fairly low weight, big magazine capacity, low profile barrel and good accuracy.</text>
+	</string>
+<!-- // -->
 	<string id="wpn-akms_s">
 		<text>AKMS</text>
 	</string>
@@ -322,7 +392,7 @@
 	<string id="enc_weapons1_wpn-swd">
 		<text>%c[255,1,255,255]Ammunition: %c[default] \n%c[255,1,255,255]• %c[default] 7,62õ54 mm 7N1 - sniper \n%c[255,1,255,255]• %c[default] 7,62õ54 mm 7N26 - armor-piercing \n%c[255,1,255,255]• %c[default] 7,62õ54 mm 7N14 - sniper armor-piercing \n
 		%c[255,1,255,255]Addons: %c[default] \n%c[255,1,255,255]• %c[default] TGP-V \n%c[255,1,255,255]• %c[default] butt cheek \n
-		7.62-mm Dragunov self-loading sniper rifle (6V1). Designed to improve distance of effective firing for infantry. Main features - skeletal butt; gear and stamped receiver that derived from AK rifles; gas regulator for reliability in field operations. SVD is used world-wide in almost all combat operations as a reliable kind of weapon and one of the best self-loading sniper rifle. Main deficiency of SVD is  big length.</text>
+		7.62-mm Dragunov self-loading sniper rifle (6V1). Designed to improve distance of effective firing for infantry. Main features - skeletal butt; gear and stamped receiver that derived from AK rifles; gas regulator for reliability in field operations. SVD is used world-wide in almost all combat operations as a reliable kind of weapon and one of the best self-loading sniper rifles. Main deficiency of SVD is  big length.</text>
 	</string>
 <!-- // -->	
 	
@@ -637,6 +707,22 @@
 	</string>
 	<string id="enc_addon_svd_scheek">
 		<text>Unadjustable cheek rest, can be attached on SVD. Makes sniper fire management more convenient. Can be mounted on the butt and fixed on it with a lock.</text>
+	</string>
+<!-- // -->
+	<string id="addon_usp_ck9">
+		<text>HK 9mm Conversion Kit</text>
+	</string>
+	<string id="addon_usp_ck9_s">
+		<text>HK 9mm CK</text>
+	</string>
+	<string id="addon_usp_ck45">
+		<text>HK .45 Caliber Conversion Kit</text>
+	</string>
+	<string id="addon_usp_ck45_s">
+		<text>HK .45 CK</text>
+	</string>
+	<string id="enc_addon_usp_ck">
+		<text>Heckler&Koch Conversion Kit is designed for switching of USP pistol caliber with new barrel, magazine and shutter.</text>
 	</string>
 <!-- // -->
 	<string id="addon_bino">

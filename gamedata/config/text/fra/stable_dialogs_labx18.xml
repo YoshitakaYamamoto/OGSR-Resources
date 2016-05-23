@@ -1,126 +1,180 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <string_table>
-<string id="dar_explorer_dialog_1">
-		<text>Je suis en mission.</text>
+	<string id="dar_explorer_dialog_1">
+		<text>Je suis sur une mission. Recherche des trucs.</text>
 	</string>
 	<string id="dar_explorer_dialog_11">
-		<text>Hum. Quel genre de mission? Tu cherches quelque chose? Tu l'as peut-être déjà trouvé? Il paraît qu'on trouve plein de trucs par ici...</text>
+		<text>Hm. Que cherches tu? Ou peut-etre vous avez deja trouve quelque chose?</text>
 	</string>
 	<string id="dar_explorer_dialog_111">
-		<text>Désolé, je sais pas, et j'ai pas le temps de toute façon.</text>
+		<text>Peut etre...</text>
 	</string>
 	<string id="dar_explorer_dialog_1111">
-		<text>Attends, t'enfuis pas. T'auras bien assez d'occasions pour ça... Qu'est-ce que tu as trouvé? Tu sais je traîne pas non plus dans le coin par hasard.</text>
+		<text>Ne vous pressez pas! Qu'as-tu trouve? Je cherche des trucs trop.</text>
 	</string>
 	<string id="dar_explorer_dialog_11111">
-		<text>Ça te regarde pas.</text>
-	</string>
-	<string id="dar_explorer_dialog_11112">
-		<text>J'ai trouvé des documents du labo X18. Le Barman a promis de m'en donner un bon prix.</text>
+		<text>J'ai trouve quelques documents. Barkeep m'a offert de l'argent pour eux.</text>
 	</string>
 	<string id="dar_explorer_dialog_112">
-		<text>J'ai rien trouvé.</text>
+		<text>Non rien. Juste un peu de la merde.</text>
+	</string>
+	<string id="dar_explorer_dialog_1121">
+		<text>Je vois. Je pensais que, peut-etre vous avez trouve des documents. Je suis ici non seulement pour une promenade.</text>
+	</string>
+	<string id="dar_explorer_dialog_11211">
+		<text>Attendez! Qu'est-ce que tu as? Dites-moi.</text>
 	</string>
 	<string id="dar_explorer_dialog_2">
-		<text>Je sais même pas comment j'ai atterri là. J'ai aucune envie de m'attarder.</text>
+		<text>Cela ne veut pas votre entreprise.</text>
 	</string>
 	<string id="dar_explorer_dialog_21">
-		<text>T'as rien trouvé d'intéressant, hein ? Il paraît qu'il y a des informations sur des expériences scientifiques. Ça vaut un paquet...</text>
+		<text>Ne marchez pas sur moi, l'homme.</text>
 	</string>
 	<string id="dar_explorer_dialog_211">
-		<text>Non, rien.</text>
+		<text>Besoin de problemes? J'ai 30 d'entre eux dans mon fusil!</text>
 	</string>
 	<string id="dar_explorer_dialog_2111">
-		<text>Ah ouais? Cherche encore... Tu me cacherais pas quelque chose?</text>
-	</string>
-	<string id="dar_explorer_dialog_21111">
-		<text>Non.</text>
-	</string>
-	<string id="dar_explorer_dialog_21112">
-		<text>Pourquoi tu me demandes ça ?</text>
-	</string>
-	<string id="dar_explorer_dialog_21113">
-		<text>Tu me menaces?</text>
+		<text>Pourquoi si serieux? Je ne fais que demander.</text>
 	</string>
 	<string id="dar_explorer_dialog_212">
-		<text>Je m'en fous de tes informations. J'ai déjà du mal à rester en vie...</text>
+		<text>Oh-oh, tres effrayant! Sors d'ici!</text>
 	</string>
 	<string id="dar_explorer_dialog_2121">
-		<text>OK, vas-y. Si tu trouves quelque chose, je serai dans le coin...</text>
+		<text>Eh bien, considerez-vous mort!</text>
 	</string>
-	<string id="dar_explorer_dialog_25">
-		<text>Écoute vieux, j'ai survécu au feu, aux anomalies et aux monstres, et je suis toujours vivant comme tu le vois ! Alors c'est pas toi qui vas m'empêcher de parler. Je suis là pour les documents et je partirai pas sans. Si tu les as, je te conseille de me les filer, sinon ce trou sera ta tombe ! Pigé ?</text>
+	<string id="dar_explorer_dialog_213">
+		<text>Pourquoi si serieux? Parlons.</text>
 	</string>
-	<string id="dar_explorer_dialog_251">
-		<text>Pigé.</text>
+	<string id="dar_explorer_dialog_2131">
+		<text>Ok, parler. Je demande encore une fois - avez-vous trouve quelque chose?</text>
 	</string>
-	<string id="dar_explorer_dialog_2511">
-		<text>T'es dans la merde si tu me mens. Si t'essaies de me baiser, t'es dans la merde aussi. Et si tu me racontes des conneries, t'es encore plus dans la merde. En fait, t'es tellement dans la merde que tu vas pas tarder à t'étouffer! Alors on va la refaire une dernière fois pour les crétins qu'auraient pas compris : est-ce que t'as trouvé les documents?</text>
+	<string id="dar_explorer_dialog_3">
+		<text>Documents ... Je vois. Je suis ici pour que les documents.\nEt maintenant, vous allez les donner a moi et fuir.\nComprenez vous?</text>
 	</string>
-<string id="dar_explorer_dialog_252">
-	<text>Tranquille, mon pote! Tu peux me croire sur parole, j'ai rien trouvé!</text>
-</string>
-<string id="dar_explorer_dialog_2521">
-	<text>OK, et la prochaine fois fais gaffe à ce que tu dis. Tu peux y aller. Si jamais tu trouves quelque chose, je serai par là...</text>
-</string>
-<string id="dar_explorer_dialog_253">
-	<text>Cette discussion est finie, dégage.</text>
-</string>
-<string id="dar_explorer_dialog_26">
-	<text>Non, sérieusement. Je n'ai pas les documents. J'ai juste besoin de sortir d'ici.</text>
-</string>
-<string id="dar_explorer_dialog_27">
-	<text>Eh bien ... oui ... j'ai trouvé quelques informations, mais il semble qu'il n'y a rien d'important.</text>
-</string>
-<string id="dar_explorer_dialog_271">
-	<text>C'est mieux, vieux. Maintenant donne-moi toutes les infos que t'as, jusqu'au dernier morceau de papier. Et t'avise surtout pas de faire de blague, parce que ça serait ta dernière...</text>
-</string>
-<string id="dar_explorer_dialog_51">
-		<text>T'as pas compris, ça suffit! Je traîne pas dans ce trou à rat par hasard! </text>
+	<string id="dar_explorer_dialog_31">
+		<text>Je comprends. Avez-vous trouve quelque chose par vous-meme?</text>
 	</string>
-	<string id="dar_explorer_dialog_511">
-		<text>Je partage rien.</text>
+	<string id="dar_explorer_dialog_311">
+		<text>Peut etre.</text>
 	</string>
-	<string id="dar_explorer_dialog_5111">
-		<text>Oh oh, dégage maintenant... Et un dernier conseil: sois prudent, Stalker, t'en auras besoin!</text>
+	<string id="dar_explorer_dialog_3111">
+		<text>Quels documents avez-vous trouve?</text>
 	</string>
-	<string id="dar_explorer_dialog_512">
-		<text>Tu me menaces?</text>
+	<string id="dar_explorer_dialog_32">
+		<text>Vous pouvez les prendre. Ils ne sont pas si important.</text>
 	</string>
-	<string id="dar_explorer_dialog_5121">
-		<text>OK, OK, du calme... Je suis juste curieux, sors pas ton flingue! J'arrête avec les questions. Sois juste prudent.</text>
+	<string id="dar_explorer_dialog_4">
+		<text>Les documents communs. Description de quelques experiences. Le titre est "Rapport de securite".</text>
 	</string>
-	<string id="dar_explorer_dialog_61">
-		<text>Des documents, hum... Ça tombe bien, je suis là pour la même chose. Alors tu vas me les donner et reprendre ta route. Compris ?</text>
+	<string id="dar_explorer_dialog_41">
+		<text>Ohh ... Ecoutez, je en ai besoin de toute urgence. Faisons du commerce. Je peux vous donner beaucoup d'argent.</text>
 	</string>
-	<string id="dar_explorer_dialog_6111">
-		<text>Je peux te payer.</text>
+	<string id="dar_explorer_dialog_411">
+		<text>Je ne sais pas... Peut-etre pour 20 grands...\nOu un artefact qui peut guerir de la condition de zombie. Appele «Gold Fish».\nApportez-moi et je vais donner des documents a vous. Ou tout simplement me donner de l'argent.</text>
 	</string>
-	<string id="dar_explorer_dialog_6121">
-		<text>Bon allez, arrête de déconner. Faisons un marché. Je peux te donner un joli pactole, tu le regretteras pas.</text>
+	<string id="dar_explorer_dialog_4111">
+		<text>Je l'ai. Prends le!</text>
 	</string>
-	<string id="dar_explorer_dialog_6131">
-		<text>Écoute, ma vie dépend de ces documents. Montre un peu ce que tu as... On peut sûrement trouver un arrangement...</text>
+	<string id="dar_explorer_dialog_41111">
+		<text>Oh! Cool! C'est tres utile.</text>
 	</string>
-	<string id="dar_explorer_dialog_8011">
-		<text>Il fait trop sombre, j'y vois rien. Et ça grouille de trucs bizarres... pourquoi j'ai accepté de faire ça?! Et toi, comment t'as atterri ici?</text>
+	<string id="dar_explorer_dialog_4112">
+		<text>Merde ... Ou puis-je trouver un?</text>
 	</string>
-	<string id="dar_explorer_dialog_8021">
-		<text>Avance, Stalker.</text>
+	<string id="dar_explorer_dialog_41121">
+		<text>Je ne me soucie pas.</text>
 	</string>
-	<string id="dar_explorer_dialog_8031">
-		<text>J'ai horreur qu'on me coupe quand je parle. Bref, je suis venu chercher des documents importants. Si t'as trouvé quelque chose, crache le morceau ou t'auras des ennuis. Si t'as rien, barre-toi et me fais pas perdre mon temps.</text>
+	<string id="dar_explorer_dialog_5">
+		<text>Homme! Ou sont mes documents?</text>
 	</string>
-	<string id="dar_explorer_dialog_8041">
-		<text>J'ai horreur qu'on me coupe quand je parle. Donne-moi ces documents si tu veux pas dire adieu à la vie.</text>
+	<string id="dar_explorer_dialog_51">
+		<text>Je rigole! Prenez vos documents.</text>
 	</string>
-	<string id="dar_explorer_dialog_9">
-		<text>Je m'en souviendrai.</text>
+	<string id="dar_explorer_dialog_611">
+		<text>Il est sombre et effrayant ici. Burgers et Snorks autour... Pourquoi ai-je suis d'accord pour tout cela?!\nPourquoi es-tu ici?</text>
 	</string>
-<string id="dar_explorer_dialog_91">
-	<text>Bon merde, prends-les. C'est que de la paperasse moisie.</text>
-</string>
-<string id="dar_explorer_dialog_92">
-	<text>Salut.</text>
-</string>
+	<string id="dar_explorer_dialog_621">
+		<text>Allez-y, stalker.</text>
+	</string>
+	<string id="dar_explorer_dialog_622">
+		<text>A plus!</text>
+	</string>
+	<string id="dar_explorer_dialog_6301">
+		<text>Je n'aime pas quand la conversation est interrompue de cette facon! Donnez-moi les documents ou vous allez rester ici pour toujours.</text>
+	</string>
+	<string id="dar_explorer_dialog_63011">
+		<text>Pourquoi devrais-je donner les documents a vous? Trouve un peu par vous-meme?</text>
+	</string>
+	<string id="dar_explorer_dialog_6302">
+		<text>Je n'aime pas quand la conversation est interrompue de cette facon! Je suis ici pour des documents de valeur.\nSi vous avez trouve quelque chose - me donner tout ce que vous avez, ou vous aurez de serieux problemes.\nSinon - sortir d'ici.</text>
+	</string>
+	<string id="dar_explorer_dialog_63021">
+		<text>Allez vous faire foutre!</text>
+	</string>
+	<string id="dar_explorer_dialog_6303">
+		<text>Eh bien, trouve Fish? Besoin documents? Ok, mais maintenant je dois goldfishes pour eux.\nJe rigole. Permet de commerce.\nOu donnez-moi tous vos documents!</text>
+	</string>
+	<string id="dar_explorer_dialog_63031">
+		<text>Wow Wow! Prends le!</text>
+	</string>
+	<string id="dar_explorer_dialog_6304">
+		<text>Eh bien, trouve Fish? Besoin documents? Ok, mais maintenant je dois goldfishes pour eux.\nJe rigole. Permet de commerce.</text>
+	</string>
+	<string id="dar_explorer_dialog_63041">
+		<text>Trouve! Besoin d'eux! Prends le!</text>
+	</string>
+	<string id="dar_explorer_dialog_6305">
+		<text>Eh bien, trouve Fish? Non? Ensuite, allez trouver un!</text>
+	</string>
+	<string id="dar_explorer_dialog_63051">
+		<text>En cours.</text>
+	</string>
+	<string id="dar_explorer_dialog_6306">
+		<text>Eh bien, trouve Fish? Non? Ensuite, allez trouver un!\nOu donnez-moi tous vos documents!</text>
+	</string>
+	<string id="dar_explorer_dialog_6307">
+		<text>Qu'est-ce que tu veux?</text>
+	</string>
+	<string id="dar_explorer_dialog_6308">
+		<text>Vous voulez quelque chose d'autre?</text>
+	</string>
+	<string id="dar_explorer_dialog_6309">
+		<text>Avez-vous change d'avis? Besoin documents? Mais maintenant je dois 100 grands pour eux.\nJe rigole. Donnez-moi 20 grands et les documents sont les votres.</text>
+	</string>
+	<string id="dar_explorer_dialog_63091">
+		<text>C'est trop.</text>
+	</string>
+	<string id="dar_explorer_dialog_630911">
+		<text>Eh bien, vous savez ou je suis.</text>
+	</string>
+	<string id="dar_explorer_dialog_63092">
+		<text>Merde ... Ok, je vraiment besoin d'eux. Prends le.</text>
+	</string>
+	<string id="dar_explorer_dialog_630921">
+		<text>Oh! Cool! Maintenant, je suis riche, hein.</text>
+	</string>
+		<string id="dar_explorer_dialog_6310">
+		<text>Avez-vous change d'avis? Besoin documents? Mais maintenant je dois 100 grands pour eux.\nJe rigole. Donnez-moi 20 grands et les documents sont les votres.\nOu donnez-moi tous vos documents.</text>
+	</string>
+	<string id="dar_explorer_dialog_6311">
+		<text>Avez-vous change d'avis? Pas d'argent pas de miel.</text>
+	</string>
+	<string id="dar_explorer_dialog_6312">
+		<text>Avez-vous change d'avis? Pas d'argent pas de miel.\nOu donnez-moi tous vos documents.</text>
+	</string>
+	<string id="dar_explorer_dialog_71">
+		<text>A plus!</text>
+	</string>
+	<string id="dar_explorer_dialog_72">
+		<text>Ok.</text>
+	</string>
+	<string id="dar_explorer_dialog_73">
+		<text>Comme tu dis.</text>
+	</string>
+	<string id="dar_explorer_dialog_74">
+		<text>Au revoir.</text>
+	</string>
+	<string id="dar_explorer_dialog_75">
+		<text>Au revoir.</text>
+	</string>
 </string_table>

@@ -51,8 +51,18 @@ impair			= 1.15
 wm_size         = 0.07
 explosive		= on
 
-;------------------------------
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;фейк-боеприпас для оружия без магазина 
+[ammo_11.43x23_dummy]:ammo_11.43x23_fmj
+;$spawn			= "weapons\ammo\ammo_wpn_dummy" ; option for Level Editor
+;visual          = physics\equipment_cache\equipment_box_01_case.ogf
+cost			= 0
+box_size		= 0
+inv_weight		= 0.001
+inv_name		= ammo-11.43x23-dummy
+inv_name_short	= ammo-11.43x23-dummy_s
+description		= enc_weapons_ammo-11.43x23-dummy
 
+;------------------------------
 [clip_7_11.43x23_fmj]:ammo_11.43x23_fmj
 box_size	= 1
 mag_size	= 7

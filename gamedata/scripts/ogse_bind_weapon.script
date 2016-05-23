@@ -113,7 +113,7 @@ function wpn_binder:__init (obj) super(obj)
 	if self.is_binoc then
 		self.scope_zoom_factor = get_float(obj_section, "scope_zoom_factor")
 		ASSERT(self.scope_zoom_factor, "[wpn_binder:__init] scope_zoom_factor is not defined in section '%s'", obj_section)
-		log3("scope_zoom_factor = %5.2f", self.scope_zoom_factor)
+		--log3("scope_zoom_factor = %5.2f", self.scope_zoom_factor)
 	end
 	self.extra_addon_flags = 0
 	if get_string(obj_section, "scope_mount_name") then
@@ -169,7 +169,7 @@ function wpn_binder:init_addons(a,b)
 	if self.extra_addon_flags ~= 0 then
 		ogse_wpn_utils.set_extra_addon_flags(self.object, self.extra_addon_flags)
 	end
-	log3("wpn_binder:ini_addons - %d, %d", a,b)
+	--log3("wpn_binder:ini_addons - %d, %d", a,b)
 	for des_name,desc in pairs(self.addon_descriptors) do
 		if desc.extra_actions then desc.extra_actions(self.object, desc) end
 	end

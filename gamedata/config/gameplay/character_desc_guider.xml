@@ -7,24 +7,25 @@
                 <icon>ui_npc_u_stalker_sv_balon_10</icon>
                 <bio>esc_ckryacker</bio>
  
-                 <class>guider</class> 
-                 <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+                <class>guider</class> 
+                <community>guider</community> 
+				<terrain_sect>stalker_terrain</terrain_sect>
                   
-                 <rank>773</rank>
-                 <reputation>5</reputation>
-                 <money min="600" max="5000" infinitive="0"/>
+                <rank>773</rank>
+                <reputation>5</reputation>
+                <money min="600" max="5000" infinitive="0"/>
                  
-                 <snd_config>characters_voice\human_01\stalker\</snd_config>
-                 <crouch_type>-1</crouch_type>
+                <snd_config>characters_voice\human_01\stalker\</snd_config>
+                <crouch_type>-1</crouch_type>
 
-                 <visual>actors\neytral\stalker_neytral_rukzak_3</visual>
-                 <supplies>
+                <visual>actors\neytral\stalker_neytral_rukzak_3</visual>
+                <supplies>
                          [spawn] \n 
                          wpn_pm \n
 						 ammo_9x18_pmm \n
 						 wpn_aks74ub_aks74ub30_ironsight \n
 						 ammo_5.45x39_fmj \n
-                 </supplies>
+                </supplies>
 	            <start_dialog>dialog_guider_2</start_dialog>			 
 #include "gameplay\character_criticals_4.xml"
              
@@ -36,24 +37,25 @@
                 <icon>ui_npc_u_stalker_militari_2</icon>
                 <bio>esc_ckryacker</bio>
  
-                 <class>yan_guider</class> 
-                 <community>ecolog</community> <terrain_sect>stalker_ecolog_terrain</terrain_sect>
+                <class>yan_guider</class> 
+                <community>guider</community>
+				<terrain_sect>stalker_ecolog_terrain</terrain_sect>
                   
-                 <rank>773</rank>
-                 <reputation>5</reputation>
-                 <money min="600" max="5000" infinitive="0"/>
+                <rank>773</rank>
+                <reputation>5</reputation>
+                <money min="600" max="5000" infinitive="0"/>
                  
-                 <snd_config>characters_voice\human_03\ecolog\</snd_config>
-                 <crouch_type>-1</crouch_type>
+                <snd_config>characters_voice\human_03\ecolog\</snd_config>
+                <crouch_type>-1</crouch_type>
 
-                 <visual>actors\militari\stalker_militari_2</visual>
-                 <supplies>
+                <visual>actors\militari\stalker_militari_2</visual>
+                <supplies>
                          [spawn] \n 
                          wpn_pm \n
 						 ammo_9x18_pmm \n
 						 wpn_aks74ub_aks74ub30_ironsight \n
 						 ammo_5.45x39_fmj \n
-                 </supplies>
+                </supplies>
 	            <actor_dialog>dm_dialog_guider_pilot</actor_dialog>			 
 #include "gameplay\character_criticals_4.xml"
              
@@ -65,24 +67,26 @@
                 <icon>ui_npc_u_stalker_militari_2</icon>
                 <bio>esc_ckryacker</bio>
  
-                 <class>bar_guider</class> 
-                 <community>quest_stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+                <class>bar_guider</class> 
+                <community>guider</community>
+				<!--<community>quest_stalker</community>-->
+				<terrain_sect>stalker_terrain</terrain_sect>
                   
-                 <rank>773</rank>
-                 <reputation>5</reputation>
-                 <money min="600" max="5000" infinitive="0"/>
+                <rank>773</rank>
+                <reputation>5</reputation>
+                <money min="600" max="5000" infinitive="0"/>
                  
-                 <snd_config>characters_voice\human_01\stalker\</snd_config>
-                 <crouch_type>-1</crouch_type>
+                <snd_config>characters_voice\human_01\stalker\</snd_config>
+                <crouch_type>-1</crouch_type>
 
-                 <visual>actors\soldier\stalker_military_black</visual>
-                 <supplies>
+                <visual>actors\soldier\stalker_military_black</visual>
+                <supplies>
                          [spawn] \n 
                          wpn_beretta \n
 						 ammo_9x19_pbp \n
 						 wpn_spas12 \n
 						 ammo_12x70_kart \n
-                 </supplies>
+                </supplies>
 	            <actor_dialog>dm_dialog_guider_script</actor_dialog>			 
 #include "gameplay\character_criticals_4.xml"
              
@@ -94,24 +98,26 @@
                 <icon>ui_npc_u_stalker_sv_balon_10</icon>
                 <bio>esc_ckryacker</bio>
  
-                 <class>pri_guider</class> 
-                 <community>quest_stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+                <class>pri_guider</class> 
+                <community>guider</community>
+				<!--<community>quest_stalker</community>-->
+				<terrain_sect>stalker_terrain</terrain_sect>
                   
-                 <rank>773</rank>
-                 <reputation>5</reputation>
-                 <money min="600" max="5000" infinitive="0"/>
+                <rank>773</rank>
+                <reputation>5</reputation>
+                <money min="600" max="5000" infinitive="0"/>
                  
-                 <snd_config>characters_voice\human_01\stalker\</snd_config>
-                 <crouch_type>-1</crouch_type>
+                <snd_config>characters_voice\human_01\stalker\</snd_config>
+                <crouch_type>-1</crouch_type>
 
-                 <visual>actors\neytral\stalker_neytral_rukzak_3</visual>
-                 <supplies>
+                <visual>actors\neytral\stalker_neytral_rukzak_3</visual>
+                <supplies>
                          [spawn] \n 
                          wpn_beretta \n
 						 ammo_9x19_pbp \n
 						 wpn_spas12 \n
 						 ammo_12x70_kart \n
-                 </supplies>
+                </supplies>
 	            <actor_dialog>dm_dialog_guider_script</actor_dialog>				 
 #include "gameplay\character_criticals_4.xml"
              
@@ -123,24 +129,26 @@
                 <icon>ui_npc_u_stalker_sv_balon_10</icon>
                 <bio>esc_ckryacker</bio>
  
-                 <class>ds_guider</class> 
-                 <community>quest_stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+                <class>ds_guider</class> 
+                <community>guider</community>
+				<!--<community>quest_stalker</community>-->
+				<terrain_sect>stalker_terrain</terrain_sect>
                   
-                 <rank>773</rank>
-                 <reputation>5</reputation>
-                 <money min="600" max="5000" infinitive="0"/>
+                <rank>773</rank>
+                <reputation>5</reputation>
+                <money min="600" max="5000" infinitive="0"/>
                  
-                 <snd_config>characters_voice\human_01\stalker\</snd_config>
-                 <crouch_type>-1</crouch_type>
+                <snd_config>characters_voice\human_01\stalker\</snd_config>
+                <crouch_type>-1</crouch_type>
 
-                 <visual>actors\neytral\stalker_neytral_rukzak_3</visual>
-                 <supplies>
+                <visual>actors\neytral\stalker_neytral_rukzak_3</visual>
+                <supplies>
                          [spawn] \n 
                          wpn_pm \n
 						 ammo_9x18_pmm \n
 						 wpn_aks74ub_aks74ub30_ironsight \n
 						 ammo_5.45x39_fmj \n
-                 </supplies>
+                </supplies>
 	            <actor_dialog>dm_dialog_guider_script</actor_dialog>				 
 #include "gameplay\character_criticals_4.xml"
              

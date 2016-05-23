@@ -1,91 +1,84 @@
 -------------------- Спавнер динамических пси-зон для OGSE --------------------
-
 ---------------------- Copyright 2007-2009 DEXXX, Dusty79 ---------------------
 
-
 local zone_parametrs = {
-l01_escape =    	 {num_min = 2, num_max = 3, rad_min =  7, rad_max = 10},
-l02_garbage =   	 {num_min = 3, num_max = 4, rad_min = 10, rad_max = 14},
-l03_agroprom =   	 {num_min = 3, num_max = 4, rad_min = 10, rad_max = 14},
-l04_darkvalley =	 {num_min = 3, num_max = 4, rad_min = 10, rad_max = 14},
-l05_bar =       	 {num_min = 1, num_max = 2, rad_min =  8, rad_max = 11},
-l06_rostok =    	 {num_min = 2, num_max = 3, rad_min = 10, rad_max = 15},
-l07_military =   	 {num_min = 4, num_max = 5, rad_min = 13, rad_max = 17},
-l08_yantar =         {num_min = 2, num_max = 4, rad_min =  9, rad_max = 12},
-l10_radar =    		 {num_min = 4, num_max = 6, rad_min = 15, rad_max = 19},
-l11_pripyat =   	 {num_min = 5, num_max = 6, rad_min = 16, rad_max = 20},
-k01_darkscape_ogse = {num_min = 0, num_max = 0, rad_min = 0, rad_max = 0},
-l09_deadcity_ogse =  {num_min = 3, num_max = 4, rad_min = 10, rad_max = 14},
-l13_generators_ogse = {num_min = 4, num_max = 5, rad_min = 10, rad_max = 14},
-other =         	 {num_min = 3, num_max = 5, rad_min =  8, rad_max = 13}
+	l01_escape =    	 {num_min = 2, num_max = 3, rad_min =  7, rad_max = 10},
+	l02_garbage =   	 {num_min = 3, num_max = 4, rad_min = 10, rad_max = 14},
+	l03_agroprom =   	 {num_min = 3, num_max = 4, rad_min = 10, rad_max = 14},
+	l04_darkvalley =	 {num_min = 3, num_max = 4, rad_min = 10, rad_max = 14},
+	l05_bar =       	 {num_min = 1, num_max = 2, rad_min =  8, rad_max = 11},
+	l06_rostok =    	 {num_min = 2, num_max = 3, rad_min = 10, rad_max = 15},
+	l07_military =   	 {num_min = 4, num_max = 5, rad_min = 13, rad_max = 17},
+	l08_yantar =         {num_min = 2, num_max = 4, rad_min =  9, rad_max = 12},
+	l10_radar =    		 {num_min = 4, num_max = 6, rad_min = 15, rad_max = 19},
+	l11_pripyat =   	 {num_min = 5, num_max = 6, rad_min = 16, rad_max = 20},
+	k01_darkscape_ogse = {num_min = 0, num_max = 0, rad_min = 0, rad_max = 0},
+	l09_deadcity_ogse =  {num_min = 3, num_max = 4, rad_min = 10, rad_max = 14},
+	l13_generators_ogse = {num_min = 4, num_max = 5, rad_min = 10, rad_max = 14},
+	other =         	 {num_min = 3, num_max = 5, rad_min =  8, rad_max = 13}
 }
-
 
 -- Спавн пси-зон
 function spawn_psy()
+	local levelname = level.name()
+	-- log1("Спавн пси-зон на локации " .. levelname)
 
-local levelname = level.name()
--- log1("Спавн пси-зон на локации " .. levelname)
+	if ogse_anomaly.chek_exclusion_location(levelname) or levelname == "l10_radar" then
+		-- log1("Опускаем флаг пси-выброса для локации как для исключения.")
+		ogse.del_variable("pz"..ogse_anomaly.loc[levelname])
+		return
+	end
 
-if ogse_anomaly.chek_exclusion_location(levelname) or levelname == "l10_radar" then
--- log1("Опускаем флаг пси-выброса для локации как для исключения.")
+	for k, v in pairs(ogsm_respawn.psy_list) do
+		alife():release(v, true)
+		--level_tasks.remove_location_by_id(ogsm_respawn.psy_list[k], "red_location")
+		ogsm_respawn.psy_list[k] = nil
+	end
+
+	generate_psy_zones()
+	-- log1("Опускаем флаг пси-выброса для локации.")
 	ogse.del_variable("pz"..ogse_anomaly.loc[levelname])
-	return
-end
-
-for k, v in pairs(ogsm_respawn.psy_list) do
-	alife():release(v, true)
-	--level_tasks.remove_location_by_id(ogsm_respawn.psy_list[k], "red_location")
-	ogsm_respawn.psy_list[k] = nil
-end
-
-generate_psy_zones()
--- log1("Опускаем флаг пси-выброса для локации.")
-ogse.del_variable("pz"..ogse_anomaly.loc[levelname])
 end
 
 
 -- Создаёт набор пси-зон на уровне
 function generate_psy_zones()
+	local levelname = level.name()
+	local zone_parametrs_string
+	if zone_parametrs[levelname] then
+		zone_parametrs_string = zone_parametrs[levelname]
+	else
+		zone_parametrs_string = zone_parametrs.other
+	end
 
-local levelname = level.name()
-local zone_parametrs_string
-if zone_parametrs[levelname] then
-	zone_parametrs_string = zone_parametrs[levelname]
-else
-	zone_parametrs_string = zone_parametrs.other
+	local number = math.random(zone_parametrs_string.num_min, zone_parametrs_string.num_max)
+
+	ogse_anomaly.get_lists()
+
+	for i = 1, number do
+		local pos, lv, gv = ogse_anomaly.anomaly_position_choice(levelname, true)
+		local radius = math.random(zone_parametrs_string.rad_min, zone_parametrs_string.rad_max)
+
+		local obj = ogsm_respawn.spawn_restrictor(levelname, pos, lv, gv, "pp", radius)
+		table.insert(ogsm_respawn.psy_list, obj)
+		ogse_anomaly.lvids_forbidden[lv] = true
+		table.insert(ogse_anomaly.position_forbidden, pos)
+	end
+	ogse_anomaly.lvids_forbidden = {}
+	ogse_anomaly.position_forbidden = {}
 end
-
-local number = math.random(zone_parametrs_string.num_min, zone_parametrs_string.num_max)
-
-ogse_anomaly.get_lists()
-
-for i = 1, number do
-	local pos, lv, gv = ogse_anomaly.anomaly_position_choice(levelname, true)
-	local radius = math.random(zone_parametrs_string.rad_min, zone_parametrs_string.rad_max)
-	
-	local obj = ogsm_respawn.spawn_restrictor(levelname, pos, lv, gv, "pp", radius)
-	table.insert(ogsm_respawn.psy_list, obj)
-	ogse_anomaly.lvids_forbidden[lv] = true
-	table.insert(ogse_anomaly.position_forbidden, pos)
-end
-ogse_anomaly.lvids_forbidden = {}
-ogse_anomaly.position_forbidden = {}
-
-end
-
 
 -- Проверка при загрузке уровня нужно ли спавнить пси-зоны
 function spawn_on_load()
-if table.getn(ogsm_respawn.psy_list) == 0 then
-	spawn_psy()
-else
--- log1("Проверим, надо ли обновлять пси-зоны для этой локации.")
-	if tonumber(ogse.load_variable("pz"..ogse_anomaly.loc[level.name()],0)) == 1 then
--- log1("Да. Обновляем.")
+	if table.getn(ogsm_respawn.psy_list) == 0 then
 		spawn_psy()
+	else
+		-- log1("Проверим, надо ли обновлять пси-зоны для этой локации.")
+		if tonumber(ogse.load_variable("pz"..ogse_anomaly.loc[level.name()],0)) == 1 then
+			-- log1("Да. Обновляем.")
+			spawn_psy()
+		end
 	end
-end
 end
 
 
@@ -99,5 +92,4 @@ function psy_blow_flags()
 end
 
 -------------------- Спавнер динамических пси-зон для OGSE --------------------
-
 ---------------------- Copyright 2007-2009 DEXXX, Dusty79 ---------------------

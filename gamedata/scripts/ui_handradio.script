@@ -51,6 +51,7 @@ function handradio:__init(owner) super()
 	self.owner = owner
 	self:InitControls()
 	self:InitCallBacks()
+	self:SetWindowName("handradio")
 end
 
 

@@ -3285,9 +3285,31 @@
 			<phrase id="4">
 				<text>find_mikluha_dialog_phrase_5</text>
 				<give_info>spawn_rad_zomb_company</give_info>
+				<give_info>talked_with_lukash_about_flash</give_info>
 			</phrase>
 			<phrase id="5">
 				<text>find_mikluha_dialog_phrase_6</text>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="find_filin_dialog">
+		<dont_has_info>fleshka_5_find</dont_has_info>
+		<dont_has_info>talked_with_lukash_about_flash</dont_has_info>
+		<has_info>lukash_mikluha_reward</has_info>
+		<has_info>agr_knockdown</has_info>
+		<has_info>first_planshet_info</has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>find_mikluha_dialog_phrase_1</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>find_mikluha_dialog_phrase_2_1</text>
+				<give_info>talked_with_lukash_about_flash</give_info>
+				<next>2</next>
+			</phrase>
+			<phrase id="2">
+				<text>find_mikluha_dialog_phrase_3_1</text>
 			</phrase>
 		</phrase_list>
 	</dialog>

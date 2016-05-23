@@ -180,7 +180,6 @@ function actor_has_elite_detector()
 	return false
 end
 
-
 function marks_on_minimap(obj)
 	local mark = "none"
 	if obj then
@@ -199,18 +198,21 @@ function marks_on_minimap(obj)
 end
 
 function need_marks_on_minimap(obj)
-	if not actor_has_detector() then
+	if	not actor_has_detector()
+		or not is_detectable_by_current_detector(obj)
+	then
 		return false
 	end
+
 	local dist_to_actor = obj:position():distance_to(db.actor:position())
 	local sect = obj:section()
-	if dist_to_actor <= map_radius and not string.find(sect, "nodetect") then
+	if dist_to_actor <= map_radius then
 		return true
 	end
 	return false
 end
 
-function need_beeps(obj)
+function is_detectable_by_current_detector(obj)
 	local detector_preset = detectors_presets[last_detector_sect]
 	if detector_preset and obj then
 		local sect = obj:section()
@@ -460,7 +462,7 @@ function on_update()
 
 		local hasanom, anomid, pos, cls, distance, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(db.actor:position())
 		local obj = level.object_by_id(anomid)
-		if hasanom and obj and ogse_anomaly.get_anomaly_mode(anomid) ~= "anom_off" and need_beeps(obj) then
+		if hasanom and obj and ogse_anomaly.get_anomaly_mode(anomid) ~= "anom_off" and is_detectable_by_current_detector(obj) then
 			if distance <= detect_radius then
 				if last_beep == 0 then
 					snd_beep:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 10.0)

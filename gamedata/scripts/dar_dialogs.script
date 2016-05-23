@@ -1,33 +1,72 @@
--- забирает все документы
-function explorer_take_away_docs(first_speaker, second_speaker)
-	local obj = first_speaker:object("dar_document1")
-	if obj ~= nil then
-		dialogs.relocate_item(second_speaker, obj, "out")
-	end
-	
-	obj = first_speaker:object("dar_document2")
-	if obj ~= nil then
-		dialogs.relocate_item(second_speaker, obj, "out")
-	end
-	
-	obj = first_speaker:object("dar_document3")
-	if obj ~= nil then
-		dialogs.relocate_item(second_speaker, obj, "out")
-	end
+local items = {"dar_document1", "dar_document2", "dar_document4", "dar_document5"}
+local money_amount = 20000
 
-	obj = first_speaker:object("dar_document4")
-	if obj ~= nil then
-		dialogs.relocate_item(second_speaker, obj, "out")
-	end
-
-	obj = first_speaker:object("dar_document5")
-	if obj ~= nil then
-		dialogs.relocate_item(second_speaker, obj, "out")
-	end
-	
+-- Жека Дуплет забирает все документы
+function explorer_take_away_docs(actor, npc)
+	for k,v in pairs(items) do
+		local obj = actor:object(v)
+		if obj ~= nil then
+			dialogs.relocate_item(npc, obj, "out")
+		end		
+	end	
 end
 
--- злится и пытаестя силой отобрать документы
---function actor_enemy(actor, npc)
---	npc:set_relation(game_object.enemy, actor)
---end
+-- проверка наличия документов у гг - есть
+function explorer_has_docs()
+	for k,v in pairs(items) do
+		if db.actor:object(v) ~= nil then
+			return true
+		end
+	end	
+	return false
+end
+
+-- проверка наличия документов у гг - нет
+function explorer_dont_has_docs()
+	return not explorer_has_docs()
+end
+
+-- проверка наличия золотой рыбки у гг - есть
+function explorer_has_af()
+	return db.actor:object("af_gold_fish") ~= nil
+end
+
+-- проверка наличия золотой рыбки у гг - нет
+function explorer_dont_has_af()
+	return not explorer_has_af()
+end
+
+-- гг отдает золотую рыбку
+function explorer_take_away_af(actor, npc)
+	dialogs.relocate_item_section(npc, "af_gold_fish", "out")
+end
+
+-- проверка наличия 20000 денег у гг - есть
+function explorer_has_money()
+	return db.actor:money() >= money_amount
+end
+
+-- проверка наличия 20000 денег у гг - нет
+function explorer_dont_has_money()
+	return not explorer_has_money()
+end
+
+-- гг отдает 20000 денег
+function explorer_take_away_money(actor, npc)
+	dialogs.relocate_money(npc, money_amount, "out")
+end
+
+-- сообщение, что найдена рыбка
+function send_message_af(actor, npc)
+	news_manager.send_tip(db.actor, "finde_af", nil, nil, 3000, nil)
+end
+
+-- сообщение, что достаточно денег
+function send_message_money(actor, npc)
+	news_manager.send_tip(db.actor, "finde_money", nil, "money", 3000, nil)
+end
+
+-- Жека Дуплет отдает 3-й документ
+function explorer_give_away_doc(actor, npc)
+	dialogs.relocate_item_section(npc, "dar_document3", "in")
+end

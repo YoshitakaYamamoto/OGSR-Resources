@@ -226,11 +226,11 @@ function se_smart_terrain:get_se_objs()
 		else
 			
 			if self.gulag then
-				log3("se_smart_terrain:get_se_objs: [smart_terrain '%s'] cleared dead id=%d", self:name(), id )
+				--log3("se_smart_terrain:get_se_objs: [smart_terrain '%s'] cleared dead id=%d", self:name(), id )
 				self.gulag:removeObject( id )
 			end
 			
-			log3("se_smart_terrain:get_se_objs: [smart_terrain '%s'] can't get server object id=%d", self:name(), id )
+			--log3("se_smart_terrain:get_se_objs: [smart_terrain '%s'] can't get server object id=%d", self:name(), id )
 			self.npc_info[id] = nil
 			
 		end
@@ -299,7 +299,7 @@ function se_smart_terrain:read_params()
 
 		if not ini:section_exist( sect ) then
 --			abort( "[smart_terrain %s] no configuration!", self:name() )
-			log3( "[smart_terrain %s] no configuration!", self:name() )
+			--log3( "[smart_terrain %s] no configuration!", self:name() )
 			self.disabled = true
 			return
 		end

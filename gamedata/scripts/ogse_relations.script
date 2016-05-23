@@ -8,6 +8,7 @@
 function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_goodwill_change", fun = this.on_goodwill_change})
 	sm:subscribe({signal = "on_release_npc", fun = this.on_release})
+	sm:subscribe({signal = "on_npc_spawn", fun = this.on_npc_spawn})
 	sm:subscribe({signal = "on_save", fun = this.save})
 	sm:subscribe({signal = "on_load", fun = this.load})
 end
@@ -21,49 +22,33 @@ function write_log(str)
 end
 
 local relation_table = {}
+local relation_seen  = {}
 
 function on_goodwill_change(from, to)
-	local to_table
-	local to_id = to
-	if to == 0 then
-		return
-	end
-	if relation_table then
-		to_table = relation_table[to_id]
-		if not to_table then
-			to_table = {}
-		end
+	if to == 0 then return end
+	if not relation_seen[to] then relation_seen[to] = {} end
+	if relation_seen[to][from] then
+		write_log("[RELATIONS] REPEATED GOODWILL CHANGED FROM "..alife():object(from):name().." TO "..alife():object(to):name())
 	else
-		relation_table = {}
-		to_table = {}
-	end
-	local idx = 0
-	for i = 1, table.getn(to_table) do
-		if to_table[i] == from then
-			idx = idx + 1
+		if not relation_table[to] then
+			relation_table[to] = {}
 		end
+		table.insert(relation_table[to], from)
+		relation_seen[to][from] = true
+		write_log("[RELATIONS] GOODWILL CHANGED FROM "..alife():object(from):name().." TO "..alife():object(to):name())
 	end
-	if idx == 0 then
-		table.insert(to_table, from)
-		relation_table[to_id] = to_table
-	end
-	write_log("[RELATIONS] GOODWILL CHANGED FROM "..alife():object(from):name().." TO "..alife():object(to):name())
 end
 
 function on_release(npc_id)
 	if not db.actor then return end
 	if npc_id == 0 then return end
-	write_log("[RELATIONS] NPC "..tostring(npc_id).." RELEASED")
-	if relation_table then
+	if relation_table[npc_id] then
 		local from_table = relation_table[npc_id]
-		if from_table then
-			local t_size = table.getn(from_table)
-			for i = 1, t_size do
-				db.actor:clear_personal_record(from_table[i], npc_id)
-				write_log("[RELATIONS] 	RELATION RECORD CLEARED FOR OBJECT "..tostring(from_table[i]))
-			end
-			relation_table[npc_id] = nil
+		for _, id in ipairs(from_table) do
+			db.actor:clear_personal_record(id, npc_id)
 		end
+		relation_seen[npc_id] = nil
+		relation_table[npc_id] = nil
 	end
 end
 
@@ -89,9 +74,8 @@ function save()
 				pk:w_u16(k)
 			end
 			pk:w_u16(table_size)
-			for i = 1,table_size do
-				pk:w_u16(v[i])
-				write_log("[RELATIONS] 	SAVING RELATION TO "..tostring(k).." FROM "..tostring(v[i]))
+			for _, id in ipairs(v) do
+				pk:w_u16(id)
 			end
 		end
 	end
@@ -100,8 +84,6 @@ function save()
 end
 
 function load()
-	relation_table = {}
-	
 	local pk = ogse.load_var_safe("ogse_relation_reverse_table")
 	if pk then
 		local table_size = pk:r_u16()
@@ -110,18 +92,49 @@ function load()
 			local to_id = pk:r_u16()
 			local to_id_size = pk:r_u16()
 			write_log("[RELATIONS] 	LOADING RELATION TABLE RECORD "..tostring(to_id).." WITH SIZE "..tostring(to_id_size))
-			local to_table = {}
+			if to_id == 0 then
+				to_id = "actor"
+			end
+			relation_seen[to_id] = {}
+			relation_table[to_id] = {}
 			for j = 1, to_id_size do
 				local curr_id = pk:r_u16()
-				table.insert(to_table, curr_id)
+				ASSERT(
+					(not relation_seen[to_id][curr_id]),
+					"[RELATIONS] FOUND SECOND RECORD TO %s FROM %s",
+					tostring(to_id), tostring(curr_id)
+				)
+				table.insert(relation_table[to_id], curr_id)
+				relation_seen[to_id][curr_id] = true
 				write_log("[RELATIONS] LOADING RELATION TO "..tostring(to_id).." FROM "..tostring(curr_id))
-			end
-			if to_id == 0 then
-				relation_table["actor"] = to_table
-			else
-				relation_table[to_id] = to_table
 			end
 		end
 		write_log("[RELATIONS] RELATION TABLE LOADED!")
+	end
+end
+
+local included_comms_to_fix = 
+{
+	["stalker"] = true,
+	["dolg"] = true,
+	["freedom"] = true,
+	["ecolog"] = true,
+	["bandit"] = true,
+}
+
+function on_npc_spawn(npc, binder)
+	local sobj = alife():object(npc:id())
+	if not sobj then return end
+	if not included_comms_to_fix[npc:character_community()] then return end
+	local attitude_neutal_threshold = get_float("game_relations", "attitude_neutal_threshold")
+	local p_gw = npc:goodwill(db.actor)
+	if p_gw < attitude_neutal_threshold then
+		local comm = npc:character_community()
+		local c_gw = relation_registry.community_goodwill(comm, db.actor:id())
+		if c_gw >= attitude_neutal_threshold
+			and ((not relation_seen[npc:id()]) or (not relation_seen[npc:id()][db.actor:id()]))
+		then
+			npc:set_goodwill(attitude_neutal_threshold, db.actor)
+		end
 	end
 end

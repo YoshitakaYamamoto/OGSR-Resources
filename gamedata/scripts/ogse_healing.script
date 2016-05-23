@@ -69,8 +69,8 @@ local text_yod_using_error_notfunct = game.translate_string("ogse_healing_text_y
 -- или время в прошлом, значит препарат неактивен.
 --local drugs_times = {}
 amount_of_medkit_used = 0 -- количество использованных аптечек
-local next_detoxication_time -- время следуюшего такта детоксикации
-local next_healing_time -- следующий такт лечения
+local next_detoxication_time = nil -- время следуюшего такта детоксикации
+local next_healing_time = nil -- следующий такт лечения
 local timers_immunities = { -- динамические иммунитеты от таймеров
 	["rad_immunity"] = {},
 	["rad_food_immunity"] = {},
@@ -526,9 +526,8 @@ function on_before_use_item(obj, sobj)
 	return true -- дальше это событие не пойдёт
 end
 
--------------- медленные эффекты некоторых препаратов ----------------------------------------------
--- TODO: перевести энергетик на универсальный таймер
-local function heal_recursive(current_time)
+-------------- медленный эффект водки ----------------------------------------------
+local function apply_vodka_effect(current_time)
 	if next_healing_time then -- если задано время следующего обновления
 		if current_time > next_healing_time then -- если это время уже сработало
 			-- водка немного выводит радиацию
@@ -536,29 +535,21 @@ local function heal_recursive(current_time)
 				-- эффективность зависит от степени опьянения
 				db.actor.radiation = f_healing_interval * vodka_radiation_remove_rate * db.actor.alcohol
 			end
-			-- энергетик просто повышает скорость восстановления энергии
-			--if db.actor.power < 1 and ogse.tmr_exists("using_dix") then -- восстанавливаем энергию энергетиком
-			--	db.actor.power = f_healing_interval * dix_power_restore_rate
-			--end
 			db.actor:update_condition() -- обновляем свойства актора
-			if --[[db.actor.power < 1 or ]]db.actor.radiation > 0 then -- проверяем, если осталось, что делать
+			if db.actor.radiation > 0 then -- проверяем, если осталось, что делать
 				next_healing_time = next_healing_time + healing_interval -- если осталось, то задаём следующий интервал обновления
 			else
 				next_healing_time = nil -- иначе, прекращаем обновлять
 			end
-			-- если мы по каким-то причинам пропустили несколько интервалов, то выполняем их все
-			-- это может получиться в случае сна, когда интервалы игрового времени могут быть гораздо больше
-			-- тактов обновления. В этом случае за один интервал надо сделать несколько тактов.
-			heal_recursive(current_time)
 		end
-	elseif --[[db.actor.power < 1 or ]]db.actor.radiation > 0 then -- если сейчас ничего делать не заказано, то проверям, не надо ли начать
+	elseif db.actor.radiation > 0 then -- если сейчас ничего делать не заказано, то проверям, не надо ли начать
 		next_healing_time = current_time + healing_interval -- если надо, заказываем работу на следующем такте
 	end
 end
 
 function on_actor_update()
 	local current_time = game.get_game_time()
-	heal_recursive(current_time)
+	apply_vodka_effect(current_time)
 end
 
 local imm_names = {"rad_immunity", "rad_food_immunity", "psy_immunity"}

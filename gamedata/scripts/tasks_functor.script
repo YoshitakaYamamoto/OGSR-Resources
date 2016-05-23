@@ -3344,7 +3344,16 @@ function clothes_changing_actor_dont_see:action()
 
     --if xs_stor.get("agr_swamp_ratcatcher_actor_give_stalker_outfit", "novice_outfit") == "stalker_outfit" then vis = stalker_visuials else vis = novice_visuals end
     if xs_stor.get("agr_swamp_ratcatcher_actor_give_stalker_outfit", "novice_outfit") == "stalker_outfit" then vis = stalker_visuials_dez else vis = novice_visuals_dez end
-	
+
+	local ratcatcher = level.object_by_id(self.npc_id)
+	if ratcatcher then
+		local out = ratcatcher:object(xs_stor.get("agr_swamp_ratcatcher_actor_give_stalker_outfit", "novice_outfit"))
+		if out then
+			local s_out = alife():object(out:id())
+			alife():release(s_out, true)
+		end
+	end
+
 	xs_stor.set("agr_swamp_ratcatcher_actor_give_stalker_outfit", nil)
 
 	local s_obj = alife():object(self.npc_id)

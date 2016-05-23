@@ -157,7 +157,7 @@ function set_actor_enemy_for (sid)
 end
 
 function transfer_scope (npc, actor)
-    dialogs.relocate_item_section(npc, "wpn_addon_scope", "in") 
+    dialogs.relocate_item_section(npc, "wpn_addon_scope_1pn51", "in") 
     dialogs.relocate_item_section(npc, "vodka", "out")
 end
 

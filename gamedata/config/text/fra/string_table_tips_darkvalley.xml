@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<string_table>
 	<string id="val_give_escort_task_pda">
 		<text>J'ai besoin d'aide pour sauver un ami.</text>
 	</string>
@@ -7,3 +9,10 @@
 	<string id="val_sos_pda">
 		<text>Au secours, je vais mourir.</text>
 	</string>
+	<string id="finde_af">
+		<text>%c[100,50,250,50]«Goldfish» pour Zheka Doublet se trouve%c[default]</text>
+	</string>
+	<string id="finde_money">
+		<text>%c[100,50,250,50]Maintenant, vous avez assez d'argent pour Zheka Doublet%c[default]</text>
+	</string>
+</string_table>

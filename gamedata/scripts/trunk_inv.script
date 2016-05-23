@@ -234,7 +234,7 @@ end
 function trunk_box_binder:on_put(item)
 	if self.scar then
 		if not self.no_weight_check and self:get_weight() > self.max_trunk_weight then
-			ogse.autohiding_msg("Превышен лимит веса багажника!", 1000)
+			ogse.autohiding_msg(game.translate_string("trunk_is_full_string"), 1000)
 			self.object:transfer_item(item, db.actor) -- пихаем обратно
 		end
 		self.no_weight_check = false -- сбрасываем одноразовый флажок

@@ -649,7 +649,7 @@ end
 function check_state (gulag)
     
     -- отсеиваем четвертое состояние.
-    if has_alife_info("mil_lukash_dead") or has_alife_info("mil_freedom_quests_end") then
+    if has_alife_info("mil_lukash_dead") --[[or has_alife_info("mil_freedom_quests_end")]] then
        if this.check_enemy (gulag) == true then
           -- поскольку вопрос об отношении к актеру решаться не собирается, то выход будет именно таким.
           if gulag:npc_is_enemy_to_anybody (db.actor) == true then

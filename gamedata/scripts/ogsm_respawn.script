@@ -190,15 +190,17 @@ function get_level_mobs()
 	local lname = level.name()
 	for i=1,65535 do
 		local obj = alife():object(i)
-		if obj and is_on_level(obj, lname) then
-			if string.find(get_monster_portion(obj.id), level.name()) then 
-				list_mob_ids[obj.id] = obj.id
-			end
+		if obj then
 			if string.find(obj:name(), "_hide_restrictor") then
 				table.insert(restrictor_list, obj)
 			end
-			if string.find(obj:name(), "_psy_restrictor") then
-				table.insert(psy_list, obj)
+			if is_on_level(obj, lname) then
+				if string.find(get_monster_portion(obj.id), level.name()) then 
+					list_mob_ids[obj.id] = obj.id
+				end
+				if string.find(obj:name(), "_psy_restrictor") then
+					table.insert(psy_list, obj)
+				end
 			end
 		end
 	end

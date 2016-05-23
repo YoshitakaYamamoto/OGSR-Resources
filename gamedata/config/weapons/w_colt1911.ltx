@@ -1,3 +1,13 @@
+; Colt M1911A1 Government model
+; калибр 					.45 (11.43x23 мм)
+; длина ствола 				127 мм
+; магазин					15
+; вес без магазина			1.075
+; эффективна€ дальность стрельбы	62 м
+; прицельна€ дальность		---
+; дульна€ скорость пули		285 м/с
+; темп стрельбы				30 в/с
+;---------------------------------------------------
 [wpn_colt1911]:identity_immunities,base_wpn_zoom
 GroupControlSection			= spawn_group
 discovery_dependency 		= 
@@ -8,7 +18,7 @@ scheduled            		= off              ; option for ALife Simulator
 cform                    	= skeleton
 class                    	= WP_PM
 min_radius               	= 5
-max_radius               	= 30
+max_radius                  = 30
 description					= enc_weapons1_wpn-colt1911
 
 ef_weapon_type				= 5
@@ -22,8 +32,7 @@ cost					 	= 1100
 
 ammo_elapsed		 		= 7
 ammo_mag_size		 		= 7
-ammo_class		 			= ammo_11.43x23_fmj, ammo_11.43x23_hydro
-
+ammo_class		 			= ammo_11.43x23_fmj, ammo_11.43x23_hydro 
 
 hand_dependence		 		= 1
 single_handed				= 1
@@ -32,7 +41,7 @@ slot 				 		= 1		; // primary
 animation_slot		 		= 1		; type of the animation that will be used
 
 inv_name					= wpn-colt1911
-inv_name_short				= wpn-colt1911
+inv_name_short				= wpn-colt1911_s
 inv_weight					= 1.1
 
 inv_grid_width				= 2
@@ -47,7 +56,8 @@ kill_msg_height		= 24
 
 ;-----------------------------------------------------------------------------------
 ;базова€ дисперси€
-fire_dispersion_base		= 0.22	;угол (в градусах) базовой дисперсии оружи€ (оружи€ зажатого в тисках)
+fire_dispersion_base		= 0.21	;угол (в градусах) базовой дисперсии оружи€ (оружи€ зажатого в тисках)
+;control_inertion_factor		= 1.10f
 
 ;отдача
 cam_relax_speed         	= 8;3.0	;скорость возврата в исходное положение
@@ -59,33 +69,35 @@ cam_max_angle			= 20.0	;максимальный угол отдачи
 cam_max_angle_horz		= 10.0	;(degree) maximum shot horizontal degree 
 cam_step_angle_horz		= 0.6	;(degree) size of step camera moved in horizontal position while shooting
 
-fire_dispersion_condition_factor = 3	;увеличение дисперсии в процентах при максимальном износе 
-misfire_probability 		= 0.001	;веро€тность осечки при максимальном износе 
-misfire_condition_k			= 0.05
+fire_dispersion_condition_factor = 5	;увеличение дисперсии в процентах при максимальном износе 
+misfire_probability 		= 0.004	;веро€тность осечки при максимальном износе 
+misfire_condition_k					= 0.05
 condition_shot_dec			= 0.0009 ;увеличение износа при каждом выстреле
 ;-----------------------------------------------------------------------------------
 
 direction                	= 0, 0, 1
-fire_point			= 0.000000,0.130000,0.185000
+fire_point               	= 0.0, 0.132, 0.137
 
-flame_particles		   		= weapons\generic_weapon03
-smoke_particles		   		= weapons\generic_shoot_00
+flame_particles				= amik\weapons\flame_particles\flame_particles_04
+smoke_particles				= amik\weapons\smoke_particles\smoke_particles_02
+
+shell_point		 			= 0.0, 0.132, 0.03
+shell_dir		 			= 0.0, 0.0, 0.4
+shell_particles	 			= amik\weapons\45_shells_r
+
 rpm_empty_click 	 		= 200
 
-shell_point		 			= 0.0, 0.127, 0.05
-shell_dir		 			= 0.0, 0.0, 0.4
-shell_particles	 			= weapons\generic_shells
-
-PDM_disp_base 			= 1.0
+PDM_disp_base 				= 1.0
 PDM_disp_vel_factor 		= 0.9
 PDM_disp_accel_factor 		= 0.9
-PDM_crouch	 		= 1.0
-PDM_crouch_no_acc 		= 1.0
+PDM_crouch	 				= 1.0
+PDM_crouch_no_acc 			= 1.0
 
 ; ttc
-hit_power           = 0.35, 0.39, 0.42, 0.45
-hit_impulse		 	= 105
-hit_type 			= fire_wound
+hit_power           = 0.55					;было 0.35, 0.39, 0.42, 0.45 ““0.51 
+hit_impulse		 	= 120	;15
+hit_type 					= fire_wound
+;hit_rate			= 1.85
 
 fire_distance       = 50
 bullet_speed		= 285	;начальна€ скорость пули
@@ -95,23 +107,16 @@ rpm                 = 300
 use_aim_bullet				= true		;ѕоддерживаетс€ ли перва€ суппер пул€
 time_to_aim					= 1.0	
 
-silencer_hit_power       	= 0.40
-silencer_hit_impulse	 	= 85
-silencer_fire_distance   	= 100
+silencer_hit_power       	= 0.50
+silencer_hit_impulse	 	= 100
+silencer_fire_distance   	= 40
 silencer_bullet_speed	 	= 280
 
 hud                      	= wpn_colt1911_hud
 normal                   	= 0, 1, 0
-position                 	= -0.021, -0.092, 0.0
+position                 	= -0.021, -0.08, 0.0
 orientation              	= 0, 0, 0
 
-;--STRAP PARAMETERS-----------------------------------------------------------------
-;strap_position         		= -0.1,-0.45,0.2			; position (offset) and orientation of the weapon when it is strapped
-;strap_orientation      		= 1.57,0,0						; (3rd person view)
-;strap_bone0					= bip01_spine2
-;strap_bone1					= bip01_spine1
-
-startup_ammo             	= 90
 visual                   	= weapons\colt1911\wpn_colt1911.ogf
 
 light_color		 			= 0.6,0.5,0.3
@@ -127,14 +132,13 @@ grenade_launcher_status		= 0
 
 zoom_enabled				= true
 
-;звуки
-snd_draw					= weapons\fort_draw
-snd_holster					= weapons\generic_holster
-snd_shoot					= weapons\t_colt1911_shot         ;pm_shoot ;fort_shoot
-snd_empty					= weapons\pistol_empty
-snd_reload					= weapons\colt_reload, 0.8
-snd_close					= weapons\generic_close
-
+snd_draw					= weapons\usp\draw
+snd_holster					= weapons\usp\holster
+snd_shoot					= weapons\usp\shoot
+snd_empty					= weapons\usp\empty
+snd_reload					= weapons\usp\reload
+snd_close					= weapons\usp\close
+snd_silncer_shot			= weapons\usp\shoot_sil 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; silencer
@@ -147,46 +151,61 @@ silencer_y 					= -15
 ;params when silencer is attached 
 ;similar to corresponding params without prefix silencer_
 
-;silencer_flame_particles 	= weapons\generic_weapon01
 silencer_smoke_particles 	= weapons\generic_shoot_00
-snd_silncer_shot			= weapons\pb_shoot, 0.6
 silencer_light_color		= 0.6,0.5,0.3
 silencer_light_range		= 0.01
 silencer_light_var_color	= 0.05
 silencer_light_var_range	= 0.5
 silencer_light_time 		= 0.2
-
-
+ 
+;-----------------------------------------------------------------------------
+;-- HUD DESCRIPTION
+;----------------------------------------------------------------------------- 
 [wpn_colt1911_hud]
+;shell_point          		= 0.05, 0.00, -0.1
+;fire_point					= 0.00, 0.04, -0.20
 
-shell_point			= 0.005000,0.060000,-0.420000
-fire_point			= 0.005000,0.060000,-0.335000
+;sto1en
+shell_point          		= 0.082, -0.0037, -0.08
+fire_point					= 0.01, 0.03, -0.28
 
 fire_bone                	= wpn_body
-orientation              	= 0,0,0
-position                 	= 0,0,0
+
+;position					= -0.050,-0.145,-0.0500
+;orientation					= 0,0,0
+
+;sto1en
+position					= -0.01, -0.155, -0.050
+orientation					= 0.00, 0.50, 0.00
+
 visual                   	= weapons\colt1911\wpn_colt1911_hud.ogf
 
 anim_holster				= holster
 anim_idle					= idle
-anim_empty					= empty
-anim_reload					= reload_full
-anim_reload_empty			= reload
+anim_empty					= idle_empty
+anim_reload					= reload
+anim_reload_empty			= reload_empty
 anim_draw					= draw
 anim_draw_empty				= draw_empty
 anim_shoot					= shoot
 anim_shot_last				= shoot_last
-anim_close					= holster	;draw
+anim_close					= holster_empty
 anim_idle_aim				= idle_aim
 anim_idle_sprint			= idle_sprint
 
 ;смещени€ HUD дл€ режима приближени€
-zoom_offset			= -0.176600,0.067000,-0.244100
-zoom_rotate_x		= -0.008400
-zoom_rotate_y		= -0.000500
+;zoom_offset					= -0.065400,0.029200,0.000000
+;zoom_rotate_x				= -0.010900
+;zoom_rotate_y				= -0.008600
 
-zoom_hide_crosshair	= true						;to hide crosshair in zoom
+;sto1en
+zoom_offset			= -0.106300,0.039100,-0.019400
+zoom_rotate_x		= -0.001200
+zoom_rotate_y		= -0.006900
+
+;collide_hud 				= false
+zoom_hide_crosshair			= true
 
 [wpn_colt1911_repair]
-tech_complication = 400
+tech_complication 			= 400
 repair_compatibility = colt1911

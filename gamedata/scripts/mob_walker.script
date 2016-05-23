@@ -87,11 +87,11 @@ function mob_walker:update(delta)
 		return
 	end
 
-	if self:arrived_to_first_waypoint() then
+	--if self:arrived_to_first_waypoint() then
 		if xr_logic.try_switch_to_another_section(self.object, self.st, actor) then
 			return
 		end
-	end
+	--end
 
 	if self.state == state_standing then
 		if not self.object:action() then

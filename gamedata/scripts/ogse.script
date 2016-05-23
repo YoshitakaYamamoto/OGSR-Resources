@@ -1470,49 +1470,33 @@ end
 
 -- Запуск вызовов при первом апдейта актора
 function on_actor_first_update()
-	--[=[if db.actor:dont_has_info("OGSE_LIANA_PATCH_3_FIX") then
-		if level.name() ~= "l08u_brainlab" then
-			-- баг с лианами
-			local obj = alife():object("liana_00")
-			if obj then
-				alife():release(obj, true)
+	if db.actor:dont_has_info("OGSE_LIANA_PATCH_3_FIX") then
+		local names = {
+			"liana_00",
+			"liana_01",
+			"liana_02",
+			"liana_03",
+			"liana_04",
+			"liana_05",
+			"liana_06",
+		}
+		for _, n in ipairs( names ) do
+			local sobj = alife():object( n )
+			if sobj then
+				alife():release( sobj )
 			end
-			obj = alife():object("liana_01")
-			if obj then
-				alife():release(obj, true)
-			end
-			obj = alife():object("liana_02")
-			if obj then
-				alife():release(obj, true)
-			end
-			obj = alife():object("liana_03")
-			if obj then
-				alife():release(obj, true)
-			end
-			obj = alife():object("liana_04")
-			if obj then
-				alife():release(obj, true)
-			end
-			obj = alife():object("liana_05")
-			if obj then
-				alife():release(obj, true)
-			end
-			obj = alife():object("liana_06")
-			if obj then
-				alife():release(obj, true)
-			end
-			alife():create(5928)
-			alife():create(5929)
-			alife():create(5930)
-			alife():create(5931)
-			alife():create(5932)
-			alife():create(5933)
-			alife():create(5934)
 		end
+		alife():create(5929)
+		alife():create(5930)
+		alife():create(5931)
+		alife():create(5932)
+		alife():create(5933)
+		alife():create(5934)
+		alife():create(5935)
 		db.actor:give_info_portion("OGSE_LIANA_PATCH_3_FIX")
-	end--]=]
+	end
 
-	if db.actor:dont_has_info("OGSE_KOLYA_PATCH_6_FIX") then
+	if db.actor:dont_has_info("OGSE_KOLYA_PATCH_10_FIX") then
 		-- варианты: 
 		-- 1) Коля еще не заспавнен
 		-- 2) Коля заспавнен, есть, еще не найден
@@ -1533,10 +1517,10 @@ function on_actor_first_update()
 			end
 		end
 		
-		db.actor:give_info_portion("OGSE_KOLYA_PATCH_6_FIX")
+		db.actor:give_info_portion("OGSE_KOLYA_PATCH_10_FIX")
 	end
 
-	--[=[if db.actor:dont_has_info("OGSE_PATCH_8_FIX") then
+	if db.actor:dont_has_info("OGSE_PATCH_8_FIX") then
 		if db.actor:dont_has_info("dead_stalker_start_dialog_2") then
 			local obj = alife():story_object(story_ids.x18_death_stalker)
 			if obj then
@@ -1545,7 +1529,7 @@ function on_actor_first_update()
 			end
 		end
 		db.actor:give_info_portion("OGSE_PATCH_8_FIX")
-	end]=]
+	end
 
 	-- Установка FOV
 	db.actor:set_camera_fov(fov_vol)
@@ -2163,11 +2147,11 @@ function transfer_items_to_box(box_sid, remove_quest_items, exclude_sections, ex
 		if obj then
 		local sect = obj:section()
 		-- фильтр по запрещенным class id
-		if not exclude_clsids or exclude_clsids[obj:clsid()] ~= true then
+		if not exclude_clsids or not exclude_clsids[obj:clsid()] then
 		-- фильтр по запрещенным секциям
-		if not exclude_sections or exclude_sections[sect] ~= true then
+		if not exclude_sections or not exclude_sections[sect] then
 		-- фильтр по квестовым вещам
-		if not remove_quest_items or not (sys_ini:line_exist(sect, "quest_item") and sys_ini:r_bool(sect, "quest_item")) then
+		if remove_quest_items or not (sys_ini:line_exist(sect, "quest_item") and sys_ini:r_bool(sect, "quest_item")) then
 			-- особая обработка метки
 			if sect == "amk_metka" then
 				ogse_metka.dropped_to_box = ogse_metka.dropped_to_box + 1

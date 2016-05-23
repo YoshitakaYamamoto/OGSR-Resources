@@ -246,3 +246,51 @@ always_fake = true
 real_item_section = wpn_addon_mag_cmag100
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;HK Conversion Kit (смена калибра USP)
+;.45 (11.43x23 мм)
+[wpn_addon_mag_usp8]:wpn_fake_addon_base
+visual          = weapons\upgrade\mag_ak102-30.ogf
+inv_name		= addon_usp_ck45
+inv_name_short	= addon_usp_ck45_s
+description		= enc_addon_usp_ck
+cost			= 1500
+
+inv_weight		= 0.2
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 76				; position and size are in terms of 64x64 squares
+inv_grid_y			= 8
+
+fake_item_section	= fake_wpn_addon_mag_usp8
+is_magazine_addon = true
+always_fake = true
+
+[fake_wpn_addon_mag_usp8]:wpn_addon_mag_usp8
+real_item_section = wpn_addon_mag_usp8
+
+
+;9х19 мм
+[wpn_addon_mag_usp15]:wpn_fake_addon_base
+visual          = weapons\upgrade\mag_cmag-100.ogf
+inv_name		= addon_usp_ck9
+inv_name_short	= addon_usp_ck9_s
+description		= enc_addon_usp_ck
+cost			= 1500
+
+inv_weight		= 0.2
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 77				; position and size are in terms of 64x64 squares
+inv_grid_y			= 8
+
+fake_item_section	= fake_wpn_addon_mag_usp15
+is_magazine_addon = true
+always_fake = true
+
+[fake_wpn_addon_mag_usp15]:wpn_addon_mag_usp15
+real_item_section = wpn_addon_mag_usp15
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

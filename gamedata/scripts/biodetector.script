@@ -189,8 +189,8 @@ local firmware = {
 	["bioradar_poltergeist"]	= {"poltergeist"},
 	["bioradar_chimera"]	= {"chimera"},
 	["bioradar_boar"]			= {"boar"},
-	["bioradar_zombie"]		= {"zombie","izlom"},
-	["bioradar_stalker"]		= {"stalker","stalker_trader","stalker_diehard","bandit","quest_stalker","kulg_band","kulg_band_2","iskatel"}
+	["bioradar_zombie"]		= {"zombie","izlom","fracture"},
+	["bioradar_stalker"]		= {"stalker","stalker_trader","stalker_diehard","bandit","quest_stalker","kulg_band","kulg_band_2","iskatel","gunsmith", "guider"}
 	}
 
 function on_use_item(obj)

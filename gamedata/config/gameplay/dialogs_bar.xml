@@ -265,6 +265,7 @@
 	</dialog>
 	<dialog id="bar_friend_propusk">
 		<dont_has_info>bar_dolg_propusk_done</dont_has_info>
+		<has_info>bar_dolg_propusk_start</has_info>
 		<precondition>bar_dialogs.bar_dolg_propusk_have</precondition>
 		<phrase_list>
 			<phrase id="0">
@@ -6593,19 +6594,19 @@
 				<text>kaligula_start_dialog_phrase_10</text>
 				<give_info>kaligula_goto_arena</give_info>
 				<action>jekan_work.kaligula_fight_pistol</action>
-				<action>jekan_work.kaligula_get_restrictor</action>
+				<!--action>jekan_work.kaligula_get_restrictor</action-->
 			</phrase>
 			<phrase id="10">
 				<text>kaligula_start_dialog_phrase_11</text>
 				<give_info>kaligula_goto_arena</give_info>
 				<action>jekan_work.kaligula_fight_knife</action>
-				<action>jekan_work.kaligula_get_restrictor</action>
+				<!--action>jekan_work.kaligula_get_restrictor</action-->
 			</phrase>
 			<phrase id="11">
 				<text>kaligula_start_dialog_phrase_12</text>
 				<give_info>kaligula_goto_arena</give_info>
 				<action>jekan_work.kaligula_fight_obrez</action>
-				<action>jekan_work.kaligula_get_restrictor</action>
+				<!--action>jekan_work.kaligula_get_restrictor</action-->
 			</phrase>
 		</phrase_list>
 	</dialog>

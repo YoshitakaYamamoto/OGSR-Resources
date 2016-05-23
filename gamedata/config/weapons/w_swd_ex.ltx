@@ -237,9 +237,17 @@ bones = d1
 grip_name				= wpn_addon_svd_scheek
 grip					= swd_scheek
 ;+ТЕСТ точности wpn_svd_m1 "Дальнобойщик"
-fire_dispersion_base	= 0.013		 	;ОГСЕ СВД 0.015
-control_inertion_factor	= 2.3f			;ОГСЕ СВД 2.2f		;удобность
+fire_dispersion_base	= 0.005		 	;ОГСЕ СВД 0.015
+control_inertion_factor	= 2.5f			;ОГСЕ СВД 2.2f		;удобность
+disp_rate 			    = 1.0
 
+;отдача
+cam_dispersion          = 1.2	;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc		= 0.3	;увеличениe cam_dispersion с каждым выстрелом
+cam_dispertion_frac		= 1.0	;ствол будет подыматься на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+cam_max_angle			= 7.0	;максимальный угол отдачи
+cam_max_angle_horz		= 1.5	;(degree) maximum shot horizontal degree 
+cam_step_angle_horz		= 0.15	;(degree) size of step camera moved in horizontal position while shooting
 
 ;-ТЕСТ калоши d2 (НЕ ИСПОЛЬЗУЕТСЯ)
 ;[swd_gp_galoscha]

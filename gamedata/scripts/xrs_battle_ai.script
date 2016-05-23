@@ -73,7 +73,9 @@ local max_invisible_range_mon = 5
 local forbidden_comms = {			-- запретные коммунити
 	["zombied"] = true,
 	["ecolog"] = true,
-	["trader"] = true
+	["trader"] = true,
+	["gunsmith"] = true,
+	["guider"] = true,
 }
 
 local forbidden_schemes = {			-- запретные схемы
@@ -234,7 +236,9 @@ local community_deviation_coeff = {
 	["killer"] = 0.3, 
 	["monolith"] = 1, 
 	["csky"] = 1, 
-	["quest_stalker"] = 1
+	["quest_stalker"] = 1,
+	["gunsmith"] = 1, 
+	["guider"] = 1, 
 }
 
 --- группировки с улучшенной координацией (имеют радиосвязь, соотв. об одной цели сразу знают все члены группировки)
@@ -3939,7 +3943,9 @@ function restore_restrictions(npc)
 	or string.find(name, "leader") or string.find(profile, "leader")
 	or string.find(name, "aem_") or string.find(profile, "aem_")
 	or string.find(name, "bar_arena") or string.find(profile, "bar_arena")	
-	or string.find(name, "trader") or string.find(profile, "trader")	
+	or string.find(name, "trader") or string.find(profile, "trader")
+	or string.find(name, "gunsmith") or string.find(profile, "gunsmith")
+	or string.find(name, "guider") or string.find(profile, "guider")
 	then
 		return false
 	end

@@ -5,8 +5,26 @@
 <!-- Dialog so stalkerom -->
 <info_portion id="dar_explorer_dlg_open"></info_portion>
 <info_portion id="dar_explorer_dlg_completed"></info_portion>
-<info_portion id="dar_explorer_actor_has_docs"></info_portion>
+<info_portion id="dar_explorer_dlg_snuffy"></info_portion>
 <info_portion id="dar_explorer_dlg_angry"></info_portion>
+<info_portion id="dar_explorer_find_af">
+	<task>find_af_gold_fish</task>
+</info_portion>
+<info_portion id="send_message_af"></info_portion>
+<info_portion id="dar_explorer_fond_af">
+	<action>dar_dialogs.send_message_af</action>
+</info_portion>
+<info_portion id="find_af_gold_fish_done"></info_portion>
+<info_portion id="dar_explorer_take_af"></info_portion>
+<info_portion id="dar_explorer_find_money">
+	<task>find_money</task>
+</info_portion>
+<info_portion id="dar_explorer_fond_money">
+	<action>dar_dialogs.send_message_money</action>
+</info_portion>
+<info_portion id="send_message_money"></info_portion>
+<info_portion id="find_money_done"></info_portion>
+<info_portion id="dar_explorer_take_money"></info_portion>
 
 <!-- Kodovyy zamok 1 -->
 <info_portion id="dar_codelock1_unlock">

@@ -566,10 +566,12 @@ function motivator_binder:net_spawn(sobject)
 				end				
 			end
 			
+			self.am:call( "on_npc_spawn", self.object, self )
 			ogse_debug.process_npc(self.object, "s_spw", 0)
 			return true
 		end
 		
+		self.am:call( "on_npc_spawn", self.object, self )
 		ogse_debug.process_npc(self.object, "s_spw", 0)
 		return true
 	end
@@ -655,6 +657,8 @@ function motivator_binder:net_spawn(sobject)
 
 	ogse_car_control.register_target(self.object)
 	ogse_scripted_btr.register_target(self.object)
+
+	self.am:call( "on_npc_spawn", self.object, self )
 
 	ogse_debug.process_npc(self.object, "s_spw", 0)
 	--// xr_companion	

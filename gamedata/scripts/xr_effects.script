@@ -1355,8 +1355,7 @@ function bar_arena_weapon_spawn ()
 						obj:game_vertex_id())
 	end	
 end
-local items_no_transfer = 
-{
+local items_no_transfer = {
 	["device_pda"] = true,
 	["device_torch"] = true,
 	["bolt"] = true,
@@ -1364,7 +1363,7 @@ local items_no_transfer =
 local function transfer_object_item(item)
     out_object:transfer_item(item, in_object)
 end
-function bar_arena_teleport ( actor, npc)
+function bar_arena_teleport( actor, npc)
 
 --[[	inv_box_1 = level_object_by_sid (story_ids.bar_arena_inventory_box)
 
@@ -1442,7 +1441,7 @@ function bar_arena_teleport ( actor, npc)
 	
 end
 
-function bar_arena_weapon_slot ()
+function bar_arena_weapon_slot()
 	if	has_alife_info("bar_arena_fight_1") then  
 		db.actor:activate_slot(1)
 	else 
@@ -1450,7 +1449,7 @@ function bar_arena_weapon_slot ()
 	end
 end
 
-function bar_arena_teleport_2 ( actor, npc)
+function bar_arena_teleport_2( actor, npc)
 
 	  level.add_pp_effector ("blink.ppe", 234, false)				
 	
@@ -1461,7 +1460,7 @@ function bar_arena_teleport_2 ( actor, npc)
 		-- удаляем то, что у актора есть
 		db.actor:inventory_for_each(function(item, npc)
 										if not item then return end
-										if items_no_transfer[item:section()] ~= true then ogse.remove_item_from_inventory(item, npc) end
+										if not items_no_transfer[item:section()] then ogse.remove_item_from_inventory(item, npc) end
 									end)
 		-- переносим к нему его барахло
 		ogse.transfer_items_from_box(story_ids.bar_arena_inventory_box_2, true, nil, nil)
@@ -3373,7 +3372,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function city_btr_crashed_use()
-local obj = level_object_by_sid(7128)
+local obj = level_object_by_sid(story_ids.city_btr_crashed)
 local pos = obj:position()
 local snd_obj = xr_sound.get_safe_sound_object([[car\trabantnoise]])
 snd_obj:play_at_pos(obj, obj:position(), 0, sound_object.s3d)
@@ -3392,7 +3391,7 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function caravan_hit_by_actor1()
-  local npc = level_object_by_sid(7132)
+  local npc = level_object_by_sid(story_ids.caravan_guard1)
 if npc and npc:alive() then
    npc:set_relation(game_object.enemy, db.actor)
    npc:set_goodwill(-5000, db.actor)
@@ -3400,7 +3399,7 @@ if npc and npc:alive() then
 end
 
 function caravan_hit_by_actor2()
-  local npc = level_object_by_sid(7133)
+  local npc = level_object_by_sid(story_ids.caravan_guard2)
 if npc and npc:alive() then
    npc:set_relation(game_object.enemy, db.actor)
    npc:set_goodwill(-5000, db.actor)
@@ -3409,23 +3408,23 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function human_pervert_init_dialod()
-	local npc = level_object_by_sid(7086)
+	local npc = level_object_by_sid(story_ids.human_pervert)
 	db.actor:run_talk_dialog(npc)
 end
 
 function stalin_init_dialod()
-	local npc = level_object_by_sid(46)
+	local npc = level_object_by_sid(story_ids.sidr_guard)
 	db.actor:run_talk_dialog(npc)
 end
 
 function forest_init_dialod()
-	local npc = level_object_by_sid(16005)
+	local npc = level_object_by_sid(story_ids.forrest_gump)
 	db.actor:run_talk_dialog(npc)
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function moonshine_apparat_use1()
-local obj = level_object_by_sid(7135)
+local obj = level_object_by_sid(story_ids.moonshine_apparat)
 local pos = obj:position()
 local snd_obj = xr_sound.get_safe_sound_object([[ambient\x16\x16_brain_run]])
 snd_obj:play_at_pos(obj, obj:position(), 0, sound_object.s3d)
@@ -3433,7 +3432,7 @@ jekan_work.spawn_glassful_on_table()
 end
 
 function moonshine_apparat_use2()
-local obj = level_object_by_sid(7135)
+local obj = level_object_by_sid(story_ids.moonshine_apparat)
 local pos = obj:position()
 local fx_particle = "industrial_particles\\exhaust_isparenie"
 fx_particle = particles_object(fx_particle)

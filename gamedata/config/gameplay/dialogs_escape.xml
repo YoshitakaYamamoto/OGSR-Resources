@@ -1123,6 +1123,7 @@
 	</dialog>
 	<dialog id="find_vodka">
 		<precondition>ogsm_quests.has_five_vodkas</precondition>
+		<has_info>look_tolik_vodka</has_info>
 		<dont_has_info>find_tolik_vodka</dont_has_info>
 		<phrase_list>
 			<phrase id="1">
