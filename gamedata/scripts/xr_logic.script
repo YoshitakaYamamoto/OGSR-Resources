@@ -1416,8 +1416,6 @@ function get_customdata_or_ini_file(npc, filename)
 	elseif string.find( filename, "*" ) == 1 then --динамический ltx
 		local p = string.find( filename, "*", 2 )
 		return gulag_tasks.loadLtx( string.sub(filename, 2, p-1), string.sub(filename, p+1) )
-	elseif string.find( filename, "gulag_tasks" ) then --KRodin: если нашли в названии переменной "gulag_tasks", то будем использовать быстрый sys_ini
-		return sys_ini
 	else
 		return dsh.cached_ini_file(filename)
 	end

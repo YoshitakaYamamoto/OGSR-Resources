@@ -272,7 +272,7 @@ function gulag:init_ltx(name, type)
 		self.ltx      = ltx
 		self.ltx_name = ltx_name
 	else
-		self.ltx      = sys_ini
+		self.ltx      = dsh.cached_ini_file(gulag_tasks_file_name)
 		self.ltx_name = gulag_tasks_file_name
 	end
 end
