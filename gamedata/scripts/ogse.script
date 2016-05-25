@@ -1560,8 +1560,6 @@ end
 -- Колбэк на выдачу инфопоршена ГГ
 function on_info_update(npc, info_id)
 	_sdata.infos(info_id)
-
-	pda_fx.on_pda_info(info_id) --"Выключение" PDA в Выброс
 end
 
 -- Загружаем все переменные, которые нужно, вызывается при загрузке игры автоматически
