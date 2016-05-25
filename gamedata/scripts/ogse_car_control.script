@@ -663,6 +663,10 @@ end
 
 function on_first_update()
 	SetDetailsMinRadius(current_car and 2.0 or 0.0)
+
+	if db.actor:has_info("no_net_signal") then
+		surge = true
+	end
 end
 
 function update_car_hud()
