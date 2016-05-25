@@ -20,6 +20,7 @@ function attach(sm)
 	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.chek_drop_pnv })
 	sm:subscribe({ signal = "on_destroy",		fun = this.on_destroy })
 	sm:subscribe({ signal = "on_save",			fun = this.on_save })
+	sm:subscribe({ signal = "on_info",			fun = this.on_info })
 end
 
 --==========================================================Настройки=================================================================
@@ -32,6 +33,7 @@ local night_vision_fx_not_sniper = true		-- Если true - значит НЕ н
 local night_vision_fx_on = false			-- флаг работающего ПНВ
 local night_vision_btr_fx_on = false		-- флаг работающего ПНВ БТР
 local night_vision_scope_fx_on = false		-- флаг работающего ночного режима в оптическом прицеле или бинокле
+local night_vision_surge_block = false		-- флаг запрета работы ПНВ во время выброса
 -----------------------------------------
 local scope_colored = false					-- флаг включенной цветокоррекции.
 
@@ -67,7 +69,7 @@ function is_nv_working() --Проверка, включен ли ПНВ. Выз�
 end
 
 function turn_pnv_off() --Выключение пнв по квестам. Вызывается из ogse_quests.script, не удалять!
-	if night_vision_fx_on then --если включен обычный ПНВ, выключем его
+	if night_vision_fx_on then --если включен обычный ПНВ, выключим его
 		turn_off_nv_fx()
 	elseif night_vision_btr_fx_on then --если включен ПНВ БТР, выключим его
 		turn_off_nv_btr_fx()
@@ -79,13 +81,27 @@ function on_save() --Сохраняем состояние работы пнв
 	ogse.save_var( "pnv_scope", nv_scope_fx_autoenable )
 end
 
+function on_info(npc, info_id) --Выключение ПНВ в выброс
+	if info_id == "no_net_signal" then
+		night_vision_surge_block = true
+		turn_pnv_off()
+	elseif info_id == "net_signal" then
+		night_vision_surge_block = false
+	end
+end
+
 function on_destroy() --отключаются шейдерные эффекты тепловизора
 	cmd("r2_render_mode normal")
 end
 
 function try_to_restart_nv_fx() --Попытаемся восстановить работу ПНВ после загрузки сейва
 	nv_scope_fx_autoenable = ogse.load_var( "pnv_scope", true ) --ПНВ/Подсветка прицела
-	if ogse.load_var( "pnv", false ) then
+--------------------Выключение ПНВ в выброс-------------------------
+	if db.actor:has_info("no_net_signal") then
+		night_vision_surge_block = true
+	end
+--------------------------------------------------------------------
+	if ogse.load_var( "pnv", false ) and not night_vision_surge_block then
 		if ogse_car_control.in_btr then --если находимся в БТР, то:
 			turn_on_nv_btr_fx() --Включаем ПНВ БТР
 		else --в противном случае
@@ -118,11 +134,11 @@ function call_pnv(key) --Действие при нажатии клавиши �
 	or level.main_input_receiver()
 	or not db.actor:alive() then return end
 
-	if ogse_car_control.in_btr then --если сидим в БТР'е
+	if ogse_car_control.in_btr and not night_vision_surge_block then --если сидим в БТР'е
 		if not night_vision_btr_fx_on then turn_on_nv_btr_fx() else turn_off_nv_btr_fx() end --вкл/выкл ПНВ БТР
-	elseif night_vision_fx_not_sniper then -- Если не смотрим в прицел
+	elseif night_vision_fx_not_sniper and not night_vision_surge_block then -- Если не смотрим в прицел
 		if not night_vision_fx_on then nv_fx_on() else turn_off_nv_fx() end --вкл/выкл прибор ПНВ
-	else --Если смотрим в прицел
+	elseif not night_vision_fx_not_sniper then --Если смотрим в прицел
 		if not night_vision_scope_fx_on then nv_scope_fx_on() else turn_off_nv_scope_fx() end --вкл/выкл ПНВ в прицеле, в том числе бинокля
 		if not highlight_wnd then turn_on_scope_sights_lighting() else turn_off_scope_sights_lighting() end --вкл/выкл подсветку прицельной сетки + цветокоррекцию.
 		nv_scope_fx_autoenable = not nv_scope_fx_autoenable --нужно для правильного сохранения состояния пнв/подсветки.
@@ -152,15 +168,15 @@ function off_sniper_mode() --Вышли из режима прицеливани
 	night_vision_fx_not_sniper = true --вышли из режима прицеливания.
 	if night_vision_fx_store then --Если запомнили что пнв был включен, значит включаем его.
 		night_vision_fx_store = false
-		nv_fx_on()
+		if not night_vision_surge_block then
+			nv_fx_on()
+		end
 	end
 end
 --====================================================================================================================
 
 --******************************************************************Девайс ПНВ*************************************************************************
 function chek_drop_pnv(obj) --Проверка выкладывания работающего ПНВ
-	--if not obj then return end
-	
 	local outfit_slot = db.actor:item_in_slot(6) --предмет в слоте брони
 	local outfit_slot_nv = outfit_slot and sys_ini:line_exist(outfit_slot:section(), "nightvision_sect") --Проверка, есть ли в костюме встроенный ПНВ
 	
@@ -173,8 +189,6 @@ function chek_drop_pnv(obj) --Проверка выкладывания рабо
 end
 
 function chek_outfit_double_pnv(obj) --Проверка "двойного" надевания ПНВ при смене костюма
-	--if not obj then return end
-
 	local is_nv_obj = sys_ini:line_exist(obj:section(), "nightvision_sect") --Проверка, есть ли в конфиге объекта строка nightvision_sect
 	local is_outfit_nv = isOutfit(obj) and is_nv_obj --проверка, является ли объект костюмом в котором есть встроенный ПНВ
 
