@@ -17,7 +17,9 @@ load_scheme("xr_danger",	  "danger",      stype_stalker)
 if ogsm_hideout then
 	load_scheme("ogsm_hideout",    "ogsm_hideout",      stype_stalker)
 end
-load_scheme("ogse_anomaly_evader",    "evader",      stype_stalker)
+if not ogse_anomaly_evader.turn_off_path_around then
+	load_scheme("ogse_anomaly_evader",    "evader",      stype_stalker)
+end
 load_scheme("xr_abuse",		  "abuse",       stype_stalker)
 load_scheme("xr_walker",      "walker",      stype_stalker)
 load_scheme("xr_remark",      "remark",      stype_stalker)

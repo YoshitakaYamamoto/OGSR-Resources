@@ -1,4 +1,3 @@
--- -*- mode: lua; coding: windows-1251-dos -*-
 -----------------------------------------------------------------------
 --- ogse_anomaly_evader.script
 --- Модуль обхода аномалий
@@ -8,16 +7,18 @@
 --- Настройки схемы
 -----------------------------------------------------------------------
 local debug_flag = false
-local monsters_too = false
+-----------------------------------------------------------------------
 local turn_off_restrictors = false	-- выключить рестрикторную часть
-local turn_off_path_around = true	-- выключить часть обхода по путям
+local monsters_too = false
+-----------------------------------------------------------------------
+turn_off_path_around = true	-- выключить часть обхода по путям
 local transit_coeff = 1.4 	-- Коэффициент, на который умножается радиус аномалии для получения транзитных точек. Нельзя выставлять менее 1.2 - будет зацеплять аномалию
 --local exit_coeff = 7		-- Коэффициент, на который умножается радиус аномалии для получения точки выхода из маршрута. Имеет смысл ставить побольше, чтобы непись не отирался около аномалии на выходе.
-local timeout = 3000		-- Время в миллисекундах, на которое NPC забывает об аномалии после успешного её обхода. Нужно обязательно, чтобы непись не застрял вокруг аномалии, иначе схема может отправить его обходить её бесконечно.
+local timeout = 3000--30000	-- Время в миллисекундах, на которое NPC забывает об аномалии после успешного её обхода. Нужно обязательно, чтобы непись не застрял вокруг аномалии, иначе схема может отправить его обходить её бесконечно.
 local timeout_to_evade = 20000 -- Время на обход, предельное
------------------------------------------------------------------------
 local count_update 			= 0	-- Счетчик апдейтов. Нельзя чтобы схема стартовала включенной сразу же, иначе 
 local engage_after_update 	= 15 -- будут глюки на переключении схем и выборе оружия
+-----------------------------------------------------------------------
 
 local anomaly_to_evade = {}
 local anomaly_to_ignore_timeout = {}
@@ -57,27 +58,28 @@ local added_restrictions = {}
 local last_position      = {}
 
 
-function attach( sm )
-  sm:subscribe({ signal = "on_spawn", fun = this.on_spawn })
-  sm:subscribe({ signal = "on_save",  fun = this.on_save  })
-end
-
-
 function init()
-  event( "npc_death"       ):register( death )
-  event( "npc_net_destroy" ):register( death )
-  event( "npc_update"      ):register( update_norm )
-  if monsters_too then
-    event( "monster_death"       ):register( death )
-    event( "monster_net_destroy" ):register( death )
-    event( "monster_update"      ):register( update_norm )
+  if not turn_off_restrictors then
+    event( "npc_death"       ):register( death )
+    event( "npc_net_destroy" ):register( death )
+    event( "npc_update"      ):register( update_norm )
+    if monsters_too then
+      event( "monster_death"       ):register( death )
+      event( "monster_net_destroy" ):register( death )
+      event( "monster_update"      ):register( update_norm )
+    end
   end
 end
 
 function remove_restriction(npc, anomid)
-	if not npc then return end
-	if not anomid then return end
-	if isIndoor(level.name()) then return end
+	if
+	  not npc
+	  or not anomid
+	  or isIndoor(level.name())
+	then
+	  return
+	end
+
 	local obj = level.object_by_id(anomid)
 	local anom_sect = ""
 	if obj then
@@ -96,7 +98,7 @@ function remove_restriction(npc, anomid)
 	if ogse_anomaly.chek_exclusion_anomaly(anomid) and not string.find(anom_sect, "handmade_") then
 		ogse_anomaly.set_anomaly_mode(anomid, "anom_off")
 		ogse_anomaly.remove_anomaly(anomid)	
---		ogse_anomaly.delete_anom(level.name(), anomid)
+		ogse_anomaly.delete_anom(level.name(), anomid)
 	end
 	if added_restrictions[npc_id] and added_restrictions[npc_id][anomid] then
 		added_restrictions[npc_id][anomid] = nil
@@ -130,32 +132,32 @@ end
 local freq = 1000
 
 function update_norm(e)
-	
-	e:setFingerprint("ogse_anom_evader_update")
-	
-	local npc = e.obj
-	if not npc:alive() then return end
-
-	local profile = npc:profile_name()
-	local name = npc:name()
-	local lev_name = level.name()
+  e:setFingerprint("ogse_anom_evader_update")
+  local npc = e.obj
 
   if
-    excluded_npc[ profile ]
-    or excluded_npc[ name ]
-    or excluded_npc[ npc:story_id() ]
+    excluded_locations[ level.name() ]
+    or not npc:alive()
     or (
-      IsStalker( npc ) and excluded_comms[ npc:character_community() ]
+      IsStalker( npc )
+      and (
+        excluded_comms[ npc:character_community() ]
+        or excluded_npc[ npc:profile_name() ]
+        or excluded_npc[ npc:name() ]
+        or excluded_npc[ npc:story_id() ]
+        or ( (not turn_off_path_around) and is_alife_controlled(npc) and not xr_companion.is_companion(npc:id()) )
+      )
     )
   then
-    return
-  end
-  if excluded_locations[ lev_name ] then return end
+  	return
+  end		
 
   local binder = npc:binded_object()
-  if debug_flag then log1("UPDATING ANOMALY EVADER FOR "..e.obj:name()) end
-  if debug_flag then log1("BINDER ANOMALY "..tostring(binder.ogse_anomaly_evader_t)) end
-  if debug_flag then log1("TIME GLOBAL "..tostring(time_global())) end
+  if debug_flag then
+    log1("UPDATING ANOMALY EVADER FOR "..e.obj:name())
+    log1("BINDER ANOMALY "..tostring(binder.ogse_anomaly_evader_t))
+    log1("TIME GLOBAL "..tostring(time_global()))
+  end
   if
     binder.ogse_anomaly_evader_t
     and binder.ogse_anomaly_evader_t > time_global()
@@ -163,7 +165,8 @@ function update_norm(e)
     return
   end
   binder.ogse_anomaly_evader_t = time_global() + freq
-if debug_flag then log1("BINDER ANOMALY NOW"..tostring(binder.ogse_anomaly_evader_t)) end
+  if debug_flag then log1("BINDER ANOMALY NOW"..tostring(binder.ogse_anomaly_evader_t)) end
+
   local curr_pos = npc:position()
   local prev_pos = last_position[ npc:id() ]
   if prev_pos then
@@ -179,13 +182,12 @@ if debug_flag then log1("BINDER ANOMALY NOW"..tostring(binder.ogse_anomaly_evade
   if not added_restrictions[ npc:id() ] then
     added_restrictions[ npc:id() ] = {}
   end
-if debug_flag then log1("[ANOMALY EVADER] try to enumerate anomalies") end
+  if debug_flag then log1("[ANOMALY EVADER] try to enumerate anomalies") end
   local restr = {}
   for a, b in pairs(ogse_anomaly.get_all_nearest_anomalies_by_point_in_radius( npc:position(), 30 )) do
 	if debug_flag then log1("[ANOMALY EVADER] anomaly "..tostring(a)) end
     local obj = level.object_by_id( a )
     if obj and ogse_anomaly.get_anomaly_mode( a ) ~= "anom_off" then
- --     local sect_anom = obj:section()
 	  if debug_flag then log1("[ANOMALY EVADER] anomaly "..obj:name()) end
       local ignore    = false
       for k, v in pairs( excluded_sect ) do
@@ -217,81 +219,28 @@ if debug_flag then log1("[ANOMALY EVADER] try to enumerate anomalies") end
 
   local add = {}
   for k, _ in pairs( restr ) do
-    if not should_npc_miss_this_anomaly( npc ) then
-      table.insert( add, k ) -- добавить новый
-      added_restrictions[ npc:id() ][ k ] = true
-    end
+    table.insert( add, k ) -- добавить новый
+    added_restrictions[ npc:id() ][ k ] = true
   end
   if table.getn( add ) > 0 then
     npc:add_restrictions( "", table.concat( add, "," ) )
   end
 end
 
-
-local monster_miss_cnt = 0
-function should_npc_miss_this_anomaly( npc )
-  local miss_this_anomaly = false
-  if IsMonster( npc ) then
-    if monster_miss_cnt == 0 then
-      miss_this_anomaly = true
-      monster_miss_cnt  = init_monster_miss_cnt()
-    else
-      monster_miss_cnt = monster_miss_cnt - 1
-    end
-  end
-  return miss_this_anomaly
-end
-
-
-function init_monster_miss_cnt()
-  return ( 1 + level.get_game_difficulty() ) * 2
-end
-
-
-function on_spawn()
-  monster_miss_cnt = ogse.load_var(
-    script_name() .. ".monster_miss_cnt", init_monster_miss_cnt()
-  )
-end
-
-
-function on_save()
-  ogse.save_var(
-    script_name() .. ".monster_miss_cnt", monster_miss_cnt, "u8"
-  )
-end
-
-
+-----------------------------------------------------------------------
+--- Обход по точкам для неписей под управлением idle_alife - НЕ ИСПОЛЬЗУЕТСЯ ПРИ turn_off_path_around = true !!!
+-----------------------------------------------------------------------
 function update(npc)
-	
-	local profile = npc:profile_name()
-	local name = npc:name()
-	local lev_name = level.name()
-	
-	if
-	  excluded_npc[ profile ]
-	  or excluded_npc[ name ]
-	  or (
-	    IsStalker( npc ) and excluded_comms[ npc:character_community() ]
-	  )
-	then
-		return
-	end	
-	if excluded_locations[lev_name] then
-		return
-	end	
-	
 	local hasanom, anomid, pos, cls, dist, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(npc:position())
 	local obj = level.object_by_id(anomid)	
 	if hasanom and obj and ogse_anomaly.get_anomaly_mode(anomid) ~= "anom_off" then
-	
+
 		for k, v in pairs(excluded_sect) do
 			if string.find(sect_anom, k) then
 				return false
 			end			
 		end	
-	
-	
+
 		if dist < 5 then
 			local an_name = obj:name()
 			local sobj = alife():object(npc:id())
@@ -325,14 +274,8 @@ function update(npc)
 			cnt = cnt + 1
 		end
 		if restr ~= "" then
-			if
-			  turn_off_restrictors
-			  or (
-			    IsStalker( npc )
-			    and npc:character_community() == "zombied"
-			  )
-			then
-				log1("!!RESTRICT_TURNED_OFF or "..npc:name().." is zombied.")
+			if turn_off_restrictors then
+				log1("!!RESTRICT_TURNED_OFF for "..npc:name())
 			else
 				npc:add_restrictions("", restr)
 				if debug_flag then 
@@ -343,10 +286,6 @@ function update(npc)
 	end	
 end
 
------------------------------------------------------------------------
---- Обход по точкам для неписей под управлением idle_alife
------------------------------------------------------------------------
-
 class "evaluator_anomaly" (property_evaluator)
 
 function evaluator_anomaly:__init(storage, npc, name) super(nil, name)
@@ -356,38 +295,30 @@ function evaluator_anomaly:__init(storage, npc, name) super(nil, name)
 end
 
 function evaluator_anomaly:evaluate()
-
 	if count_update <= engage_after_update then
 		count_update = count_update + 1
 		return false
 	end	
 
 	local nid = self.npc:id()
-	
-	local profile = self.npc:profile_name()
-	local name = self.npc:name()
+
 	if
-	  excluded_npc[ profile ]
-	  or excluded_npc[ name ]
+	  excluded_locations[level.name()]
+	  or not self.npc:alive()
 	  or (
 	    IsStalker( self.npc )
-	    and excluded_comms[ self.npc:character_community() ]
+	    and (
+	      excluded_comms[ self.npc:character_community() ]
+	      or excluded_npc[ self.npc:profile_name() ]
+	      or excluded_npc[ self.npc:name() ]
+	      or excluded_npc[ self.npc:story_id() ]
+	      or ( (not turn_off_restrictors) and xr_companion.is_companion(nid) )
+	    )
 	  )
-		or xr_companion.is_companion(nid)
 	then
 		return false
 	end		
 
-	if
-	  turn_off_path_around
-	  or (
-	    IsStalker( self.npc )
-	    and self.npc:character_community() == "zombied"
-	  )
-	then
-		return false
-	end
-	
 	local scheme1 = ""			
 	if db.storage[self.npc:id()] then
 		scheme1 = tostring(db.storage[self.npc:id()].active_section)
@@ -475,11 +406,7 @@ end
 function check_arrival(npc_position, vertex)
 	local vertex_pos = level.vertex_position(vertex)
 	local dist = npc_position:distance_to(vertex_pos)
-	if dist < 1 then
-		return true
-	else
-		return false
-	end
+	return dist < 1
 end
 
 function is_alife_controlled(npc)
@@ -521,7 +448,6 @@ function action_evade_anomaly:initialize()
 end
 
 function action_evade_anomaly:execute ()
-
 	action_base.execute(self)
 	
 	update(self.object)
@@ -542,16 +468,6 @@ function action_evade_anomaly:execute ()
 		anomaly_to_evade[nid] = nil
 		escape_paths[nid] = nil
 		progress = nil		
-		return
-	end
-
-	if
-	  turn_off_path_around
-	  or (
-	    IsStalker( self.npc )
-	    and self.npc:character_community() == "zombied"
-	  )
-	then
 		return
 	end
 	

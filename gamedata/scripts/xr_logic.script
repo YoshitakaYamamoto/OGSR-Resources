@@ -296,8 +296,10 @@ function enable_generic_schemes(ini, npc, stype, section)
 
 		xr_abuse.set_abuse(npc, ini, "abuse", section)
 
-		ogse_anomaly_evader.set_evade(npc,ini,"evader",section)
-		
+		if not ogse_anomaly_evader.turn_off_path_around then
+			ogse_anomaly_evader.set_evade(npc,ini,"evader",section)
+		end
+
 		local meet_section = utils.cfg_get_string (ini, section, "meet", npc, false, "")
 		xr_meet.set_meet (npc, ini, "meet", meet_section)
 
