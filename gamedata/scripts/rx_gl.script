@@ -818,7 +818,7 @@ function add_to_binder(npc,ini,scheme,section,storage)
 	action = action_reload_gl(npc,"act_reload_gl",storage)
 	action:add_precondition(world_property(stalker_ids.property_alive,true))
 	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
-	if rx_bandage then
+	if rx_bandage and rx_bandage.enable_scheme then
 		action:add_precondition(world_property(rx_bandage.evid_bandage,false))
 	end
 	if rx_facer then

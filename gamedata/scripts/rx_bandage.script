@@ -5,6 +5,8 @@
 --	get_console():execute("flush")
 --end
 
+enable_scheme = get_bool("rx_bandage_main", "enabled", true)
+
 local bandage_sets = {forbiddens = {items = {},factions = {},npcs = {}},
 				check_prd = rx_utils.read_from_ini(sys_ini,"rx_bandage_main","check_period",1500),
 				enabled = rx_utils.read_from_ini(sys_ini,"rx_bandage_main","enabled",true,0)}
@@ -225,6 +227,7 @@ function add_to_binder(npc,ini,scheme,section,storage)
 	if not bandage_sets.inited then
 		init()
 	end
+
 	local manager = npc:motivation_action_manager()
 
 	local state_mgr_to_idle_combat 	= xr_actions_id.state_mgr + 1
@@ -263,7 +266,7 @@ end
 function npc_update(npc)
 	local npc_id = npc:id()
 	local st = db.storage[npc_id]["bandage"]
-	if not bandage_sets.enabled or not st or st.disabled then
+	if not st or st.disabled then
 		return
 	end
 	local obj = npc:object("yad")

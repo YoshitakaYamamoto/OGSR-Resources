@@ -1620,7 +1620,7 @@ function add_to_binder(object, char_ini, scheme, section, st)
 		action:add_precondition( world_property( xrs_grenade.prop_fire,          		     false  ) )
 		action:add_precondition( world_property( xrs_grenade.prop_grenade,          	     false  ) )
 	end
-	if rx_bandage then
+	if rx_bandage and rx_bandage.enable_scheme then
 		action:add_precondition(world_property(rx_bandage.evid_bandage,false))
 	end	
 	if rx_facer then

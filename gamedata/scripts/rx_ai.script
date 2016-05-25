@@ -91,7 +91,7 @@ function npc_update(npc)
 		if rx_addons then
 			rx_addons.npc_update(npc,st)
 		end
-		if rx_bandage then
+		if rx_bandage and rx_bandage.enable_scheme then
 			rx_bandage.npc_update(npc,st)
 		end
 		eat_medkit(npc)
@@ -168,7 +168,7 @@ function load_schemes()
 	if rx_facer then
 		load_scheme("rx_facer","facer",stype_stalker)
 	end
-	if rx_bandage then
+	if rx_bandage and rx_bandage.enable_scheme then
 		load_scheme("rx_bandage","bandage",stype_stalker)
 	end
 end
@@ -193,7 +193,7 @@ function enable_schemes(ini,npc)
 	if rx_facer then
 		rx_facer.set_scheme(npc,ini,"facer","facer")
 	end
-	if rx_bandage then
+	if rx_bandage and rx_bandage.enable_scheme then
 		rx_bandage.set_scheme(npc,ini,"bandage","bandage")
 	end
 end
@@ -205,7 +205,7 @@ function addCommonPrecondition(action)
 	if rx_facer then
 		action:add_precondition(world_property(rx_facer.evid_facer,false))
 	end
-	if rx_bandage then
+	if rx_bandage and rx_bandage.enable_scheme then
 		action:add_precondition(world_property(rx_bandage.evid_bandage,false))
 	end
 end
