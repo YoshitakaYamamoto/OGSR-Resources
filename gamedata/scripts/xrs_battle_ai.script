@@ -304,8 +304,8 @@ local grenade_launchers = {
 }
 
 local short_weapons = {
-		[clsid.wpn_binocular] 			= true,
-		[clsid.wpn_binocular_s] 		= true,
+		--[clsid.wpn_binocular] 			= true,
+		--[clsid.wpn_binocular_s] 		= true,
 		[clsid.wpn_fort]				= true,
 		[clsid.wpn_grenade_f1] 			= true,
 		[clsid.wpn_grenade_fake] 		= true,
