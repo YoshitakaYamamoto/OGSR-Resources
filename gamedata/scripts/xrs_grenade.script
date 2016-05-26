@@ -834,7 +834,7 @@ function npc_update(binder)
 				break
 			end
 		end
-		binder.grenade_update_time=time_global()+120000
+		binder.grenade_update_time=time_global()+180000
 	end
 end
 
