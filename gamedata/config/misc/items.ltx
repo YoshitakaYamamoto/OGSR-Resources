@@ -177,7 +177,7 @@ inv_name			= device-torch
 inv_name_short		= device-torch
 inv_weight			= 0.3
 inv_grid_width		= 2
-inv_grid_height		= 1
+inv_grid_height		= 2
 inv_grid_x			= 16
 inv_grid_y			= 12
 
@@ -187,7 +187,7 @@ can_trade			= true
 position			= 0.35,0.25,0.0
 light_trace_bone	= cone_bone
 attach_angle_offset	= 0, -3.14, 1.6 ;-0.4, 3.14, 1.6 фонарик советский
-attach_position_offset	=  0.12, 0.0, 0.08 ;-0.1, 0, 0.16 фонарик советский
+attach_position_offset	=  0.115, 0.00, 0.07 ; 0.12, 0.0, 0.08 ;-0.1, 0, 0.16 фонарик советский
 attach_bone_name		= bip01_head; bip01_spine2 фонарик советский
 auto_attach			= false
 
@@ -1134,7 +1134,7 @@ inv_grid_x		= 21
 inv_grid_y		= 12
 cost			= 7500
 
-; Противогаз ГП-5
+; Респиратор
 [af_maska_1]:bio
 GroupControlSection	= spawn_group
 $spawn 			= "artifacts\af_maska_1"
@@ -1147,7 +1147,7 @@ visual			= equipments\gasmask1.ogf
 inv_name		= af_maska_1
 inv_name_short	= af_maska_1
 description		= enc_zone_af_maska_1
-inv_weight		= 1.2
+inv_weight		= 0.9
 inv_grid_width	= 2
 inv_grid_height	= 2
 inv_grid_x		= 18
@@ -1171,13 +1171,13 @@ burn_immunity = 1.0				;коэффициенты иммунитета
 strike_immunity = 1.0
 shock_immunity = 1.0
 wound_immunity = 1.0		
-radiation_immunity = 0.85
+radiation_immunity = 0.8
 telepatic_immunity = 1.0
-chemical_burn_immunity = 0.75
+chemical_burn_immunity = 0.8
 explosion_immunity = 1.0
 fire_wound_immunity  = 1.0
 
-; Противогаз XM-40
+; Противогаз ГП-5
 [af_maska_2]:af_maska_1
 $spawn 			= "artifacts\af_maska_2"
 visual			= equipments\gasmask3.ogf
@@ -1193,8 +1193,9 @@ power_restore_speed = -0.004
 hit_absorbation_sect = af_maska_2_absorbation
 
 [af_maska_2_absorbation]:af_maska_1_absorbation
-radiation_immunity = 0.83
+radiation_immunity = 0.7
 chemical_burn_immunity = 0.7
+telepatic_immunity = 0.95
 
 [mobile_changer]:identity_immunities
 GroupControlSection = spawn_group
@@ -1244,7 +1245,7 @@ inv_name_short	= item_pnv_1
 description		= item_pnv_1_description
 inv_weight		= 2.2
 inv_grid_width	= 2
-inv_grid_height	= 1
+inv_grid_height	= 2
 inv_grid_x		= 18
 inv_grid_y		= 34
 cost			= 1500
@@ -1261,7 +1262,7 @@ attach_bone_name			= bip01_root
 animation_slot				= 11
 belt						= false
 
-nightvision_sect            = effector_nightvision_good
+nightvision_sect            = effector_nightvision_bad
 
 ;скорости увеличения (уменьшения) 
 health_restore_speed = 0.0			
@@ -1300,10 +1301,10 @@ description		= item_pnv_2_description
 inv_weight		= 1.7
 
 inv_grid_x		= 18
-inv_grid_y		= 37
+inv_grid_y		= 36
 cost			= 10000
 
-nightvision_sect    = effector_nightvision_elite
+nightvision_sect    = effector_nightvision_grey
 
 [device_termovizor]:device_pnv_1
 $spawn 			= "device\device_termovizor"

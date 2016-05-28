@@ -1,3 +1,11 @@
+;Броня ТОЛЬКО для игрока!
+;
+;полная экза - любой голова/шлем и бронька меняется на экзовские, кроме конечностей
+
+;Правки внесены потому, что... читаем внимательно!: защита от пуль (и только от них) задается параметром bones_koeff_protection, а не fire_wound_protection, который просто фейковый параметр для отображения на экране монитора.
+;Отсюда же следующая особенность - параметр пулестойкости НЕ зависит от состояния костюма. Т.е. даже самый "убитый" костюм будет защищать как новый.
+;Более подробно можно почитать здесь http://www.amk-team.ru/forum/index.php?showtopic=4188&page=1#entry174907 посты за авторством Колмогора (первого движкового ковырятеля)
+;
 [outfit_base]
 ; delete full_scale_icon ;иконка сталкера в костюме в полный рост next update- obsolete, use  full_icon_name instead !!!
 GroupControlSection	 = spawn_group
@@ -14,6 +22,9 @@ power_loss      = 1
 
 slot			= 6
 sprint_allowed	= true
+
+; RESISTANCE
+fire_wound_protection	=	0.0 ;фейковый параметр, настоящий в bones_koeff_protection
 
 [light_exo_visual_base]
 actor_visual	= actors\hero\light_exo_neytral_actor.ogf
@@ -58,18 +69,16 @@ cost				= 84200
 immunities_sect			= sect_exo_outfit_immunities
 
 ; RESISTANCE
-burn_protection 				= 0.4
-strike_protection 				= 0.45
-shock_protection 				= 0.5
-wound_protection				= 0.44
-radiation_protection 			= 0.5
-telepatic_protection 			= 0.0
-chemical_burn_protection 		= 0.4
-explosion_protection 			= 0.55
-fire_wound_protection  			= 0.55 ;fake parameter real values in bones_koeff_protection below
+burn_protection 	 = 	0.25
+shock_protection 	 = 	-0.35
+chemical_burn_protection 	 = 	0.20
+radiation_protection 	 = 	0.40
+telepatic_protection 	 = 	0.45
+strike_protection 	 = 	0.60
+wound_protection	 = 	0.75
+explosion_protection 	 = 	0.50
 
 ;запрещение режима Sprint для Актера
-bones_koeff_protection			= exo_helmet_damage
 additional_inventory_weight		= 30
 additional_inventory_weight2	= 30
 
@@ -81,9 +90,9 @@ shock_immunity				= 0.035
 wound_immunity				= 0.01
 radiation_immunity			= 0.0
 telepatic_immunity			= 0.0
-chemical_burn_immunity		= 0.2
+chemical_burn_immunity		        = 0.2
 explosion_immunity			= 0.035
-fire_wound_immunity			= 0.015
+fire_wound_immunity			= 0.01
 
 [exo_outfit_repair]
 tech_complication          = 900
@@ -92,7 +101,7 @@ repair_compatibility     = exoskeleton_outfit
 ;---------------------------------------------------------------------------------------------
 ;		Новички и сталкеры
 ;---------------------------------------------------------------------------------------------
-;		ОБЫЧНЫЙ КОСТЮМ
+;		ОБЫЧНЫЙ ОДЕЖДА
 ;---------------------------------------------------------------------------------------------
 [novice_outfit]:outfit_base 
 $spawn 			= "outfit\novice_outfit"
@@ -113,20 +122,19 @@ full_icon_name		= npc_icon_novice_outfit
 
 cost				= 2500
 
-immunities_sect			= sect_novice_outfit_immunities
+immunities_sect		= sect_novice_outfit_immunities
 
 ; RESISTANCE
-burn_protection	=	0.17
-shock_protection	=	0.15
-radiation_protection	=	0.15
-telepatic_protection	=	0.0
-chemical_burn_protection	=	0.1
-strike_protection	=	0.1
-wound_protection	=	0.13
-explosion_protection	=	0.15
-fire_wound_protection	=	0.15 ;fake parameter real values in bones_koeff_protection below
+bones_koeff_protection = armor_0_0_0
 
-bones_koeff_protection = kurtka_mask_damage
+burn_protection 	 = 	0.15
+shock_protection 	 = 	0.00
+chemical_burn_protection 	 = 	0.10
+radiation_protection 	 = 	0.15
+telepatic_protection 	 = 	0.00
+strike_protection 	 = 	0.10
+wound_protection	 = 	0.15
+explosion_protection 	 = 	0.15
 
 ; Параметры для ремонта
 tech_complication        = 100
@@ -145,7 +153,7 @@ radiation_immunity			= 0.0
 telepatic_immunity			= 0.0
 chemical_burn_immunity		= 0.5
 explosion_immunity			= 0.05
-fire_wound_immunity			= 0.03
+fire_wound_immunity			= 0.02
 
 [novice_outfit_repair]
 tech_complication        = 100
@@ -165,9 +173,10 @@ description			= outfit_novice_exo1_description
 full_icon_name		= npc_icon_novice_outfit_exo1
 cost				= 14500
 
-strike_protection	=	0.13
-wound_protection	=	0.15
-explosion_protection	=	0.17
+; RESISTANCE
+strike_protection 	 = 	0.12
+wound_protection	 = 	0.17
+explosion_protection 	 = 	0.17
 
 ; Параметры для ремонта
 tech_complication        = 100
@@ -192,11 +201,18 @@ description			= outfit_novice_exo2_description
 full_icon_name		= npc_icon_novice_outfit_exo2
 cost				= 25500
 
-radiation_protection	=	0.16
-telepatic_protection	=	0.02
-strike_protection	=	0.25
-wound_protection	=	0.28
-explosion_protection	=	0.20 
+bones_koeff_protection = armor_5_4_0
+
+; RESISTANCE
+; защитные параметры одетой полной экзы высчитываются по формуле: (параметр костюма + параметр экзы) / 1.5 Исходные параметры RESISTANCE экзы смотерть в секции [exo_outfit] в начале файла
+burn_protection 	 = 	0.27
+shock_protection 	 = 	-0.23
+chemical_burn_protection 	 = 	0.15
+radiation_protection 	 = 	0.37
+telepatic_protection 	 = 	0.30
+strike_protection 	 = 	0.47
+wound_protection	 = 	0.60
+explosion_protection 	 = 	0.44
 
 ; Параметры для ремонта
 tech_complication        = 100
@@ -219,7 +235,7 @@ inv_name_short					= novice_outfit_name_m
 full_icon_name		            = npc_icon_outfit_novice_m1
 description						= novice_outfit_description_m
 visual                          = equipments\novice_suit_m1.ogf
-health_restore_speed			= 0.0009
+health_restore_speed			= 0.001
 satiety_restore_speed			= 6.614e-5
 bleeding_restore_speed			= 0.006
 power_restore_speed				= 0.004
@@ -231,10 +247,6 @@ cost				= 13300
 ; Параметры для ремонта
 repair_compatibility     = light_outfit
 tech_complication          = 120
-
-bones_koeff_protection = gilet_antigas_damage
-
-explosion_protection	=	0.25
 
 ; Параметры для экзоскелетов
 exo1 = novice_outfit_m1_exo1
@@ -257,9 +269,10 @@ description			= novice_outfit_m1_exo1_description
 full_icon_name		= npc_icon_novice_outfit_m1_exo1
 cost				= 25300
 
-strike_protection	=	0.13
-wound_protection	=	0.15
-explosion_protection	=	0.25
+; RESISTANCE
+strike_protection 	 = 	0.12
+wound_protection	 = 	0.17
+explosion_protection 	 = 	0.17
 
 repair_compatibility     = light_outfit
 tech_complication          = 120
@@ -283,11 +296,17 @@ description			= novice_outfit_m1_exo2_description
 full_icon_name		= npc_icon_novice_outfit_m1_exo2
 cost				= 36300
 
-radiation_protection	=	0.16
-telepatic_protection	=	0.02
-strike_protection	=	0.25
-wound_protection	=	0.28
-explosion_protection	=	0.25
+bones_koeff_protection = armor_5_4_0
+
+; RESISTANCE
+burn_protection 	 = 	0.27
+shock_protection 	 = 	-0.23
+chemical_burn_protection 	 = 	0.15
+radiation_protection 	 = 	0.37
+telepatic_protection 	 = 	0.30
+strike_protection 	 = 	0.47
+wound_protection	 = 	0.60
+explosion_protection 	 = 	0.44
 
 repair_compatibility     = light_outfit
 tech_complication          = 120
@@ -315,14 +334,19 @@ actor_visual					= actors\hero\stalker_bandit.ogf
 inv_weight			            = 4.0
 inv_grid_x						= 41
 inv_grid_y						= 4
-
 cost				= 11330
 
-burn_protection	=	0.18
-shock_protection	=	0.18
-radiation_protection	=	0.17
-strike_protection	=	0.15
-wound_protection	=	0.18
+bones_koeff_protection = armor_2_0_0
+
+; RESISTANCE
+burn_protection 	 = 	0.15
+shock_protection 	 = 	-0.25
+chemical_burn_protection 	 = 	0.10
+radiation_protection 	 = 	0.20
+telepatic_protection 	 = 	0.10
+strike_protection 	 = 	0.35
+wound_protection	 = 	0.45
+explosion_protection 	 = 	0.15
 
 ; Параметры для ремонта
 repair_compatibility     = light_outfit
@@ -349,8 +373,10 @@ description			= bandit_outfit_exo1_description
 full_icon_name		= npc_icon_outfit_bandit_m1_exo1
 cost				= 23300
 
-strike_protection	=	0.18
-wound_protection	=	0.20
+; RESISTANCE
+strike_protection 	 = 	0.37
+wound_protection	 = 	0.47
+explosion_protection 	 = 	0.17
 
 ; Параметры для ремонта
 repair_compatibility     = light_outfit
@@ -375,10 +401,17 @@ description			= bandit_outfit_exo2_description
 full_icon_name		= npc_icon_outfit_bandit_m1_exo2
 cost				= 34330
 
-radiation_protection	=	0.18
-telepatic_protection	=	0.02
-strike_protection	=	0.3
-wound_protection	=	0.33
+bones_koeff_protection = armor_5_4_0
+
+; RESISTANCE
+burn_protection 	 = 	0.27
+shock_protection 	 = 	-0.40
+chemical_burn_protection 	 = 	0.20
+radiation_protection 	 = 	0.40
+telepatic_protection 	 = 	0.37
+strike_protection 	 = 	0.63
+wound_protection	 = 	0.80
+explosion_protection 	 = 	0.43
 
 ; Параметры для ремонта
 repair_compatibility     = light_outfit
@@ -394,7 +427,7 @@ exo_section = exo2 			                    ;формат записи параметра: exo_section 
 ;---------------------------------------------------------------------------------------------
 ;		КОСТЮМ НЕЙТРАЛЬНОГО СТАЛКЕРА
 ;---------------------------------------------------------------------------------------------
-[base_bandit_stalker_outfit_advanced]:outfit_base
+[stalker_outfit]:outfit_base
 $spawn 			= "outfit\stalker_outfit"
 visual          = equipments\stalker_suit
 actor_visual	= actors\hero\stalker_hood.ogf
@@ -415,26 +448,25 @@ power_loss      = 1.1
 
 cost				= 28400
 
+bones_koeff_protection = armor_2_0_1
+
 immunities_sect			= sect_stalker_outfit_immunities
 
 ; RESISTANCE
-burn_protection	=	0.23
-shock_protection	=	0.4
-radiation_protection	=	0.28
-telepatic_protection	=	0.1
-chemical_burn_protection	=	0.35
-strike_protection	=	0.35
-wound_protection	=	0.38
-explosion_protection	=	0.4
-fire_wound_protection	=	0.29 ;fake parameter real values in bones_koeff_protection below
-
-bones_koeff_protection = gilet_antigas_damage
+burn_protection 	 = 	0.40
+shock_protection 	 = 	0.15
+chemical_burn_protection 	 = 	0.25
+radiation_protection 	 = 	0.20
+telepatic_protection 	 = 	0.00
+strike_protection 	 =  0.25
+wound_protection	 = 	0.35
+explosion_protection 	 = 	0.25
 
 ; Параметры для ремонта
+[stalker_outfit_repair]
 tech_complication          = 500
 repair_compatibility     = heavy_outfit
 
-[stalker_outfit]:base_bandit_stalker_outfit_advanced
 ; Параметры для экзоскелетов
 exo1 = stalker_outfit_exo1
 exo2 = stalker_outfit_exo2
@@ -446,13 +478,9 @@ shock_immunity				= 0.03
 wound_immunity				= 0.03
 radiation_immunity			= 0.00
 telepatic_immunity			= 0.00
-chemical_burn_immunity		= 0.2
+chemical_burn_immunity		        = 0.20
 explosion_immunity			= 0.03
-fire_wound_immunity			= 0.02
-
-[stalker_outfit_repair]
-tech_complication          = 500
-repair_compatibility     = heavy_outfit
+fire_wound_immunity			= 0.015
 
 [stalker_outfit_exo1]:stalker_outfit,light_exo_visual_base
 $spawn 			= "outfit\stalker_outfit_exo1"
@@ -468,8 +496,10 @@ description			= stalker_outfit_exo1_description
 full_icon_name		= npc_icon_stalker_outfit_exo1
 cost				= 40400
 
-strike_protection	=	0.38
-wound_protection	=	0.4
+; RESISTANCE
+strike_protection 	 =  0.27
+wound_protection	 = 	0.37
+explosion_protection 	 = 	0.27
 
 ; Параметры для ремонта
 tech_complication          = 500
@@ -495,11 +525,17 @@ description			= stalker_outfit_exo2_description
 full_icon_name		= npc_icon_stalker_outfit_exo2
 cost				= 51400
 
-radiation_protection	=	0.29
-telepatic_protection	=	0.12
-strike_protection	=	0.5
-wound_protection	=	0.53
-explosion_protection	=	0.47
+bones_koeff_protection = armor_5_4_1
+
+; RESISTANCE
+burn_protection 	 = 	0.43
+shock_protection 	 = 	-0.13
+chemical_burn_protection 	 = 	0.30
+radiation_protection 	 = 	0.40
+telepatic_protection 	 = 	0.30
+strike_protection 	 = 	0.57
+wound_protection	 = 	0.73
+explosion_protection 	 = 	0.50
 
 ; Параметры для ремонта
 tech_complication          = 500
@@ -522,10 +558,17 @@ inv_name_short					= stalker_outfit_name_m1
 full_icon_name		            = npc_icon_outfit_stalker_m1
 description						= stalker_outfit_description_m1
 health_restore_speed			= 0.008
-cost				            = 39760
 inv_grid_x     				    = 41
 inv_grid_y      				= 24
 
+cost				            = 39760
+
+; RESISTANCE
+burn_protection 	 = 	0.50
+shock_protection 	 = 	0.20
+chemical_burn_protection 	 = 	0.30
+radiation_protection 	 = 	0.35
+telepatic_protection 	 = 	0.10
 
 ; Параметры для ремонта
 tech_complication          = 500
@@ -551,8 +594,10 @@ description			= stalker_outfit_exo1_description_m1
 full_icon_name		= npc_icon_outfit_stalker_m1_exo1
 cost				= 51760
 
-strike_protection	=	0.38
-wound_protection	=	0.4
+; RESISTANCE
+strike_protection 	 =  0.27
+wound_protection	 = 	0.37
+explosion_protection 	 = 	0.27
 
 power_loss      = 0.12
 additional_inventory_weight = 50
@@ -579,11 +624,17 @@ full_icon_name		= npc_icon_outfit_stalker_m1_exo2
 
 cost				= 62760
 
-radiation_protection	=	0.29
-telepatic_protection	=	0.12
-strike_protection	=	0.5
-wound_protection	=	0.53
-explosion_protection	=	0.47
+bones_koeff_protection = armor_5_4_1
+
+; RESISTANCE
+burn_protection 	 = 	0.50
+shock_protection 	 = 	-0.10
+chemical_burn_protection 	 = 	0.33
+radiation_protection 	 = 	0.50
+telepatic_protection 	 = 	0.37
+strike_protection 	 = 	0.57
+wound_protection	 = 	0.73
+explosion_protection 	 = 	0.50
 
 ; Параметры для ремонта
 tech_complication          = 500
@@ -641,9 +692,10 @@ description			= stalker_outfit_exo1_description_m2
 full_icon_name		= npc_icon_outfit_stalker_m2_exo1
 cost				= 43240
 
-fire_wound_protection	=	0.36
-strike_protection	=	0.38
-wound_protection	=	0.4
+; RESISTANCE
+strike_protection 	 =  0.27
+wound_protection	 = 	0.37
+explosion_protection 	 = 	0.27
 
 ; Параметры для ремонта
 tech_complication          = 800
@@ -670,11 +722,17 @@ full_icon_name		= npc_icon_outfit_stalker_m2_exo2
 
 cost				= 54240
 
-radiation_protection	=	0.29
-telepatic_protection	=	0.12
-strike_protection	=	0.5
-wound_protection	=	0.53
-explosion_protection	=	0.47
+bones_koeff_protection = armor_5_4_1
+
+; RESISTANCE
+burn_protection 	 = 	0.43
+shock_protection 	 = 	-0.13
+chemical_burn_protection 	 = 	0.30
+radiation_protection 	 = 	0.40
+telepatic_protection 	 = 	0.30
+strike_protection 	 = 	0.57
+wound_protection	 = 	0.73
+explosion_protection 	 = 	0.50
 
 ; Параметры для ремонта
 tech_complication          = 800
@@ -713,20 +771,19 @@ power_loss          = 1.3
 
 cost				= 79940
 
+bones_koeff_protection = armor_2_1_1
+
 immunities_sect			= sect_scientific_outfit_immunities
 
 ; RESISTANCE
-burn_protection	=	0.6
-shock_protection	=	0.66
-radiation_protection	=	0.8
-telepatic_protection	=	0.6
-chemical_burn_protection	=	0.85
-strike_protection	=	0.53
-wound_protection	=	0.56
-explosion_protection	=	0.48
-fire_wound_protection	=	0.40 ;fake parameter real values in bones_koeff_protection below
-
-bones_koeff_protection = kombez_kupol_damage
+burn_protection 	 = 	0.50
+shock_protection 	 = 	0.50
+chemical_burn_protection 	 = 	0.70
+radiation_protection 	 = 	0.75
+telepatic_protection 	 = 	0.30
+strike_protection 	 = 	0.15
+wound_protection	 = 	0.35
+explosion_protection 	 = 	0.25
 
 ; Параметры для ремонта
 tech_complication          = 800
@@ -750,9 +807,9 @@ repair_compatibility     = scientific_outfit
 ;---------------------------------------------------------------------------------------------
 ;		Бандиты
 ;---------------------------------------------------------------------------------------------
-;		ПЛАЩ БАНДИТА ВЕТЕРАНА
+;		ПЛАЩ БАНДИТА ВЕТЕРАНА (БРИГАДИРА)
 ;---------------------------------------------------------------------------------------------
-[bandit_plash]:base_bandit_stalker_outfit_advanced
+[bandit_plash]:stalker_outfit
 $spawn 			= "outfit\bandit_plash"
 visual          = equipments\bandit_plash
 actor_visual	=	actors\hero\stalker_bandit_plasch_actor.ogf
@@ -772,15 +829,17 @@ power_loss      = 1.1
 
 cost				= 39000
 
+bones_koeff_protection = armor_2_1_1
+
 ; RESISTANCE
-burn_protection	=	0.30
-shock_protection	=	0.40
-radiation_protection	=	0.30
-telepatic_protection	=	0.0
-chemical_burn_protection	=	0.35
-strike_protection	=	0.35
-wound_protection	=	0.38
-explosion_protection	=	0.30
+burn_protection 	 = 	0.45
+shock_protection 	 = 	0.15
+chemical_burn_protection 	 = 	0.35
+radiation_protection 	 = 	0.25
+telepatic_protection 	 = 	0.10
+strike_protection 	 = 	0.35
+wound_protection	 = 	0.40
+explosion_protection 	 = 	0.30
 
 immunities_sect			= sect_bandit_plash_immunities
 
@@ -825,17 +884,19 @@ power_loss      = 1.1
 
 cost				= 47080
 
+bones_koeff_protection = armor_3_1_1
+
 bleeding_restore_speed			= -0.006
 
 ; RESISTANCE
-burn_protection	=	0.35
-shock_protection	=	0.45
-radiation_protection	=	0.32
-telepatic_protection	=	0.0
-chemical_burn_protection	=	0.40
-strike_protection	=	0.40
-wound_protection	=	0.38
-explosion_protection	=	0.35
+burn_protection 	 = 	0.50
+shock_protection 	 = 	0.15
+chemical_burn_protection 	 = 	0.35
+radiation_protection 	 = 	0.25
+telepatic_protection 	 = 	0.10
+strike_protection 	 = 	0.45
+wound_protection	 = 	0.45
+explosion_protection 	 = 	0.35
 
 immunities_sect			= sect_bandit_plash_m1_immunities
 
@@ -877,20 +938,19 @@ power_loss      = 1.15
 
 cost				= 28400
 
+bones_koeff_protection = armor_3_1_1
+
 immunities_sect		= sect_dolg_outfit_immunities
 
 ; RESISTANCE
-burn_protection	=	0.23
-shock_protection	=	0.4
-radiation_protection	=	0.27
-telepatic_protection	=	0.1
-chemical_burn_protection	=	0.32
-strike_protection	=	0.36
-wound_protection	=	0.39
-explosion_protection	=	0.41
-fire_wound_protection	=	0.40 ;fake parameter real values in bones_koeff_protection below
-
-bones_koeff_protection = kombez_antigas_damage
+burn_protection 	 = 	0.15
+shock_protection 	 = 	0.15
+chemical_burn_protection 	 = 	0.10
+radiation_protection 	 = 	0.20
+telepatic_protection 	 = 	0.00
+strike_protection 	 = 	0.20
+wound_protection	 = 	0.35
+explosion_protection 	 = 	0.30
 
 ; Параметры для ремонта
 tech_complication          = 650
@@ -922,8 +982,10 @@ description			= dolg_outfit_exo1_description
 full_icon_name		= npc_icon_dolg_outfit_exo1
 cost				= 40400
 
-strike_protection	=	0.4
-wound_protection	=	0.42
+; RESISTANCE
+strike_protection 	 = 	0.22
+wound_protection	 = 	0.37
+explosion_protection 	 = 	0.32
 
 power_loss      = 0.11
 additional_inventory_weight = 50
@@ -938,7 +1000,6 @@ exo_section = exo1
 
 [dolg_outfit_exo1_repair]:dolg_outfit_repair
 
-
 [dolg_outfit_exo2]:dolg_outfit_exo1,heavy_exo_visual_base
 $spawn 			= "outfit\dolg_outfit_exo2"
 inv_weight			= 37.5
@@ -950,11 +1011,17 @@ description			= dolg_outfit_exo2_description
 full_icon_name		= npc_icon_dolg_outfit_exo2
 cost				= 51400
 
-radiation_protection	=	0.28
-telepatic_protection	=	0.12
-strike_protection	=	0.51
-wound_protection	=	0.54
-explosion_protection	=	0.48
+bones_koeff_protection = armor_5_4_1
+
+; RESISTANCE
+burn_protection 	 = 	0.27
+shock_protection 	 = 	-0.13
+chemical_burn_protection 	 = 	0.20
+radiation_protection 	 = 	0.40
+telepatic_protection 	 = 	0.30
+strike_protection 	 = 	0.53
+wound_protection	 = 	0.73
+explosion_protection 	 = 	0.53
 
 ; Параметры для ремонта
 tech_complication          = 650
@@ -985,10 +1052,17 @@ full_icon_name		= npc_icon_dolg_outfit_m1
 
 cost				= 32340
 
-burn_protection	=	0.24
-strike_protection	=	0.4
-wound_protection	=	0.61
-explosion_protection	=	0.44
+bones_koeff_protection = armor_3_1_2
+
+; RESISTANCE
+burn_protection 	 = 	0.15
+shock_protection 	 = 	0.15
+chemical_burn_protection 	 = 	0.10
+radiation_protection 	 = 	0.20
+telepatic_protection 	 = 	0.00
+strike_protection 	 = 	0.25
+wound_protection	 = 	0.45
+explosion_protection 	 = 	0.35
 
 additional_inventory_weight = 10
 additional_inventory_weight2 = 10
@@ -1018,8 +1092,10 @@ description			= dolg_outfit_m1_exo1_description
 full_icon_name		= npc_icon_dolg_outfit_m1_exo1
 cost				= 44340
 
-strike_protection	=	0.41
-wound_protection	=	0.63
+; RESISTANCE
+strike_protection 	 = 	0.27
+wound_protection	 = 	0.47
+explosion_protection 	 = 	0.37
 
 power_loss      = 0.11
 additional_inventory_weight = 60
@@ -1045,11 +1121,17 @@ description			= dolg_outfit_m1_exo2_description
 full_icon_name		= npc_icon_dolg_outfit_m1_exo2
 cost				= 55340
 
-radiation_protection	=	0.28
-telepatic_protection	=	0.12
-strike_protection	=	0.53
-wound_protection	=	0.76
-explosion_protection	=	0.51
+bones_koeff_protection = armor_5_4_2
+
+; RESISTANCE
+burn_protection 	 = 	0.27
+shock_protection 	 = 	-0.13
+chemical_burn_protection 	 = 	0.20
+radiation_protection 	 = 	0.40
+telepatic_protection 	 = 	0.30
+strike_protection 	 = 	0.57
+wound_protection	 = 	0.80
+explosion_protection 	 = 	0.57
 
 ; Параметры для ремонта
 tech_complication       = 1200
@@ -1089,20 +1171,19 @@ power_loss      = 1.25
 
 cost				= 59620
 
+bones_koeff_protection = armor_4_2_3
+
 immunities_sect			= sect_svoboda_heavy_outfit_immunities
 
 ; RESISTANCE
-burn_protection	=	0.4
-shock_protection	=	0.46
-radiation_protection	=	0.5
-telepatic_protection	=	0.34
-chemical_burn_protection	=	0.65
-strike_protection	=	0.73
-wound_protection	=	0.76
-explosion_protection	=	0.55
-fire_wound_protection	=	0.40 ;fake parameter real values in bones_koeff_protection below
-
-bones_koeff_protection = kombez_antigas_damage
+burn_protection 	 = 	0.15
+shock_protection 	 = 	0.00
+chemical_burn_protection 	 = 	0.20
+radiation_protection 	 = 	0.30
+telepatic_protection 	 = 	0.15
+strike_protection 	 = 	0.50
+wound_protection	 = 	0.70
+explosion_protection 	 = 	0.45
 
 ; Параметры для ремонта
 tech_complication          = 1000
@@ -1135,8 +1216,10 @@ description			= svoboda_heavy_outfit_exo1_description
 full_icon_name		= npc_icon_svoboda_heavy_outfit_exo1
 cost				= 71620
 
-strike_protection	=	0.76
-wound_protection	=	0.78
+; RESISTANCE
+strike_protection 	 = 	0.52
+wound_protection	 = 	0.77
+explosion_protection 	 = 	0.47
 
 power_loss      = 0.135
 additional_inventory_weight = 50
@@ -1162,10 +1245,17 @@ description			= svoboda_heavy_outfit_exo2_description
 full_icon_name		= npc_icon_svoboda_heavy_outfit_exo2
 cost				= 82620
 
-telepatic_protection	=	0.36
-strike_protection	=	0.82
-wound_protection	=	0.80
-explosion_protection	=	0.60
+bones_koeff_protection = armor_5_4_3
+
+; RESISTANCE
+burn_protection 	 = 	0.27
+shock_protection 	 = 	-0.23
+chemical_burn_protection 	 = 	0.27
+radiation_protection 	 = 	0.47
+telepatic_protection 	 = 	0.40
+strike_protection 	 = 	0.73
+wound_protection	 = 	0.97
+explosion_protection 	 = 	0.63
 
 ; Параметры для ремонта
 tech_complication          = 1000
@@ -1201,24 +1291,23 @@ inv_grid_x			= 47
 inv_grid_y			= 0
 full_icon_name		= npc_icon_killer_outfit
 
+immunities_sect			= sect_killer_outfit_immunities
+
 power_loss      = 1.1
 
 cost				= 32600
 
-immunities_sect			= sect_killer_outfit_immunities
+bones_koeff_protection = armor_3_1_1
 
 ; RESISTANCE
-burn_protection	=	0.23
-shock_protection	=	0.4
-radiation_protection	=	0.27
-telepatic_protection	=	0.0
-chemical_burn_protection	=	0.3
-strike_protection	=	0.5
-wound_protection	=	0.53
-explosion_protection	=	0.40
-fire_wound_protection	=	0.33 ;fake parameter real values in bones_koeff_protection below
-
-bones_koeff_protection = gilet_antigas_damage
+burn_protection 	 = 	0.15
+shock_protection 	 = 	0.00
+chemical_burn_protection 	 = 	0.10
+radiation_protection 	 = 	0.15
+telepatic_protection 	 = 	0.00
+strike_protection 	 = 	0.25
+wound_protection	 = 	0.35
+explosion_protection 	 = 	0.30
 
 ; Параметры для ремонта
 tech_complication          = 300
@@ -1250,8 +1339,10 @@ description			= killer_outfit_exo1_description
 full_icon_name		= npc_icon_killer_outfit_exo1
 cost				= 44600
 
-strike_protection	=	0.53
-wound_protection	=	0.55
+; RESISTANCE
+strike_protection 	 = 	0.27
+wound_protection	 = 	0.37
+explosion_protection 	 = 	0.32
 
 power_loss      = 0.12
 additional_inventory_weight = 50
@@ -1277,11 +1368,17 @@ description			= killer_outfit_exo2_description
 full_icon_name		= npc_icon_killer_outfit_exo2
 cost				= 55600
 
-radiation_protection	=	0.28
-telepatic_protection	=	0.02
-strike_protection	=	0.65
-wound_protection	=	0.68
-explosion_protection	=	0.50
+bones_koeff_protection = armor_5_4_1
+
+; RESISTANCE
+burn_protection 	 = 	0.27
+shock_protection 	 = 	-0.23
+chemical_burn_protection 	 = 	0.20
+radiation_protection 	 = 	0.37
+telepatic_protection 	 = 	0.30
+strike_protection 	 = 	0.57
+wound_protection	 = 	0.73
+explosion_protection 	 = 	0.53
 
 ; Параметры для ремонта
 tech_complication          = 300
@@ -1307,18 +1404,22 @@ full_icon_name		            = npc_icon_outfit_killer_m1
 description						= killer_outfit_description_m1
 inv_weight			            = 5.5
 
-; RESISTANCE
-burn_protection	=	0.24
-strike_protection	=	0.52
-wound_protection	=	0.55
-explosion_protection	=	0.45
-fire_wound_protection	=	0.40 ;fake parameter real values in bones_koeff_protection below
+cost				= 33000
 
-bones_koeff_protection			= kombez_antigas_damage
+bones_koeff_protection = armor_3_1_2
+
+; RESISTANCE
+burn_protection 	 = 	0.15
+shock_protection 	 = 	-0.25
+chemical_burn_protection 	 = 	0.10
+radiation_protection 	 = 	0.15
+telepatic_protection 	 = 	0.00
+strike_protection 	 = 	0.35
+wound_protection	 = 	0.45
+explosion_protection 	 = 	0.35
+
 inv_grid_x						= 47
 inv_grid_y						= 3
-
-cost				= 33000
 
 ; Параметры для ремонта
 repair_compatibility     = middle_outfit
@@ -1344,8 +1445,10 @@ description			= killer_outfit_exo1_description_m1
 full_icon_name		= npc_icon_outfit_killer_m1_exo1
 cost				= 45000
 
-strike_protection	=	0.55
-wound_protection	=	0.57
+; RESISTANCE
+strike_protection 	 = 	0.37
+wound_protection	 = 	0.47
+explosion_protection 	 = 	0.37
 
 power_loss      = 0.12
 additional_inventory_weight = 50
@@ -1371,11 +1474,17 @@ description			= killer_outfit_exo2_description_m1
 full_icon_name		= npc_icon_outfit_killer_m1_exo2
 cost				= 56000
 
-radiation_protection	=	0.28
-telepatic_protection	=	0.02
-strike_protection	=	0.67
-wound_protection	=	0.7
-explosion_protection	=	0.62
+bones_koeff_protection = armor_5_4_2
+
+; RESISTANCE
+burn_protection 	 = 	0.27
+shock_protection 	 = 	-0.40
+chemical_burn_protection 	 = 	0.20
+radiation_protection 	 = 	0.37
+telepatic_protection 	 = 	0.30
+strike_protection 	 = 	0.63
+wound_protection	 = 	0.80
+explosion_protection 	 = 	0.57
 
 ; Параметры для ремонта
 repair_compatibility     = middle_outfit
@@ -1394,7 +1503,7 @@ exo_section = exo2 			                    ;формат записи параметра: exo_section 
 ;---------------------------------------------------------------------------------------------
 ;		КОСТЮМ МОНОЛИТОВЦА
 ;---------------------------------------------------------------------------------------------
-[monolit_outfit]:outfit_base
+[monolit_outfit]:stalker_outfit
 $spawn 			= "outfit\monolit_outfit"
 visual          = equipments\monolit_suit
 actor_visual	= actors\hero\stalker_monolit.ogf
@@ -1418,17 +1527,14 @@ cost				= 29100
 immunities_sect			= sect_monolit_outfit_immunities
 
 ; RESISTANCE
-burn_protection	=	0.23
-shock_protection	=	0.4
-radiation_protection	=	0.68
-telepatic_protection	=	-0.2
-chemical_burn_protection	=	0.32
-strike_protection	=	0.35
-wound_protection	=	0.38
-explosion_protection	=	0.4
-fire_wound_protection	=	0.4 ;fake parameter real values in bones_koeff_protection below
-
-bones_koeff_protection = kombez_antigas_damage
+burn_protection 	 = 	0.35
+shock_protection 	 = 	0.15
+chemical_burn_protection 	 = 	0.10
+radiation_protection 	 = 	0.50
+telepatic_protection 	 = 	-0.30
+strike_protection 	 = 	0.15
+wound_protection	 = 	0.30
+explosion_protection 	 = 	0.25
 
 ; Параметры для ремонта
 tech_complication          = 600
@@ -1445,7 +1551,6 @@ chemical_burn_immunity		= 0.05
 tech_complication          = 600
 repair_compatibility     = heavy_outfit
 
-
 [monolit_outfit_exo1]:monolit_outfit,light_exo_visual_base
 $spawn 			= "outfit\monolit_outfit_exo1"
 visual          = equipments\exoskelet	
@@ -1460,8 +1565,10 @@ description			= monolit_outfit_exo1_description
 full_icon_name		= npc_icon_monolit_outfit_exo1
 cost				= 41100
 
-strike_protection	=	0.38
-wound_protection	=	0.4
+; RESISTANCE
+strike_protection 	 = 	0.17
+wound_protection	 = 	0.32
+explosion_protection 	 = 	0.27
 
 power_loss      = 0.12
 additional_inventory_weight = 50
@@ -1487,11 +1594,17 @@ description			= monolit_outfit_exo2_description
 full_icon_name		= npc_icon_monolit_outfit_exo2
 cost				= 52100
 
-radiation_protection	=	0.7
-telepatic_protection	=	-0.18
-strike_protection	=	0.5
-wound_protection	=	0.53
-explosion_protection	=	0.47
+bones_koeff_protection = armor_5_4_1
+
+; RESISTANCE
+burn_protection 	 = 	0.40
+shock_protection 	 = 	-0.13
+chemical_burn_protection 	 = 	0.20
+radiation_protection 	 = 	0.60
+telepatic_protection 	 = 	0.10
+strike_protection 	 = 	0.50
+wound_protection	 = 	0.70
+explosion_protection 	 = 	0.50
 
 ; Параметры для ремонта
 tech_complication          = 600
@@ -1519,7 +1632,8 @@ full_icon_name		= npc_icon_monolit_outfit_m1
 
 cost				= 54740
 
-telepatic_protection	=	0.8
+; RESISTANCE
+telepatic_protection	=	0.7
 
 ; Параметры для ремонта
 tech_complication          = 800
@@ -1544,10 +1658,13 @@ inv_name			= monolit_outfit_exo1_m1_name
 inv_name_short		= monolit_outfit_exo1_m1_name
 description			= monolit_outfit_exo1_m1_description
 full_icon_name		= npc_icon_monolit_outfit_m1_exo1
+
 cost				= 66740
 
-strike_protection	=	0.38
-wound_protection	=	0.42
+; RESISTANCE
+strike_protection 	 = 	0.17
+wound_protection	 = 	0.32
+explosion_protection 	 = 	0.27
 
 power_loss      = 0.12
 additional_inventory_weight = 50
@@ -1573,11 +1690,17 @@ description			= monolit_outfit_exo2_m1_description
 full_icon_name		= npc_icon_monolit_outfit_m1_exo2
 cost				= 77740
 
-radiation_protection	=	0.7
-telepatic_protection	=	0.82
-strike_protection	=	0.5
-wound_protection	=	0.53
-explosion_protection	=	0.47
+bones_koeff_protection = armor_5_4_1
+
+; RESISTANCE
+burn_protection 	 = 	0.40
+shock_protection 	 = 	-0.13
+chemical_burn_protection 	 = 	0.20
+radiation_protection 	 = 	0.60
+telepatic_protection 	 = 	0.77
+strike_protection 	 = 	0.50
+wound_protection	 = 	0.70
+explosion_protection 	 = 	0.50
 
 ; Параметры для ремонта
 tech_complication          = 800
@@ -1612,20 +1735,20 @@ cost			= 70600
 
 power_loss      = 0.08
 
+bones_koeff_protection = armor_5_4_1
+
 ; RESISTANCE
-burn_protection	=	0.25
-shock_protection	=	0.43
-radiation_protection	=	0.7
-telepatic_protection	=	-0.25
-chemical_burn_protection	=	0.7
-strike_protection	=	0.7
-wound_protection	=	0.8
-explosion_protection	=	0.55
-fire_wound_protection	=	0.55 ;fake parameter real values in bones_koeff_protection below
+burn_protection 	 = 	0.40
+shock_protection 	 = 	-0.13
+chemical_burn_protection 	 = 	0.20
+radiation_protection 	 = 	0.65
+telepatic_protection 	 = 	-0.30
+strike_protection 	 = 	0.50
+wound_protection	 = 	0.70
+explosion_protection 	 = 	0.50
 
 health_restore_speed			= 0.0007
 immunities_sect			        = sect_exo_outfit_immunities
-bones_koeff_protection			= exo_helmet_damage
 
 additional_inventory_weight		= 50
 additional_inventory_weight2	= 60
@@ -1668,18 +1791,17 @@ cost				= 48000
 
 immunities_sect			= sect_ecolog_outfit_immunities
 
-; RESISTANCE
-burn_protection	=	0.74
-shock_protection	=	0.87
-radiation_protection	=	0.9
-telepatic_protection	=	0.7
-chemical_burn_protection	=	0.93
-strike_protection	=	0.15
-wound_protection	=	0.18
-explosion_protection	=	0.2
-fire_wound_protection	=	0.27 ;fake parameter real values in bones_koeff_protection below
+bones_koeff_protection = armor_1_1_1
 
-bones_koeff_protection = kurtka_kupol_damage
+; RESISTANCE
+burn_protection 	 = 	0.65
+shock_protection 	 = 	0.85
+chemical_burn_protection 	 = 	0.85
+radiation_protection 	 = 	0.80
+telepatic_protection 	 = 	0.50
+strike_protection 	 = 	0.15
+wound_protection	 = 	0.15
+explosion_protection 	 = 	0.15
 
 ; Параметры для ремонта
 tech_complication          = 800
@@ -1725,18 +1847,17 @@ cost				= 59510
 
 immunities_sect			= sect_protection_outfit_immunities
 
-; RESISTANCE
-burn_protection	=	0.74
-shock_protection	=	0.87
-radiation_protection	=	0.9
-telepatic_protection	=	0.7
-chemical_burn_protection	=	0.93
-strike_protection	=	0.32
-wound_protection	=	0.34
-explosion_protection	=	0.38
-fire_wound_protection	=	0.38 ;fake parameter real values in bones_koeff_protection below
+bones_koeff_protection = armor_2_1_1
 
-bones_koeff_protection = kombez_kupol_damage
+; RESISTANCE
+burn_protection 	 = 	0.75
+shock_protection 	 = 	0.95
+chemical_burn_protection 	 = 	0.95
+radiation_protection 	 = 	0.90
+telepatic_protection 	 = 	0.65
+strike_protection 	 = 	0.30
+wound_protection	 = 	0.25
+explosion_protection 	 = 	0.30
 
 ; Параметры для ремонта
 tech_complication          = 1000
@@ -1783,19 +1904,17 @@ cost				= 22400
 
 immunities_sect			= sect_soldier_outfit_immunities
 
+bones_koeff_protection = armor_2_0_0
+
 ; RESISTANCE
-burn_protection	=	0.21
-shock_protection	=	0.2
-radiation_protection	=	0.17
-telepatic_protection	=	0.0
-chemical_burn_protection	=	0.2
-strike_protection	=	0.43
-wound_protection	=	0.40
-explosion_protection	=	0.35
-fire_wound_protection	=	0.29 ;fake parameter real values in bones_koeff_protection below
-
-bones_koeff_protection = gilet_mask_damage
-
+burn_protection 	 = 	0.15
+shock_protection 	 = 	0.00
+chemical_burn_protection 	 = 	0.10
+radiation_protection 	 = 	0.15
+telepatic_protection 	 = 	0.00
+strike_protection 	 = 	0.15
+wound_protection	 = 	0.25
+explosion_protection 	 = 	0.25
 
 ; Параметры для ремонта
 tech_complication          = 250
@@ -1834,8 +1953,10 @@ description			= outfit_soldier_exo1_description
 full_icon_name		= npc_icon_soldier_outfit_exo1
 cost				= 44400
 
-strike_protection	=	0.55
-wound_protection	=	0.58
+; RESISTANCE
+strike_protection 	 = 	0.15
+wound_protection	 = 	0.25
+explosion_protection 	 = 	0.25
 
 power_loss      = 0.12
 additional_inventory_weight		= 50
@@ -1861,11 +1982,17 @@ description			= outfit_soldier_exo2_description
 full_icon_name		= npc_icon_soldier_outfit_exo2
 cost				= 55400
 
-radiation_protection	=	0.19
-telepatic_protection	=	0.02
-strike_protection	=	0.55
-wound_protection	=	0.58
-explosion_protection	=	0.40
+bones_koeff_protection = armor_5_4_0
+
+; RESISTANCE
+burn_protection 	 = 	0.27
+shock_protection 	 = 	-0.23
+chemical_burn_protection 	 = 	0.20
+radiation_protection 	 = 	0.37
+telepatic_protection 	 = 	0.30
+strike_protection 	 = 	0.50
+wound_protection	 = 	0.67
+explosion_protection 	 = 	0.50
 
 ; Параметры для ремонта
 tech_complication          = 250
@@ -1905,18 +2032,17 @@ cost				= 44100
 
 immunities_sect			= sect_specops_outfit_immunities
 
-; RESISTANCE
-burn_protection	=	0.4
-shock_protection	=	0.33
-radiation_protection	=	0.3
-telepatic_protection	=	0.1
-chemical_burn_protection	=	0.4
-strike_protection	=	0.7
-wound_protection	=	0.73
-explosion_protection	=	0.46
-fire_wound_protection	=	0.45 ;fake parameter real values in bones_koeff_protection below
+bones_koeff_protection = armor_4_3_1
 
-bones_koeff_protection = kombez_helmet_damage
+; RESISTANCE
+burn_protection 	 = 	0.45
+shock_protection 	 = 	0.35
+chemical_burn_protection 	 = 	0.25
+radiation_protection 	 = 	0.45
+telepatic_protection 	 = 	0.15
+strike_protection 	 = 	0.45
+wound_protection	 = 	0.65
+explosion_protection 	 = 	0.45
 
 ; Параметры для ремонта
 tech_complication          = 650
@@ -1924,7 +2050,7 @@ repair_compatibility     = heavy_outfit
 
 ; Параметры для экзоскелетов
 exo1 = specops_outfit_exo1
-;exo2 = specops_outfit_exo2 ; невозможно одеть из-за крупногабаритного бронекостюма, мешающего одеванию бронекирасы
+;exo2 = specops_outfit_exo2 ; невозможно одеть из-за крупногабаритного бронекостюма, мешающего одеванию бронекирасы экзоскелета
 
 [sect_specops_outfit_immunities]:sect_stalker_outfit_immunities
 strike_immunity				= 0.007
@@ -1951,8 +2077,10 @@ description			= specops_outfit_exo1_description
 full_icon_name		= npc_icon_specops_outfit_exo1
 cost				= 56100
 
-strike_protection	=	0.73
-wound_protection	=	0.75
+; RESISTANCE
+strike_protection 	 = 	0.45
+wound_protection	 = 	0.65
+explosion_protection 	 = 	0.45
 
 ; Параметры для ремонта
 tech_complication          = 650
@@ -1978,11 +2106,17 @@ description			= specops_outfit_exo2_description
 full_icon_name		= npc_icon_specops_outfit_exo2
 cost				= 67100
 
-radiation_protection	=	0.32
-telepatic_protection	=	0.12
-strike_protection	=	0.85
-wound_protection	=	0.88
-explosion_protection	=	0.82
+bones_koeff_protection = armor_5_4_1
+
+; RESISTANCE
+burn_protection 	 = 	0.47
+shock_protection 	 = 	0.00
+chemical_burn_protection 	 = 	0.30
+radiation_protection 	 = 	0.57
+telepatic_protection 	 = 	0.40
+strike_protection 	 = 	0.70
+wound_protection	 = 	0.93
+explosion_protection 	 = 	0.63
 
 ; Параметры для ремонта
 tech_complication          = 650
@@ -2017,7 +2151,7 @@ repair_compatibility     = heavy_outfit
 
 ; Параметры для экзоскелетов
 exo1 = outfit_specnaz_m1_exo1
-;exo2 = outfit_specnaz_m1_exo2 ; невозможно одеть из-за крупногабаритного бронекостюма, мешающего одеванию бронекирасы
+;exo2 = outfit_specnaz_m1_exo2 ; невозможно одеть из-за крупногабаритного бронекостюма, мешающего одеванию бронекирасы экзоскелета
 
 [outfit_specnaz_m1_repair]:specops_outfit_repair
 tech_complication          = 1200
@@ -2036,8 +2170,10 @@ description			= specnaz_outfit_exo1_description_m1
 full_icon_name		= npc_icon_specops_outfit_m1_exo1
 cost				= 73740
 
-strike_protection	=	0.73
-wound_protection	=	0.75
+; RESISTANCE
+strike_protection 	 = 	0.45
+wound_protection	 = 	0.65
+explosion_protection 	 = 	0.45
 
 ; Параметры для ремонта
 tech_complication          = 1200
@@ -2063,11 +2199,17 @@ description			= specnaz_outfit_exo2_description_m1
 full_icon_name		= npc_icon_specops_outfit_m1_exo2
 cost				= 84740
 
-radiation_protection	=	0.32
-telepatic_protection	=	0.12
-strike_protection	=	0.85
-wound_protection	=	0.88
-explosion_protection	=	0.82
+bones_koeff_protection = armor_5_4_1
+
+; RESISTANCE
+burn_protection 	 = 	0.47
+shock_protection 	 = 	0.00
+chemical_burn_protection 	 = 	0.30
+radiation_protection 	 = 	0.57
+telepatic_protection 	 = 	0.40
+strike_protection 	 = 	0.70
+wound_protection	 = 	0.93
+explosion_protection 	 = 	0.63
 
 ; Параметры для ремонта
 tech_complication          = 1200
@@ -2082,7 +2224,7 @@ exo_section = exo2 			                    ;формат записи параметра: exo_section 
 [outfit_specnaz_m1_exo2_repair]:outfit_specnaz_m1_repair
 
 ;---------------------------------------------------------------------------------------------
-;		ТЯЖЕЛЫЙ КОСТЮМ ВОЕННОГО СТАЛКЕРА (СКАТ-9А)
+;		КОСТЮМ ВОЕННОГО СТАЛКЕРА (СКАТ-9А)
 ;---------------------------------------------------------------------------------------------
 [military_outfit]:outfit_base
 $spawn 			= "outfit\military_outfit"
@@ -2106,18 +2248,18 @@ power_loss      = 1.2
 cost				= 60000
 
 immunities_sect			= sect_military_stalker_outfit_immunities
-; RESISTANCE
-burn_protection	=	0.8
-shock_protection	=	0.6
-radiation_protection	=	0.6
-telepatic_protection	=	0.3
-chemical_burn_protection	=	0.75
-strike_protection	=	0.9
-wound_protection	=	0.9
-explosion_protection	=	0.65
-fire_wound_protection	=	0.61 ;fake parameter real values in bones_koeff_protection below
 
-bones_koeff_protection =	armor_helmet_damage
+bones_koeff_protection = armor_3_2_2
+
+; RESISTANCE
+burn_protection 	 = 	0.60
+shock_protection 	 = 	0.55
+chemical_burn_protection 	 = 	0.55
+radiation_protection 	 = 	0.60
+telepatic_protection 	 = 	0.45
+strike_protection 	 = 	0.35
+wound_protection	 = 	0.45
+explosion_protection 	 = 	0.35
 
 ; Параметры для ремонта
 tech_complication          = 850
@@ -2155,8 +2297,10 @@ description			= military_outfit_exo1_description
 full_icon_name		= npc_icon_military_outfit_exo1
 cost				= 72000
 
-strike_protection	=	0.95
-wound_protection	=	0.95
+; RESISTANCE
+strike_protection 	 = 	0.35
+wound_protection	 = 	0.45
+explosion_protection 	 = 	0.35
 
 power_loss      = 0.13
 additional_inventory_weight = 50
@@ -2182,14 +2326,17 @@ description			= military_outfit_exo2_description
 full_icon_name		= npc_icon_military_outfit_exo2
 cost				= 83000
 
-radiation_protection	=	0.7
-telepatic_protection	=	0.4
-strike_protection	=	0.98
-wound_protection	=	0.98
-explosion_protection	=	0.91
-fire_wound_protection	=	0.7 ;fake parameter real values in bones_koeff_protection below
+bones_koeff_protection = armor_5_4_2
 
-bones_koeff_protection =	heavy_armor_helmet_damage
+; RESISTANCE
+burn_protection 	 = 	0.57
+shock_protection 	 = 	0.13
+chemical_burn_protection 	 = 	0.50
+radiation_protection 	 = 	0.67
+telepatic_protection 	 = 	0.60
+strike_protection 	 = 	0.63
+wound_protection	 = 	0.80
+explosion_protection 	 = 	0.57
 
 ; Параметры для ремонта
 tech_complication          = 850

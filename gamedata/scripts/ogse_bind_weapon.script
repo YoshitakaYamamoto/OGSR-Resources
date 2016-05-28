@@ -163,7 +163,7 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 function wpn_binder:init_addons(a,b)
 	if a == 1 and self.object:is_weapon_gl() then
-		log1("skip")
+		--log1("skip")
 		return
 	end
 	if self.extra_addon_flags ~= 0 then
