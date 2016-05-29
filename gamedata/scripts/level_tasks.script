@@ -99,6 +99,10 @@ function is_map_spot_present(sid, location)
 	return false
 end
 
+function is_map_spot_present_by_id(id, location)
+	return level.map_has_object_spot(id, location) ~= 0
+end
+
 function set_task_state(id_state, id_task, id_subtask)
 	if db.actor then
 		db.actor:set_task_state(id_state, id_task, id_subtask)

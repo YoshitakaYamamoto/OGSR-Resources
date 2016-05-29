@@ -113,36 +113,61 @@ function get_max_radlevel()
 end
 
 local anoms_to_show = {}
+local spots = {
+	"anomaly_bald_location",
+	"anomaly_minc_location",
+	"anomaly_grav_location",
+	"anomaly_rad_location",
+	"anomaly_elec_location",
+	"anomaly_burn_location",
+	"anomaly_hvat_location",
+	"anomaly_hvat_location",
+	"anomaly_liana_location",
+	"anomaly_hvat_location",
+	"anomaly_buzz_location",
+}
 
 function anomaly_binder:update()
 	get_rad_intensity(self.object)
+
 	local sid = self.object:id()
 	if not anoms_to_show[sid] then
 		anoms_to_show[sid] = false
 	end
 	local mark_text = ogse_detectors.marks_on_minimap(self.object)
-	local need_mark = ogse_detectors.need_marks_on_minimap(self.object)
-	if need_mark and mark_text ~= "none" then
-		if anoms_to_show[sid] == false then
+	if mark_text ~= "none" then
+		if level_tasks.is_map_spot_present_by_id(sid, mark_text) then
+			anoms_to_show[sid] = true
+		elseif anoms_to_show[sid] == false then
+			--log3("Called adding location by id for [%s], Spot: [%s]", sid, mark_text)
 			level_tasks.add_location_by_id(sid, mark_text, "DANGER")
 			anoms_to_show[sid] = true
 		end
-	else
-		if anoms_to_show[sid] == true then
-			level_tasks.remove_location_by_id(sid,mark_text,"DANGER")
-			anoms_to_show[sid] = false
-		end		
+	elseif anoms_to_show[sid] == true then
+		for _, n in ipairs( spots ) do
+			if level_tasks.is_map_spot_present_by_id(sid, n) then
+				--log3("Called removing location by id for [%s], Spot: [%s]", sid, n)
+				level_tasks.remove_location_by_id(sid,n,"DANGER")
+				break
+			end
+		end
+		anoms_to_show[sid] = false
 	end
 end
 
 function anomaly_binder:net_destroy()
-	if radzone_deeps[self.object:id()] then
-		radzone_deeps[self.object:id()] = nil
+	local sid = self.object:id()
+	if radzone_deeps[sid] then
+		radzone_deeps[sid] = nil
 	end
-	if anoms_to_show[self.object:id()] == true then
-		local mark_text = ogse_detectors.marks_on_minimap(self.object)
-		level_tasks.remove_location_by_id(self.object:id(),mark_text,"DANGER")
-		anoms_to_show[self.object:id()] = false
+	if anoms_to_show[sid] == true then
+		for _, n in ipairs( spots ) do
+			if level_tasks.is_map_spot_present_by_id(sid, n) then
+				--log3("Called removing location by id for [%s], Spot: [%s]", sid, n)
+				level_tasks.remove_location_by_id(sid,n,"DANGER")
+				break
+			end
+		end
+		anoms_to_show[sid] = false
 	end	
---	log3("[anomaly_binder:net_destroy] name=%s, id=%d", self.object:name(), self.object:id())
 end

@@ -71,9 +71,8 @@ local detectors_presets = {
 		["_mosquito_bald"] = true,
 		["_mincer"] = true,
 		["_gravi_zone"] = true,
-		["_radioactive"] = false,
 		["_witches_galantine"] = false,
-		["_mine_field"] = false,
+		--["_mine_field"] = false,
 		["_zharka_static"] = false,
 		["_ameba"] = false,
 		["_hvatalka"] = false,
@@ -85,9 +84,8 @@ local detectors_presets = {
 		["_mosquito_bald"] = true,
 		["_mincer"] = true,
 		["_gravi_zone"] = true,
-		["_radioactive"] = true,
 		["_witches_galantine"] = true,
-		["_mine_field"] = false,
+		--["_mine_field"] = false,
 		["_zharka_static"] = true,
 		["_ameba"] = false,
 		["_hvatalka"] = false,
@@ -99,9 +97,8 @@ local detectors_presets = {
 		["_mosquito_bald"] = true,
 		["_mincer"] = true,
 		["_gravi_zone"] = true,
-		["_radioactive"] = true,
 		["_witches_galantine"] = true,
-		["_mine_field"] = false,
+		--["_mine_field"] = false,
 		["_zharka_static"] = true,
 		["_ameba"] = true,
 		["_hvatalka"] = true,
@@ -184,35 +181,25 @@ function actor_has_elite_detector()
 end
 
 function marks_on_minimap(obj)
-	local mark = "none"
+	if
+		not actor_has_detector()
+		or obj:position():distance_to(db.actor:position()) > map_radius
+	then
+		return "none"
+	end
+
 	if obj then
 		local detector_marks = minimap_detectors[last_detector_sect]
 		if detector_marks then
 			local sect = obj:section()
 			for k, v in pairs(detector_marks) do
 				if string.find(sect, k) and not string.find(sect, "nodetect") then
-					mark = v
-					return mark
+					return v
 				end
 			end
 		end	
 	end
 	return "none"
-end
-
-function need_marks_on_minimap(obj)
-	if	not actor_has_detector()
-		or not is_detectable_by_current_detector(obj)
-	then
-		return false
-	end
-
-	local dist_to_actor = obj:position():distance_to(db.actor:position())
-	local sect = obj:section()
-	if dist_to_actor <= map_radius then
-		return true
-	end
-	return false
 end
 
 function is_detectable_by_current_detector(obj)
