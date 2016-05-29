@@ -1249,12 +1249,12 @@ end
 
 -- Колбэк на появление предмета в инвентаре ГГ
 function on_item_take(obj)
-	if --[[db.actor and]] obj:section() == "wpn_montirovka" and db.actor:dont_has_info("player_have_crowbar") and level.name() == "l06_rostok" then
+	if obj:section() == "wpn_montirovka" and db.actor:dont_has_info("player_have_crowbar") and level.name() == "l06_rostok" then
 		soundtrack.rostok_gordon()
 		db.actor:give_info_portion("player_have_crowbar")
 		return true
-	elseif obj:section() == "book_1" then
-		db.actor:give_info_portion ("prof_zapiska_find")
+	elseif obj:section() == "book_1" and db.actor:dont_has_info("prof_zapiska_find") then
+		db.actor:give_info_portion("prof_zapiska_find")
 		return true
 	end
 end
@@ -1269,7 +1269,7 @@ local anom_enum = time_global()
 
 local watchdog --НЕ ТРОГАТЬ! Здесь не должно быть никакого значения!
 local func --Тоже самое.
-local watchdog_tbl = { --АПДЕЙТЫ С НИЗКИМ ПРИОРИТЕТОМ ПОМЕЩАТЬ СЮДА!
+local watchdog_tbl = { --АПДЕЙТЫ С НИЗКИМ ПРИОРИТЕТОМ!
 function()
 	ogse_debug.process_actor("upd", 11)
 	if db.actor.radiation >= 0.7 then --Вывод сообщения о большой радиации
@@ -1411,14 +1411,6 @@ function()
 end,
 ------------------------------------------------Квестовые апдейты---------------------------------------------
 function()
-	ogse_debug.process_actor("upd_a", 481)
-	ogse_quests.check_gorkom_books()
-end,
-function()
-	ogse_debug.process_actor("upd_a", 482)
-	ogse_quests.check_colonel_dead()
-end,
-function()
 	ogse_debug.process_actor("upd_a", 29)
 	ogse_quests_fix.check_radar_off() -- Багфикс радара
 end,
@@ -1427,20 +1419,8 @@ end,
 	ogsm_quests.actor_af_transmut_8_fx() -- Постэффект ношения "Ока" актором
 end,]]
 function()
-	ogse_debug.process_actor("upd_a", 42)
-	jekan_work.check_bind_avail_six_anom_house_items()
-end,
-function()
-	ogse_debug.process_actor("upd_a", 5)	
-	ogse_quests.play_digger_motor_sound()	
-end,
-function()
 	ogse_debug.process_actor("upd_a", 8)
 	ogse_teleport_art_quest.check_actor_leave_zone()
-end,
-function()
-	ogse_debug.process_actor("upd_a", 14)
-	ogse_quests.make_colonel_follow()
 end,
 function()
 	ogse_debug.process_actor("upd_a", 22)

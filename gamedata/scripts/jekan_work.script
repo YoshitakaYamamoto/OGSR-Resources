@@ -2,7 +2,8 @@
 -- 03.02.2012 --------------------------------------------------------------------------------------
 
 function attach(sm)
-	sm:subscribe({signal = "on_drop", fun = this.check_generator})
+	sm:subscribe({signal = "on_drop",		fun = this.check_generator})
+	sm:subscribe({signal = "on_update",		fun = this.check_bind_avail_six_anom_house_items, queued = true})
 end
 
 local spawn_db = ogse_spawn_db.script_spawn_registry.jekan_quests

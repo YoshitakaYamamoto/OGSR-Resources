@@ -13,6 +13,10 @@ function attach(sm)
 	sm:subscribe({ signal = "on_storyline_start", fun = this.spawn_black_dealer })
 	sm:subscribe({ signal = "on_storyline_start", fun = this.scape_doors_start })
 	sm:subscribe({ signal = "on_spawn",			fun = this.dar_stalker_explorer_spawn })
+	sm:subscribe({signal = "on_update",			fun = this.check_gorkom_books, queued = true})
+	sm:subscribe({signal = "on_update",			fun = this.check_colonel_dead, queued = true})
+	sm:subscribe({signal = "on_update",			fun = this.play_digger_motor_sound, queued = true})
+	sm:subscribe({signal = "on_update",			fun = this.make_colonel_follow, queued = true})
 end
 
 --/ спавн квестовых предметов для OGSE и скриптовые квесты /--
@@ -834,8 +838,7 @@ local start_particle = "anomaly2\\emi_damage_big_electra"
 local dust_particle = "nc\\fog_base"
 
 function play_digger_motor_sound()
-	local lname = level.name()
-	if lname == "l03u_agr_underground" and db.actor:has_info("diggers_pda_info") then
+	if level.name() == "l03u_agr_underground" and db.actor:has_info("diggers_pda_info") then
 		local hasanom,anomid,pos,cls,dist,radius,sect = ogse_anomaly.get_nearest_anomaly_by_point(motor_pos)
 		if hasanom and dist < 2 and string.find(sect, "zone_witches_galantine") then
 			if not db.actor:has_info("diggers_motor") then 
