@@ -38,6 +38,7 @@ end
 
 local detector_hud_active = false
 local upgrade_mode_active = false
+local hud_tip_text = "clean"
 
 local upgrade_frequency = 0
 local snd_beep = xr_sound.get_safe_sound_object("detectors\\da-2_beep1")
@@ -223,9 +224,11 @@ function set_hud_tip_clean()
 		hud:AddCustomStatic("detector_upgrade_hud", true)
 		info = hud:GetCustomStatic("detector_upgrade_hud"):wnd()
 		info:SetText("")
+		hud_tip_text = "clean"
 	else
 		info = hud:GetCustomStatic("detector_upgrade_hud"):wnd()
 		info:SetText("")
+		hud_tip_text = "clean"
 	end
 end
 
@@ -236,9 +239,11 @@ function set_hud_tip_normal()
 		hud:AddCustomStatic("detector_upgrade_hud", true)
 		info = hud:GetCustomStatic("detector_upgrade_hud"):wnd()
 		info:SetText(game.translate_string("detector_normal_tip"))
+		hud_tip_text = "normal"
 	else
 		info = hud:GetCustomStatic("detector_upgrade_hud"):wnd()
 		info:SetText(game.translate_string("detector_normal_tip"))
+		hud_tip_text = "normal"
 	end
 end
 
@@ -249,94 +254,60 @@ function set_hud_tip_upgrade()
 		hud:AddCustomStatic("detector_upgrade_hud", true)
 		info = hud:GetCustomStatic("detector_upgrade_hud"):wnd()
 		info:SetText(game.translate_string("detector_upgrade_tip"))
+		hud_tip_text = "upgrade"
 	else
 		info = hud:GetCustomStatic("detector_upgrade_hud"):wnd()
 		info:SetText(game.translate_string("detector_upgrade_tip"))
+		hud_tip_text = "upgrade"
 	end
 end
 
 function on_key_down(key, bind)
-	if not db.actor or not db.actor:alive() then return end -- нет актора - нечего делать
 	if level.main_input_receiver() then return end
-	local act_slot = db.actor:active_slot()
-	if act_slot == 8 then
-		detector_hud_active = true
-	end		
+
 	if actor_has_detector() then
+		if db.actor:active_slot() == 8 then
+			detector_hud_active = true
+		end
 		if key == DIK_keys.DIK_8 then
-			if detector_hud_active then
-				-- убираем
+			if detector_hud_active then --убираем
 				db.actor:activate_slot(-1)
 				detector_hud_active = false
-				upgrade_mode_active = false
-				set_hud_tip_clean()	
-			else
-				-- достаем
+			else --достаем
 				db.actor:activate_slot(8)
 				detector_hud_active = true
-				upgrade_mode_active = false
 			end
-		elseif bind == key_bindings.kWPN_1
-		or bind == key_bindings.kWPN_2
-		or bind == key_bindings.kWPN_3
-		or bind == key_bindings.kWPN_4
-		or bind == key_bindings.kWPN_5
-		or bind == key_bindings.kWPN_6
+		elseif
+			bind == key_bindings.kWPN_1
+			or bind == key_bindings.kWPN_2
+			or bind == key_bindings.kWPN_3
+			or bind == key_bindings.kWPN_4
+			or bind == key_bindings.kWPN_5
+			or bind == key_bindings.kWPN_6
 		then	
 			detector_hud_active = false
-			upgrade_mode_active = false
-			-- убрать подсказку по включению апгрейда
-			set_hud_tip_clean()			
 		end
-		if detector_hud_active and actor_has_elite_detector() then
-			if db.actor:object("afscanner") and upgrade_mode_active == false then
-				-- показать подсказку по включению апгрейда
-				write_log("!!IMPULSE_SCANNER show notice")
-				set_hud_tip_normal()
-			elseif not db.actor:object("afscanner") then
-				set_hud_tip_clean()
-				upgrade_mode_active = false
-				return
-			end		
-			-- DIK_RETURN          0x1C    /* Enter on main keyboard */
-			-- DIK_COMMA <
-			-- DIK_PERIOD >
-			-- DIK_SLASH /
+------------------------------------------------------------------------------------------------------------
+		if detector_hud_active == true and actor_has_elite_detector() and db.actor:object("afscanner") then
 			if key == DIK_keys.DIK_K then
-				if upgrade_mode_active == false and db.actor:object("afscanner") then
-					-- проверить если ли апгрейд и если есть включить режим, показать экранную подсказку
+				if upgrade_mode_active == false then --проверить если ли апгрейд и если есть включить режим
 					write_log("!!IMPULSE_SCANNER POWER_ON")
 					upgrade_frequency = 0
 					set_detector_mode(1, upgrade_frequency)
-					set_hud_tip_upgrade()
 					upgrade_mode_active = true
 					soundtrack.afscanner_click()
-					return
-				elseif upgrade_mode_active == true and db.actor:object("afscanner") then
-					-- если режим апгрейда активен - выключить, убрать подсказку
+				else --если режим апгрейда активен - выключить
 					write_log("!!IMPULSE_SCANNER POWER_OFF")
 					upgrade_frequency = 0
 					set_detector_mode(0, 9)
-					set_hud_tip_normal()
 					upgrade_mode_active = false
 					soundtrack.afscanner_off()
-					return
-				else
-					write_log("!!IMPULSE_SCANNER POWER_OFF NO_UPGRADE")
-					upgrade_frequency = 0
-					set_detector_mode(0, 9)
-					set_hud_tip_clean()		
-					upgrade_mode_active = false
-					return					
 				end			
-			end	
-			if upgrade_mode_active == true then
-				-- проверяем остальные клавиши бинда
-				if key == DIK_keys.DIK_RETURN then
-					-- послать импульс на этой частоте
+			end
+			if upgrade_mode_active == true then --проверяем остальные клавиши бинда
+				if key == DIK_keys.DIK_RETURN then  -- Enter --послать импульс на этой частоте
 					write_log("!!IMPULSE_SCANNER SEND_IMPULSE")
-					if not are_actor_in_strange_zone() then
-						-- мы вне зоны, предупредить
+					if not are_actor_in_strange_zone() then --мы вне зоны, предупредить
 						write_log("!!IMPULSE_SCANNER OUT_ZONE")
 						soundtrack.afscanner_click2()
 						news_manager.send_tip(db.actor, "actor_out_strangzone", nil, "anomal", 5000, nil)
@@ -344,37 +315,36 @@ function on_key_down(key, bind)
 						write_log("!!IMPULSE_SCANNER IMPULSE_SENT")
 						check_actor_in_zone_action(upgrade_frequency)
 					end
-					return
-				end
-				if key == DIK_keys.DIK_COMMA then
-					-- понизить частоту
+				elseif key == DIK_keys.DIK_COMMA then -- < --понизить частоту
 					if upgrade_frequency > 0 then
 						upgrade_frequency = upgrade_frequency - 1
 					end
 					write_log("!!IMPULSE_SCANNER SET FREQ IDX ["..tostring(upgrade_frequency).."]")
 					set_detector_mode(1, upgrade_frequency)	
 					soundtrack.afscanner_click()
-					return
-				end	
-				if key == DIK_keys.DIK_PERIOD then
-					-- повысить частоту
+				elseif key == DIK_keys.DIK_PERIOD then -- > --повысить частоту
 					if upgrade_frequency < 8 then
 						upgrade_frequency = upgrade_frequency + 1
 					end		
 					write_log("!!IMPULSE_SCANNER SET FREQ IDX ["..tostring(upgrade_frequency).."]")					
 					set_detector_mode(1, upgrade_frequency)
 					soundtrack.afscanner_click()
-					return
-				end				
+				end
+				if hud_tip_text ~= "upgrade" then
+					set_hud_tip_upgrade() --KRodin: Если включен режим апгрейда, покажем соответствующую подсказку.
+				end
+			elseif hud_tip_text ~= "normal" then
+				set_hud_tip_normal() --KRodin: Если включен обычный режим, покажем соответствующую подсказку.
 			end
-		else	
-			set_hud_tip_clean()	
-		end		
-	else
+		elseif hud_tip_text ~= "clean" then --KRodin: Если убрали детектор из рук, а подсказка с худа не убрана, то
+			dsh.timeout(900, function() --запускаем быстрый таймер на 0,9 сек. Примерно столько времени отыгрывается анимация убирания детектора.
+				detector_hud_active = false
+				set_hud_tip_clean() --Как только таймер сработал, удаляем подсказку с худа. Этот способ позволяет частично избежать проблем с её неудалением.
+			end)
+		end
+	elseif hud_tip_text ~= "clean" then
 		detector_hud_active = false
-		upgrade_mode_active = false
-		-- убрать подсказку по включению апгрейда
-		set_hud_tip_clean()					
+		set_hud_tip_clean() --KRodin: Если детектор выбросили из слота, или убрали в инвентарь, то удалим подсказку с худа при первом же нажатии любой клавиши.
 	end
 end
 
@@ -384,17 +354,17 @@ local geiger_snd = nil
 
 function on_update()
 	local det = db.actor:item_in_slot(8)
-	
+
 	-- нет детектора - выходим
 	if not det then
 		return
 	end
-	
-	-- проверка на секцию
-	local sect = det:section()
-	if sect == "interactive_detector_simple" or sect == "interactive_detector_advanced" or sect == "interactive_detector_elite" then
+
+	if actor_has_detector() then
+-------------------------------------------------------------------------------------------------------------------------------
 		-- перебор онлайновых артефактов в таблице
 		local act_pos = db.actor:position()
+		local sect = det:section()
 		local det_radius = get_u32(sect, "detection_radius", 0)
 		local i = 0
 		for id, art in pairs (db.artefacts) do
@@ -413,8 +383,8 @@ function on_update()
 			set_artefact_slot(j, 0, 0, 0)
 			j = j + 1
 		end
-
-		if sect == "interactive_detector_elite" then
+--------------------------------------------------------------------------------------------------------------------------------
+		if actor_has_elite_detector() then
 			local k = 0
 			local anm_table = ogse_anomaly.get_all_nearest_anomalies_by_point_in_radius(act_pos, det_radius)
 			-- пересчитаем радиус без учета вертикальной координаты
@@ -446,10 +416,7 @@ function on_update()
 				l = l + 1
 			end
 		end
-
-	end
-	if actor_has_detector() then
-
+--------------------------------------------------------------------------------------------------------------------------------------
 		local hasanom, anomid, pos, cls, distance, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(db.actor:position())
 		local obj = level.object_by_id(anomid)
 		if hasanom and obj and ogse_anomaly.get_anomaly_mode(anomid) ~= "anom_off" and is_detectable_by_current_detector(obj) then
@@ -474,7 +441,7 @@ function on_update()
 				end
 			end
 		end
-		
+---------------------------------------------------------------------------------------------------------------------------------------
 		local rads = ogse_dbg_anomaly_binder.get_max_radlevel()
 		if rads > 0 then
 			local rnd_val = rads
@@ -507,7 +474,6 @@ function on_update()
 				last_click = 0
 			end		
 		end
-	
+------------------------------------------------------------------------------------------------------------------------------------------
 	end
-	
 end
