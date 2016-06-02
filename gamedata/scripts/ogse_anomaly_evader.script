@@ -129,7 +129,7 @@ end
 
 
 -- как часто выполн€ть обход аномалий (в мс)
-local freq = 1000
+local freq = 100 --ѕри значени€х больше 100, неписи частенько попадают в аномалии!
 
 function update_norm(e)
   e:setFingerprint("ogse_anom_evader_update")
