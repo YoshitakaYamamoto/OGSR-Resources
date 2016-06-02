@@ -11,15 +11,10 @@
 -----------------------------------------------------------------------
 
 function attach(sm) -- для менеджера сигналов
-	--sm:subscribe({signal = "on_spawn",    fun = this.on_spawn})
-	--sm:subscribe({signal = "on_finalize", fun = this.on_finalize})
 	sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
-	--sm:subscribe({signal = "on_key_up",   fun = this.on_key_up})
-	--sm:subscribe({signal = "on_key_hold", fun = this.on_key_hold})
-	--sm:subscribe({signal = "on_wheel",    fun = this.on_wheel})
 	sm:subscribe({signal = "on_update",   fun = this.on_update})
 	sm:subscribe({signal = "on_first_update",   fun = this.on_first_update})
-	--sm:subscribe({signal = "on_info",     fun = this.on_info})
+	sm:subscribe({signal = "on_item_to_slot",	fun = this.on_item_to_slot})
 end
 
 local MAX_ARTEFACTS = 8
@@ -43,28 +38,25 @@ local hud_tip_text = "clean"
 local upgrade_frequency = 0
 local snd_beep = xr_sound.get_safe_sound_object("detectors\\da-2_beep1")
 local detect_radius = 12
-local map_radius = 30
 local beep_period = 1000
 local click_peroid = 1500
 local miminal_click_period = 120
 local miminal_beep_period = 150
 geiger_radius = 15
 
-local minimap_detectors = {
-	["interactive_detector_elite"] = {
-		["_mosquito_bald"] = "anomaly_bald_location",
-		["_mincer"] = "anomaly_minc_location",
-		["_gravi_zone"] = "anomaly_grav_location",
-		["_radioactive"] = "anomaly_rad_location",
-		["_witches_galantine"] = "anomaly_elec_location",
-	--	["_mine_field"] = "anomaly_mine_location",
-		["_zharka_static"] = "anomaly_burn_location",
-		["_ameba"] = "anomaly_hvat_location",
-		["_hvatalka"] = "anomaly_hvat_location",
-		["_liana"] = "anomaly_liana_location",
-		["_burning_fuzz"] = "anomaly_hvat_location",
-		["_buzz"] = "anomaly_buzz_location",
-	},
+minimap_detectors = {
+	["_mosquito_bald"] = "anomaly_bald_location",
+	["_mincer"] = "anomaly_minc_location",
+	["_gravi_zone"] = "anomaly_grav_location",
+	["_radioactive"] = "anomaly_rad_location",
+	["_witches_galantine"] = "anomaly_elec_location",
+	--["_mine_field"] = "anomaly_mine_location",
+	["_zharka_static"] = "anomaly_burn_location",
+	["_ameba"] = "anomaly_hvat_location",
+	["_hvatalka"] = "anomaly_hvat_location",
+	["_liana"] = "anomaly_liana_location",
+	["_burning_fuzz"] = "anomaly_hvat_location",
+	["_buzz"] = "anomaly_buzz_location",
 }
 
 local detectors_presets = {
@@ -109,7 +101,16 @@ local detectors_presets = {
 	},
 }
 
-local last_detector_sect = "__"
+local last_detector_sect = ""
+local det_radius = 0
+
+function on_item_to_slot(obj)
+	local sect = obj:section()
+	if string.find(sect, "interactive_detector") then
+		last_detector_sect = sect
+		det_radius = get_u32(sect, "detection_radius", 0)
+	end
+end
 
 local strange_zones_by_frequency = {
 	[0] = {name = "", id = 0},
@@ -160,45 +161,32 @@ function check_actor_in_zone_action(frequency)
 end
 
 function actor_has_detector()
-	if not db.actor or not db.actor:alive() then return false end -- нет актора - нечего делать
-	--if level.main_input_receiver() then return false end
 	local detector_in_slot = db.actor:item_in_slot(8)
-	if detector_in_slot and string.find(detector_in_slot:section(), "interactive_detector") then
-		last_detector_sect = detector_in_slot:section()
-		return true
-	end
-	return false
+	return ( detector_in_slot and string.find(detector_in_slot:section(), "interactive_detector") )
 end
 
 function actor_has_elite_detector()
-	if not db.actor or not db.actor:alive() then return false end -- нет актора - нечего делать
-	--if level.main_input_receiver() then return false end
 	local detector_in_slot = db.actor:item_in_slot(8)
-	if detector_in_slot and string.find(detector_in_slot:section(), "interactive_detector_elite") then
-		last_detector_sect = detector_in_slot:section()
-		return true
-	end
-	return false
+	return ( detector_in_slot and detector_in_slot:section() == "interactive_detector_elite" )
 end
 
 function marks_on_minimap(obj)
 	if
-		not actor_has_detector()
-		or obj:position():distance_to(db.actor:position()) > map_radius
+		not actor_has_elite_detector()
+		or obj:position():distance_to(db.actor:position()) > det_radius
 	then
 		return "none"
 	end
 
 	if obj then
-		local detector_marks = minimap_detectors[last_detector_sect]
-		if detector_marks then
-			local sect = obj:section()
-			for k, v in pairs(detector_marks) do
-				if string.find(sect, k) and not string.find(sect, "nodetect") then
+		local sect = obj:section()
+		if not string.find(sect, "nodetect") then
+			for k, v in pairs(minimap_detectors) do
+				if string.find(sect, k) then
 					return v
 				end
 			end
-		end	
+		end
 	end
 	return "none"
 end
@@ -207,11 +195,13 @@ function is_detectable_by_current_detector(obj)
 	local detector_preset = detectors_presets[last_detector_sect]
 	if detector_preset and obj then
 		local sect = obj:section()
-		for k, v in pairs(detector_preset) do
-			if string.find(sect, k) and not string.find(sect, "nodetect") and v == true then
-				return true
-			end
-		end	
+		if not string.find(sect, "nodetect") then
+			for k, v in pairs(detector_preset) do
+				if string.find(sect, k) and v == true then
+					return true
+				end
+			end	
+		end
 	end
 	return false
 end
@@ -353,19 +343,10 @@ local last_click = 0
 local geiger_snd = nil
 
 function on_update()
-	local det = db.actor:item_in_slot(8)
-
-	-- нет детектора - выходим
-	if not det then
-		return
-	end
-
 	if actor_has_detector() then
+		local act_pos = db.actor:position()
 -------------------------------------------------------------------------------------------------------------------------------
 		-- перебор онлайновых артефактов в таблице
-		local act_pos = db.actor:position()
-		local sect = det:section()
-		local det_radius = get_u32(sect, "detection_radius", 0)
 		local i = 0
 		for id, art in pairs (db.artefacts) do
 			-- проверяем, не в рюкзаке ли артефакт. Их детектировать не надо
@@ -417,7 +398,7 @@ function on_update()
 			end
 		end
 --------------------------------------------------------------------------------------------------------------------------------------
-		local hasanom, anomid, pos, cls, distance, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(db.actor:position())
+		local hasanom, anomid, pos, cls, distance, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(act_pos)
 		local obj = level.object_by_id(anomid)
 		if hasanom and obj and ogse_anomaly.get_anomaly_mode(anomid) ~= "anom_off" and is_detectable_by_current_detector(obj) then
 			if distance <= detect_radius then

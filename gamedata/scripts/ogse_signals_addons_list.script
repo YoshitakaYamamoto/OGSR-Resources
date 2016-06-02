@@ -10,7 +10,7 @@ addons = {
 	"ogse_bind_weapon",
 	"ogse_unist",
 	"ogse_st_mgr",
-	"ogse_detectors",
+	"ogse_detectors", --должен быть не ниже этого места!
 	"ogse_car_control",
 	"ogse_relations",
 	"ogse_grenade_switcher",
@@ -63,6 +63,6 @@ addons = {
 	"xr_sound", --должен быть перед инвентарём!
 	"inventory", --должен быть предпоследним!
 -----------------------------------------------
-	"dsh_memuse" --ПОДКЛЮЧАТЬ В САМОМ КОНЦЕ!
+	"dsh_memuse" --должен быть последним!
 -----------------------------------------------
 }
