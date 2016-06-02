@@ -104,11 +104,11 @@ end
 
 function load_rukzak( id )
   local prefix     = "dsh_rukzak." .. id
-  local sections   = ogse.load_var( prefix .. ".sections", {}, "array" )
-  local conds      = ogse.load_var( prefix .. ".conds",    {}, "array" )
-  local game_types = ogse.load_var( prefix .. ".types",    {}, "array" )
-  local counts     = ogse.load_var( prefix .. ".counts",   {}, "array" )
-  local infos      = ogse.load_var( prefix .. ".infos",    {}, "array" )
+  local sections   = ogse.load_var_safe( prefix .. ".sections", {}, "array" ) or {}
+  local conds      = ogse.load_var_safe( prefix .. ".conds",    {}, "array" ) or {}
+  local game_types = ogse.load_var_safe( prefix .. ".types",    {}, "array" ) or {}
+  local counts     = ogse.load_var_safe( prefix .. ".counts",   {}, "array" ) or {}
+  local infos      = ogse.load_var_safe( prefix .. ".infos",    {}, "array" ) or {}
   local data = {}
   for i, sect in ipairs( sections ) do
     local cond = conds[ i ]
