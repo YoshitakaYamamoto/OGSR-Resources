@@ -1,26 +1,27 @@
 -----------------------------------------------------------------------
 --- ogse_detectors.script
---- ���������� �������� ���������� � �����
---- ������: K.D., KamikaZze
+--- Скриптовая оболочка детекторов в руках
+--- Авторы: K.D., KamikaZze
 --- version 1.7.00 (23/01/2015)
+--- Доработка скрипта, исправление ошибок: KRodin © 2016
 -----------------------------------------------------------------------
---- TODO: ������� ��� ���������, ����������� ��������������� � 
---- ��������� (�������������� �������� � �.�), � ��� ������ ����
---- ������� ���������� �� ������ ����� �����������
---- ������� ������� �� ������������ ��������� ����� �����������
+--- TODO: Вынести все настройки, относящиеся непосредственно к 
+--- детектору (распознаваемые аномалии и т.п), в его конфиг вещи
+--- Сделать разделение по звукам между детекторами
+--- Сделать деление по определяемым аномалиям между детекторами
+--- Сделать для детекторов настраиваемую клавишу в опциях
 -----------------------------------------------------------------------
 
-function attach(sm) -- ��� ��������� ��������
-	sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
-	sm:subscribe({signal = "on_update",   fun = this.on_update})
-	sm:subscribe({signal = "on_first_update",   fun = this.on_first_update})
+function attach(sm)
 	sm:subscribe({signal = "on_item_to_slot",	fun = this.on_item_to_slot})
+	sm:subscribe({signal = "on_first_update",	fun = this.on_first_update})
+	sm:subscribe({signal = "on_update",			fun = this.on_update})
+	sm:subscribe({signal = "on_key_down",		fun = this.on_key_down})
 end
 
 local MAX_ARTEFACTS = 8
 
-local total_debug = get_console():get_bool("write_debug_log")
-
+local total_debug = get_con_bool("write_debug_log")
 function write_log(str)
 	if total_debug then
 		log1(str)
@@ -31,11 +32,6 @@ function on_first_update()
 	set_detector_mode(0, 9)
 end
 
-local detector_hud_active = false
-local upgrade_mode_active = false
-local hud_tip_text = "clean"
-
-local upgrade_frequency = 0
 local snd_beep = xr_sound.get_safe_sound_object("detectors\\da-2_beep1")
 local detect_radius = 12
 local beep_period = 1000
@@ -206,8 +202,11 @@ function is_detectable_by_current_detector(obj)
 	return false
 end
 
+local hud_tip_text = "clean"
 
 function set_hud_tip_clean()
+	if hud_tip_text == "clean" then return end
+
 	local hud = get_hud()
 	local info = hud:GetCustomStatic("detector_upgrade_hud")
 	if not info then
@@ -223,6 +222,8 @@ function set_hud_tip_clean()
 end
 
 function set_hud_tip_normal()
+	if hud_tip_text == "normal" then return end
+
 	local hud = get_hud()
 	local info = hud:GetCustomStatic("detector_upgrade_hud")
 	if not info then
@@ -238,6 +239,8 @@ function set_hud_tip_normal()
 end
 
 function set_hud_tip_upgrade()
+	if hud_tip_text == "upgrade" then return end
+
 	local hud = get_hud()
 	local info = hud:GetCustomStatic("detector_upgrade_hud")
 	if not info then
@@ -252,91 +255,179 @@ function set_hud_tip_upgrade()
 	end
 end
 
-function on_key_down(key, bind)
-	if level.main_input_receiver() then return end
+--******************************************[KRodin's FIX - Start]*********************************************
+local detector_hud_active = false
+local upgrade_mode_active = false
+local upgrade_frequency = 0
+local block_detector_keys = false
 
-	if actor_has_detector() then
-		if db.actor:active_slot() == 8 then
-			detector_hud_active = true
+------------------------------------------------------------------------------------------------------
+--Служебный таймер, ждущий изменение активного слота.
+--Запускается при убирании/доставании детекторов и  блокирует вызов функции "on_key_down",
+--чтобы до активации другого слота при нажатии клавиш не происходило никаких действий.
+--Это позволяет избежать различных проблем.
+--И ещё, таймер можно запускать с аргументом-функцией, которая запустится по срабатыванию таймера.
+class "slot_change_timer" (ogse_qt.quick_timer)
+function slot_change_timer:__init(fun) --Запуск таймера
+	write_log("!!Starting timer! Block detector keys!")					
+	block_detector_keys = true --Заблокируем вызов функции "on_key_down"
+	self.saved_act_slot = db.actor:active_slot() --Запоминаем активный слот
+	self.fun = fun
+end
+function slot_change_timer:condition() --Условие проверяется на каждом апдейте
+	return db.actor:active_slot() ~= self.saved_act_slot --Сработает при смене активного слота
+end
+function slot_change_timer:action() --Действие по сработавшему условию
+	write_log("!!Timer is end! Unblock detector keys")					
+	if self.fun then self.fun() end --Если вызывали с аргументом, запускаем функцию-аргумент.
+	block_detector_keys = false --Разблокируем вызов функции "on_key_down"
+end
+function start_slot_change_timer(fun) --Обёртка для упрощённого запуска (можно вызывать и без аргумента).
+	slot_change_timer(fun):start()
+end
+------------------------------------------------------------------------------------------------------
+
+function on_key_down(key, bind)
+	if block_detector_keys then --Если вызов функции не требуется
+		write_log("!!Function 'on_key_down' is blocked. Exit!")
+		return --Ничего не делать
+	end
+
+	if actor_has_detector() then --В слоте есть любой интерактивный детектор
+------------------------------------------------------------------------------------------------------
+		if
+			level.main_input_receiver() --если открыто какое-то окно
+			and not level.get_inventory_wnd():IsShown() --и это не инвентарь
+			and not level.get_pda_wnd():IsShown() --и не ПДА
+		then
+			write_log("!!Input Receiver is active. Exit!")
+			return --Ничего не делать
 		end
-		if key == DIK_keys.DIK_8 then
-			if detector_hud_active then --�������
-				db.actor:activate_slot(-1)
-				detector_hud_active = false
-			else --�������
-				db.actor:activate_slot(8)
-				detector_hud_active = true
-			end
-		elseif
-			bind == key_bindings.kWPN_1
+------------------------------------------------------------------------------------------------------
+		if db.actor:active_slot() == 8 then --Детектор в руках
+			write_log("!!Actor active slot == 8!")
+			detector_hud_active = true
+		else --Просто в слоте
+			write_log("!!Actor active slot ~= 8!")
+			detector_hud_active = false
+		end
+------------------------------------------------------------------------------------------------------
+		if
+			key == DIK_keys.DIK_8
+			or bind == key_bindings.kWPN_1
 			or bind == key_bindings.kWPN_2
 			or bind == key_bindings.kWPN_3
 			or bind == key_bindings.kWPN_4
 			or bind == key_bindings.kWPN_5
 			or bind == key_bindings.kWPN_6
-		then	
-			detector_hud_active = false
-		end
-------------------------------------------------------------------------------------------------------------
-		if detector_hud_active == true and actor_has_elite_detector() and db.actor:object("afscanner") then
-			if key == DIK_keys.DIK_K then
-				if upgrade_mode_active == false then --��������� ���� �� ������� � ���� ���� �������� �����
-					write_log("!!IMPULSE_SCANNER POWER_ON")
-					upgrade_frequency = 0
-					set_detector_mode(1, upgrade_frequency)
-					upgrade_mode_active = true
-					soundtrack.afscanner_click()
-				else --���� ����� �������� ������� - ���������
-					write_log("!!IMPULSE_SCANNER POWER_OFF")
-					upgrade_frequency = 0
-					set_detector_mode(0, 9)
-					upgrade_mode_active = false
-					soundtrack.afscanner_off()
-				end			
-			end
-			if upgrade_mode_active == true then --��������� ��������� ������� �����
-				if key == DIK_keys.DIK_RETURN then  -- Enter --������� ������� �� ���� �������
-					write_log("!!IMPULSE_SCANNER SEND_IMPULSE")
-					if not are_actor_in_strange_zone() then --�� ��� ����, ������������
-						write_log("!!IMPULSE_SCANNER OUT_ZONE")
-						soundtrack.afscanner_click2()
-						news_manager.send_tip(db.actor, "actor_out_strangzone", nil, "anomal", 5000, nil)
-					else
-						write_log("!!IMPULSE_SCANNER IMPULSE_SENT")
-						check_actor_in_zone_action(upgrade_frequency)
-					end
-				elseif key == DIK_keys.DIK_COMMA then -- < --�������� �������
-					if upgrade_frequency > 0 then
-						upgrade_frequency = upgrade_frequency - 1
-					end
-					write_log("!!IMPULSE_SCANNER SET FREQ IDX ["..tostring(upgrade_frequency).."]")
-					set_detector_mode(1, upgrade_frequency)	
-					soundtrack.afscanner_click()
-				elseif key == DIK_keys.DIK_PERIOD then -- > --�������� �������
-					if upgrade_frequency < 8 then
-						upgrade_frequency = upgrade_frequency + 1
-					end		
-					write_log("!!IMPULSE_SCANNER SET FREQ IDX ["..tostring(upgrade_frequency).."]")					
-					set_detector_mode(1, upgrade_frequency)
-					soundtrack.afscanner_click()
+		then --Если нажали клавишу доставания чего-либо из слотов 1-8 (кроме 7, там доставать нечего)
+			if detector_hud_active then --Детектор в руках - значит убираем его
+				write_log("!!Actor removes detector!")					
+				if key == DIK_keys.DIK_8 then
+					db.actor:activate_slot(-1)
 				end
-				if hud_tip_text ~= "upgrade" then
-					set_hud_tip_upgrade() --KRodin: ���� ������� ����� ��������, ������� ��������������� ���������.
-				end
-			elseif hud_tip_text ~= "normal" then
-				set_hud_tip_normal() --KRodin: ���� ������� ������� �����, ������� ��������������� ���������.
+				start_slot_change_timer(function() --Запускаем таймер на время убирания детектора.
+					set_hud_tip_clean() --Удаляем подсказку с худа
+				end)
+				return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
+			elseif key == DIK_keys.DIK_8 then --Детектора в руках нет - значит достанем его
+				write_log("!!Actor takes detector!")
+				db.actor:activate_slot(8)
+				start_slot_change_timer(function() --Запускаем таймер на время доставания детектора.
+					if
+						actor_has_elite_detector() --Если достали элитный детектор
+						and db.actor:object("afscanner") --И есть апгрейд для детектора
+					then
+						if upgrade_mode_active then
+							write_log("!!Set hud tip upgrade!")					
+							set_hud_tip_upgrade() --Включен режим апгрейда, покажем подсказку.
+						else
+							write_log("!!Set hud tip normal!")					
+							set_hud_tip_normal() --Включен обычный режим, покажем подсказку.
+						end
+					end
+				end)
+				return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
 			end
-		elseif hud_tip_text ~= "clean" then --KRodin: ���� ������ �������� �� ���, � ��������� � ���� �� ������, ��
-			dsh.timeout(900, function() --��������� ������� ������ �� 0,9 ���. �������� ������� ������� ������������ �������� �������� ���������.
-				detector_hud_active = false
-				set_hud_tip_clean() --��� ������ ������ ��������, ������� ��������� � ����. ���� ������ ��������� �������� �������� ������� � � �����������.
-			end)
 		end
-	elseif hud_tip_text ~= "clean" then
-		detector_hud_active = false
-		set_hud_tip_clean() --KRodin: ���� �������� ��������� �� �����, ��� ������ � ���������, �� ������ ��������� � ���� ��� ������ �� ������� ����� �������.
+------------------------------------------------------------------------------------------------------
+		if
+			not detector_hud_active --если в руках нет детектора
+			or not actor_has_elite_detector() --или в руках НЕ элитный детектор
+			or not db.actor:object("afscanner") --или нет апгрейда для детектора
+		then
+			write_log("!!Elite detector with afscanner not found! Deleting tip from hud!")
+			set_hud_tip_clean() --Удаляем подсказку с худа, а то она не удаляется в некоторых случаях.
+			return --больше здесь делать нечего
+		end
+------------------------------------------------------------------------------------------------------
+		if key == DIK_keys.DIK_K then
+			if not upgrade_mode_active then --проверить есть ли апгрейд и если есть включить режим
+				write_log("!!IMPULSE_SCANNER POWER_ON")
+				upgrade_frequency = 0
+				set_detector_mode(1, upgrade_frequency)
+				upgrade_mode_active = true
+				soundtrack.afscanner_click()
+				set_hud_tip_upgrade() --Если включен режим апгрейда, покажем соответствующую подсказку.
+			else --если режим апгрейда активен - выключить
+				write_log("!!IMPULSE_SCANNER POWER_OFF")
+				upgrade_frequency = 0
+				set_detector_mode(0, 9)
+				upgrade_mode_active = false
+				soundtrack.afscanner_off()
+				set_hud_tip_normal() --Если включен обычный режим, покажем соответствующую подсказку.
+			end			
+			return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
+		end
+------------------------------------------------------------------------------------------------------
+		if not upgrade_mode_active then --если режим апгрейда выключен
+			write_log("!!upgrade_mode in NOT active! - set_hud_tip_normal")
+			set_hud_tip_normal() --Покажем подсказку, чтобы в редких случаях она не исчезала
+			return --дальше нам делать нечего
+		else --если включен
+			write_log("!!upgrade_mode_active - set_hud_tip_upgrade")
+			set_hud_tip_upgrade() --Покажем подсказку, чтобы в некоторых случаях она не исчезала
+		end
+------------------------------------------------------------------------------------------------------
+		if key == DIK_keys.DIK_RETURN then  -- Enter --послать импульс на этой частоте
+			write_log("!!IMPULSE_SCANNER SEND_IMPULSE")
+			if not are_actor_in_strange_zone() then --мы вне зоны, предупредить
+				write_log("!!IMPULSE_SCANNER OUT_ZONE")
+				soundtrack.afscanner_click2()
+				news_manager.send_tip(db.actor, "actor_out_strangzone", nil, "anomal", 5000, nil)
+			else
+				write_log("!!IMPULSE_SCANNER IMPULSE_SENT")
+				check_actor_in_zone_action(upgrade_frequency)
+			end
+			return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
+		end
+------------------------------------------------------------------------------------------------------
+		if key == DIK_keys.DIK_COMMA then -- < --понизить частоту
+			if upgrade_frequency > 0 then
+				upgrade_frequency = upgrade_frequency - 1
+			end
+			write_log("!!IMPULSE_SCANNER SET FREQ IDX ["..tostring(upgrade_frequency).."]")
+			set_detector_mode(1, upgrade_frequency)	
+			soundtrack.afscanner_click()
+			return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
+		end
+------------------------------------------------------------------------------------------------------
+		if key == DIK_keys.DIK_PERIOD then -- > --повысить частоту
+			if upgrade_frequency < 8 then
+				upgrade_frequency = upgrade_frequency + 1
+			end		
+			write_log("!!IMPULSE_SCANNER SET FREQ IDX ["..tostring(upgrade_frequency).."]")					
+			set_detector_mode(1, upgrade_frequency)
+			soundtrack.afscanner_click()
+			return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
+		end
+------------------------------------------------------------------------------------------------------
+	else --Нет детектора
+		write_log("!!Actor don't has detector. Cleaning hud tip!")					
+		set_hud_tip_clean() --Удалим подсказку с худа, а то она в некоторых случаях не удаляется
 	end
 end
+--*******************************************[KRodin's FIX - End]**********************************************
 
 local last_beep = 0
 local last_click = 0
@@ -346,14 +437,14 @@ function on_update()
 	if actor_has_detector() then
 		local act_pos = db.actor:position()
 -------------------------------------------------------------------------------------------------------------------------------
-		-- ������� ���������� ���������� � �������
+		-- перебор онлайновых артефактов в таблице
 		local i = 0
 		for id, art in pairs (db.artefacts) do
-			-- ���������, �� � ������� �� ��������. �� ������������� �� ����
+			-- проверяем, не в рюкзаке ли артефакт. Их детектировать не надо
 			if art:parent() == nil then
 				local art_pos = art:position()
 				local dist = act_pos:distance_to(art_pos)
-				-- �������� �� ��������� � ������ ��������������
+				-- проверка на попадание в радиус детектирования
 				if dist < det_radius and i < MAX_ARTEFACTS then
 					set_artefact_slot(i, art_pos.x, art_pos.y, art_pos.z)
 					i = i + 1
@@ -368,7 +459,7 @@ function on_update()
 		if actor_has_elite_detector() then
 			local k = 0
 			local anm_table = ogse_anomaly.get_all_nearest_anomalies_by_point_in_radius(act_pos, det_radius)
-			-- ����������� ������ ��� ����� ������������ ����������
+			-- пересчитаем радиус без учета вертикальной координаты
 --			write_log("elite detector update, pos "..tostring(act_pos.x)..", "..tostring(act_pos.y)..", "..tostring(act_pos.z)..", radius "..tostring(det_radius))
 			local act_pos_no_y = act_pos
 			act_pos_no_y.y = 0

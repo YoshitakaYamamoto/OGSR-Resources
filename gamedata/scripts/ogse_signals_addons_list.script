@@ -6,11 +6,11 @@ addons = {
 	"dunin_ammo", --должен быть первым!
 	"ogse_anomaly", --должен быть вторым!
 	"ogse", --должен быть третьим!
+	"ogse_detectors", --должен быть четвертым!
 	"ogse_addons",
 	"ogse_bind_weapon",
 	"ogse_unist",
 	"ogse_st_mgr",
-	"ogse_detectors", --должен быть не ниже этого места!
 	"ogse_car_control",
 	"ogse_relations",
 	"ogse_grenade_switcher",
