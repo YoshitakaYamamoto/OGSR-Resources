@@ -1104,8 +1104,6 @@ function motivator_binder:update(delta)
 		xr_sound.update(self.object)
 	end
 	
-	ogse_debug.process_npc(self.object, "upd", 4)
-	
 	ogse_debug.process_npc(self.object, "upd", 5)
 
 	if self.object:alive() then

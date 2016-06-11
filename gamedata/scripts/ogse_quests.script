@@ -926,9 +926,9 @@ function check_gorkom_books()
 	local safe = level_object_by_sid(story_ids.gorkom_safe)
 	local monster = level_object_by_sid(story_ids.gorkom_librarian)
 	if safe then
-		if monster then
+		--if monster then
 		--	monster:add_restrictions("deadcity_gorkom_1", "")
-		end	
+		--end	
 		local weight_count = 0
 		for i=0,safe:inv_box_count()-1 do
 			local item = safe:object_from_inv_box(i)

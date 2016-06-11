@@ -3904,7 +3904,7 @@ function process_restrictions(npc)
 		backup_restrictions_in[npc:id()] = restr_in
 		-- write_log("--XRS_BATTLE_AI: RESTRICTIONS_IN BACKUP FOR "..npc:name().." : "..restr_in)
 	end	
-	--log1("[XRS BATTLE AI] REMOVING ALL RESTRICTIONS FOR "..npc:name())
+	log1("[XRS BATTLE AI] REMOVING ALL RESTRICTIONS FOR "..npc:name())
 	npc:remove_all_restrictions()
 end
 
