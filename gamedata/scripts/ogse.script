@@ -1263,7 +1263,6 @@ end
 local psyzones_flag = sys_ini:r_s32("options","psyzones_flag")
 local ids_timer = time_global()
 local mine_timer = time_global()
-local loot_timer = time_global()
 local buggy_timer = time_global()
 local anom_enum = time_global()
 
@@ -1340,10 +1339,7 @@ function()
 end,
 function()
 	ogse_debug.process_actor("upd_a", 40)
-	if time_global() > loot_timer then
-		db.remove_deadman() -- Уборка трупов и лута
-		loot_timer = loot_timer + math.random(500, 800)
-	end
+	db.remove_deadman() -- Уборка трупов и лута
 end,
 function()
 	ogse_debug.process_actor("upd_a", 41)
@@ -1432,9 +1428,10 @@ end,
 
 function on_actor_update() --Колбэк на апдейт ГГ
 ---------------------АПДЕЙТЫ С ВЫСОКИМ ПРИОРИТЕТОМ ПОМЕЩАТЬ СЮДА!---------------------
+--[[ --KRodin: отключено, эффектов из ogse_critical_hit вполне достаточно.
 	ogse_debug.process_actor("upd_a", 10)
 	ogsm_quests.wounded_pp() --эффекты ранения актора
-
+]]
 	ogse_debug.process_actor("upd_a", 13)
 	if xrs_ai then xrs_ai.actor_update() end -- Обновление АИ-пака
 
