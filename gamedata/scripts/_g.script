@@ -81,6 +81,35 @@ function sum_args_ex(base, offs)
 	return res
 end
 
+--Некоторые недостающие DIK_keys:
+DIK_keys["MOUSE_4"] = 340
+DIK_keys["MOUSE_5"] = 341
+DIK_keys["MOUSE_6"] = 342
+DIK_keys["MOUSE_7"] = 343
+DIK_keys["MOUSE_8"] = 344
+
+--Некоторые недостающие key_bindings:
+key_bindings["kSPRINT_TOGGLE"] = 8
+key_bindings["kENGINE"] = 15
+key_bindings["kARTEFACT"] = 30
+key_bindings["kWPN_FIREMODE_PREV"] = 38
+key_bindings["kWPN_FIREMODE_NEXT"] = 39
+key_bindings["kPAUSE"] = 40
+key_bindings["kCHAT_TEAM"] = 45
+key_bindings["kACTIVE_JOBS"] = 53
+key_bindings["kMAP"] = 54
+key_bindings["kCONTACTS"] = 55
+key_bindings["kVOTE_BEGIN"] = 57
+key_bindings["kVOTE"] = 58
+key_bindings["kVOTEYES"] = 59
+key_bindings["kVOTENO"] = 60
+key_bindings["kSPEECH_MENU_0"] = 63
+key_bindings["kSPEECH_MENU_1"] = 64
+key_bindings["kUSE_BANDAGE"] = 73
+key_bindings["kUSE_MEDKIT"] = 74
+key_bindings["kQUICK_SAVE"] = 75
+key_bindings["kQUICK_LOAD"] = 76
+
 log1("--Инициализация расширений движка закончена!")
 --******************************************** Инициализация расширений движка закончена ********************************************
 
@@ -1374,16 +1403,16 @@ function log3(fmt,...)
 		if typ == "table" then
 			args[i] = table.tostring(arg).."\n"
 		elseif typ == "userdata" then
-			args[i] = "[IT'S USERDATA! PRINTING ISN'T POSSIBLE!]"
+			args[i] = "[USERDATA! PRINTING ISN'T POSSIBLE!]"
 		elseif typ == "function" then
-			args[i] = "[IT'S FUNCTION! PRINTING IS NOT POSSIBLE!]"
+			args[i] = "[FUNCTION! PRINTING ISN'T POSSIBLE!]"
 		else
 			args[i] = tostring(arg)
 		end
 	end
 	local res,msg = pcall(string.format, fmt, unpack(args))
 	if not res then
-		log1("!!log3 failed:\n"..msg)
+		log1("!!log3 failed: "..msg)
 		return
 	end
 	if string.sIsSep(msg, "\n") then --Если нашли в тексте хоть один перенос строки
@@ -1410,12 +1439,12 @@ table.tostring = function( tbl, subs )
 		local typ = type(v)
 		local s = tostring(k)
 		if typ == "table" then
-			result = result.."\n"..subs..s..": [IT'S TABLE! PRINTING:]"
+			result = result.."\n"..subs..s..": [TABLE! PRINTING:]"
 			result = result..table.tostring(v, subs.."    ")
 		elseif typ == "function" then
-			result = result.."\n"..subs..s..": [IT'S FUNCTION! PRINTING IS NOT POSSIBLE!]"
+			result = result.."\n"..subs..s..": [FUNCTION! PRINTING ISN'T POSSIBLE!]"
 		elseif typ == "userdata" then
-			result = result.."\n"..subs..s..": [IT'S USERDATA! PRINTING IS NOT POSSIBLE!]"
+			result = result.."\n"..subs..s..": [USERDATA! PRINTING ISN'T POSSIBLE!]"
 		else
 			result = result.."\n"..subs..s..": "..tostring(v)
 		end
