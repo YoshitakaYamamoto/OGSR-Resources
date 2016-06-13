@@ -7,27 +7,11 @@
 --- Настройки схемы
 -----------------------------------------------------------------------
 local debug_flag = false
------------------------------------------------------------------------
+
 local turn_off_restrictors = false	-- выключить рестрикторную часть
-local monsters_too = false
------------------------------------------------------------------------
 turn_off_path_around = true	-- выключить часть обхода по путям
-local transit_coeff = 1.4 	-- Коэффициент, на который умножается радиус аномалии для получения транзитных точек. Нельзя выставлять менее 1.2 - будет зацеплять аномалию
---local exit_coeff = 7		-- Коэффициент, на который умножается радиус аномалии для получения точки выхода из маршрута. Имеет смысл ставить побольше, чтобы непись не отирался около аномалии на выходе.
-local timeout = 3000--30000	-- Время в миллисекундах, на которое NPC забывает об аномалии после успешного её обхода. Нужно обязательно, чтобы непись не застрял вокруг аномалии, иначе схема может отправить его обходить её бесконечно.
-local timeout_to_evade = 20000 -- Время на обход, предельное
-local count_update 			= 0	-- Счетчик апдейтов. Нельзя чтобы схема стартовала включенной сразу же, иначе 
-local engage_after_update 	= 15 -- будут глюки на переключении схем и выборе оружия
------------------------------------------------------------------------
 
-local anomaly_to_evade = {}
-local anomaly_to_ignore_timeout = {}
-local anomaly_timeout = {}
-local rdelta = {}
-local ready = {}
-local escape_paths = {}
-
-local excluded_npc = {
+local excluded_npc = { --Запретные профили/имена/story_id
 	["bar_ecolog_professor"] = true,
 	["dik_the_drifter"] = true,
 	["zona_brother1"] = true,
@@ -37,26 +21,27 @@ local excluded_npc = {
 	["bandit_trader"] =	true,
 	["bandit_trader_spawn"]	= true,		
 }
-
-local excluded_sect = {
+local excluded_sect = { --Запретные аномалии
 	["burning_fuzz"] = true,
 	["zone_rad"] = true,
 }
-
-local excluded_comms = {			-- запретные коммунити
+local excluded_comms = { --Запретные коммунити
 	["zombied"] = true,
 	["trader"] = true,
 	["gunsmith"] = true,
 	["guider"] = true,
 }
-
-local excluded_locations = {
+local excluded_locations = { --Запретные локации
 	--["l03u_agr_underground"] = true,
 }
 
+-----------------------------------------------------------------------
+--- Обход по рестрикторам
+-----------------------------------------------------------------------
+local monsters_too = false --Включить монстрам обход аномалий?
+local freq = 1000 --Как часто выполнять апдейт обхода аномалий (в мс)
 local added_restrictions = {}
 local last_position      = {}
-
 
 function init()
   if not turn_off_restrictors then
@@ -102,6 +87,7 @@ function remove_restriction(npc, anomid)
 	end
 	if added_restrictions[npc_id] and added_restrictions[npc_id][anomid] then
 		added_restrictions[npc_id][anomid] = nil
+		log3("~~[%s] REMOVING IN RESTRICTION FOR [%s]: [%s]", string.upper(script_name()), npc:name(), obj:name())
 		npc:remove_restrictions("",obj:name())
 	end
 end
@@ -114,22 +100,18 @@ function death(e)
 		local restrs = {}
 		for k, v in pairs(anoms) do
 			local sobj = alife():object(k)
-			if debug_flag then log1("!!REMOVE_RESTRICT "..k.." FOR "..e.victim:name()) end
 			if sobj then
 				table.insert(restrs, sobj:name())
 			end
 		end
 		if table.getn(restrs) > 0 then
+			log3("~~[%s] REMOVING IN RESTRICTIONS FOR [%s]: %s", string.upper(script_name()), e.victim:name(), restrs)
 			e.victim:remove_restrictions("", table.concat( restrs, "," ))
 		end
 		added_restrictions[nid] = nil
 		last_position[nid]      = nil
 	end
 end
-
-
--- как часто выполнять обход аномалий (в мс)
-local freq = 100 --При значениях больше 100, неписи частенько попадают в аномалии!
 
 function update_norm(e)
   e:setFingerprint("ogse_anom_evader_update")
@@ -214,6 +196,7 @@ function update_norm(e)
     for _, k in ipairs( del ) do
       added_restrictions[ npc:id() ][ k ] = nil
     end
+    log3("~~[%s] REMOVING IN RESTRICTIONS FOR [%s]: %s", string.upper(script_name()), npc:name(), del)
     npc:remove_restrictions( "", table.concat( del, "," ) )
   end
 
@@ -223,13 +206,27 @@ function update_norm(e)
     added_restrictions[ npc:id() ][ k ] = true
   end
   if table.getn( add ) > 0 then
+    log3("--[%s] ADDING IN RESTRICTIONS FOR [%s]: %s", string.upper(script_name()), npc:name(), add)
     npc:add_restrictions( "", table.concat( add, "," ) )
   end
 end
 
 -----------------------------------------------------------------------
---- Обход по точкам для неписей под управлением idle_alife - НЕ ИСПОЛЬЗУЕТСЯ ПРИ turn_off_path_around = true !!!
+--- Обход по точкам для неписей под управлением idle_alife
 -----------------------------------------------------------------------
+local transit_coeff = 1.4 	-- Коэффициент, на который умножается радиус аномалии для получения транзитных точек. Нельзя выставлять менее 1.2 - будет зацеплять аномалию
+--local exit_coeff = 7		-- Коэффициент, на который умножается радиус аномалии для получения точки выхода из маршрута. Имеет смысл ставить побольше, чтобы непись не отирался около аномалии на выходе.
+local timeout = 3000--30000	-- Время в миллисекундах, на которое NPC забывает об аномалии после успешного её обхода. Нужно обязательно, чтобы непись не застрял вокруг аномалии, иначе схема может отправить его обходить её бесконечно.
+local timeout_to_evade = 20000 -- Время на обход, предельное
+local count_update 			= 0	-- Счетчик апдейтов. Нельзя чтобы схема стартовала включенной сразу же, иначе 
+local engage_after_update 	= 15 -- будут глюки на переключении схем и выборе оружия
+local anomaly_to_evade = {}
+local anomaly_to_ignore_timeout = {}
+local anomaly_timeout = {}
+local rdelta = {}
+local ready = {}
+local escape_paths = {}
+
 function update(npc)
 	local hasanom, anomid, pos, cls, dist, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(npc:position())
 	local obj = level.object_by_id(anomid)	
@@ -277,10 +274,8 @@ function update(npc)
 			if turn_off_restrictors then
 				log1("!!RESTRICT_TURNED_OFF for "..npc:name())
 			else
+				log3("[%s] ADDING IN RESTRICTIONS FOR [%s]: [%s]", string.upper(script_name()), npc:name(), restr)
 				npc:add_restrictions("", restr)
-				if debug_flag then 
-					log1("--ADD_RESTRICT FINISHED ["..restr.."] FOR "..npc:name())
-				end			
 			end
 		end
 	end	
@@ -621,7 +616,7 @@ function action_evade_anomaly:finalize()
 		local npc_sobj = alife():object(nid)
 		for k, v in pairs(anoms) do
 			local sobj = alife():object(k)
-			if debug_flag then log1("!!REMOVE_RESTRICT "..k.." FOR "..self.object:name()) end
+			log3("[%s] REMOVING IN RESTRICTIONS FOR [%s]: [%s]", string.upper(script_name()), self.object:name(), sobj:name())
 			self.object:remove_restrictions("",sobj:name())
 		end
 		added_restrictions[nid] = nil
