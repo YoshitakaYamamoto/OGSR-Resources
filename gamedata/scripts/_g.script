@@ -86,6 +86,7 @@ log1("--Инициализация расширений движка закончена!")
 
 prefetch("_luaxml")
 prefetch("_geom_helpers")
+prefetch("_s")
 
 -- FIX Nazgool ------------------------------------------------------------------
 -- Возможно подобные функции уже где-то и есть, но я пока не нашёл.
@@ -180,16 +181,11 @@ end
 
 ----------------------------------------------------------------------
 
+--TODO: Поотрывать вызовы и удалить!
 function printf(fmt,...)
---	log(string.format(fmt,...))
 end
-
-local bufferedmessages={}
-
+--TODO: Поотрывать вызовы и удалить!
 function dbglog(fmt,...)
-	local msg = string.format(fmt, ...)
-	local msg_no_ws = string.gsub(msg, "%s", "_")
---	get_console():execute("dbg:" .. msg_no_ws)
 end
 
 function validate_enemy_object(enemy)
@@ -328,17 +324,6 @@ end
 --/ константа, которую использовать в местах, где нужно задать неограниченное время действия
 time_infinite = 100000000
 
---/ название скрипта, который в данный момент находится в отладке
---/ (в этом скрипте будут срабатывать вызовы функции debug_log)
-debug_script_name = ""
---/ выводит в лог строчку, если script_name == debug_script_name (используется для отрадки сценариев)
-
-function debug_log(script_name, fmt, ...)
-	if debug_script_name == script_name then
-		log(string.format(fmt, ...))
-	end
-end
-
 --/ если в данный момент выполняется какое-то действие, прерывает его и отключает скриптовый режим
 function interrupt_action(who, script_name)
   if who:get_script() then
@@ -394,52 +379,6 @@ function update_action (npc, script, ...)
     end
     reset_action (npc, script)
     npc:command (act, false)
-end
-
-function str_split (str)
-
-    local strlen = string.len (str)
-    local parts = {{}, {}, {}, {}}
-    local cpart = 1
-    for a = 1, strlen, 1 do
-        local char = string.byte (str, a)
-        if char ~= 95 then
-           table.insert (parts[cpart], char)
-        else
-           cpart = cpart + 1
-           if cpart > 4 then break end
-        end
-    end
-
-    if cpart ~= 4 then return "unknown", "stalker", 0, 0 end
-
-    local str1 = string.char ()
-    local str2 = string.char ()
-    local str3 = string.char ()
-    local str4 = string.char ()
-
-    local ref = parts[1]
-    for a = 1, table.getn (ref), 1 do
-        str1 = string.format ("%s%c", str1, ref[a])
-    end
-
-    ref = parts[2]
-    for a = 1, table.getn (ref), 1 do
-        str2 = string.format ("%s%c", str2, ref[a])
-    end
-
-    ref = parts[3]
-    for a = 1, table.getn (ref), 1 do
-        str3 = string.format ("%s%c", str3, ref[a])
-    end
-
-    ref = parts[4]
-    for a = 1, table.getn (ref), 1 do
-        str4 = string.format ("%s%c", str4, ref[a])
-    end
-
-    printf("%s %s %d %d", str1, str2, str3, str4)
-    return str1, str2, (str3 + 1) - 1, (str4 + 1) - 1
 end
 
 function r_bool(spawn_ini, section, line, default)
@@ -708,36 +647,8 @@ function near_point_with_bit(point, patrol_path, bit)
     return index
 end
 
---/ Рекурсивная распечатка таблицы
+--TODO: ПООТРЫВАТЬ ВЫЗОВЫ И УДАЛИТЬ!
 function print_table_inlog_v2(table, subs)
-	local sub
-	if subs ~= nil then
-		sub = subs
-	else
-		sub = ""
-	end
-	for k,v in pairs(table) do
-		if type(v) == "table" then
-			log1(sub.." "..tostring(k)..": table")
-			print_table_inlog_v2(v, sub.."    ")
-		elseif type(v) == "function" then
-			log1(sub.." "..tostring(k)..": function")
-		elseif type(v) == "userdata" then
-			log1(sub.." "..tostring(k)..": userdata")
-		elseif type(v) == "boolean" then
-			if v == true then
-				log1(sub.." "..tostring(k)..": true")
-			else
-				log1(sub.." "..tostring(k)..": false")
-			end
-		else
-			if v ~= nil then
-				log1(sub.." "..tostring(k)..": "..tostring(v))
-			else
-				log1(sub.." "..tostring(k)..": is NIL")
-			end
-		end
-	end
 end
 
 --TODO: ПООТРЫВАТЬ ВЫЗОВЫ И УДАЛИТЬ!
@@ -868,7 +779,7 @@ function abort(fmt, ...)
 	log1(debug.traceback())
 	log1("ПОСЛЕДНЕЕ СООБЩЕНИЕ СИСТЕМЫ OFFLINE_ALIFE: "..amk_offline_alife.last_debug_message)
 	log1("ОПИСАНИЕ ОШИБКИ: "..message)
-	get_console():execute("flush")
+	cmd("flush")
 
 	local hud = get_hud()
 	local critical = hud:GetCustomStatic("btr_critical")
@@ -899,7 +810,7 @@ function abort(fmt, ...)
 	
 		crash_counter = crash_counter + 1
 		log3("get_console():execute quit")
-		get_console():execute("quit")
+		cmd("quit")
 	end
 end
 
@@ -1122,7 +1033,6 @@ function start_game_callback()
 
 	task_manager.clear_task_manager()
 	treasure_manager.clear_treasure_manager()
-	--xr_sound.clear_all_sound_object()
 	dialog_manager.fill_phrase_table()	
 
 	-- xStream -- sandbox init --
@@ -1443,41 +1353,86 @@ function level_name_by_gvid(gvid)
 	return level_name_by_level_system_name(level_system_name_by_gvid(gvid))
 end
 
-function clear_log()
-	get_console():execute("clear_log")	
-end
-function flush_log()
-	get_console():execute("flush")
-end
--- просто удобная обёртка для log1
-function log2(fmt,...)
-	ASSERT(fmt, "log2: has no format string")
-	log1(fmt:format(...))
-end
--- делает дополнительную работу по конвертации некоторых параметров, которые не воспринимаются родной функцией string.format
--- невоспринимаемые параметры (nil, boolean, userdata) должны в строке формата стоять как %s (потому, что будут заменены на строки)
--- работает медленней, чем log2
+--***********************************[Функции для вывода в лог]****************************************
+local subs_tbl = { --Если в log1/2/3 передать строку формата, в которой первыми символами будут эти, то текст в консоли будет цветной:
+	["--"] = true, --Зелёный
+	["~~"] = true, --Жёлтый
+	["!!"] = true  --Красный
+}
+--Удобная обертка для log1.
+--Делает дополнительную работу по конвертации некоторых параметров, которые не воспринимаются родной функцией string.format.
+--Невоспринимаемые параметры (nil, boolean, table, userdata, function) должны в строке формата стоять как %s (потому, что будут заменены на строки).
+--Функция умеет полностью печатать в лог таблицы с любым содержанием, таблицы в таблицах и тд. Простой пример вызова: log3("Printing table: %s", table)
+--Исправлена проблема с цветом строк в консоли: Если указано, что текст должен быть цветным, то в консоли цветными будут все строки текста, а не только первая.
+--Исправлено ограничение в 1024 символа. С этой функцией в лог можно вывести неограниченое кол-во символов (например, очень большие таблицы)
 function log3(fmt,...)
-	ASSERT(fmt, "log3: has no format string")
+	ASSERT(fmt and type(fmt) == "string", "log3: has no format string") --Нет строки формата - вылетаем
 	local args = {...}
 	for i=1,#args do -- Цикл ipairs здесь не работает, поскольку останавливается на первом _значении_ nil, что исключает возможность иметь nil-аргументы
 		local arg = args[i]
 		local typ = type(arg)
-		if typ == "boolean" then
-			args[i] = tostring(arg)
+		if typ == "table" then
+			args[i] = table.tostring(arg).."\n"
 		elseif typ == "userdata" then
-			args[i] = "userdata"
-		elseif typ == "table" then
-			args[i] = "table"
-		elseif typ == "nil" then
-			args[i] = "nil"
+			args[i] = "[IT'S USERDATA! PRINTING ISN'T POSSIBLE!]"
+		elseif typ == "function" then
+			args[i] = "[IT'S FUNCTION! PRINTING IS NOT POSSIBLE!]"
+		else
+			args[i] = tostring(arg)
 		end
 	end
-	local res,msg = pcall(log2, fmt, unpack(args))
+	local res,msg = pcall(string.format, fmt, unpack(args))
 	if not res then
-		log1("log3 failed:\n"..msg)
+		log1("!!log3 failed:\n"..msg)
+		return
+	end
+	if string.sIsSep(msg, "\n") then --Если нашли в тексте хоть один перенос строки
+		msg = string.sTrimR(msg) --Если в самом конце текста есть перенос строки, срежем его.
+		local subs = string.sLeft(msg, 2) or "" --Читаем два символа из самого начала текста
+		if subs_tbl[subs] then --Если это символы, отвечающие за цвет текста в консоли, то
+			msg = string.sRepChAll(msg, "\n", "\n"..subs) --вставим их после каждого "\n", чтобы в консоли были цветными все строки, а не только первая.
+		end
+		msg = string.sArraySub(msg, "\n") --Сконвертируем строку в массив подстрок
+		for _, n in ipairs( msg ) do
+			log1(n) --Выводим в лог каждую подстроку отдельно. Это позволяет избежать ограничения в 1024 символа, после которых текст просто обрезается.
+		end
+	else --Если подстрок нет
+		log1(msg) --Выводим текст в лог без дополнительных манипуляций.
 	end
 end
+
+--Конвертирование таблицы в строку.
+--Используется как компонент функции log3.
+table.tostring = function( tbl, subs )
+	subs = subs or ""
+	local result = ""
+	for k,v in pairs(tbl) do
+		local typ = type(v)
+		local s = tostring(k)
+		if typ == "table" then
+			result = result.."\n"..subs..s..": [IT'S TABLE! PRINTING:]"
+			result = result..table.tostring(v, subs.."    ")
+		elseif typ == "function" then
+			result = result.."\n"..subs..s..": [IT'S FUNCTION! PRINTING IS NOT POSSIBLE!]"
+		elseif typ == "userdata" then
+			result = result.."\n"..subs..s..": [IT'S USERDATA! PRINTING IS NOT POSSIBLE!]"
+		else
+			result = result.."\n"..subs..s..": "..tostring(v)
+		end
+	end
+	return result
+end
+
+log2 = log3 --вместо log2 использовать log3!
+
+function clear_log()
+	cmd("clear_log")	
+end
+
+function flush_log()
+	cmd("flush")
+end
+--*****************************************************************************************************
 
 function get_item_weight_by_section(section)
 	local res = get_float(section, "inv_weight")
@@ -1493,14 +1448,14 @@ function get_ammo_weight_by_section(section, count)
 end
 
 function print_vector(name, v)
-	log1(string.format("%s: %9.3f, %9.3f, %9.3f", name, v.x, v.y, v.z))
+	log2("%s: %9.3f, %9.3f, %9.3f", name, v.x, v.y, v.z)
 end
 function print_matrix(name, m)
 	log1(name..":")
-	log1(string.format("[%9.3f, %9.3f, %9.3f, %9.3f]", m.i.x, m.i.y, m.i.z, m._14_))
-	log1(string.format("[%9.3f, %9.3f, %9.3f, %9.3f]", m.j.x, m.j.y, m.j.z, m._24_))
-	log1(string.format("[%9.3f, %9.3f, %9.3f, %9.3f]", m.k.x, m.k.y, m.k.z, m._34_))
-	log1(string.format("[%9.3f, %9.3f, %9.3f, %9.3f]", m.c.x, m.c.y, m.c.z, m._44_))
+	log2("[%9.3f, %9.3f, %9.3f, %9.3f]", m.i.x, m.i.y, m.i.z, m._14_)
+	log2("[%9.3f, %9.3f, %9.3f, %9.3f]", m.j.x, m.j.y, m.j.z, m._24_)
+	log2("[%9.3f, %9.3f, %9.3f, %9.3f]", m.k.x, m.k.y, m.k.z, m._34_)
+	log2("[%9.3f, %9.3f, %9.3f, %9.3f]", m.c.x, m.c.y, m.c.z, m._44_)
 end
 function time2string(time, fmt, order)
 	ASSERT(time, "[_g.time2string] 'time' is a nil reference")
@@ -1579,7 +1534,7 @@ end
 -- надёжнее, чем device().aspect_ratio, поскольку не зависит от инициализированности рендера
 -- однако медленная. Не рекомендуется использовать часто
 function get_aspect_ratio()
-	local s =  get_console():get_string("vid_mode")
+	local s =  get_con_string("vid_mode")
 	local sw,sh = string.match(s, "(%d+)x(%d+)")
 	return tonumber(sh)/tonumber(sw)
 end
@@ -1957,6 +1912,7 @@ end
 
 local logs_cach = {}
 
+--KRodin: Интересная штука, но её надо бы доработать, как log3.
 function dbg_log(fname, fmt, ...)
 	--log1(fname.." "..fmt:format(...))
 	--do return end
