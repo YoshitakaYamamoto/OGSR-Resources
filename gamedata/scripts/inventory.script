@@ -3,6 +3,7 @@ function attach(sm)
 	sm:subscribe({signal = "on_update",       fun = this.on_update, queued = true}) --KRodin: ни к чему обновлять hit_from_arts на каждом апдейте
 	sm:subscribe({signal = "on_update",       fun = this.on_update_lp, queued = true})
 	sm:subscribe({signal = "on_drop",         fun = this.on_item_drop})
+	sm:subscribe({signal = "on_item_to_slot", fun = this.check_remove_gasmask}) --проверка надевания противогаза на костюм с худом
 	sm:subscribe({signal = "on_item_to_slot", fun = this.on_item_to_slot})
 	sm:subscribe({signal = "on_item_to_belt", fun = this.on_item_to_belt})
 	sm:subscribe({signal = "on_item_to_ruck", fun = this.on_item_to_ruck})
@@ -245,3 +246,43 @@ function spoilage_food()
 		ogse_addons.wait_for_deleted_objects_to_disappear(ids):start()
 	end
 end
+
+--**************************Проверка надевания противогаза на костюм с худом****************************
+--Перенесено из модуля динамического худа
+function have_gasmask() --проверка, имеет ли костюм встроенный противогаз
+	local armor = db.actor:get_current_outfit()
+	if not armor then return false end
+
+	local armorname = armor:section()
+	if 	string.find(armorname, "monolit_exoskeleton") or
+		string.find(armorname, "military_outfit") or
+		string.find(armorname, "svoboda_heavy_outfit") or
+		string.find(armorname, "scientific_outfit") or
+		string.find(armorname, "ecolog_outfit") or
+		string.find(armorname, "protection_outfit") or
+		string.find(armorname, "specops_outfit") or
+		string.find(armorname, "outfit_specnaz") or
+		string.find(armorname, "outfit_dolg") or
+		string.find(armorname, "killer_outfit") then
+		return true
+	end
+end
+
+local counter = 0
+function check_remove_gasmask()
+	local bio_belt = db.actor:item_in_slot(10)
+	if not bio_belt then return end
+
+	if have_gasmask() then
+		local sect = bio_belt:section()
+		if sect == "af_maska_1" or sect == "af_maska_2" then
+			db.actor:move_to_ruck(bio_belt)
+			counter = counter + 1
+			if counter == 1 then
+				news_text = game.translate_string("dinhud_gasmask_text")
+				db.actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(0,188,83,47), 0, 5000)	
+			end
+		end
+	end
+end
+--*****************************************************************************************************

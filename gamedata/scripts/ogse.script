@@ -1594,6 +1594,7 @@ function on_game_load()
 	cmd("r2_sun_lumscale 1.")
 	cmd("r2_rain_drops_control on") --капли на стекле
 	cmd("r2_lens_dirt_control on") --грязь на линзе
+	cmd("cam_inert 0") --KRodin: сбрасываем инерцию камеры в 0
 -----------------------KD: end-------------------------
 
 	ogse_debug.process_actor("a_spw", 120)
