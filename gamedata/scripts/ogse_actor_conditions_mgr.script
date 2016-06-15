@@ -1,11 +1,9 @@
--- -*- mode: lua; coding: windows-1251-dos -*-
 
 function attach( sm ) -- для менеджера сигналов
   --sm:subscribe({ signal = "on_destroy", fun = this.on_destroy })
   sm:subscribe({ signal = "on_spawn",   fun = this.on_spawn   })
   sm:subscribe({ signal = "on_update",  fun = this.on_update  })
 end
-
 
 -- читаем глобальные параметры эффектов здоровья
 local satiety_v = get_float("actor_script_condition", "satiety_v")
@@ -97,6 +95,17 @@ ASSERT(
 )
 local override_jump_speed
 
+local run_coef = get_float("actor", "run_coef")
+ASSERT(
+  run_coef,
+  "ogse_actor_conditions_mgr: 'actor:run_coef' parameter not found!"
+)
+
+local run_back_coef = get_float("actor", "run_back_coef")
+ASSERT(
+  run_back_coef,
+  "ogse_actor_conditions_mgr: 'actor:run_back_coef' parameter not found!"
+)
 
 local cam_inert, cur_cam_inert
 local health_t, satiety_t
@@ -142,6 +151,20 @@ local function get_item_cond_effect( item )
     ef.psy_health_restore_speed = get_float(
       section, "psy_health_restore_speed", 0
     )
+--Эффекты ношения экзоскелетов--
+	local exo_section = get_string(section, "exo_section", nil)
+	if exo_section then
+		ef.jump_speed_dif	= get_float(exo_section, "jump_speed_dif", 0)
+		ef.sprint_koef_dif	= get_float(exo_section, "sprint_koef_dif", 0)
+		ef.run_coef_dif		= get_float(exo_section, "run_coef_dif", 0)
+		ef.run_back_coef_dif = get_float(exo_section, "run_back_coef_dif", 0)
+	else
+		ef.jump_speed_dif	= 0
+		ef.sprint_koef_dif	= 0
+		ef.run_coef_dif		= 0
+		ef.run_back_coef_dif = 0
+	end
+--------------------------------
     cached_item_cond_effects[ section ] = ef
   end
   return ef
@@ -151,7 +174,7 @@ end
 has_overweight = false
 local cur_walk_accel = walk_accel - min_walk_accel
 local override_power = 1
-local use_overweight = false --true --Отключил перегруз
+local use_overweight = false --Отключил перегруз. TODO: вырезать его вообще
 
 function on_update()
   if device().precache_frame > 0 then return end
@@ -202,6 +225,12 @@ function on_update()
   local summary_alcohol_effect           = ext.alcohol_restore_speed
   local af_additional_inventory_weight   = 0
   local af_additional_inventory_weight2  = 0
+--Эффекты ношения экзоскелетов--
+  local summary_jump_speed = 0
+  local summary_sprint_koef = 0
+  local summary_run_coef = 0
+  local summary_run_back_coef = 0
+ -------------------------------
   -- неучтённые в движке эффекты от артефактов на поясе
   for i = 0, act:belt_count() - 1 do
     local item = act:item_on_belt( i )
@@ -234,6 +263,12 @@ function on_update()
         + ef.bleeding_restore_speed
       summary_psy_health_effect = summary_psy_health_effect
         + ef.psy_health_restore_speed
+--Эффекты ношения экзоскелетов--
+	  summary_jump_speed	= jump_speed + ef.jump_speed_dif
+	  summary_sprint_koef	= sprint_koef + ef.sprint_koef_dif
+	  summary_run_coef		= run_coef + ef.run_coef_dif
+	  summary_run_back_coef	= run_back_coef + ef.run_back_coef_dif
+-------------------------------
     end
   end
   -- эффекты, связанные c голодом
@@ -283,10 +318,15 @@ function on_update()
   end
 
   local cur_sprint_koef = override_sprint_koef or (
-    sprint_koef + ext.sprint_koef_add
+    summary_sprint_koef + ext.sprint_koef_add
   )
   set_sprint_factor( cur_sprint_koef )
 
+--Эффекты экзоскелетов--
+  set_run_factor(summary_run_coef)
+  set_run_back_factor(summary_run_back_coef)
+------------------------
+  
   cur_walk_accel = walk_accel - min_walk_accel
   if act.satiety < light_hunger_limit then
     if not satiety_t then satiety_t = time_global() + 10000 end
@@ -367,7 +407,7 @@ function on_update()
   if cur_walk_accel < 1 then
     set_jump_speed( 0 )
   else
-    set_jump_speed( override_jump_speed or jump_speed )
+    set_jump_speed( override_jump_speed or summary_jump_speed )
   end
 
   local cur_jump_power = override_jump_power or def_jump_power

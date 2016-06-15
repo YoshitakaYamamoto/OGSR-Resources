@@ -7,7 +7,6 @@
 
 function attach(sm)
 	sm:subscribe({ signal = "on_spawn",			fun = this.load })
-	sm:subscribe({ signal = "on_first_update",	fun = this.set_actor_parameters })
 	sm:subscribe({ signal = "on_save",			fun = this.save })
 	sm:subscribe({ signal = "on_drop",			fun = this.chek_button_accessibility })
 	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.chek_button_accessibility })
@@ -157,66 +156,4 @@ function chek_button_accessibility()
 		sys_ini:line_exist(outfit_item:section(), "exo_section") and
 		can_detach_exo(outfit_item:section())
 	rec_wnd.btn:Enable(enabled)
-	set_actor_parameters()
-end
-
-function set_actor_parameters()
-do return end --временно отключено
-	if db.actor and db.actor:alive() then
-		local jump_speed = sys_ini:r_float("actor", "jump_speed")
-		local sprint_koef = sys_ini:r_float("actor", "sprint_koef")
-		local run_coef = sys_ini:r_float("actor", "run_coef")
-		local run_back_coef = sys_ini:r_float("actor", "run_back_coef")
-		local outfit_item = db.actor:item_in_slot(6)
-		local max_weight = sys_ini:r_float("inventory", "max_weight")
-		local max_walk_weight = sys_ini:r_float("actor_condition", "max_walk_weight")
-		local exo_used =
-			outfit_item and sim:object(outfit_item:id()) and
-			sys_ini:line_exist(outfit_item:section(), "exo_section")
---		local condition_for_weight_calc
-		if outfit_item then			-- проверка нужна на время переодевания костюма
-			if exo_used then
-				local exo_section = sys_ini:r_string(outfit_item:section(), "exo_section")
-				if sys_ini:line_exist(exo_section, "jump_speed_dif") then
-					local jump_speed_dif = sys_ini:r_float(exo_section, "jump_speed_dif")
-					jump_speed = jump_speed+jump_speed_dif
-				end
-				if sys_ini:line_exist(exo_section, "sprint_koef_dif") then
-					local sprint_koef_dif = sys_ini:r_float(exo_section, "sprint_koef_dif")
-					sprint_koef = sprint_koef+sprint_koef_dif
-				end
-				if sys_ini:line_exist(exo_section, "run_coef_dif") then
-					local run_coef_dif = sys_ini:r_float(exo_section, "run_coef_dif")
-					run_coef = run_coef+run_coef_dif
-				end
-				if sys_ini:line_exist(exo_section, "run_back_coef_dif") then
-					local run_back_coef_dif = sys_ini:r_float(exo_section, "run_back_coef_dif")
-					run_back_coef = run_back_coef+run_back_coef_dif
-				end
---[[				condition_for_weight_calc = exo_condition
-			else
-				condition_for_weight_calc = outfit_item:condition()]]
-			end
-			-- KD: отключено, т.к. неудобно в геймплейном плане.
---[[			local sect = outfit_item:section()
-				-- это херня, что добавляемый вес не зависит от состояния экзы. исправим.
-			
-			if sys_ini:line_exist(sect, "additional_inventory_weight") then
-				local walk_weight = sys_ini:r_float(sect, "additional_inventory_weight")
-				max_walk_weight = max_walk_weight+walk_weight*(condition_for_weight_calc - 1)	-- движок тоже прибавляет вес, так что учтем это
-			end
-			if sys_ini:line_exist(sect, "additional_inventory_weight2") then
-				local weight = sys_ini:r_float(sect, "additional_inventory_weight2")
-				max_weight = max_weight+weight*(condition_for_weight_calc - 1)	-- движок тоже прибавляет вес, так что учтем это
-			end
-]]
-		end
-		
-		set_jump_speed(jump_speed)
-		set_sprint_factor(sprint_koef)
-		set_run_factor(run_coef)
-		set_run_back_factor(run_back_coef)
-		db.actor:set_actor_max_weight(max_weight)
-		db.actor:set_actor_max_walk_weight(max_walk_weight)
-	end
 end
