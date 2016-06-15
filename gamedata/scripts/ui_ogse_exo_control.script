@@ -161,6 +161,7 @@ function chek_button_accessibility()
 end
 
 function set_actor_parameters()
+do return end --временно отключено
 	if db.actor and db.actor:alive() then
 		local jump_speed = sys_ini:r_float("actor", "jump_speed")
 		local sprint_koef = sys_ini:r_float("actor", "sprint_koef")
