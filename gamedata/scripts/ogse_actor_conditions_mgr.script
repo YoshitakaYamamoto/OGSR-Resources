@@ -1,6 +1,5 @@
 
 function attach( sm ) -- для менеджера сигналов
-  --sm:subscribe({ signal = "on_destroy", fun = this.on_destroy })
   sm:subscribe({ signal = "on_spawn",   fun = this.on_spawn   })
   sm:subscribe({ signal = "on_update",  fun = this.on_update  })
 end
@@ -20,9 +19,7 @@ local satiety_health_factor = get_float("actor_script_condition", "satiety_healt
 ASSERT(satiety_health_factor, "ogse_actor_conditions_mgr: 'satiety_health_factor' parameter not found!")
 local max_stand_power = get_float("actor_condition", "stand_power")
 ASSERT(max_stand_power, "ogse_actor_conditions_mgr: 'stand_power' parameter not found!")
-local satiety_k = max_stand_power
-  * ( 1 - satiety_power_factor ) / light_hunger_limit
-
+local satiety_k = max_stand_power * ( 1 - satiety_power_factor ) / light_hunger_limit
 local engine_satiety_v = get_float("actor_condition", "satiety_v")
 ASSERT(engine_satiety_v, "ogse_actor_conditions_mgr: 'actor_condition:engine_satiety_v' parameter not found!")
 local engine_satiety_health_v = get_float("actor_condition", "satiety_health_v")
@@ -31,109 +28,41 @@ local engine_satiety_power_v = get_float("actor_condition", "satiety_power_v")
 ASSERT(engine_satiety_power_v, "ogse_actor_conditions_mgr: 'actor_condition:satiety_power_v' parameter not found!")
 
 local sprint_koef = get_float( "actor", "sprint_koef" )
-ASSERT(
-  sprint_koef,
-  "ogse_actor_conditions_mgr: 'actor:sprint_koef' parameter not found!"
-)
-local override_sprint_koef
-
+ASSERT(sprint_koef, "ogse_actor_conditions_mgr: 'actor:sprint_koef' parameter not found!")
 local walk_accel = get_float( "actor", "walk_accel" )
-ASSERT(
-  walk_accel,
-  "ogse_actor_conditions_mgr: 'actor:walk_accel' parameter not found!"
-)
+ASSERT(walk_accel, "ogse_actor_conditions_mgr: 'actor:walk_accel' parameter not found!")
 local min_walk_accel = 4
-local override_walk_accel
-
 local def_jump_power = get_float( "actor_condition", "jump_power" )
-ASSERT(
-  def_jump_power,
-  "ogse_actor_conditions_mgr: 'actor_condition:jump_power' parameter not found!"
-)
-local override_jump_power
-
+ASSERT(def_jump_power, "ogse_actor_conditions_mgr: 'actor_condition:jump_power' parameter not found!")
 local jump_weight_power = get_float( "actor_condition", "jump_weight_power" )
-ASSERT(
-  jump_weight_power,
-  "ogse_actor_conditions_mgr: 'actor_condition:jump_weight_power' parameter not found!"
-)
-
+ASSERT(jump_weight_power, "ogse_actor_conditions_mgr: 'actor_condition:jump_weight_power' parameter not found!")
 local overweight_jump_k = get_float( "actor_condition", "overweight_jump_k" )
-ASSERT(
-  overweight_jump_k,
-  "ogse_actor_conditions_mgr: 'actor_condition:overweight_jump_k' parameter not found!"
-)
-
+ASSERT(overweight_jump_k, "ogse_actor_conditions_mgr: 'actor_condition:overweight_jump_k' parameter not found!")
 local def_walk_power = get_float( "actor_condition", "walk_power" )
-ASSERT(
-  def_walk_power,
-  "ogse_actor_conditions_mgr: 'actor_condition:walk_power' parameter not found!"
-)
-
+ASSERT(def_walk_power, "ogse_actor_conditions_mgr: 'actor_condition:walk_power' parameter not found!")
 local walk_weight_power = get_float( "actor_condition", "walk_weight_power" )
-ASSERT(
-  walk_weight_power,
-  "ogse_actor_conditions_mgr: 'actor_condition:walk_weight_power' parameter not found!"
-)
-
+ASSERT(walk_weight_power, "ogse_actor_conditions_mgr: 'actor_condition:walk_weight_power' parameter not found!")
 local overweight_walk_k = get_float( "actor_condition", "overweight_walk_k" )
-ASSERT(
-  overweight_walk_k,
-  "ogse_actor_conditions_mgr: 'actor_condition:overweight_walk_k' parameter not found!"
-)
-
+ASSERT(overweight_walk_k, "ogse_actor_conditions_mgr: 'actor_condition:overweight_walk_k' parameter not found!")
 local def_max_weight = get_float( "inventory", "max_weight" )
-ASSERT(
-  def_max_weight,
-  "ogse_actor_conditions_mgr: 'inventory:max_weight' parameter not found!"
-)
-
+ASSERT(def_max_weight, "ogse_actor_conditions_mgr: 'inventory:max_weight' parameter not found!")
 local jump_speed = get_float( "actor", "jump_speed" )
-ASSERT(
-  jump_speed,
-  "ogse_actor_conditions_mgr: 'actor:jump_speed' parameter not found!"
-)
-local override_jump_speed
-
+ASSERT(jump_speed, "ogse_actor_conditions_mgr: 'actor:jump_speed' parameter not found!")
 local run_coef = get_float("actor", "run_coef")
-ASSERT(
-  run_coef,
-  "ogse_actor_conditions_mgr: 'actor:run_coef' parameter not found!"
-)
-
+ASSERT(run_coef, "ogse_actor_conditions_mgr: 'actor:run_coef' parameter not found!")
 local run_back_coef = get_float("actor", "run_back_coef")
-ASSERT(
-  run_back_coef,
-  "ogse_actor_conditions_mgr: 'actor:run_back_coef' parameter not found!"
-)
+ASSERT(run_back_coef, "ogse_actor_conditions_mgr: 'actor:run_back_coef' parameter not found!")
 
 local cam_inert, cur_cam_inert
-local health_t, satiety_t
 local pt
-
 function on_spawn()
   pt = { game.get_game_time():get() }
   cam_inert = get_con_float( "cam_inert" )
-  if db.actor.health < 0.9 then
-    health_t = 0
-  end
-  if db.actor.satiety < light_hunger_limit then
-    satiety_t = 0
-  end
 end
-
-
---[[function on_destroy()
-  if cam_inert then
-    cmd( "cam_inert", cam_inert )
-  end
-end]]
-
 
 local cached_item_cond_effects = {}
 local function get_item_cond_effect( item )
-  --TODO: сделать получение эффекта непосредственно из объекта
-  if item == nil or alife():object( item:id() ) == nil then return end
+  if not item or not alife():object( item:id() ) then return end
   local section = item:section()
   local ef = cached_item_cond_effects[ section ]
   if not ef then
@@ -142,15 +71,9 @@ local function get_item_cond_effect( item )
     ef.health_restore_speed   = get_float( section, "health_restore_speed",   0 )
     ef.bleeding_restore_speed = get_float( section, "bleeding_restore_speed", 0 )
     ef.power_restore_speed    = get_float( section, "power_restore_speed",    0 )
-    ef.additional_inventory_weight  = get_float(
-      section, "additional_inventory_weight",  0
-    )
-    ef.additional_inventory_weight2 = get_float(
-      section, "additional_inventory_weight2", 0
-    )
-    ef.psy_health_restore_speed = get_float(
-      section, "psy_health_restore_speed", 0
-    )
+    ef.additional_inventory_weight  = get_float(section, "additional_inventory_weight",  0)
+    ef.additional_inventory_weight2 = get_float(section, "additional_inventory_weight2", 0)
+    ef.psy_health_restore_speed = get_float(section, "psy_health_restore_speed", 0)
 --Эффекты ношения экзоскелетов--
 	local exo_section = get_string(section, "exo_section", nil)
 	if exo_section then
@@ -170,15 +93,11 @@ local function get_item_cond_effect( item )
   return ef
 end
 
-
-has_overweight = false
 local cur_walk_accel = walk_accel - min_walk_accel
-local override_power = 1
-local use_overweight = false --Отключил перегруз. TODO: вырезать его вообще
-
 function on_update()
-  if device().precache_frame > 0 then return end
-  if not ( db.actor and db.actor:alive() ) then return end
+  if device().precache_frame > 0
+  or not ( db.actor and db.actor:alive() ) then return end
+
   local act = db.actor
   --log3("%04d/%02d/%02d %02d:%02d:%02d.%03d", unpack(pt))
   local previous_check_time = game.CTime()
@@ -197,7 +116,8 @@ function on_update()
     [ "satiety_restore_speed"    ] = 0,
     [ "sprint_koef_add"          ] = 0,
   }
-  ogse_signals.get_mgr():call( "on_before_actor_conditions_update", ext )
+  --ogse_signals.get_mgr():call( "on_before_actor_conditions_update", ext )
+
   -- учитываем здесь естественное оголодание, а также
   -- движковое(обнулять его нельзя, на нем основан показ свойств
   -- артефактов)
@@ -205,11 +125,7 @@ function on_update()
     satiety_v * ( 1 - math.min( act.health, act.power ) )
   )
   local satiety_custom_k = 1
-  if
-    override_power < 1
-    or act:is_actor_sprinting() or act:is_actor_climbing()
-    or act:get_bleeding() > 0.1
-  then
+  if act:is_actor_sprinting() or act:is_actor_climbing() or act:get_bleeding() > 0.1 then
     satiety_custom_k = 2
   end
   cur_satiety_v = cur_satiety_v * satiety_custom_k
@@ -226,10 +142,10 @@ function on_update()
   local af_additional_inventory_weight   = 0
   local af_additional_inventory_weight2  = 0
 --Эффекты ношения экзоскелетов--
-  local summary_jump_speed = 0
-  local summary_sprint_koef = 0
-  local summary_run_coef = 0
-  local summary_run_back_coef = 0
+  local summary_jump_speed = jump_speed
+  local summary_sprint_koef = sprint_koef
+  local summary_run_coef = run_coef
+  local summary_run_back_coef = run_back_coef
  -------------------------------
   -- неучтённые в движке эффекты от артефактов на поясе
   for i = 0, act:belt_count() - 1 do
@@ -276,22 +192,20 @@ function on_update()
     local sadd = ( light_hunger_limit - act.satiety ) * satiety_k
     summary_power_effect = summary_power_effect + sadd
   end
-
   if act.satiety < critical_hunger_limit then
     local hadd = ( act.satiety - critical_hunger_limit )
       * satiety_health_factor
     summary_health_effect = summary_health_effect + hadd
   end
 
-  -- TODO: учесть потерю сил и здоровья от недосыпа
-  --
+  --TODO: учесть потерю сил и здоровья от недосыпа
   --TODO: оптимизировать вычисление суммарного эффекта,
-  -- сделать это только по факту изменения объектов на поясе
+  --сделать это только по факту изменения объектов на поясе
   act.satiety = summary_satiety_effect * dt
   -- ограничиваем снизу. TODO: может учесть это в самом движке
   if act.satiety < 0 then act:set_actor_condition_float( nil, 0.0, 256 ) end
   act.health = summary_health_effect * dt
-  if not ogse_sleep_mgr.is_sleep_active() then --Добавить эту функцию, если её нету в слип менеджере
+  if not ogse_sleep_mgr.is_sleep_active() then
     act.power = summary_power_effect * dt
   end
   if
@@ -303,7 +217,6 @@ function on_update()
     end
   end
   act.radiation = summary_radiation_restore_effect * dt
-  --if act.satiety < 0.1 then act.satiety = 1 end
   if
     summary_psy_health_effect > 0
     or summary_psy_health_effect < 0
@@ -317,38 +230,27 @@ function on_update()
     act.alcohol = summary_alcohol_effect * dt
   end
 
-  local cur_sprint_koef = override_sprint_koef or (
-    summary_sprint_koef + ext.sprint_koef_add
-  )
+  local cur_sprint_koef = summary_sprint_koef + ext.sprint_koef_add
+
   set_sprint_factor( cur_sprint_koef )
 
---Эффекты экзоскелетов--
+--Эффекты ношения экзоскелетов--
   set_run_factor(summary_run_coef)
   set_run_back_factor(summary_run_back_coef)
-------------------------
+--------------------------------
   
   cur_walk_accel = walk_accel - min_walk_accel
   if act.satiety < light_hunger_limit then
-    if not satiety_t then satiety_t = time_global() + 10000 end
-    if satiety_t < time_global() then
-      cur_walk_accel = cur_walk_accel * ( act.satiety / light_hunger_limit )
-    end
-  else
-    satiety_t = nil
+    cur_walk_accel = cur_walk_accel * ( act.satiety / light_hunger_limit )
   end
   if act.health < 0.9 then
-    if not health_t then health_t = time_global() + 10000 end
-    if health_t < time_global() then
-      cur_walk_accel = cur_walk_accel * ( act.health / 0.9 )
-    end
-  else
-    health_t = nil
+    cur_walk_accel = cur_walk_accel * ( act.health / 0.9 )
   end
 
   local inv_weight  = db.actor:get_inventory_weight()
-  local max_weight  = db.actor:get_actor_max_weight()
+  local max_weight  = db.actor:get_actor_max_weight() --этот параметр вроде нигде не переопределяется. Может, проще использовать значение из конфига?
     + af_additional_inventory_weight2
-  local walk_weight = db.actor:get_actor_max_walk_weight()
+  local walk_weight = db.actor:get_actor_max_walk_weight() --тоже самое
     + af_additional_inventory_weight
   if af_additional_inventory_weight > 0 then
     db.actor:set_actor_max_walk_weight( walk_weight )
@@ -357,37 +259,20 @@ function on_update()
     db.actor:set_actor_max_weight( max_weight )
   end
   if armor then
-    max_weight  = max_weight  + get_float(
+    max_weight  = max_weight  + get_float( --Перенести в кэширование, нефиг перебирать конфиги на каждом апе
       armor:section(), "additional_inventory_weight2",  0
     )
-    walk_weight = walk_weight + get_float(
-      armor:section(), "additional_inventory_weight", 0
-    )
-    --if armor:condition() < 0.8 then --Это уж слишком ххардкорно
-    --  cur_walk_accel = cur_walk_accel * ( armor:condition() / 0.8 )
-    --end
+    --walk_weight = walk_weight + get_float( --тоже самое, и вообще, это походу нужно только в перегрузе, который я вырезал
+    --  armor:section(), "additional_inventory_weight", 0
+    --)
   end
-  local new_cam_inert
-  if inv_weight > max_weight and use_overweight then --Перегруз. Может вообще вырезать это?
-    has_overweight = true
-    if inv_weight > walk_weight then inv_weight = walk_weight end
-    local k1     = ( inv_weight - max_weight ) / ( walk_weight - max_weight )
-    local k2     = 1 - k1
-    cur_walk_accel = cur_walk_accel * k2
-    new_cam_inert  = k1
-    if k2 < 0.1 then
-      override_power = 0.1
-    else
-      override_power = k2
-    end
+  local new_cam_inert = 0
+  if inv_weight > max_weight then
     set_overweight_jump_k( overweight_jump_k )
     set_overweight_walk_k( overweight_walk_k )
     set_jump_weight_power( jump_weight_power )
     set_walk_weight_power( walk_weight_power )
-  else --А вот ниже - нужный кусок. Оставляем.
-    has_overweight = false
-    override_power = 1
-    new_cam_inert  = 0
+  else
     set_overweight_jump_k( 1 )
     set_overweight_walk_k( 1 )
     -- если экзоскелет переносит 170 кг., то сил на перенос 170-и
@@ -402,21 +287,21 @@ function on_update()
     local power_inert = 1 - act.power / 0.7
     if power_inert > new_cam_inert then new_cam_inert = power_inert end
   end
-  set_walk_accel( override_walk_accel or ( min_walk_accel + cur_walk_accel ) )
+  set_walk_accel( min_walk_accel + cur_walk_accel )
 
   if cur_walk_accel < 1 then
     set_jump_speed( 0 )
   else
-    set_jump_speed( override_jump_speed or summary_jump_speed )
+    set_jump_speed( summary_jump_speed )
   end
 
-  local cur_jump_power = override_jump_power or def_jump_power
-  if act.satiety < light_hunger_limit and satiety_t < time_global() then
+  local cur_jump_power = def_jump_power
+  if act.satiety < light_hunger_limit then
     cur_jump_power = cur_jump_power + (
       ( 0.9 - cur_jump_power ) * ( 1 - ( act.satiety / light_hunger_limit ) )
     )
   end
-  if act.health < 0.9 and health_t < time_global() then
+  if act.health < 0.9 then
     cur_jump_power = cur_jump_power + (
       ( 0.9 - cur_jump_power ) * ( 1 - ( act.health / 0.9 ) )
     )
@@ -426,7 +311,7 @@ function on_update()
     end
   end
   set_jump_power( cur_jump_power )
-
+--TODO: Оптимизировать, чтобы не вызывалось на каждом апе
   if new_cam_inert and new_cam_inert ~= cur_cam_inert then
     if new_cam_inert > 0 then
       local min_cam_inert = math.max( 0.4, cam_inert + 0.1 )
@@ -445,36 +330,7 @@ function on_update()
   end
 end
 
-
-function disable_sprint()
-  set_sprint( 1 )
-end
-function set_sprint( koef )
-  override_sprint_koef = koef
-end
-function restore_sprint()
-  set_sprint( nil )
-end
-
-
-function change_jump_power( k )
-  override_jump_power = k
-end
-
-
-function change_jump_speed( k )
-  override_jump_speed = k
-  set_jump_speed( override_jump_speed or jump_speed )
-end
-
-
-function change_walk_accel( k )
-  override_walk_accel = k
-  set_walk_accel( override_walk_accel or ( min_walk_accel + cur_walk_accel ) )
-end
-
-
-function adjust_satiety_restore_speed( v )
+function adjust_satiety_restore_speed( v ) --Рассчёт параметров голода
   if db.actor:is_actor_sprinting() or db.actor:is_actor_climbing() then
     if v > 0 then
       v = v / 2
@@ -483,14 +339,4 @@ function adjust_satiety_restore_speed( v )
     end
   end
   return v
-end
-
-
-function get_overweight_power()
-  return override_power
-end
-
-
-function switch_use_overweight( mode )
-  use_overweight = mode and true or false
 end
