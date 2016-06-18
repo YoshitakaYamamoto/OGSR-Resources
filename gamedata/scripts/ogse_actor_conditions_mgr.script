@@ -30,7 +30,7 @@ local sprint_koef = get_float( "actor", "sprint_koef" )
 ASSERT(sprint_koef, "ogse_actor_conditions_mgr: 'actor:sprint_koef' parameter not found!")
 local walk_accel = get_float( "actor", "walk_accel" )
 ASSERT(walk_accel, "ogse_actor_conditions_mgr: 'actor:walk_accel' parameter not found!")
-local min_walk_accel = 4
+local min_walk_accel = 6
 local def_jump_power = get_float( "actor_condition", "jump_power" )
 ASSERT(def_jump_power, "ogse_actor_conditions_mgr: 'actor_condition:jump_power' parameter not found!")
 local jump_weight_power = get_float( "actor_condition", "jump_weight_power" )
@@ -302,12 +302,12 @@ function on_update()
 
   if act.satiety < light_hunger_limit then
     cur_jump_power = cur_jump_power + (
-      ( 0.9 - cur_jump_power ) * ( 1 - ( act.satiety / light_hunger_limit ) )
+      ( 0.2 - cur_jump_power ) * ( 1 - ( act.satiety / light_hunger_limit ) )
     )
   end
   if act.health < 0.9 then
     cur_jump_power = cur_jump_power + (
-      ( 0.9 - cur_jump_power ) * ( 1 - ( act.health / 0.9 ) )
+      ( 0.2 - cur_jump_power ) * ( 1 - ( act.health / 0.9 ) )
     )
     if act.health < 0.8 then
       local health_inert = 0.8 - act.health
