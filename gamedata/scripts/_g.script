@@ -1147,54 +1147,67 @@ function dbg_sys_ini:__init()
 end
 function dbg_sys_ini:line_count(sec)
 	log3("dbg_sys_ini:line_count: %s", sec)
+	log1(debug.traceback())
 	return orig_sys_ini:line_count(sec)
 end
 function dbg_sys_ini:section_exist(sec)
 	log3("dbg_sys_ini:section_exist: %s", sec)
+	log1(debug.traceback())
 	return orig_sys_ini:section_exist(sec)
 end
 function dbg_sys_ini:line_exist(sec, param)
 	log3("dbg_sys_ini:line_exist: %s - %s", sec, param)
+	log1(debug.traceback())
 	return orig_sys_ini:line_exist(sec, param)
 end
 function dbg_sys_ini:r_bool(sec, param)
 	log3("dbg_sys_ini:r_bool: %s - %s", sec, param)
+	log1(debug.traceback())
 	return orig_sys_ini:r_bool(sec, param)
 end
 function dbg_sys_ini:r_float(sec, param)
 	log3("dbg_sys_ini:r_float: %s - %s", sec, param)
+	log1(debug.traceback())
 	return orig_sys_ini:r_float(sec, param)
 end
 function dbg_sys_ini:r_clsid(sec, param)
 	log3("dbg_sys_ini:r_clsid: %s - %s", sec, param)
+	log1(debug.traceback())
 	return orig_sys_ini:r_clsid(sec, param)
 end
 function dbg_sys_ini:r_s32(sec, param)
 	log3("dbg_sys_ini:r_s32: %s - %s", sec, param)
+	log1(debug.traceback())
 	return orig_sys_ini:r_s32(sec, param)
 end
 function dbg_sys_ini:r_u32(sec, param)
 	log3("dbg_sys_ini:r_u32: %s - %s", sec, param)
+	log1(debug.traceback())
 	return orig_sys_ini:r_u32(sec, param)
 end
 function dbg_sys_ini:r_vector(sec, param)
 	log3("dbg_sys_ini:r_vector: %s - %s", sec, param)
+	log1(debug.traceback())
 	return orig_sys_ini:r_vector(sec, param)
 end
 function dbg_sys_ini:r_string_wq(sec, param)
 	log3("dbg_sys_ini:r_string_wq: %s - %s", sec, param)
+	log1(debug.traceback())
 	return orig_sys_ini:r_string_wq(sec, param)
 end
 function dbg_sys_ini:r_string(sec, param)
 	log3("dbg_sys_ini:r_string: %s - %s", sec, param)
+	log1(debug.traceback())
 	return orig_sys_ini:r_string(sec, param)
 end
 function dbg_sys_ini:r_token(...)
 	log3("dbg_sys_ini:r_token: %s - %s", sec, param)
+	log1(debug.traceback())
 	return orig_sys_ini:r_token(...)
 end
 function dbg_sys_ini:r_line(sec, line_num)
 	log3("dbg_sys_ini:r_line: %s - %s", sec, line_num)
+	log1(debug.traceback())
 	return orig_sys_ini:r_line(sec, line_num)
 end
 
