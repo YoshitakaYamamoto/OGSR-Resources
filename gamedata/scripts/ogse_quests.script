@@ -1751,20 +1751,12 @@ function nuke_burn_everyone()
 	for k, v in pairs(db.creature) do
 		local npc = level.object_by_id(k)
 		if npc then
-			local script
-			if IsMonster(npc) then 
-				script = bind_monster
-			elseif IsStalker(npc) then
-				script = xr_motivator
-			end
-			if script then
-				script.play_particle(npc,
-				{
-					obj=npc,
-					particle="damage_fx\\body_burn_02",
-					bone="bip01_spine"
-				})
-			end
+			dsh_particles.play_particle(npc, {
+				obj=npc,
+				particle="damage_fx\\body_burn_02",
+				bone="bip01_spine"
+			})
+
 			local blast_pos = vector():set(20.762310028076,34.853042602539,-250.56936645508)
 			local dist = npc:position():distance_to(blast_pos)
 			if dist < 150 then

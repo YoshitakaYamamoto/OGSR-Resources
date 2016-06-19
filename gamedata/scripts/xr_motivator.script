@@ -25,8 +25,6 @@ local pri_f_count = 0
 local pri_d_count = 0
 local pri_m_count = 0
 
-local particles={}
-
 ----------------------------------------------------------------------------------------------------------------------
 function protected_loot(object, backup)
 	death_manager.drop_manager(object, backup):create_release_item()
@@ -350,9 +348,9 @@ function motivator_binder:__init (obj) super(obj)
     self.first_update = false
 	self.treasure_processed = false
 	self.oDisguise = amkII_equip.CAmkDisguise()
-	self.particles = {}
 
 	self.am = ogse_signals.get_mgr()
+	self.am:call( "on_npc_init", obj, self )
 end
 
 function motivator_binder:extrapolate_callback(cur_pt)
@@ -373,8 +371,6 @@ function motivator_binder:reinit()
     if self.object == nil then return end
 	
     object_binder.reinit(self)
-    --memusage.collect_info(self.object, "reinit_start")
-    --printf("motivator_binder:reinit(): self.object:name()='%s'", self.object:name())
 
     -- КОЛЛБЕКИ ЗДЕСЬ СТАВИТЬ НЕЛЬЗЯ! Здесь еще неизвестна активная схема.
     -- Ставьте коллбеки в методе update в отмеченном комментарием месте.
@@ -414,9 +410,6 @@ local function del_zero_ammo(npc, item)
 end	
 
 function motivator_binder:net_spawn(sobject)
-	printf("motivator_binder:net_spawn(): self.object:name()='%s'", self.object:name())
-	--memusage.collect_info(self.object, "netspawn_start")
-	
 	ogse_debug.process_npc(self.object, "s_spw", 1)
 
 	ogse.fix_restrictors(self.object)
@@ -720,8 +713,6 @@ function motivator_binder:net_destroy()
 	
 	if xrs_ai then xrs_ai.npc_net_destroy(self.object) end
 
-	--printf("motivator_binder:net_destroy(): self.object:name()='%s'", self.object:name())
-
 	local st = db.storage[self.object:id()]
 	if st.active_scheme then
 		xr_logic.issue_event(self.object, st[st.active_scheme], "net_destroy", self.object)
@@ -737,15 +728,6 @@ function motivator_binder:net_destroy()
 
 	ogse_car_control.unregister_target(self.object)
 	ogse_scripted_btr.unregister_target(self.object)
-	
-	if table.getn(self.particles)>0 then
-		for kk,vv in pairs(self.particles) do
-			if not vv:is_finished() then
-				vv:stop()
-				self.particles[kk]=nil
-			end
-		end
-	end
 
 	self.am:call( "on_npc_net_destroy", self.object )
 	self.am:cleanup_signal_subs( "on_npc_update." .. self.object:id() )
@@ -1034,13 +1016,6 @@ function motivator_binder:death_callback(victim, who)
 	ogse_debug.process_npc(victim, "dth", 19)
 	ogse_car_control.unregister_target(self.object)
 	ogse_scripted_btr.unregister_target(self.object)
-	
-	ogse_debug.process_npc(victim, "dth", 20)
-	if table.getn(self.particles)>0 then
-		for kk,vv in pairs(self.particles) do
-				vv:on_death()
-		end
-	end	
 
 	ogse_debug.process_npc(victim, "dth", 21)
 
@@ -1138,14 +1113,13 @@ function motivator_binder:update(delta)
 	if best_enemy then
 		self.object:info_add('enemy -- ' .. best_enemy:name())
 	end
-
 	ogse_debug.process_npc(self.object, "upd", 7)
 	local active_section = db.storage[self.object:id()].active_section
 	if active_section then
 		self.object:info_add('section -- ' .. active_section)
 	end
 	self.object:info_add('name -- ' .. self.object:name())
-	
+
 	ogse_debug.process_npc(self.object, "upd", 8)
 	if xr_combat_companion then
 		xr_combat_companion.process_enemy(db.actor, self.object)
@@ -1162,27 +1136,6 @@ function motivator_binder:update(delta)
 		end	
 	end
 
-	ogse_debug.process_npc(self.object, "upd", 82)
-	if particles[self.object:id()] and table.getn(particles[self.object:id()])>0 then
-		for kk,vv in pairs(particles[self.object:id()]) do
-			if amk_particle then
-				table.insert(self.particles,amk_particle.amk_particle(vv))
-				table.remove(particles[self.object:id()],kk)
-			end
-		end
-	end
-
-	ogse_debug.process_npc(self.object, "upd", 83)
-	if table.getn(self.particles)>0 then
-		for kk,vv in pairs(self.particles) do
-			if vv:is_finished() then
-				self.particles[kk]=nil
-			else
-				vv:update(delta)
-			end
-		end
-	end	
-
 	--ogse_debug.process_npc(self.object, "upd", 86)
 	--ogse_quest_guard.check_guard_necessity_for_object(self.object) --KRodin: Отключено, не вижу особого смысла в этом скрипте
 
@@ -1198,8 +1151,6 @@ end
 
 --**********************************************************************************
 function motivator_binder:check_light() --Апдейт включения/выключения фонарика.
-	--if not self.object:alive() then return end
-
 	if time_global() - self.last_update > 1000 then
 		ogse_debug.process_npc(self.object, "upd", 9)
 		sr_light.check_light(self.object)
@@ -1208,38 +1159,26 @@ function motivator_binder:check_light() --Апдейт включения/выключения фонарика.
 end
 
 function motivator_binder:trade_manager_update() --Апдейт торговли.
-	--if not self.object:alive() then return end
-
 	ogse_debug.process_npc(self.object, "upd", 10)
-	--if self.st.state_mgr.combat == false and self.st.state_mgr.alife == false then
-		trade_manager.update(self.object)
-	--end					
+	trade_manager.update(self.object)
 end
 
 function motivator_binder:xrs_ai_npc_update() --Обновление схем гранатометания, медика и переодевания.
-	--if not self.object:alive() then return end
-
 	ogse_debug.process_npc(self.object, "upd", 12)
 	if xrs_ai then xrs_ai.npc_update(self) end
 end
 
 function motivator_binder:rx_ai_npc_update() --Обновление оружейного менеджера.
-	--if not self.object:alive() then return end
-
 	ogse_debug.process_npc(self.object, "upd", 13)
 	if rx_ai then rx_ai.npc_update(self.object,self.st) end
 end
 
 function motivator_binder:check_art_weapon() --Проверка артефакта в руках.
-	--if not self.object:alive() then return end
-
 	ogse_debug.process_npc(self.object, "upd", 14)
 	check_art_weapon(self.object)
 end
 
 function motivator_binder:amkii_equip() --Проверка брони.
-	--if not self.object:alive() then return end
-
 	ogse_debug.process_npc(self.object, "upd", 15)
 	local chk_time = time_global()
 	if not armor_check[ self.object:id() ] or time_global() > armor_check[ self.object:id() ] then
@@ -1250,15 +1189,10 @@ end
 --***********************************************************************************
 
 function motivator_binder:reload(section)
-	--memusage.collect_info(self.object, "reload_start")
 	object_binder.reload(self, section)
-	--printf("motivator_binder:reload(): self.object:name()='%s'", self.object:name())
-	--self.object:set_pda_callback(pda_callback)
-	--memusage.collect_info(self.object, "reload_end")
 end
 
 function motivator_binder:net_save_relevant()
-	--printf("motivator_binder:net_save_relevant(): self.object:name()='%s'", self.object:name())
 	return true
 end
 
@@ -1306,9 +1240,7 @@ end
 function motivator_binder:load(reader)
 	self.loaded = true
 
-	printf("motivator_binder:load(): self.object:name()='%s'", self.object:name())
 	object_binder.load(self, reader)
-	printf("motivator_binder:object_binder.load(): self.object:name()='%s'", self.object:name())
 
 	if reader:r_eof() then
 		if self.object:alive() then
@@ -1474,11 +1406,4 @@ function addCommonPrecondition(action)
 		action:add_precondition (world_property(watcher_act.evid_near_stuff, false))
 	end
 
-end
-
-function play_particle(obj,params)
-	if not particles[obj:id()] then
-		particles[obj:id()]={}
-	end
-	table.insert(particles[obj:id()],params)
 end
