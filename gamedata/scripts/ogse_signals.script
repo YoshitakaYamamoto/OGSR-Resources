@@ -195,6 +195,13 @@ function signals_mgr:unsubscribe(slot_to_unsubscribe)
 		end
 	end
 end
+
+function signals_mgr:cleanup_signal_subs( signal )
+	if self.signals[ signal ] then
+		self.signals[ signal ] = { normal = {}, queue = {}, next_in_queue = 1 }
+	end
+end
+
 function signals_mgr:subscribe_module(module_name)
 	prefetch(module_name)
 	local res, msg = check_module(module_name)

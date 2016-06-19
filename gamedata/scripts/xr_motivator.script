@@ -19,8 +19,6 @@ local warn_check_timer = {}
 local snd_check_timer = {}
 local armor_check = {}
 
-local check_npc_on_fire_line = true
-
 local pri_checked = 0
 
 local pri_f_count = 0
@@ -28,9 +26,6 @@ local pri_d_count = 0
 local pri_m_count = 0
 
 local particles={}
-
-local watchdog = {}
-local watchdog_max = 7
 
 ----------------------------------------------------------------------------------------------------------------------
 function protected_loot(object, backup)
@@ -352,15 +347,11 @@ class "motivator_binder" (object_binder)
 function motivator_binder:__init (obj) super(obj)
 	self.loaded = false
 	self.last_update = 0
-	----memusage.collect_info(self.object, "__init")
-
     self.first_update = false
 	self.treasure_processed = false
-	if (amkII_equip) then
-		
-		self.oDisguise = amkII_equip.CAmkDisguise()
-	end	
+	self.oDisguise = amkII_equip.CAmkDisguise()
 	self.particles = {}
+
 	self.am = ogse_signals.get_mgr()
 end
 
@@ -422,7 +413,6 @@ local function del_zero_ammo(npc, item)
 	end		
 end	
 
-
 function motivator_binder:net_spawn(sobject)
 	printf("motivator_binder:net_spawn(): self.object:name()='%s'", self.object:name())
 	--memusage.collect_info(self.object, "netspawn_start")
@@ -479,7 +469,10 @@ function motivator_binder:net_spawn(sobject)
 	if not ogse.is_quest_npc(self.object) then
 		self.object:set_callback(callback.sound, motivator_binder.hear_callback, self)
 	end
-	
+
+	ogse_debug.process_npc(self.object, "s_spw", 5111)
+	self:subscribe_updaters()
+
 	ogse_debug.process_npc(self.object, "s_spw", 6)
 
     --' Загрузка историй для лагеря.
@@ -665,6 +658,63 @@ function motivator_binder:net_spawn(sobject)
 	return true
 end
 
+function motivator_binder:subscribe_updaters()
+	self.updaters = {
+		[ "list" ] = {
+			{
+				[ "alive" ] = self.check_light,
+			},
+			{
+				[ "alive" ] = self.trade_manager_update,
+			},
+			{
+				[ "alive" ] = self.xrs_ai_npc_update,
+			},
+			{
+				[ "alive" ] = self.rx_ai_npc_update,
+			},
+			{
+				[ "alive" ] = self.check_art_weapon,
+			},
+			{
+				[ "alive" ] = self.amkii_equip,
+			},
+		},
+		[ "subscribed" ] = {
+			[ "alive" ] = {},
+			[ "dead"  ] = {},
+		}
+	}
+
+	for _, item in ipairs( self.updaters.list ) do
+		local fun, subscribed
+		if self.object:alive() then
+			fun        = item.alive
+			subscribed = self.updaters.subscribed.alive
+		else
+			fun        = item.dead
+			subscribed = self.updaters.subscribed.dead
+		end
+		if fun then
+			if item.pre_check then
+				if not item.pre_check( self ) then
+					fun = nil
+				end
+			end
+		end
+		if fun then
+			local t = {
+				[ "signal" ] = "on_npc_update." .. self.object:id(),
+				[ "self"   ] = self,
+				[ "fun"    ] = fun,
+				[ "queued" ] = true,
+			}
+			table.insert( subscribed, t )
+			self.am:subscribe( t )
+		end
+	end
+end
+
 function motivator_binder:net_destroy()
 	xr_logic.save_logic_online(self.object)
 	
@@ -696,7 +746,10 @@ function motivator_binder:net_destroy()
 			end
 		end
 	end
-	
+
+	self.am:call( "on_npc_net_destroy", self.object )
+	self.am:cleanup_signal_subs( "on_npc_update." .. self.object:id() )
+
 	event("npc_net_destroy"):trigger({victim = self.object})
 
 	object_binder.net_destroy(self)
@@ -867,6 +920,8 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	
 	ogse_debug.process_npc(self.object, "hit", 16)
 	
+	self.am:call( "on_npc_hit", self.object, amount, local_direction, who, bone_index )
+
 	event("npc_hit"):trigger({victim = self.object, amount = amount, dir = local_direction, who = who, bone = bone_index})
 	
 	ogse_debug.process_npc(self.object, "hit", 0)
@@ -875,8 +930,12 @@ end
 
 function motivator_binder:death_callback(victim, who)
 
+	for _, s in ipairs( self.updaters.subscribed.alive ) do
+		self.am:unsubscribe( s )
+	end
+	self.updaters.subscribed.alive = {}
+
 	ogse_debug.process_npc(victim, "dth", 1)
-	
 	if who and victim and string.find(who:name(), "vehicle_btr") and ogse_car_control.current_car and who:id() == ogse_car_control.current_car:id() then
 		who = db.actor
 		local drop, err_msg = pcall(ogse_car_control.btr_kill,victim)
@@ -887,32 +946,26 @@ function motivator_binder:death_callback(victim, who)
 	end
 	
 	ogse_debug.process_npc(victim, "dth", 2)
-
 	ogse.deadmans_table[victim:id()] = tostring(game.time()).."_"..tostring(who:id())
 	
 	ogse_debug.process_npc(victim, "dth", 21)	
-
 	local name = tostring(victim:name())
 	ogse_hitfx.npc_on_death(victim, who)
 	
 	ogse_debug.process_npc(victim, "dth", 3)
-
 	if self.st.death then
 		xr_logic.issue_event(self.object, self.st.death, "death_callback", victim, who)
 	end
 	
 	ogse_debug.process_npc(victim, "dth", 4)	
-
 	if self.st.active_section then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", victim, who)
 	end
 	
 	ogse_debug.process_npc(victim, "dth", 5)	
-
 	sr_territory.issue_event(self.object, "death_callback", victim, who)
 	
 	ogse_debug.process_npc(victim, "dth", 6)	
-
 	if self.object then
 		smart_terrain.on_death(self.object:id())
 	elseif victim then
@@ -927,7 +980,6 @@ function motivator_binder:death_callback(victim, who)
 	end	
 	
 	ogse_debug.process_npc(victim, "dth", 7)
-
 	local drop, err_msg = pcall(protected_loot,self.object,victim)
 	if not drop then
 		log1("ERROR: XR_M protected_loot pcall FAIL "..victim:id().." reason: "..tostring(err_msg))
@@ -935,50 +987,28 @@ function motivator_binder:death_callback(victim, who)
 	end	
 	
 	ogse_debug.process_npc(victim, "dth", 8)
-
 	rx_ai.npc_death(self.object,who)
 	
 	ogse_debug.process_npc(victim, "dth", 9)
-
 	self:clear_callbacks()
 	
 	ogse_debug.process_npc(victim, "dth", 10)
-
 	-- добавим в постмортем-обработчик
 	db.add_deadman(self.object, victim)
 	
 	ogse_debug.process_npc(victim, "dth", 11)
-	
 	-- добавление опыта за убийство
---	if who:id() == db.actor:id() then
-		xr_statistic.addKillCount(who, self.object)
---	end
+	xr_statistic.addKillCount(who, self.object)
 	
 	ogse_debug.process_npc(victim, "dth", 13)
-
 	--проверка на аномалии  
 	ogse_death_artefact.on_death(victim, who)
 	
 	ogse_debug.process_npc(victim, "dth", 14)
-	
 	--проверка на мины
 	if checker_minefield then checker_minefield.mine_hit(victim,who) end
 	
-	ogse_debug.process_npc(victim, "dth", 15)
-	
-	-- --' Наносим небольшой импульс вперед.
-	-- local h = hit()
-	-- h.draftsman = self.object
-	-- h.type = hit.fire_wound
-	-- h.direction = db.actor:position():sub(self.object:position())
-	-- h:bone("pelvis")
-	-- h.power = 1
-	-- h.impulse = 10
-	-- self.object:hit(h)
-	
 	ogse_debug.process_npc(victim, "dth", 16)
-	
-
 	local community = self.object:character_community()
 	if	community == "zombied" or
 		community == "monolith" or
@@ -995,30 +1025,26 @@ function motivator_binder:death_callback(victim, who)
 	end
 	
 	ogse_debug.process_npc(victim, "dth", 17)
-	
 	--// xr_companion
 	xr_companion.companion_death(self.object)
 	
 	ogse_debug.process_npc(victim, "dth", 18)
-	
 	xr_effects.bar_territory_death(self.object, who)
 	
 	ogse_debug.process_npc(victim, "dth", 19)
-	
 	ogse_car_control.unregister_target(self.object)
 	ogse_scripted_btr.unregister_target(self.object)
 	
 	ogse_debug.process_npc(victim, "dth", 20)
-	
 	if table.getn(self.particles)>0 then
 		for kk,vv in pairs(self.particles) do
 				vv:on_death()
 		end
 	end	
-	
+
 	ogse_debug.process_npc(victim, "dth", 21)
 
-	ogse_signals.get_mgr():call("on_npc_death", victim, who)
+	self.am:call("on_npc_death", victim, who)
 	event("npc_death"):trigger({victim = self.object, who = who})
 
 	ogse_debug.process_npc(victim, "dth", 0)
@@ -1061,18 +1087,11 @@ end
 
 function motivator_binder:update(delta)
 	object_binder.update(self, delta)
-	
+
 	ogse_debug.check_monsters()
 	ogse_debug.check_actor()
-	
+
 	ogse_debug.process_npc(self.object, "upd", 1)
-	
-	if not watchdog[self.object:id()] then
-		watchdog[self.object:id()] = 0
-	end
-
---	self.prev_action_id = debug_helper.print_action(self.object, self.prev_action_id)
-
     if self.first_update == false then
 		--спавн друпа если не был произведен
         if self.object:alive() == false then
@@ -1085,28 +1104,25 @@ function motivator_binder:update(delta)
         end        
         self.first_update = true
     end
-	
-	ogse_debug.process_npc(self.object, "upd", 2)
 
+	ogse_debug.process_npc(self.object, "upd", 2)
 	--' Апдейт менеджера состояний тела
 	if self.st.state_mgr then
-		if self.object:alive() then
+		if self.object:alive() then --Вынести действия при смерти в соотв. калбек
 			self.st.state_mgr:update()
 		else
 			self.st.state_mgr = nil
 		end
 	end
-	
+
 	ogse_debug.process_npc(self.object, "upd", 3)
-	
 	--' Апдейт саундменеджера
-	if self.object:alive() then
+	if self.object:alive() then --TODO: Вынести подписку в сам скрипт и подписывать по условию что объект жив.
 		xr_sound.update(self.object)
 	end
-	
-	ogse_debug.process_npc(self.object, "upd", 5)
 
-	if self.object:alive() then
+	ogse_debug.process_npc(self.object, "upd", 5)
+	if self.object:alive() then --Вынести действия при смерти в соотв. калбек
 		if self.object:is_talk_enabled() then
 			self.object:set_tip_text("character_use")
 		else
@@ -1117,15 +1133,13 @@ function motivator_binder:update(delta)
 	end
 
 	ogse_debug.process_npc(self.object, "upd", 6)
-	
 	self.object:info_clear()
 	local best_enemy = self.object:best_enemy()
 	if best_enemy then
 		self.object:info_add('enemy -- ' .. best_enemy:name())
 	end
-	
+
 	ogse_debug.process_npc(self.object, "upd", 7)
-	
 	local active_section = db.storage[self.object:id()].active_section
 	if active_section then
 		self.object:info_add('section -- ' .. active_section)
@@ -1133,13 +1147,12 @@ function motivator_binder:update(delta)
 	self.object:info_add('name -- ' .. self.object:name())
 	
 	ogse_debug.process_npc(self.object, "upd", 8)
-	
 	if xr_combat_companion then
 		xr_combat_companion.process_enemy(db.actor, self.object)
 	else	
 		log1("--xr_combat_companion cannot be loaded!")
 	end
-	
+
 	ogse_debug.process_npc(self.object, "upd", 81)
 	if xr_companion.is_companion(self.object:id()) then
 		if xr_combat_companion then
@@ -1148,9 +1161,8 @@ function motivator_binder:update(delta)
 			log1("--xr_combat_companion cannot be loaded!")
 		end	
 	end
-	
+
 	ogse_debug.process_npc(self.object, "upd", 82)
-	
 	if particles[self.object:id()] and table.getn(particles[self.object:id()])>0 then
 		for kk,vv in pairs(particles[self.object:id()]) do
 			if amk_particle then
@@ -1161,7 +1173,6 @@ function motivator_binder:update(delta)
 	end
 
 	ogse_debug.process_npc(self.object, "upd", 83)
-	
 	if table.getn(self.particles)>0 then
 		for kk,vv in pairs(self.particles) do
 			if vv:is_finished() then
@@ -1171,118 +1182,72 @@ function motivator_binder:update(delta)
 			end
 		end
 	end	
-	
+
+	--ogse_debug.process_npc(self.object, "upd", 86)
+	--ogse_quest_guard.check_guard_necessity_for_object(self.object) --KRodin: Отключено, не вижу особого смысла в этом скрипте
+
 	ogse_debug.process_npc(self.object, "upd", 84)
-	
 	event("npc_update"):trigger({obj = self.object})
 
-	--' Проверка потери жизни
---[[
-	if lasttime == nil or
-	   game.get_game_time():diffSec(lasttime) > 1
-	then
-		printf("%f * %f", self.object.health, self.object.health - lasthealth)
-		lasthealth = self.object.health
-		lasttime = game.get_game_time()
-	end
-]]
---[[	if not self.debug_smrt then
-		for k, v in pairs( db.smart_terrain_by_id ) do
-			self.debug_smrt = true
+	ogse_debug.process_npc(self.object, "upd", 87)
+	self.am:call( "on_npc_update", self.object, delta )
+	self.am:call( "on_npc_update." .. self.object:id(), self.object, delta )
 
-			local o = alife():object( self.object:id() )
-
-			if v:enabled(o) then
-				v:register(o)
-			end
-
-			break
-		end
-	end]]
-	
-	ogse_debug.process_npc(self.object, "upd", 85)
-	
-	if watchdog[self.object:id()] == 1 then
-		-- Апдейт включения/выключения фонарика
-		if self.object:alive() then
-			if time_global() - self.last_update > 1000 then
-				ogse_debug.process_npc(self.object, "upd", 9)
-			   sr_light.check_light(self.object)
-			   self.last_update = time_global()
-			end	
-		end
-		-- Апдейт включения/выключения фонарика
-	end
-	if watchdog[self.object:id()] == 2 then
-		-- Апдейт торговли
-		ogse_debug.process_npc(self.object, "upd", 10)
-		if self.object:alive() then
-			if self.st.state_mgr.combat == false and
-			   self.st.state_mgr.alife == false
-			then
-				trade_manager.update(self.object)
-			end					
-		end
-		-- Апдейт торговли
-	end
-	if watchdog[self.object:id()] == 3 then
-		-- Обновление схем гранатометания, медика и переодевания
-		ogse_debug.process_npc(self.object, "upd", 12)
-		if self.object:alive() then
-			if xrs_ai then xrs_ai.npc_update(self) end
-		end
-		-- Обновление схем гранатометания, медика и переодевания
-	end
-	if watchdog[self.object:id()] == 4 then
-		-- Обновление оружейного менеджера
-		ogse_debug.process_npc(self.object, "upd", 13)
-		if self.object:alive() then
-			if rx_ai then rx_ai.npc_update(self.object,self.st) end
-		end
-		-- Обновление оружейного менеджера
-	end
-	if watchdog[self.object:id()] == 5 then
-		-- Проверка артефакта в руках
-		ogse_debug.process_npc(self.object, "upd", 14)
-		if self.object:alive() then
-			check_art_weapon(self.object)
-		end
-		-- Проверка артефакта в руках
-	end
-	if watchdog[self.object:id()] == 6 then
-		-- Проверка брони
-		ogse_debug.process_npc(self.object, "upd", 15)
-		if self.object:alive() then
-			local chk_time = time_global()
-			if not armor_check[self.object:id()] then
-				armor_check[self.object:id()] = time_global() + math.random(10000, 30000)
-				if (amkII_equip) then
-					amkII_equip.CAmkDisguise():PeriodicalUpdate(self.object)
-				end	
-			elseif chk_time > armor_check[self.object:id()] then
-				armor_check[self.object:id()] = time_global() + math.random(10000, 30000)
-				if (amkII_equip) then
-					amkII_equip.CAmkDisguise():PeriodicalUpdate(self.object)
-				end		
-			end
-		end
-		-- Проверка брони
-	end	
-
-	ogse_debug.process_npc(self.object, "upd", 86)
-	
-	ogse_quest_guard.check_guard_necessity_for_object(self.object)
-	
-	ogse_debug.process_npc(self.object, "upd", 16)
-	
-	watchdog[self.object:id()] = watchdog[self.object:id()] + 1
-	if watchdog[self.object:id()] >= watchdog_max then
-		watchdog[self.object:id()] = 0
-	end
-	
 	ogse_debug.process_npc(self.object, "upd", 0)
-	
 end
+
+--**********************************************************************************
+function motivator_binder:check_light() --Апдейт включения/выключения фонарика.
+	--if not self.object:alive() then return end
+
+	if time_global() - self.last_update > 1000 then
+		ogse_debug.process_npc(self.object, "upd", 9)
+		sr_light.check_light(self.object)
+		self.last_update = time_global()
+	end
+end
+
+function motivator_binder:trade_manager_update() --Апдейт торговли.
+	--if not self.object:alive() then return end
+
+	ogse_debug.process_npc(self.object, "upd", 10)
+	--if self.st.state_mgr.combat == false and self.st.state_mgr.alife == false then
+		trade_manager.update(self.object)
+	--end					
+end
+
+function motivator_binder:xrs_ai_npc_update() --Обновление схем гранатометания, медика и переодевания.
+	--if not self.object:alive() then return end
+
+	ogse_debug.process_npc(self.object, "upd", 12)
+	if xrs_ai then xrs_ai.npc_update(self) end
+end
+
+function motivator_binder:rx_ai_npc_update() --Обновление оружейного менеджера.
+	--if not self.object:alive() then return end
+
+	ogse_debug.process_npc(self.object, "upd", 13)
+	if rx_ai then rx_ai.npc_update(self.object,self.st) end
+end
+
+function motivator_binder:check_art_weapon() --Проверка артефакта в руках.
+	--if not self.object:alive() then return end
+
+	ogse_debug.process_npc(self.object, "upd", 14)
+	check_art_weapon(self.object)
+end
+
+function motivator_binder:amkii_equip() --Проверка брони.
+	--if not self.object:alive() then return end
+
+	ogse_debug.process_npc(self.object, "upd", 15)
+	local chk_time = time_global()
+	if not armor_check[ self.object:id() ] or time_global() > armor_check[ self.object:id() ] then
+		armor_check[ self.object:id() ] = time_global() + math.random( 10000, 30000 )
+		amkii_equip.CAmkDisguise():PeriodicalUpdate( self.object )
+	end
+end
+--***********************************************************************************
 
 function motivator_binder:reload(section)
 	--memusage.collect_info(self.object, "reload_start")
@@ -1507,10 +1472,6 @@ function addCommonPrecondition(action)
 	if watcher_act then
 		action:add_precondition (world_property(watcher_act.evid_see_stuff, false))
 		action:add_precondition (world_property(watcher_act.evid_near_stuff, false))
-	end
-
-	if not ogse_anomaly_evader.turn_off_path_around then
-		action:add_precondition(world_property(ogse_anomaly_evader.prop_evade,false))
 	end
 
 end

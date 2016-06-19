@@ -17,9 +17,6 @@ load_scheme("xr_danger",	  "danger",      stype_stalker)
 if ogsm_hideout then
 	load_scheme("ogsm_hideout",    "ogsm_hideout",      stype_stalker)
 end
-if not ogse_anomaly_evader.turn_off_path_around then
-	load_scheme("ogse_anomaly_evader",    "evader",      stype_stalker)
-end
 load_scheme("xr_abuse",		  "abuse",       stype_stalker)
 load_scheme("xr_walker",      "walker",      stype_stalker)
 load_scheme("xr_remark",      "remark",      stype_stalker)
@@ -27,7 +24,6 @@ load_scheme("xr_sleeper",     "sleeper",     stype_stalker)
 load_scheme("xr_kamp",        "kamp",        stype_stalker)
 load_scheme("xr_camper",      "camper",      stype_stalker)
 load_scheme("xr_meet",		  "meet",        stype_stalker)
---load_scheme("xr_reactions",	  "reactions",   stype_stalker)
 load_scheme("xr_test",        "test",        stype_stalker)
 load_scheme("xr_heli_hunter", "heli_hunter", stype_stalker)
 load_scheme("xr_attendant",   "follower",    stype_stalker)
@@ -49,7 +45,9 @@ end
 if xrs_ai then 
 	xrs_ai.load_schemes() 
 end
-if rx_ai then rx_ai.load_schemes() end
+if rx_ai then
+	rx_ai.load_schemes()
+end
 
 ----------------------------------------------------------------------
 -- Загрузка модулей монстров:
@@ -116,4 +114,3 @@ load_scheme("sr_aes_deadzone","sr_aes_deadzone",stype_restrictor)
 load_scheme("sr_sleep",       "sr_sleep",       stype_restrictor)
 load_scheme("sr_cutscene",    "sr_cutscene",    stype_restrictor)
 load_scheme("ogsm_effector",    "ogsm_effector",    stype_restrictor)
-
