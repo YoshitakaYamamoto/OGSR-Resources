@@ -384,14 +384,14 @@ function motivator_binder:reinit()
     self.st = db.storage[self.object:id()]
 
     --' Создание менеджера контроля положений тела
-    --memusage.collect_info(self.object, "before_statemgr")
-	self.st.state_mgr = state_mgr.bind_manager(self.object)
+	if self.object:alive() then
+		self.st.state_mgr = state_mgr.bind_manager(self.object)
+	else
+		self.st.state_mgr = nil
+	end
 
 	self.st.move_mgr = move_mgr.move_mgr(self.object)
 	self.st.move_mgr:initialize()
-
-	--memusage.collect_info(self.object, "after_statemgr")
-	--memusage.collect_info(self.object, "reinit_end")
 end
 ----------------------------------------------------------------------------------------------------------------------
 
@@ -912,6 +912,8 @@ end
 
 function motivator_binder:death_callback(victim, who)
 
+	self.st.state_mgr = nil --блокируем апдейт менеджера состояний
+
 	for _, s in ipairs( self.updaters.subscribed.alive ) do
 		self.am:unsubscribe( s )
 	end
@@ -1069,10 +1071,11 @@ function motivator_binder:update(delta)
 	ogse_debug.process_npc(self.object, "upd", 1)
     if self.first_update == false then
 		--спавн друпа если не был произведен
-        if self.object:alive() == false then
+        if not self.object:alive() then
 			local obj = level.object_by_id(self.object:id())
-			if obj and IsStalker(obj) and (obj:object("device_torch") or obj:object("device_pda")) then
+			if obj and IsStalker(obj) then
 				death_manager.drop_manager(self.object, nil):create_release_item()
+				self.am:call( "on_npc_update", self.object, delta )
 				ogse_debug.process_npc(self.object, "upd", 0)
 				return
 			end				
@@ -1083,21 +1086,11 @@ function motivator_binder:update(delta)
 	ogse_debug.process_npc(self.object, "upd", 2)
 	--' Апдейт менеджера состояний тела
 	if self.st.state_mgr then
-		if self.object:alive() then --Вынести действия при смерти в соотв. калбек
-			self.st.state_mgr:update()
-		else
-			self.st.state_mgr = nil
-		end
-	end
-
-	ogse_debug.process_npc(self.object, "upd", 3)
-	--' Апдейт саундменеджера
-	if self.object:alive() then --TODO: Вынести подписку в сам скрипт и подписывать по условию что объект жив.
-		xr_sound.update(self.object)
+		self.st.state_mgr:update()
 	end
 
 	ogse_debug.process_npc(self.object, "upd", 5)
-	if self.object:alive() then --Вынести действия при смерти в соотв. калбек
+	if self.object:alive() then --Вынести апдейт в отдельный метод, а действия при смерти в соотв. калбек
 		if self.object:is_talk_enabled() then
 			self.object:set_tip_text("character_use")
 		else
@@ -1163,7 +1156,7 @@ function motivator_binder:trade_manager_update() --Апдейт торговли.
 	trade_manager.update(self.object)
 end
 
-function motivator_binder:xrs_ai_npc_update() --Обновление схем гранатометания, медика и переодевания.
+function motivator_binder:xrs_ai_npc_update() --Обновление схем гранатометания и медика.
 	ogse_debug.process_npc(self.object, "upd", 12)
 	if xrs_ai then xrs_ai.npc_update(self) end
 end
@@ -1178,7 +1171,7 @@ function motivator_binder:check_art_weapon() --Проверка артефакта в руках.
 	check_art_weapon(self.object)
 end
 
-function motivator_binder:amkii_equip() --Проверка брони.
+function motivator_binder:amkii_equip() --Апдейт переодевания.
 	ogse_debug.process_npc(self.object, "upd", 15)
 	local chk_time = time_global()
 	if not armor_check[ self.object:id() ] or time_global() > armor_check[ self.object:id() ] then

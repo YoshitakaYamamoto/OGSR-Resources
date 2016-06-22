@@ -8,8 +8,29 @@ function attach(sm)
 	sm:subscribe({signal = "on_update", fun = this.update_actor})
 	sm:subscribe({signal = "on_update", fun = this.actor_update_lp, queued = true})
 	--sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
+	sm:subscribe({ signal = "on_npc_death",  fun = this.on_npc_death })
+	sm:subscribe({ signal = "on_npc_spawn",  fun = this.on_npc_spawn })
 end
 
+function on_npc_spawn( obj, binder )
+	if not obj:alive() then return end
+	local s = {
+		[ "signal" ] = "on_npc_update." .. obj:id(),
+		[ "fun"    ] = this.update,
+		--[ "queued" ] = true,
+	}
+	binder[ script_name() .. ".subscribed" ] = s
+	ogse_signals.get_mgr():subscribe( s )
+end
+
+function on_npc_death( obj, who )
+	local binder     = obj:binded_object()
+	local subscribed = binder[ script_name() .. ".subscribed" ]
+	if subscribed then
+		ogse_signals.get_mgr():unsubscribe( subscribed )
+	end
+end
+ 
 -- сколько держать загруженный звук в мс
 -- влияет на работу функции get_safe_sound_object. Вместо того, чтобы держать все звуки бесконечно,
 -- удалять те, что существуют более этого значения
@@ -17,9 +38,6 @@ local sound_removal_threshold = 5000 -- 5 сек
 
 key_by_id = {}
 group_idle = {}
-
---function printf()
---end
 
 function get_sound(path, tt, npc)
 	if path == nil then return nil end
@@ -124,7 +142,6 @@ function set_sound(npc, sound, now, into_timeout)
 end
 
 function set_sound_play(npc, sound, timeout)
-	printf("*SND* play SND to [%s] for [%s]", utils.to_str(sound), npc:name())
 	local npc_id = npc:id()
 	if db.sound[npc_id] == nil then db.sound[npc_id] = {} end
 	if db.sound[npc_id].last_snd == nil then
