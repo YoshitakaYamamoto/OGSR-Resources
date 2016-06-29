@@ -643,10 +643,6 @@ local selector = {
 	["make_reinforcements_mad"] = function(params_string)
 		jekan_work.dar_zapravka_reinforcement_madness()
 	end,
-	
-	["phatnom_controller"] = function(params_string)
-		db.actor:disable_info_portion("phatnom_controller")
-	end,
 
 	["block_begin_dialog"] = function(params_string)
 		if has_alife_info("block_begin_dialog") then

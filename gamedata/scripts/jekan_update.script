@@ -357,7 +357,7 @@ local sound_obj_left = sound_object([[characters_voice\scenario\superkontroler\f
 function controller_special_effect(p_obj)
 	sound_obj_right.volume = 1.0
 	sound_obj_left.volume = 1.0
-	if not has_alife_info("actor_set_zombied") then
+	--if not has_alife_info("actor_set_zombied") then
 		if not sound_obj_left:playing() then 
 			local i=math.random(1,11)
 			if i==1 then 
@@ -444,7 +444,7 @@ function controller_special_effect(p_obj)
 				sound_obj_right:play_at_pos(db.actor, vector():set(-1, 0, 1), 0, sound_object.s2d) 
 			end
 		end
-	end
+	--end
 end
 
 function actor_fake_sleep()

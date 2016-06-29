@@ -17,7 +17,8 @@ if level.present() then
 	pos.y = pos.y + 2
 	pos.x = pos.x + 4
 
-	-- alife():create('esc_vehicle_btr',pos,db.actor:level_vertex_id(),db.actor:game_vertex_id())
+	--alife():create('zombie_plague',pos,db.actor:level_vertex_id(),db.actor:game_vertex_id())
+	--alife():create('rad_zombie_rusty',pos,db.actor:level_vertex_id(),db.actor:game_vertex_id())
 
 ogse.send_tip("Ђ—частье дл€ всех, даром, и пусть никто не уйдЄт обиженный!ї")
 end
