@@ -1069,15 +1069,12 @@ function motivator_binder:update(delta)
 	ogse_debug.check_actor()
 
 	ogse_debug.process_npc(self.object, "upd", 1)
-    if self.first_update == false then
+    if not self.first_update then
 		--спавн друпа если не был произведен
         if not self.object:alive() then
 			local obj = level.object_by_id(self.object:id())
 			if obj and IsStalker(obj) then
 				death_manager.drop_manager(self.object, nil):create_release_item()
-				self.am:call( "on_npc_update", self.object, delta )
-				ogse_debug.process_npc(self.object, "upd", 0)
-				return
 			end				
         end        
         self.first_update = true

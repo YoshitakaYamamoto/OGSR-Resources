@@ -321,14 +321,6 @@ function drop_manager:create_release_item()
 	end
 end
 
-function shedule_release(item)
-	if item then
-		if not deferred_release[item:id()] then
-			deferred_release[item:id()] = time_global()
-		end
-	end
-end
-
 --' Функция вызывается для каждого предмета в инвентаре убитого НПС
 function keep_item(npc, item)
 	if not item then return end
@@ -353,6 +345,14 @@ function keep_item(npc, item)
 		end
 	elseif item:is_weapon_magazined() then
 		set_weapon_drop_condition(item,npc)
+	end
+end
+
+function shedule_release(item)
+	if item then
+		if not deferred_release[item:id()] then
+			deferred_release[item:id()] = time_global()
+		end
 	end
 end
 
