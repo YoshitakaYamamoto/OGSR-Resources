@@ -342,7 +342,6 @@ function motivator_binder:__init (obj) super(obj)
 	self.last_update = 0
     self.first_update = false
 	self.treasure_processed = false
-	self.oDisguise = amkII_equip.CAmkDisguise()
 
 	self.am = ogse_signals.get_mgr()
 	self.am:call( "on_npc_init", obj, self )
@@ -638,9 +637,6 @@ function motivator_binder:subscribe_updaters()
 			},
 			{
 				[ "alive" ] = self.check_art_weapon,
-			},
-			{
-				[ "alive" ] = self.amkii_equip,
 			},
 		},
 		[ "subscribed" ] = {
@@ -1062,11 +1058,6 @@ end
 
 function motivator_binder:check_art_weapon() --Проверка артефакта в руках.
 	check_art_weapon(self.object)
-end
-
-function motivator_binder:amkii_equip() --Апдейт переодевания.
-	ogse_signals.get_mgr():reschedule(math.random( 10000, 30000 ))
-	amkii_equip.CAmkDisguise():PeriodicalUpdate( self.object )
 end
 --***********************************************************************************
 

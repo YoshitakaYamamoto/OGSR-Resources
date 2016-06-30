@@ -848,17 +848,11 @@ function act_grab_item:execute()
 				gi:iterate_inventory(function (d,item)
 				if item:section() ~= "bolt" and not do_not_touch(item) then 
 					gi:transfer_item(item,npc)
-					if (amkII_equip) and (amkII_equip.aOutfitsList[gi:section()]) then
-						amkII_equip.CAmkDisguise():Update(npc, gi)
-					end				
 				end end, nil)
 				corpse_checked[gi:id()] = false -- нет больше лута тут
 			else
 				gi:transfer_item(gi,npc)
 				npc:enable_memory_object(gi,false)
-				if (amkII_equip) and (amkII_equip.aOutfitsList[gi:section()]) then
-					amkII_equip.CAmkDisguise():Update(npc, gi)
-				end
 			end
 			claimed_pos[gi:level_vertex_id()] = nil
 			obj_owner[gi:id()] = nil
