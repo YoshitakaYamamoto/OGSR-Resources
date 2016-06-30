@@ -1,3 +1,4 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
 -------------------------------------------------------------------------------
 --| ogse_st_mgr.script                                                      |--
 --| Serializable Timers Manager                                             |--
@@ -5,364 +6,567 @@
 --| version 1.0                                                             |--
 -------------------------------------------------------------------------------
 
--- Использование сохраняемых (сериализуемых) таймеров в целом похоже на использование
--- "быстрых" таймеров из модуля ogse_qt.script. Создаётся объект таймера, в нём 
--- создаются методы условия и действия, он запускается и далее живёт своей жизнью,
--- срабатывая по условию и выполняя в нужный момент заданное действие.
--- Первое отличие от quick_timer в некоторых ограничениях при создании, связанных
--- с необходимостью создавать объект класса таймера заново при загрузке.
--- Второе отличие, в наличии методов save/load, в которых таймер может сохранить
--- любые данные, необходимые ему для работы. Это могут быть как данные, необходимые для
--- проверки условия, так и данные необходимые для выполнения действия.
+-- РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ СЃРѕС…СЂР°РЅСЏРµРјС‹С… (СЃРµСЂРёР°Р»РёР·СѓРµРјС‹С…) С‚Р°Р№РјРµСЂРѕРІ РІ С†РµР»РѕРј РїРѕС…РѕР¶Рµ РЅР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ
+-- "Р±С‹СЃС‚СЂС‹С…" С‚Р°Р№РјРµСЂРѕРІ РёР· РјРѕРґСѓР»СЏ ogse_qt.script. РЎРѕР·РґР°С‘С‚СЃСЏ РѕР±СЉРµРєС‚ С‚Р°Р№РјРµСЂР°, РІ РЅС‘Рј 
+-- СЃРѕР·РґР°СЋС‚СЃСЏ РјРµС‚РѕРґС‹ СѓСЃР»РѕРІРёСЏ Рё РґРµР№СЃС‚РІРёСЏ, РѕРЅ Р·Р°РїСѓСЃРєР°РµС‚СЃСЏ Рё РґР°Р»РµРµ Р¶РёРІС‘С‚ СЃРІРѕРµР№ Р¶РёР·РЅСЊСЋ,
+-- СЃСЂР°Р±Р°С‚С‹РІР°СЏ РїРѕ СѓСЃР»РѕРІРёСЋ Рё РІС‹РїРѕР»РЅСЏСЏ РІ РЅСѓР¶РЅС‹Р№ РјРѕРјРµРЅС‚ Р·Р°РґР°РЅРЅРѕРµ РґРµР№СЃС‚РІРёРµ.
+-- РџРµСЂРІРѕРµ РѕС‚Р»РёС‡РёРµ РѕС‚ quick_timer РІ РЅРµРєРѕС‚РѕСЂС‹С… РѕРіСЂР°РЅРёС‡РµРЅРёСЏС… РїСЂРё СЃРѕР·РґР°РЅРёРё, СЃРІСЏР·Р°РЅРЅС‹С…
+-- СЃ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊСЋ СЃРѕР·РґР°РІР°С‚СЊ РѕР±СЉРµРєС‚ РєР»Р°СЃСЃР° С‚Р°Р№РјРµСЂР° Р·Р°РЅРѕРІРѕ РїСЂРё Р·Р°РіСЂСѓР·РєРµ.
+-- Р’С‚РѕСЂРѕРµ РѕС‚Р»РёС‡РёРµ, РІ РЅР°Р»РёС‡РёРё РјРµС‚РѕРґРѕРІ save/load, РІ РєРѕС‚РѕСЂС‹С… С‚Р°Р№РјРµСЂ РјРѕР¶РµС‚ СЃРѕС…СЂР°РЅРёС‚СЊ
+-- Р»СЋР±С‹Рµ РґР°РЅРЅС‹Рµ, РЅРµРѕР±С…РѕРґРёРјС‹Рµ РµРјСѓ РґР»СЏ СЂР°Р±РѕС‚С‹. Р­С‚Рѕ РјРѕРіСѓС‚ Р±С‹С‚СЊ РєР°Рє РґР°РЅРЅС‹Рµ, РЅРµРѕР±С…РѕРґРёРјС‹Рµ РґР»СЏ
+-- РїСЂРѕРІРµСЂРєРё СѓСЃР»РѕРІРёСЏ, С‚Р°Рє Рё РґР°РЅРЅС‹Рµ РЅРµРѕР±С…РѕРґРёРјС‹Рµ РґР»СЏ РІС‹РїРѕР»РЅРµРЅРёСЏ РґРµР№СЃС‚РІРёСЏ.
 --
--- Пример создания и использования простого таймера, использующего только
--- временнОе условие:
+-- РџСЂРёРјРµСЂ СЃРѕР·РґР°РЅРёСЏ Рё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РїСЂРѕСЃС‚РѕРіРѕ С‚Р°Р№РјРµСЂР°, РёСЃРїРѕР»СЊР·СѓСЋС‰РµРіРѕ С‚РѕР»СЊРєРѕ
+-- РІСЂРµРјРµРЅРЅРћРµ СѓСЃР»РѕРІРёРµ:
 --[[
 class "test_timer" (ogse_st_mgr.savable_timer)
 function test_timer:__init() super()
-	-- обязательная строка с именем класса таймера
-	self._class = script_name()..".test_timer"
+        -- РѕР±СЏР·Р°С‚РµР»СЊРЅР°СЏ СЃС‚СЂРѕРєР° СЃ РёРјРµРЅРµРј РєР»Р°СЃСЃР° С‚Р°Р№РјРµСЂР°
+        self._class = script_name()..".test_timer"
 end
--- метод для первичной инициализации, может иметь произвольное имя
+-- РјРµС‚РѕРґ РґР»СЏ РїРµСЂРІРёС‡РЅРѕР№ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё, РјРѕР¶РµС‚ РёРјРµС‚СЊ РїСЂРѕРёР·РІРѕР»СЊРЅРѕРµ РёРјСЏ
 function test_timer:set_data(s)
-	self.str = s
+        self.str = s
 end
--- перегруженные методы загрузки/сохранения пользовательских данных
+-- РїРµСЂРµРіСЂСѓР¶РµРЅРЅС‹Рµ РјРµС‚РѕРґС‹ Р·Р°РіСЂСѓР·РєРё/СЃРѕС…СЂР°РЅРµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… РґР°РЅРЅС‹С…
 function test_timer:load(packet)
-	self.str = packet:r_stringZ()
+        self.str = packet:r_stringZ()
 end
 function test_timer:save(packet)
-	packet:w_stringZ(self.str)
+        packet:w_stringZ(self.str)
 end
--- перегруженный метод действия по временнОму условию
+-- РїРµСЂРµРіСЂСѓР¶РµРЅРЅС‹Р№ РјРµС‚РѕРґ РґРµР№СЃС‚РІРёСЏ РїРѕ РІСЂРµРјРµРЅРЅРћРјСѓ СѓСЃР»РѕРІРёСЋ
 function test_timer:taction()
-	log1(self.str) -- что-то делаем в назначенное время
+        log1(self.str) -- С‡С‚Рѕ-С‚Рѕ РґРµР»Р°РµРј РІ РЅР°Р·РЅР°С‡РµРЅРЅРѕРµ РІСЂРµРјСЏ
 end
 
--- создание и запуск таймера
+-- СЃРѕР·РґР°РЅРёРµ Рё Р·Р°РїСѓСЃРє С‚Р°Р№РјРµСЂР°
 local t = test_timer()
 t:set_data("some string")
-t:set_delay(600) -- сработает через 10 минут реального времени
--- или
---t:set_gdelay(600) -- сработает через 10 минут игрового времени
--- или
---t:set_gtime(game.CTime():set(...)) -- сработает в заданный момент игрового времени
-t:start() -- запустить с низким приоритетом (по умолчанию)
--- или
---t:start(true) -- запустить с высоким приоритетом (проверка на каждом апдейте)
+t:set_delay(600) -- СЃСЂР°Р±РѕС‚Р°РµС‚ С‡РµСЂРµР· 10 РјРёРЅСѓС‚ СЂРµР°Р»СЊРЅРѕРіРѕ РІСЂРµРјРµРЅРё
+-- РёР»Рё
+--t:set_gdelay(600) -- СЃСЂР°Р±РѕС‚Р°РµС‚ С‡РµСЂРµР· 10 РјРёРЅСѓС‚ РёРіСЂРѕРІРѕРіРѕ РІСЂРµРјРµРЅРё
+-- РёР»Рё
+--t:set_gtime(game.CTime():set(...)) -- СЃСЂР°Р±РѕС‚Р°РµС‚ РІ Р·Р°РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚ РёРіСЂРѕРІРѕРіРѕ РІСЂРµРјРµРЅРё
+t:start() -- Р·Р°РїСѓСЃС‚РёС‚СЊ СЃ РЅРёР·РєРёРј РїСЂРёРѕСЂРёС‚РµС‚РѕРј (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ)
+-- РёР»Рё
+--t:start(true) -- Р·Р°РїСѓСЃС‚РёС‚СЊ СЃ РІС‹СЃРѕРєРёРј РїСЂРёРѕСЂРёС‚РµС‚РѕРј (РїСЂРѕРІРµСЂРєР° РЅР° РєР°Р¶РґРѕРј Р°РїРґРµР№С‚Рµ)
 ]]
 
--- Пример таймера с произвольным условием. Следит за неким неписем, который
--- когда-то может быть выйдет в онлайн:
+-- РџСЂРёРјРµСЂ С‚Р°Р№РјРµСЂР° СЃ РїСЂРѕРёР·РІРѕР»СЊРЅС‹Рј СѓСЃР»РѕРІРёРµРј. РЎР»РµРґРёС‚ Р·Р° РЅРµРєРёРј РЅРµРїРёСЃРµРј, РєРѕС‚РѕСЂС‹Р№
+-- РєРѕРіРґР°-С‚Рѕ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹Р№РґРµС‚ РІ РѕРЅР»Р°Р№РЅ:
 --[[
 class "conditional_timer" (ogse_st_mgr.savable_timer)
 function conditional_timer:__init(timer_id) super(timer_id)
-	self._class = script_name()..".conditional_timer"
+        self._class = script_name()..".conditional_timer"
 end
 function conditional_timer:init(npc_id)
-	self.npc_id = npc_id
-	return self -- для вызова цепочкой
+        self.npc_id = npc_id
+        return self -- РґР»СЏ РІС‹Р·РѕРІР° С†РµРїРѕС‡РєРѕР№
 end
--- перегруженные методы загрузки/сохранения пользовательских данных
+-- РїРµСЂРµРіСЂСѓР¶РµРЅРЅС‹Рµ РјРµС‚РѕРґС‹ Р·Р°РіСЂСѓР·РєРё/СЃРѕС…СЂР°РЅРµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… РґР°РЅРЅС‹С…
 function conditional_timer:load(packet)
-	self.npc_id = packet:r_u16()
+        self.npc_id = packet:r_u16()
 end
 function conditional_timer:save(packet)
-	packet:w_u16(self.npc_id)
+        packet:w_u16(self.npc_id)
 end
 function conditional_timer:condition()
-	self.npc = level.object_by_id(self.npc_id)
-	return self.npc
+        self.npc = level.object_by_id(self.npc_id)
+        return self.npc
 end
--- перегруженный метод действия по пользовательскому условию (имя метода action, а не taction !)
+-- РїРµСЂРµРіСЂСѓР¶РµРЅРЅС‹Р№ РјРµС‚РѕРґ РґРµР№СЃС‚РІРёСЏ РїРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРјСѓ СѓСЃР»РѕРІРёСЋ (РёРјСЏ РјРµС‚РѕРґР° action, Р° РЅРµ taction !)
 function conditional_timer:action()
-	self.npc:kill(db.actor) -- что-то делаем при появлении чувака
+        self.npc:kill(db.actor) -- С‡С‚Рѕ-С‚Рѕ РґРµР»Р°РµРј РїСЂРё РїРѕСЏРІР»РµРЅРёРё С‡СѓРІР°РєР°
 end
 
--- создание таймера, инициализация и запуск с низким приоритетом
+-- СЃРѕР·РґР°РЅРёРµ С‚Р°Р№РјРµСЂР°, РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Рё Р·Р°РїСѓСЃРє СЃ РЅРёР·РєРёРј РїСЂРёРѕСЂРёС‚РµС‚РѕРј
 conditional_timer("my_timer"):init(12345):start()
-get_timer("my_timer"):stop() -- передумали и остановили
+get_timer("my_timer"):stop() -- РїРµСЂРµРґСѓРјР°Р»Рё Рё РѕСЃС‚Р°РЅРѕРІРёР»Рё
 ]]
 
+
 function attach(sm)
-	sm:subscribe({signal = "on_load", fun = this.on_load})
-	sm:subscribe({signal = "on_save", fun = this.on_save})
+  sm:subscribe({ signal = "on_load",   fun = this.on_load   })
+  sm:subscribe( {signal = "on_save",   fun = this.on_save   })
+  sm:subscribe( {signal = "on_update", fun = this.on_update })
 end
 
--- уникальный идентификатор для переменной со списком таймеров. НЕ МЕНЯТЬ!
+
+-- СѓРЅРёРєР°Р»СЊРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РґР»СЏ РїРµСЂРµРјРµРЅРЅРѕР№ СЃРѕ СЃРїРёСЃРєРѕРј С‚Р°Р№РјРµСЂРѕРІ. РќР• РњР•РќРЇРўР¬!
 local root_guid = "{663A0135-0A8F-41D9-91BA-FCCBFD59B146}_root"
--- уникальная базовая часть идентификатора таймеров. НЕ МЕНЯТЬ!
+-- СѓРЅРёРєР°Р»СЊРЅР°СЏ Р±Р°Р·РѕРІР°СЏ С‡Р°СЃС‚СЊ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚Р°Р№РјРµСЂРѕРІ. РќР• РњР•РќРЇРўР¬!
 local storage_guid = "{36881905-5863-4D7C-BB12-0ECAC401FE1A}"
+local registry = {} -- С…СЂР°РЅРёР»РёС‰Рµ С‚Р°Р№РјРµСЂРѕРІ РІ РїР°РјСЏС‚Рё.
 
-local registry = {} -- хранилище таймеров в памяти.
--- 
+
 function delete_all_timers()
-	for id,timer in pairs(registry) do
-		timer:stop()
-	end
-end
--- функция для получения уникального идентификатора для таймера
-local function get_free_id()
-	for i=0,65535 do
-		local id = tostring(i)
-		if not registry[id] then return id end
-	end
-	abort("ogse_st_mgr.get_free_id: Can't find free id for timer!")
-end
--- получить таймер по идентификатору
-function get_timer(id)
-	local timer = registry[id]
-	ASSERT(timer, "ogse_st_mgr.get_timer: timer with id'"..id.."' doesn't exist")
-	return timer
-end
--- проверка существования таймера
-function timer_exists(id)
-	return registry[id] ~= nil
-end
--- загрузка всех таймеров
-function on_load()
-	local timers_list = ogse.load_var(root_guid, {}, "array")
-	for _,timer_id in ipairs(timers_list) do
-		local timer_chunk = ogse.load_var(storage_guid.."_"..timer_id)
-		local timer_class = timer_chunk:r_stringZ()
-		
-		local f, msg = loadstring("return "..timer_class.."(...)")
-		ASSERT(f, msg)
-		local timer = f(timer_id)
-		timer:_aux_load(timer_chunk)
-		timer:start(timer._high_priority)
-		ogse.delete_var(storage_guid.."_"..timer_id)
-	end
-end
--- сохранение состояния всех таймеров
-function on_save()
-	local timers_list = {}
-	for timer_id,timer in pairs(registry) do
-		table.insert(timers_list, timer_id)
-	end
-	ogse.save_var(root_guid, timers_list, "array")
+  for id, timer in pairs( registry ) do
+    timer:stop()
+  end
 end
 
----------------------------------------------------------------------------------
---< базовый класс сохраняемого таймера для отслеживания произвольного события >--
----------------------------------------------------------------------------------
+
+local function get_free_id()
+  for i = 0, 65535 do
+    local id = tostring( i )
+    if not registry[ id ] then return id end
+  end
+  abort( "ogse_st_mgr.get_free_id: Can't find free id for timer!" )
+end
+
+
+function get_timer( id )
+  local timer = registry[ id ]
+  ASSERT(
+    timer, "ogse_st_mgr.get_timer: timer with id'" .. id .. "' doesn't exist"
+  )
+  return timer
+end
+
+
+function timer_exists( id )
+  return registry[ id ] ~= nil
+end
+
+
+-- Р·Р°РіСЂСѓР·РєР° РІСЃРµС… С‚Р°Р№РјРµСЂРѕРІ
+function on_load()
+  local chunks = ogse.load_var_safe( script_name() .. ".chunks" )
+  if not chunks then return on_load_old() end
+  for _, pk in ipairs( chunks ) do
+    local timer_id    = pk:r_stringZ()
+    local timer_class = pk:r_stringZ()
+    local f, msg = loadstring( "return " .. timer_class .. "(...)" )
+    ASSERT( f, msg )
+    local timer = f( timer_id )
+    timer:_aux_load( pk )
+    timer.loaded = true
+    timer:start( timer._high_priority )
+  end
+  sort_all_timers()
+  log2( "[%s]: %s timers loaded", script_name(), table.getn( chunks ) )
+end
+
+
+function on_load_old()
+  local timers_list = ogse.load_var( root_guid, {}, "array" )
+  for _, timer_id in ipairs( timers_list ) do
+    local timer_chunk = ogse.load_var( storage_guid .. "_" .. timer_id )
+    local timer_class = timer_chunk:r_stringZ()
+    local f, msg = loadstring( "return " .. timer_class .. "(...)" )
+    ASSERT( f, msg )
+    local timer = f( timer_id )
+    timer:_aux_load( timer_chunk )
+    timer:start( timer._high_priority )
+    ogse.delete_var( storage_guid .. "_" .. timer_id )
+  end
+  ogse.delete_var( root_guid )
+  log2(
+    "[%s]: %s old timers loaded", script_name(), table.getn( timers_list )
+  )
+end
+
+
+-- СЃРѕС…СЂР°РЅРµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РІСЃРµС… С‚Р°Р№РјРµСЂРѕРІ
+function on_save()
+  local chunks = {}
+  for timer_id, timer in pairs( registry ) do
+    local pk = net_packet()
+    pk:w_begin( 123 )     -- РґРІСѓС…Р±Р°Р№С‚РѕРІР°СЏ Р·Р°РіР»СѓС€РєР°
+    pk:r_seek( 2 )        -- С‡С‚РѕР±С‹ РїСЂРѕРїСѓСЃС‚РёС‚СЊ СЌС‚Рё РґРІР° Р±Р°Р№С‚Р° РїСЂРё С‡С‚РµРЅРёРё
+    table.insert( chunks, pk )
+    pk:w_stringZ( timer_id )
+    timer:_aux_save( pk )
+  end
+  ogse.save_var( script_name() .. ".chunks", chunks, "array", "chunk" )
+  log2( "[%s]: %s timers saved", script_name(), table.getn( chunks ) )
+end
+
+
+local g_high_queue = {}
+local g_lowp_queue = {}
+local r_high_queue = {}
+local r_lowp_queue = {}
+function sort_all_timers()
+  for _, q in ipairs({
+    g_high_queue, g_lowp_queue, r_high_queue, r_lowp_queue
+  }) do
+    sort_any_timers( q )
+  end
+end
+
+function register_any_timer( t, prio )
+  local q, sort_by
+  if t._game_termination_time then
+    q       = prio and g_high_queue or g_lowp_queue
+    sort_by = t._game_termination_time
+  elseif t._residual_time then
+    q       = prio and r_high_queue or r_lowp_queue
+    sort_by = t._residual_time
+  else
+    abort( "unknown timer type: %s.%s", t._class, t._id )
+  end
+  table.insert( q, {
+    [ "sort_by" ] = sort_by,
+    [ "timer"   ] = t,
+  })
+  t._queue = q
+  if not t.loaded then
+    sort_any_timers( q )
+  end
+  registry[ t._id ] = t
+end
+
+function unregister_any_timer( t )
+  local q = t._queue
+  registry[ t._id ] = nil
+  local found = false
+  for i = 1, table.getn( q ) do
+    if rawequal( t, q[ i ].timer ) then
+      table.remove( q, i )
+      found = true
+      break
+    end
+  end
+  ASSERT( found, "can't find requested timer: %s.%s", t._class, t._id )
+end
+
+function sort_any_timers( q )
+  table.sort( q, function( a, b ) return a.sort_by < b.sort_by end )
+end
+
+
+function on_update()
+  process_r_queue( r_high_queue    )
+  process_r_queue( r_lowp_queue, 1 )
+  process_g_queue( g_high_queue    )
+  process_g_queue( g_lowp_queue, 1 )
+end
+
+function process_g_queue( q, n )
+  local cnt = 0
+  while (
+    table.getn( q ) > 0
+    and q[ 1 ].timer._game_termination_time <= game.get_game_time()
+  ) do
+    local t = q[ 1 ].timer
+    table.remove( q, 1 )
+    registry[ t._id ] = nil
+    t:taction()
+    cnt = cnt + 1
+    if n and cnt == n then break end
+  end
+end
+
+function process_r_queue( q, n )
+  local cnt = 0
+  while table.getn( q ) > 0 do
+    local t = q[ 1 ].timer
+    local time_from_loading = 1.0e-3 * ( time_global() - t._loading_time )
+    if t._residual_time <= time_from_loading then
+      table.remove( q, 1 )
+      registry[ t._id ] = nil
+      t:taction()
+      cnt = cnt + 1
+      if n and cnt == n then break end
+    else
+      break
+    end
+  end
+end
+
+
+-------------------------------------------------------------------------------
+--< Р±Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ СЃРѕС…СЂР°РЅСЏРµРјРѕРіРѕ С‚Р°Р№РјРµСЂР° РґР»СЏ РѕС‚СЃР»РµР¶РёРІР°РЅРёСЏ РїСЂРѕРёР·РІРѕР»СЊРЅРѕРіРѕ СЃРѕР±С‹С‚РёСЏ >
+-------------------------------------------------------------------------------
 
 class "savable_timer"
 
--- конструктор таймера в базовом классе
-function savable_timer:__init(timer_id)
-	self._class = "error: it is forbidden to create instances of a base savable timer class!"
-	if timer_id then
-		ASSERT(tostring(timer_id),
-			"savable_timer:__init: custom id assigned to timer must be a string or be convertible to a string")
-		ASSERT(not timer_exists(timer_id), "savable_timer:__init: timer with the id '"..timer_id.."' already exists!")
-		self._id = tostring(timer_id)
-	else
-		self._id = get_free_id()
-	end
+-- РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ С‚Р°Р№РјРµСЂР° РІ Р±Р°Р·РѕРІРѕРј РєР»Р°СЃСЃРµ
+function savable_timer:__init( timer_id )
+  self._class = "error: it is forbidden to create instances of a base savable timer class!"
+  self.loaded = false
+  if timer_id then
+    ASSERT(
+      tostring( timer_id ),
+      "savable_timer:__init: custom id assigned to timer must be a string or be convertible to a string"
+    )
+    ASSERT(
+      not timer_exists( timer_id ),
+      "savable_timer:__init: timer with the id '" .. timer_id .. "' already exists!"
+    )
+    self._id = tostring( timer_id )
+  else
+    self._id = get_free_id()
+  end
 end
-function savable_timer:_aux_load(packet)
-	self._high_priority = packet:r_bool()
-	-- загружаем сохранённое время срабатывания по шкале реальных и игровых секунд
-	local res_time = packet:r_float()
-	if res_time ~= 0 then
-		-- строго нулевое значение означает, что таймер реальных секунд не задан
-		self:set_delay(res_time)
-	end
-	-- загружаем игровое время срабатывания
-	--[[local a1 = packet:r_u32()
-	local a2 = packet:r_u32()
-	if a1~=0 or a2~=0 then -- если не нулевое
-		local t = game.CTime()
-		t:set_value(a1, a2)
-		self:set_gtime(t)
-	end]]
-	local end_t = utils.r_CTime_ex(packet)
-	if end_t ~= game.CTime() then
-		self:set_gtime(end_t)
-	end
-	-- загружаем игровое время запуска
-	--[[self._start_time = game.CTime()
-	self._start_time:set_value(
-		packet:r_u32(), -- a1
-		packet:r_u32()) -- a2]]
-	self._start_time = utils.r_CTime_ex(packet)
-	-- загружаем данные пользователя, если есть
-	if not packet:r_eof() then
-		self:load(packet)
-	end
+
+
+function savable_timer:_aux_load( packet )
+  self._high_priority = packet:r_bool()
+  -- Р·Р°РіСЂСѓР¶Р°РµРј СЃРѕС…СЂР°РЅС‘РЅРЅРѕРµ РІСЂРµРјСЏ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ РїРѕ С€РєР°Р»Рµ СЂРµР°Р»СЊРЅС‹С… Рё РёРіСЂРѕРІС‹С…
+  -- СЃРµРєСѓРЅРґ
+  local res_time = packet:r_float()
+  if res_time ~= 0 then
+    -- СЃС‚СЂРѕРіРѕ РЅСѓР»РµРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РѕР·РЅР°С‡Р°РµС‚, С‡С‚Рѕ С‚Р°Р№РјРµСЂ СЂРµР°Р»СЊРЅС‹С… СЃРµРєСѓРЅРґ РЅРµ Р·Р°РґР°РЅ
+    self:set_delay( res_time )
+  end
+  -- Р·Р°РіСЂСѓР¶Р°РµРј РёРіСЂРѕРІРѕРµ РІСЂРµРјСЏ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ
+  local end_t = utils.r_CTime_ex( packet )
+  if end_t ~= game.CTime() then
+    self:set_gtime( end_t )
+  end
+  -- Р·Р°РіСЂСѓР¶Р°РµРј РёРіСЂРѕРІРѕРµ РІСЂРµРјСЏ Р·Р°РїСѓСЃРєР°
+  self._start_time = utils.r_CTime_ex( packet )
+  -- Р·Р°РіСЂСѓР¶Р°РµРј РґР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ, РµСЃР»Рё РµСЃС‚СЊ
+  if not packet:r_eof() then
+    self:load( packet )
+  end
 end
-function savable_timer:_aux_save()
-	local timer_chunk = net_packet()
-	timer_chunk:w_begin(123)
-	timer_chunk:r_seek(2)
-	timer_chunk:w_stringZ(self._class)
-	timer_chunk:w_bool(self._high_priority)
-	-- сохранение времени срабатывания по шкале реального и игрового времени
-	-- включено в состав заголовка таймера.
-	-- сохраняем время до срабатывания по шкале реальных секунд
-	if self._residual_time then
-		-- вычисляем и пишем новое оставшееся до выполнения время
-		timer_chunk:w_float(self._residual_time - self._time_from_loading)
-	else
-		 -- строго нулевое значение будет означать, что таймер реальных секунд не задан
-		timer_chunk:w_float(0)
-	end
-	-- сохраняем игровое время срабатывания
-	--local a1,a2 = 0,0
-	if self._game_termination_time then
-		--a1,a2 = self._game_termination_time:get_value()
-		utils.w_CTime_ex(timer_chunk, self._game_termination_time)
-	else
-		utils.w_CTime_ex(timer_chunk, game.CTime())
-	end
-	--timer_chunk:w_u32(a1)
-	--timer_chunk:w_u32(a2)
-	
-	-- сохраняем время запуска
-	--local a1,a2 = self._start_time:get_value()
-	--timer_chunk:w_u32(a1)
-	--timer_chunk:w_u32(a2)
-	utils.w_CTime_ex(timer_chunk, self._start_time)
-	
-	-- теперь сохраняем данные пользователя, если есть
-	self:save(timer_chunk)
-	ogse.save_var(storage_guid.."_"..self._id, timer_chunk, "chunk")
+
+
+function savable_timer:_aux_save( timer_chunk )
+  timer_chunk:w_stringZ( self._class )
+  timer_chunk:w_bool( self._high_priority )
+  -- СЃРѕС…СЂР°РЅРµРЅРёРµ РІСЂРµРјРµРЅРё СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ РїРѕ С€РєР°Р»Рµ СЂРµР°Р»СЊРЅРѕРіРѕ Рё РёРіСЂРѕРІРѕРіРѕ РІСЂРµРјРµРЅРё
+  -- РІРєР»СЋС‡РµРЅРѕ РІ СЃРѕСЃС‚Р°РІ Р·Р°РіРѕР»РѕРІРєР° С‚Р°Р№РјРµСЂР°.
+  -- СЃРѕС…СЂР°РЅСЏРµРј РІСЂРµРјСЏ РґРѕ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ РїРѕ С€РєР°Р»Рµ СЂРµР°Р»СЊРЅС‹С… СЃРµРєСѓРЅРґ
+  if self._residual_time then
+    -- РІС‹С‡РёСЃР»СЏРµРј Рё РїРёС€РµРј РЅРѕРІРѕРµ РѕСЃС‚Р°РІС€РµРµСЃСЏ РґРѕ РІС‹РїРѕР»РЅРµРЅРёСЏ РІСЂРµРјСЏ
+    local time_from_loading = 1.0e-3 * ( time_global() - self._loading_time )
+    local delay = self._residual_time - time_from_loading
+    ASSERT( delay > 0, "wrong delay = %s: %s.%s", delay, self._class, self._id )
+    timer_chunk:w_float( delay )
+  else
+    -- СЃС‚СЂРѕРіРѕ РЅСѓР»РµРІРѕРµ Р·РЅР°С‡РµРЅРёРµ Р±СѓРґРµС‚ РѕР·РЅР°С‡Р°С‚СЊ, С‡С‚Рѕ С‚Р°Р№РјРµСЂ СЂРµР°Р»СЊРЅС‹С… СЃРµРєСѓРЅРґ РЅРµ
+    -- Р·Р°РґР°РЅ
+    timer_chunk:w_float( 0 )
+  end
+  -- СЃРѕС…СЂР°РЅСЏРµРј РёРіСЂРѕРІРѕРµ РІСЂРµРјСЏ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ
+  if self._game_termination_time then
+    utils.w_CTime_ex( timer_chunk, self._game_termination_time )
+  else
+    utils.w_CTime_ex( timer_chunk, game.CTime() )
+  end
+  -- СЃРѕС…СЂР°РЅСЏРµРј РІСЂРµРјСЏ Р·Р°РїСѓСЃРєР°
+  utils.w_CTime_ex( timer_chunk, self._start_time )
+  -- С‚РµРїРµСЂСЊ СЃРѕС…СЂР°РЅСЏРµРј РґР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ, РµСЃР»Рё РµСЃС‚СЊ
+  self:save( timer_chunk )
 end
--- задать точное время срабатывания в терминах игрового времени
-function savable_timer:set_gtime(t) -- аргумент - объект типа game.CTime
-	self._game_termination_time = game.CTime(t)
-	return self
+
+
+-- Р·Р°РґР°С‚СЊ С‚РѕС‡РЅРѕРµ РІСЂРµРјСЏ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ РІ С‚РµСЂРјРёРЅР°С… РёРіСЂРѕРІРѕРіРѕ РІСЂРµРјРµРЅРё
+function savable_timer:set_gtime( t ) -- Р°СЂРіСѓРјРµРЅС‚ - РѕР±СЉРµРєС‚ С‚РёРїР° game.CTime
+  self._game_termination_time = game.CTime( t )
+  return self
 end
---
+
+
 function savable_timer:get_start_time()
-	return game.CTime(self._start_time)
+  return game.CTime( self._start_time )
 end
+
+
 function savable_timer:get_end_time()
-	ASSERT(self._game_termination_time, "savable_timer:get_end_time: termination time is not defined!")
-	return game.CTime(self._game_termination_time)
+  ASSERT(
+    self._game_termination_time,
+    "savable_timer:get_end_time: termination time is not defined!"
+  )
+  return game.CTime( self._game_termination_time )
 end
-function savable_timer:set_gdelayDHMS(d,h,m,s)
-	local delay = d*24*3600 + h*3600+m*60+s
-	self:set_gdelay(delay)
-	return self
+
+
+function savable_timer:set_gdelayDHMS( d, h, m, s )
+  local delay = d * 24 * 3600 + h * 3600 + m * 60 + s
+  self:set_gdelay( delay )
+  return self
 end
--- задать задержку срабатывания от текушего времени в секундах игрового времени
--- аргумент - задержка в секундах, тип float (дробная часть задаёт микросекунды)
-function savable_timer:set_gdelay(delay)
-	local s,ms = math.modf(delay)
-	local t = game.CTime()
-	t:setHMSms(0,0,s,ms*1000)
-	self._game_termination_time = game.CTime(game.get_game_time() + t)
-	return self
+
+
+function savable_timer:set_HMS_of_day( h, m, s )
+  local pt      = { game.get_game_time():get() }
+  local now     = pt[ 4 ] * 3600 + pt[ 5 ] * 60 + pt[ 6 ] + pt[ 7 ] / 1000
+  local seconds = h * 3600 + m * 60 + s
+  if now > seconds then
+    seconds = ( 86400 - now ) + seconds
+  else
+    seconds = seconds - now
+  end
+  self:set_gdelay( seconds )
+  return self
 end
--- задать задержку срабатывания от текушего времени в секундах реального времени
--- аргумент - задержка в секундах, тип float
-function savable_timer:set_delay(delay)
-	self._residual_time = delay
-	self._loading_time = time_global()
-	self._time_from_loading = 0.0
-	return self
+
+
+-- Р·Р°РґР°С‚СЊ Р·Р°РґРµСЂР¶РєСѓ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ РѕС‚ С‚РµРєСѓС€РµРіРѕ РІСЂРµРјРµРЅРё РІ СЃРµРєСѓРЅРґР°С… РёРіСЂРѕРІРѕРіРѕ РІСЂРµРјРµРЅРё
+-- Р°СЂРіСѓРјРµРЅС‚ - Р·Р°РґРµСЂР¶РєР° РІ СЃРµРєСѓРЅРґР°С…, С‚РёРї float
+-- ( РґСЂРѕР±РЅР°СЏ С‡Р°СЃС‚СЊ Р·Р°РґР°С‘С‚ РјРёРєСЂРѕСЃРµРєСѓРЅРґС‹ )
+function savable_timer:set_gdelay( delay )
+  local s, ms = math.modf( delay )
+  local t = game.CTime()
+  t:setHMSms( 0, 0, s, ms * 1000 )
+  self._game_termination_time = game.CTime( game.get_game_time() + t )
+  return self
 end
-function savable_timer:set_delayDHMS(d,h,m,s)
-	local delay = d*24*3600 + h*3600+m*60+s
-	self:set_delay(delay)
-	return self
+
+
+-- Р·Р°РґР°С‚СЊ Р·Р°РґРµСЂР¶РєСѓ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ РѕС‚ С‚РµРєСѓС€РµРіРѕ РІСЂРµРјРµРЅРё РІ СЃРµРєСѓРЅРґР°С… СЂРµР°Р»СЊРЅРѕРіРѕ
+-- РІСЂРµРјРµРЅРё
+-- Р°СЂРіСѓРјРµРЅС‚ - Р·Р°РґРµСЂР¶РєР° РІ СЃРµРєСѓРЅРґР°С…, С‚РёРї float
+function savable_timer:set_delay( delay )
+  self._residual_time = delay
+  self._loading_time = time_global()
+  return self
 end
--- запустить таймер с указанием, в какую очередь поместить проверку
--- в отличие от "быстрых" таймеров приоритет по умолчанию - низкий
-function savable_timer:start(high_priority)
-	self._start_time = self._start_time or game.get_game_time()
-	self._high_priority = high_priority
-	self._cond_slot_desc = {signal = "on_update", self = self, fun = self._aux_cond, queued = not high_priority}
-	self._save_slot_desc = {signal = "on_save", self = self, fun = self._aux_save}
-	local sm = ogse_signals.get_mgr()
-	sm:subscribe(self._cond_slot_desc)
-	sm:subscribe(self._save_slot_desc)
-	registry[self._id] = self
-	return self
+
+
+function savable_timer:set_delayDHMS( d, h, m, s )
+  local delay = d * 24 * 3600 + h * 3600 + m * 60 + s
+  self:set_delay( delay )
+  return self
 end
--- останов таймера
+
+
+-- Р·Р°РїСѓСЃС‚РёС‚СЊ С‚Р°Р№РјРµСЂ СЃ СѓРєР°Р·Р°РЅРёРµРј, РІ РєР°РєСѓСЋ РѕС‡РµСЂРµРґСЊ РїРѕРјРµСЃС‚РёС‚СЊ РїСЂРѕРІРµСЂРєСѓ
+-- РІ РѕС‚Р»РёС‡РёРµ РѕС‚ "Р±С‹СЃС‚СЂС‹С…" С‚Р°Р№РјРµСЂРѕРІ РїСЂРёРѕСЂРёС‚РµС‚ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ - РЅРёР·РєРёР№
+function savable_timer:start( high_priority )
+  self._start_time     = self._start_time or game.get_game_time()
+  self._high_priority  = high_priority
+  self._cond_slot_desc = {
+    signal = "on_update",
+    self   = self,
+    fun    = self._aux_cond,
+    queued = not high_priority,
+  }
+  ogse_signals.get_mgr():subscribe( self._cond_slot_desc )
+  registry[ self._id ] = self
+  return self
+end
+
+
+-- РѕСЃС‚Р°РЅРѕРІ С‚Р°Р№РјРµСЂР°
 function savable_timer:stop()
-	ogse_signals.get_mgr():unsubscribe(self._cond_slot_desc)
-	ogse_signals.get_mgr():unsubscribe(self._save_slot_desc)
-	registry[self._id] = nil
-	local timer_storage_name = storage_guid.."_"..self._id
-	if ogse.var_exists(timer_storage_name) then
-		ogse.delete_var(timer_storage_name)
-	end
+  ogse_signals.get_mgr():unsubscribe( self._cond_slot_desc )
+  registry[ self._id ] = nil
 end
--- метод для внутреннего использования таймером
+
+
+-- РјРµС‚РѕРґ РґР»СЏ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ С‚Р°Р№РјРµСЂРѕРј
 function savable_timer:_aux_cond()
-	if self._game_termination_time and game.get_game_time() > self._game_termination_time then -- если сработал таймаут
-		self:stop()    -- останавливаем проверки		
-		self:taction() -- выполняем действие по таймауту
-		return
-	elseif self._residual_time then
-		self._time_from_loading = 1.0e-3 * (time_global() - self._loading_time)
-		if self._time_from_loading > self._residual_time then
-			self:stop()    -- останавливаем проверки		
-			self:taction() -- выполняем действие по таймауту
-			return
-		end
-	end
-	if self:condition() then -- если сработало условие
-		self:stop()	
-		self:action() -- выполняем действие по условия
-		return
-	end
+  if
+    self._game_termination_time
+    and game.get_game_time() > self._game_termination_time
+  then -- РµСЃР»Рё СЃСЂР°Р±РѕС‚Р°Р» С‚Р°Р№РјР°СѓС‚
+    self:stop()    -- РѕСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРѕРІРµСЂРєРё            
+    self:taction() -- РІС‹РїРѕР»РЅСЏРµРј РґРµР№СЃС‚РІРёРµ РїРѕ С‚Р°Р№РјР°СѓС‚Сѓ
+    return
+  elseif self._residual_time then
+    local time_from_loading = 1.0e-3 * ( time_global() - self._loading_time )
+    if time_from_loading > self._residual_time then
+      self:stop()    -- РѕСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРѕРІРµСЂРєРё          
+      self:taction() -- РІС‹РїРѕР»РЅСЏРµРј РґРµР№СЃС‚РІРёРµ РїРѕ С‚Р°Р№РјР°СѓС‚Сѓ
+      return
+    end
+  end
+  if self:condition() then -- РµСЃР»Рё СЃСЂР°Р±РѕС‚Р°Р»Рѕ СѓСЃР»РѕРІРёРµ
+    self:stop() 
+    self:action() -- РІС‹РїРѕР»РЅСЏРµРј РґРµР№СЃС‚РІРёРµ РїРѕ СѓСЃР»РѕРІРёСЏ
+    return
+  end
 end
--- условие-заглушка на случай использования только с таймаутом
+
+
+-- СѓСЃР»РѕРІРёРµ-Р·Р°РіР»СѓС€РєР° РЅР° СЃР»СѓС‡Р°Р№ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ С‚РѕР»СЊРєРѕ СЃ С‚Р°Р№РјР°СѓС‚РѕРј
 function savable_timer:condition()
-	return false
+  return false
 end
--- пустые действия в базовом классе. Нужны для того случая, 
--- когда не используем соответствующее действие в унаследованном классе
-function savable_timer:action() end
+
+
+-- РїСѓСЃС‚С‹Рµ РґРµР№СЃС‚РІРёСЏ РІ Р±Р°Р·РѕРІРѕРј РєР»Р°СЃСЃРµ. РќСѓР¶РЅС‹ РґР»СЏ С‚РѕРіРѕ СЃР»СѓС‡Р°СЏ, 
+-- РєРѕРіРґР° РЅРµ РёСЃРїРѕР»СЊР·СѓРµРј СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРµ РґРµР№СЃС‚РІРёРµ РІ СѓРЅР°СЃР»РµРґРѕРІР°РЅРЅРѕРј РєР»Р°СЃСЃРµ
+function savable_timer:action()  end
 function savable_timer:taction() end
--- переопределять для сохранения/загрузки пользовательских данных
-function savable_timer:load(packet) end
-function savable_timer:save(packet) end
+
+
+-- РїРµСЂРµРѕРїСЂРµРґРµР»СЏС‚СЊ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ/Р·Р°РіСЂСѓР·РєРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… РґР°РЅРЅС‹С…
+function savable_timer:load( packet ) end
+function savable_timer:save( packet ) end
+
 
 ----------------------------------------------------------------------------------------------------
---| Обёртка для упрощённого запуска таймера                                                      |--
---| позволяет запустить простой таймер с временнОй задержкой,                                    |--
---| который запускает заданную функцию, передавая её заданные параметры                          |--
+--| РћР±С‘СЂС‚РєР° РґР»СЏ СѓРїСЂРѕС‰С‘РЅРЅРѕРіРѕ Р·Р°РїСѓСЃРєР° С‚Р°Р№РјРµСЂР°                                                      |--
+--| РїРѕР·РІРѕР»СЏРµС‚ Р·Р°РїСѓСЃС‚РёС‚СЊ РїСЂРѕСЃС‚РѕР№ С‚Р°Р№РјРµСЂ СЃ РІСЂРµРјРµРЅРЅРћР№ Р·Р°РґРµСЂР¶РєРѕР№,                                    |--
+--| РєРѕС‚РѕСЂС‹Р№ Р·Р°РїСѓСЃРєР°РµС‚ Р·Р°РґР°РЅРЅСѓСЋ С„СѓРЅРєС†РёСЋ, РїРµСЂРµРґР°РІР°СЏ РµС‘ Р·Р°РґР°РЅРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹                          |--
 ----------------------------------------------------------------------------------------------------
-class "delayed_fun_start" (savable_timer)
-function delayed_fun_start:__init(name) super(name)
-	self._class = script_name()..".delayed_fun_start"
+class "delayed_fun_start" ( savable_timer )
+function delayed_fun_start:__init( name ) super( name )
+  self._class = script_name() .. ".delayed_fun_start"
 end
-function delayed_fun_start:init(action_name, ...)
-	self.action_name = action_name
-	self.user_action = loadstring("return "..self.action_name.."(...)")
-	ASSERT(self.user_action, "delayed_fun_start:init: can not compile function with the name '"..tostring(self.action_name).."'")
-	self.fun_params = {...}
-	return self
+
+function delayed_fun_start:init( action_name, ... )
+  self.action_name = action_name
+  self.user_action = loadstring( "return " .. self.action_name .. "( ... )" )
+  ASSERT(
+    self.user_action,
+    "delayed_fun_start:init: can not compile function with the name '%s'",
+    tostring( self.action_name )
+  )
+  self.fun_params = { ... }
+  return self
 end
-function delayed_fun_start:load(packet)
-	self.action_name = packet:r_stringZ()
-	self.user_action = loadstring("return "..self.action_name.."(...)")
-	ASSERT(self.user_action, "delayed_fun_start:load: can not compile function with the name '"..tostring(self.action_name).."'")
-	local array_item = ogse_unist.read_item_from_packet(packet)
-	ASSERT(array_item.type == ogse_unist.types.array, "delayed_fun_start:load: wrong parameters readed")
-	self.fun_params = array_item:get_value()
+
+function delayed_fun_start:load( packet )
+  self.action_name = packet:r_stringZ()
+  self.user_action = loadstring( "return " .. self.action_name .. "( ... )" )
+  ASSERT(
+    self.user_action,
+    "delayed_fun_start:load: can not compile function with the name '%s'",
+    tostring( self.action_name )
+  )
+  local array_item = ogse_unist.read_item_from_packet( packet )
+  ASSERT(
+    array_item.type == ogse_unist.types.array,
+   "delayed_fun_start:load: wrong parameters readed"
+  )
+  self.fun_params = array_item:get_value()
 end
-function delayed_fun_start:save(packet)
-	packet:w_stringZ(self.action_name)
-	local array_item = ogse_unist.create_item("", self.fun_params, "array")
-	ogse_unist.write_item_to_packet(packet, array_item)
+
+function delayed_fun_start:save( packet )
+  packet:w_stringZ( self.action_name )
+  local array_item = ogse_unist.create_item( "", self.fun_params, "array" )
+  ogse_unist.write_item_to_packet( packet, array_item )
 end
+
+function delayed_fun_start:start( high_priority )
+  self._start_time    = self._start_time or game.get_game_time()
+  self._high_priority = high_priority
+  register_any_timer( self, high_priority )
+  return self
+end
+
+function delayed_fun_start:stop()
+  unregister_any_timer( self )
+end
+
 function delayed_fun_start:condition()
-	return false
-end
-function delayed_fun_start:taction()
-	self.user_action(unpack(self.fun_params))
+  return false
 end
 
-function start_timer(name, delay, fname, ...)
-	return delayed_fun_start(name):set_delay(delay):init(fname, ...):start()
+function delayed_fun_start:taction()
+  self.user_action( unpack( self.fun_params ) )
 end
-function start_gtimer(name, delay, fname, ...)
-	return delayed_fun_start(name):set_gdelay(delay):init(fname, ...):start()
+
+
+function start_timer( name, delay, fname, ... )
+  return delayed_fun_start( name )
+    :set_delay( delay )
+    :init( fname, ... )
+    :start()
+end
+
+function start_gtimer( name, delay, fname, ... )
+  return delayed_fun_start( name )
+    :set_gdelay( delay )
+    :init( fname, ... )
+    :start()
 end
