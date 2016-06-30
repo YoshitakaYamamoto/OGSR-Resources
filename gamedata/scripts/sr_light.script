@@ -1,3 +1,44 @@
+function attach( sm )
+  sm:subscribe({ signal = "on_destroy",   fun = this.on_destroy   })
+  sm:subscribe({ signal = "on_npc_death", fun = this.on_death     })
+  sm:subscribe({ signal = "on_npc_spawn", fun = this.on_npc_spawn })
+end
+
+
+function on_npc_spawn( obj, binder )
+  if not obj:alive() then return end
+  local s = {
+    [ "signal" ] = "on_npc_update." .. obj:id(),
+    [ "fun"    ] = this.on_update,
+    [ "queued" ] = true,
+  }
+  binder[ script_name() .. ".subscribed" ] = s
+  ogse_signals.get_mgr():subscribe( s )
+end
+
+
+function on_update( obj )
+  --ogse_signals.get_mgr():reschedule( math.random( 6000, 12000 ) )
+  ogse_signals.get_mgr():reschedule( math.random( 1000, 3000 ) )
+  check_light( obj )
+end
+
+
+function on_death( obj )
+  local binder     = obj:binded_object()
+  local subscribed = binder[ script_name() .. ".subscribed" ]
+  if subscribed then
+    ogse_signals.get_mgr():unsubscribe( subscribed )
+  end
+  check_light( obj )
+end
+
+
+function on_destroy()
+  clean_up()
+end
+
+
 local light_zones = {}
 
 class "action_light"
@@ -46,32 +87,17 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.light = utils.cfg_get_bool (ini, section, "light_on", npc, false, false)
 end
 
-local engage_after = 20
-local engaged = {}
-
 ---------------------------------------------------------------------------------------------------------------------
 function check_light(stalker)
-	--'printf("[check_light %s] start", stalker:name())
     if not stalker then 
        return 
     end
-	
-	if not engaged[stalker:id()] then
-		engaged[stalker:id()] = 0
-	else	
-		if engaged[stalker:id()] < engage_after then
-			engaged[stalker:id()] = engaged[stalker:id()] + 1
-			return
-		end		
-	end
 
-	--'printf("[check_light %s] start_passed", stalker:name())
     local torch = stalker:object("device_torch")
     if not torch then
        return
     end
 
-	--'printf("[check_light %s] torch_passed", stalker:name())
 	local light = false
 	local forced = false
 
@@ -81,7 +107,7 @@ function check_light(stalker)
 		end
 		return
 	end
-	
+
 	if xr_companion.is_companion(stalker:id()) then
 		if xr_combat_companion.in_ambush(stalker) or ogse_night_vision.is_nv_working() then
 			if torch then
@@ -91,7 +117,6 @@ function check_light(stalker)
 		end
 	end
 
-	--'printf("[check_light %s] alive_passed: light=%s, forced=%s", stalker:name(), tostring(light), tostring(forced))
     --' Проверка по лайтзонам
     if not forced then
 	    for k,v in pairs(light_zones) do
@@ -103,7 +128,6 @@ function check_light(stalker)
     end
 
 	local weather = ogse_weather_mgr.monitoring_weather_sect
-	--'printf("[check_light %s] lightzone_passed: light=%s, forced=%s", stalker:name(), tostring(light), tostring(forced))
 	if not forced then
 		--' Проверка по времени суток (ночью всегда включено)
 		local htime = level.get_time_hours()
@@ -123,27 +147,23 @@ function check_light(stalker)
 		end
 	end			
 
-	--'printf("[check_light %s] timezone_passed: light=%s, forced=%s", stalker:name(), tostring(light), tostring(forced))
 	--' Проверка по активному действию
 	if not forced and light == true then
-		--' Фонарики должны быть выключены у костра
-		if stalker then
-			local scheme = db.storage[stalker:id()].active_scheme
-			if scheme and (scheme == "kamp" or scheme == "camper") then
-				light = false
-				forced = true
-			end
+		--' Фонарики должны быть выключены у костра или если непись спит.
+		local scheme = db.storage[stalker:id()].active_scheme
+		if scheme and (scheme == "kamp" or scheme == "camper" or scheme == "sleeper") then
+			light = false
+			forced = true
 		end
 	end
 
-	--'printf("[check_light %s] scheme_passed: light=%s, forced=%s", stalker:name(), tostring(light), tostring(forced))	
 	if not forced and light == true then
 		--' Фонарики должны быть выключены в бою. Но если в бою идет поиск врага - то включены.
-		if stalker and stalker:alive() and stalker:best_enemy() then
+		if stalker:alive() and stalker:best_enemy() then
 			light = false
 		end				
-	end
-	
+	end	
+
 	if light ~= nil and torch then
 		torch:enable_attachable_item(light)
 	end
