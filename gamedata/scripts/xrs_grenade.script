@@ -1,9 +1,53 @@
-----------------------------------------------------------------------------------------------------------------------
+------------------------------------------------
 --' Схема метания гранат и убегания от них
 --' мод OGSE, версия 2.5, 18/08/2011
 --' автор: xStream
 --' переработка, доработки алгоритма: KamikaZze
-----------------------------------------------------------------------------------------------------------------------
+------------------------------------------------
+
+function attach( sm )
+  sm:subscribe({ signal = "on_npc_death", fun = this.on_death     })
+  sm:subscribe({ signal = "on_npc_spawn", fun = this.on_npc_spawn })
+  sm:subscribe({ signal = "on_spawn",     fun = this.net_spawn    })
+  sm:subscribe({ signal = "on_update",    fun = this.update, queued = true })
+end
+
+
+function on_npc_spawn( obj, binder )
+  if not obj:alive() then return end
+  if
+    obj:character_community() == "ecolog"
+    or obj:character_community() == "zombied"
+    or obj:character_community() == "trader"
+    or obj:character_community() == "arena_enemy"
+    or obj:character_community() == "quest_stalker"
+    or obj:name() == "mil_stalker0012"
+    or obj:name() == "yantar_ecolog_general"
+    or string.find( obj:section(), "arena" )
+    or string.find( obj:section(), "aem" )
+  then
+    return
+  end
+
+  local s = {
+    [ "signal" ] = "on_npc_update." .. obj:id(),
+    [ "fun"    ] = this.npc_update,
+    [ "queued" ] = true,
+  }
+  binder[ script_name() .. ".subscribed" ] = s
+  ogse_signals.get_mgr():subscribe( s )
+end
+
+
+function on_death( obj )
+  local binder     = obj:binded_object()
+  local subscribed = binder[ script_name() .. ".subscribed" ]
+  if subscribed then
+    ogse_signals.get_mgr():unsubscribe( subscribed )
+  end
+  death_callback( obj )
+end
+
 
 gr_types={
 	[1]="grenade_f1",
@@ -13,7 +57,6 @@ gr_types={
 
 grenades = {}
 grenadiers = {}
-pseudo_grenades = {}
 
 local grenade_owners = {}
 local grenade_times = {}
@@ -725,56 +768,47 @@ function get_grenade_radius(section)
 	return r,t
 end
 
+
 function update()
-
-	for k,v in pairs(pseudo_grenades) do
-		local sobj = alife():object(k)
-		if sobj then
-			local obj = level.object_by_id(k)
-			if obj then 
-				obj:explode(0)
-				pseudo_grenades[k]=nil
-			end
-		else
-			pseudo_grenades[k]=nil
-		end
-	end
-
-	for k,v in pairs(grenades) do
-		local sobj = alife():object(k)
-		if sobj then
-			if time_global()>v then
-				local obj = level.object_by_id(k)
-				if obj then 
-					local a = alife():create(obj:section().."_fake",obj:position():add(vector():set(0,1,0)),obj:level_vertex_id(),obj:game_vertex_id())
-					level.client_spawn_manager():add(a.id, -1, mark_grenade_non_pickable)
-					if a then
-						pseudo_grenades[a.id]=true
-					end
-				end
-				if sobj then
-					alife():release(sobj, true)
-				end
-				grenades[k]=nil
-			end
-		else
-			grenades[k]=nil
-		end
-	end
-
-	for k,v in pairs(test_grenades) do
-		local sobj = alife():object(k)
-		if sobj then
-			if time_global()>v then
-				alife():release(sobj, true)
-				test_grenades[k]=nil
-			end
-		else
-			test_grenades[k]=nil
-		end
-	end
-
+  ogse_signals.get_mgr():reschedule( 1000 )
+  for k, v in pairs( grenades ) do
+    local sobj = alife():object( k )
+    if sobj then
+      if time_global() > v then
+        local obj = level.object_by_id( k )
+        if obj then
+          local a = alife():create(
+            obj:section() .. "_fake",
+            obj:position():add( vector():set( 0, 1, 0 ) ),
+            obj:level_vertex_id(), obj:game_vertex_id()
+          )
+          level.client_spawn_manager():add(
+            a.id, -1, function( id, obj )
+              mark_grenade_non_pickable( id, obj )
+              obj:explode( 0 )
+            end
+          )
+        end
+        alife():release( sobj, true )
+        grenades[ k ] = nil
+      end
+    else
+      grenades[ k ] = nil
+    end
+  end
+  for k, v in pairs( test_grenades ) do
+    local sobj = alife():object( k )
+    if sobj then
+      if time_global() > v then
+        alife():release( sobj, true )
+        test_grenades[ k ] = nil
+      end
+    else
+      test_grenades[ k ] = nil
+    end
+  end
 end
+
 
 function death_callback(npc)
 	if grenadiers[npc:id()] then
@@ -802,40 +836,30 @@ function check_enemy(npc,be)
 		) and be:alive() and npc:see(be) and be:position():distance_to(level.vertex_position(be:level_vertex_id()))<2 --из-за глюков движка кидать будем только в объекты, недалеко от аи сетки
 end
 
-function npc_update(binder)
-	local npc = binder.object
-	if not npc:alive() then return end
-	if not binder.grenade_update_time then binder.grenade_update_time=time_global()+15000 end
-
-	if time_global()>binder.grenade_update_time then
-		-- так дергаетс€ намного реже
-		if npc:character_community()=="ecolog" 
-		or npc:character_community()=="zombied" 
-		or npc:character_community()=="trader" 
-		or npc:character_community()=="arena_enemy" 
-		or npc:character_community()=="quest_stalker"		
-		or npc:name()=="mil_stalker0012" 
-		or npc:name()=="yantar_ecolog_general" 
-		or string.find(npc:section(),"arena") 
-		or string.find(npc:section(),"aem") then return end
-			  
-		for k,v in pairs(gr_types) do
-			local curr_gr = npc:object(v)
-			if not curr_gr then 
-				local sobj = alife():object(npc:id())
-				if sobj and sobj.rank and sobj:rank()~=0 then
-					local prb = sobj:rank()/2500
-					if prb>0.9 then prb=0.9 end
-					if prb<0.01 then prb=0.01 end
-					if v=="grenade_f1" then prb=prb/2 end
-					if math.random()<prb then alife():create(v,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id()) end
-				end
-			else
-				break
-			end
-		end
-		binder.grenade_update_time=time_global()+180000
-	end
+function npc_update( npc )
+  ogse_signals.get_mgr():reschedule(
+    120000 - 20000 * level.get_game_difficulty()
+  )
+  for k, v in ipairs( gr_types ) do
+    local curr_gr = npc:object( v )
+    if not curr_gr then
+      local sobj = alife():object( npc:id() )
+      if sobj and sobj.rank and sobj:rank() ~= 0 then
+        local prb = sobj:rank() / 2500
+        if prb > 0.9  then prb = 0.9  end
+        if prb < 0.01 then prb = 0.01 end
+        if math.random() < prb then
+          alife():create(
+            v,
+            npc:position(), npc:level_vertex_id(), npc:game_vertex_id(),
+            npc:id()
+          )
+        end
+      end
+    else
+      break
+    end
+  end
 end
 
 function throw(id,typ,target)
@@ -853,7 +877,7 @@ function throw(id,typ,target)
 end
 
 function net_spawn()
-	for a=0,65534 do
+	for a=1,65534 do
 		local sobj = alife():object(a)
 		if sobj then
 			for k,v in pairs(gr_types) do

@@ -1,9 +1,9 @@
-----------------------------------------------------------------------------------------------------------------------
+--------------------------------------------
 --'	Лечим нерадивых товарищей...
 --' ver: 2.0
 --'	автор: xStream
 --'	TODO: 
-----------------------------------------------------------------------------------------------------------------------
+--------------------------------------------
 
 local excluded_npcs={
 	["esc_fox"]						= true,
@@ -30,6 +30,50 @@ local excluded_npcs={
 	["ecolog"]						= true,
 	["agr_nii_plennik_stalker"]		= true,	
 }
+
+
+function attach( sm )
+  sm:subscribe({ signal = "on_npc_death", fun = this.on_death     })
+  sm:subscribe({ signal = "on_npc_spawn", fun = this.on_npc_spawn })
+end
+
+function on_npc_spawn( obj, binder )
+  if not obj:alive() then return end
+  if
+    excluded_npcs[ obj:name() ]
+    or excluded_npcs[ obj:character_community() ]
+  then
+    return
+  end
+  if
+    obj:character_community() == "zombied"
+    or obj:character_community() == "trader"
+    or obj:character_community() == "arena_enemy"
+    or obj:name() == "mil_stalker0012"
+    or obj:name() == "yantar_ecolog_general"
+  then
+    return
+  end
+
+  local s = {
+    [ "signal" ] = "on_npc_update." .. obj:id(),
+    [ "fun"    ] = this.npc_update,
+    [ "queued" ] = true,
+  }
+  binder[ script_name() .. ".subscribed" ] = s
+  ogse_signals.get_mgr():subscribe( s )
+end
+
+
+function on_death( obj )
+  local binder     = obj:binded_object()
+  local subscribed = binder[ script_name() .. ".subscribed" ]
+  if subscribed then
+    ogse_signals.get_mgr():unsubscribe( subscribed )
+  end
+  death_callback( obj )
+end
+
 
 mk_types={
 	[1]="medkit",
@@ -329,45 +373,47 @@ function death_callback(npc)
 	end
 end
 
-function npc_update(binder)
-	local npc = binder.object
-	
-	if not npc:alive() then 
-		wounded[npc:id()]=nil
-		has_medic[npc:id()]=nil
-		return 
-	end
-	
-	if excluded_npcs[npc:name()] or excluded_npcs[npc:character_community()] then return end
-	
-	if npc:critically_wounded() or npc:wounded() then
-		if not wounded[npc:id()] then
-			wounded[npc:id()]=true
-			for k,v in pairs(has_medic) do
-				if v == npc:id() then has_medic[k]=nil break end
-			end
-		end
-	else
-		wounded[npc:id()]=nil
-	end
-	
-	if not npc:object("yad") then
-		alife():create("yad",npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
-	end
-	
-	if not binder.medkit_update_time then binder.medkit_update_time=time_global()+5000 end
-	
-	if time_global()>binder.medkit_update_time then
-		if not npc:object("medkit") and not npc:object("medkit_army") and not npc:object("medkit_scientic") then
-			local sobj = alife():object(npc:id())
-			if sobj and sobj.rank and sobj:rank()~=0 then
-				if math.random()>0.2 then alife():create(mk_types[3%math.ceil(sobj:rank()/1000)+1],npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id()) end
-			end
-		end
-		if not npc:object("bandage") then
-			if math.random()>0.05 then alife():create("bandage",npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id()) end
-		end
-		binder.medkit_update_time=time_global()+300000
-	end
-	
+function npc_update( npc )
+  ogse_signals.get_mgr():reschedule( 300000 )
+  if npc:critically_wounded() or npc:wounded() then
+    if not wounded[ npc:id() ] then
+      wounded[ npc:id()   ] = true
+      has_medic[ npc:id() ] = nil
+    end
+  else
+    wounded[ npc:id() ] = nil
+  end
+  if not npc:object( "yad" ) then
+    alife():create(
+      "yad",
+      npc:position(),
+      npc:level_vertex_id(), npc:game_vertex_id(),
+      npc:id()
+    )
+  end
+  if
+    ( not npc:object( "medkit" ) )
+    and ( not npc:object( "medkit_army" ) )
+    and ( not npc:object( "medkit_scientic" ) )
+  then
+    local sobj = alife():object( npc:id() )
+    if sobj and sobj.rank and sobj:rank() ~= 0 then
+      if math.random() > 0.2 then
+        alife():create(
+          mk_types[ 3 % math.ceil( sobj:rank() / 1000 ) + 1 ],
+          npc:position(), npc:level_vertex_id(), npc:game_vertex_id(),
+          npc:id()
+        )
+      end
+    end
+  end
+  if not npc:object( "bandage" ) then
+    if math.random() > 0.05 then
+      alife():create(
+        "bandage",
+        npc:position(), npc:level_vertex_id(), npc:game_vertex_id(),
+        npc:id()
+      )
+    end
+  end
 end

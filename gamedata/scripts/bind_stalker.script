@@ -77,9 +77,6 @@ function actor_binder:net_spawn(data)
 	ogse_debug.process_actor("a_spw", 9)
 	death_manager.init_drop_settings() --Загружаем настройки дропа
 
-	ogse_debug.process_actor("a_spw", 12)
-	if xrs_ai then xrs_ai.actor_net_spawn() end
-
 	ogse_debug.process_actor("a_spw", 13)
 	if rx_ai then rx_ai.actor_net_spawn() end
 

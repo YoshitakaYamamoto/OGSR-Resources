@@ -63,7 +63,6 @@ function remove_deadman()
 		if v ~= 0 then
 			local obj = level.object_by_id(v)
 			if obj then
-				if xrs_ai then xrs_ai.npc_death_callback(obj) end
 				obj:iterate_inventory(death_manager.keep_item, obj)
 				dead_bodies[k] = 0
 				break
@@ -75,7 +74,7 @@ function remove_deadman()
 end
 
 function protected_loot(object, backup)
-	death_manager.drop_manager(object, backup):create_release_item()
+	death_manager.drop_manager(object):create_release_item()
 end
 
 function remove_delayed()

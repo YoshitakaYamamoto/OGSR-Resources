@@ -1,3 +1,20 @@
+
+function attach( sm )
+  sm:subscribe({ signal = "on_npc_death", fun = this.on_death })
+  sm:subscribe({ signal = "on_npc_first_update", fun = this.on_first_update })
+end
+
+function on_first_update( obj )
+  if not obj:alive() then
+    drop_manager( obj ):create_release_item()
+  end
+end
+
+function on_death( obj )
+  drop_manager( obj ):create_release_item()
+end
+
+
 local total_debug = false
 
 function write_log(str)
@@ -243,18 +260,14 @@ function keep_offline_item(npc, item)
 end
 
 class "drop_manager"
-function drop_manager:__init(npc, backup)
+function drop_manager:__init(npc)
 	self.npc = npc
-	self.backup = backup
 end
 
 function drop_manager:create_release_item()
-	if not self.npc or not IsStalker(self.npc) then
-		if self.backup and IsStalker(self.backup) then
-			self.npc = level.object_by_id(self.backup:id())
-		else
-			return
-		end
+	local obj = level.object_by_id(self.npc:id())
+	if not obj or not IsStalker(obj) then
+		return
 	end
 
 	--' Спрашиваем у серверного объекта генерились ли предметы

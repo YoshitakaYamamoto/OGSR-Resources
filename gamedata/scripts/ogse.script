@@ -1424,13 +1424,6 @@ end,
 
 function on_actor_update() --Колбэк на апдейт ГГ
 ---------------------АПДЕЙТЫ С ВЫСОКИМ ПРИОРИТЕТОМ ПОМЕЩАТЬ СЮДА!---------------------
---[[ --KRodin: отключено, эффектов из ogse_critical_hit вполне достаточно.
-	ogse_debug.process_actor("upd_a", 10)
-	ogsm_quests.wounded_pp() --эффекты ранения актора
-]]
-	ogse_debug.process_actor("upd_a", 13)
-	if xrs_ai then xrs_ai.actor_update() end -- Обновление АИ-пака
-
 	ogse_debug.process_actor("upd_a", 1488)
 	if rx_ai then rx_ai.actor_update() end --обновление AI управления оружием
 --------------------------КОНЕЦ АПДЕЙТОВ С ВЫСОКИМ ПРИОРИТЕТОМ-------------------------
