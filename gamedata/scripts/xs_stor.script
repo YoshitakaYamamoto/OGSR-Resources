@@ -108,7 +108,6 @@ function load()
 	end
 
 	loaded = true
-	event("storage_load"):trigger()
 end
 
 local function element_size(key, val)
@@ -146,8 +145,6 @@ end
 
 function save()
 	ASSERT(loaded, "xs_stor.save: trying to save, but was not properly loaded!")
-	
-	event("storage_save"):trigger()
 	
 	-- saving...
 	-- готовим список элементов для сохранения

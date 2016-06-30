@@ -144,13 +144,10 @@ function generic_object_binder:update(delta)
 	self.am:call( "on_monster_update", self.object, delta )
 	self.am:call( "on_monster_update." .. self.object:id(), self.object, delta )
 
-	event("monster_update"):trigger({obj = self.object})
-
 	ogse_debug.process_monster(self.object, "upd", 0)
 end
 
 function generic_object_binder:use_callback(obj, who)
-	event("npc_used"):trigger({obj = self.object, who = who})
 	self.am:call("npc_use", self.object, who)
 end
 
@@ -237,7 +234,6 @@ function generic_object_binder:death_callback(victim, who)
 	ogse_debug.process_monster(victim, "dth", 13)	
 
 	self.am:call( "on_monster_death", victim, who )
-	event("monster_death"):trigger({victim = self.object, who = who})
 
 	ogse_debug.process_monster(victim, "dth", 0)
 end
@@ -270,8 +266,6 @@ function generic_object_binder:hit_callback(obj, amount, local_direction, who, b
 	ogse_debug.process_monster(self.object, "hit", 7)
 	self.am:call( "on_monster_hit", obj, amount, local_direction, who, bone_index, self )
 
-	event("monster_hit"):trigger({victim = self.object, amount = amount, dir = local_direction, who = who, bone = bone_index})	
-
 	ogse_debug.process_monster(self.object, "hit", 0)
 end
 
@@ -297,7 +291,6 @@ function generic_object_binder:net_destroy()
 
 	self.am:call( "on_monster_net_destroy", self.object )
 	self.am:cleanup_signal_subs( "on_monster_update." .. self.object:id() )
-	event("monster_net_destroy"):trigger({victim = self.object})
 
 	object_binder.net_destroy(self)
 end 

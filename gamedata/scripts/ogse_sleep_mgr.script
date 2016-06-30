@@ -94,7 +94,6 @@ function begin_sleep(desired_sleep_time)
 		-- приходится явно обновлять каждую подсистему, требующую обновления
 		-- при необходимости расширить список!
 		ogse_signals.get_mgr():call("on_update", 0)
-		event("actor_update"):trigger({delta = 0})
 
 		-- проверяем останов по разным событиям
 		if break_sleep_request then -- кто-то запросил останов сна

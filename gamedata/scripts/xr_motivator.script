@@ -696,8 +696,6 @@ function motivator_binder:net_destroy()
 	self.am:call( "on_npc_net_destroy", self.object )
 	self.am:cleanup_signal_subs( "on_npc_update." .. self.object:id() )
 
-	event("npc_net_destroy"):trigger({victim = self.object})
-
 	object_binder.net_destroy(self)
 end
 
@@ -837,8 +835,6 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 
 	self.am:call( "on_npc_hit", self.object, amount, local_direction, who, bone_index )
 
-	event("npc_hit"):trigger({victim = self.object, amount = amount, dir = local_direction, who = who, bone = bone_index})
-
 	ogse_debug.process_npc(self.object, "hit", 0)
 end
 
@@ -941,7 +937,6 @@ function motivator_binder:death_callback(victim, who)
 	ogse_debug.process_npc(victim, "dth", 21)
 
 	self.am:call("on_npc_death", victim, who)
-	event("npc_death"):trigger({victim = self.object, who = who})
 
 	ogse_debug.process_npc(victim, "dth", 0)
 end
@@ -976,9 +971,9 @@ function motivator_binder:use_callback(obj, who)
 		end
 	end
 
-	ogse_debug.process_npc(self.object, "use", 0)
-	event("npc_used"):trigger({obj = self.object, who = who})
 	self.am:call("npc_use", self.object, who)
+
+	ogse_debug.process_npc(self.object, "use", 0)
 end
 
 function motivator_binder:update(delta)
@@ -1035,9 +1030,6 @@ function motivator_binder:update(delta)
 
 	--ogse_debug.process_npc(self.object, "upd", 86)
 	--ogse_quest_guard.check_guard_necessity_for_object(self.object) --KRodin: Отключено, не вижу особого смысла в этом скрипте
-
-	ogse_debug.process_npc(self.object, "upd", 84)
-	event("npc_update"):trigger({obj = self.object})
 
 	ogse_debug.process_npc(self.object, "upd", 87)
 
