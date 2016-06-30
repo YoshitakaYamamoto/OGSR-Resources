@@ -35,9 +35,10 @@ local excluded_locations = { --Запретные локации
 
 
 function attach( sm )
-	sm:subscribe({ signal = "on_npc_death",				fun = this.on_death })
-	sm:subscribe({ signal = "on_npc_net_destroy",		fun = this.on_destroy })
-	sm:subscribe({ signal = "on_npc_spawn",				fun = this.on_npc_spawn })
+	sm:subscribe({ signal = "on_after_blowout",		fun = this.on_after_blowout })
+	sm:subscribe({ signal = "on_npc_death",			fun = this.on_death })
+	sm:subscribe({ signal = "on_npc_net_destroy",	fun = this.on_destroy })
+	sm:subscribe({ signal = "on_npc_spawn",			fun = this.on_npc_spawn })
 	if monsters_too then
 		sm:subscribe({ signal = "on_monster_death",			fun = this.on_death })
 		sm:subscribe({ signal = "on_monster_net_destroy",	fun = this.on_destroy })
@@ -64,7 +65,17 @@ function can_evade(npc)
   return true
 end
 
+local added_restrictions = {}
+local last_position      = {}
+
+function on_after_blowout()
+  last_position = {}
+end
+
 function on_monster_spawn( obj, binder )
+  added_restrictions[ obj:id() ] = nil
+  last_position[ obj:id()      ] = nil
+
   if not can_evade(obj) then return end
   local s = {
     [ "signal" ] = "on_monster_update." .. obj:id(),
@@ -76,6 +87,9 @@ function on_monster_spawn( obj, binder )
 end
 
 function on_npc_spawn( obj, binder )
+  added_restrictions[ obj:id() ] = nil
+  last_position[ obj:id()      ] = nil
+
   if not can_evade(obj) then return end
   local s = {
     [ "signal" ] = "on_npc_update." .. obj:id(),
@@ -98,9 +112,6 @@ end
 function on_destroy( obj )
   cleanup( obj )
 end
-
-local added_restrictions = {}
-local last_position      = {}
 
 function remove_restriction(npc, anomid)
 	if
@@ -159,19 +170,12 @@ function cleanup( obj )
 end
 
 function update_norm(npc)
-  local binder = npc:binded_object()
-  if
-    binder.ogse_anomaly_evader_t
-    and binder.ogse_anomaly_evader_t > time_global()
-  then
-    return
-  end
-  binder.ogse_anomaly_evader_t = time_global() + freq
+  ogse_signals.get_mgr():reschedule( freq )
 
   local curr_pos = npc:position()
   local prev_pos = last_position[ npc:id() ]
   if prev_pos then
-    if prev_pos:distance_to( curr_pos ) < 20 then
+    if prev_pos:distance_to( curr_pos ) < 15 then --ранее было 20
       return
     else
       last_position[ npc:id() ] = curr_pos
