@@ -132,27 +132,22 @@ end
 
 --==========================strings======================================
 -- trim of string
-if string.trim then
-	_G.trim = string.trim
-else
-	_G.trim = function (s)
+if not string.trim then
+	_G.string.trim = function(s)
 		return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
 	end
 end
 
 -- explode string by divider (PHP-like function)
-_G.explode = function(div,str,clear)
+_G.str_explode = function(div,str,clear)
+	ASSERT(type(str) == 'string', "ERROR in xs_helpers.str_explode - Argument [%s] is [%s] , not string!", tostring(str) or "-nil-", type(str))
+
 	local t = {}
-	
-	if type(str)~='string' then
-		return t
-	end
-	
 	local cpt = string.find(str,div,1,true)
 	if cpt then
 		repeat
 			if clear then
-				table.insert(t, trim(string.sub(str,1,cpt-1)))
+				table.insert(t, string.trim(string.sub(str,1,cpt-1)))
 			else
 				table.insert(t,string.sub(str,1,cpt-1))
 			end
@@ -161,7 +156,7 @@ _G.explode = function(div,str,clear)
 		until cpt == nil
 	end
 	if clear then
-		table.insert(t, trim(str))
+		table.insert(t, string.trim(str))
 	else
 		table.insert(t,str)
 	end
@@ -177,30 +172,30 @@ local function parse_ini(str)
 		return t, false
 	end
 	
-	str = trim( string.gsub(str, ";.-\n", "\n") ) -- cleanup comments, symbol ';' is denied in sections names and keys/values!
+	str = string.trim( string.gsub(str, ";.-\n", "\n") ) -- cleanup comments, symbol ';' is denied in sections names and keys/values!
 	
 	for section, section_data in string.gfind(str,"%s*%[([^%]]*)%]%s*([^%[%z]*)%s*") do -- get sections names and their's data
-		section = trim(section)
+		section = string.trim(section)
 		t[section]={}
 		
-		for line in string.gfind(trim(section_data), "([^\n]*)\n*") do
+		for line in string.gfind(string.trim(section_data), "([^\n]*)\n*") do
 			if string.len(line)>0 then
 				if string.find(line,"=")~=nil then -- 'key=val' sequence
 					for k, v in string.gfind(line, "([^=]-)%s*=%s*(.*)") do
-						k = trim(k)
+						k = string.trim(k)
 						if k~=nil and k~='' and v~=nil then 
 							if v == "<<true>>" then
 								t[section][k] = true
 							elseif v == "<<false>>" then
 								t[section][k] = false
 							else
-								t[section][k]=trim(v) 
+								t[section][k]=string.trim(v) 
 							end
 						end
 					end
 				else -- 'key' sequence
 					for k in string.gfind(line, "(.+)") do
-						k = trim(k)
+						k = string.trim(k)
 						if k~=nil and k~='' then
 							t[section][k] = math.nan --use nan instead nil for key existance
 						end

@@ -1453,18 +1453,10 @@ function hit_fx( obj, amount, who, bone_index )
 			hit_timeout[obj:id()] = time_global() + 2000
 		end	
 	end
-	
-	local sobj = alife():object(obj:id())
+
 	local exo_flag = false
-	
-	if sobj then
-		local pk = xs_netpk.stalker(sobj)
-		if pk and pk:isOk() then
-			local data = pk:get()
-			local vis = tostring(data.visual_name)	
-			if string.find(vis,"exo") then exo_flag = true end
-		end
-	end
+	local vis = table.remove( str_explode( "\\", obj:get_visual_name() ) )
+	if string.find(vis, "exo") then exo_flag = true end
 
 	local key_3 = nil
 	local need_drop = false

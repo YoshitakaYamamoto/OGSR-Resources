@@ -914,7 +914,7 @@ function read_wm_modes(comm,rank,sect,npc)
 		end
 		wm_modes.priors[cm.priors] = pr
 
-	local tps = rx_utils.str_explode(",",cm.types,true)
+	local tps = str_explode(",",cm.types,true)
 	cm.types = {}
 	for k,v in ipairs(wm_modes.types.list) do
 		table.insert(cm.types,{t = v,p = tonumber(tps[k])})
@@ -1074,7 +1074,7 @@ end
 function get_enemyt(section)
 	local enemyt = read_if_exist_string(section,"enemy",nil)
 	if enemyt then
-		local tmp = rx_utils.str_explode(",",enemyt,true)
+		local tmp = str_explode(",",enemyt,true)
 		enemyt = {}
 		for k,v in ipairs(tmp) do
 			local p = string.find(v,":",1,true)
@@ -1087,7 +1087,7 @@ end
 function get_rsect(section)
 	local rsect = read_if_exist_string(section,"rsec",nil)
 	if rsect then
-		rsect = rx_utils.str_explode(",",rsect,true)
+		rsect = str_explode(",",rsect,true)
 		if #rsect < 3 then
 			abort("number of values in rsec(%s) '%s' < 3!",section,#rsect)
 		end

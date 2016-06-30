@@ -55,29 +55,6 @@ function parse_list(ini,sec,val,convert)
 	return tmp
 end
 
---------------------------------------str---------------------------------------
-function str_explode(div,str,clear)
-	local t = {}
-	local cpt = string.find(str,div,1,true)
-	if cpt then
-		repeat
-			if clear then
-				table.insert(t, string.trim(string.sub(str,1,cpt-1)))
-			else
-				table.insert(t,string.sub(str,1,cpt-1))
-			end
-			str = string.sub(str,cpt+string.len(div))
-			cpt = string.find(str,div,1,true)
-		until cpt == nil
-	end
-	if clear then
-		table.insert(t, string.trim(str))
-	else
-		table.insert(t,str)
-	end
-	return t
-end
-
 --------------------------------------class---------------------------------------
 local weapon_classes_without_grenades = {
 		[clsid.wpn_ak74] 				= true,
