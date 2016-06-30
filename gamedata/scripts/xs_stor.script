@@ -29,11 +29,6 @@
 		в ключах и значени€х.  роме того, объем таблицы очень сильно
 		ограничен - при сериализации строка должна влазить в пакет, а 
 		значит ограничение примерно в 8000 байт текста.)
-	
-Depends on:
-	xs_sandbox
-	xs_helpers (as sandbox's module)
-	xs_netpk
 --]]---------------------------------------------------------------------
 
 -------------------------------------------------------------------------
@@ -41,11 +36,16 @@ Depends on:
 --- version 1.3                                                       ---
 -------------------------------------------------------------------------
 
+function attach(sm)
+	sm:subscribe({ signal = "on_save_after_all",	fun = this.save })
+	sm:subscribe({ signal = "on_load_before_all",	fun = this.load })
+end
+
+
 local storage_guid = "{005E17CE-3054-430E-9D68-08F264828F57}" -- Ќ≈ ћ≈Ќя“№!
 local st_marker = "XS_STOR_MARKER_"..storage_guid -- идентификатор маркера последнего хранилища
 local st_count = 1 -- количество объектов-хранилищ
 
---private members
 
 local loaded = false
 local storage = {}
@@ -85,8 +85,8 @@ local function read_item(pk)
 	return key, val
 end
 
-local function load()
-	ASSERT(db.actor, "xs_stor.load: inappropriate call. Actor is not online.")
+function load()
+	--ASSERT(db.actor, "xs_stor.load: inappropriate call. Actor is not online.")
 	
 	-- если первое хранилище существует, то там всЄ настроено и оттуда можно читать данные
 	-- в противном случае оно будет прозрачно создано при сохранении
@@ -144,7 +144,7 @@ local function save_item(pk, key, val)
 	end
 end
 
-local function save()
+function save()
 	ASSERT(loaded, "xs_stor.save: trying to save, but was not properly loaded!")
 	
 	event("storage_save"):trigger()
@@ -179,12 +179,6 @@ local function save()
 end
 
 --================================================================================
-
---public members
-function init()
-	event("actor_save"):register(save)
-	event("actor_spawn"):register(load)
-end
 
 -- in: string, any
 -- out: any

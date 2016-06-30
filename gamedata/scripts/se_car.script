@@ -30,7 +30,8 @@ function se_car:on_spawn()
 end
 --------------------
 function se_car:STATE_Write (packet)
-	event("se_car:STATE_Write_begin"):trigger({packet = packet, id = self.id})
+	ogse_signals.get_mgr():call("se_car:STATE_Write_begin", packet, self.id)
+
 	cse_alife_car.STATE_Write (self, packet)
 	if self.id == 65535 then return end
 	if self.trunk then
@@ -39,7 +40,7 @@ function se_car:STATE_Write (packet)
 end
 --------------------
 function se_car:on_unregister()
-	event("se_car:on_unregister"):trigger({id = self.id})
+	ogse_signals.get_mgr():call("se_car:on_unregister", self.id)
 end
 --------------------
 function se_car:STATE_Read (packet, size)

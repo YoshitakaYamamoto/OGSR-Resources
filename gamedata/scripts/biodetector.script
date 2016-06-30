@@ -26,7 +26,6 @@ local koef_x_old = 0
 local a,s,c,b,xa = 0,0,1,0,0
 local level_object_by_id = level.object_by_id
 local ms, mc, math_atan2 = math.sin, math.cos, math.atan2
-local hud = get_hud()
 local angle = 0
 local lim_angle = 1000*2*math.pi
 local biomap_sweep = nil
@@ -84,7 +83,7 @@ function dot:__init(o,is_stalker)
 	self.st:Init(1024,0,dot_size,dot_size)
 	self.st:InitTexture("biomap\\white_dot")
 	self.st:SetStretchTexture(true)
-	hud:GetCustomStatic("biomap"):wnd():AttachChild(self.st)
+	get_hud():GetCustomStatic("biomap"):wnd():AttachChild(self.st)
 	self.st:SetAutoDelete(true)
 	self.cnt = 0
 	self.st:SetWndPos(d * koef_x - 1,d)
@@ -204,11 +203,11 @@ end
 
 -- убирает радар с экрана
 function bioradar_hide()
-	if hud:GetCustomStatic("biomap") then
+	if get_hud():GetCustomStatic("biomap") then
 		dots = {}
-		hud:RemoveCustomStatic("biomap")
+		get_hud():RemoveCustomStatic("biomap")
 		if biomap_sweep_enabled then
-			hud:RemoveCustomStatic("biomap_sweep")
+			get_hud():RemoveCustomStatic("biomap_sweep")
 			biomap_sweep = nil
 		end
 	end
@@ -259,20 +258,20 @@ function update()
 	koef_x = (device().height/device().width) / (768/1024)
 	if koef_x ~= koef_x_old then
 		koef_x_old = koef_x
-		hud:RemoveCustomStatic("biomap")
-		hud:RemoveCustomStatic("biomap_sweep")
+		get_hud():RemoveCustomStatic("biomap")
+		get_hud():RemoveCustomStatic("biomap_sweep")
 		dots={}
 	end
 	-- log1("BIOMAP INIT KOEFF: "..koef_x)
-	if not hud:GetCustomStatic("biomap") then
+	if not get_hud():GetCustomStatic("biomap") then
 
 		if biomap_sweep_enabled then
-			biomap_sweep = hud:AddCustomStatic("biomap_sweep"):wnd()
+			biomap_sweep = get_hud():AddCustomStatic("biomap_sweep"):wnd()
 			biomap_sweep:Init(1024 - 2 - (biomap_width + biomap_sweep_width)*koef_x/2,-2 + (biomap_width - biomap_sweep_width)/2,biomap_sweep_width*koef_x,biomap_sweep_width)
 			-- log1("BIOSWEEP INIT: "..tostring(1024 - 2 - (biomap_width + biomap_sweep_width)*koef_x/2)..","..tostring(-2 + (biomap_width - biomap_sweep_width)/2)..","..tostring(biomap_sweep_width*koef_x)..","..tostring(biomap_sweep_width))
 		end
 		
-		local biomap_static = hud:AddCustomStatic("biomap"):wnd()
+		local biomap_static = get_hud():AddCustomStatic("biomap"):wnd()
 		biomap_static:SetWndPos(1024 - biomap_width*koef_x,0)
 		biomap_static:SetWidth(biomap_width*koef_x)
 	end

@@ -36,18 +36,17 @@ end
 
 
 local debug_flag = false		-- включить отладочный вывод
-local hud = get_hud()
 
 function printf(fmt, ...)
 	if debug_flag then
 		-- ogse.send_tip(fmt)
-		local info = hud:GetCustomStatic("companion_hud")
+		local info = get_hud():GetCustomStatic("companion_hud")
 		if not info then
-			hud:AddCustomStatic("companion_hud", true)
-			info = hud:GetCustomStatic("companion_hud"):wnd()
+			get_hud():AddCustomStatic("companion_hud", true)
+			info = get_hud():GetCustomStatic("companion_hud"):wnd()
 			info:SetText(fmt)
 		else
-			info = hud:GetCustomStatic("companion_hud"):wnd()
+			info = get_hud():GetCustomStatic("companion_hud"):wnd()
 			info:SetText(fmt)
 		end
 		log1("**XR_COMBAT_COMP: "..fmt)
@@ -58,13 +57,13 @@ end
 function prints(fmt, ...)
 	if debug_flag then
 		-- ogse.send_tip(fmt)
-		local info = hud:GetCustomStatic("companion_hud")
+		local info = get_hud():GetCustomStatic("companion_hud")
 		if not info then
-			hud:AddCustomStatic("companion_hud", true)
-			info = hud:GetCustomStatic("companion_hud"):wnd()
+			get_hud():AddCustomStatic("companion_hud", true)
+			info = get_hud():GetCustomStatic("companion_hud"):wnd()
 			info:SetText(fmt)
 		else
-			info = hud:GetCustomStatic("companion_hud"):wnd()
+			info = get_hud():GetCustomStatic("companion_hud"):wnd()
 			info:SetText(fmt)
 		end
 		-- log1("**XR_COMBAT_COMP: "..fmt)

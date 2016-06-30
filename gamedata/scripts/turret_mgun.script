@@ -266,11 +266,12 @@ function se_turret_mgun:STATE_Read(packet, size)
 end
 
 function se_turret_mgun:STATE_Write(packet)
-	event("se_turret_mgun:STATE_Write_begin"):trigger({packet = packet, id = self.id})
+	ogse_signals.get_mgr():call("se_turret_mgun:STATE_Write_begin", packet, self.id)
+
 	cse_alife_helicopter.STATE_Write(self, packet)
 	packet:w_float(self.health)
 	packet:w_vec3(self.direction)
 end
 function se_turret_mgun:on_unregister()
-	event("se_turret_mgun:on_unregister"):trigger({id = self.id})
+	ogse_signals.get_mgr():call("se_turret_mgun:on_unregister", self.id)
 end

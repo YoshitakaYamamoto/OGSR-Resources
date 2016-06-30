@@ -104,27 +104,26 @@
 	2) обязательно сделать метод биндера STATE_Write
 		Для примера с броней я сделала так:
 		function se_outfit:STATE_Write(packet)
-			event("se_outfit:STATE_Write_begin"):trigger({packet = packet, id = self.id})
+			ogse_signals.get_mgr():call("se_outfit:STATE_Write_begin", packet, self.id)
 			cse_alife_item_custom_outfit.STATE_Write (self, packet)
 		end
 
-	3) кинуть событие и передать туда таблицу вида {packet = packet, id = self.id}
+	3) кинуть событие и передать туда аргументы: packet, self.id
 		См. выше:
-			event("se_outfit:STATE_Write_begin"):trigger({packet = packet, id = self.id})
-		PS все можно сделать не используя песочницу xs_sandbox, но как - уже не буду расписывать. Кто знает, сам разберется.
+			ogse_signals.get_mgr():call("se_outfit:STATE_Write_begin", packet, self.id)
 
 	4) если вдруг объект удалится ДО того, как будет записана его абстракная часть, то необходимо стереть данные, которые мы хотели изменить
 		Для этого необходимо наличие метода on_unregister у класса-биндера, в нем необходимо кинуть аналогичное событие и передать id объекта:
 		function se_outfit:on_unregister()
 			...
-			event("se_outfit:on_unregister"):trigger({id = self.id})
+			ogse_signals.get_mgr():call("se_outfit:on_unregister", self.id)
 		end
 	
-	5) прописать в init() этого файла подписчики на эти события (один на запись пакета, второй на его удаление, функции-подписчики обязательно такие)
+	5) прописать в attach(sm) этого файла подписчики на эти события (один на запись пакета, второй на его удаление, функции-подписчики обязательно такие)
 		Например:
-		function init()
-			event("se_outfit:STATE_Write_begin"):register(on_se_state_write_begin)
-			event("se_outfit:on_unregister"):register(on_se_unregister)
+		function attach(sm)
+			sm:subscribe({ signal = "se_outfit:STATE_Write_begin", fun = this.on_se_state_write_begin })
+			sm:subscribe({ signal = "se_outfit:on_unregister", fun = this.on_se_unregister })
 		end
 	
 	Выполнение этих действий ОБЯЗАТЕЛЬНО. 
@@ -161,16 +160,27 @@
 		~Расставить STATE_Write (если необходимо - создать биндеры и зарегистрировать) для необходимых объектов, 
 		чтоб можно было менять абстрактную часть пакетов
 			+ броня
-			
---- Depends on:
-		xs_sandbox (optionally)
-		xs_helpers
 --]]---------------------------------------------------------------------
 
 -------------------------------------------------------------------------
 --- xStream, 13/01/2012                                               ---
 --- version 1.7                                                       ---
 -------------------------------------------------------------------------
+
+function attach(sm)
+	-- outfit
+	sm:subscribe({ signal = "se_outfit:STATE_Write_begin",			fun = this.on_se_state_write_begin })
+	sm:subscribe({ signal = "se_outfit:on_unregister",				fun = this.on_se_unregister })
+	-- pysic objects
+	sm:subscribe({ signal = "se_physic:STATE_Write_begin",			fun = this.on_se_state_write_begin })
+	sm:subscribe({ signal = "se_physic:on_unregister",				fun = this.on_se_unregister })
+	-- turrets
+	sm:subscribe({ signal = "se_turret_mgun:STATE_Write_begin",		fun = this.on_se_state_write_begin })
+	sm:subscribe({ signal = "se_turret_mgun:on_unregister",			fun = this.on_se_unregister })
+	-- cars
+	sm:subscribe({ signal = "se_car:STATE_Write_begin",				fun = this.on_se_state_write_begin })
+	sm:subscribe({ signal = "se_car:on_unregister",					fun = this.on_se_unregister })
+end
 
 -- private members
 
@@ -187,43 +197,22 @@ end
 
 local abstract_to_save = {}
 
-local function on_se_state_write_begin(e)
-	local desc = abstract_to_save[e.id]
+function on_se_state_write_begin(packet, id)
+	local desc = abstract_to_save[id]
 	
 	if not desc then return end
 	
-	local data = desc.pk:__get(e.packet)
+	local data = desc.pk:__get(packet)
 	desc.callback(data)
-	desc.pk:__set(data, e.packet)
+	desc.pk:__set(data, packet)
 	
-	abstract_to_save[e.id] = nil
+	abstract_to_save[id] = nil
 end
 
-local function on_se_unregister(e)
-	if abstract_to_save[e.id] then
-		abstract_to_save[e.id] = nil
+function on_se_unregister( id )
+	if abstract_to_save[id] then
+		abstract_to_save[id] = nil
 	end
-end
-
--- public members
-
-function init()
-	-- outfit
-	event("se_outfit:STATE_Write_begin"):register(on_se_state_write_begin)
-	event("se_outfit:on_unregister"):register(on_se_unregister)
-	
-	-- pysic objects
-	event("se_physic:STATE_Write_begin"):register(on_se_state_write_begin)
-	event("se_physic:on_unregister"):register(on_se_unregister)
-	
-	-- turrets
-	event("se_turret_mgun:STATE_Write_begin"):register(on_se_state_write_begin)
-	event("se_turret_mgun:on_unregister"):register(on_se_unregister)
-	
-	-- cars
-	event("se_car:STATE_Write_begin"):register(on_se_state_write_begin)
-	event("se_car:on_unregister"):register(on_se_unregister)
-
 end
 
 -- helper functions --

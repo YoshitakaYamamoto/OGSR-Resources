@@ -10,9 +10,9 @@ function attach(sm)
 end
 
 local dev = device()
-local hud = get_hud()
 
 function update_shelter_icon()
+	local hud = get_hud()
 	local static_name
 	if dev.aspect_ratio < 0.7 then
 		static_name = "shelter_static_16"

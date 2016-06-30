@@ -18,7 +18,8 @@ end
 function se_outfit:on_unregister()
 	--' Отрегистрация в таскменеджере
 	task_manager.get_random_task():unregister_target(self)
-	event("se_outfit:on_unregister"):trigger({id = self.id})
+
+	ogse_signals.get_mgr():call("se_outfit:on_unregister", self.id)
 end
 -- функция замены значений в определённых полях пакета
 function replace_params(src, dest)
@@ -44,7 +45,7 @@ function wpn_state_read_and_modify(base_class, self, packet, size)
 end
 
 function se_outfit:STATE_Write(packet)
-	event("se_outfit:STATE_Write_begin"):trigger({packet = packet, id = self.id})
+	ogse_signals.get_mgr():call("se_outfit:STATE_Write_begin", packet, self.id)
 	cse_alife_item_custom_outfit.STATE_Write (self, packet)
 end
 
@@ -211,11 +212,11 @@ function se_physic:keep_saved_data_anyway()
 	return true
 end
 function se_physic:STATE_Write(packet)
-	event("se_physic:STATE_Write_begin"):trigger({packet = packet, id = self.id})
+	ogse_signals.get_mgr():call("se_physic:STATE_Write_begin", packet, self.id)
 	cse_alife_object_physic.STATE_Write (self, packet)
 end
 function se_physic:on_unregister()
-	event("se_physic:on_unregister"):trigger({id = self.id})
+	ogse_signals.get_mgr():call("se_physic:on_unregister", self.id)
 end
 
 
