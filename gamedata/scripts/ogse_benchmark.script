@@ -2,7 +2,6 @@ function attach(sm)
 	sm:subscribe({signal = "on_spawn", fun = this.on_actor_spawn})
 	sm:subscribe({signal = "on_update", fun = this.on_actor_update})
 end
-auto_attach = true
 
 local fps = 0
 

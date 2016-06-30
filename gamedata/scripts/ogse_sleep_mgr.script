@@ -267,18 +267,13 @@ function update_sleep_effects(force_update)
 	end
 end
 
-local last_time_checked = 0
-
 function on_update()
 	if not sleeping_now then  -- если не спит
-		local tg = time_global()
-		if tg - last_time_checked > hud_update_interval then
-			last_time_checked = tg
-			update_sleep_effects()
-		end
+		ogse_signals.get_mgr():reschedule(hud_update_interval)
+		update_sleep_effects()
 	end
 end
---
+
 function on_spawn()
 	-- событие on_spawn здесь используется для загрузки значений
 	awakening_time = ogse.load_var("sleep_mgr__awakening_time", game.get_game_time(), "time")

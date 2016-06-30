@@ -468,14 +468,9 @@ function get_safe_sound_object(path)
 	return t.snd
 end
 
-local snd_chk_counter = 0
 function actor_update_lp()
-	if snd_chk_counter == 20 then
-		snd_chk_counter = 0
-		cleen_sounds()
-	end
-	snd_chk_counter = snd_chk_counter + 1
-	--log3("sounds counter: %d", counter)
+	ogse_signals.get_mgr():reschedule(20000)
+	cleen_sounds()
 end
 function on_key_down(key, bind)
 	if key == DIK_keys.DIK_RETURN then

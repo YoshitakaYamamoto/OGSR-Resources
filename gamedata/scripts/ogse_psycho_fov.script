@@ -4,8 +4,6 @@ function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_update", fun = this.on_actor_update})
 end
 
-auto_attach = true
-
 local fov_vol = sys_ini:r_s32("options","fov_volume")
 local max_alarm_fov_vol = 90
 local min_alarm_fov_vol = 30
@@ -59,10 +57,12 @@ function on_actor_update()
 		end	
 	end
 end
+
 function fov_start()
 	db.actor:give_info_portion("fov_play_start")
 	level.add_cam_effector("camera_effects\\drunk.anm", 7447, true, "")
 end
+
 function fov_end()
 	db.actor:give_info_portion("fov_play_end")
 	level.remove_cam_effector(7447)

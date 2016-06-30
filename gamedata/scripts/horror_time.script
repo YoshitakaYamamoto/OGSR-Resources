@@ -284,8 +284,6 @@ function horror_begin()
 end
 
 -- Процедура пси-выброса
-local premeter_time = time_global() + 100
-
 function horror_process()
 -- log1("Вызов пси-выброса")
 
@@ -294,9 +292,7 @@ function horror_process()
 		return
 	end
 
-	local uptime = time_global()
-	if uptime < premeter_time then return end
-	premeter_time = uptime + 100
+	ogse_signals.get_mgr():reschedule(200)
 
 	if has_alife_info("horror_time") and db.actor:alive() then
 

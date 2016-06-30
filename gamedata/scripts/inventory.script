@@ -88,6 +88,7 @@ function on_spawn()
 end
 function on_update()
 	if make_hits then
+		ogse_signals.get_mgr():reschedule(200)
 		hit_from_arts()
 	end
 end
@@ -116,13 +117,7 @@ local immunities_data = {
 local art_hit_koef = 0.02	-- Коэффициент хита, наносимого актору при превышении ограничения по иммунитету от артефактов
 
 -- Нанесение хита актору при превышении ограничения по иммунитетам, получаемым от артефактов
-local hit_from_arts_meter_time = time_global() + 100
 function hit_from_arts()
-	--log1("hit_from_arts")
-	local uptime = time_global()
-	if uptime < hit_from_arts_meter_time then return end
-	hit_from_arts_meter_time = uptime + 100
-
 	local immunities = {
 		burn_immunity = 0,
 		strike_immunity = 0,

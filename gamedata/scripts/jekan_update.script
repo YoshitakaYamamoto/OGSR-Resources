@@ -669,9 +669,8 @@ function thunderbird_visual_effect()
 end
 
 -- Ржавчина ----------------------------------------------------------------------------------------
-local hit_time = 0
 function upd_strange_zone_effects()
-	if hit_time > time_global() then return end
+	ogse_signals.get_mgr():reschedule(1000)
 
 	if in_strange_zone() then
 		strange_zone_actor_particle()
@@ -679,7 +678,6 @@ function upd_strange_zone_effects()
 		rustyfield_effect2()
 		rustyfield_effect3()
 	end
-	hit_time = time_global() + 1000
 end
 
 function rustyfield_effect1()

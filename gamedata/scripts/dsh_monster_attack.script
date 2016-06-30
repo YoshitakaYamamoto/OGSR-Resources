@@ -207,13 +207,11 @@ function set_custom_panic( obj )
   then
     return
   end
-  local binder = obj:binded_object()
-  if binder.panic_t and binder.panic_t > time_global() then return end
   local dist   = obj:position():distance_to( enemy:position() )
   local panic_dist = 6
-  binder.panic_t   = time_global() + (
-    dist < ( panic_dist * 3 ) and 0 or 1000
-  )
+  ogse_signals.get_mgr():reschedule( ( dist < panic_dist * 3 and 100 ) or ( dist < obj:range() and 1000 ) or 5000 )
+  if dist > panic_dist then return end
+  if not may_attack()  then return end
   if enemy:active_slot() == 0 and enemy:see( obj ) then
     obj:set_custom_panic_threshold( 1 )
   else
@@ -257,13 +255,9 @@ function burer_attack( obj )
   then
     return
   end
-  local binder = obj:binded_object()
-  if binder.attack_t and binder.attack_t > time_global() then return end
   local dist = obj:position():distance_to( enemy:position() )
   local attack_dist = 25
-  binder.attack_t   = time_global() + (
-    dist < attack_dist and 0 or 1000
-  )
+  ogse_signals.get_mgr():reschedule( ( dist < attack_dist and 100 ) or ( dist < obj:range() and 1000 ) or 5000 )
   if dist > attack_dist then return end
   local v1 = obj:direction()
   local v2 = enemy:direction()
@@ -281,7 +275,7 @@ function burer_attack( obj )
 	then
 	  enemy:drop_item(active_item)
 	end
-    binder.attack_t = time_global() + ( 6000 * ( 1 + math.random( -0.2, 0.2 ) ) )
+    ogse_signals.get_mgr():reschedule( 6000 * ( 1 + math.random( -0.2, 0.2 ) ) )
   end
 end
 
@@ -460,9 +454,6 @@ end
 --Пси-аттака некоторых собак
 function dog_attack( obj )
   if not may_attack() then return end
-  local binder = obj:binded_object()
-  if binder.attack_t and binder.attack_t > time_global() then return end
-  binder.attack_t = time_global() + 1513
   if obj.health < 0.05 then return end
   local enemy = obj:best_enemy()
   if not (
@@ -471,7 +462,9 @@ function dog_attack( obj )
     return
   end
   local dist = obj:position():distance_to( enemy:position() )
-  if dist > 8 or math.random() > 0.5 then return end
+  local attack_dist = 8
+  ogse_signals.get_mgr():reschedule( ( dist < attack_dist and 1000 ) or 5000)
+  if dist > attack_dist or math.random() > 0.8 then return end
   level.add_pp_effector( "radiation.ppe", 2012, false )
   local h = hit()
   h.type      = hit.telepatic
@@ -499,8 +492,7 @@ end
 function dog_attack_phantom( obj )
   if not may_attack() then return end
   local binder = obj:binded_object()
-  if binder.attack_t2 and binder.attack_t2 > time_global() then return end
-  binder.attack_t2 = time_global() + 5000
+  ogse_signals.get_mgr():reschedule(5000)
   if obj.health < 0.05 then return end
   local enemy = obj:best_enemy()
   if not (
@@ -532,13 +524,9 @@ local insect_particle = particles_object( "ogsm\\ogsm_flies_00" )
 local insect_sound    = xr_sound.get_safe_sound_object( [[anomaly\flies]] )
 function zombie_plague_attack( obj )
   if not may_attack() then return end
-  local binder = obj:binded_object()
-  if binder.attack_t and binder.attack_t > time_global() then return end
   local dist = obj:position():distance_to( db.actor:position() )
   local attack_dist = 10
-  binder.attack_t   = time_global() + (
-    dist < ( attack_dist * 2 ) and 100 or 1000
-  )
+  ogse_signals.get_mgr():reschedule( ( dist < attack_dist and 100 ) or ( dist < attack_dist * 2 and 1000 ) or 5000 )
   if dist < 10 then
     level.add_pp_effector( "dead_zone.ppe", 1001, true )
     level.set_pp_effector_factor( 1001, 0.1 )
@@ -620,7 +608,7 @@ function blow_zombie(p_obj)
 	end
 
 	switch_offline(p_obj) --на всякий случай выпихнем в оффлайн перед удалением
-	dsh.timeout(100, function() --Типа безопасное удаление
+	dsh.timeout(300, function() --Типа безопасное удаление
 		death_manager.shedule_release(p_obj)
 	end)
 end

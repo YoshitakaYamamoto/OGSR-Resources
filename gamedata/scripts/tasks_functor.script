@@ -3655,11 +3655,9 @@ function on_first_update_firefly()
 	end
 end
 
-local on_firefly_update_time = time_global()
 local anom_status = ""
 function on_firefly_update()
-	if on_firefly_update_time + 1000 > time_global() then return end
-	on_firefly_update_time = time_global()
+	ogse_signals.get_mgr():reschedule(1000)
 
 	local art_id = xs_stor.get("art_firefly_id", -1)
 	if level.rain_factor() > 0 then

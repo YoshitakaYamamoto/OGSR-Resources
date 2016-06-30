@@ -36,13 +36,9 @@ function on_spawn_amk_news()
 	news_amk_core.init()
 end
 
-local off_timer = time_global()
 function on_update_amk_news()
+	ogse_signals.get_mgr():reschedule(random_death_news_delta * 4000)
 	news_amk_core.check_news()
-	if time_global() > off_timer then
-		news_amk_core.on_news()
-		off_timer = off_timer + random_death_news_delta * 4000
-	end
 end
 
 function on_npc_death(victim, who)
@@ -56,10 +52,7 @@ function on_spawn_offline_alife()
 	amk_offline_alife.update_trade()
 end
 
-local off_timer_1 = time_global()
 function on_update_offline_alife()
-	if time_global() > off_timer_1 then
-		amk_offline_alife.update()
-		off_timer_1 = off_timer_1 + math.random(20000, 30000)
-	end
+	ogse_signals.get_mgr():reschedule(math.random(20000, 30000))
+	amk_offline_alife.update()
 end
