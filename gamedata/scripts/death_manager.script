@@ -265,20 +265,10 @@ function drop_manager:__init(npc)
 end
 
 function drop_manager:create_release_item()
-	local obj = level.object_by_id(self.npc:id())
-	if not obj or not IsStalker(obj) then
-		return
-	end
-
 	--' Спрашиваем у серверного объекта генерились ли предметы
 	local se_obj = alife():object(self.npc:id())
-	if se_obj and se_obj.death_droped then
-		if se_obj.death_droped == true then
-			return
-		else	
-			se_obj.death_droped = true
-		end
-	end
+	if not se_obj or se_obj.death_droped then return end
+	se_obj.death_droped = true
 
 	--// xr_companion
 	if xr_companion.is_companion(self.npc:id()) then
