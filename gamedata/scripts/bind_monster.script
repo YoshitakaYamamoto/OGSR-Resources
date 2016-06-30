@@ -105,74 +105,12 @@ function generic_object_binder:net_spawn(sobject)
 	ogse_car_control.register_target(self.object)
 	ogse_scripted_btr.register_target(self.object)
 
-	self:subscribe_updaters()
-
 	ogse_debug.process_monster(self.object, "m_spw", 63)
 	self.am:call( "on_monster_spawn", self.object, self )
 
 	ogse_debug.process_monster(self.object, "m_spw", 0)
 	return true
 end
-
-
-function generic_object_binder:subscribe_updaters()
-  self.updaters = {
-    [ "list" ] = {
-      --{
-      --  [ "alive"     ] = self.defend_hospital,
-      --  [ "pre_check" ] = self.defend_hospital_need,
-      --},
-      {
-        [ "alive"     ] = self.trade_manager_update,
-        [ "pre_check" ] = self.trade_manager_update_need,
-      },
-      --{
-      --  [ "alive"     ] = self.check_blowout,
-      --},
-    },
-    [ "subscribed" ] = {
-      [ "alive" ] = {},
-      [ "dead"  ] = {},
-    }
-  }
-  for _, item in ipairs( self.updaters.list ) do
-    local fun, subscribed
-    if self.object:alive() then
-      fun        = item.alive
-      subscribed = self.updaters.subscribed.alive
-    else
-      fun        = item.dead
-      subscribed = self.updaters.subscribed.dead
-    end
-    if fun then
-      if item.pre_check then
-        if not item.pre_check( self ) then
-          fun = nil
-        end
-      end
-    end
-    if fun then
-      local t = {
-        [ "signal" ] = "on_monster_update." .. self.object:id(),
-        [ "self"   ] = self,
-        [ "fun"    ] = fun,
-        [ "queued" ] = true,
-      }
-      table.insert( subscribed, t )
-      self.am:subscribe( t )
-    end
-  end
-end
-
-
-function generic_object_binder:trade_manager_update_need()
-  return self.object:clsid() == clsid.script_trader
-end
-
-function generic_object_binder:trade_manager_update()
-  trade_manager.update( self.object )
-end
-
 
 function generic_object_binder:update(delta)
 	ogse_debug.check_npc()
@@ -233,12 +171,6 @@ function generic_object_binder:waypoint_callback(obj, action_type, index)
 end
 
 function generic_object_binder:death_callback(victim, who)
-
-	for _, s in ipairs( self.updaters.subscribed.alive ) do
-		self.am:unsubscribe( s )
-	end
-	self.updaters.subscribed.alive = {}
-
 	ogse_debug.process_monster(victim, "dth", 1)
 	if who and string.find(who:name(), "vehicle_btr") then
 		who = db.actor
