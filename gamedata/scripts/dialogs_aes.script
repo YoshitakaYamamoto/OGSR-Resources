@@ -13,7 +13,10 @@ function osoznanie_decline(npc, actor)
 	for k, v in pairs(db.creature) do
 		local obj = level.object_by_id(k)
 		if v == false and obj and obj:alive() and string.find( obj:section(), "poltergeist") then
-			ogsm_mutants.safely_destroy_creature(obj)
+			switch_offline(obj) --на всякий случай выпихнем в оффлайн перед удалением
+			dsh.timeout(150, function() --Типа безопасное удаление
+				death_manager.shedule_release(obj)
+			end)
 		end	
 	end
 

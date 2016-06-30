@@ -175,12 +175,12 @@ function action_wounded:execute ()
 			if rnd == 1 and not has_alife_info("enable_talk")  then
 				db.actor:give_info_portion("die")
 				soundtrack.monolith_die()
-				ogsm_mutants.blow_zombie(self.object)
+				dsh_monster_attack.blow_zombie(self.object)
 			end
 			if rnd == 2 and not has_alife_info("enable_talk")  then
 				db.actor:give_info_portion("die")
 				soundtrack.monolith_die()
-				ogsm_mutants.blow_zombie(self.object)
+				dsh_monster_attack.blow_zombie(self.object)
 			end
 			if rnd == 3 and not has_alife_info("die")  then
 				db.actor:give_info_portion("enable_talk")

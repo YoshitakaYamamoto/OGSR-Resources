@@ -177,7 +177,10 @@ function on_timer_hel1()
 	for k, v in pairs(deadman) do
 		local npc = level.object_by_id(v)
 		if npc then
-			ogsm_mutants.safely_destroy_creature(npc)
+			switch_offline(npc) --на всякий случай выпихнем в оффлайн перед удалением
+			dsh.timeout(300, function() --Типа безопасное удаление
+				death_manager.shedule_release(npc)
+			end)
 			deadman[npc:id()] = nil
 		end		
 	end	
