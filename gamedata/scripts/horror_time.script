@@ -292,7 +292,7 @@ function horror_process()
 		return
 	end
 
-	ogse_signals.get_mgr():reschedule(200)
+	ogse_signals.get_mgr():reschedule(1500)
 
 	if has_alife_info("horror_time") and db.actor:alive() then
 

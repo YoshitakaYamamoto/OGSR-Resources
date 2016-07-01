@@ -88,7 +88,7 @@ function on_spawn()
 end
 function on_update()
 	if make_hits then
-		ogse_signals.get_mgr():reschedule(200)
+		ogse_signals.get_mgr():reschedule(800)
 		hit_from_arts()
 	end
 end

@@ -18,7 +18,6 @@ end
 
 
 function on_update( obj )
-  --ogse_signals.get_mgr():reschedule( math.random( 6000, 12000 ) )
   ogse_signals.get_mgr():reschedule( math.random( 1000, 3000 ) )
   check_light( obj )
 end
