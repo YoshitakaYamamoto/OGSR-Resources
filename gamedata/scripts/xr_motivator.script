@@ -616,6 +616,7 @@ function motivator_binder:net_spawn(sobject)
 	else
 		xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_stalker, self.loaded )
 	end
+	--// xr_companion	
 
 	ogse_debug.process_npc(self.object, "s_spw", 13)
 
@@ -625,53 +626,32 @@ function motivator_binder:net_spawn(sobject)
 	self.am:call( "on_npc_spawn", self.object, self )
 
 	ogse_debug.process_npc(self.object, "s_spw", 0)
-	--// xr_companion	
 	return true
 end
 
 function motivator_binder:subscribe_updaters()
-	self.updaters = {
-		[ "list" ] = {
-			{
-				[ "alive" ] = self.rx_ai_npc_update,
-			},
-			{
-				[ "alive" ] = self.check_art_weapon,
-			},
-		},
-		[ "subscribed" ] = {
-			[ "alive" ] = {},
-			[ "dead"  ] = {},
-		}
-	}
-
-	for _, item in ipairs( self.updaters.list ) do
-		local fun, subscribed
-		if self.object:alive() then
-			fun        = item.alive
-			subscribed = self.updaters.subscribed.alive
-		else
-			fun        = item.dead
-			subscribed = self.updaters.subscribed.dead
-		end
-		if fun then
-			if item.pre_check then
-				if not item.pre_check( self ) then
-					fun = nil
-				end
-			end
-		end
-		if fun then
-			local t = {
-				[ "signal" ] = "on_npc_update." .. self.object:id(),
-				[ "self"   ] = self,
-				[ "fun"    ] = fun,
-				[ "queued" ] = true,
-			}
-			table.insert( subscribed, t )
-			self.am:subscribe( t )
-		end
-	end
+  local s_name = "on_npc_update." .. self.object:id()
+  if self.object:alive() then
+    self.updaters = {
+      {
+        [ "signal" ] = s_name,
+        [ "self"   ] = self,
+        [ "fun"    ] = self.rx_ai_npc_update,
+        [ "queued" ] = true,
+      },
+      {
+        [ "signal" ] = s_name,
+        [ "self"   ] = self,
+        [ "fun"    ] = self.check_art_weapon,
+        [ "queued" ] = true,
+      },
+    }
+  else
+    self.updaters = {}
+  end
+  for _, s in ipairs( self.updaters ) do
+    self.am:subscribe( s )
+  end
 end
 
 function motivator_binder:net_destroy()
@@ -841,11 +821,12 @@ end
 function motivator_binder:death_callback(victim, who)
 
 	self.st.state_mgr = nil --блокируем апдейт менеджера состояний
+	self.object:set_tip_text_default()
 
-	for _, s in ipairs( self.updaters.subscribed.alive ) do
+	for _, s in ipairs( self.updaters ) do
 		self.am:unsubscribe( s )
 	end
-	self.updaters.subscribed.alive = {}
+	self.updaters = {}
 
 	ogse_debug.process_npc(victim, "dth", 1)
 	if who and victim and string.find(who:name(), "vehicle_btr") and ogse_car_control.current_car and who:id() == ogse_car_control.current_car:id() then
@@ -983,20 +964,20 @@ function motivator_binder:update(delta)
 	ogse_debug.check_actor()
 
 	ogse_debug.process_npc(self.object, "upd", 2)
-	--' Апдейт менеджера состояний тела
-	if self.st.state_mgr then
-		self.st.state_mgr:update()
-	end
+	if self.st.state_mgr then -- Условие истинно, пока непись жив.
+		self.st.state_mgr:update() --Апдейт менеджера состояний тела
 
-	ogse_debug.process_npc(self.object, "upd", 5)
-	if self.object:alive() then
+		ogse_debug.process_npc(self.object, "upd", 5)
 		if self.object:is_talk_enabled() then
 			self.object:set_tip_text("character_use")
 		else
 			self.object:set_tip_text("")
 		end
-	else
-		self.object:set_tip_text_default()
+
+		ogse_debug.process_npc(self.object, "upd", 81)
+		if xr_companion.is_companion(self.object:id()) then
+			xr_combat_companion.reprioritize_targets(self.object)
+		end
 	end
 
 	ogse_debug.process_npc(self.object, "upd", 6)
@@ -1011,22 +992,6 @@ function motivator_binder:update(delta)
 		self.object:info_add('section -- ' .. active_section)
 	end
 	self.object:info_add('name -- ' .. self.object:name())
-
-	ogse_debug.process_npc(self.object, "upd", 8)
-	if xr_combat_companion then
-		xr_combat_companion.process_enemy(db.actor, self.object)
-	else	
-		log1("--xr_combat_companion cannot be loaded!")
-	end
-
-	ogse_debug.process_npc(self.object, "upd", 81)
-	if xr_companion.is_companion(self.object:id()) then
-		if xr_combat_companion then
-			xr_combat_companion.reprioritize_targets(self.object)
-		else	
-			log1("--xr_combat_companion cannot be loaded!")
-		end	
-	end
 
 	--ogse_debug.process_npc(self.object, "upd", 86)
 	--ogse_quest_guard.check_guard_necessity_for_object(self.object) --KRodin: Отключено, не вижу особого смысла в этом скрипте

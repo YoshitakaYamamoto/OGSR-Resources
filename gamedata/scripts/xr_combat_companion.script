@@ -7,8 +7,10 @@
 ----------------------------------------------------------------------------------------------------
 
 function attach( sm )
-  sm:subscribe({ signal = "on_monster_death",  fun = this.on_monster_death })
-  sm:subscribe({ signal = "on_monster_spawn",  fun = this.on_monster_spawn })
+  sm:subscribe({ signal = "on_monster_death",	fun = this.on_monster_death })
+  sm:subscribe({ signal = "on_monster_spawn",	fun = this.on_monster_spawn })
+  sm:subscribe({ signal = "on_npc_death",		fun = this.on_npc_death })
+  sm:subscribe({ signal = "on_npc_spawn",		fun = this.on_npc_spawn })
 end
 
 function on_monster_spawn( obj, binder )
@@ -31,6 +33,30 @@ function on_monster_death( obj, who )
 end
 
 function on_monster_update( obj )
+  process_enemy( db.actor, obj )
+end
+
+function on_npc_spawn( obj, binder )
+  if not obj:alive() then return end
+  local s = {
+    [ "signal" ] = "on_npc_update." .. obj:id(),
+    [ "fun"    ] = this.on_npc_update,
+    --[ "queued" ] = true,
+  }
+  binder[ script_name() .. ".subscribed" ] = s
+  ogse_signals.get_mgr():subscribe( s )
+end
+
+function on_npc_death( obj, who )
+  local binder     = obj:binded_object()
+  local subscribed = binder[ script_name() .. ".subscribed" ]
+  if subscribed then
+    ogse_signals.get_mgr():unsubscribe( subscribed )
+  end
+end
+
+function on_npc_update( obj )
+--log3("!!Combat companion npc update for [%s]", obj:id())
   process_enemy( db.actor, obj )
 end
 
@@ -206,7 +232,7 @@ function process_enemy(npc, enemy)
 	-- данная функция помещается в апдейты монстров и неписей 
 	if enemy and enemy.clsid and (IsStalker(enemy) or IsMonster(enemy)) and enemy:alive() and enemy:id() ~= db.actor:id() and not xr_companion.is_companion(enemy:id()) then
 		write_log("!!!PROCESSING_"..enemy:name().." RESULT IS_STK ["..tostring(IsStalker(enemy)).."] IS_MNSTR ["..tostring(IsMonster(enemy)).."] CHK ["..tostring(we_are_under_attack(enemy)).."]")
-		if ((IsStalker(enemy) or IsMonster(enemy)) and we_are_under_attack(enemy)) then
+		if we_are_under_attack(enemy) then
 			-- человек ты иль монструшка
 			register_as_target(enemy)
 		else
