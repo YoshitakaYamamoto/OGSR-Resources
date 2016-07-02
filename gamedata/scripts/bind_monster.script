@@ -140,7 +140,7 @@ function generic_object_binder:update(delta)
 	end
 
 	ogse_debug.process_monster(self.object, "upd", 12)
-	self.am:call( "on_monster_update", self.object, delta )
+	--self.am:call( "on_monster_update", self.object, delta )
 	self.am:call( "on_monster_update." .. self.object:id(), self.object, delta )
 
 	ogse_debug.process_monster(self.object, "upd", 0)

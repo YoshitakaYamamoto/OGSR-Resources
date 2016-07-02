@@ -1002,7 +1002,7 @@ function motivator_binder:update(delta)
 		self.first_update = true
 		self.am:call( "on_npc_first_update", self.object, delta )
 	end
-	self.am:call( "on_npc_update", self.object, delta )
+	--self.am:call( "on_npc_update", self.object, delta )
 	self.am:call( "on_npc_update." .. self.object:id(), self.object, delta )
 
 	ogse_debug.process_npc(self.object, "upd", 0)
