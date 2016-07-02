@@ -89,9 +89,6 @@ function npc_update(npc)
 		if rx_addons then
 			rx_addons.npc_update(npc,st)
 		end
-		if rx_bandage and rx_bandage.enable_scheme then
-			rx_bandage.npc_update(npc,st)
-		end
 	end
 end
 

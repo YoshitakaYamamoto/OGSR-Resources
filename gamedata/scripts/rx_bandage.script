@@ -149,9 +149,9 @@ function action_bandage:execute()
 		return
 	end
 	local danger = npc:best_danger() or npc:best_enemy()
-	if danger then
+	--if danger then
 --		npc:set_sight(look.point,danger:position())
-	end
+	--end
 	if not self.timer then
 		self.timer = 0
 	end
@@ -257,38 +257,6 @@ function add_to_binder(npc,ini,scheme,section,storage)
 	(xrs_medic and xrs_medic.actid_medic),(watcher_act and watcher_act.actid_reach_item)}) do
 		action = manager:action(id)
 		action:add_precondition(world_property(evid_bandage,false))
-	end
-end
-
-function npc_update(npc)
-	local npc_id = npc:id()
-	local st = db.storage[npc_id]["bandage"]
-	if not st or st.disabled then
-		return
-	end
-	local obj = npc:object("yad")
-	if not obj then
-		alife():create("yad",npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc_id)
-	end
-	if not (xrs_medic and db.storage[npc_id]["medic"]) then
-		st = rx_ai.get_storage(npc_id,"rx_bandage")
-		if time_global() > (st.spawn_time or 10000) then
-			local ban = nil
-			for k,v in ipairs(bandage_sets.bandages) do
-				ban = npc:object(v)
-				if ban then
-					break
-				end
-			end
-			if not ban then
-				if math.random() > 0.15 then
-					local bnd = bandage_sets.bandages[math.random(#bandage_sets.bandages)]
-					log1("npc_update["..npc:name().."]:spawn bandage "..bnd)
-					alife():create(bnd,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc_id)
-				end
-			end
-			st.spawn_time = time_global()+math.random(100,400)*1000
-		end
 	end
 end
 
