@@ -4,8 +4,6 @@
 --           until bug fixed in all.spawn file
 -------------------------------------------------------------------------
 
--- function printf() end
-
 function val_rob_actor_has_money(actor, npc)
 	if has_alife_info("val_rob_buying") then
 		return false

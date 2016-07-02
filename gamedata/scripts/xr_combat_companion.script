@@ -63,22 +63,22 @@ end
 
 local debug_flag = false		-- включить отладочный вывод
 
-function printf(fmt, ...)
-	if debug_flag then
-		-- ogse.send_tip(fmt)
-		local info = get_hud():GetCustomStatic("companion_hud")
-		if not info then
-			get_hud():AddCustomStatic("companion_hud", true)
-			info = get_hud():GetCustomStatic("companion_hud"):wnd()
-			info:SetText(fmt)
-		else
-			info = get_hud():GetCustomStatic("companion_hud"):wnd()
-			info:SetText(fmt)
-		end
-		log1("**XR_COMBAT_COMP: "..fmt)
-		-- get_console():execute("flush")	
-	end
-end
+--function printf(fmt, ...)
+--	if debug_flag then
+--		 ogse.send_tip(fmt)
+--		local info = get_hud():GetCustomStatic("companion_hud")
+--		if not info then
+--			get_hud():AddCustomStatic("companion_hud", true)
+--			info = get_hud():GetCustomStatic("companion_hud"):wnd()
+--			info:SetText(fmt)
+--		else
+--			info = get_hud():GetCustomStatic("companion_hud"):wnd()
+--			info:SetText(fmt)
+--		end
+--		log1("**XR_COMBAT_COMP: "..fmt)
+--		 get_console():execute("flush")	
+--	end
+--end
 
 function prints(fmt, ...)
 	if debug_flag then

@@ -6,11 +6,11 @@
 
 local total_debug = false
 
-function printf(fmt,...)
-	if total_debug then
-		log3(fmt,...)
-	end
-end
+--function printf(fmt,...)
+--	if total_debug then
+--		log3(fmt,...)
+--	end
+--end
 
 local key = nil
 local data = nil

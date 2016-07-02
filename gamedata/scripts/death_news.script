@@ -15,10 +15,10 @@ function write_log(msg)
 	end
 end
 
-function printf(fmt, ...)
-	ogse.send_tip(fmt)
-	log1(fmt)
-end
+--function printf(fmt, ...)
+--	ogse.send_tip(fmt)
+--	log1(fmt)
+--end
 
 levels = {
 	["l01_escape"] = {{name = game.translate_string("death_news_levels_1_text"), name_where = game.translate_string("death_news_levels_1a_text")}},

@@ -27,11 +27,11 @@ local knife_pain = {
 timeout = {}
 local debug_this = ogse_debug.verbose_debug
 
-function printf(s, ...)
-	if debug_this then
-		log3("rx_facer:"..s,...)
-	end
-end
+--function printf(s, ...)
+--	if debug_this then
+--		log3("rx_facer:"..s,...)
+--	end
+--end
 
 function read_from_ini(ini,sec,val,def,typ)
 	return rx_utils.read_from_ini(ini,sec,val,def,typ)

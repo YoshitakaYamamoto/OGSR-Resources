@@ -4,11 +4,11 @@
 --	TODO: 
 ----------------------------------------------------------------------------------------------------------------------
 
-function printf(fmt, ...)
-	local msg = string.format(fmt, ...)
-	local msg_no_ws = string.gsub(msg, "%s", "_")
-	get_console():execute("dbg:" .. msg_no_ws)
-end
+--function printf(fmt, ...)
+--	local msg = string.format(fmt, ...)
+--	local msg_no_ws = string.gsub(msg, "%s", "_")
+--	get_console():execute("dbg:" .. msg_no_ws)
+--end
 
 kamps = {}
 kamp_stalkers = {} -- могут ли сталкеры в лагере юзаться игроком.

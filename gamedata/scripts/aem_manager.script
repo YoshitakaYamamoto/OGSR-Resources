@@ -22,11 +22,11 @@ local spawn_db = ogse_spawn_db.script_spawn_registry.aem_manager
 ---------------------------------------------------------------------------------------------------
 --SPAWN_V1 : примечание. Смотри также файл config\misc\aem_manager.ltx и отметку в нём
 
-function printf(fmt, ...)
+--function printf(fmt, ...)
 --	local msg = string.format(fmt, ...)
 --	local msg_no_ws = string.gsub(msg, "%s", "_")
 --	get_console():execute("dbg:" .. msg_no_ws)
-end
+--end
 
 ---------------------------------------------------------------------------------------------------
 -- функции для работы с ltx

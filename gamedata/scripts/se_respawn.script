@@ -197,12 +197,12 @@ monsters_limit = {
 
 }
 
-function printf(fmt, ...)
-	if ogse.check_game() then
-		ogse.send_tip(fmt)
-		log1(fmt)
-	end
-end
+--function printf(fmt, ...)
+--	if ogse.check_game() then
+--		ogse.send_tip(fmt)
+--		log1(fmt)
+--	end
+--end
 
 function init()
 

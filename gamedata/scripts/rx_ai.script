@@ -2,13 +2,13 @@
 
 --------------------------------------utils------------------------------------------
 
-function printf(str,...)
-	if not str then
-		str = "((string is nil))"
-	end
-	log1(script_name()..string.format(str,...))
+--function printf(str,...)
+--	if not str then
+--		str = "((string is nil))"
+--	end
+--	log1(script_name()..string.format(str,...))
 --	get_console():execute("flush")
-end
+--end
 
 function count_table(t)
 	if type(t) ~= "table" then

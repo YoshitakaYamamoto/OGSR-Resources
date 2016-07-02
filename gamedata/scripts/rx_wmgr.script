@@ -9,9 +9,9 @@
 ------------------------------------------------------------------------------------------------
 local total_debug = ogse_debug.verbose_debug
 
-function printf(s,...)
-	rx_ai.printf("wm:"..s,...)
-end
+--function printf(s,...)
+--	rx_ai.printf("wm:"..s,...)
+--end
 
 function printw(s,...)
 	rx_ai.printf("wm:"..s.."!!!",...)

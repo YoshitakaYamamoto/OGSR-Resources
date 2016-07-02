@@ -1,8 +1,8 @@
 ---- Rulix aka Bak --- 2.7.2009
 
-function printf(s, ...)
+--function printf(s, ...)
 --	rx_ai.printf("ads:"..s,...)
-end
+--end
 
 function printw(s, ...)
 	rx_ai.printf("ads:"..s.."!!!",...)
