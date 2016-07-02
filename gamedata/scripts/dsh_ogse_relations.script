@@ -188,11 +188,12 @@ local attitude_neutal_threshold = get_float(
   "game_relations", "attitude_neutal_threshold"
 )
 local fix_rel_exceptions = {
---TODO: Добавить сюда группу черепа!
-  --[ "mil_dolg" ] = true, -- группа Черепа
+  [ "mil_Dolg_specnaz_cherep" ] = true, -- Череп
+  [ "mil_Dolg_specnaz_silence" ] = true, -- группа Черепа
 }
 
 function on_npc_spawn( npc, binder )
+  if db.actor:character_community() ~= "actor" then return end
   local sobj = alife():object( npc:id() )
   if not sobj then return end
   if
