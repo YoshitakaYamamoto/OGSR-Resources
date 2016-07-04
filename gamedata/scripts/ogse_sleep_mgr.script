@@ -283,7 +283,9 @@ function on_spawn()
 	
 	sleep_supressed = remained_sleep_suppression_time() > 0
 	update_sleep_effects(true)
-	on_update()
+	if not sleeping_now then  -- если не спит
+		update_sleep_effects()
+	end
 end
 
 function on_save()
