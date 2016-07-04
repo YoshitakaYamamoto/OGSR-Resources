@@ -946,10 +946,13 @@ function on_inventory_open()
 	db.actor:inventory_for_each(function(item, npc)
 		if db.actor:is_in_ruck(item) then
 			local res = convert_item_to_fake_in_inventory(item)
-			if res then table.insert(ids, item:id()) end
+			if res then
+				table.insert(ids, item:id())
+				--log3("Conv itm to fake sect: [%s]", item:section())
+			end
 		end
 	end)
-	--log3("items converted: %d", #ids)
+	--log3("items converted: %s", #ids)
 	if #ids > 0 then
 		wait_for_deleted_objects_to_disappear(ids):start()
 	end
@@ -967,7 +970,7 @@ function on_inventory_hide()
 			if res then table.insert(ids, item:id()) end
 		end
     end)
-	--log3("items converted: %d", #ids)
+	--log3("items converted: %s", #ids)
 	-- важна€ затычка. ѕеред тем, как дать игроку жать на клавиши после закрыти€ окна инвентар€,
 	-- надо дождатьс€, чтобы клиентские части всех удалЄнных предметов 
 	-- на самом деле исчезли из инвентар€. ¬ противном случае есть риск, что игрок попытаетс€
@@ -992,12 +995,9 @@ function convert_item_to_fake_in_inventory(item)
 end
 
 class "wait_for_deleted_objects_to_disappear" (ogse_qt.quick_timer)
-function wait_for_deleted_objects_to_disappear:__init(ids) super()
-	self.ids = ids
-end
-function wait_for_deleted_objects_to_disappear:start(...)
+function wait_for_deleted_objects_to_disappear:__init(ids)
 	level.disable_input()
-	return ogse_qt.quick_timer.start(self, ...)
+	self.ids = ids
 end
 function wait_for_deleted_objects_to_disappear:condition()	
 	-- начать перебирать список
