@@ -66,7 +66,7 @@ local mgr
 function get_mgr()
   if not this.mgr then
     -- this.mgr инициализируется внутри конструтора. См. комментарии там.
-    signals_mgr( "global", ogse_signals_addons_list.addons, true )
+    signals_mgr( "global", ogse_signals_addons_list.addons, false )
   end
   return this.mgr
 end
@@ -97,7 +97,7 @@ function signals_mgr:__init( name, modules_list, scan_for_autoattaching_modules 
   self.slots_in_process = {}
   if modules_list then -- если задали список модулей, то начинаем их подключение
     local registered_modules = {}
-    --[[if scan_for_autoattaching_modules then
+    if scan_for_autoattaching_modules then
       -- только если вообще подключаем модули, тогда проверяем опцию
       -- автоподключения.
       -- ищем и регистрируем все автоподключаемые плагины
@@ -118,7 +118,7 @@ function signals_mgr:__init( name, modules_list, scan_for_autoattaching_modules 
           registered_modules[ fname ] = true
         end
       end
-    end]]
+    end
     -- регистрируем все явно подключаемые плагины
     for _, fname in ipairs( modules_list ) do
       if not registered_modules[ fname ] then
