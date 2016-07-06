@@ -3507,27 +3507,17 @@ function play_klondike_activate_sound()
 	end
 end
 
-local sects = {[1] = "weak", [2] = "weak", [3] = "normal", [4] = "strong_klondike"}
-
+local sects = {"weak", "normal", "strong", "strong_klondike", "plague"}
 function spawn_zombies()
-	local diff = level.get_game_difficulty() + 1
-	local num = 40
-	if diff == 1 then
-		num = 20
-	end
-	for i = 0,num do
-		local sect = "zombie_"..sects[diff]
-		if math.random(0,100) > 70 then
-			sect = "rad_zombied_respawn_1"
-		end
-		alife():create(sect, vector():set(12.57, 1.08, 72.53+i*0.7), 511607+i,3617)
-	end
+	local diff = level.get_game_difficulty()
+	local num = diff < 2 and 27 or diff * 27
 	for i = 0, num do
-		local sect = "zombie_"..sects[diff]
-		if math.random(0,100) > 70 then
-			sect = "rad_zombied_respawn_1"
+		local sect = "zombie_"..sects[math.random(1, #sects)]
+		if math.random() > 0.5 then
+			dsh.create_free_mob(sect, vector():set(12.57, 1.08, 72.53+i*0.7), 511607+i,3617)
+		else
+			dsh.create_free_mob(sect, vector():set(70.1, 1.08, 64.13+i*0.7), 580769+i,3614)
 		end
-		alife():create(sect, vector():set(70.1, 1.08, 64.13+i*0.7), 580769+i,3614)
 	end
 end
 
