@@ -8,7 +8,7 @@ function vis_to_armor(npc)
 local section
 
 	if npc then
-		local vis = table.remove( str_explode( "\\", npc:get_visual_name() ) )
+		local vis = table.remove( string.explode( "\\", npc:get_visual_name() ) )
 
 		if vis then
 			if npc:character_community()=="bandit" then

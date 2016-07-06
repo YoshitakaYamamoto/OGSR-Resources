@@ -122,39 +122,6 @@ function table.clone(object)
     return _copy(object)
 end
 
---==========================strings======================================
--- trim of string
-if not string.trim then
-	_G.string.trim = function(s)
-		return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
-	end
-end
-
--- explode string by divider (PHP-like function)
-_G.str_explode = function(div,str,clear)
-	ASSERT(type(str) == 'string', "ERROR in xs_helpers.str_explode - Argument [%s] is [%s] , not string!", tostring(str) or "-nil-", type(str))
-
-	local t = {}
-	local cpt = string.find(str,div,1,true)
-	if cpt then
-		repeat
-			if clear then
-				table.insert(t, string.trim(string.sub(str,1,cpt-1)))
-			else
-				table.insert(t,string.sub(str,1,cpt-1))
-			end
-			str = string.sub(str,cpt+string.len(div))
-			cpt = string.find(str,div,1,true)
-		until cpt == nil
-	end
-	if clear then
-		table.insert(t, string.trim(str))
-	else
-		table.insert(t,str)
-	end
-	return t
-end
-
 --===========================custom data (ini-style strings)=============
 
 local function parse_ini(str)

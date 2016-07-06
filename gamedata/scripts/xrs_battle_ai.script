@@ -1455,7 +1455,7 @@ function hit_fx( obj, amount, who, bone_index )
 	end
 
 	local exo_flag = false
-	local vis = table.remove( str_explode( "\\", obj:get_visual_name() ) )
+	local vis = table.remove( string.explode( "\\", obj:get_visual_name() ) )
 	if string.find(vis, "exo") then exo_flag = true end
 
 	local key_3 = nil

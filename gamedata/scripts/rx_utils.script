@@ -44,7 +44,7 @@ function collect_sections(ini,sections)
 end
 
 function parse_list(ini,sec,val,convert)
-	local tmp = str_explode(",",read_from_ini(ini,sec,val,"",1),true)
+	local tmp = string.explode(",",read_from_ini(ini,sec,val,"",1),true)
 	if convert and #tmp ~= 0 then
 		local t = {}
 		for i,v in ipairs(tmp) do

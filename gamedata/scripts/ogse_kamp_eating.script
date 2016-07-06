@@ -48,7 +48,7 @@ local forbidden = {
 
 function can_eat(npc)
 	if npc then
-		local vis = table.remove( str_explode( "\\", npc:get_visual_name() ) )
+		local vis = table.remove( string.explode( "\\", npc:get_visual_name() ) )
 		if vis then
 			for k, v in pairs(forbidden) do
 				if string.find(vis,k) then

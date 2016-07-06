@@ -421,7 +421,7 @@ function build_tables()
 	rel_enemy,rel_friend = utils.cfg_get_number(sys_ini, "game_relations", "goodwill_enemy", nil, false, -1000), utils.cfg_get_number(sys_ini, "game_relations", "goodwill_friend", nil, false, 1000)
 	local s_comm_list = utils.cfg_get_string(sys_ini, "game_relations", "communities", nil, false, "", "")
 	local comm_list = {}
-	local s_value = str_explode(",", string.trim(s_comm_list), true)
+	local s_value = string.explode(",", string.trim(s_comm_list), true)
 	for a=1, table.getn(s_value), 2 do
 		local s_comm = s_value[a]
 		table.insert(comm_list, s_comm)
@@ -440,7 +440,7 @@ function build_tables()
 	for a=1,table.getn(tmp) do
 		local value = utils.cfg_get_string(sys_ini, "communities_relations", tmp[a], nil, false, "", "")
 		local idx = tmp[a]
-		local m_value = str_explode(",", string.trim(value), true)
+		local m_value = string.explode(",", string.trim(value), true)
 		for i=1, table.getn(m_value) do
 			local idx2 = comm_list[i]
 			local v = m_value[i]
@@ -1675,7 +1675,7 @@ function process_trade(npc)
 					if bOk == true then
 						local ac = utils.cfg_get_string(sys_ini, sect, "ammo_class", v, false, "")
 						if ac and ac ~= "" then
-							local vvv = str_explode(",", ac, true)
+							local vvv = string.explode(",", ac, true)
 							local ammo_classes = {}
 							for ak,av in pairs(vvv) do
 								table.insert(ammo_classes, av)
@@ -1910,7 +1910,7 @@ function get_monster_params(obj) -- заменить last_debug_message на наш дебуг
   last_debug_message="get_monster_params chp14"
 					if id~=nil and string.trim(id)~="" and string.trim(id)~=nil and value~=nil then
   last_debug_message="get_monster_params chp15"
-						local m_value = str_explode(",", string.trim(value), true)
+						local m_value = string.explode(",", string.trim(value), true)
   last_debug_message="get_monster_params chp16"
 						if (m_value and table.getn(m_value)>2) then
   last_debug_message="get_monster_params chp17"

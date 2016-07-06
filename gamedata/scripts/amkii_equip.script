@@ -70,7 +70,7 @@ end
 
 local info_by_visual = {}
 function get_npc_current_visual( npc )
-  local vis = table.remove( str_explode( "\\", npc:get_visual_name() ) )
+  local vis = table.remove( string.explode( "\\", npc:get_visual_name() ) )
   if not info_by_visual[ vis ] then
     local sect = vis_to_sect[ vis ]
     if not sect then
@@ -85,9 +85,9 @@ function get_npc_current_visual( npc )
     if sect then
       local vis_suit = get_string( sect, "visual" )
       if vis_suit then
-        vis_suit = str_explode( "\\", vis_suit )
+        vis_suit = string.explode( "\\", vis_suit )
         if vis_suit[ 2 ] then
-          vis_suit = str_explode( ".", vis_suit[ 2 ] )
+          vis_suit = string.explode( ".", vis_suit[ 2 ] )
         end
         vis_suit = vis_suit[ 1 ]
         if armor_levels[ vis_suit ] then
@@ -116,7 +116,7 @@ function CAmkDisguise:Update( oNpc, oItem )
   if oNpc:wounded() then return end
 
   local com = oNpc:character_community()
-  local vis = table.remove( str_explode( "\\", oItem:get_visual_name() ) )
+  local vis = table.remove( string.explode( "\\", oItem:get_visual_name() ) )
   local avail = suits_to_visuals[ com ][ vis ]
   if avail then
     local cur_armor_l, cur_armor_sect = get_npc_current_visual( oNpc )
