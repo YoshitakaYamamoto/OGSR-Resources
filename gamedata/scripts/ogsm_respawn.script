@@ -286,7 +286,7 @@ function proceed_spawn(p_name, p_vector, p_lv, p_gv, p_count, p_port, p_fake)
 			local community = r_str(sys_ini, p_name, "community", "nil")
 			local rank = r_str(sys_ini, p_name, "spec_rank", "nil")	
 			if se_respawn.check_monster_spawn_allowed(p_name, community, rank) then
-				local sp_ob = alife():create(p_name, p_vector, p_lv, p_gv)
+				local sp_ob = dsh.create_free_mob(p_name, p_vector, p_lv, p_gv)
 				sp_ob.ogsm_portion = p_port
 				local m_id = sp_ob.id
 				list_mob_ids[m_id] = m_id
@@ -478,40 +478,40 @@ function first_run()
 	-- Монстры в Х18 --
 	-------------------
 	--SPAWN_V1
-	alife():create("burer_weak", vector():set(6, -9, -4.5), 1, 1122)
-	alife():create("burer_weak", vector():set(-27, -9, -13.5), 1, 1122)
+	dsh.create_free_mob("burer_weak", vector():set(6, -9, -4.5), 1, 1122)
+	dsh.create_free_mob("burer_weak", vector():set(-27, -9, -13.5), 1, 1122)
 
 	-------------------
 	-- Монстры в Х16 --
 	-------------------
 
 	--SPAWN_V1
-	alife():create("burer_strong", vector():set(95, 7, -27), 1, 1570)
-	alife():create("burer_strong", vector():set(-9, 5, 12), 1, 1570)
-	alife():create("burer_v_strong", vector():set(-9, 5, 12), 1, 1570)
+	dsh.create_free_mob("burer_strong", vector():set(95, 7, -27), 1, 1570)
+	dsh.create_free_mob("burer_strong", vector():set(-9, 5, 12), 1, 1570)
+	dsh.create_free_mob("burer_v_strong", vector():set(-9, 5, 12), 1, 1570)
 
 	---------------------------
 	-- Монстры на Выжигателе --
 	---------------------------
 
 	--SPAWN_V1
-	alife():create("burer_strong", vector():set(-21, 7, 6), 1, 2800)
-	alife():create("burer_weak", vector():set(-55, -20, 32), 1, 2800)
-	alife():create("burer_v_strong", vector():set(8.7, -21.9, 54.6), 1, 2790)
-	alife():create("zombie_strong", vector():set(-12.55, -7.35, 7.37), 1, 2800)
-	alife():create("zombie_strong", vector():set(-8.52, -7.35, -7.04), 1, 2800)
-	alife():create("zombie_strong", vector():set(0.44, -7.25, -0.06), 1, 2800)
-	alife():create("zombie_strong", vector():set(3.19, -7.37, -20.58), 1, 2800)
-	alife():create("zombie_strong", vector():set(-9.03, -7.38, -16.44), 1, 2800)
-	alife():create("zombie_strong", vector():set(-9, -7.38, -16.44), 1, 2800)
+	dsh.create_free_mob("burer_strong", vector():set(-21, 7, 6), 1, 2800)
+	dsh.create_free_mob("burer_weak", vector():set(-55, -20, 32), 1, 2800)
+	dsh.create_free_mob("burer_v_strong", vector():set(8.7, -21.9, 54.6), 1, 2790)
+	dsh.create_free_mob("zombie_strong", vector():set(-12.55, -7.35, 7.37), 1, 2800)
+	dsh.create_free_mob("zombie_strong", vector():set(-8.52, -7.35, -7.04), 1, 2800)
+	dsh.create_free_mob("zombie_strong", vector():set(0.44, -7.25, -0.06), 1, 2800)
+	dsh.create_free_mob("zombie_strong", vector():set(3.19, -7.37, -20.58), 1, 2800)
+	dsh.create_free_mob("zombie_strong", vector():set(-9.03, -7.38, -16.44), 1, 2800)
+	dsh.create_free_mob("zombie_strong", vector():set(-9, -7.38, -16.44), 1, 2800)
 
 	-------------------------
 	-- Монстры на Монолите --
 	-------------------------
 
 	--SPAWN_V1
-	alife():create("burer_strong", vector():set(12, 1, 34), 1, 2490)
-	alife():create("burer_weak", vector():set(66, 1, 8.5), 1, 2490)
+	dsh.create_free_mob("burer_strong", vector():set(12, 1, 34), 1, 2490)
+	dsh.create_free_mob("burer_weak", vector():set(66, 1, 8.5), 1, 2490)
 
 	-- Спавн пластинок -------------
 	ogse.spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_1)
@@ -523,18 +523,6 @@ function first_run()
 	ogse.spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_9)	
 	ogse.spawn_object_rand(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_4)
 	ogse.spawn_object_rand(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_7)
-
-	-------------------------
-	-- Предметы на Складах --
-	-------------------------
-
-	--SPAWN_V1
-	--alife():create("wpn_vintorez", vector():set(41, -7, 385.5), 342418, 1806)
-	--for ind = 1, 3 do
-	--SPAWN_V1
-		--alife():create("ammo_9x39_ap", vector():set(42, -7, 385.5), 342418, 1806)
-	--end
-
 end
 
 -- Спавн для каждого уровня (вызывается из респавнера)
@@ -783,7 +771,7 @@ function spawn_in_agr()
 
 	for ind = 1, 8 do
 	--SPAWN_V1
-		alife():create("rat_weak", vector():set(-128.2, -2.8, -140.1), 12, 719) 
+		dsh.create_free_mob("rat_weak", vector():set(-128.2, -2.8, -140.1), 12, 719) 
 	end
 end
 

@@ -213,7 +213,7 @@ for ind = 1, count do
 	local check_2 =  se_respawn.check_monster_spawn_allowed(section, community, rank)
 	if check_1 == true or check_2 == true then
 		if pos and new_lv and new_gv then
-			local obj = alife():create(section, pos, new_lv, new_gv)
+			local obj = dsh.create_free_mob(section, pos, new_lv, new_gv)
 		end	
 		if obj then
 			local str = community.."_"..rank

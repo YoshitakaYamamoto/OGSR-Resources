@@ -501,7 +501,7 @@ local suprises = {
 function surprise() -- Ñþðïðèç!!!!
 	if suprises[level.name()] then
 		local section_table = suprises[level.name()]
-		alife():create(
+		dsh.create_free_mob(
 			section_table[math.random(table.getn(section_table))],
 			db.actor:position():add(vector():set(math.random(-2,2), 1, 0)),
 			db.actor:level_vertex_id(),
