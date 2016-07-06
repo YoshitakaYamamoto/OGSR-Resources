@@ -182,6 +182,7 @@ function se_monster:STATE_Read(packet, size)
 end
 --------------------
 function se_monster:on_before_register()
+	ogse_signals.get_mgr():call( "se_monster_on_before_register", self )
 	self:fill_exclusives()
 end
 --------------------

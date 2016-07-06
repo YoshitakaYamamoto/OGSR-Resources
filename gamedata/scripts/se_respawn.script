@@ -332,7 +332,10 @@ function add_deadcity_zombies(number)
 						-- спавним
 						local sect = zombie_types[math.random(#zombie_types)]
 						spawn_point.pos = convert_pos_to_table(spawn_point.pos)
-						ogse.quest_spawn_ex(sect, 1, spawn_point)
+
+						--KRodin: —пособ спавна изменЄн, чтобы зомбей не зат€гивало в свободные гулаги.
+						dsh.create_free_mob(sect, vector():set(unpack(spawn_point.pos)), spawn_point.lvid, spawn_point.gvid)
+
 						check_spawn = check_spawn - 1
 						if debug_flag then
 							log1("!!MG_RESP RESPAWNED_BACK ["..tostring(sect).."]")
@@ -341,12 +344,14 @@ function add_deadcity_zombies(number)
 				else
 					local sect = zombie_types[math.random(#zombie_types)]
 					spawn_point.pos = convert_pos_to_table(spawn_point.pos)
-					ogse.quest_spawn_ex(sect, 1, spawn_point)
+
+					--KRodin: —пособ спавна изменЄн, чтобы зомбей не зат€гивало в свободные гулаги.
+					dsh.create_free_mob(sect, vector():set(unpack(spawn_point.pos)), spawn_point.lvid, spawn_point.gvid)
+
 					check_spawn = check_spawn - 1
 					if debug_flag then
 						log1("!!MG_RESP RESPAWNED ["..tostring(sect).."]")
 					end					
-					-- спавним
 				end			
 			end		
 		end
