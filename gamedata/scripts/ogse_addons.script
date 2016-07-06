@@ -954,7 +954,7 @@ function on_inventory_open()
 	end)
 	--log3("items converted: %s", #ids)
 	if #ids > 0 then
-		wait_for_deleted_objects_to_disappear(ids):start()
+		wait_for_deleted_objects_to_disappear(ids)
 	end
 end
 
@@ -976,7 +976,7 @@ function on_inventory_hide()
 	-- на самом деле исчезли из инвентаря. В противном случае есть риск, что игрок попытается
 	-- открыть инвентарь ещё раз до полной очистки. Тогда будет мерзкий и плохо отлавливаемый вылет.
 	if #ids > 0 then 
-		wait_for_deleted_objects_to_disappear(ids):start()
+		wait_for_deleted_objects_to_disappear(ids)
 	end
 end
 --перенесено из модуля фейковых предметов
@@ -994,26 +994,29 @@ function convert_item_to_fake_in_inventory(item)
 	return false
 end
 
-class "wait_for_deleted_objects_to_disappear" (ogse_qt.quick_timer)
-function wait_for_deleted_objects_to_disappear:__init(ids)
-	level.disable_input()
-	self.ids = ids
-end
-function wait_for_deleted_objects_to_disappear:condition()	
+-----------------------------------------------------------
+local ids
+local function wfdotd_condition()
 	-- начать перебирать список
 	-- если объект существует, прекратить, вернуть false
 	-- иначе - удалить объект из списка и перейти к следующему
 	-- если объектов больше нет, вернуть true
-	while #self.ids > 0 do
-		local obj = level.object_by_id(self.ids[1])
+	while #ids > 0 do
+		local obj = level.object_by_id(ids[1])
 		if obj then return false end
-		table.remove(self.ids, 1)
+		table.remove(ids, 1)
 	end
 	return true
 end
-function wait_for_deleted_objects_to_disappear:action()
-	level.enable_input() 
+local function wfdotd_action()
+	level.enable_input()
 end
+function wait_for_deleted_objects_to_disappear(idss)
+	ids = idss
+	level.disable_input()
+	level.add_call(wfdotd_condition,wfdotd_action)
+end
+-----------------------------------------------------------
 
 function convert_fake_to_item_in_inventory(item)
 	if item == nil or sim:object(item:id()) == nil then return false end

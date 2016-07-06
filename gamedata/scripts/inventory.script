@@ -238,7 +238,7 @@ function spoilage_food()
 		table.insert(ids, item:id())
 	end
 	if #ids > 0 then 
-		ogse_addons.wait_for_deleted_objects_to_disappear(ids):start()
+		ogse_addons.wait_for_deleted_objects_to_disappear(ids)
 	end
 end
 
