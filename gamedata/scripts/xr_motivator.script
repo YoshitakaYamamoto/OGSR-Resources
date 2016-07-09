@@ -290,7 +290,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 	end
 end
 
-function check_art_weapon(npc)
+--[=[function check_art_weapon(npc)
 ------------------------------
 --' Изредка движок сглюкивает,
 --' назначая неписю в слот артефакт
@@ -332,7 +332,7 @@ function check_art_weapon(npc)
 			end
 		end
 	end
-end
+end]=]
 
 ---------------------------------------------------------------------------------------------------------------------
 class "motivator_binder" (object_binder)
@@ -457,8 +457,8 @@ function motivator_binder:net_spawn(sobject)
 		self.object:set_callback(callback.sound, motivator_binder.hear_callback, self)
 	end
 
-	ogse_debug.process_npc(self.object, "s_spw", 5111)
-	self:subscribe_updaters()
+	--ogse_debug.process_npc(self.object, "s_spw", 5111)
+	--self:subscribe_updaters()
 
 	ogse_debug.process_npc(self.object, "s_spw", 6)
 
@@ -629,7 +629,7 @@ function motivator_binder:net_spawn(sobject)
 	return true
 end
 
-function motivator_binder:subscribe_updaters()
+--[=[function motivator_binder:subscribe_updaters()
   local s_name = "on_npc_update." .. self.object:id()
   if self.object:alive() then
     self.updaters = {
@@ -646,7 +646,7 @@ function motivator_binder:subscribe_updaters()
   for _, s in ipairs( self.updaters ) do
     self.am:subscribe( s )
   end
-end
+end]=]
 
 function motivator_binder:net_destroy()
 	xr_logic.save_logic_online(self.object)
@@ -817,10 +817,10 @@ function motivator_binder:death_callback(victim, who)
 	self.st.state_mgr = nil --блокируем апдейт менеджера состояний
 	self.object:set_tip_text_default()
 
-	for _, s in ipairs( self.updaters ) do
+	--[[for _, s in ipairs( self.updaters ) do
 		self.am:unsubscribe( s )
 	end
-	self.updaters = {}
+	self.updaters = {}]]
 
 	ogse_debug.process_npc(victim, "dth", 1)
 	if who and victim and string.find(who:name(), "vehicle_btr") and ogse_car_control.current_car and who:id() == ogse_car_control.current_car:id() then
@@ -999,9 +999,9 @@ function motivator_binder:update(delta)
 	ogse_debug.process_npc(self.object, "upd", 0)
 end
 
-function motivator_binder:check_art_weapon() --Проверка артефакта в руках.
+--[[function motivator_binder:check_art_weapon() --Проверка артефакта в руках.
 	check_art_weapon(self.object)
-end
+end]]
 
 function motivator_binder:reload(section)
 	object_binder.reload(self, section)
