@@ -97,7 +97,6 @@ function remove_delayed()
 							log1("ERROR: DB remove_delayed pcall FAIL "..obj:name().." reason: "..tostring(err_msg))
 							db.actor:give_game_news(game.translate_string("deadman_fail_warning_text"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
 						end						
-						if rx_ai then rx_ai.npc_death(obj,obj) end
 						obj:set_patrol_extrapolate_callback(nil)
 						obj:set_callback(callback.hit, nil)
 						obj:set_callback(callback.death, nil)

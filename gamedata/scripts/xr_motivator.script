@@ -636,12 +636,6 @@ function motivator_binder:subscribe_updaters()
       {
         [ "signal" ] = s_name,
         [ "self"   ] = self,
-        [ "fun"    ] = self.rx_ai_npc_update,
-        [ "queued" ] = true,
-      },
-      {
-        [ "signal" ] = s_name,
-        [ "self"   ] = self,
         [ "fun"    ] = self.check_art_weapon,
         [ "queued" ] = true,
       },
@@ -837,27 +831,27 @@ function motivator_binder:death_callback(victim, who)
 			db.actor:give_game_news(game.translate_string("xr_motivator_debug4"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
 		end
 	end
-	
+
 	ogse_debug.process_npc(victim, "dth", 2)
 	ogse.deadmans_table[victim:id()] = tostring(game.time()).."_"..tostring(who:id())
-	
+
 	ogse_debug.process_npc(victim, "dth", 21)	
 	local name = tostring(victim:name())
 	ogse_hitfx.npc_on_death(victim, who)
-	
+
 	ogse_debug.process_npc(victim, "dth", 3)
 	if self.st.death then
 		xr_logic.issue_event(self.object, self.st.death, "death_callback", victim, who)
 	end
-	
+
 	ogse_debug.process_npc(victim, "dth", 4)	
 	if self.st.active_section then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", victim, who)
 	end
-	
+
 	ogse_debug.process_npc(victim, "dth", 5)	
 	sr_territory.issue_event(self.object, "death_callback", victim, who)
-	
+
 	ogse_debug.process_npc(victim, "dth", 6)	
 	if self.object then
 		smart_terrain.on_death(self.object:id())
@@ -865,29 +859,26 @@ function motivator_binder:death_callback(victim, who)
 		smart_terrain.on_death(victim:id())
 		self.object = victim
 	end
-	
-	ogse_debug.process_npc(victim, "dth", 8)
-	rx_ai.npc_death(self.object,who)
-	
+
 	ogse_debug.process_npc(victim, "dth", 9)
 	self:clear_callbacks()
-	
+
 	ogse_debug.process_npc(victim, "dth", 10)
 	-- добавим в постмортем-обработчик
 	db.add_deadman(self.object, victim)
-	
+
 	ogse_debug.process_npc(victim, "dth", 11)
 	-- добавление опыта за убийство
 	xr_statistic.addKillCount(who, self.object)
-	
+
 	ogse_debug.process_npc(victim, "dth", 13)
 	--проверка на аномалии  
 	ogse_death_artefact.on_death(victim, who)
-	
+
 	ogse_debug.process_npc(victim, "dth", 14)
 	--проверка на мины
 	if checker_minefield then checker_minefield.mine_hit(victim,who) end
-	
+
 	ogse_debug.process_npc(victim, "dth", 16)
 	local community = self.object:character_community()
 	if	community == "zombied" or
@@ -903,14 +894,14 @@ function motivator_binder:death_callback(victim, who)
 			db.actor:give_game_news(game.translate_string("xr_motivator_debug6"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
 		end		
 	end
-	
+
 	ogse_debug.process_npc(victim, "dth", 17)
 	--// xr_companion
 	xr_companion.companion_death(self.object)
-	
+
 	ogse_debug.process_npc(victim, "dth", 18)
 	xr_effects.bar_territory_death(self.object, who)
-	
+
 	ogse_debug.process_npc(victim, "dth", 19)
 	ogse_car_control.unregister_target(self.object)
 	ogse_scripted_btr.unregister_target(self.object)
@@ -1008,15 +999,9 @@ function motivator_binder:update(delta)
 	ogse_debug.process_npc(self.object, "upd", 0)
 end
 
---**********************************************************************************
-function motivator_binder:rx_ai_npc_update() --Обновление оружейного менеджера.
-	if rx_ai then rx_ai.npc_update(self.object, self.st) end
-end
-
 function motivator_binder:check_art_weapon() --Проверка артефакта в руках.
 	check_art_weapon(self.object)
 end
---***********************************************************************************
 
 function motivator_binder:reload(section)
 	object_binder.reload(self, section)
@@ -1029,41 +1014,26 @@ end
 function motivator_binder:save(packet)
 
 	ogse_debug.process_npc(self.object, "npc_sv", 1)
-
 	xr_logic.pstor_store(self.object, "anom_invis", get_anomaly_invisibility(self.object))
-	
+
 	ogse_debug.process_npc(self.object, "npc_sv", 2)
-	
 	xr_logic.pstor_store(self.object, "is_invulnerable", self.object:invulnerable())
-	
-	ogse_debug.process_npc(self.object, "npc_sv", 3)
 
-	if rx_wmgr then
-		rx_wmgr.return_all()
-	end
-	
-	ogse_debug.process_npc(self.object, "npc_sv", 4)
-	
 	ogse_debug.process_npc(self.object, "npc_sv", 5)
-	
 	object_binder.save(self, packet)
-	
+
 	ogse_debug.process_npc(self.object, "npc_sv", 6)
-
 	packet:w_bool(self.treasure_processed)
-	
-	ogse_debug.process_npc(self.object, "npc_sv", 7)
 
+	ogse_debug.process_npc(self.object, "npc_sv", 7)
 	xr_logic.save_obj(self.object, packet)
-	
+
 	ogse_debug.process_npc(self.object, "npc_sv", 9)
-	
 	dialog_manager.save(self.object, packet)
-	
+
 	ogse_debug.process_npc(self.object, "npc_sv", 10)
-	
 	trade_manager.save(self.object, packet)
-	
+
 	ogse_debug.process_npc(self.object, "npc_sv", 0)
 end
 
