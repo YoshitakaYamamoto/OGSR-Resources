@@ -144,7 +144,7 @@ function remove_restriction(npc, anomid)
 	end
 	if added_restrictions[npc_id] and added_restrictions[npc_id][anomid] then
 		added_restrictions[npc_id][anomid] = nil
-		log3("~~[ANOMALY EVADER] REMOVING IN RESTRICTION FOR [%s]: [%s]", npc:name(), obj:name())
+		log3("[ANOMALY EVADER] REMOVING IN RESTRICTION FOR [%s]: [%s]", npc:name(), obj:name())
 		npc:remove_restrictions("",obj:name())
 	end
 end
@@ -161,7 +161,7 @@ function cleanup( obj )
 			end
 		end
 		if table.getn(restrs) > 0 then
-			log3("~~[ANOMALY EVADER] REMOVING IN RESTRICTIONS FOR [%s]: %s", obj:name(), restrs)
+			log3("[ANOMALY EVADER] REMOVING IN RESTRICTIONS FOR [%s]: %s", obj:name(), restrs)
 			obj:remove_restrictions("", table.concat( restrs, "," ))
 		end
 		added_restrictions[nid] = nil
@@ -216,7 +216,7 @@ function update_norm(npc)
     for _, k in ipairs( del ) do
       added_restrictions[ npc:id() ][ k ] = nil
     end
-    log3("~~[ANOMALY EVADER] REMOVING IN RESTRICTIONS FOR [%s]: %s", npc:name(), del)
+    log3("[ANOMALY EVADER] REMOVING IN RESTRICTIONS FOR [%s]: %s", npc:name(), del)
     npc:remove_restrictions( "", table.concat( del, "," ) )
   end
 
@@ -226,7 +226,7 @@ function update_norm(npc)
     added_restrictions[ npc:id() ][ k ] = true
   end
   if table.getn( add ) > 0 then
-    log3("--[ANOMALY EVADER] ADDING IN RESTRICTIONS FOR [%s]: %s", npc:name(), add)
+    log3("[ANOMALY EVADER] ADDING IN RESTRICTIONS FOR [%s]: %s", npc:name(), add)
     npc:add_restrictions( "", table.concat( add, "," ) )
   end
 end
