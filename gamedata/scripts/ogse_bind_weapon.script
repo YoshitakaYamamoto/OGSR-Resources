@@ -4,11 +4,10 @@
 --- OGS Evolution Team 2016
 -----------------------------------------------------------------------
 
-prefetch("ogse_wpn_utils")
-
 function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_item_to_slot", fun = this.on_item_to_slot})
 end
+
 local need_initialize_hud = nil
 function on_item_to_slot(item, sitem)
 	if item:is_weapon_magazined() then
