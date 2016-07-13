@@ -16,10 +16,12 @@ Version: 1.0
 ------------------------------------------------------
 Подключение:
 Добавить куда-нибудь в _G:
-prefetch("_s")
+if not SString_loaded then
+	dofile(getFS():update_path("$game_data$","scripts\\_s.script"))
+end
 --]]--------------------------------------------------
 
-module '_G'
+SString_loaded = true --Глобальная переменная (флаг подключения)
 
 ---- локальные переменные
 local tblW = function (str) t = {}; for w in tostring(str):gmatch("%s-(%S+)%s-") do t[#t+1] = w end; return t end
@@ -125,12 +127,12 @@ end
 -- http://www.amk-team.ru/forum/topic/13216-sborochnyj-tcekh/page-2#entry967222
 local _lower = string.lower
 string.lower = function(s)
-    return _lower(s:gsub("([А-Я])",function(c) return string.char(c:byte()+32) end):gsub("Ё", "ё"))
+    return _lower(tostring(s):gsub("([А-Я])",function(c) return string.char(c:byte()+32) end):gsub("Ё", "ё"))
 end
 
 local _upper = string.upper
 string.upper = function(s)
-    return _upper(s:gsub("([а-я])",function(c) return string.char(c:byte()-32) end):gsub("ё", "Ё"))
+    return _upper(tostring(s):gsub("([а-я])",function(c) return string.char(c:byte()-32) end):gsub("ё", "Ё"))
 end
 ----------------------------------------------------------------------------------------------------
 
@@ -147,8 +149,8 @@ string.explode = function ( div,		-- разделитель
 							clear )		-- обрезать ли пробелы по краям строк (false/true)
 	local ret = {}
 	div = to_ptrn[div] or div
-	for s in string.gmatch(str, "([^"..div.."]+)") do
-		ret[#ret+1] = (clear and string.trim(s) or s)
+	for s in tostring(str):gmatch("([^"..div.."]+)") do
+		ret[#ret+1] = (clear and s:trim() or s)
 	end
 	return ret
 end

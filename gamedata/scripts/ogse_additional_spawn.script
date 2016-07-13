@@ -207,8 +207,8 @@ for ind = 1, count do
 
 	local pos, new_lv, new_gv = ogse_anomaly.anomaly_position_choice(level.name(), false)
 
-    local community = r_str(sys_ini, section, "community", "nil")
-    local rank = r_str(sys_ini, section, "spec_rank", "nil")
+    local community = get_string(section, "community", "nil")
+    local rank = get_string(section, "spec_rank", "nil")
 	local check_1 =  se_respawn.check_npc_spawn_allowed(section, community, rank)
 	local check_2 =  se_respawn.check_monster_spawn_allowed(section, community, rank)
 	if check_1 == true or check_2 == true then

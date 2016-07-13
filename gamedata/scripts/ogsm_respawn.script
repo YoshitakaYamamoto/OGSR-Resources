@@ -283,8 +283,8 @@ function proceed_spawn(p_name, p_vector, p_lv, p_gv, p_count, p_port, p_fake)
 
 	if qnt>=1 then
 		for ind = 1, qnt do
-			local community = r_str(sys_ini, p_name, "community", "nil")
-			local rank = r_str(sys_ini, p_name, "spec_rank", "nil")	
+			local community = get_string(p_name, "community", "nil")
+			local rank = get_string(p_name, "spec_rank", "nil")	
 			if se_respawn.check_monster_spawn_allowed(p_name, community, rank) then
 				local sp_ob = dsh.create_free_mob(p_name, p_vector, p_lv, p_gv)
 				sp_ob.ogsm_portion = p_port

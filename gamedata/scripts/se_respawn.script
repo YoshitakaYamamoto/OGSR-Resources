@@ -524,66 +524,16 @@ local idle_spawn_preset = {
 -- Список респавнеров, для сбора статистики
 local respawners = {}
 local respawners_by_parent = {}
+
 ----------------------------------------------------------------------------------------------------------------------
 -- Разные полезные функции
 ----------------------------------------------------------------------------------------------------------------------
-
---[[function r_bool( spawn_ini, section, line, default )
-  if spawn_ini:line_exist( section, line ) then
-    return spawn_ini:r_bool( section, line )
-  else
-    return default
-  end
-end]]
-
---[[function r_str( spawn_ini, section, line, default )
-  if spawn_ini:line_exist( section, line ) then
-    return spawn_ini:r_string( section, line )
-  else
-    return default
-  end
-end]]
-
---[[function r_num( spawn_ini, section, line, default )
-  if spawn_ini:line_exist( section, line ) then
-    return spawn_ini:r_float( section, line )
-  else
-    return default
-  end
-end]]
-
---[[function r_2nums( spawn_ini, section, line, def1, def2 )
-	if spawn_ini:line_exist( section, line ) then
-		-- если default-ов больше, чем значений в ini, то забить недостающие последним значением из ini
-		local t = parse_names( spawn_ini:r_string( section, line ) )
-		local n = table.getn( t )
-
-		if n == 0 then
-			return def1, def2
-		elseif n == 1 then
-			return t[1], def2
-		else
-			return t[1], t[2]
-		end
-	else
-		return def1, def2
-	end
-end
-
-function parse_names( s )
-    local t = {}
-    for name in string.gfind( s, "([%w_%-.\\]+)%p*" ) do
-        table.insert( t, name )
-    end
-    return t
-end]]
-
 function r_spawns( spawn_ini, section, line, sectSpawnProps)
   if spawn_ini:line_exist( section, line ) then
     --' если default-ов больше, чем значений в ini, то забить недостающие последним значением из ini
     local t = parse_names( spawn_ini:r_string( section, line ) )
     local n = table.getn( t )
-    
+
     local ret_table = {}
     local k = 1
     while k <= n do
@@ -607,38 +557,33 @@ function r_spawns( spawn_ini, section, line, sectSpawnProps)
         k = k + 1
       end
       table.insert(ret_table, spawn)
-  
+
       -- Вычитываем настройки секций респавна и кешируем их.
-      if sectSpawnProps[spawn.section] == nil then
-        local community = r_str(sys_ini, spawn.section, "community", "nil")
-        local rank = r_str(sys_ini, spawn.section, "spec_rank", "nil")
+      if not sectSpawnProps[spawn.section] then
         local check = true
-        local custom_data = r_str(sys_ini, spawn.section, "custom_data")
-        if custom_data ~= nil and (tostring(custom_data) ~= "stalker_custom_data.ltx") then --KRodin: ни к чему несколько раз подряд читать один и тот же пустой конфиг!
-		--log1("SE_RESPAWN - CUSTOM_DATA: "..tostring(custom_data))
-          local custom_data_ltx = dsh.cached_ini_file(custom_data)
-          if custom_data_ltx:section_exist("smart_terrains") then
-            if custom_data_ltx:line_exist("smart_terrains", "none") then
-              if r_str(custom_data_ltx, "smart_terrains", "none") == "true" then
-                check = false
-              end 
-            end
-            if custom_data_ltx:line_exist("smart_terrains", "respawn_check") then
-				if r_str(custom_data_ltx, "smart_terrains", "respawn_check") == "false" then
-					check = false
-				end
-			end                        
+        local community = get_string(spawn.section, "community", "nil")
+        local rank = get_string(spawn.section, "spec_rank", "nil")
+        local custom_data = get_string(spawn.section, "custom_data", nil)
+        if custom_data then
+          local ltx = dsh.cached_ini_file(custom_data)
+          if ltx:section_exist("smart_terrains") then
+            if
+			  get_bool("smart_terrains", "none", false, ltx)
+              or not get_bool("smart_terrains", "respawn_check", true, ltx)
+			then
+              check = false
+			end
           end
         end
-        
         sectSpawnProps[spawn.section] = {community = community, rank = rank, check = check}
       end
-            
+
     end
     return ret_table
   end
   return nil
 end
+
 ----------------------------------------------------------------------------------------------------------------------
 -- Серверный объект спавнера
 ----------------------------------------------------------------------------------------------------------------------
@@ -1066,7 +1011,7 @@ function init_respawn_params(obj)
 
   -- Вычитываем настройки спауна
   local ini = obj:spawn_ini()
-  if not ini:section_exist(section_name) then
+  if not ini:section_exist(section_name) then --нет секции "respawn" - дальше делать нечего
     return  
   end
   
@@ -1075,12 +1020,12 @@ function init_respawn_params(obj)
     abort("RESPAWN: [%s] field 'respawn_section' doesn't exist.", obj:name())
   end
 
-  obj.spawned_goes_online = r_bool(ini, section_name, "spawned_goes_online", nil)
-	
-  obj.spawn_once = r_bool(ini, section_name, "spawn_once", false)
-	
-  obj.min_count = r_num(ini, section_name, "min_count", 0)
-  obj.max_count = r_num(ini, section_name, "max_count", -1)
+  obj.spawned_goes_online = get_bool(section_name, "spawned_goes_online", nil, ini)
+
+  obj.spawn_once = get_bool(section_name, "spawn_once", false, ini)
+
+  obj.min_count = get_float(section_name, "min_count", 0, ini)
+  obj.max_count = get_float(section_name, "max_count", -1, ini)
   if obj.min_count > obj.max_count and
      obj.max_count ~= -1 
   then
@@ -1091,7 +1036,7 @@ function init_respawn_params(obj)
   --' obj.min_count = obj.max_count
   --'end
   
-  obj.max_spawn = r_num(ini, section_name, "max_spawn", 1)
+  obj.max_spawn = get_float(section_name, "max_spawn", 1, ini)
   obj.idle_spawn_min, obj.idle_spawn_max = r_2strings(ini, section_name, "idle_spawn")
   if obj.idle_spawn_min == nil then
     abort("RESPAWN: [%s] field 'idle_spawn' doesn't exist.", obj:name())
@@ -1114,15 +1059,15 @@ function init_respawn_params(obj)
 
   --log1("spawn_min %d spawn_max %d", obj.idle_spawn_min, obj.idle_spawn_max) 
 
-  obj.str_conditions = r_str(ini, section_name, "conditions", 100) 
+  obj.str_conditions = get_string(section_name, "conditions", 100, ini) 
   obj.conditions = xr_logic.parse_condlist(obj, section_name, "conditions", obj.str_conditions)
-  obj.respawn_radius = r_num(ini, section_name, "respawn_radius", -1)
+  obj.respawn_radius = get_float(section_name, "respawn_radius", -1, ini)
     --' Спешкейс, чтобы сохранить совместимость сейвов.
   if obj:name() == "mil_freedom_barier_respawn_1" then
     obj.respawn_radius = -1
   end
-  obj.parent = r_num(ini, section_name, "parent", nil)
-  obj.item_spawn = r_bool(ini, section_name, "item_spawn", false)
+  obj.parent = get_float(section_name, "parent", nil, ini)
+  obj.item_spawn = get_bool(section_name, "item_spawn", false, ini)
   
   -- производим первичную инициализацию
   if obj.rt_read == false then

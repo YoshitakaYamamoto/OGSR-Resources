@@ -167,6 +167,8 @@
 --- version 1.7                                                       ---
 -------------------------------------------------------------------------
 
+prefetch("xs_helpers")
+
 function attach(sm)
 	-- outfit
 	sm:subscribe({ signal = "se_outfit:STATE_Write_begin",			fun = this.on_se_state_write_begin })

@@ -110,13 +110,17 @@ key_bindings["kUSE_MEDKIT"] = 74
 key_bindings["kQUICK_SAVE"] = 75
 key_bindings["kQUICK_LOAD"] = 76
 
+if not SString_loaded then
+	dofile(getFS():update_path("$game_data$","scripts\\_s.script"))
+	log1("--SString loaded!")
+end
+if not luaXML_loaded then
+	dofile(getFS():update_path("$game_data$","scripts\\_luaxml.script"))
+	log1("--luaXML loaded!")
+end
+
 log1("--Инициализация расширений движка закончена!")
 --******************************************** Инициализация расширений движка закончена ********************************************
-
-prefetch("_luaxml")
-prefetch("_geom_helpers")
-prefetch("_s")
-prefetch("xs_helpers")
 
 -- FIX Nazgool ------------------------------------------------------------------
 -- Возможно подобные функции уже где-то и есть, но я пока не нашёл.
@@ -411,30 +415,6 @@ function update_action (npc, script, ...)
     npc:command (act, false)
 end
 
-function r_bool(spawn_ini, section, line, default)
-	if spawn_ini:line_exist( section, line ) then
-		return spawn_ini:r_bool( section, line )
-	else
-		return default
-	end
-end
-
-function r_str(spawn_ini, section, line, default)
-	if spawn_ini:line_exist( section, line ) then
-		return spawn_ini:r_string( section, line )
-	else
-		return default
-	end
-end
-
-function r_num(spawn_ini, section, line, default)
-	if spawn_ini:line_exist( section, line ) then
-		return spawn_ini:r_float( section, line )
-	else
-		return default
-	end
-end
-
 --/ парсит строку вида "ааа, ббб, ввв ..." в таблицу { "ааа", "ббб", "ввв", ... }
 function parse_names( s )
 	local t = {}
@@ -452,12 +432,7 @@ function parse_key_value( s )
 	local t0 = parse_names( s )
     for i=1,#t0,2 do
 		local key, nam = t0[i], t0[i+1]
-		if not nam then
-			--log1("yyyyyyyyyyyyyyyyyyyyyyyyy")
-			--log3("parse_key_value: %s, stopped at %d: '%s' - '%s'", s, i, tostring(key), tostring(nam))
-			abort("1111111111111111111111")
-			--ASSERT(nam, "parse_key_value: %s, stopped at %d: '%s' - '%s'", s, i, tostring(key), tostring(nam))
-		end
+		ASSERT(nam, "parse_key_value: %s, stopped at %d: '%s' - '%s'", s or "nil", i or "nil", tostring(key) or "nil", tostring(nam) or "nil")
 		t[key] = nam
     end
     return t
@@ -468,17 +443,13 @@ function parse_nums( s )
     local t = {}
     for i,entry in ipairs(parse_names( s )) do
 		local v = tonumber( entry )
-		if not v then
-			--log1("xxxxxxxxxxxxxxxxxxxxxxxxxx")
-			--log3("parse_nums: '%s', stopped at %d:'%s'", tostring(s), i, tostring(entry))
-			--ASSERT(v, "parse_nums: '%s', stopped at %d:'%s'", tostring(s), i, tostring(entry))
-			abort("aaaaaaaaaaaaaaa")
-		end
+		ASSERT(v, "parse_nums: '%s', stopped at %d:'%s'", tostring(s) or "nil", i or "nil", tostring(entry) or "nil")
 		table.insert(t,  v)
     end
     return t
 end
-function r_2nums( spawn_ini, section, line, def1, def2 )
+
+--[[function r_2nums( spawn_ini, section, line, def1, def2 )
 	--log3("r_2nums: %s, %s", section, line)
 	if spawn_ini:line_exist( section, line ) then
 		-- если default-ов больше, чем значений в ini, то забить недостающие последним значением из ini
@@ -490,7 +461,8 @@ function r_2nums( spawn_ini, section, line, def1, def2 )
 	else
 		return def1, def2
 	end
-end
+end]]
+
 function r_2strings( spawn_ini, section, line, def1, def2 )
 	if spawn_ini:line_exist( section, line ) then
 		-- если default-ов больше, чем значений в ini, то забить недостающие последним значением из ini
@@ -503,6 +475,7 @@ function r_2strings( spawn_ini, section, line, def1, def2 )
 		return def1, def2
 	end
 end
+
 --/ проверяет, есть ли объект в онлайне
 function is_object_online(obj_id)
 	return level.object_by_id(obj_id) ~= nil
