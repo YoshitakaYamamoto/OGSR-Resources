@@ -50,7 +50,7 @@ end
 function actor_binder:net_spawn(data)
 
 	ogse_debug.process_actor("a_spw", 1)
-	get_console():execute("r2_dof_control off")
+	cmd("r2_dof_control", "off")
 
 	level.show_indicators()
 
@@ -196,9 +196,9 @@ function actor_binder:actor_death_callback(victim, who)
 			local obj = level.object_by_id(k)
 			if obj and obj:clsid() == clsid.controller_s and obj:position():distance_to_sqr(actorPosition) <= kontrikSoundAuraDistance then
 				controllerSoundPresentOnDeath = true
-				get_console():execute("cfg_save user.ltx")
-				get_console():execute("unbind quick_load")
-				get_console():execute("unbind_sec quick_load")
+				cmd("cfg_save", "user.ltx")
+				cmd("unbind", "quick_load")
+				cmd("unbind_sec", "quick_load")
 				break
 			end
 		end
@@ -584,7 +584,7 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:load(reader)
 	local game_difficulty = ogse.load_var("game_difficulty", 3) --Загружаем уровень сложности
-	get_console():execute("g_game_difficulty "..game_difficulty_by_num[game_difficulty]) --и устанавливаем его.
+	cmd("g_game_difficulty", game_difficulty_by_num[game_difficulty]) --и устанавливаем его.
 
 	xr_logic.pstor_load_all(self.object, reader)
 	treasure_manager.load(reader)

@@ -19,12 +19,11 @@ function set_condition( item, cond )
 end
 
 function remove_quotes( s )
-  local  s2 = string.gsub( s, "[«»\"\']", "" )
-  return s2
+  return string.gsub( s, "[ÇÈ\"\']", "" )
 end
 
 function strip_quotes( s )
-  return string.gsub( s, "^%s*[«»\"\']+%s*(.+)%s*[«»\"\']+%s*$", "%1" )
+  return string.gsub( s, "^%s*[ÇÈ\"\']+%s*(.+)%s*[ÇÈ\"\']+%s*$", "%1" )
 end
 
 
@@ -50,6 +49,7 @@ function set_none_smart_terrain( sobj )
   if pk:isOk() then
     local data = pk:get()
     local cd   = data.custom_data:getTable()
+	--log3("~~[Custom data %s]: %s", sobj:name(), cd)
     if cd.smart_terrains then
       for k, _ in pairs( cd.smart_terrains ) do
         return
