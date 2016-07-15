@@ -418,7 +418,7 @@ function set_btr_nonworking() --при отсутствии у ГГ аккумулятора, при влезании в
 end
 
 function set_btr_working() --при вылезании из БТР, возвращаем все как было
-	if ogse.var_exists("turn_engine_key") or (not db.actor:has_info("btr_get_accum_set")) then
+	if ogse.var_exists("turn_engine_key") and not db.actor:has_info("btr_get_accum_set") then
 		local eng_key = ogse.load_var("turn_engine_key") --грузим клавишу из хранилища
 		local dik_key = ogse_rebind_key.dik_to_name(eng_key) --конвертируем
 		cmd("bind", "turn_engine", dik_key) --биндим
