@@ -28,7 +28,6 @@ local smart_terrains = {}
 		...
 	}
 ]]
---local smart_terrains_by_name = {} -- Не используется!!!!!!
 
 exclusives = {}
 --[[ увеличивается на 1 в каждом se_monster.se_monster:fill_exclusives() и se_stalker.se_stalker:fill_exclusives()
@@ -48,9 +47,8 @@ exclusives = {}
 class "se_smart_terrain" ( cse_alife_smart_zone )
 
 function se_smart_terrain:__init( section ) super( section )
---	log( "se_smart_terrain::se_smart_terrain called!" )
+--	log1( "se_smart_terrain::se_smart_terrain called!" )
 
-	--self.initialized = false -- можно и не заводить
 	self.registred = false
 	self.duration_end = game.CTime() -- убрать
 	self.idle_end     = game.CTime() -- убрать
@@ -58,22 +56,22 @@ end
 
 -- использовалась в вырезанном оффлайновом комбате
 function se_smart_terrain:detect_probability()
---	log( "se_smart_terrain::detect_probability called!" )
+--	log1( "se_smart_terrain::detect_probability called!" )
 	return 0
 end
 
 function se_smart_terrain:print()
-	printf( "NPCs:" )
+	log1( "NPCs:" )
 	if self.npc_info then
 		for id, v in pairs( self.npc_info ) do
-			printf( "    %d %s", id, tostring(v.name) )
+			log3( "    %d %s", id, tostring(v.name) )
 		end
 	end
 end
 
 -- сохранение
 function se_smart_terrain:STATE_Write( packet )
---	log( "se_smart_terrain::STATE_Write called!" )
+--	log1( "se_smart_terrain::STATE_Write called!" )
 	cse_alife_smart_zone.STATE_Write( self, packet )
 
 --	self:print()
@@ -112,10 +110,10 @@ end
 
 -- восстановление
 function se_smart_terrain:STATE_Read( packet, size )
---	log( "se_smart_terrain::STATE_Read called!" )
+--	log1( "se_smart_terrain::STATE_Read called!" )
 	cse_alife_smart_zone.STATE_Read( self, packet, size )
 
---	printf( "before read_params" )
+--	log1( "before read_params" )
 --	self:print()
 	
 	self:read_params()
@@ -125,7 +123,7 @@ function se_smart_terrain:STATE_Read( packet, size )
 		return
 	end
 
---	printf( "name=%s, script_version=%d", self:name(), self.script_version )
+--	log3( "name=%s, script_version=%d", self:name(), self.script_version )
 
 	self.duration_end = utils.r_CTime( packet ) -- убрать
 	self.idle_end     = utils.r_CTime( packet ) -- убрать
@@ -141,7 +139,7 @@ function se_smart_terrain:STATE_Read( packet, size )
 		local n = packet:r_u8()
 		local o_id, o
 
---		printf( "npc_info=%s", tostring( n ) )
+--		log3( "npc_info=%s", tostring( n ) )
 
 		for i = 1, n do
 			o_id = packet:r_u16()
@@ -159,7 +157,7 @@ function se_smart_terrain:STATE_Read( packet, size )
 		self.population_locked = packet:r_bool()
 	end
 
---	printf( "after read [%s]", self:name())
+--	log3( "after read [%s]", self:name())
 --	self:print()
 end
 
@@ -191,10 +189,10 @@ function se_smart_terrain:preserve_exclusives()
 	local e = exclusives[self:name()]
 
 	if e then
---'	printf( "[smart_terrain %s] exclusives=%d", self:name(), e )
+--'	log3( "[smart_terrain %s] exclusives=%d", self:name(), e )
 
 	self.exclusives = e
---'	printf("[smart_terrain %s] preserve_exclusives [%s]", self:name(), tostring(self.gulag.capacity_non_exclusive))
+--'	log3("[smart_terrain %s] preserve_exclusives [%s]", self:name(), tostring(self.gulag.capacity_non_exclusive))
 		self.gulag.capacity_non_exclusive = self.gulag.capacity_non_exclusive - e
 
 		exclusives[self:name()] = nil
@@ -206,33 +204,24 @@ end
 -- получить серверные объекты персонажей
 -- выполняется строго один раз как часть initialize_if_needed
 function se_smart_terrain:get_se_objs()
-	local sim = alife()
-	
-	-- print_table_inlog_v2(self.npc_info, "INFO_SMART:")	
-
-	for id, v in pairs( self.npc_info ) do
-		local obj = sim:object( id )
-		
-		if obj then
-
-			--ASSERT(obj, "se_smart_terrain:get_se_objs: [smart_terrain '%s'] can't get server object id=%d", self:name(), id )
-
-			sim_statistic.add( obj )
-
-			self:fill_npc_info( obj, v ) -- дополнить информацию о неписе, впридачу к сохранённой/прочитанной
-		
-		else
-			
-			if self.gulag then
-				--log3("se_smart_terrain:get_se_objs: [smart_terrain '%s'] cleared dead id=%d", self:name(), id )
-				self.gulag:removeObject( id )
-			end
-			
-			--log3("se_smart_terrain:get_se_objs: [smart_terrain '%s'] can't get server object id=%d", self:name(), id )
-			self.npc_info[id] = nil
-			
-		end
-	end
+  local sim = alife()
+  local del = {}
+  for id, v in pairs( self.npc_info ) do
+    local obj = sim:object( id )
+    if obj then
+	  sim_statistic.add( obj )
+      self:fill_npc_info( obj, v )
+    else
+      log2(
+        "[smart_terrain %s] can't get server object id=%d", self:name(), id
+      )
+      table.insert( del, id )
+    end
+  end
+  for _, id in ipairs( del ) do
+    self.npc_info[ id ] = nil
+    self.gulag:removeObject( id )
+  end
 end
 
 -- заполнить информацию о персонаже
@@ -296,7 +285,6 @@ function se_smart_terrain:read_params()
 		sect = "gulag1"
 
 		if not ini:section_exist( sect ) then
---			abort( "[smart_terrain %s] no configuration!", self:name() )
 			--log3( "[smart_terrain %s] no configuration!", self:name() )
 			self.disabled = true
 			return
@@ -310,32 +298,24 @@ function se_smart_terrain:read_params()
 	self.npc_info  = {}          -- group и squad для каждого npc
 	self.gparams   = gp          -- настройки гулага
 
-	gp.type        = ini:r_string( sect, "type" )
-	gp.preset_name = r_str ( ini, sect, "preset" )
---'	printf("%s read_params preset name [%s]", self:name(), tostring(gp.preset_name))
-	gp.capacity    = r_num ( ini, sect, "capacity", 100 ) -- ёмкость. а настоящая ёмкость = min(эта_ёмкость, ёмкость гулага)
-	gp.squad       = r_num ( ini, sect, "squad" )
+	gp.type        = get_string( sect, "type",   nil, ini )
+	gp.preset_name = get_string( sect, "preset", nil, ini )
+--'	log3("%s read_params preset name [%s]", self:name(), tostring(gp.preset_name))
+	gp.capacity    = get_float( sect, "capacity", 100, ini ) -- ёмкость. а настоящая ёмкость = min(эта_ёмкость, ёмкость гулага)
+	gp.squad       = get_float( sect, "squad", nil, ini )
+	gp.respawn = get_string( sect, "respawn", nil, ini )
 
-	--gp.idle_min,     gp.idle_max      = r_2nums( ini, sect, "idle",       0,     0 )
-	--gp.duration_min, gp.duration_max  = r_2nums( ini, sect, "duration",   10000, 10001 )
-	--gp.stay_min,     gp.stay_max      = smart_terrain_params.get_stay_time_interval( r_str( ini, sect, "stay", "default" ) )
-
-	gp.respawn     = r_str ( ini, sect, "respawn" )
-
---	printf( "gp.stay_min=%d, gp.stay_max=%d", gp.stay_min * h2ms, gp.stay_max * h2ms )
-
-	
-	local cond_str = r_str( ini, sect, "cond" )
+	local cond_str = get_string( sect, "cond",    nil, ini )
 	if cond_str then
 		gp.cond = xr_logic.parse_condlist( nil, sect, "cond", cond_str)
 	end
 
-	local groups_str = r_str( ini, sect, "groups" )
+	local groups_str = get_string( sect, "groups",  nil, ini )
 	if groups_str then
 		gp.groups = parse_nums(groups_str)
 	end
 
-	local s_comm = r_str( ini, sect, "communities" )
+	local s_comm = get_string( sect, "communities", nil, ini )
 	if s_comm then
 		local t = parse_names( s_comm )
 
@@ -345,8 +325,8 @@ function se_smart_terrain:read_params()
 		end
 	end
 
-	self.rank_inc_min = sys_ini:r_u32( "smart_terrain_rank_change", "min" )
-	self.rank_inc_max = sys_ini:r_u32( "smart_terrain_rank_change", "max" )
+	self.rank_inc_min = get_u32( "smart_terrain_rank_change", "min" )
+	self.rank_inc_max = get_u32( "smart_terrain_rank_change", "max" )
 
 	self.population_locked = false
 
@@ -354,36 +334,6 @@ function se_smart_terrain:read_params()
 
 	self.gulag_working = false
 end
-
--- подходит ли персонаж по предустановкам.
--- если такой предустановки нету, то он всегда подходит.
--- непонятно, откуда вызывается ???????????????????????????????????
--- ниоткуда походу
---[[function se_smart_terrain:check_preset( npc_community, npc_rank, preset_name )
-	local preset = smart_terrain_params.get_preset( preset_name )
-
-	if preset == false then
-		return true
-	else
-		local t = preset[npc_community]
-
---		printf( "preset_name=%s ranks=[%d,%d] npc_rank=%d", preset_name, t[1], t[2], npc_rank )
-
-		if t and ( npc_rank >= t[1] and npc_rank <= t[2] ) then
-			return true
-		else
-			return false
-		end
-	end
-end]]
-
---[[ подходит ли объект гулагу?
-1) если объект не согласен сюда идти, то smart terrain его не возьмёт
-2) если объект согласен идти куда угодно, то проверить, есть ли ещё места, подходит ли он гулагу,
-   подходит ли он хоть на одну работу
-3) если объект согласен идти только в этот смарт, то принимаем даже если нету места (он вытеснит кого-то), проверить,
-   подходит ли он гулагу, подходит ли он хоть на одну работу
-]]
 
 -- таблица level_groups задаёт что-то вроде карты, где локации сгруппированы в области.
 -- Неписи пойдут в смарт с другого уровня, только если этот уровень находится в одной группе со смартом.
@@ -418,35 +368,49 @@ local level_groups = {
 	l23_x9 = "group3"
 }
 
---[[ Подходит ли объект гулагу. 
+function is_same_level_group( l1, l2 )
+  local g1 = level_groups[ l1 ] or l1
+  local g2 = level_groups[ l2 ] or l2
+  return g1 == g2
+end
+
+--[[
+Подходит ли объект гулагу?
+1) если объект не согласен сюда идти, то smart terrain его не возьмёт
+2) если объект согласен идти куда угодно, то проверить, есть ли ещё места, подходит ли он гулагу,
+   подходит ли он хоть на одну работу
+3) если объект согласен идти только в этот смарт, то принимаем даже если нету места (он вытеснит кого-то), проверить,
+   подходит ли он гулагу, подходит ли он хоть на одну работу
+------------
 Второй аргумент - результат работы функии obj_accepts_smart_terrain - тип согласия объекта на
-вступление в этот смарт
+вступление в этот смарт.
+Вызывается как часть enabled
 ]]
---вызывается как часть enabled
 function se_smart_terrain:smart_terrain_accepts_obj( obj, obj_agreement )
 	if obj_agreement == disagreed then -- объект в этот смарт идти не хочет
---		printf("[%s] disagreed", obj:name())
+--		log3("[%s] disagreed", obj:name())
 		return false
 	end
-	
+
 	if xr_companion.is_companion(obj.id) then -- это компаньон, нечего ему в смарте делать
 		return false
 	end	
 
---'	if obj:name() == "esc_wolf" then
---'		printf("before checking: pop = %s, cap = %s", tostring(self.gulag:get_non_exclusive_population()), tostring(self.gulag.capacity_non_exclusive))
---'	end
 	-- в любом случае, если хочет идти только в этот, или если готов без условий и при этом гулаг не заполнен полностью
 	if obj_agreement == agreed_exclusive or 
 		self.gulag:get_non_exclusive_population() < self.gulag.capacity_non_exclusive
 	then
 		local community, is_stalker = self:get_obj_community( obj )
 
+		if not community then return false end -- фантомов не принимаем никуда
+		if not obj:alive() then return false end -- мертвых не принимаем тоже
+
         --' Проверка что смарттеррейн и НПС находятся в одном кластере уровней (чтобы не ходили через БАР)
-        local smart_level_name = object_level_name(self)
-        local npc_level_name = object_level_name(obj)
-		
-        if level_groups[smart_level_name] ~= level_groups[npc_level_name] then
+		local npc_level_name = ""
+		if game_graph():valid_vertex_id( obj.m_game_vertex_id ) then
+			npc_level_name = object_level_name(obj)
+		end
+		if not is_same_level_group( object_level_name(self), npc_level_name ) then
             return false -- с этого уровня в этот смарт идти нельзя
         end
 		-- если в кастомдате смарта есть перечень допустимых группировок
@@ -455,9 +419,9 @@ function se_smart_terrain:smart_terrain_accepts_obj( obj, obj_agreement )
 			return false -- то не подходит
 		end
 		-- выполнить проверку, заданную скриптом для конкретного уровня (обычно соответствие типа гулага и параметров непися)
-		if not xr_gulag.checkNpc( community, is_stalker, self.gparams.type, obj:rank(), obj ) then
-			return false
-		end
+		--if not xr_gulag.checkNpc( community, is_stalker, self.gparams.type, obj:rank(), obj ) then
+		--	return false
+		--end
 		-- если есть работа
 		return self.gulag:is_there_any_suitable_job( self:fill_npc_info( obj ), obj_agreement == agreed_exclusive )
 	else
@@ -490,7 +454,8 @@ function se_smart_terrain:obj_accepts_smart_terrain( obj )
 	if obj.smart_terrain_conditions then -- если вообще есть какие-то специальные условия насчёт смартов
 		-- перебираем все варианты условий из секции непися
 		-- TODO: зачем перебирать условия для всех смартов, если можно по ключу выбрать только
-		-- условие для этого? 
+		-- условие для этого?
+		--log3("~~\nSmart_terrain_conditions for object [%s]: %s", obj:name(), obj.smart_terrain_conditions)
 		if xr_logic.pick_section_from_condlist( db.actor_proxy, obj, obj.smart_terrain_conditions["none"]) then
 			return disagreed -- явно прописано, что не идёт ни в какой смарт
 		else
@@ -498,20 +463,24 @@ function se_smart_terrain:obj_accepts_smart_terrain( obj )
 			if condlist then -- есть условие для этого смарта
 				if xr_logic.pick_section_from_condlist( db.actor_proxy, obj, condlist ) then
 					return agreed_exclusive -- идёт только в этот смарт
-				else
-					return disagreed -- в этот не идёт
 				end
 			end
 		end
-		-- здесь имеем: эксклюзивов нет, явного запрета тоже нет
-		
-		--' Если объекту запрещено переходить в online и эксклюзивные
-		--' смарты недоступны, то не пускаем его никуда. Это исключает
-		--' переброску отключенных до (или после) определённого события
-		--' людей и мутантов в другой неэксклюзивный смарт.
-		if not obj:can_switch_online() then
-			return disagreed
-		end
+		return disagreed -- в этот не идёт
+	end
+	-- здесь имеем: эксклюзивов нет, явного запрета тоже нет
+	--
+	--' Если объекту запрещено переходить в online и эксклюзивные
+	--' смарты недоступны, то не пускаем его никуда. Это исключает
+	--' переброску отключенных до (или после) определённого события
+	--' людей и мутантов в другой неэксклюзивный смарт.
+	--
+	----if not obj:can_switch_online() then return disagreed end --старая проверка
+	if
+		obj.spawner
+		and xr_logic.pick_section_from_condlist( db.actor, obj, obj.spawner ) == nil
+	then
+		return disagreed
 	end
 
 	return agreed -- просто согласен идти в этот смарт без обязаловки
@@ -525,7 +494,7 @@ local team_smtr_assigned = {}
 function se_smart_terrain:enabled(obj)
 	-- DEBUG
 	if self.disabled then
---		printf("[smart_terrain %s] DISABLED obj=%s (self.disabled)", self:name(), obj:name())
+--		log3("[smart_terrain %s] DISABLED obj=%s (self.disabled)", self:name(), obj:name())
 		return false
 	end
 	--// xr_companion
@@ -533,16 +502,20 @@ function se_smart_terrain:enabled(obj)
 		return false
 	end	
 	--// xr_companion	
-	--------
+
 	-- если всё это делаем в первый раз
 	self:register_if_needed() -- проинитим ...вообще-то это должно с гарантией происходить при создании смарта движком,
 	self:initialize_if_needed() -- но на всякий случай...
-	-- если гулаг активен (по cond_list из кастомдаты смарта) и не заблокировано добавление персонажей
-	if self:is_gulag_available() and not self.population_locked then
-		local b = self:obj_accepts_smart_terrain( obj ) -- если смарт подходит неписю
-		local a = self:smart_terrain_accepts_obj( obj, b ) -- и непись подходит смарту
 
-		return a -- возвращаем в движок результат
+	-- если гулаг активен (по cond_list из кастомдаты смарта) и не заблокировано добавление персонажей
+	if self:is_gulag_available() then
+		local b = self:obj_accepts_smart_terrain( obj ) -- если смарт подходит неписю
+		if self.population_locked then
+			return b == agreed_exclusive -- если гулаг заблокирован, то принимать только экслюзивных неписей
+		else
+			local a = self:smart_terrain_accepts_obj( obj, b ) -- и непись подходит смарту
+			return a
+		end
 	else
 		return false
 	end
@@ -558,9 +531,6 @@ end
 -- на основе это функции принимается решение для непися (не смарта), т.е. здесь непись выбирает себе смарт
 -- для какого смарта число больше, туда и пойдёт
 function se_smart_terrain:suitable( obj )
-	--[[if xr_companion.is_companion(obj.id) then -- по идее не надо, поскольку напарник и так заблокирован
-		return 0
-	end]]
 	if xr_companion.is_companion(obj.id) then -- это компаньон, нечего ему в смарте делать
 		return 0
 	end		
@@ -571,17 +541,29 @@ function se_smart_terrain:suitable( obj )
 		return 100000 -- сразу возвращаем, зачем ещё что-то проверять, если это заведомо больше всех
 	end
 
-	local v = 0 -- посчитаем доступное на уровне количество работ
-	for id, strn in pairs( smart_terrains[object_level_name(self)] ) do -- перебираем все гулаги на одном уровне с этим
-		if strn:is_gulag_available() then -- если они доступны
-			v = v + strn.gulag.capacity - strn.gulag:get_population() -- то суммируем их вакансии
-		end
-	end
-	-- непонятен критерий! Получается, неэксклюзивный непись почти всегда пойдёт на уровень с тупо большим числом смартов,
-	-- а уровни с небольшим количеством смартов заселятся в последнюю очередь.
-	-- надо подумать над критерием. 
-	-- Кроме того, непонятно, где прописывается ограничение по рангу/силе монстров. Может это сделать здесь?
-	return v -- возвращаем фактически число вакансий на уровне
+  local k = 1                  -- коэффициент привлекательности смарта
+  local self_lname = object_level_name( self )
+  if object_level_name( obj ) ~= self_lname then
+    -- смарт на другой локации будет привлекательнее смарта на текущей
+    -- локации непися. Полагаю, это приведет к большей движухе.
+    k = 10 + math.random( 0, 10 )
+  end
+
+  local v = 0        -- посчитаем доступное на уровне количество работ
+  -- перебираем все гулаги на одном уровне с этим
+  for id, strn in pairs( smart_terrains[ self_lname ] ) do
+    if strn:is_gulag_available() then -- если они доступны
+      -- то суммируем их вакансии
+      v = v + strn.gulag.capacity - strn.gulag:get_population()
+    end
+  end
+  -- непонятен критерий! Получается, неэксклюзивный непись почти
+  -- всегда пойдёт на уровень с тупо большим числом смартов, а уровни
+  -- с небольшим количеством смартов заселятся в последнюю очередь.
+  -- надо подумать над критерием.  Кроме того, непонятно, где
+  -- прописывается ограничение по рангу/силе монстров. Может это
+  -- сделать здесь?
+  return v * k -- возвращаем фактически число вакансий на уровне
 end
 
 ------------ добавить npc в smart terrain.
@@ -591,16 +573,15 @@ end
 -- вытолкнуть из этого smart terrain с подходящей работы объект, который попал в него не эксклюзивно.
 function se_smart_terrain:register_npc( obj )
 
-	--printf( "[smart_terrain %s] register called obj=%s gulag_type=%s", self:name(), obj:name(), self.gparams.type )
+	--log3( "[smart_terrain %s] register called obj=%s gulag_type=%s", self:name(), obj:name(), self.gparams.type )
 
 	local npc_info = {
 		-- старые squad и group
 		o_group        = obj:g_group(),
 		o_squad        = obj:g_squad(),
-								-- опять вызыываем эту функцию, хотя вроде бы это уже два раза сделали только что TODO: оптимизировать
+		-- опять вызыываем эту функцию, хотя вроде бы это уже два раза сделали только что TODO: оптимизировать
 		exclusive      = self:obj_accepts_smart_terrain( obj ) == agreed_exclusive, 
 
---		move_offline   = o:move_offline(),
 		stay_end       = game.CTime()
 	}
 
@@ -611,9 +592,9 @@ function se_smart_terrain:register_npc( obj )
 	   not self.gulag:is_there_any_suitable_job( npc_info, false ) --) и нет неэксклюзивных работ
 	   -- а не надо ли проверить на эксклюзивность персонажа?
 	then
-		--printf( "get_population=%d capacity=%d", self.gulag:get_population(), self.gulag.capacity )
-		--printf( "is_there_any_suitable_job=%s", tostring(self.gulag:is_there_any_suitable_job(npc_info, false)) )
-		--print_table( self.npc_info )
+		--log3( "get_population=%d capacity=%d", self.gulag:get_population(), self.gulag.capacity )
+		--log3( "is_there_any_suitable_job=%s", tostring(self.gulag:is_there_any_suitable_job(npc_info, false)) )
+		--log1( table.tostring(self.npc_info) )
 		self:kick_someone_non_exclusive( npc_info ) -- кого-то выкидываем
 	end
 
@@ -622,15 +603,6 @@ function se_smart_terrain:register_npc( obj )
 	obj.was_in_smart_terrain = true
 
 	self.npc_info[obj.id] = npc_info
-
-	-- формируем окончание пребывания в гулаге как текущее время + <добавка в пределах stay_min..stay_max>
-	-- не используется
-	--[[t = self.npc_info[obj.id].stay_end
---	t:setHMSms( 0, 0, 0, math.random( self.gparams.stay_min * h2ms, self.gparams.stay_max * h2ms ) )
-	t:setHMS( math.random( self.gparams.stay_min, self.gparams.stay_max ), 0, 0)
-	t:add( game.get_game_time() )]]
-
---	o:move_offline( false )
 
 	if not self.gulag_working then -- если там ещё нет объектов
 		self:create_gulag() -- активировали гулаг
@@ -642,42 +614,27 @@ function se_smart_terrain:register_npc( obj )
 
 	self.gulag:update() -- обновили
 
-
---	printf( "[smart_terrain %s] added %s to gulag type=%s", self:name(), obj:name(), self.gparams.type )
+--	log3( "[smart_terrain %s] added %s to gulag type=%s", self:name(), obj:name(), self.gparams.type )
 end
 
 -- отпустить npc
 -- TODO а если такого объекта уже нету?
 function se_smart_terrain:unregister_npc( obj )
 	--' Если анрегистрим мертвого эксклюзивного НПС, нужно уменьшить счетчик эксклюзивности
-	if not obj:alive() and obj.smart_terrain_conditions then
-		--local any_exclusive = false
-		--local s
+	if obj.smart_terrain_conditions then
 		local condlist = obj.smart_terrain_conditions[self:name()]
 		if condlist and xr_logic.pick_section_from_condlist( db.actor_proxy, obj, condlist ) then
 			self.exclusives = self.exclusives - 1 --' уменьшаем счетчик
 			self.gulag.capacity_non_exclusive = self.gulag.capacity_non_exclusive + 1
 		end
-		--[[for name, condlist in pairs(obj.smart_terrain_conditions) do
-			s = xr_logic.pick_section_from_condlist( db.actor_proxy, obj, condlist )
-
-			if s ~= nil then
-			 	if name == self:name() then
-					--' уменьшаем счетчик
-					self.exclusives = self.exclusives - 1
-					self.gulag.capacity_non_exclusive = self.gulag.capacity_non_exclusive + 1
-				end
-			end
-		end]]
-
 	end
 
 	local n = self.npc_info[obj.id]
-	--[[if not n then
-		printf( "self.npc_info[obj.id] = nil !!! obj.id=%d", obj.id )
-		self:print()
-		self.gulag:print()
-	end]]
+	--if not n then
+	--	log3( "self.npc_info[obj.id] = nil !!! obj.id=%d", obj.id )
+	--	self:print()
+	--	self.gulag:print()
+	--end
 
 	self.gulag:removeObject( obj.id )
 
@@ -700,7 +657,7 @@ function se_smart_terrain:unregister_npc( obj )
 --'		level.map_change_spot_hint(obj.id, spot, str)		
 --'	end
 
---	printf( "[smart_terrain %s] removed %s from gulag type=%s, strn_id=%s", self:name(), obj:name() or "<<<nil>>>", self.gparams.type, obj:smart_terrain_id())
+--	log3( "[smart_terrain %s] removed %s from gulag type=%s, strn_id=%s", self:name(), obj:name() or "<<<nil>>>", self.gparams.type, obj:smart_terrain_id())
 end
 
 -- увеличить ранг сталкера при регистрации в смарте
@@ -712,18 +669,17 @@ function se_smart_terrain:update_obj_rank( obj )
 
 		obj:set_rank( old_rank + math.random( self.rank_inc_min, self.rank_inc_max ) )
 
---		printf( "[smart_terrain %s] obj=%s rank %d -> %d", self:name(), obj:name(), old_rank, obj:rank() )
+--		log3( "[smart_terrain %s] obj=%s rank %d -> %d", self:name(), obj:name(), old_rank, obj:rank() )
 	end
 end
 
 -- выгнать из-под смарттеррейна первого попавшегося неэксклюзивного персонажа,
 -- который занимает работу, подходящую новому персонажу.
 -- TODO а если я выгоню кого-то, а его работа не подойдёт по idle ?
-
 function se_smart_terrain:kick_someone_non_exclusive( new_npc_info )
 	for obj_id, npc_info in pairs( self.npc_info ) do
 		if not npc_info.exclusive and self.gulag:obj1_job_suits_obj2( obj_id, new_npc_info ) then
-			--printf("[smart_terrain %s] kicking %s", self:name(), npc_info.name)
+			--log3("[smart_terrain %s] kicking %s", self:name(), npc_info.name)
 			self:unregister_npc( npc_info.se_obj )
 			return
 		end
@@ -763,14 +719,14 @@ function se_smart_terrain:task( obj )
   	local path_name = self.gulag:get_obj_job_path_name( obj.id )
 	if not path_name then
 		log1("!!WARNING: NO PATH ["..obj.id.."] ["..obj:name().."] ["..self:name().."] PATH ["..tostring(path_name).."]")
-		--printf("[smart_terrain %s] task: obj=%s job_path=nil, CLEARING", self:name(), obj:name() )
+		--log3("[smart_terrain %s] task: obj=%s job_path=nil, CLEARING", self:name(), obj:name() )
 		self.gulag:free_obj( obj.id )
 		self:unregister_npc(obj) --'Затычка против вылета.
 		self:reset_npc_logic(obj)
 		return CALifeSmartTerrainTask("simulation_default_path")
 	end
 
---'	printf("SEETING TASK PATH %s = %s", obj:name(), path_name)
+--'	log3("SEETING TASK PATH %s = %s", obj:name(), path_name)
 	--' Пробуем проапдейтить типс чувака на карте
 --'	if sim_statistic.show_stalker_spot == true and obj:alive() then
 --'		local community, rank = sim_statistic.getNpcType(obj)
@@ -799,6 +755,7 @@ function se_smart_terrain:is_gulag_available()
 		return true -- то значит всегда можно работать
 	end
 end
+
 function se_smart_terrain:show_smart_debug_spot(avail)
 	if sim_statistic.show_smart_spot == true then
 		--' Показать отметку
@@ -837,19 +794,10 @@ function se_smart_terrain:show_smart_debug_spot(avail)
 		end		
 	end
 end
--- установка/снятие блокировки приёма персонажей
--- ниоткуда не вызывается! 
---[[function se_smart_terrain:lock_population( need_lock )
-	self.population_locked = need_lock
-end]]
 
 -- в гулаг поступил первый персонаж и он начинает работать
 -- название в целом запутывает! Это не создание, а скорее активация гулага
 function se_smart_terrain:create_gulag()
-	--[[self.duration_end = game.CTime()
-	self.duration_end:setHMS( math.random( self.gparams.duration_min, self.gparams.duration_max ), 0, 0)
-	self.duration_end:add( game.get_game_time() )]]
-
 	self.check_time = CTime_0
 
 	self.gulag:initialize()
@@ -868,21 +816,12 @@ function se_smart_terrain:remove_gulag( disable )
 		return
 	end
 
-	--printf( "[smart_terrain %s] removed gulag type=%s", self:name(), self.gparams.type )
+	--log3( "[smart_terrain %s] removed gulag type=%s", self:name(), self.gparams.type )
 
 	-- освободить всех персонажей
 	for id, npc_info in pairs( self.npc_info ) do
 		self:unregister_npc( npc_info.se_obj )
 	end
-
-	--[[if self.gparams.idle_max > 0 then
-		self.idle_end = game.CTime()
---		self.idle_end:setHMSms( 0, 0, 0, math.random( self.gparams.idle_min * h2ms, self.gparams.idle_max * h2ms ) )
-		self.idle_end:setHMSms( math.random( self.gparams.idle_min, self.gparams.idle_max ), 0, 0, 0 )
-		self.idle_end:add( game.get_game_time() )
-	else
-		self.idle_end = nil
-	end]]
 
 	self.gulag = xr_gulag.gulag( self, self.gparams.type, self.gparams.squad, self.gparams.groups, self.npc_info, self.gparams.capacity )
 	self.gulag:load_jobs()
@@ -918,18 +857,13 @@ function se_smart_terrain:fill_monster_classes()
 	end
 end
 
--- возвращает название уровня, на котором находится smart terrain
--- TODO: переделать на готовую функцию
---[[function se_smart_terrain:get_level_name()
-	return alife():level_name( game_graph():vertex( self.m_game_vertex_id ):level_id() )
-end]]
-
 -- регистрация объекта в симуляторе.
 -- вызывается движком после загрузки/создания объекта.
 function se_smart_terrain:on_register()
 
 	cse_alife_smart_zone.on_register( self )
-	
+
+	--TODO: А что будет если это удалить?
 	if has_alife_info("pri_stadium_scene_start") and string.find(self:name(), "pri_wave") then
 		self:remove_gulag(true)
 	end		
@@ -946,7 +880,7 @@ function se_smart_terrain:register_if_needed()
 	end
 	self.registred = true
 	
-	--printf( "%s register called", self:name() )
+	--log3( "%s register called", self:name() )
 	-- DEBUG
 	if self.disabled then
 		return
@@ -965,7 +899,6 @@ function se_smart_terrain:register_if_needed()
 	end
 
 	smart_terrains[level_name][self.id] = self
-	--smart_terrains_by_name[self:name()] = self
 
 	if self.gparams.respawn then
 		db.strn_by_respawn[self.gparams.respawn] = self
@@ -990,15 +923,13 @@ end
 function se_smart_terrain:on_unregister()
 	cse_alife_smart_zone.on_unregister( self )
 
---	printf( "[smart_terrain %s] on_unregister called", self:name() )
+--	log3( "[smart_terrain %s] on_unregister called", self:name() )
 
 	local lvl_smarts = smart_terrains[object_level_name(self)]
 
 	if lvl_smarts then
 		lvl_smarts[self.id] = nil
 	end
-
-	--smart_terrains_by_name[self:name()] = nil
 
 	if self.gparams and self.gparams.respawn then
 		db.strn_by_respawn[self.gparams.respawn] = nil
@@ -1072,10 +1003,10 @@ function se_smart_terrain:stat() -- отладочная, только для информации!!
 
 	s = s .. pop .. " " .. cap .. " " .. self:stat_get_accepted_communities()
 
-	printf( s )
+	log3( s )
 
 --	for id, npc_info in pairs( self.npc_info ) do
---		printf( "    %s", npc_info.name )
+--		log3( "    %s", npc_info.name )
 --	end
 
 	return avail, pop, cap
@@ -1086,14 +1017,12 @@ end
 -- Также может вызваться принудительно из xr_effects
 -- Если мужиков в гулаге больше не осталось или условия существования гулага не выполняются, то убрать гулаг.
 function se_smart_terrain:update()
---	log( "se_smart_terrain::update called!" )
+--	log1( "se_smart_terrain::update called!" )
 	cse_alife_smart_zone.update( self )
 
 	if not self.gulag_working then
 		return
 	end
-
---'	self:initialize_if_needed()
 
 	if self:is_gulag_available() then
 		local cur_time = game.get_game_time()
@@ -1103,7 +1032,7 @@ function se_smart_terrain:update()
 			--' проверять, не собрался ли кто-то к этому времени уже уходить
 			for id, npc_info in pairs( self.npc_info ) do
 				if npc_info.cond and not xr_logic.pick_section_from_condlist( db.actor_proxy, npc_info.se_obj, npc_info.cond ) then
-					--printf("[smart_terrain %s] leaving %s", self:name(), npc_info.name)
+					--log3("[smart_terrain %s] leaving %s", self:name(), npc_info.name)
 					self:unregister_npc( npc_info.se_obj )
 				end
 			end
@@ -1131,7 +1060,7 @@ end
 -- найти и почистить гулаг объекта
 -- вызывается из кучи мест. Скорее всего дубируется многократно
 function on_death( obj_id )
---	printf( "on_death obj_id=%d", obj_id )
+--	log3( "on_death obj_id=%d", obj_id )
 	local sim = alife()
 	if sim then
 		local obj = sim:object( obj_id )
@@ -1170,32 +1099,46 @@ end
 -- прочитать секцию [smart_terrains]
 -- вызывается объектами, которые могут ходить под smart terrain
 -- вызывается из se_monster:fill_exclusives() в файле se_monster и  и se_stalker.se_stalker:fill_exclusives()
-
+--
+-- Добавлена поддержка [smart_terrains] в файле логики
+-- https://github.com/dsh2dsh/op2ogse/commit/d95b91610c4b346ab7cc08ef17e1c3a7ba9ed9fc
 function read_smart_terrain_conditions( self )
-	if self.ini and self.ini:section_exist( smart_section ) then
-		local conds = {}
-		local accepts = false
-		local result, field, str
-		local n = self.ini:line_count( smart_section )
-
-		if n > 0 then
-			for i = 0, n-1 do
-				result, field, str = self.ini:r_line( smart_section, i, "", "" )
-
-				conds[field] = xr_logic.parse_condlist(self, smart_section, field, str)
-			end
-
-			return conds
-		end
-	end
-
-	return nil
+  local ini = self.ini
+  if ini then
+    if
+      ( not ini:section_exist( smart_section ) )
+      and ini:section_exist( "logic" )
+    then
+      local cfg = get_string( "logic", "cfg", nil, ini )
+      if cfg then
+		log3("~~[smart_terrain %s]: Smart section not found in spawn_ini(). Will be used logic file: [%s]", self:name(), cfg)
+        ini = dsh.cached_ini_file( cfg )
+      end
+    end
+  end
+  if ini and ini:section_exist( smart_section ) then
+    local conds   = {}
+    local accepts = false
+    local n       = ini:line_count( smart_section )
+    if n > 0 then
+      for i = 0, n - 1 do
+        local result, field, str = ini:r_line( smart_section, i, "", "" )
+        conds[ field ] = xr_logic.parse_condlist(
+          self, smart_section, field, str
+        )
+      end
+	  --log3("~~\n[Smart Terrain] Conditions for %s: %s", self:name(), conds)
+      return conds
+    end
+  end
+  --log3("!![smart_terrain %s]: Smart section not found!", self:name())
+  return nil
 end
 
 --------------------
 -- Вывод статистики по всем смартам в симуляции
 function stat()
-	printf( "--------------- Smart terrains statistics START ----------------------" )
+	log1( "--------------- Smart terrains statistics START ----------------------" )
 
 	local jobs, jobs_in_avail, occupied
 	local level_stats = {}
@@ -1224,23 +1167,23 @@ function stat()
 
 	jobs, jobs_in_avail, occupied = 0, 0, 0
 
-	printf("")
+	log1("")
 
 	for level_name, l in pairs( level_stats ) do
-		printf( "Level %s :", level_name )
-		printf( "    Jobs in all smart terrains : %d",       l.jobs )
-		printf( "    Jobs in available smart terrains : %d", l.jobs_in_avail )
-		printf( "    Occupied jobs : %d",                    l.occupied )
+		log3( "Level %s :", level_name )
+		log3( "    Jobs in all smart terrains : %d",       l.jobs )
+		log3( "    Jobs in available smart terrains : %d", l.jobs_in_avail )
+		log3( "    Occupied jobs : %d",                    l.occupied )
 
 		jobs          = jobs          + l.jobs
 		jobs_in_avail = jobs_in_avail + l.jobs_in_avail
 		occupied      = occupied      + l.occupied
 	end
 
-	printf( "All levels:" )
-	printf( "    Jobs in all smart terrains : %d",       jobs )
-	printf( "    Jobs in available smart terrains : %d", jobs_in_avail )
-	printf( "    Occupied jobs : %d",                    occupied )
+	log3( "All levels:" )
+	log3( "    Jobs in all smart terrains : %d",       jobs )
+	log3( "    Jobs in available smart terrains : %d", jobs_in_avail )
+	log3( "    Occupied jobs : %d",                    occupied )
 
-	printf( "--------------- Smart terrains statistics END ------------------------" )
+	log1( "--------------- Smart terrains statistics END ------------------------" )
 end

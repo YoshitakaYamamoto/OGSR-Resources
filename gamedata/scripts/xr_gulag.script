@@ -1468,7 +1468,7 @@ function setup_gulag_and_logic_on_spawn( obj, st, sobject, stype, loaded )
 		local strn                   = sim:object( strn_id )
 		
 		if not strn then
-			log1("!!ERROR: XR_GULAG cannot find SOBJ ["..tostring(strn_id).."] for obj ["..sobject:name().."]")
+			--log1("!!ERROR: XR_GULAG cannot find SOBJ ["..tostring(strn_id).."] for obj ["..sobject:name().."]")
 			strn_id = 65535
 			-- KD: попробуем перезагрузить логику гулага потеряшкам
 			loaded = false
