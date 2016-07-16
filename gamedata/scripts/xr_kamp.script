@@ -1069,7 +1069,8 @@ function CKampManager:addNpc(npc, bind)
 	end
 	self:selectPosition(npc:id(), bind)	
 	if db.story_by_id[npc:id()] == nil then
-		xr_info.loadInfo(npc, sys_ini)
+		local char_ini1 = dsh.cached_ini_file("scripts\\stories.ltx")
+		xr_info.loadInfo(npc, char_ini1)
 	end
 end
 

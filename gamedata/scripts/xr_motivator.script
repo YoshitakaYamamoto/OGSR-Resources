@@ -369,8 +369,6 @@ function motivator_binder:reinit()
     -- КОЛЛБЕКИ ЗДЕСЬ СТАВИТЬ НЕЛЬЗЯ! Здесь еще неизвестна активная схема.
     -- Ставьте коллбеки в методе update в отмеченном комментарием месте.
 
-    local char_ini = self.object:spawn_ini() or sys_ini
-
 ----------------------------------------------------------------------------------------------------------------------
 -- Общие скрипты
 ----------------------------------------------------------------------------------------------------------------------
@@ -464,7 +462,7 @@ function motivator_binder:net_spawn(sobject)
 
     --' Загрузка историй для лагеря.
 	if self.loaded == false then
-		local char_ini = self.object:spawn_ini() or sys_ini
+		local char_ini = self.object:spawn_ini() or dsh.cached_ini_file("scripts\\dummy.ltx")
 		xr_info.loadInfo(self.object, char_ini)
 	end
 	
