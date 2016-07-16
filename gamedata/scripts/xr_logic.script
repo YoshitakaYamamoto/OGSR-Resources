@@ -1445,6 +1445,13 @@ function initialize_obj(obj, st, loaded, actor, stype)
 	end
 end
 
+-- у объекта есть "непустая" логика
+function logic_not_empty(npc, ini)
+	return ini:section_exist("logic") and (
+		ini:line_exist("logic", "cfg") or (ini:line_exist("logic", "active") and ini:r_string("logic", "active") ~= "nil")
+	)
+end
+
 function save_logic_online(obj)
 	local npc_id = obj:id()
 	local st = db.storage[npc_id]

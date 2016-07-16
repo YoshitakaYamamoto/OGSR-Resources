@@ -1,110 +1,139 @@
---[[------------------------------------------------------------------------------------------------
-Space restrictor binder
-����� ���������
+-- Space restrictor binder
+-- Чугай Александр
+-----------------------
+-- Примечания:
+--	обновлений у рестрикторов нету, поэтому для тех, кому надо,
+--	актёр вызывает искусственно на своём обновлении
 
-����������:
-	- ���������� � ������������ ����, ������� ��� ���, ���� ����, ���� �������� ������������ �� ���� ����������
---------------------------------------------------------------------------------------------------]]
-
-local updatable_binders = {}    -- �������, ������� ������� ���������� (update)
-
-function actor_update(delta)
-	ogse_debug.process_actor("upd", 8111)
-	for i, v in pairs(updatable_binders) do
-		local sobj = alife():object(i)
-		if sobj then
-			ogse_debug.process_actor("upd", "8111: "..sobj:name())
-		end
-		v:actor_update(delta)
-	end
-end
 
 function bind( obj )
---	db.storage[obj:id()] = { }
-
-	obj:bind_object( restrictor_binder( obj ) )
+  obj:bind_object( restrictor_binder( obj ) )
 end
 
-----------------------------------------------------------------------------------------------------
+
 class "restrictor_binder" ( object_binder )
-
-function restrictor_binder:__init(obj, char_ini) super(obj)
-	self.initialized = false
-	self.loaded = false
+function restrictor_binder:__init( obj, char_ini ) super( obj )
+  self.initialized = false
+  self.loaded      = false
+  self.sm          = ogse_signals.get_mgr()
 end
 
-function restrictor_binder:reload(section)
-	object_binder.reload(self, section)
+
+function restrictor_binder:reload( section )
+  object_binder.reload(self, section)
 end
+
 
 function restrictor_binder:reinit()
-	object_binder.reinit(self)
-
-	db.storage[self.object:id()] = { }
-
-	self.st = db.storage[self.object:id()]
+  object_binder.reinit( self )
+  db.storage[ self.object:id() ] = {}
+  self.st = db.storage[ self.object:id() ]
 end
 
-function restrictor_binder:net_spawn(data)
-	if not object_binder.net_spawn( self,data ) then
-		return false
-	end
 
-	db.add_zone( self.object )
-
-	-- �� ���������������� �� �������, ���� � ������� � customdata
-	-- ��� ������ logic ������.
-	local char_ini = xr_logic.get_customdata_or_ini_file(self.object, "<customdata>")
-	if char_ini:section_exist("logic") then
-		updatable_binders[self.object:id()] = self
-	end
-
-	return true
+function restrictor_binder:net_spawn( data )
+  if not object_binder.net_spawn( self, data ) then
+    return false
+  end
+  db.add_zone( self.object )
+  -- Не регистрироваться на апдейты, если у объекта в customdata
+  -- нет секции logic вообще.
+  --
+  -- ОП-2: Функция
+  --
+  -- xr_logic.get_customdata_or_ini_file(self.object, "<customdata>")
+  --
+  -- при отсутствии у рестриктора кастомдаты -- возвращает "пустую" логику:
+  -- return ini_file([[scripts\dummy.ltx]]), в которой секция logic есть.
+  -- Поэтому в updatable_binders в варианте от ПЫСов, несмотря на их
+  -- коммент выше, регистрируются на апдейты АБСОЛЮТНО ВСЕ
+  -- рестрикторы. Даже те, у которых нет кастомдаты вообще.  Поэтому
+  -- условие проверки доработано на проверку строки active ~= nil и
+  -- отсутствие строки cfg.
+  local char_ini = xr_logic.get_customdata_or_ini_file(
+    self.object, "<customdata>"
+  )
+  if xr_logic.logic_not_empty( self.object, char_ini ) then
+	--log3("--Restrictor subscribed to update: [%s]", self.object:name())
+    self.subscribed = {
+      [ "signal" ] = "on_update",
+      [ "fun"    ] = self.actor_update,
+      [ "self"   ] = self,
+    }
+    self.sm:subscribe( self.subscribed )
+  --else
+	--log3("!!Restrictor NOT subscribed to update: [%s], logic is empty!", self.object:name())    
+  end
+  return true
 end
+
 
 function restrictor_binder:net_destroy()
-	local st = db.storage[self.object:id()]
-	if st.active_scheme then
-		xr_logic.issue_event(self.object, st[st.active_scheme], "net_destroy")
-	end
-
-	db.del_zone( self.object )
-
-	updatable_binders[self.object:id()] = nil
-
-	db.storage[self.object:id()] = nil
-
-	object_binder.net_destroy(self)
+  local st = db.storage[ self.object:id() ]
+  if st.active_scheme then
+    xr_logic.issue_event( self.object, st[st.active_scheme], "net_destroy" )
+  end
+  db.del_zone( self.object )
+  if self.subscribed then
+    self.sm:unsubscribe( self.subscribed )
+    self.subscribed = nil
+  end
+  db.storage[ self.object:id() ] = nil
+  object_binder.net_destroy( self )
 end
 
--- ���������� �� ���������� �����!
-function restrictor_binder:actor_update(delta)
-	if not self.initialized and db.actor then
-		self.initialized = true
-		xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_restrictor)
-	end
 
-	if self.st.active_section ~= nil then
-		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
-	end
+-- вызывается из обновления актёра!
+function restrictor_binder:actor_update( delta )
+  if not self.initialized and db.actor then
+    self.initialized = true
+    xr_logic.initialize_obj(
+      self.object, self.st, self.loaded, db.actor, modules.stype_restrictor
+    )
+  end
+  if not self:is_nil_active_section() then
+    xr_logic.issue_event(
+      self.object, self.st[self.st.active_scheme], "update", delta
+    )
+  end
+  -- пустая логика могла быть пустой изначально, или могла переключиться
+  -- активная секция после вызова xr_logic.issue_event(). Поэтому проверим
+  -- лишний раз здесь.
+  if self:is_nil_active_section() then
+    -- Рестрикторы, у которых логика вышла в nil, снимаем с апдейта.
+	ASSERT( self.subscribed, "not subscribed: %s", self.object:name() )
+    self.sm:unsubscribe( self.subscribed )
+    self.subscribed = nil
+  else
+    local dist = self.object:position():distance_to( db.actor:position() )
+    self.sm:reschedule(
+      ( dist < 50 and 200 ) or ( dist < 100 and 1000 )
+      or math.random( 5000, 6000 )
+    )
+  end
 end
+
+
+function restrictor_binder:is_nil_active_section()
+  return
+    self.st.active_section == nil
+    or self.st.active_section == "sr_idle@nil"
+end
+
 
 function restrictor_binder:net_save_relevant()
-	return true
+  return true
 end
 
-function restrictor_binder:save(packet)
-	object_binder.save(self, packet)
 
-	xr_logic.save_obj(self.object, packet)
+function restrictor_binder:save( packet )
+  object_binder.save( self, packet )
+  xr_logic.save_obj( self.object, packet )
 end
 
-function restrictor_binder:load(reader)
-	self.loaded = true
 
-	printf( "restrictor_binder:load" )
-
-	object_binder.load(self, reader)
-
-	xr_logic.load_obj(self.object, reader)
+function restrictor_binder:load( reader )
+  self.loaded = true
+  object_binder.load( self, reader )
+  xr_logic.load_obj( self.object, reader )
 end

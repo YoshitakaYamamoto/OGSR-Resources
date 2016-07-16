@@ -464,12 +464,6 @@ function actor_binder:update(delta)
 	end
 
 	if mteleport_update_time < time_global() then --Эти функции апдейтить только так и никак больше! При переносе в ватчдоги, они вообще переставали работать!
-		ogse_debug.process_actor("upd", 811)
-		bind_restrictor.actor_update(delta)
-
-		ogse_debug.process_actor("upd", 812)
-		bind_mteleport.actor_update() --Апдейтим наш телепорт
-
 		ogse_debug.process_actor("upd", 814)
 		ogse_water_restrictor.actor_update()
 
