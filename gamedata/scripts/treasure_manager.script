@@ -202,17 +202,17 @@ function CTreasure:give_treasure(k)
 			pid = obj.id
 		end
 		
-	log1("Попробуем отследить что там не так с наградами")
-	print_table_inlog(v)
-		
+	--log1("Попробуем отследить что там не так с наградами")
+	--print_table_inlog(v)
+
 -- Рандомные награды
 	--if v.name then
 		local new_treasure = ogse_random_treasure.random_treasure(v.name, v.target)
-		log1(game.translate_string(v.name))
+		--log1(game.translate_string(v.name))
 		local new_items = new_treasure:set_random_reward()
 		if new_items then 
 			v.items = new_items
-			print_table_inlog(v.items,"v.items:")
+			--print_table_inlog(v.items,"v.items:")
 		end
 		new_treasure = nil -- чистим неиспользуемое
 	--end

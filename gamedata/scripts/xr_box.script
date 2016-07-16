@@ -110,7 +110,7 @@ end
 
 --' Функция спавнит необходимое число предметов
 function create_items(obj, section, number, rnd)
-    log3("create_items %s of %s", tostring(number), tostring(section))
+    --log3("create_items %s of %s", tostring(number), tostring(section))
     if ammo_sections[section] == true then
 		if math.random(100) <= rnd	then
 				
