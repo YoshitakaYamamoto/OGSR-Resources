@@ -198,7 +198,7 @@ end
 
 --Какая-то приблуда для кровососа
 function set_custom_panic( obj )
-  if obj.health < 0.05 then return end
+  if not may_attack() or obj.health < 0.05 then return end
   local enemy = obj:best_enemy()
   if
     not (
@@ -210,9 +210,7 @@ function set_custom_panic( obj )
   local dist   = obj:position():distance_to( enemy:position() )
   local panic_dist = 6
   ogse_signals.get_mgr():reschedule( ( dist < panic_dist * 3 and 100 ) or ( dist < obj:range() and 1000 ) or 5000 )
-  if dist > panic_dist then return end
-  if not may_attack()  then return end
-  if enemy:active_slot() == 0 and enemy:see( obj ) then
+  if dist < panic_dist and enemy:active_slot() == 0 and enemy:see( obj ) then
     obj:set_custom_panic_threshold( 1 )
   else
     obj:set_custom_panic_threshold( 0 )
@@ -284,12 +282,6 @@ local psy_burer_sound = {
 	{ ["sound_name"] = sound_object([[ambient\random\rnd_moan2]]), ["direction"] = 1,  ["volume"] = 0.5 },
 	{ ["sound_name"] = sound_object([[ambient\random\rnd_moan1]]), ["direction"] = -1, ["volume"] = 0.5 }
 }
-local sound_rnd_moan = {
-	[[ambient\random\rnd_moan1]],
-	[[ambient\random\rnd_moan2]],
-	[[ambient\random\rnd_moan4]],
-	[[ambient\random\rnd_moan5]]
-}
 function psy_burer_attack( obj )
   if not may_attack() then return end
 	if obj:position():distance_to(db.actor:position()) < 20 then
@@ -303,7 +295,7 @@ function psy_burer_attack( obj )
 		zh.power = 0.1
 		for k,v in pairs(psy_burer_sound) do
 			if not v.sound_name:playing() then
-				v.sound_name = sound_object(sound_rnd_moan[math.random(#sound_rnd_moan)])
+				v.sound_name = sound_object("ambient\\random\\rnd_moan"..math.random(5))
 				v.sound_name.volume = v.volume
 				v.sound_name:play_at_pos(db.actor, vector():set(v.direction, 0, 1), 0, sound_object.s2d)
 				db.actor:hit(zh)
@@ -418,21 +410,21 @@ function controller_psy_attack( obj )
 ----------------------------------------------------------------------
 		if npc:id() == db.actor:id() and obj:see(npc) then
 			if not may_attack() then return end
-			if obj:position():distance_to(npc:position()) < math.random(1, 100) then
+			if obj:position():distance_to(npc:position()) < math.random(10, 100) then
 				local binder = obj:binded_object()
 				if not ( binder.phantom_spawned_id and level.object_by_id( binder.phantom_spawned_id ) ) then
 					binder.phantom_spawned_id = nil
 					local sobj = alife():create(hard_phantom_types[math.random(#hard_phantom_types)], obj:position(), npc:level_vertex_id() , npc:game_vertex_id() )
 					binder.phantom_spawned_id = sobj.id
 
-					local snd_obj = xr_sound.get_safe_sound_object("soundtrack\\controller\\"..math.random(1,25))
+					local snd_obj = xr_sound.get_safe_sound_object("soundtrack\\controller\\"..math.random(25))
 					if snd_obj then
 						snd_obj:play_at_pos(npc, vector():set(0,0,0), 0, sound_object.s2d)
 					end
 				end
 
 				local active_item = npc:active_item()
-				if active_item and active_item:section() ~= "bolt" and not isKnife(active_item) and math.random(1, 100) / 100 > npc.psy_health then
+				if active_item and active_item:section() ~= "bolt" and not isKnife(active_item) and math.random(100) / 100 > npc.psy_health then
 					npc:drop_item(active_item)
 				end
 			end
@@ -509,7 +501,7 @@ function dog_attack_phantom( obj )
     binder.phantom_spawned_id = nil
     if math.random() < 0.3 then
       local sobj = alife():create(
-        "phantom_dog_" .. math.random( 1, 2 ),
+        "phantom_dog_" .. math.random( 2 ),
         obj:position(),
         enemy:level_vertex_id(), enemy:game_vertex_id()
       )
@@ -664,9 +656,9 @@ function quest_functions_on_death( obj, who )
 		local gvid = obj:game_vertex_id()
 		position.y = position.y + 2
 		for i = 1,4 do
-			local id = math.random(1, #malish_arts)
+			local id = math.random(#malish_arts)
 			while id == last_id do
-				id = math.random(1, #malish_arts)
+				id = math.random(#malish_arts)
 			end
 			alife():create(malish_arts[id], position, vid, gvid)
 		end
