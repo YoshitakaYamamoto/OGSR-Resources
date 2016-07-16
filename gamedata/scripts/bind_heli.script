@@ -195,13 +195,13 @@ function heli_binder:check_health()
 		if health < self.flame_start_health and not heli.m_flame_started then
 			heli_start_flame( self.object )
 
-			heli_snd.play_snd( self.st, heli_snd.snd_damaged, 3 )
+			heli_snd.play_snd( self.st, "damage", 3 )
 		end
 
 		if health <= 0.005 then
 			heli_die( self.object )
 
-			heli_snd.play_snd( self.st, heli_snd.snd_down, 4 )
+			heli_snd.play_snd( self.st, "death", 4 )
 		end
 	end
 end
@@ -266,7 +266,7 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 	end
 	-- пилоты ругаются по рации
 	if self.last_hit_snd_timeout < time_global() then
-		heli_snd.play_snd( self.st, heli_snd.snd_hit, 2 )
+		heli_snd.play_snd( self.st, "hit", 2 )
 		self.last_hit_snd_timeout = time_global() + math.random( 4000, 8000 )
 	end
 end
