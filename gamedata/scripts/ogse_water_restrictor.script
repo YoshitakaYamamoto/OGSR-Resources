@@ -6,7 +6,7 @@
 
 -- звуки
 local snd_dive = xr_sound.get_safe_sound_object("material\\actor\\step\\n_water_1")
-local snd_underwater = xr_sound.get_safe_sound_object("ogse\\\underwater")
+local snd_underwater = xr_sound.get_safe_sound_object("ogse\\underwater")
 local snd_emersion = xr_sound.get_safe_sound_object("material\\actor\\step\\n_water_2")
 local snd_blow = xr_sound.get_safe_sound_object("material\\actor\\step\\t_water2")
 local snd_breath = xr_sound.get_safe_sound_object("actor\\breath_1")
@@ -17,7 +17,6 @@ local snd_dive_subvolume = 1	-- громкость звука погружения
 local snd_underwater_subvolume = 0.7	-- громкость звука под водой
 local snd_emersion_subvolume = 1		-- громкость звука всплытия
 
-local water_binders = {}    -- биндеры, которые требуют обновлений (update)
 local underwater = {}
 
 local breather_prefixes = {
@@ -29,84 +28,18 @@ local breather_prefixes = {
 
 local debug_flag = false
 
-function actor_update(delta)
-	for i, v in pairs(water_binders) do
-		v:actor_update(delta)
-	end
-end
+-- вызывается из биндера рестрикторов
+function update(obj)
+	fx_play(obj:id())
 
-function bind( obj )
-	obj:bind_object( water_binder( obj ) )
-end
-
-----------------------------------------------------------------------------------------------------
-class "water_binder" ( object_binder )
-
-function water_binder:__init(obj, char_ini) super(obj)
-	self.initialized = false
-	self.loaded = false
-	self.actor_inside = false
-end
-
-function water_binder:reload(section)
-	object_binder.reload(self, section)
-end
-
-function water_binder:reinit()
-	object_binder.reinit(self)
-	db.storage[self.object:id()] = { }
-	self.st = db.storage[self.object:id()]
-end
-
-function water_binder:net_spawn(data)
-	if not object_binder.net_spawn( self,data ) then
-		return false
-	end
-	db.add_zone( self.object )
-	water_binders[self.object:id()] = self
-	return true
-end
-
-function water_binder:net_destroy()
-	db.del_zone( self.object )
-	water_binders[self.object:id()] = nil
-	db.storage[self.object:id()] = nil
-	object_binder.net_destroy(self)
-end
-
--- вызывается из обновления актёра!
-function water_binder:actor_update(delta)
-	if not self.initialized and db.actor then
-		self.initialized = true
-		xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_restrictor)
-	end
-	
-	self.actor_inside = self.object:inside(device().cam_pos)
-	
-	fx_play(self.object:id())
-	
-	if self.actor_inside then
-		fx_start(self.object:id())
+	local actor_inside = obj:inside(device().cam_pos)
+	if actor_inside then
+		fx_start(obj:id())
 	else	
-		fx_stop(self.object:id())
+		fx_stop(obj:id())
 	end
-	
 end
 
-function water_binder:net_save_relevant()
-	return true
-end
-
-function water_binder:save(packet)
-	object_binder.save(self, packet)
-	xr_logic.save_obj(self.object, packet)
-end
-
-function water_binder:load(reader)
-	self.loaded = true
-	object_binder.load(self, reader)
-	xr_logic.load_obj(self.object, reader)
-end
 
 local walk_accel = nil
 local jump_speed = nil

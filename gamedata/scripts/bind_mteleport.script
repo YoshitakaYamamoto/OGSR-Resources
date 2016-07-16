@@ -102,7 +102,7 @@ function restrictor_teleport:net_spawn(data)
 			[ "self"   ] = self,
 		}
 		self.sm:subscribe( self.subscribed )
-		log3("--Teleport [%s] subscribed to update!", self.object:name())
+		--log3("--Teleport [%s] subscribed to update!", self.object:name())
 	end
 	return true
 end
@@ -112,7 +112,7 @@ function restrictor_teleport:net_destroy()
 	if self.subscribed then
 		self.sm:unsubscribe( self.subscribed )
 		self.subscribed = nil
-		log3("!!Teleport [%s] UNsubscribed from update!", self.object:name())
+		--log3("!!Teleport [%s] UNsubscribed from update!", self.object:name())
 	end
 	teleport_binders[self.object:id()] = nil
 	self.parametrs = nil
