@@ -237,7 +237,9 @@ function on_hit( obj, amount, local_direction, who, bone_index, binder )
 		pos:add(dir:mul(1.0))
 		particle_start:play_at_pos(pos)
 
-		obj.health = binder[ script_name() .. ".health_before_hit" ] --[[ - obj.health ]]
+		if binder[ script_name() .. ".health_before_hit" ] then
+			obj.health = binder[ script_name() .. ".health_before_hit" ] --[[ - obj.health ]]
+		end
 	end
   end
 end
