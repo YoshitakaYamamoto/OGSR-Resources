@@ -549,8 +549,6 @@ end
 
 function se_stalker:update ()
 	cse_alife_human_stalker.update(self)
-	
-	--ogse_quest_guard.check_guard_innecessity_for_object(self) --KRodin: Отключено, не вижу особого смысла в этом скрипте
 end
 
 --'Торговец
