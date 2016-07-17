@@ -969,6 +969,7 @@ function motivator_binder:update(delta)
 		end
 	end
 
+--[=[
 	ogse_debug.process_npc(self.object, "upd", 6)
 	self.object:info_clear()
 	local best_enemy = self.object:best_enemy()
@@ -981,6 +982,7 @@ function motivator_binder:update(delta)
 		self.object:info_add('section -- ' .. active_section)
 	end
 	self.object:info_add('name -- ' .. self.object:name())
+--]=]
 
 	--ogse_debug.process_npc(self.object, "upd", 86)
 	--ogse_quest_guard.check_guard_necessity_for_object(self.object) --KRodin: Отключено, не вижу особого смысла в этом скрипте
