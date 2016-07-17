@@ -8,23 +8,16 @@ load
 net_spawn
 --------------------------------------------------------------------------------------------------------------------]]
 
-memtsg = {} --' временная таблица
-lasthealth = 0
-lastime = nil
+--memtsg = {} --' временная таблица
+--lasthealth = 0
+--lastime = nil
 
 local debug_flag = false
-local count = 0
 
+--*****************************************************************************************************
 local warn_check_timer = {}
 local snd_check_timer = {}
 
-local pri_checked = 0
-
-local pri_f_count = 0
-local pri_d_count = 0
-local pri_m_count = 0
-
-----------------------------------------------------------------------------------------------------------------------
 function look_to_shot(object, who)
 	if object and who then
 		if IsStalker(object) and 
@@ -101,67 +94,38 @@ function recognize_sound(sound_type)
 	return sn_t
 end
 
-local hear_something = {
-
-[1] = [[characters_voice\human_01\dolg\reactions\hear_something\hear_1]],
-[2] = [[characters_voice\human_01\dolg\reactions\hear_something\hear_2]],
-[3] = [[characters_voice\human_01\dolg\reactions\hear_something\hear_3]],
-[4] = [[characters_voice\human_01\dolg\reactions\hear_something\hear_4]],
-[5] = [[characters_voice\human_01\dolg\reactions\hear_something\hear_5]],
-[6] = [[characters_voice\human_01\dolg\reactions\hear_something\hear_6]],
-[7] = [[characters_voice\human_01\dolg\reactions\hear_something\hear_7]],
-[8] = [[characters_voice\human_01\dolg\reactions\hear_something\hear_8]],
-[9] = [[characters_voice\human_01\dolg\reactions\hear_something\hear_9]]
-
+local sil_levels_tbl = {
+	--["l06_rostok"] = true,
+	["l08u_brainlab"] = true,
+	["l10u_bunker"] = true,
+	["l12_stancia"] = true,
+	["l12u_sarcofag"] = true,
+	["l12u_control_monolith"] = true,
+	["l12_stancia_2"] = true,
 }
-
-local nothing_there = {
-
-[1] = [[characters_voice\human_01\dolg\reactions\nothing\nothing_1]],
-[2] = [[characters_voice\human_01\dolg\reactions\nothing\nothing_2]],
-[3] = [[characters_voice\human_01\dolg\reactions\nothing\nothing_3]],
-[4] = [[characters_voice\human_01\dolg\reactions\nothing\nothing_4]],
-[5] = [[characters_voice\human_01\dolg\reactions\nothing\nothing_5]],
-[6] = [[characters_voice\human_01\dolg\reactions\nothing\nothing_6]],
-[7] = [[characters_voice\human_01\dolg\reactions\nothing\nothing_7]]
-
-}
-
 
 function silent_level()
-	if 	level.name() == "l06_rostok" or
-		level.name() == "l08u_brainlab" or
-		level.name() == "l10u_bunker" or
-		level.name() == "l12_stancia" or 
-		level.name() == "l12u_sarcofag" or
-		level.name() == "l12u_control_monolith" or
-		level.name() == "l12_stancia_2" then
-		return true 
-	else 
-		return false
-	end
+	return sil_levels_tbl[level.name()]
 end
-
-local warn_check_timer = {}
 
 function check_sound(self, who, sound_type, sound_position, sound_power)
 	-- secure and optimize
-	
-	if not self or
-		not who or
-		not sound_type or
-		not sound_position or
-		not sound_power 
+	if
+		( not self )
+		or ( not who )
+		or ( not sound_type )
+		or ( not sound_position )
+		or ( not sound_power )
 	then
-		return 
+		return
 	end
-	
-	local actsch = nil
-	
+
+	local actsch
+
 	if db.storage[self:id()] and db.storage[self:id()].active_scheme then
 		actsch = db.storage[self:id()].active_scheme
 	end
-	
+
 	if actsch and (actsch == "remark" or actsch == "wounded" or actsch == "actor_dialogs")
 	then 
 		return 
@@ -172,11 +136,11 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 	local who_dist = 1000
 	local check_dist = 25*sound_power
 	local who_dist = self:position():distance_to(who:position())
-	
+
 	if who_dist > 100 then
 		return
 	end
-	
+
 	-- Отсеиваем свои звуки и звуки друзей
 	if (who:is_monster() or who:is_stalker() or who:id() == db.actor:id()) 
 	and (who:alive() and self:alive()) then
@@ -188,16 +152,16 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 	else	
 		return
 	end
-	
+
 	local snd_t = recognize_sound(sound_type)
-	
+
 	local blow = hit()
 	blow.power = 0.001
 	blow.impulse = 1
 	blow.draftsman = who
 	blow.type = hit.wound
 	blow.direction = utils.vector_copy_by_val(self:position()):sub(who:position())
-	
+
 	-- Если тип задан проверим реакцию на него
 	if snd_t and snd_t ~= "NIL" and not self:best_enemy() then
 		if IsStalker(who) and (self:relation(who) == game_object.enemy) then
@@ -210,7 +174,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 				if who_dist > check_dist then
 					if not silent_level() then
 						if not warn_check_timer[self:id()] or warn_check_timer[self:id()] < time_global() then
-							local snd_name = nothing_there[math.random(1,7)]
+							local snd_name = "characters_voice\\human_01\\dolg\\reactions\\nothing\\nothing_"..math.random(7)
 							if snd_name and self:character_community() ~= "zombied" then
 								local snd_obj = xr_sound.get_safe_sound_object(snd_name)
 								if snd_obj and not snd_obj:playing() then
@@ -225,7 +189,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 				else
 					if not silent_level() then
 						if not warn_check_timer[self:id()] or warn_check_timer[self:id()] < time_global() then
-							local snd_name = hear_something[math.random(1,9)]
+							local snd_name = "characters_voice\\human_01\\dolg\\reactions\\hear_something\\hear_"..math.random(9)
 							if snd_name and self:character_community() ~= "zombied" then
 								local snd_obj = xr_sound.get_safe_sound_object(snd_name)
 								if snd_obj and not snd_obj:playing() then
@@ -258,11 +222,11 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 				self:set_sight(look.point,sound_position)
 				self:set_mental_state(anim.danger)			
 			end			
-		elseif IsMonster(who) then
+		elseif IsMonster(who) --[[and self:relation( who ) == game_object.enemy]] then
 			if who_dist > check_dist then
 				if not silent_level() then
 					if not warn_check_timer[self:id()] or warn_check_timer[self:id()] < time_global() then
-						local snd_name = nothing_there[math.random(1,7)]
+						local snd_name = "characters_voice\\human_01\\dolg\\reactions\\nothing\\nothing_"..math.random(7)
 						if snd_name and self:character_community() ~= "zombied" then
 							local snd_obj = xr_sound.get_safe_sound_object(snd_name)
 							if snd_obj and not snd_obj:playing() then
@@ -289,6 +253,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 		end
 	end
 end
+--*****************************************************************************************************
 
 --[=[function check_art_weapon(npc)
 ------------------------------
@@ -334,12 +299,10 @@ end
 	end
 end]=]
 
----------------------------------------------------------------------------------------------------------------------
 class "motivator_binder" (object_binder)
 
 function motivator_binder:__init (obj) super(obj)
 	self.loaded = false
-	self.last_update = 0
     self.first_update = false
 	self.treasure_processed = false
 
@@ -348,30 +311,26 @@ function motivator_binder:__init (obj) super(obj)
 end
 
 function motivator_binder:extrapolate_callback(cur_pt)
-    if self.object == nil then return false end
+    if not self.object then return false end
 	if self.st.active_section then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "extrapolate_callback")
 		self.st.move_mgr:extrapolate_callback(self.object)
 	end
 
-		if patrol(self.object:patrol()):flags(cur_pt):get() == 0 then
-			return true
-		end
+	if patrol(self.object:patrol()):flags(cur_pt):get() == 0 then
+		return true
+	end
 	return false
 end
 
 function motivator_binder:reinit()
+    if not self.object then return end
 
-    if self.object == nil then return end
-	
     object_binder.reinit(self)
 
-    -- КОЛЛБЕКИ ЗДЕСЬ СТАВИТЬ НЕЛЬЗЯ! Здесь еще неизвестна активная схема.
-    -- Ставьте коллбеки в методе update в отмеченном комментарием месте.
+--КОЛЛБЕКИ ЗДЕСЬ СТАВИТЬ НЕЛЬЗЯ! Здесь еще неизвестна активная схема.
+--Ставьте коллбеки в методе net_spawn в отмеченном комментарием месте.
 
-----------------------------------------------------------------------------------------------------------------------
--- Общие скрипты
-----------------------------------------------------------------------------------------------------------------------
     db.storage[self.object:id()] = {  followers = {} }
     self.st = db.storage[self.object:id()]
 
@@ -385,38 +344,20 @@ function motivator_binder:reinit()
 	self.st.move_mgr = move_mgr.move_mgr(self.object)
 	self.st.move_mgr:initialize()
 end
-----------------------------------------------------------------------------------------------------------------------
-
-local function del_zero_ammo(npc, item)
-	if not item then return end
-	local sobj = alife():object(item:id())
-	if not sobj then return end
-
-	local section = sobj:section_name()
-	if item:is_ammo() then
-		local size = dunin_ammo.get_ammo_size(item)
-		if size == 0 then
-			death_manager.shedule_release(item)
-		end
-	end		
-end	
 
 function motivator_binder:net_spawn(sobject)
 	ogse_debug.process_npc(self.object, "s_spw", 1)
-
 	ogse.fix_restrictors(self.object)
-	
-	ogse_debug.process_npc(self.object, "s_spw", 2)
 
+	ogse_debug.process_npc(self.object, "s_spw", 2)
 	if not object_binder.net_spawn(self, sobject) then
 		ogse_debug.process_npc(self.object, "s_spw", 0)
 		return false
 	end
-	
-	ogse_debug.process_npc(self.object, "s_spw", 3)
 
+	ogse_debug.process_npc(self.object, "s_spw", 3)
 	db.add_obj(self.object)
-	
+
 	if not self.loaded then
 		self.loaded = xr_logic.load_logic_online(self.object)
 		local st = self.st
@@ -425,7 +366,8 @@ function motivator_binder:net_spawn(sobject)
 		st.loaded_active_section = st.active_section
 		st.loaded_gulag_name = st.gulag_name
 	end
-	
+
+--TODO: Удалить
 	if has_alife_info("bar_heli_scene_stay_online") then
 		if string.find(self.object:name(), "bar_ecolog_professor") then
 			local gulag = xr_gulag.get_npc_gulag(self.object)
@@ -443,14 +385,9 @@ function motivator_binder:net_spawn(sobject)
 	self.object:set_callback(callback.hit, motivator_binder.hit_callback, self)
 	self.object:set_callback(callback.death, motivator_binder.death_callback, self)
 	self.object:set_callback(callback.use_object, motivator_binder.use_callback, self)
-	--
 	self.object:set_callback(callback_ex.entity_alive_before_hit, self.before_hit_callback, self)
 	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)	
 	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
-	--memusage.collect_info(self.object, "after__callback")
-	
-	ogse_debug.process_npc(self.object, "s_spw", 5)
-
 	if not ogse.is_quest_npc(self.object) then
 		self.object:set_callback(callback.sound, motivator_binder.hear_callback, self)
 	end
@@ -459,15 +396,13 @@ function motivator_binder:net_spawn(sobject)
 	--self:subscribe_updaters()
 
 	ogse_debug.process_npc(self.object, "s_spw", 6)
-
     --' Загрузка историй для лагеря.
 	if self.loaded == false then
 		local char_ini = self.object:spawn_ini() or dsh.cached_ini_file("scripts\\dummy.ltx")
 		xr_info.loadInfo(self.object, char_ini)
 	end
-	
-	ogse_debug.process_npc(self.object, "s_spw", 7)
 
+	ogse_debug.process_npc(self.object, "s_spw", 7)
 	if not self.object:alive() then
 		if xr_companion.is_companion(self.object:id()) then
 			xr_companion.save_var_companion(self.object:id(), "is_companion", 0)
@@ -485,7 +420,6 @@ function motivator_binder:net_spawn(sobject)
 		local s_obj = alife():object(self.object:id())
 
 		if s_obj.offline_dead == 1 then
-
 			ogse_debug.process_npc(self.object, "s_spw", 71)
 			if debug_flag then
 				log1("--ВНИМАНИЕ! Обнаружен погибший в оффлайне! Объект: ИД: "..self.object:id().." ИМЯ:"..self.object:name().." Будет произведена обработка лута и постановка объекта на удаление!")					
@@ -503,7 +437,7 @@ function motivator_binder:net_spawn(sobject)
 
 			ogse_debug.process_npc(self.object, "s_spw", 73)	
 			sr_territory.issue_event(self.object, "death_callback", self.object, self.object)
-	
+
 			ogse_debug.process_npc(self.object, "s_spw", 75)
 			self:clear_callbacks()
 
@@ -540,61 +474,50 @@ function motivator_binder:net_spawn(sobject)
 	end
 
 	ogse_debug.process_npc(self.object, "s_spw", 8)
-  --' Для зомбированных чуваков говорим что аномалий не существует
-  if self.object:character_community() == "zombied" then
-    local manager = self.object:motivation_action_manager()
-    manager:remove_evaluator  (stalker_ids.property_anomaly)
-    manager:add_evaluator   (stalker_ids.property_anomaly, property_evaluator_const(false))
-  else
-    local manager = self.object:motivation_action_manager()
-    manager:remove_evaluator  (stalker_ids.property_anomaly)
-    manager:add_evaluator   (stalker_ids.property_anomaly, property_evaluator_const(false))
-  end
-  
-  ogse_debug.process_npc(self.object, "s_spw", 9)
-	
+	-- Для зомбированных чуваков говорим что аномалий не существует
+	if self.object:character_community() == "zombied" then
+		local manager = self.object:motivation_action_manager()
+		manager:remove_evaluator  (stalker_ids.property_anomaly)
+		manager:add_evaluator   (stalker_ids.property_anomaly, property_evaluator_const(false))
+	else
+		local manager = self.object:motivation_action_manager()
+		manager:remove_evaluator  (stalker_ids.property_anomaly)
+		manager:add_evaluator   (stalker_ids.property_anomaly, property_evaluator_const(false))
+	end
+
+	ogse_debug.process_npc(self.object, "s_spw", 9)
 	if xr_combat_companion then
 		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(xr_combat_companion.prop_combat, property_evaluator_const(false))
-	end	
-	
+	end
 	if xrs_battle_ai then
 		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(xrs_battle_ai.evid_altcombat, property_evaluator_const(false))	
 	end
-	
 	if xr_companion then
 		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(xr_companion.property_need_companion, property_evaluator_const(false))
-	end	
-	
+	end
 	if xrs_grenade then
 		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(xrs_grenade.prop_fire, property_evaluator_const(false))
 		manager:add_evaluator(xrs_grenade.prop_grenade, property_evaluator_const(false))
-	end		
-	
+	end
+
 	ogse_debug.process_npc(self.object, "s_spw", 10)
-	  
+	if ogsm_hideout then
+		local manager = self.object:motivation_action_manager()
+		manager:add_evaluator(ogsm_hideout.property_blowout, property_evaluator_const(false))
+		manager:add_evaluator(ogsm_hideout.property_hideout_lost, property_evaluator_const(false))
+		manager:add_evaluator(ogsm_hideout.property_inhide, property_evaluator_const(false))
+		manager:add_evaluator(ogsm_hideout.property_psyzoned, property_evaluator_const(false))
+	end
 
-  if ogsm_hideout then
-	local manager = self.object:motivation_action_manager()
-      manager:add_evaluator(ogsm_hideout.property_blowout, property_evaluator_const(false))
-      manager:add_evaluator(ogsm_hideout.property_hideout_lost, property_evaluator_const(false))
-      manager:add_evaluator(ogsm_hideout.property_inhide, property_evaluator_const(false))
-      manager:add_evaluator(ogsm_hideout.property_psyzoned, property_evaluator_const(false))
-
-  end
-  
 	ogse_debug.process_npc(self.object, "s_spw", 11)
-
-    --' загрузка озвучки
-    --memusage.collect_info(self.object, "before_soundmgr")
+    -- загрузка озвучки
     xr_sound.load_sound(self.object)
-    --memusage.collect_info(self.object, "after_soundmgr_netspawn_end")
-	
+
 	ogse_debug.process_npc(self.object, "s_spw", 12)
-	
 	--// xr_companion
 	if xr_companion.is_companion(self.object:id()) then
 		local gulag = xr_gulag.get_npc_gulag(self.object)
@@ -617,7 +540,6 @@ function motivator_binder:net_spawn(sobject)
 	--// xr_companion	
 
 	ogse_debug.process_npc(self.object, "s_spw", 13)
-
 	ogse_car_control.register_target(self.object)
 	ogse_scripted_btr.register_target(self.object)
 
@@ -660,7 +582,6 @@ function motivator_binder:net_destroy()
 
 	self:clear_callbacks()
 	self.object:set_callback(callback.use_object, nil)
-	self.object:set_callback(callback.sound, nil)
 
 	ogse_car_control.unregister_target(self.object)
 	ogse_scripted_btr.unregister_target(self.object)
@@ -677,6 +598,8 @@ function motivator_binder:clear_callbacks()
 	self.object:set_callback(callback.death, nil)
 	self.object:set_callback(callback.on_item_drop, nil)
 	self.object:set_callback(callback.on_item_take, nil)
+	self.object:set_callback(callback_ex.entity_alive_before_hit, nil)
+	self.object:set_callback(callback.sound, nil)
 end
 
 function motivator_binder:before_hit_callback(p_s_hit, p_ignore_flags)
@@ -710,7 +633,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 1)
-	if xr_companion.is_companion(self.object:id()) and amount < 0.3 then
+	if xr_companion.is_companion(self.object:id()) --[[and amount < 0.3]] then
 		xr_sound.set_sound(self.object, nil)
 		stop_play_sound(self.object)
 	end
@@ -720,7 +643,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 		who = db.actor
 	end	
 
-	if amount > 0.01 then
+	if self.object:alive() then
 		local chk_dist = self.object:position():distance_to(who:position())
 		local range = self.object:range()
 		if chk_dist > range then
@@ -752,7 +675,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 7)
-	if amount > 0 then
+	--if amount > 0 then
 		sr_territory.issue_event(self.object, "hit_callback", obj, amount, local_direction, who, bone_index)
 		if self.object then
 			local drop, err_msg = pcall(xr_wounded.hit_callback,self.object:id())
@@ -767,7 +690,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 				db.actor:give_game_news(game.translate_string("xr_motivator_debug2"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
 			end				
 		end
-	end
+	--end
 
 	ogse_debug.process_npc(self.object, "hit", 10)
 	if checker_minefield then checker_minefield.mine_hit(obj,who) end
@@ -790,9 +713,9 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 13)
-	if amount > 0.05 then
+	--if amount > 0.05 then
 		xr_effects.bar_territory_hit(self.object, who)
-	end
+	--end
 
 	ogse_debug.process_npc(self.object, "hit", 14)
 	if xr_companion.is_companion(self.object:id()) then
@@ -811,7 +734,6 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 end
 
 function motivator_binder:death_callback(victim, who)
-
 	self.st.state_mgr = nil --блокируем апдейт менеджера состояний
 	self.object:set_tip_text_default()
 
@@ -912,9 +834,7 @@ function motivator_binder:death_callback(victim, who)
 end
 
 function motivator_binder:use_callback(obj, who)
-
 	ogse_debug.process_npc(self.object, "use", 1)
-
     if not self.object then 
 		if obj then
 			self.object = obj
@@ -923,13 +843,12 @@ function motivator_binder:use_callback(obj, who)
 			return
 		end
 	end
-	
-	ogse_debug.process_npc(self.object, "use", 2)
 
+	ogse_debug.process_npc(self.object, "use", 2)
 	if self.object:alive() then
 		ogse_debug.process_npc(self.object, "use", 3)
-		
 		xr_use.notify_on_use(obj, who)
+
 		if self.st.active_section then
 			xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "use_callback", obj, who)
 		end
@@ -1012,7 +931,6 @@ function motivator_binder:net_save_relevant()
 end
 
 function motivator_binder:save(packet)
-
 	ogse_debug.process_npc(self.object, "npc_sv", 1)
 	xr_logic.pstor_store(self.object, "anom_invis", get_anomaly_invisibility(self.object))
 
@@ -1058,34 +976,30 @@ function motivator_binder:load(reader)
 
 	self.npc_script_version = alife():object(self.object:id()).script_version
 	dialog_manager.load(self.object, reader, self.npc_script_version)
+
 	trade_manager.load(self.object, reader)
+
 	local anom_invis = xr_logic.pstor_retrieve(self.object, "anom_invis", false)
 	set_anomaly_invisibility(self.object, anom_invis)
-	
+
 	local is_invulnerable = xr_logic.pstor_retrieve(self.object, "is_invulnerable", false)
 	self.object:invulnerable(is_invulnerable)
 end
 
 function motivator_binder:hear_callback(self, who, sound_type, sound_position, sound_power)
-
 	ogse_debug.process_npc(self, "hr", 1)
-	
 	--// xr_companion
 	if xr_companion.is_companion(self:id()) then
 		ogse_debug.process_npc(self, "hr", 0)
 		return
 	end	
-	
+
 	if who and string.find(who:name(), "vehicle_btr") then
 		who = db.actor
 	end		
 
 	ogse_debug.process_npc(self, "hr", 2)	
-	
 	local snd_timer = time_global()
-	
-	ogse_debug.process_npc(self, "hr", 3)
-	
 	if not snd_check_timer[self:id()] then
 		snd_check_timer[self:id()] = snd_timer + math.random(1000, 2000) 
 	else
@@ -1109,11 +1023,12 @@ function timer_drop_weapon:__init(item, parent) super()
 end
 function timer_drop_weapon:condition()
 	local item = level.object_by_id(self.item_id)
-	if item == nil then
+	local sobj = alife():object( self.item_id )
+	if item == nil or sobj == nil then
 		self:stop()
-	elseif item:parent() == nil then
+	elseif item:parent() == nil or sobj.parent_id == 65535 then
 		return true
-	elseif item:parent():id() ~= self.parent_id then
+	elseif item:parent():id() ~= self.parent_id or sobj.parent_id ~= self.parent_id then
 		self:stop()
 	end
 	return false
@@ -1142,7 +1057,7 @@ function motivator_binder:on_item_drop(obj)
 end
 
 function motivator_binder:on_item_take(obj)
-	local sobj = nil
+	local sobj
 	if not obj then 
 		return 
 	else	
@@ -1152,9 +1067,8 @@ function motivator_binder:on_item_take(obj)
 			return
 		end
 	end
-	
+
 	local section = sobj:section_name()
-	
 	if section == "device_torch" then
 		if not obj:attachable_item_enabled() then
 			obj:switch_torch(false)
@@ -1170,21 +1084,20 @@ end
 
 -- Эвалюаторы, которые имеют высший приоритет, и, соответственно, перебивают остальные скрипты собой
 function addCommonPrecondition(action)
-	--action:add_precondition (world_property(xr_evaluators_id.reaction,false))
 	action:add_precondition (world_property(xr_evaluators_id.stohe_meet_base + 1,false))
 	action:add_precondition (world_property(xr_evaluators_id.sidor_wounded_base + 0,  false))
 	action:add_precondition (world_property(xr_evaluators_id.chugai_heli_hunter_base, false))
 	action:add_precondition (world_property(xr_evaluators_id.abuse_base, false))
-	
+
 	if xr_combat_companion and xr_companion then
 		action:add_precondition (world_property(xr_combat_companion.prop_combat, false))
 		action:add_precondition (world_property(xr_companion.property_need_companion, false))
 	end
-	
+
 	if xrs_battle_ai then
 		action:add_precondition (world_property(xrs_battle_ai.evid_altcombat, false))
 	end	
-	
+
 	if ogsm_hideout then
 		action:add_precondition(world_property(ogsm_hideout.property_blowout, false))
 		action:add_precondition(world_property(ogsm_hideout.property_hideout_lost, false))
@@ -1195,10 +1108,9 @@ function addCommonPrecondition(action)
 	if xrs_ai then xrs_ai.addCommonPrecondition(action) end
 
 	if rx_ai then rx_ai.addCommonPrecondition(action) end
-	
+
 	if watcher_act then
 		action:add_precondition (world_property(watcher_act.evid_see_stuff, false))
 		action:add_precondition (world_property(watcher_act.evid_near_stuff, false))
 	end
-
 end
