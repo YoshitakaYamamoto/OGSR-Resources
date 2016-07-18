@@ -85,7 +85,7 @@ local talking_time = 5000
 local talking_npc = {}
 
 being_attacked = false
-actor_attacked = false
+--actor_attacked = false --нигде не мен€етс€
 
 -----------------------------------------------------
 --- каких групп бывают напарники

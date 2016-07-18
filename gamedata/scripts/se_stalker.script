@@ -438,13 +438,10 @@ function se_stalker:on_register()
 		-- end
 	end
 	
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker register 6 "..self:name())
-	end	
-	
-	if debug_flag then
 		-- log1("se_stalker register end "..self:name())
-	end	
+	--end	
 	-- получаем имя персонажа для быстрого доступа в дальнейшем
 	local sobj = alife():object(self.id)
 	if sobj then

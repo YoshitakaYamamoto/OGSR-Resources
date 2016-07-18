@@ -1361,8 +1361,8 @@ function()
 	if id_cleaner and id_cleaner.check_ids_flag == 1 then
 		if time_global() > ids_timer then
 			id_cleaner.check_ids()
-			--- снятие флага атаки на актора
-			xr_companion.actor_attacked = false
+			--- снятие флага атаки на актора --он и так не меняется нигде, нет смысла крутить на апдейте
+			--xr_companion.actor_attacked = false
 			---
 			ids_timer = ids_timer + math.random(30000, 60000)
 		end
