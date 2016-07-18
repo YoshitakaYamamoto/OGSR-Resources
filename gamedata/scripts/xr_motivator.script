@@ -1,4 +1,4 @@
---[[------------------------------------------------------------------------------------------------------------------
+--[[-----------------------------
 автор: Диденко Руслан (Stohe)
 
 порядок вызова методов биндера:
@@ -6,7 +6,7 @@ reload
 reinit
 load
 net_spawn
---------------------------------------------------------------------------------------------------------------------]]
+-------------------------------]]
 
 --memtsg = {} --' временная таблица
 --lasthealth = 0
@@ -633,7 +633,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 1)
-	if xr_companion.is_companion(self.object:id()) --[[and amount < 0.3]] then
+	if xr_companion.is_companion(self.object:id()) and amount < 0.3 then
 		xr_sound.set_sound(self.object, nil)
 		stop_play_sound(self.object)
 	end
@@ -675,7 +675,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 7)
-	--if amount > 0 then
+	if amount > 0 then
 		sr_territory.issue_event(self.object, "hit_callback", obj, amount, local_direction, who, bone_index)
 		if self.object then
 			local drop, err_msg = pcall(xr_wounded.hit_callback,self.object:id())
@@ -690,7 +690,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 				db.actor:give_game_news(game.translate_string("xr_motivator_debug2"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
 			end				
 		end
-	--end
+	end
 
 	ogse_debug.process_npc(self.object, "hit", 10)
 	if checker_minefield then checker_minefield.mine_hit(obj,who) end
@@ -713,17 +713,8 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 13)
-	--if amount > 0.05 then
+	if amount > 0.05 then
 		xr_effects.bar_territory_hit(self.object, who)
-	--end
-
-	ogse_debug.process_npc(self.object, "hit", 14)
-	if xr_companion.is_companion(self.object:id()) then
-		if xr_combat_companion then
-			xr_combat_companion.hit_callback(self.object, who, amount)
-		else	
-			log1("--xr_combat_companion cannot be loaded!")
-		end
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 16)
@@ -880,11 +871,6 @@ function motivator_binder:update(delta)
 			self.object:set_tip_text("character_use")
 		else
 			self.object:set_tip_text("")
-		end
-
-		ogse_debug.process_npc(self.object, "upd", 81)
-		if xr_companion.is_companion(self.object:id()) then
-			xr_combat_companion.reprioritize_targets(self.object)
 		end
 	end
 

@@ -10,27 +10,14 @@ local hearthbeat = xr_sound.get_safe_sound_object([[affects\heartbeat]])
 local breath_cold = xr_sound.get_safe_sound_object([[actor\breath_cold]])
 -----------------------------------------------------------------------
 function check_critical(amount, bone_index, who)
+	if enabled == 0 or ogse_car_control.in_btr then return end
 
-	if ogse_car_control.current_car and ogse_car_control.in_btr then
-		return
-	end
-	
-	if amount > 0.02 and xr_combat_companion.current_companion then
-		local companion = level.object_by_id(xr_combat_companion.current_companion)
-		if companion then
-			xr_combat_companion.hit_callback(companion, who, amount)
-		end
-	end
-	if enabled == 0 then
-		return
-	end
 	if debug_flag then
 		log1("ACTOR HIT "..tostring(amount).." in "..tostring(bone_index))
 	end
+
 	if amount > 0.2 and bone_index and bone_index > 0 and db.actor:alive() then
-	
 		local str = " "
-	
 		if bone_index < 5 then
 			str = " попадание в левую ногу "
 			level.add_cam_effector("camera_effects\\hit_back_left.anm", 100, false, "")
@@ -86,15 +73,11 @@ function check_critical(amount, bone_index, who)
 				end			
 			end
 		end
-		
-		str = str..amount
 
 		if debug_flag then
+			str = str..amount
 			ogse.send_tip(str)
 			log1(str)
 		end
-		
 	end
-
-
 end

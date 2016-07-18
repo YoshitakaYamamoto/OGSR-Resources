@@ -7,10 +7,12 @@
 ----------------------------------------------------------------------------------------------------
 
 function attach( sm )
-  sm:subscribe({ signal = "on_monster_death",	fun = this.on_monster_death })
+  sm:subscribe({ signal = "on_monster_death",	fun = this.on_death })
   sm:subscribe({ signal = "on_monster_spawn",	fun = this.on_monster_spawn })
-  sm:subscribe({ signal = "on_npc_death",		fun = this.on_npc_death })
+  sm:subscribe({ signal = "on_npc_death",		fun = this.on_death })
   sm:subscribe({ signal = "on_npc_spawn",		fun = this.on_npc_spawn })
+  sm:subscribe({ signal = "on_npc_hit",			fun = this.on_npc_hit })
+  sm:subscribe({ signal = "on_hit",				fun = this.on_hit })
 end
 
 function on_monster_spawn( obj, binder )
@@ -24,7 +26,7 @@ function on_monster_spawn( obj, binder )
   ogse_signals.get_mgr():subscribe( s )
 end
 
-function on_monster_death( obj, who )
+function on_death( obj, who )
   local binder     = obj:binded_object()
   local subscribed = binder[ script_name() .. ".subscribed" ]
   if subscribed then
@@ -47,38 +49,48 @@ function on_npc_spawn( obj, binder )
   ogse_signals.get_mgr():subscribe( s )
 end
 
-function on_npc_death( obj, who )
-  local binder     = obj:binded_object()
-  local subscribed = binder[ script_name() .. ".subscribed" ]
-  if subscribed then
-    ogse_signals.get_mgr():unsubscribe( subscribed )
-  end
-end
-
 function on_npc_update( obj )
 --log3("!!Combat companion npc update for [%s]", obj:id())
   process_enemy( db.actor, obj )
+  if xr_companion.is_companion(obj:id()) then
+    reprioritize_targets(obj)
+  end
+end
+
+function on_npc_hit(obj, amount, local_direction, who, bone_index)
+	if xr_companion.is_companion(obj:id()) then
+		hit_callback(obj, who, amount)
+	end
+end
+
+function on_hit(obj, amount, local_direction, who, bone_index)
+	if current_companion then
+		local companion = level.object_by_id(current_companion)
+		if companion then
+			hit_callback(companion, who, amount)
+		end
+	end
 end
 
 
 local debug_flag = false		-- включить отладочный вывод
 
---function printf(fmt, ...)
---	if debug_flag then
---		 ogse.send_tip(fmt)
---		local info = get_hud():GetCustomStatic("companion_hud")
---		if not info then
---			get_hud():AddCustomStatic("companion_hud", true)
---			info = get_hud():GetCustomStatic("companion_hud"):wnd()
---			info:SetText(fmt)
---		else
---			info = get_hud():GetCustomStatic("companion_hud"):wnd()
---			info:SetText(fmt)
---		end
---		log1("**XR_COMBAT_COMP: "..fmt)
---		 get_console():execute("flush")	
---	end
---end
+function printf(fmt, ...)
+	if debug_flag then
+		 ogse.send_tip(fmt)
+		local info = get_hud():GetCustomStatic("companion_hud")
+		if not info then
+			get_hud():AddCustomStatic("companion_hud", true)
+			info = get_hud():GetCustomStatic("companion_hud"):wnd()
+			info:SetText(fmt)
+		else
+			info = get_hud():GetCustomStatic("companion_hud"):wnd()
+			info:SetText(fmt)
+		end
+		log1("**XR_COMBAT_COMP: "..fmt)
+		 get_console():execute("flush")	
+	end
+end
 
 function prints(fmt, ...)
 	if debug_flag then
