@@ -60,7 +60,7 @@ function check_freezers()
         .. " is in panic more than 25 seconds! Trying to recover!"
       )
       local npc = level.object_by_id( k )
-      if npc then
+      if npc and npc:alive() then
         npc:set_mental_state( anim.danger )
       end
       panic_freezers[ k ] = nil
