@@ -8,10 +8,6 @@ load
 net_spawn
 -------------------------------]]
 
---memtsg = {} --' временная таблица
---lasthealth = 0
---lastime = nil
-
 local debug_flag = false
 
 --*****************************************************************************************************
@@ -337,8 +333,6 @@ function motivator_binder:reinit()
     --' Создание менеджера контроля положений тела
 	if self.object:alive() then
 		self.st.state_mgr = state_mgr.bind_manager(self.object)
-	else
-		self.st.state_mgr = nil
 	end
 
 	self.st.move_mgr = move_mgr.move_mgr(self.object)
@@ -725,9 +719,6 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 end
 
 function motivator_binder:death_callback(victim, who)
-	self.st.state_mgr = nil --блокируем апдейт менеджера состояний
-	self.object:set_tip_text_default()
-
 	--[[for _, s in ipairs( self.updaters ) do
 		self.am:unsubscribe( s )
 	end
@@ -863,15 +854,14 @@ function motivator_binder:update(delta)
 	ogse_debug.check_actor()
 
 	ogse_debug.process_npc(self.object, "upd", 2)
-	if self.st.state_mgr then -- Условие истинно, пока непись жив.
-		self.st.state_mgr:update() --Апдейт менеджера состояний тела
-
-		ogse_debug.process_npc(self.object, "upd", 5)
+	if self.object:alive() then -- Условие истинно, пока непись жив.
 		if self.object:is_talk_enabled() then
 			self.object:set_tip_text("character_use")
 		else
 			self.object:set_tip_text("")
 		end
+	else
+		self.object:set_tip_text_default()
 	end
 
 --[=[

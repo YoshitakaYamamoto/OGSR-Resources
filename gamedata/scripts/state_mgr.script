@@ -4,9 +4,21 @@
 --	TODO: 
 ----------------------------------------------------------------------------------------------------------------------
 
+function attach( sm )
+	sm:subscribe({ signal = "on_npc_death", fun = this.on_npc_death })
+end
+
+function on_npc_death( obj )
+	local st = db.storage[ obj:id() ]
+	if st.state_mgr then
+		st.state_mgr:unsubscribe()
+		st.state_mgr = nil
+	end
+end
+
+
 aim_ratio = 1000/50
 min_ratio = 1500
-
 
 --' Эвалуатор, который синхронизирует менеджер.
 --' Мы уже в безраличном состоянии idle или нет
@@ -63,12 +75,12 @@ function evaluator_state_mgr_idle_alife:evaluate()
 	-- апдейт менеджера анимаций
 	-- раньше он был тут, сейчас он вынесен из эвалуатора
 
---	printf("SECTION %s", utils.to_str(db.storage[self.st.npc:id()].active_section))
+--	log3("SECTION %s", utils.to_str(db.storage[self.st.npc:id()].active_section))
 	mgr = self.object:motivation_action_manager()
 	self.t = nil
 	if mgr:initialized() then
 		self.t = mgr:current_action_id()
-		--printf("ACTION %s", utils.to_str(self.t))
+		--log3("ACTION %s", utils.to_str(self.t))
 		if self.t ~= xr_actions_id.alife then
 			self.st.alife = false
 		end
@@ -94,11 +106,11 @@ function evaluator_state_mgr_idle_alife:evaluate()
 				self.st.planner:evaluator(self.st.properties["animstate"]):evaluate() and
 				self.st.planner:evaluator(self.st.properties["animation"]):evaluate()
 				
-	--		printf("%s", utils.to_str(self.st.target_state))
-	--		printf("%s", utils.to_str(self.st.planner:evaluator(self.st.properties["locked"]):evaluate()))
-	--		printf("%s", utils.to_str(self.st.planner:evaluator(self.st.properties["movement"]):evaluate()))
-	--		printf("%s", utils.to_str(self.st.planner:evaluator(self.st.properties["animstate"]):evaluate()))
-	--		printf("%s", utils.to_str(self.st.planner:evaluator(self.st.properties["animation"]):evaluate()))
+	--		log3("%s", utils.to_str(self.st.target_state))
+	--		log3("%s", utils.to_str(self.st.planner:evaluator(self.st.properties["locked"]):evaluate()))
+	--		log3("%s", utils.to_str(self.st.planner:evaluator(self.st.properties["movement"]):evaluate()))
+	--		log3("%s", utils.to_str(self.st.planner:evaluator(self.st.properties["animstate"]):evaluate()))
+	--		log3("%s", utils.to_str(self.st.planner:evaluator(self.st.properties["animation"]):evaluate()))
 			
 			if t == true then self.st.alife = true end
 			if self.st.alife == true then 
@@ -230,11 +242,11 @@ function eva_state_mgr_locked:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_locked:evaluate()
-	--printf("npc %s", self.object:name())
-	--printf("weapon locked: %s", utils.to_str(self.st.planner:evaluator(self.st.properties["weapon_locked"]):evaluate()))
-	--printf("direction locked: %s", utils.to_str(self.st.planner:evaluator(self.st.properties["direction_turning"]):evaluate()))
-	--printf("animstate locked: %s", utils.to_str(self.st.planner:evaluator(self.st.properties["animstate_locked"]):evaluate()))
-	--printf("animation locked: %s", utils.to_str(self.st.planner:evaluator(self.st.properties["animation_locked"]):evaluate()))
+	--log3("npc %s", self.object:name())
+	--log3("weapon locked: %s", utils.to_str(self.st.planner:evaluator(self.st.properties["weapon_locked"]):evaluate()))
+	--log3("direction locked: %s", utils.to_str(self.st.planner:evaluator(self.st.properties["direction_turning"]):evaluate()))
+	--log3("animstate locked: %s", utils.to_str(self.st.planner:evaluator(self.st.properties["animstate_locked"]):evaluate()))
+	--log3("animation locked: %s", utils.to_str(self.st.planner:evaluator(self.st.properties["animation_locked"]):evaluate()))
 	if self.st.combat or self.st.alife then 
 		ogse_debug.add_active_eval( self.object, script_name(), "locked_ca" )
 		return true 
@@ -296,7 +308,7 @@ function act_state_mgr_end:weapon_update()
 	end
 	ogse_debug.process_npc(self.object, "smgr_uw", 6)
 	if t == "fire" or t == "sniper_fire" then
-		--printf("[%s] shooting", self.object:name())
+		--log3("[%s] shooting", self.object:name())
 		local sniper_aim = 3000
 		if self.st.look_object ~= nil then
 			ogse_debug.process_npc(self.object, "smgr_uw", 61)
@@ -363,7 +375,7 @@ function act_state_mgr_end:weapon_update()
 		return
 	elseif t == "unstrapped" then
 		ogse_debug.process_npc(self.object, "smgr_uw", 9)
-		--printf("[%s] not shooting", self.object:name())
+		--log3("[%s] not shooting", self.object:name())
 		self.object:set_item(state_mgr_weapon.get_idle_state(self.st.target_state), wpn)
 	end	
 	ogse_debug.process_npc(self.object, "smgr_uw", 0)
@@ -394,7 +406,7 @@ animation_reset_denied = {
 	wounded_heavy_2 = true,
 	wounded_heavy_3 = true,
 	wounded_zombie = true
-	}
+}
 
 --' Сам менеджер
 class "state_manager"
@@ -412,9 +424,28 @@ function state_manager:__init(npc)
 	self.yaw_delta = nil
 	self.subanim = 0
 	self.need_reweapon = false
+
+	self.sm = ogse_signals.get_mgr()
+	if npc:alive() then
+		local s = {
+			[ "signal" ] = "on_npc_update." .. self.npc:id(),
+			[ "fun"    ] = self.update,
+			[ "self"   ] = self,
+		}
+		self.sm:subscribe( s )
+		self.subscribed = s
+	end
 end
+
+function state_manager:unsubscribe()
+  if self.subscribed then
+    self.sm:unsubscribe( self.subscribed )
+    self.subscribed = nil
+  end
+end
+
 function state_manager:set_state(caller, state_name, callback, timeout, target, emerg, synsound, extrakeys)
-	printf("Set State called: for %s State: %s", self.npc:name(), state_name)
+	--log3("Set State called: for %s State: %s", self.npc:name(), state_name)
 	
 	ogse_debug.process_npc(self.npc, "smgr_s", 1)
 	
@@ -424,24 +455,20 @@ function state_manager:set_state(caller, state_name, callback, timeout, target, 
 		-- state_name="idle"
 	end
 	
-	ogse_debug.process_npc(self.npc, "smgr_s", 2)
-	
-	if target then
+	--[[if target then
 		if target.look_position then
-			printf("look position: %s %s %s", target.look_position.x,
-												target.look_position.y,
-												target.look_position.z)
+			log3("look position: %s %s %s", target.look_position.x, target.look_position.y, target.look_position.z)
 		else
-			printf("look position: NIL")
+			log3("look position: NIL")
 		end
 		if target.look_object then
-			printf("look object: %s", target.look_object:name())
+			log3("look object: %s", target.look_object:name())
 		else
-			printf("look object: NIL")
+			log3("look object: NIL")
 		end
 	else
-		printf("look target NIL")
-	end
+		log3("look target NIL")
+	end]]
 	
 	ogse_debug.process_npc(self.npc, "smgr_s", 3)
 
@@ -487,7 +514,7 @@ function state_manager:set_state(caller, state_name, callback, timeout, target, 
 		   state_lib.states[state_name].weapon ~= "sniper_fire")		
 		then		
 			self.npc:set_item(state_mgr_weapon.get_idle_state(state_name), state_mgr_weapon.get_weapon(self.npc, state_name))
-			--printf("[%s] stop shooting", self.npc:name())
+			--log3("[%s] stop shooting", self.npc:name())
 		end
 
 		-- --' Если мы переключаемся из идущего положения в стоящее - надо задизаблить перемещение
@@ -561,7 +588,7 @@ function state_manager:get_state()
 	return self.target_state
 end
 function state_manager:update()
-	--printf("Update called")
+	--log1("Update called")
 	ogse_debug.process_npc(self.npc, "smgr_u", 1)
 	self.animstate:update()	
 	ogse_debug.process_npc(self.npc, "smgr_u", 2)
@@ -601,12 +628,6 @@ function get_state(npc)
 		return db.storage[npc:id()].state_mgr:get_state()
 	end
 	return nil
-end
-
-function update_state(npc)
-	if db.storage[npc:id()].state_mgr then
-		db.storage[npc:id()].state_mgr:update()
-	end
 end
 
 
@@ -658,6 +679,3 @@ function bind_manager(object)
 	
 	return state_manager
 end
-
-
-
