@@ -63,7 +63,7 @@ function trade_init( npc, cfg )
   tt.cfg_ltx     = cfg
   tt.config      = dsh.cached_ini_file( cfg )
 
-  -- коэфициенты покупки
+  -- РєРѕСЌС„РёС†РёРµРЅС‚С‹ РїРѕРєСѓРїРєРё
   local str = get_string( "trader", "buy_condition", nil, tt.config )
   ASSERT(
     str,
@@ -74,7 +74,7 @@ function trade_init( npc, cfg )
     npc, "trade_manager", "buy_condition", str
   )
 
-  -- коэфициенты продажи
+  -- РєРѕСЌС„РёС†РёРµРЅС‚С‹ РїСЂРѕРґР°Р¶Рё
   str = get_string( "trader", "sell_condition", nil, tt.config )
   ASSERT(
     str,
@@ -85,7 +85,7 @@ function trade_init( npc, cfg )
     npc, "trade_manager", "sell_condition", str
   )
 
-  -- список закупки
+  -- СЃРїРёСЃРѕРє Р·Р°РєСѓРїРєРё
   str = get_string( "trader", "buy_supplies", nil, tt.config )
   if str then
     tt.buy_supplies = xr_logic.parse_condlist(
@@ -110,6 +110,8 @@ function trade_init( npc, cfg )
     tt.buy_supplies = nil
   end
 
+  update( npc, true ) --KRodin: РІС‹РЅСѓР¶РґРµРЅРЅС‹Р№ Р°РїРґРµР№С‚ С‚РѕСЂРіРѕРІР»Рё, СЃРґРµР»Р°Р» С‡С‚РѕР±С‹ РЅРѕСЂРјР°Р»СЊРЅРѕ РѕР±РЅРѕРІР»СЏР»Р°СЃСЊ РїСЂРё РІР·СЏС‚РёРё/РѕС‚РїСѓСЃРєР°РЅРёРё РЅР°РїР°СЂРЅРёРєРѕРІ.
+
   if npc:alive() then
     local binder = npc:binded_object()
     if not binder[ script_name() .. ".subscribed" ] then
@@ -133,36 +135,38 @@ function cleanup( obj )
 end
 
 
-function update( npc )
+function update( npc, forced )
   local tt = trade_manager[ npc:id() ]
   ASSERT( tt, "trade_manager[ npc:id() ] npc found: %s", npc:name() )
 
-  if tt.update_time and tt.update_time > time_global() then
-    ogse_signals.get_mgr():reschedule( tt.update_time - time_global() )
-    return
-  end
+  if forced ~= true then
+    if tt.update_time and tt.update_time > time_global() then
+      ogse_signals.get_mgr():reschedule( tt.update_time - time_global() )
+      return
+    end
 
-  local update_t = math.random( 1800, 3600 ) * 1000
-  tt.update_time = time_global() + update_t
-  ogse_signals.get_mgr():reschedule( update_t )
+    local update_t = math.random( 1800, 3600 ) * 1000
+    tt.update_time = time_global() + update_t
+    ogse_signals.get_mgr():reschedule( update_t )
+  end
 
   local str = xr_logic.pick_section_from_condlist(
     db.actor, npc, tt.buy_condition
   )
-  if tt.current_buy_condition ~= str then
-    -- log2( "TRADE UPDATE[%s]: buy condition = %s", npc:name(), str )
+  if not tt.current_buy_condition or tt.current_buy_condition ~= str then
+    --log2( "~~TRADE UPDATE[%s]: buy condition = %s", npc:name(), str )
     npc:buy_condition( tt.config, str )
     tt.current_buy_condition = str
   end
 
   str = xr_logic.pick_section_from_condlist( db.actor, npc, tt.sell_condition )
-  if tt.current_sell_condition ~= str then
-    -- log2( "TRADE UPDATE[%s]: sell condition = %s", npc:name(), str )
+  if not tt.current_sell_condition or tt.current_sell_condition ~= str then
+    --log2( "~~TRADE UPDATE[%s]: sell condition = %s", npc:name(), str )
     npc:sell_condition( tt.config, str )
     tt.current_sell_condition = str
   end
 
-  if tt.buy_supplies then
+  if forced ~= true and tt.buy_supplies then
     if
       tt.resuply_time
       and tt.resuply_time:diffSec( game.get_game_time() ) > 0
@@ -170,7 +174,7 @@ function update( npc )
       return
     end
     str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_supplies )
-    if tt.current_buy_supplies ~= str then
+    if not tt.current_buy_supplies or tt.current_buy_supplies ~= str then
       -- log2( "TRADE UPDATE[%s]: buy_supplies = %s", npc:name(), str )
       npc:buy_supplies( tt.config, str )
       add_buy_supplies( npc, tt.config, str )
@@ -203,7 +207,7 @@ end
 function save( obj, packet )
   local tt = trade_manager[ obj:id() ]
 
-  --' Сохраняем присутствует ли инициализированная торговля в принципе.
+  --' РЎРѕС…СЂР°РЅСЏРµРј РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ Р»Рё РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅРЅР°СЏ С‚РѕСЂРіРѕРІР»СЏ РІ РїСЂРёРЅС†РёРїРµ.
   if tt then
     packet:w_bool( true )
   else
