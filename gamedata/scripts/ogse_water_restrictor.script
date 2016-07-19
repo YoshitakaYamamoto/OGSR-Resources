@@ -4,6 +4,10 @@
 --- Автор: KamikaZze
 -----------------------------------------------------------------------
 
+function attach( sm )
+  sm:subscribe({ signal = "on_before_actor_conditions_update", fun = this.on_actor_conditions_update })
+end
+
 -- звуки
 local snd_dive = xr_sound.get_safe_sound_object("material\\actor\\step\\n_water_1")
 local snd_underwater = xr_sound.get_safe_sound_object("ogse\\underwater")
@@ -28,6 +32,7 @@ local breather_prefixes = {
 
 local debug_flag = false
 
+
 -- вызывается из биндера рестрикторов
 function update(obj)
 	fx_play(obj:id())
@@ -41,20 +46,31 @@ function update(obj)
 end
 
 
-local walk_accel = nil
-local jump_speed = nil
-local run_factor = nil
-local run_back_factor = nil
-local walk_back_factor = nil
-local crouch_factor = nil
-local climb_factor = nil
-local sprint_factor = nil
-local walk_strafe_factor = nil
-local run_strafe_factor = nil
+local walk_accel		= get_float( "actor", "walk_accel" )
+local jump_speed		= get_float( "actor", "jump_speed" )
+local run_factor		= get_float( "actor", "run_coef" )
+local run_back_factor	= get_float( "actor", "run_back_coef" )
+local sprint_factor		= get_float( "actor", "sprint_koef" )
+
+local walk_back_factor	= get_float( "actor", "walk_back_coef" )
+local crouch_factor		= get_float( "actor", "crouch_coef" )
+local climb_factor		= get_float( "actor", "climb_coef" )
+local walk_strafe_factor --хз, откуда это значение берётся, в конфигах его нет, поэтому придётся брать из движка
+local run_strafe_factor --тоже самое
 
 local water_coeff = 0.6
 local time_submerged = 0
 local o2_amount = 100
+
+function on_actor_conditions_update( ext )
+	if next(underwater) == nil then return end --Если актор не под водой - ничего не делать
+
+	ext.sprint_factor	= ext.sprint_factor - (sprint_factor - (sprint_factor * water_coeff))
+	ext.jump_speed		= ext.jump_speed - (jump_speed - (jump_speed * 0.01))
+	ext.walk_accel		= ext.walk_accel - (walk_accel - (walk_accel * water_coeff))
+	ext.run_factor		= ext.run_factor - (run_factor - (run_factor * water_coeff))
+	ext.run_back_factor	= ext.run_back_factor - (run_back_factor - (run_back_factor * water_coeff))
+end
 
 function actor_has_breather()
 	local outfit = db.actor:get_current_outfit()
@@ -68,8 +84,6 @@ function actor_has_breather()
 	end
 	return false
 end
-
-local need_restore_weap = false
 
 function fx_start(id)
 	if not underwater[id] then
@@ -105,39 +119,23 @@ function fx_start(id)
 			snd_dive.volume = snd_fx_volume*snd_dive_subvolume
 		end
 		if not breather then
-			get_console():execute("r2_dof_control on")
+			cmd("r2_dof_control", "on")
 		end
-		walk_accel = get_walk_accel()
-		jump_speed = get_jump_speed()
-		run_factor = get_run_factor()
-		run_back_factor = get_run_back_factor()
-		walk_back_factor = get_walk_back_factor()
-		crouch_factor = get_crouch_factor()
-		climb_factor = get_climb_factor()
-		sprint_factor = get_sprint_factor()
 		walk_strafe_factor = get_walk_strafe_factor()
 		run_strafe_factor = get_run_strafe_factor()
-		set_sprint_factor(sprint_factor*water_coeff)
-		set_jump_speed(jump_speed*0.01)
-		set_walk_accel(walk_accel*water_coeff)
-		set_run_factor(run_factor*water_coeff)
-		set_run_back_factor(run_back_factor*water_coeff)
+
 		set_walk_back_factor(walk_back_factor*water_coeff)
 		set_crouch_factor(crouch_factor*water_coeff)
 		set_climb_factor(climb_factor*water_coeff)
 		set_walk_strafe_factor(walk_strafe_factor*water_coeff)
 		set_run_strafe_factor(run_strafe_factor*water_coeff)
+
 		bind_stalker.hide_weapon()
 		underwater[id] = true
 	end
 end
 
 local hearthbeat = xr_sound.get_safe_sound_object([[affects\heartbeat]])
-local hiccups = {
-	[1] = [[monsters\stalker\hiccup\hic2]],
-	[2] = [[monsters\stalker\hiccup\hic3]],
-	[3] = [[monsters\stalker\hiccup\hic4]],
-}
 
 function fx_play(id)
 	if underwater[id] then
@@ -156,7 +154,7 @@ function fx_play(id)
 				end
 				time_submerged = time_global()
 			else	
-				local snd_hic = xr_sound.get_safe_sound_object(hiccups[math.random(1,3)])
+				local snd_hic = xr_sound.get_safe_sound_object("monsters\\stalker\\hiccup\\hic"..math.random(2,4))
 				db.actor.health = -0.1
 				time_submerged = time_global()
 				snd_hic:play_at_pos (db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
@@ -185,16 +183,6 @@ function fx_play(id)
 				end
 			end
 		end
-		set_sprint_factor(sprint_factor*water_coeff)
-		set_jump_speed(jump_speed*0.01)
-		set_walk_accel(walk_accel*water_coeff)
-		set_run_factor(run_factor*water_coeff)
-		set_run_back_factor(run_back_factor*water_coeff)
-		set_walk_back_factor(walk_back_factor*water_coeff)
-		set_crouch_factor(crouch_factor*water_coeff)
-		set_climb_factor(climb_factor*water_coeff)
-		set_walk_strafe_factor(walk_strafe_factor*water_coeff)
-		set_run_strafe_factor(run_strafe_factor*water_coeff)
 	end
 end
 
@@ -230,17 +218,14 @@ function fx_stop(id)
 			snd_emersion:play_at_pos (db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
 			snd_emersion.volume = snd_fx_volume*snd_emersion_subvolume
 		end
-		get_console():execute("r2_dof_control off")
-		set_sprint_factor(sprint_factor)
-		set_jump_speed(jump_speed)
-		set_walk_accel(walk_accel)
-		set_run_factor(run_factor)
-		set_run_back_factor(run_back_factor)
+		cmd("r2_dof_control", "off")
+
 		set_walk_back_factor(walk_back_factor)
 		set_crouch_factor(crouch_factor)
 		set_climb_factor(climb_factor)
 		set_walk_strafe_factor(walk_strafe_factor)
-		set_run_strafe_factor(run_strafe_factor)		
+		set_run_strafe_factor(run_strafe_factor)	
+
 		bind_stalker.restore_weapon()
 		underwater[id] = nil
 	end

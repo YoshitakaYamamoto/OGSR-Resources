@@ -54,8 +54,7 @@ ASSERT(run_coef, "ogse_actor_conditions_mgr: 'actor:run_coef' parameter not foun
 local run_back_coef = get_float("actor", "run_back_coef")
 ASSERT(run_back_coef, "ogse_actor_conditions_mgr: 'actor:run_back_coef' parameter not found!")
 
-local cam_inert, cur_cam_inert
-local pt
+local pt, cam_inert, cur_cam_inert
 function on_spawn()
   pt = { game.get_game_time():get() }
   cam_inert = get_con_float( "cam_inert" )
@@ -70,27 +69,27 @@ local function get_item_cond_effect( item )
   local ef = cached_item_cond_effects[ section ]
   if not ef then
     ef = {}
-    ef.satiety_restore_speed  = get_float( section, "satiety_restore_speed",  0 )
-    ef.health_restore_speed   = get_float( section, "health_restore_speed",   0 )
-    ef.bleeding_restore_speed = get_float( section, "bleeding_restore_speed", 0 )
-    ef.power_restore_speed    = get_float( section, "power_restore_speed",    0 )
-    ef.additional_inventory_weight  = get_float(section, "additional_inventory_weight",  0)
-    ef.additional_inventory_weight2 = get_float(section, "additional_inventory_weight2", 0)
-    ef.psy_health_restore_speed = get_float(section, "psy_health_restore_speed", 0)
---Эффекты ношения экзоскелетов--
+    ef.satiety_restore_speed		= get_float( section, "satiety_restore_speed",  0 )
+    ef.health_restore_speed			= get_float( section, "health_restore_speed",   0 )
+    ef.bleeding_restore_speed		= get_float( section, "bleeding_restore_speed", 0 )
+    ef.power_restore_speed			= get_float( section, "power_restore_speed",    0 )
+    ef.additional_inventory_weight	= get_float( section, "additional_inventory_weight",  0 )
+    ef.additional_inventory_weight2	= get_float( section, "additional_inventory_weight2", 0 )
+    ef.psy_health_restore_speed		= get_float( section, "psy_health_restore_speed", 0 )
+--------Эффекты ношения экзоскелетов--------
 	local exo_section = get_string(section, "exo_section", nil)
 	if exo_section and sys_ini:line_exist("exo_section") then
-		ef.jump_speed_dif	= get_float(exo_section, "jump_speed_dif", 0)
-		ef.sprint_koef_dif	= get_float(exo_section, "sprint_koef_dif", 0)
-		ef.run_coef_dif		= get_float(exo_section, "run_coef_dif", 0)
-		ef.run_back_coef_dif = get_float(exo_section, "run_back_coef_dif", 0)
+		ef.jump_speed_dif			= get_float( exo_section, "jump_speed_dif", 0 )
+		ef.sprint_factor_dif		= get_float( exo_section, "sprint_koef_dif", 0 )
+		ef.run_factor_dif			= get_float( exo_section, "run_coef_dif", 0 )
+		ef.run_back_factor_dif		= get_float( exo_section, "run_back_coef_dif", 0 )
 	else
-		ef.jump_speed_dif	= 0
-		ef.sprint_koef_dif	= 0
-		ef.run_coef_dif		= 0
-		ef.run_back_coef_dif = 0
+		ef.jump_speed_dif			= 0
+		ef.sprint_factor_dif		= 0
+		ef.run_factor_dif			= 0
+		ef.run_back_factor_dif		= 0
 	end
---------------------------------
+--------------------------------------------
     cached_item_cond_effects[ section ] = ef
   end
   return ef
@@ -108,19 +107,22 @@ function on_update()
   local dt = current_time:diffSec( previous_check_time )
   if dt == 0 then return end
   pt = { current_time:get() }
---[=[
+
   local ext = {
-    [ "alcohol_restore_speed"    ] = 0,
-    [ "bleeding_restore_speed"   ] = 0,
-    [ "health_restore_speed"     ] = 0,
-    [ "power_restore_speed"      ] = 0,
-    [ "psy_health_restore_speed" ] = 0,
-    [ "radiation_restore_speed"  ] = 0,
-    [ "satiety_restore_speed"    ] = 0,
-    [ "sprint_koef_add"          ] = 0,
+    --[ "alcohol_restore_speed"    ] = 0,
+    --[ "bleeding_restore_speed"   ] = 0,
+    --[ "health_restore_speed"     ] = 0,
+    --[ "power_restore_speed"      ] = 0,
+    --[ "psy_health_restore_speed" ] = 0,
+    --[ "radiation_restore_speed"  ] = 0,
+    --[ "satiety_restore_speed"    ] = 0,
+	[ "sprint_factor" ]		= 0,
+	[ "jump_speed" ]		= 0,
+	[ "walk_accel" ]		= 0,
+	[ "run_factor" ]		= 0,
+	[ "run_back_factor" ]	= 0,
   }
   ogse_signals.get_mgr():call( "on_before_actor_conditions_update", ext )
-]=]
 
   -- учитываем здесь естественное оголодание, а также
   -- движковое(обнулять его нельзя, на нем основан показ свойств
@@ -131,44 +133,35 @@ function on_update()
     satiety_custom_k = 2
   end
   cur_satiety_v = cur_satiety_v * satiety_custom_k
-  local summary_satiety_effect = cur_satiety_v + engine_satiety_v
---    + adjust_satiety_restore_speed( ext.satiety_restore_speed )
-  local summary_health_effect  = satiety_health_v_base - engine_satiety_health_v
---    + ext.health_restore_speed
-  local summary_power_effect   = - engine_satiety_power_v
---    + ext.power_restore_speed
-  local summary_bleeding_restore_effect  = 0 --ext.bleeding_restore_speed
-  local summary_psy_health_effect        = 0 --ext.psy_health_restore_speed
-  --local summary_radiation_restore_effect = ext.radiation_restore_speed
-  --local summary_alcohol_effect           = ext.alcohol_restore_speed
-  local af_additional_inventory_weight   = 0
-  local af_additional_inventory_weight2  = 0
---Эффекты ношения экзоскелетов--
-  local summary_jump_speed = jump_speed
-  local summary_sprint_koef = sprint_koef
-  local summary_run_coef = run_coef
-  local summary_run_back_coef = run_back_coef
- -------------------------------
-  local armor_add_inv_weight2 = 0
-  local new_cam_inert = 0
-  local cur_jump_power = def_jump_power
-  local cur_walk_accel = walk_accel - min_walk_accel
+  local summary_satiety_effect				= cur_satiety_v + engine_satiety_v -- + adjust_satiety_restore_speed( ext.satiety_restore_speed )
+  local summary_health_effect				= satiety_health_v_base - engine_satiety_health_v -- + ext.health_restore_speed
+  local summary_power_effect				= - engine_satiety_power_v -- + ext.power_restore_speed
+  local summary_bleeding_restore_effect		= 0 --ext.bleeding_restore_speed
+  local summary_psy_health_effect			= 0 --ext.psy_health_restore_speed
+  --local summary_radiation_restore_effect	= ext.radiation_restore_speed
+  --local summary_alcohol_effect			= ext.alcohol_restore_speed
+  local summary_jump_speed					= jump_speed + ext.jump_speed
+  local summary_sprint_factor				= sprint_koef + ext.sprint_factor
+  local summary_run_factor					= run_coef + ext.run_factor
+  local summary_run_back_factor				= run_back_coef + ext.run_back_factor
+  local summary_max_weight					= def_max_weight
+  local cur_jump_power						= def_jump_power
+  local cur_walk_accel						= (walk_accel - min_walk_accel) + ext.walk_accel
+  local af_additional_inventory_weight		= 0
+  local af_additional_inventory_weight2		= 0
+  local new_cam_inert						= 0
 
   -- неучтённые в движке эффекты от артефактов на поясе
   for i = 0, act:belt_count() - 1 do
     local item = act:item_on_belt( i )
     local ef = get_item_cond_effect( item )
     if ef then
-      local satiety_restore_speed = adjust_satiety_restore_speed(
-        ef.satiety_restore_speed
-      )
-      summary_satiety_effect = summary_satiety_effect + satiety_restore_speed
-      af_additional_inventory_weight  = af_additional_inventory_weight
-        + ef.additional_inventory_weight
-      af_additional_inventory_weight2 = af_additional_inventory_weight2
-        + ef.additional_inventory_weight2
-      summary_psy_health_effect = summary_psy_health_effect
-        + ef.psy_health_restore_speed
+      local satiety_restore_speed		= adjust_satiety_restore_speed( ef.satiety_restore_speed )
+      summary_satiety_effect			= summary_satiety_effect + satiety_restore_speed
+      af_additional_inventory_weight	= af_additional_inventory_weight + ef.additional_inventory_weight
+      af_additional_inventory_weight2	= af_additional_inventory_weight2 + ef.additional_inventory_weight2
+      summary_max_weight				= summary_max_weight + ef.additional_inventory_weight2
+      summary_psy_health_effect			= summary_psy_health_effect + ef.psy_health_restore_speed
     end
   end
 
@@ -177,23 +170,17 @@ function on_update()
   if armor then
     local ef = get_item_cond_effect( armor )
     if ef then
-      local satiety_restore_speed = adjust_satiety_restore_speed(
-        ef.satiety_restore_speed
-      )
-      summary_satiety_effect = summary_satiety_effect + satiety_restore_speed
-      summary_health_effect  = summary_health_effect + ef.health_restore_speed
-      summary_power_effect   = summary_power_effect + ef.power_restore_speed
-      summary_bleeding_restore_effect = summary_bleeding_restore_effect
-        + ef.bleeding_restore_speed
-      summary_psy_health_effect = summary_psy_health_effect
-        + ef.psy_health_restore_speed
---Эффекты ношения экзоскелетов--
-	  summary_jump_speed	= jump_speed + ef.jump_speed_dif
-	  summary_sprint_koef	= sprint_koef + ef.sprint_koef_dif
-	  summary_run_coef		= run_coef + ef.run_coef_dif
-	  summary_run_back_coef	= run_back_coef + ef.run_back_coef_dif
--------------------------------
-      armor_add_inv_weight2	= ef.additional_inventory_weight2
+      local satiety_restore_speed		= adjust_satiety_restore_speed( ef.satiety_restore_speed )
+      summary_satiety_effect			= summary_satiety_effect + satiety_restore_speed
+      summary_health_effect				= summary_health_effect + ef.health_restore_speed
+      summary_power_effect				= summary_power_effect + ef.power_restore_speed
+      summary_bleeding_restore_effect	= summary_bleeding_restore_effect + ef.bleeding_restore_speed
+      summary_psy_health_effect			= summary_psy_health_effect + ef.psy_health_restore_speed
+	  summary_jump_speed				= summary_jump_speed + ef.jump_speed_dif
+	  summary_sprint_factor				= summary_sprint_factor + ef.sprint_factor_dif
+	  summary_run_factor				= summary_run_factor + ef.run_factor_dif
+	  summary_run_back_factor			= summary_run_back_factor + ef.run_back_factor_dif
+      summary_max_weight				= summary_max_weight + ef.additional_inventory_weight2
     end
   end
 
@@ -247,27 +234,24 @@ function on_update()
   end
 ]]
 
---Эффекты ношения экзоскелетов--
-  set_sprint_factor( summary_sprint_koef --[[+ ext.sprint_koef_add]] )
+  set_sprint_factor( summary_sprint_factor )
 
-  set_run_factor(summary_run_coef)
+  set_run_factor(summary_run_factor)
 
-  set_run_back_factor(summary_run_back_coef)
---------------------------------
+  set_run_back_factor(summary_run_back_factor)
 
-  local inv_weight  = db.actor:get_inventory_weight()
-  local max_weight  = def_max_weight + af_additional_inventory_weight2
-  local walk_weight = def_max_walk_weight + af_additional_inventory_weight
+  --Артефакты теперь тоже могут увеличивать переносимый вес
   if af_additional_inventory_weight > 0 then
-    db.actor:set_actor_max_walk_weight( walk_weight )
+    db.actor:set_actor_max_walk_weight( def_max_walk_weight + af_additional_inventory_weight )
   end
   if af_additional_inventory_weight2 > 0 then
-    db.actor:set_actor_max_weight( max_weight )
+    db.actor:set_actor_max_weight( def_max_weight + af_additional_inventory_weight2 )
   end
-  if armor then
-    max_weight = max_weight + armor_add_inv_weight2
-  end
-  if inv_weight > max_weight then
+
+  --Если экзоскелет переносит 170 кг., то сил на перенос 170-и
+  --кг. должно тратиться столько же, как на перенос 80-и кг. в одном
+  --свитере.
+  if db.actor:get_inventory_weight() > summary_max_weight then
     set_overweight_jump_k( overweight_jump_k )
     set_overweight_walk_k( overweight_walk_k )
     set_jump_weight_power( jump_weight_power )
@@ -275,11 +259,8 @@ function on_update()
   else
     set_overweight_jump_k( 1 )
     set_overweight_walk_k( 1 )
-    -- если экзоскелет переносит 170 кг., то сил на перенос 170-и
-    -- кг. должно тратиться столько же, как на перенос 80-и кг. в одном
-    -- свитере.
-    set_jump_weight_power( jump_weight_power * ( def_max_weight / max_weight ) )
-    set_walk_weight_power( walk_weight_power * ( def_max_weight / max_weight ) )
+    set_jump_weight_power( jump_weight_power * ( def_max_weight / summary_max_weight ) )
+    set_walk_weight_power( walk_weight_power * ( def_max_weight / summary_max_weight ) )
   end
 
   if act.satiety < light_hunger_limit then
