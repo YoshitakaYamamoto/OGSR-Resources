@@ -1356,20 +1356,6 @@ function()
 	db.remove_delayed() -- Удаление глючных трупов с битым пстором
 end,
 function()
-	ogse_debug.process_actor("upd_a", 44)
--- периодическая проверка количества идентификаторов
-	if id_cleaner and id_cleaner.check_ids_flag == 1 then
-		if time_global() > ids_timer then
-			id_cleaner.check_ids()
-			--- снятие флага атаки на актора --он и так не меняется нигде, нет смысла крутить на апдейте
-			--xr_companion.actor_attacked = false
-			---
-			ids_timer = ids_timer + math.random(30000, 60000)
-		end
-	end
--- периодическая проверка количества идентификаторов
-end,
-function()
 	ogse_debug.process_actor("upd_a", 45)
 -- Периодическая проверка численности
 	if time_global() > anom_enum then

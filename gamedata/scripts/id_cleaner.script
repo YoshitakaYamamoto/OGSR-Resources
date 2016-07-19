@@ -4,15 +4,11 @@
 -- авторы: Stalbar, KamikaZze
 ---------------------------------------------------------
 
-local item_to_remove = "no_item"
-check_ids_flag = 0
 local duplicates = {}
 
-
 function check_ids()
-
 	local id_counter = 0	
-	
+
 	for i = 1,65535 do
 		local obj = alife():object(i)
 		if obj then
@@ -20,16 +16,11 @@ function check_ids()
 			--log1("OBJECT ID "..tostring(i).." TYPE "..tostring(obj:name()))
 		end
 	end	
-	
-	if id_counter > 40000 then
-		log1("WARNING: There is too much ID's in use! Commencing cleanup of ammo and artefacts!")
-		check_ids_flag = 1
+
+	if id_counter > 60000 then
+		log1("!!WARNING: There is too much ID's in use: "..tostring(id_counter).."! Commencing cleanup of ammo and artefacts!")
 		check_inv()
-	else 
-		log1("INFO: There is an "..tostring(id_counter).." ID's in use at that moment")
-		check_ids_flag = 0
 	end
-	
 end
 
 function check_inv()
@@ -46,7 +37,6 @@ function check_inv()
 						-- log1("DEBUG: Cleaning up items of "..obj:name())
 						local sobj = level.object_by_id(obj.id)
 						if sobj then sobj:iterate_inventory(del_items,sobj) end 
-						item_to_remove = "no_item"
 						duplicates = {}
 					end
 				end	
@@ -93,8 +83,3 @@ function del_items(npc, item)
 		end
 	end
 end
----------------------------------------------------------
----------------------------------------------------------
--- чистильщик ID для OGSE
--- авторы: Stalbar, KamikaZze
----------------------------------------------------------
