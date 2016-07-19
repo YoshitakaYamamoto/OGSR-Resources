@@ -17,7 +17,6 @@ function on_npc_spawn( obj, binder )
 	local s = {
 		[ "signal" ] = "on_npc_update." .. obj:id(),
 		[ "fun"    ] = this.update,
-		--[ "queued" ] = true,
 	}
 	binder[ script_name() .. ".subscribed" ] = s
 	ogse_signals.get_mgr():subscribe( s )
@@ -324,6 +323,7 @@ function set_actor_sound_factor(factor)
 end
 
 function update_actor()
+	ogse_signals.get_mgr():reschedule( 1000 )
 	local theme = sound_theme.actor_theme[actor_sound.theme]
 	if theme == nil then return end
 	
@@ -342,16 +342,16 @@ function update_actor()
 			sound:play(db.actor, 0, sound_object.s2d)
 		end
 		actor_sound.idle = math.random(actor_sound.min_snd, actor_sound.max_snd)
+		ogse_signals.get_mgr():reschedule( actor_sound.idle )
 	end
 end
-
-
 
 
 --' Таблица для хранения созданных саунд обжектов.
 sound_object_by_theme = {}
 --' type = [random|seq|looped]
 function get_sound_object(theme, t_type)
+	--log3("ph_snd_themes for theme %s: %s", theme, ph_snd_themes[theme])
 	if ph_snd_themes[theme] == nil then
 		-- abort("ph_snd_themes for theme %s", tostring(theme))
 		return
@@ -370,8 +370,8 @@ function get_sound_object(theme, t_type)
 	local table_size = table.getn(ph_snd_themes[theme])
 	if sound_object_by_theme[theme].last_id == nil then
 		if t_type == "random" then
-			if table_size >= 2 then
-				play_id = math.random(1, table_size)
+			if table_size > 1 then
+				play_id = math.random(table_size)
 			else
 				play_id = 1
 			end
@@ -380,8 +380,8 @@ function get_sound_object(theme, t_type)
 		end
 	else
 		if t_type == "random" then
-			if table_size >= 2 then
-				play_id = math.random(1, table_size - 1)
+			if table_size > 1 then
+				play_id = math.random(table_size - 1)
 				if play_id >= sound_object_by_theme[theme].last_id then play_id = play_id + 1 end
 			else
 				play_id = 1
@@ -397,7 +397,7 @@ function get_sound_object(theme, t_type)
 		end		
 	end
 
-	printf("SOUND_OBJECT: selected id [%s] for theme [%s], type [%s], size [%s]", tostring(play_id), tostring(theme), tostring(type), table_size)
+	--log3("SOUND_OBJECT: selected id [%s] for theme [%s], type [%s], size [%s]", tostring(play_id), tostring(theme), tostring(type), table_size)
 
 	if play_id == -1 then
 		return
@@ -455,6 +455,7 @@ end
 
 --' Обертка вокруг функции, возвращающий звуковой объект.
 function get_safe_sound_object(path)
+	ASSERT( path, "path is required" )
 	if sound_object_by_path[path] == nil then
 		local t = {}
 		t.snd = sound_object(path)
