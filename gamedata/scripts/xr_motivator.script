@@ -330,13 +330,12 @@ function motivator_binder:reinit()
     db.storage[self.object:id()] = {  followers = {} }
     self.st = db.storage[self.object:id()]
 
-    --' Создание менеджера контроля положений тела
 	if self.object:alive() then
-		self.st.state_mgr = state_mgr.bind_manager(self.object)
-	end
+		self.st.state_mgr = state_mgr.bind_manager(self.object) --Создание менеджера контроля положений тела
 
-	self.st.move_mgr = move_mgr.move_mgr(self.object)
-	self.st.move_mgr:initialize()
+		self.st.move_mgr = move_mgr.move_mgr(self.object)
+		self.st.move_mgr:initialize()
+	end
 end
 
 function motivator_binder:net_spawn(sobject)
