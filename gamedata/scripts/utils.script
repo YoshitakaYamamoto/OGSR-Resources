@@ -139,7 +139,7 @@ function path_parse_waypoints(pathname)
 		return nil
 	end
 
-	log1("_bp: path_parse_waypoints: pathname ="..pathname)
+	--log1("_bp: path_parse_waypoints: pathname ="..pathname)
 	local ptr = patrol(pathname)
 	if not ptr then
 		abort("can't load path "..pathname)

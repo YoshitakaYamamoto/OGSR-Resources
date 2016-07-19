@@ -151,7 +151,7 @@ function random_treasure:generate_treasure_reward()
 			self.item_data[self.treasure_placement][self.treasure_id] = working_table
 		end	
 		
-		print_table_inlog(self.item_data, "self.item_data:")
+		--print_table_inlog(self.item_data, "self.item_data:")
 		xs_stor.set("random_treasure_item_data", self.item_data) -- сохраняем данные в табличку
 		
 	else
@@ -367,8 +367,8 @@ function random_treasure:include_item_in_treasure_items(item)
 				if v.tr_type == self.current_template then
 					for k1,v1 in pairs(v.tr_item) do
 						if k1 == item and v1 > 0 then
-							log1("include_item_in_treasure_items: k1 = "..k1)
-							log1("return true")
+							--log1("include_item_in_treasure_items: k1 = "..k1)
+							--log1("return true")
 							return true 
 						end
 					end
@@ -392,21 +392,21 @@ end
 
 -- Функция уменьшения таймаута предмета, а так же дезактивации тайника
 function random_treasure:decrease_item_timeout()
-	log1("===")
-	log1("treasure_level = "..self.treasure_placement)
+	--log1("===")
+	--log1("treasure_level = "..self.treasure_placement)
 	if self.item_data[self.treasure_placement] then
 		for k,v in pairs(self.item_data[self.treasure_placement]) do
 			if v then
 				if v.tr_type == self.current_template then
-					log1("decrease "..k)
+					--log1("decrease "..k)
 					for k1,v1 in pairs(v.tr_item) do
 						v.tr_item[k1] = v.tr_item[k1] - 1
 						if v.tr_item[k1] == 0 then self.item_data[self.treasure_placement][k] = nil end -- удаляем упоминание об уже ненужном тайнике
-						log1(k1.." "..v1)
+						--log1(k1.." "..v1)
 					end
 				end
 			end
 		end
 	end
-	log1("===")
+	--log1("===")
 end

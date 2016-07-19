@@ -264,7 +264,7 @@ function validate_accessibility(npc,ppname)
 	end
 	pp_validated[ppname]=true
 	if pp then
-		log1("MOVE_MGR validating "..ppname.." for "..npc:name())
+		--log1("MOVE_MGR validating "..ppname.." for "..npc:name())
 		for i=0,pp:count()-1 do
 			local nearest_anoms = ogse_anomaly.get_all_nearest_anomalies_by_point(pp:point(i))
 			-- local hasanom, anomid, pos, cls, dist, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(pp:point(i))
@@ -279,12 +279,12 @@ function validate_accessibility(npc,ppname)
 			end
 		end
 		for i=0,pp:count()-1 do
-			log1("MOVE_MGR verifying point ["..tostring(i).."] on path "..ppname.." VTX ["..tostring(pp:level_vertex_id(i)).."] for "..npc:name())
+			--log1("MOVE_MGR verifying point ["..tostring(i).."] on path "..ppname.." VTX ["..tostring(pp:level_vertex_id(i)).."] for "..npc:name())
 			if npc:accessible(pp:level_vertex_id(i)) then
-				log1("MOVE_MGR checked point")
+				--log1("MOVE_MGR checked point")
 				return true,ppname
 			end
-			log1("MOVE_MGR verifying point end")
+			--log1("MOVE_MGR verifying point end")
 		end
 	end
 	return false,ppname
