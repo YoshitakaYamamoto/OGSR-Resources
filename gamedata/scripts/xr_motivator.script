@@ -206,9 +206,9 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 				self:set_mental_state(anim.danger)
 				self:set_sight(look.point,sound_position)
 				self:make_object_visible_somewhen(who)	
-				if xr_companion.is_companion(self:id()) then
-					xr_combat_companion.process_enemy(self, who)				
-				end			
+				--if xr_companion.is_companion(self:id()) then --Нет смысла проверять, т.к. эта функция для компаньонов не вызывается
+				--	xr_combat_companion.process_enemy(self, who)				
+				--end			
 			end
 		elseif IsStalker(who) and (self:relation(who) ~= game_object.enemy) then
 			if snd_t == "ATTCK" or
