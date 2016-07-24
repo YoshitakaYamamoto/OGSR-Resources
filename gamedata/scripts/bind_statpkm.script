@@ -63,7 +63,7 @@ function turret_control:__init(turret_binder)
 	self.turret:set_tip_text("")
 	self.heli = self.turret:get_helicopter()
 	self.heli.m_use_mgun_on_attack = false
-	db.actor:hide_weapon()
+	bind_stalker.hide_weapon()
 	self.initial_actor_pos = db.actor:position()
 	pkm_captured = self.turret:id()
 	self.key_down_desc = {signal = "on_key_down", self = self, fun = self.on_key_down}
@@ -120,7 +120,7 @@ function turret_control:action()
 	ogse_signals.get_mgr():unsubscribe(self.key_down_desc)
 	ogse_signals.get_mgr():unsubscribe(self.key_up_desc)
 	-- возвращаем актора в исходное состояние
-	db.actor:restore_weapon()
+	bind_stalker.restore_weapon()
 	-- возвращаем турель в исходное состояние
 	pkm_captured = nil
 	self.turret:set_tip_text("tip_pkm_use")

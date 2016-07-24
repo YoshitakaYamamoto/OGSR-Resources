@@ -32,7 +32,6 @@ local game_difficulty_by_num = {
 	[3] = "gd_master"
 	}
 
-local weapon_hide = false
 ----------------------------------------------------------------------------------------------------------------------
 class "actor_binder" (object_binder)
 ----------------------------------------------------------------------------------------------------------------------
@@ -57,9 +56,6 @@ function actor_binder:net_spawn(data)
 	ogse_debug.process_actor("a_spw", 2)
 	xr_gulag.make_restrictors_registry()
 
-	self.weapon_hide = false -- спрятано или нет оружие при разговоре.
-	weapon_hide = false -- устанавливаем глобальный дефолтовый флаг.
-
 	ogse_debug.process_actor("a_spw", 4)
 	db.add_actor(self.object)
 
@@ -80,6 +76,11 @@ function actor_binder:net_spawn(data)
 -------- пауза при загрузке --------
 	ui_main_menu.start()
 ------------------------------------
+
+	self.am:subscribe({ signal = "on_talk_open",  fun = this.hide_weapon    })
+	self.am:subscribe({ signal = "on_talk_hide",  fun = this.restore_weapon })
+	self.am:subscribe({ signal = "on_trade_open", fun = this.hide_weapon    })
+	self.am:subscribe({ signal = "on_trade_hide", fun = this.restore_weapon })
 
 	self.am:call("on_spawn", data)
 
@@ -448,19 +449,6 @@ function actor_binder:update(delta)
 	ogse_debug.check_npc()
 	ogse_debug.check_monsters()	
 	ogse_debug.check_gulag()	
-
-	ogse_debug.process_actor("upd", 7)
-	if weapon_hide == true or self.object:is_talking() then --Апдейт прятание оружия игрока во время диалога
-		if self.weapon_hide == false then
-			self.object:hide_weapon()
-			self.weapon_hide = true
-		end
-	else
-		if self.weapon_hide == true then
-			self.object:restore_weapon()
-			self.weapon_hide = false
-		end
-	end
 	
 	ogse_debug.process_actor("upd", 14)
 	_sdata.vis_int()
@@ -582,9 +570,27 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 
 -- Weapon functions
+local restore_wpn_t, weapon_hide
+
 function hide_weapon()
-	weapon_hide = true
+  weapon_hide = true
+  if restore_wpn_t then return end
+  db.actor:hide_weapon()
+  restore_wpn_t = dsh.wait_condition(
+    function()
+      return not ( weapon_hide or db.actor:is_talking() )
+    end,
+    function()
+      db.actor:restore_weapon()
+      weapon_hide   = false
+      restore_wpn_t = nil
+    end,
+    function()
+      ogse_signals.get_mgr():reschedule( 200 )
+    end
+  )
 end
+
 function restore_weapon()
-	weapon_hide = false
+   weapon_hide = false
 end

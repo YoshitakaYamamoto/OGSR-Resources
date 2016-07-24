@@ -73,7 +73,7 @@ function begin_sleep(desired_sleep_time)
 	break_sleep_request = false -- если кто-то запрашивал прерывание сна во время бодрствования, то сбрасываем это
 	
 	db.actor:stop_talk()
-	db.actor:hide_weapon()
+	bind_stalker.hide_weapon()
 	--
 
 	sleeping_now = true
@@ -168,7 +168,7 @@ function begin_sleep(desired_sleep_time)
 		level.add_pp_effector("yantar_underground_psi.ppe", 2007, false)
 		level.add_pp_effector("total_recall.ppe", 2008, false)
 	end
-	db.actor:restore_weapon()
+	bind_stalker.restore_weapon()
 	local snd_obj = xr_sound.get_safe_sound_object([[characters_voice\human_01\stalker\states\breath\breath_2]])
 	if snd_obj then
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 15.0)

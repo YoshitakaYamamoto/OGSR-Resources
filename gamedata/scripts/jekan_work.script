@@ -1394,7 +1394,7 @@ end
 
 function actor_rasstrel_travel()
 	db.actor:stop_talk()
-	db.actor:hide_weapon()
+	bind_stalker.hide_weapon()
 	jekan_work.teleport_sergant()
 	jekan_work.spawn_dolg_palach1()
 	jekan_work.spawn_dolg_palach2()	
@@ -1417,7 +1417,7 @@ function inventory_close_by_malandrinus() -- а это еще одна попытка закрыть инве
 end
 
 function actor_rasstrel_shans()
-	db.actor:restore_weapon()
+	bind_stalker.restore_weapon()
 	level.enable_input()
 end
 
@@ -3286,7 +3286,7 @@ function check_generator(obj, sobj)
 	--	return
 	--end	
 	if sobj:section_name() == "yan_sold_generator" and db.actor:has_info("yan_sold_go_to_dark_zone") and db.actor:dont_has_info("yan_sold_actor_paralyzed") then
-		db.actor:hide_weapon()
+		bind_stalker.hide_weapon()
 		actor_disable_inventory()
 		ogse_quests.turn_pnv_off()
 		level.disable_input()
@@ -3320,7 +3320,7 @@ function yan_sold_paralyze_actor()
 	ogse.save_variable("grenade_key", bind_to_dik(key_bindings.kWPN_4))
 	cmd("unbind", "inventory")
 	cmd("unbind", "wpn_4")
-	db.actor:restore_weapon()
+	bind_stalker.restore_weapon()
 	db.actor:activate_slot(0)
 	for i = 0,4 do
 		local wpn = db.actor:item_in_slot(i)

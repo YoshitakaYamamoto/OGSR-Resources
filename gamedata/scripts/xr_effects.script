@@ -9,19 +9,18 @@ function disable_ui_elements(actor, npc, p)
     local i, v = 0, 0
     for i, v in pairs(p) do
         if v == "all" then
-            db.actor:hide_weapon()
+            bind_stalker.hide_weapon()
             level.disable_input()
             level.hide_indicators()
             break
         elseif v == "weapon" then
-            db.actor:hide_weapon()
+            bind_stalker.hide_weapon()
         elseif v == "input" then
             level.disable_input()
         elseif v == "hud" then
             level.hide_indicators()
         end
     end
-    --printf("xr_effects <disable_ui_elements>")
 end
 
 function enable_ui_elements(actor, npc, p)
@@ -30,30 +29,28 @@ function enable_ui_elements(actor, npc, p)
         if v == "all" then
             level.show_indicators()
             level.enable_input()
-            db.actor:restore_weapon()
+            bind_stalker.restore_weapon()
             break
         elseif v == "hud" then
             level.show_indicators()
         elseif v == "input" then
             level.enable_input()
         elseif v == "weapon" then
-            db.actor:restore_weapon()
+            bind_stalker.restore_weapon()
         end
     end
 end
 
 function disable_ui(actor, npc)
-    db.actor:hide_weapon()
+    bind_stalker.hide_weapon()
     level.disable_input()
     level.hide_indicators()
-    --printf("xr_effects <disable_ui>")
 end
 
 function enable_ui(actor, npc)
     level.show_indicators()
     level.enable_input()
-    db.actor:restore_weapon()
-    --printf("xr_effects <enable_ui>")
+    bind_stalker.restore_weapon()
 end
 
 function run_cam_effector(actor, npc, p)
@@ -226,9 +223,7 @@ function check_actor_need_teleport(actor)
 end
 
 function teleport_actor_randomly_from_lair_deadcity()
-
 	if not has_alife_info("master_quest_teleported_away") then
-	
 		ogse_quests.turn_pnv_off()
 		run_postprocess(db.actor, db.actor, {"blink"})	
 
@@ -236,38 +231,33 @@ function teleport_actor_randomly_from_lair_deadcity()
 		local look = patrol(teleport_points[math.random(#teleport_points)])
 
 		play_snd(db.actor, db.actor, {"soundtrack\\x18_laugh"})
-		
+
 		db.actor:set_actor_position(point:point(0))
 		local dir = look:point(0):sub(point:point(0))
 		db.actor:set_actor_direction(-dir:getH())
 		db.actor:disable_info_portion("master_quest_teleported_inside")
 		db.actor:give_info_portion("master_quest_teleported_away")
-		
+
 		times_teleported_away = times_teleported_away + 1
 		ogse.save_var("times_teleported_away", times_teleported_away, "number")
-		
+
 		ogse_water_restrictor.stop_all_effects()
 		bind_stalker.restore_weapon()
-		db.actor:restore_weapon()		
-		
+
 		time_period = time_global() + period
-	
 	end
-	
 end
 
 function teleport_actor_randomly_deadcity_in_lair()
-
 	if not has_alife_info("master_quest_teleported_inside") then
-
 		ogse_quests.turn_pnv_off()
-		run_postprocess(db.actor, db.actor, {"blink"})	
-	
+		run_postprocess(db.actor, db.actor, {"blink"})
+
 		local point = patrol(logovo_teleport_points[math.random(#logovo_teleport_points)])
 		local look = patrol(logovo_teleport_points[math.random(#logovo_teleport_points)])
-		
+
 		play_snd(db.actor, db.actor, {"soundtrack\\x18_laugh"})	
-		
+
 		db.actor:set_actor_position(point:point(0))
 		local dir = look:point(0):sub(point:point(0))
 		db.actor:set_actor_direction(-dir:getH())
@@ -276,20 +266,15 @@ function teleport_actor_randomly_deadcity_in_lair()
 		
 		times_teleported_in = times_teleported_in + 1
 		ogse.save_var("times_teleported_in", times_teleported_in, "number")	
-		
+
 		bind_stalker.hide_weapon()
-		db.actor:hide_weapon()			
 		
 		time_period = time_global() + period
-	
 	end
-	
 end
 
 function teleport_actor_final_point_lair()
-
 	if not has_alife_info("master_quest_teleported_final") then
-
 		local point = patrol("final_teleport_pnt")
 		local look = patrol(logovo_teleport_points[math.random(#logovo_teleport_points)])
 		
@@ -303,10 +288,7 @@ function teleport_actor_final_point_lair()
 		db.actor:give_info_portion("master_quest_teleported_final")
 		
 		bind_stalker.hide_weapon()
-		db.actor:hide_weapon()			
-	
 	end
-	
 end
 
 function change_actor_torch_bad(actor, npc, p)

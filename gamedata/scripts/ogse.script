@@ -606,7 +606,7 @@ local selector = {
 		local dir = look:point(0):sub(point:point(0))
 		db.actor:set_actor_direction(-dir:getH())
 
-		db.actor:restore_weapon()
+		bind_stalker.restore_weapon()
 		level.enable_input()
 		level.show_indicators()
 	end,
@@ -631,7 +631,7 @@ local selector = {
 		local s = sound_object("x18_laugh")
 		s:play_no_feedback(db.actor,sound_object.s2d, 0, vector():set(0, 0, 0), 1.0)
 		level.enable_input()
-		db.actor:restore_weapon()
+		bind_stalker.restore_weapon()
 	end,
 
 	["dismiss_prebandit"] = function(params_string)

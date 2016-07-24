@@ -1261,17 +1261,16 @@ function master_dying()
 			end
 		end
 	end
-	
+
 	ogse_water_restrictor.stop_all_effects()
-	
+
 	bind_stalker.restore_weapon()
-	db.actor:restore_weapon()
-	
+
 	master_dead:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
 	level.add_pp_effector("deadcity_wake_old1.ppe", 2008, false)
 	xr_gulag.setGulagRelation ("deadcity_bar", game_object.friend, db.actor)
 	xr_gulag.setGulagPersonalGoodwill("deadcity_bar", 1000, db.actor)	
-	
+
 	if has_alife_info("actor_set_zombied") then
 		tasks_functor.make_actor_normal()
 	end		

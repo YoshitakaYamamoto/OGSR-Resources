@@ -687,7 +687,7 @@ function update_car_hud()
 	if car and not current_car then -- только что залезли в машину
 		SetDetailsMinRadius(2.0) -- убираем траву из под ног
 		setup_car_camera(car)
-		db.actor:hide_weapon()
+		bind_stalker.hide_weapon()
 		db.actor:set_actor_int(1432, 0)
 		db.actor:set_actor_int(1428, 0)
 		current_car = car
@@ -701,7 +701,7 @@ function update_car_hud()
 	elseif not car and current_car then -- только что вылезли из машины
 		SetDetailsMinRadius(0.0) -- вертаем траву обратно
 		fix_camera_limits = false
-		db.actor:restore_weapon()
+		bind_stalker.restore_weapon()
 		switch_firing(current_car, false)
 		current_car = nil
 		hide_car_hud(in_btr)

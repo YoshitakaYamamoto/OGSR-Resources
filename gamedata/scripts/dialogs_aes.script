@@ -7,7 +7,7 @@ function osoznanie_decline(npc, actor)
 	db.actor:stop_talk()
 	
 	xr_effects.enable_ui(db.actor, db.actor)	
-	db.actor:hide_weapon()
+	bind_stalker.hide_weapon()
 	level.disable_input()
 
 	for k, v in pairs(db.creature) do

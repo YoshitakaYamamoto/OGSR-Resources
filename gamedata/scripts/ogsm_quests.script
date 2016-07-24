@@ -724,7 +724,7 @@ function release_dark_dealer()
 		end
 	end
 	if pos then
-		db.actor:hide_weapon()
+		bind_stalker.hide_weapon()
 		level.disable_input()
 		level.add_cam_effector("camera_effects\\earthquake.anm", 2010, false, "")
 		local s = sound_object("ambient\\earthquake")
