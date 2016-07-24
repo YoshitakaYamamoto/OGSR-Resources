@@ -488,9 +488,9 @@ function actor_binder:update(delta)
 		if not has_alife_info("global_dialogs") then
 			self.object:give_info_portion("global_dialogs")
 		end
-		if not has_alife_info("level_changer_icons") then
-			self.object:give_info_portion("level_changer_icons")
-		end
+		--if not has_alife_info("level_changer_icons") then
+		--	self.object:give_info_portion("level_changer_icons")
+		--end
 
 		ogse_debug.process_actor("upd", 16)
 
