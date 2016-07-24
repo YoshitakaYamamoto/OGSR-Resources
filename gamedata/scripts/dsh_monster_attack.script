@@ -11,12 +11,6 @@ function on_monster_spawn( obj, binder )
   local subscribed = {}
   if obj:alive() then
     if obj:clsid() == clsid.bloodsucker_s then
-	  table.insert( subscribed, {
-        [ "signal" ] = s_name,
-        [ "fun"    ] = this.set_custom_panic,
-        [ "queued" ] = true,
-        [ "__unsubscribe_on_death" ] = true,
-      })
       table.insert( subscribed, {
         [ "signal" ] = s_name,
         [ "fun"    ] = this.bloodsucker_attack,
@@ -194,27 +188,6 @@ function bloodsucker_attack( obj )
 			binder.timer_anim = tg + 2000 --Таймер на проигрывание анимки
 		end
 	end
-end
-
---Какая-то приблуда для кровососа
-function set_custom_panic( obj )
-  if not may_attack() or obj.health < 0.05 then return end
-  local enemy = obj:best_enemy()
-  if
-    not (
-      enemy and enemy:id() == db.actor:id() and obj:see( enemy )
-    )
-  then
-    return
-  end
-  local dist   = obj:position():distance_to( enemy:position() )
-  local panic_dist = 6
-  ogse_signals.get_mgr():reschedule( ( dist < panic_dist * 3 and 100 ) or ( dist < obj:range() and 1000 ) or 5000 )
-  if dist < panic_dist and enemy:active_slot() == 0 and enemy:see( obj ) then
-    obj:set_custom_panic_threshold( 1 )
-  else
-    obj:set_custom_panic_threshold( 0 )
-  end
 end
 
 
