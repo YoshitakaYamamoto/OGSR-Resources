@@ -251,50 +251,6 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 end
 --*****************************************************************************************************
 
---[=[function check_art_weapon(npc)
-------------------------------
---' Изредка движок сглюкивает,
---' назначая неписю в слот артефакт
---' этого следует избежать,
---' так как такие неписи
---' застревают на попытке 
---' применения арта как оружия
-------------------------------
-	local item_in_slot = npc:item_in_slot(1)
-	local act_item = npc:active_item()
-	if act_item and item_in_slot and act_item:id() == item_in_slot:id() then
-		local item_in_slot_sec = act_item:section()
-		local item_in_slot_id = act_item:id()
-		if item_in_slot_sec and item_in_slot_id and act_item:is_artefact() then
-			--' Если непись получил арт в слот по ошибке при загрузке игры, мы просто
-			--' обновим ему оружие в руках и всё. Иначе, если он взял арт в руки и отказывается
-			--' его убирать, а лучшее оружие получить не удаётся, придётся арт выбросить, отрелизить и вернуть ему в рюкзак.
-			-- log1("WARNING! Engine error - art in NPC weapon slot! "..tostring(item_in_slot_sec).." ID "..tostring(item_in_slot_id))
-			-- local s_obj = alife():object(item_in_slot_id)
-			local bw = npc:best_weapon()
-			local be = npc:best_enemy()
-			local rem_id = npc:active_item():id()
-			npc:drop_item(npc:active_item())
-			local s_obj = alife():object(rem_id)
-			if s_obj then
-				-- log1("ITEM RESET "..tostring(item_in_slot_sec))
-				alife():release(s_obj, true)
-				alife():create(item_in_slot_sec,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
-			end			
-			if bw and bw:is_weapon() then
-				-- log1("TOSS WEAPON TO "..bw:section().." FROM "..tostring(rem_id))
-				if be then
-					npc:set_item(object.fire1, bw)
-					return
-				else
-					npc:set_item(object.idle, bw)
-					return
-				end
-			end
-		end
-	end
-end]=]
-
 class "motivator_binder" (object_binder)
 
 function motivator_binder:__init (obj) super(obj)
@@ -385,8 +341,8 @@ function motivator_binder:net_spawn(sobject)
 		self.object:set_callback(callback.sound, motivator_binder.hear_callback, self)
 	end
 
-	--ogse_debug.process_npc(self.object, "s_spw", 5111)
-	--self:subscribe_updaters()
+	ogse_debug.process_npc(self.object, "s_spw", 5111)
+	self:subscribe_updaters()
 
 	ogse_debug.process_npc(self.object, "s_spw", 6)
     --' Загрузка историй для лагеря.
@@ -542,7 +498,7 @@ function motivator_binder:net_spawn(sobject)
 	return true
 end
 
---[=[function motivator_binder:subscribe_updaters()
+function motivator_binder:subscribe_updaters()
   local s_name = "on_npc_update." .. self.object:id()
   if self.object:alive() then
     self.updaters = {
@@ -559,7 +515,7 @@ end
   for _, s in ipairs( self.updaters ) do
     self.am:subscribe( s )
   end
-end]=]
+end
 
 function motivator_binder:net_destroy()
 	xr_logic.save_logic_online(self.object)
@@ -718,10 +674,10 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 end
 
 function motivator_binder:death_callback(victim, who)
-	--[[for _, s in ipairs( self.updaters ) do
+	for _, s in ipairs( self.updaters ) do
 		self.am:unsubscribe( s )
 	end
-	self.updaters = {}]]
+	self.updaters = {}
 
 	ogse_debug.process_npc(victim, "dth", 1)
 	if who and victim and string.find(who:name(), "vehicle_btr") and ogse_car_control.current_car and who:id() == ogse_car_control.current_car:id() then
@@ -853,7 +809,7 @@ function motivator_binder:update(delta)
 	ogse_debug.check_actor()
 
 	ogse_debug.process_npc(self.object, "upd", 2)
-	if self.object:alive() then -- Условие истинно, пока непись жив.
+	if self.object:alive() then
 		if self.object:is_talk_enabled() then
 			self.object:set_tip_text("character_use")
 		else
@@ -890,9 +846,49 @@ function motivator_binder:update(delta)
 	ogse_debug.process_npc(self.object, "upd", 0)
 end
 
---[[function motivator_binder:check_art_weapon() --Проверка артефакта в руках.
-	check_art_weapon(self.object)
-end]]
+function motivator_binder:check_art_weapon()
+-------------------------------------
+--' Изредка движок сглюкивает,
+--' назначая неписю в слот артефакт
+--' этого следует избежать,
+--' так как такие неписи
+--' застревают на попытке 
+--' применения арта как оружия
+-------------------------------------
+	local item_in_slot = self.object:item_in_slot(1)
+	local act_item = self.object:active_item()
+	if act_item and item_in_slot and act_item:id() == item_in_slot:id() then
+		local item_in_slot_sec = act_item:section()
+		local item_in_slot_id = act_item:id()
+		if item_in_slot_sec and item_in_slot_id and act_item:is_artefact() then
+			--' Если непись получил арт в слот по ошибке при загрузке игры, мы просто
+			--' обновим ему оружие в руках и всё. Иначе, если он взял арт в руки и отказывается
+			--' его убирать, а лучшее оружие получить не удаётся, придётся арт выбросить, отрелизить и вернуть ему в рюкзак.
+			-- log1("WARNING! Engine error - art in NPC weapon slot! "..tostring(item_in_slot_sec).." ID "..tostring(item_in_slot_id))
+			-- local s_obj = alife():object(item_in_slot_id)
+			local bw = self.object:best_weapon()
+			local be = self.object:best_enemy()
+			local rem_id = self.object:active_item():id()
+			self.object:drop_item(self.object:active_item())
+			local s_obj = alife():object(rem_id)
+			if s_obj then
+				-- log1("ITEM RESET "..tostring(item_in_slot_sec))
+				alife():release(s_obj, true)
+				alife():create(item_in_slot_sec,self.object:position(),self.object:level_vertex_id(),self.object:game_vertex_id(),self.object:id())
+			end			
+			if bw and bw:is_weapon() then
+				-- log1("TOSS WEAPON TO "..bw:section().." FROM "..tostring(rem_id))
+				if be then
+					self.object:set_item(object.fire1, bw)
+					return
+				else
+					self.object:set_item(object.idle, bw)
+					return
+				end
+			end
+		end
+	end
+end
 
 function motivator_binder:reload(section)
 	object_binder.reload(self, section)
