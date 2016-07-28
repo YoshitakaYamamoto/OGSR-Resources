@@ -753,7 +753,7 @@ function show_car_hud(car, btr)
 		db.actor:set_camera_fov(fov_vol)
 		current_target_id = nil
 
-		ogse_signals.get_mgr():call("on_show_car_hud")
+		ogse_signals.get_mgr():call("on_sit_down_in_btr")
 	end
 	bg:AttachChild(car_hud_wnd) -- поместить окно на подложку
 end
@@ -764,7 +764,7 @@ function hide_car_hud(btr)
 		current_target_id = nil
 		db.actor:set_camera_fov(fov_vol)
 
-		ogse_signals.get_mgr():call("on_hide_car_hud")
+		ogse_signals.get_mgr():call("on_exit_from_btr")
 	end
 end
 

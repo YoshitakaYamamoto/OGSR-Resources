@@ -14,8 +14,8 @@ function attach(sm)
 	sm:subscribe({ signal = "on_item_to_slot",	fun = this.on_item_to_slot })
 	sm:subscribe({ signal = "on_sniper_mode",	fun = this.on_sniper_mode })
 	sm:subscribe({ signal = "off_sniper_mode",	fun = this.off_sniper_mode })
-	sm:subscribe({ signal = "on_show_car_hud",	fun = this.on_show_car_hud })
-	sm:subscribe({ signal = "on_hide_car_hud",	fun = this.on_hide_car_hud })
+	sm:subscribe({ signal = "on_sit_down_in_btr", fun = this.on_sit_down_in_btr })
+	sm:subscribe({ signal = "on_exit_from_btr",	fun = this.on_exit_from_btr })
 	sm:subscribe({ signal = "on_drop",			fun = this.chek_drop_pnv })
 	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.chek_drop_pnv })
 	sm:subscribe({ signal = "on_destroy",		fun = this.on_destroy })
@@ -115,14 +115,14 @@ function on_item_to_slot(obj)
 	caching_scope(obj)
 end
 
-function on_show_car_hud() --Залезли в БТР.
+function on_sit_down_in_btr() --Залезли в БТР.
 	if night_vision_fx_on then --если пнв включен, запомним что он включен и выключим. А ПНВ БТР - включим.
 		turn_off_nv_fx()
 		turn_on_nv_btr_fx()
 	end
 end
 
-function on_hide_car_hud() --Вылезли из БТР.
+function on_exit_from_btr() --Вылезли из БТР.
 	if night_vision_btr_fx_on then --Если ПНВ БТР включен, выключим его, а прибор ПНВ - включим.
 		turn_off_nv_btr_fx()
 		nv_fx_on()
