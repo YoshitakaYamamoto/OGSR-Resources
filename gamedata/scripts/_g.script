@@ -1377,23 +1377,22 @@ local subs_tbl = { --Если в log1/2/3 передать строку формата, в которой первыми 
 --Функция умеет полностью печатать в лог таблицы с любым содержанием, таблицы в таблицах и тд. Простой пример вызова: log3("Printing table: %s", table)
 --Исправлена проблема с цветом строк в консоли: Если указано, что текст должен быть цветным, то в консоли цветными будут все строки текста, а не только первая.
 --Исправлено ограничение в 1024 символа. С этой функцией в лог можно вывести неограниченое кол-во символов (например, очень большие таблицы)
-function log3(fmt,...)
-	ASSERT(fmt and type(fmt) == "string", "log3: has no format string") --Нет строки формата - вылетаем
+function log3(fmt, ...)
 	local args = {...}
 	for i=1, #args do -- Цикл ipairs здесь не работает, поскольку останавливается на первом _значении_ nil, что исключает возможность иметь nil-аргументы
 		local arg = args[i]
 		local typ = type(arg)
 		if typ == "table" then
 			args[i] = table.tostring(arg).."\n"
-		elseif typ == "userdata" then
-			args[i] = "[USERDATA! PRINTING ISN'T POSSIBLE!]"
 		elseif typ == "function" then
 			args[i] = "[FUNCTION! PRINTING ISN'T POSSIBLE!]"
+		elseif typ == "userdata" then
+			args[i] = "[USERDATA! PRINTING ISN'T POSSIBLE!]"
 		else
 			args[i] = tostring(arg)
 		end
 	end
-	local res,msg = pcall(string.format, fmt, unpack(args))
+	local res, msg = pcall(string.format, fmt, unpack(args))
 	if not res then
 		log1("!!log3 failed: "..msg)
 		return
