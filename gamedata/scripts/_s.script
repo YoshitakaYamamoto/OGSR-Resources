@@ -29,12 +29,15 @@ local ssep = [[!@#$%*.:;,-?/|\]]
 
 ---- строка (последовательность символов между началом и концом строки)
 -- Проверить строку на наличие значащих символов (не пустая строка)
---function string.sNotBlk(s) return (tostring(s):find('%S')) and true or false end
 string.sNotBlk = function(s) return (tostring(s):find('^(%S)')) and true or false end
 -- Отбросить в строке стоящие слева пробелы
-string.sTrimL = function(s) return (tostring(s):gsub("^%s+",'')) or s end
+if not string.trim_l then
+	string.trim_l = function(s) return (tostring(s):gsub("^%s+",'')) or s end
+end
 -- Отбросить в строке стоящие справа пробелы
-string.sTrimR = function(s) return (tostring(s):gsub("%s*$",'')) or s end
+if not string.trim_r then
+	string.trim_r = function(s) return (tostring(s):gsub("%s*$",'')) or s end
+end
 -- Отбросить в строке пробелы, стоящие слева и справа
 if not string.trim then
 	string.trim = function(s) return (tostring(s):gsub('^%s*(.-)%s*$', '%1')) or s end
