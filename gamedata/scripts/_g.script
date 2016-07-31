@@ -77,7 +77,7 @@ function sum_args_ex(base, offs)
 	local b1 = tonumber(b1_s, 16)
 	local b2 = tonumber(b2_s, 16)
 	local res = sum_args(bit.lshift(b1, 16), sum_args(b2, offs))
-	--log3("sum_args_ex: %s, %x, %x", base_s, offs, res)
+	--log2("sum_args_ex: %s, %x, %x", base_s, offs, res)
 	return res
 end
 
@@ -145,11 +145,10 @@ function isEmpty(obj, space)
     return false
 end
 -- является ли таблица массивом
-function isArray(obj)
-    if not isTable(obj) then return false end
+function isArray(tbl)
 	local n=0
-	for _ in pairs(obj) do n=n+1 end
-    return n <= #obj
+	for _ in pairs(tbl) do n=n+1 end
+    return n <= #tbl
 end
 
 -- Приведение значения переменной 'val' к булевому значению
@@ -794,25 +793,24 @@ function abort(fmt, ...)
 	
 	if crash_counter == 0 then
 		crash_counter = crash_counter + 1	
-		log3("ABORT: fail(message)")
+		log1("ABORT: fail(message)")
 		fail(message)
 	elseif crash_counter == 1 then
 		crash_counter = crash_counter + 1
-		log3("ABORT: 1/crash")	
+		log1("ABORT: 1/crash")	
 		local crash
 		local ooops = 1/crash
 	elseif crash_counter == 2 then
 		crash_counter = crash_counter + 1
-		log3("ABORT: string.format")	
+		log1("ABORT: string.format")	
 		string.format("%s")		
-	elseif crash_counter == 3 then
-		crash_counter = crash_counter + 1
-		log3("ABORT: log3")	
-		log3("%s")		
+	--elseif crash_counter == 3 then
+	--	crash_counter = crash_counter + 1
+	--	log1("ABORT: log3")	
+	--	log3("%s")		
 	else
-	
 		crash_counter = crash_counter + 1
-		log3("get_console():execute quit")
+		log1("get_console():execute quit")
 		cmd("quit")
 	end
 end
@@ -1366,83 +1364,119 @@ function level_name_by_gvid(gvid)
 end
 
 --***********************************[Функции для вывода в лог]****************************************
-local subs_tbl = { --Если в log1/2/3 передать строку формата, в которой первыми символами будут эти, то текст в консоли будет цветной:
+-----------------------------------------------------------------------------------------
+local tostring_all_tbl = {
+	["table"] =		function(table, ind) --Распечатка таблиц
+						local res = "{" --Начало
+						local end_res = ind and "\n"..ind.."}" or "\n}" --Конец
+						local def_ind = "  " --Отступ от начала строки
+						ind = ind and ind..def_ind or def_ind --Для каждой "таблицы внутри таблицы" отступ увеличивается в 2 раза
+						if isArray(table) then --Если это массив, обрабатываем только значения:
+							for i=1, #table do
+								res = res.."\n"..ind..tostring_all(table[i], ind)..","
+							end
+						else --Если НЕ массив, обрабатываем и ключи, и значения:
+							for k, v in pairs(table) do
+								res = res.."\n"..ind.."["..tostring_all(k, ind).."] = "..tostring_all(v, ind)..","
+							end
+						end
+						return res..end_res
+					end,
+	["string"] =	function(v) return "'"..v.."'" end, --Строки берём в кавычки. Это нужно, чтобы можно было отличить строку "123" от числа 123, "nil" от nil и тд...
+	["number"] =	function(v) return tostring(v) end,
+	["boolean"] =	function(v) return tostring(v) end,
+	["nil"] =		function(v) return tostring(v) end,
+	["function"] =	function() return "[[FUNCTION]]" end, --Function, Userdata и Thread распечатать нельзя, просто заменим на строки
+	["userdata"] =	function() return "[[USERDATA]]" end,
+	["thread"] =	function() return "[[THREAD]]" end,
+}
+--Конвертирование чего угодно в строку. Используется как компонент функции log3.
+function tostring_all(obj, ind) --ind - служебный аргумент для распечатки "таблиц в таблицах". НЕ ТРОГАТЬ ЕГО!!!
+	return tostring_all_tbl[type(obj)](obj, ind)
+end
+
+local subs_tbl = { --Если в самом начале строки формата будут эти символы, то текст в консоли будет:
 	["--"] = true, --Зелёный
 	["~~"] = true, --Жёлтый
 	["!!"] = true  --Красный
 }
---Удобная обертка для log1.
---Делает дополнительную работу по конвертации некоторых параметров, которые не воспринимаются родной функцией string.format.
---Невоспринимаемые параметры (nil, boolean, table, userdata, function) должны в строке формата стоять как %s (потому, что будут заменены на строки).
---Функция умеет полностью печатать в лог таблицы с любым содержанием, таблицы в таблицах и тд. Простой пример вызова: log3("Printing table: %s", table)
---Исправлена проблема с цветом строк в консоли: Если указано, что текст должен быть цветным, то в консоли цветными будут все строки текста, а не только первая.
---Исправлено ограничение в 1024 символа. С этой функцией в лог можно вывести неограниченое кол-во символов (например, очень большие таблицы)
+--Функциональная обёртка для log1.
+--Делает дополнительную работу по конвертации параметров, которые не воспринимаются родной функцией string.format.
+--Параметры можно передавать ЛЮБОГО ТИПА! В строке формата они должны стоять как %s (потому, что будут сконвертированы в строки).
 function log3(fmt, ...)
 	local args = {...}
-	for i=1, #args do -- Цикл ipairs здесь не работает, поскольку останавливается на первом _значении_ nil, что исключает возможность иметь nil-аргументы
-		local arg = args[i]
-		local typ = type(arg)
-		if typ == "table" then
-			args[i] = table.tostring(arg).."\n"
-		elseif typ == "function" then
-			args[i] = "[FUNCTION! PRINTING ISN'T POSSIBLE!]"
-		elseif typ == "userdata" then
-			args[i] = "[USERDATA! PRINTING ISN'T POSSIBLE!]"
-		else
-			args[i] = tostring(arg)
-		end
+	--Цикл ipairs здесь не работает, поскольку останавливается на первом _значении_ nil, что исключает возможность иметь nil-аргументы
+	--Решетка(#) nil-аргументы обрабатывает, но, к сожалению, не обрабатывает void, это никак не исправить.
+	--http://www.amk-team.ru/forum/topic/11584-iazyk-lua-obschie-voprosy-programmirovaniia/page-57#entry1016824
+	for i=1, #args do
+		args[i] = tostring_all(args[i])
 	end
 	local res, msg = pcall(string.format, fmt, unpack(args))
-	if not res then
-		log1("!!log3 failed: "..msg)
-		return
+	if not res then --Если произошла ошибка
+		msg = "!!log3 failed: "..msg
+		log1(msg) --Вылетать не будем, напишем об ошибке в лог
+		return msg
 	end
-	if msg:sIsSep("\n") then --Если нашли в тексте хоть один перенос строки
-		msg = msg:trim_r() --Если в самом конце текста есть перенос строки, срежем его.
-		local subs = msg:sLeft(2) or "" --Читаем два символа из самого начала текста
+	if msg:find('[\n]') then --Если нашли в тексте хоть один перенос строки
+		local subs = msg:sub(1, 2) --Читаем два символа из самого начала текста
 		if subs_tbl[subs] then --Если это символы, отвечающие за цвет текста в консоли, то
-			msg = msg:sRepChAll("\n", "\n"..subs) --вставим их после каждого "\n", чтобы в консоли были цветными все строки, а не только первая.
+			msg = msg:gsub("\n", "\n"..subs) --вставим их после каждого "\n", чтобы в консоли были цветными все строки, а не только первая.
 		end
-		msg = msg:sArraySub("\n") --Сконвертируем строку в массив подстрок
-		for i=1, #msg do
-			log1(msg[i]) --Выводим в лог каждую подстроку отдельно. Это позволяет избежать ограничения в 1024 символа, после которых текст просто обрезается.
+		local ret = {}
+		for s in msg:gmatch("([^\n]+)") do --Конвертируем строку в массив подстрок
+			if not subs_tbl[s] then --Трюк, чтобы отсечь пустые строки.
+				ret[#ret+1] = s
+			end
 		end
+		for s=1, #ret do
+			log1(ret[s]) --Выводим в лог каждую подстроку отдельно. Это позволяет избежать ограничения в 1024 символа, после которых текст просто обрезается.
+		end
+		return ret --Нужно для log4
 	else --Если подстрок нет
 		log1(msg) --Выводим текст в лог без дополнительных манипуляций.
+		return msg --Нужно для log4
 	end
 end
+-----------------------------------------------------------------------------------------
 
---Конвертирование таблицы в строку.
---Используется как компонент функции log3.
-table.tostring = function( tbl, subs )
-	subs = subs or ""
-	local result = ""
-	for k,v in pairs(tbl) do
-		local typ = type(v)
-		local s = tostring(k)
-		if typ == "table" then
-			result = result.."\n"..subs..s..": [TABLE! PRINTING:]"
-			result = result..table.tostring(v, subs.."    ")
-		elseif typ == "function" then
-			result = result.."\n"..subs..s..": [FUNCTION! PRINTING ISN'T POSSIBLE!]"
-		elseif typ == "userdata" then
-			result = result.."\n"..subs..s..": [USERDATA! PRINTING ISN'T POSSIBLE!]"
-		else
-			result = result.."\n"..subs..s..": "..tostring(v)
+-----------------------------------------------------------------------------------------
+local logs_cach = {}
+--Дополнительная обёртка для log3. Создаёт новый лог-файл и выводит текст в него.
+--fname - название лог-файла, например "Anomaly_Evader". Он будет создан в папке logs, к названию добавится дата и время создания.
+--fmt, ... - строка формата с параметрами. См. функцию log3.
+function log4(fname, fmt, ...)
+	local f = logs_cach[fname]
+	if not f then
+		local dt = os.date("*t")
+		local fpath = getFS():update_path("$logs$", string.format("%s_%02d.%02d.%02d_%02d.%02d.%02d.log",fname,dt.day,dt.month,dt.year,dt.hour,dt.min,dt.sec))
+		f = io.open(fpath, "w")
+		logs_cach[fname] = f
+	end
+	local msg = log3(fmt, ...)
+	if type(msg) == "string" then
+		f:write(msg..'\n')
+	elseif type(msg) == "table" then
+		for s=1, #msg do
+			f:write(msg[s]..'\n')
 		end
 	end
-	return result
+	f:flush()
 end
+-----------------------------------------------------------------------------------------
 
-log2 = log3 --вместо log2 использовать log3!
-
-function clear_log()
+-----------------------------------------------------------------------------------------
+function log2(fmt, ...) --Простая обёртка для log1.
+	log1(fmt:format(...))
+end
+-----------------------------------------------------------------------------------------
+function clear_log() --Очистить лог
 	cmd("clear_log")	
 end
-
-function flush_log()
+-----------------------------------------------------------------------------------------
+function flush_log() --Сохранить лог. По-моему, бредовая команда. Лог и так всегда нормально сохраняется.
 	cmd("flush")
 end
+-----------------------------------------------------------------------------------------
 --*****************************************************************************************************
 
 function get_item_weight_by_section(section)
@@ -1901,7 +1935,7 @@ local con = get_console()
 function cmd(scmd, ...)
 	ASSERT(scmd, "[cmd] scmd is a nil reference")
 	local args = {...}
-	if #args ~= 0 then
+	if #args > 0 then
 		scmd = scmd..' '..table.concat(args, ' ')
 	end
 	con:execute(scmd)
@@ -1930,32 +1964,6 @@ function file_exists(name)
 	return false
 end
 
-function create_log_file_name(base)
-	local dt = os.date("*t")
-	local y = tonumber(dt.year) - 2000
-	local m = tonumber(dt.month)
-	local d = tonumber(dt.day)
-	local h = tonumber(dt.hour)
-	local min = tonumber(dt.min)
-	local s = tonumber(dt.sec)
-	return getFS():update_path("$logs$", string.format("%s_%02d-%02d-%02d_%02d-%02d-%02d.log",base,y,m,d,h,min,s))
-end
-
-local logs_cach = {}
-
---KRodin: Интересная штука, но её надо бы доработать, как log3.
-function dbg_log(fname, fmt, ...)
-	--log1(fname.." "..fmt:format(...))
-	--do return end
-	local f = logs_cach[fname]
-	if not f then
-		local fpath = create_log_file_name(fname)
-		f = io.open(fpath, "w")
-		logs_cach[fname] = f
-	end
-	f:write(fmt:format(...))
-	f:flush()
-end
 
 -- Управление торгуемостью и группировкой предметов в инвентаре
 ii_flags = {
