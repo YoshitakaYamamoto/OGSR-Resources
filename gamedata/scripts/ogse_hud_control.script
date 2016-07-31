@@ -1,81 +1,83 @@
---[[----------------------------------------------------------------------
--|ogse_hud_control.script
--|Управление худом.
--|KRodin © 2016
--|Version: 3.0
--|Для работы нужен модуль функций работы с оружием ogse_wpn_utils.script
-------------------------------------------------------------------------]]
+---------------------------
+--|ogse_hud_control.script
+--|Управление худом.
+--|KRodin © 2016
+--|Version: 4.0
+---------------------------
 
 function attach(sm)
-	sm:subscribe({ signal = "on_key_down",		fun = this.check_keys })
-	sm:subscribe({ signal = "on_key_up",		fun = this.check_keys_free })
-	sm:subscribe({ signal = "on_update",		fun = this.update_hud_control })
 	sm:subscribe({ signal = "on_actor_death",	fun = this.on_actor_death })
+	sm:subscribe({ signal = "on_key_down",		fun = this.check_keys })
 end
 
-local need_sniper_check = false --флаг для проверки, нажал ли игрок кнопку зума (ПКМ по умолчанию)
-local show_indicators = true --нужно для правильного убирания худа при прицеливании.
-local aiming_complete = false --нужно для правильного "наезжания" прицела.
-local sm = ogse_signals.get_mgr() --Вызов менеджера сигналов
+------------------------------------------------------
+function on_actor_death() --При смерти актора
+	level.hide_indicators() --Убираем худ
+	level.disable_input() --Блокируем нажатия клавиш
+end
+------------------------------------------------------
 
 function check_keys(key, bind) --Проверка нажатия клавиш
-	if bind ~= key_bindings.kWPN_ZOOM or level.main_input_receiver() then return end
-
-	need_sniper_check = true
+	if bind == key_bindings.kWPN_ZOOM and not level.main_input_receiver() then
+		if actor_keeps_wpn_with_optical_sight() then
+			check_sniper_timer():start()
+		end
+	end
 end
 
-function check_keys_free(key, bind) --Проверка отпускания клавиш
-	if bind ~= key_bindings.kWPN_ZOOM or level.main_input_receiver() then return end
-
-	need_sniper_check = false
-end
-
-function check_sniper(wpn) --Проверка, смотрит ли актор в оптический прицел. (true/false)
-	if	not need_sniper_check --если проверка не требуется
-		or not zoom_mode() --доп. проверка на зум, чтобы не было ложных срабатываний
+function actor_keeps_wpn_with_optical_sight() --Проверка, держит ли актор в руках оружие с оптическим прицелом
+	local wpn = db.actor:active_item() --Проверяем что в руках у актора
+	if	not wpn --Если в руках ничего нет
+		or not wpn:is_weapon_magazined() --или в руках не оружие
 		or ogse_wpn_utils.get_forced_notex_scope(wpn) --или на оружии установлен колиматорный прицел
 	then
-		return false --возвращаем false и на этом заканчиваем
+		return false
 	end
 
-	if wpn:clsid() == clsid.wpn_binocular_s then return true end --Если в руках оружие на классе бинокля, то возвращаем true и на этом заканчиваем
+	if wpn:clsid() == clsid.wpn_binocular_s then return true end --Оружие на классе бинокля всегда с оптикой
 
-	local scope = ogse_wpn_utils.get_scope_flag(wpn) --Есть ли на оружии прицел (true/false)
+	local scope = ogse_wpn_utils.get_scope_flag(wpn) --Есть ли на оружии прицел
 	local gl_mode = false
-	if wpn:is_weapon_gl() then gl_mode = ogse_wpn_utils.get_gl_mode(wpn) end --Находится ли оружие в режиме стрельбы из ПГ (true/false)
-	return (scope and not gl_mode) --Если на оружии есть прицел и при этом оружие не находится в режиме стрельбы из ПГ - то true
+	if wpn:is_weapon_gl() then gl_mode = ogse_wpn_utils.get_gl_mode(wpn) end --Находится ли оружие в режиме стрельбы из ПГ
+	return scope and not gl_mode --Если на оружии есть прицел и при этом оружие не находится в режиме стрельбы из ПГ - true
 end
 
-function update_hud_control() --Собственно, управление элементами худа.
-	if not db.actor:alive() then return end
-
-	local act_it = db.actor:active_item() --Проверяем что в руках у актора
-	if act_it and act_it:is_weapon_magazined() and check_sniper(act_it) then --Если в руках оружие с оптикой и актор целится в него
-		if show_indicators then
+--Таймер скрывает худ на время прицеливания, запускает сигналы on/off_sniper_mode, и возвращает худ обратно
+class "check_sniper_timer" ( ogse_qt.quick_timer )
+function check_sniper_timer:__init() super()
+	self.show_indicators = true --нужно для правильного убирания худа при прицеливании.
+	self.aiming_complete = false --нужно для правильной работы сигналов on/off_sniper_mode
+	self.sm = ogse_signals.get_mgr()
+end
+function check_sniper_timer:condition() --Запускается на каждом апдейте, пока не вернёт true
+	if zoom_mode() then --Если актор смотрит в оптику
+		if self.show_indicators then
 			level.hide_indicators() --убираем худ
-			show_indicators = false
+			self.show_indicators = false
 		end
-		if ogse_wpn_utils.is_aiming_complete(act_it) then --Ждём, пока завершится "наезжание" прицела
-			if not aiming_complete then
-				sm:call("on_sniper_mode") --Включаем пнв/подсветку прицела.
-				aiming_complete = true
+		local act_it = db.actor:active_item()
+		if act_it and ogse_wpn_utils.is_aiming_complete(act_it) then --Ждём, пока завершится "наезжание" прицела
+			if not self.aiming_complete then
+				self.sm:call("on_sniper_mode") --Делаем что-то по факту "наезжания" прицела.
+				self.aiming_complete = true
 			end
 		else
-			aiming_complete = false
+			self.aiming_complete = false
 		end
-	elseif level.main_input_receiver() then --Если открыли инвентарь, пда или любое другое окно
-		if aiming_complete then
-			sm:call("off_sniper_mode") --Багфикс
-			aiming_complete = false
+	elseif level.main_input_receiver() then --Если актор вдруг открыл инвентарь, ПДА или любое другое окно
+		if self.aiming_complete then
+			self.sm:call("off_sniper_mode") --Делаем что-то по окончанию прицеливания
+			self.aiming_complete = false
 		end
-	elseif not show_indicators then --в противном случае
+	elseif not self.show_indicators then --Если актор не смотрит в оптику
+		if self.aiming_complete then
+			self.sm:call("off_sniper_mode") --Делаем что-то по окончанию прицеливания
+			self.aiming_complete = false
+		end
 		level.show_indicators() --покажем худ
-		sm:call("off_sniper_mode") --отключаем ПНВ/Подсветку прицела
-		show_indicators = true
+		self.show_indicators = true
+		return true
+	else
+		return true
 	end
-end
-
-function on_actor_death() --при смерти актора
-	level.hide_indicators() --убираем худ
-	level.disable_input() --игнор нажатия кнопок клавиатуры/мыши (можно только выйти в меню)
 end
