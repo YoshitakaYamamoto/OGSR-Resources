@@ -95,7 +95,7 @@ string.sclrMidW = function(s,ind) t = tblW(s); table.remove(t,tonumber(ind) or 0
 
 -- подстрока
 -- Проверить строку на наличие символа разделителя
-string.sIsSep = function(s, sep) return (tostring(s):find('['..sep..']')) and true or false end
+string.sIsSep = function(s) return (tostring(s):find('['..ssep..']')) and true or false end
 -- Проверяет есть ли разделитель из заданного набора в определённой позиции строки
 string.sIsSepInd = function(s,ind) return ((ssep:find(tostring(s):match('.',tonumber(ind))))) and true or false end
 -- Проверяет является ли символ в позиции строки из заданного набора
