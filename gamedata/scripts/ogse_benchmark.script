@@ -1,7 +1,16 @@
-function attach(sm)
-	sm:subscribe({signal = "on_spawn", fun = this.on_actor_spawn})
-	sm:subscribe({signal = "on_update", fun = this.on_actor_update})
+
+local subscribed
+function subscribe()
+	on_actor_spawn()
+	subscribed = { signal = "on_update", fun = this.on_actor_update }
+	ogse_signals.get_mgr():subscribe( subscribed )
 end
+
+function unsubscribe()
+	ogse_signals.get_mgr():unsubscribe( subscribed )
+	subscribed = nil
+end
+
 
 local fps = 0
 

@@ -135,6 +135,8 @@ function generic_object_binder:update(delta)
 		else
 			self.object:set_tip_text("")
 		end
+	else
+		self.object:set_tip_text_default()
 	end
 
 	ogse_debug.process_monster(self.object, "upd", 11)
@@ -170,9 +172,6 @@ function generic_object_binder:waypoint_callback(obj, action_type, index)
 end
 
 function generic_object_binder:death_callback(victim, who)
-
-	self.object:set_tip_text_default()
-
 	ogse_debug.process_monster(victim, "dth", 1)
 	if who and string.find(who:name(), "vehicle_btr") then
 		who = db.actor
@@ -266,9 +265,6 @@ function generic_object_binder:hit_callback(obj, amount, local_direction, who, b
 
 	ogse_debug.process_monster(self.object, "hit", 4)
 	smart_monster_parts.main_check(obj, amount, local_direction, who, bone_index)
-
-	ogse_debug.process_monster(self.object, "hit", 5)
-	_sdata.info_about_npc(obj)
 
 	ogse_debug.process_monster(self.object, "hit", 7)
 	self.am:call( "on_monster_hit", obj, amount, local_direction, who, bone_index, self )

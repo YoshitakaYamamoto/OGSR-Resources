@@ -24,7 +24,6 @@ local time_mantain_manuever = 20000	-- время, мсек, сколько придерживаться страт
 local time_mantain_tactics = 30000	-- время, мсек, сколько придерживаться выбранной тактики
 local visibility_treshold_value = 0.45 -- трешхолд видимости
 local use_raytrace = true
-local raytrace_fps_limit = 25 --30
 hit_timeout = {}
 
 
@@ -787,10 +786,9 @@ function action_altcombat:execute()
 	local last_algorythm = "no"
 	
 	local raytrace_see = false
-	local fps_check = ogse_benchmark.get_fps()
-	
+
 	if be:id() == db.actor:id() then
-		if use_raytrace and fps_check > raytrace_fps_limit then
+		if use_raytrace then
 			raytrace_see = actor_see_raytrace(npc)
 		else
 			raytrace_see = actor_see(npc)
@@ -1772,8 +1770,7 @@ function we_are_under_attack(npc, enemy)
 		
 			local raytrace_see = false
 			local see_actor = npc:see(db.actor)
-			local fps_check = ogse_benchmark.get_fps()
-			if use_raytrace and fps_check > raytrace_fps_limit then
+			if use_raytrace then
 				raytrace_see = actor_see_raytrace(npc)
 			else
 				raytrace_see = actor_see(npc)
@@ -2851,11 +2848,7 @@ function set_weapons_fire(npc, enemy, weapon, override_vis)
 		
 		write_log("--XRS_BATTLE_AI: WPNS_FIRE_1 "..npc:name().." : "..tostring(enemy:id()))
 		
-		local fps_check = ogse_benchmark.get_fps()
-		
-		write_log("--XRS_BATTLE_AI: WPNS_FIRE_2 "..npc:name().." : "..tostring(enemy:id()))
-		
-		if use_raytrace and fps_check > raytrace_fps_limit then
+		if use_raytrace then
 		
 			write_log("--XRS_BATTLE_AI: WPNS_FIRE_2_RTC_1 "..npc:name().." : "..tostring(enemy:id()))
 			
@@ -2915,10 +2908,6 @@ function set_weapons_fire(npc, enemy, weapon, override_vis)
 				write_log("--XRS_BATTLE_AI: RAYTRACE CHECK DOESN RETURN RESULT! "..npc:name().." : "..tostring(enemy:id()))
 				type_of_fire = object.fire1
 			end
-			
-		elseif use_raytrace and fps_check < raytrace_fps_limit then	
-			write_log("--XRS_BATTLE_AI: RAYTRACE FPS TOO LOW - FIRING AT WILL "..npc:name().." : "..tostring(enemy:id()))
-			type_of_fire = object.fire1
 		else	
 			write_log("--XRS_BATTLE_AI: RAYTRACE SWITCHED OFF - FIRING AT WILL "..npc:name().." : "..tostring(enemy:id()))
 			type_of_fire = object.fire1			

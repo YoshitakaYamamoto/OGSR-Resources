@@ -421,11 +421,10 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 -----------------------------------------------------------
 --------------------------SDATA----------------------------
 		if dik == DIK_keys.DIK_P then
-			if _sdata.GlobalEnable == false then
-				_sdata.GlobalEnable = true
+			if not _sdata.GlobalEnable then
+				_sdata.subscribe()
 			else
-				_sdata.GlobalEnable = false
-				_sdata.switch_off()
+				_sdata.unsubscribe()
 			end
 		end
 -----------------------------------------------------------

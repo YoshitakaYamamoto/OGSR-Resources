@@ -7,7 +7,6 @@
 
 function attach(sm)
 	sm:subscribe({signal = "on_take",			fun = this.on_item_take})
-	sm:subscribe({signal = "on_info",			fun = this.on_info_update})
 	sm:subscribe({signal = "on_update",			fun = this.on_actor_update})
 	sm:subscribe({signal = "on_first_update",	fun = this.on_actor_first_update})
 	sm:subscribe({signal = "on_save",			fun = this.on_game_save})
@@ -1502,11 +1501,6 @@ function on_actor_first_update()
 	end
 
 	ogse_quests_fix.clean_level() -- Очищаем уровни от трупов во фриплее
-end
-
--- Колбэк на выдачу инфопоршена ГГ
-function on_info_update(npc, info_id)
-	_sdata.infos(info_id)
 end
 
 -- Загружаем все переменные, которые нужно, вызывается при загрузке игры автоматически

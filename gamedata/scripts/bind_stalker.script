@@ -449,9 +449,6 @@ function actor_binder:update(delta)
 	ogse_debug.check_npc()
 	ogse_debug.check_monsters()	
 	ogse_debug.check_gulag()	
-	
-	ogse_debug.process_actor("upd", 14)
-	_sdata.vis_int()
 
 	ogse_debug.process_actor("upd", 15)
 	self.am:call("on_update", delta)	

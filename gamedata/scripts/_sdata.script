@@ -25,15 +25,33 @@ GlobalEnable = false		--Включить скрипт? Подробные настройки смотрите ниже
 -- Показывает состояние предметов в слотах
 ----------------------------------------------------------------------------
 
+local subscribed
+function subscribe()
+	GlobalEnable = true
+	ogse_benchmark.subscribe()
+	subscribed = {
+		{ signal = "on_info",   fun = this.infos },
+		{ signal = "on_update", fun = this.vis_int },
+	}
+	for _, s in ipairs( subscribed ) do
+		ogse_signals.get_mgr():subscribe( s )
+	end
+end
+
+function unsubscribe()
+	for _, s in ipairs( subscribed ) do
+		ogse_signals.get_mgr():unsubscribe( s )
+	end
+	subscribed = nil
+	switch_off()
+	ogse_benchmark.unsubscribe()
+	GlobalEnable = false
+end
 
 ----------------------------------------------------------------------------
 -- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ! НЕ УДАЛЯТЬ
 local hud = get_hud()
-local actor=db.actor
-local timer=0
-local huds={"cs_debug","cs_debug","prs_debug","gul_debug","zon_debug","act_debug","ach_debug","slots_debug"}
 ----------------------------------------------------------------------------
-
 
 ----------------------------------------------------------------------------
 -- ОБЩИЕ НАСТРОЙКИ
@@ -122,7 +140,7 @@ function zones()
 	ZoneCS:wnd():SetText("Актор в зоне:\\n")
 	
 	for name,zone in pairs (db.zone_by_name) do
-		if utils.npc_in_zone(actor,zone) then
+		if utils.npc_in_zone(db.actor,zone) then
 			if string.find(zone:section(),"space_restrictor") then
 			    ZonesText = string.format(ZoneCS:wnd():GetText())..
 				string.format("%s (%s) (sr)\\n",tostring(name),tostring(db.storage[zone:id()].active_section))
@@ -141,11 +159,9 @@ end
 
 local infos_time = 0
 local k=0
-function infos(info_id)
-	
-	if not GlobalEnable then return end
+function infos(npc, info_id)
 	log1("infos_"..info_id)
-	
+
 	if bInfos then
 		local InfoCS = hud:GetCustomStatic("prs_debug")
 		if InfoCS == nil then
@@ -169,9 +185,7 @@ local mental_anims = {
     [2]="panic"
 }
 
-function info_about_npc()
-	if not GlobalEnable then return end
-	
+function info_about_npc()	
 	clear_info_about_npc()
 	
 	local target_obj = level.get_target_obj()
@@ -344,30 +358,18 @@ function clear_info_about_npc()
     end
 end
 
-function vis_int(bShow)
-	if not GlobalEnable then return end
-	if bShow == false then
-		for k,cs in ipairs(huds) do
-			if hud:GetCustomStatic(cs) then hud:RemoveCustomStatic(cs) end
-		end
-		return
-	end
+function vis_int()
+	ogse_signals.get_mgr():reschedule( 200 )
 
 	if bInfoAbout then
 		info_about_npc()
 	end
-	
-	if timer > time_global() then
-		return
-	end
-	
-	timer=time_global() + 500
-	
+
 	-- зоны
 	if bZones then
 	    this.zones()
 	end
-	
+
 	-- Координаты
 	if bPosition == true then
 		local PosCS = hud:GetCustomStatic("cs_debug")
@@ -375,8 +377,8 @@ function vis_int(bShow)
 			hud:AddCustomStatic("cs_debug",true)
 			PosCS = hud:GetCustomStatic("cs_debug")
 		end
-		local lvid,gvid = actor:level_vertex_id(),actor:game_vertex_id()
-		local pos,dir,campos = actor:position(),device().cam_dir,device().cam_pos
+		local lvid,gvid = db.actor:level_vertex_id(),db.actor:game_vertex_id()
+		local pos,dir,campos = db.actor:position(),device().cam_dir,device().cam_pos
 		local valid = level.vertex_position(lvid):distance_to(pos)<=0.7
 		local fps_check = ogse_benchmark.get_fps()
 		local PosText = string.format("pos: %1.3f,%1.3f,%1.3f\\n",pos.x,pos.y,pos.z)..	-- позиция ГГ (x,y,z)
@@ -417,7 +419,7 @@ function vis_int(bShow)
 		end
 		local str
 		local ActText = ""
-		local aCommun = actor:character_community()
+		local aCommun = db.actor:character_community()
 		if string.find(aCommun,"actor") then
 			aCommun = GetString("stalker")
 		elseif string.find(aCommun,"dolg") then
@@ -442,19 +444,19 @@ function vis_int(bShow)
 			aCommun = GetString("trader")
 		end
 		if aHealth == true then
-			str = string.format(" %1.3f",actor.health)
+			str = string.format(" %1.3f",db.actor.health)
 			ActText = ActText.. GetString("sdata_actor_health").. tostring(str).."("..math.ceil(tonumber(str)*100).."%)\\n"
 		end
 		if aPower == true then
-			str=string.format(" %1.3f",actor.power)
+			str=string.format(" %1.3f",db.actor.power)
 			ActText = ActText.. GetString("sdata_actor_power").. tostring(str).." ("..math.ceil(tonumber(str)*100).."%)\\n"
 		end
 		if aRadiation == true then
-			str = string.format(" %1.3f",actor.radiation)
+			str = string.format(" %1.3f",db.actor.radiation)
 			ActText = ActText.. GetString("sdata_actor_radiation").. tostring(str).." ("..math.ceil(tonumber(str)*100).."%)\\n"
 		end
 		if aSatiety == true then
-			str = string.format(" %1.3f",actor.satiety)
+			str = string.format(" %1.3f",db.actor.satiety)
 			ActText = ActText.. GetString("sdata_actor_satiety").. tostring(str).." ("..math.ceil(tonumber(str)*100).."%)\\n"
 		end
 		if aDrinky==true then
@@ -464,23 +466,23 @@ function vis_int(bShow)
 			ActText = ActText.. string.format(GetString("sdata_actor_sleepy").." %d",ars_mod.get_actor_sleepy()).."%\\n"
 		end
 		if aMoney==true then
-			ActText = ActText.. string.format(GetString("sdata_actor_money").." %d\\n",actor:money())
+			ActText = ActText.. string.format(GetString("sdata_actor_money").." %d\\n",db.actor:money())
 		end
 		if aPsyHealth==true then
-			str = string.format(" %1.3f",actor.psy_health)
+			str = string.format(" %1.3f",db.actor.psy_health)
 			ActText = ActText.. GetString("sdata_actor_psy_health").. tostring(str).." ("..math.ceil(tonumber(str)*100).."%)\\n"
 		end
 		if aMorale == true then
-			ActText = ActText.. string.format(GetString("sdata_actor_morale").." %s\\n",tostring(actor.morale))
+			ActText = ActText.. string.format(GetString("sdata_actor_morale").." %s\\n",tostring(db.actor.morale))
 		end
 		if aRang == true then
-			ActText = ActText.. string.format(GetString("sdata_actor_rang").." %d\\n",actor:character_rank())
+			ActText = ActText.. string.format(GetString("sdata_actor_rang").." %d\\n",db.actor:character_rank())
 		end
 		if aCommunity == true then
 			ActText = ActText.. string.format(GetString("sdata_actor_community").." %s\\n",tostring(aCommun))
 		end
 		if aReputation == true then
-			ActText = ActText.. string.format(GetString("sdata_actor_reputation").." %d\\n",actor:character_reputation())
+			ActText = ActText.. string.format(GetString("sdata_actor_reputation").." %d\\n",db.actor:character_reputation())
 		end
 		if ActCS ~= nil then ActCS:wnd():SetText(ActText) end
 	end
@@ -515,7 +517,7 @@ function vis_int(bShow)
 				local name_str = ""
 				local cond_str = ""
 				if i == 2 or i == 3 or i == 7 or i == 12 then
-					slot = actor:item_in_slot(i)
+					slot = db.actor:item_in_slot(i)
 					if slot then
 						name_str = string.format("%s\\n", GetString(GetItemName(slot:section())))
 						cond_str = string.format("State: %1.2f\\n", slot:condition())

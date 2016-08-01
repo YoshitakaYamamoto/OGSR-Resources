@@ -1795,7 +1795,6 @@ function ray_pick.get_element()
 	return level.get_ray_pick_element()
 end
 
-get_fps = ogse_benchmark.get_fps
 
 function is_16_9_mode()
 	local dev = device()
