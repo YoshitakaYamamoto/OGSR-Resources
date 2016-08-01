@@ -143,50 +143,46 @@ local master_koef = 1 / ( 4 - level.get_game_difficulty() )
 
 --Атака кровососа
 function bloodsucker_attack( obj )
-	if not may_attack() or obj.health < 0.05 then return end
+	if not may_attack() then return end
 	local enemy = obj:best_enemy()
+	if not enemy or enemy:id() ~= db.actor:id() or not obj:see( enemy ) then return end
+	local dist = obj:position():distance_to( enemy:position() )
+	local attack_dist = 3
+	ogse_signals.get_mgr():reschedule( ( dist < attack_dist and 1000 ) or ( dist < obj:range() and 2000 ) or 5000 )
+	if dist > attack_dist then return end
+
+	local h = hit()
+		h.draftsman = obj
+		h.direction = vector_rotate_y( obj:direction(), 179.0 ) --/ направление удара
+		h:bone( "bip01_spine" ) --/ для учета 'брони'
+		h.power = 0.10
+		h.impulse = 120 / dist --/ чем ближе - тем сильнее пинаем
+		h.type = hit.wound
+	enemy:hit(h) --/ наносим хит жертве
+	level.add_cam_effector( [[camera_effects\fusker.anm]], 959, false, "" ) --анимация удара
+	
+	local pos = obj:position()
+	local vDir = pos:sub(enemy:position())
+	enemy:set_actor_direction(-vDir:getH())
+
+	local active_item = enemy:active_item()
 	if
-		enemy
-		and enemy:id() == db.actor:id()
-		and obj:see( enemy ) -- видит актора
-		and enemy:position():distance_to_sqr( obj:position() ) < 3 -- близко
+		active_item
+		and active_item:section() ~= "bolt"
+		and not isKnife(active_item)
+		and math.random() > 0.7
 	then
-		local tg = time_global()
-		local binder = obj:binded_object()
-		if ( binder.timer_hit or 0 ) < tg then
-			binder.timer_hit = tg + 800 -- повторим потом
-			local vDir = obj:direction() --/ вектор кровососа
-			local vDirHit = vector_rotate_y( vDir, 179.0 )
-			local h = hit()
-			h.draftsman = obj
-			h.direction = vDirHit --/ направление хита
-			h:bone( "bip01_spine" ) --/ для учета 'брони'
-			h.power = 0.10
-			level.add_cam_effector( [[camera_effects\fusker.anm]], 959, false, "" ) --Чтоб красивее было
-			h.impulse = 120 / enemy:position():distance_to( obj:position() ) --/ чем ближе - тем сильнее пинаем
-			h.type = hit.wound
-			enemy:hit(h) --/ наносим хит жертве
-			--
-			enemy:set_actor_direction( vDirHit:getH() ) --/ разворот жертвы на кровососа. TODO: требует доработки/замены!
-			enemy:set_actor_position(obj:position())
-			--
-			local active_item = enemy:active_item()
-			if
-				active_item
-				and active_item:section() ~= "bolt"
-				and not isKnife(active_item)
-				and math.random() > 0.7
-			then
-				enemy:drop_item(active_item) --Выбиваем из рук оружие
-			end
-		end
-		if ( binder.timer_anim or 0 ) < tg then
-			if obj:animation_count() ~= 0 then obj:clear_animations() end -- анимации остановили
-			obj:add_animation( "vampire_0" ) --/ варианты: "wounded_2_out" | "idle"
-			local snd = sound_object( [[monsters\bloodsucker\sucking_attack]] )
-			if snd then snd:play_no_feedback( enemy, sound_object.s2d, 0, vector(), 5.0 ) end --/ озвучка 'засоса'
-			binder.timer_anim = tg + 2000 --Таймер на проигрывание анимки
-		end
+		enemy:drop_item(active_item) --Выбиваем из рук оружие
+	end
+
+	local binder = obj:binded_object()
+	local tg = time_global()
+	if binder.timer_anim or 0 < tg then
+		if obj:animation_count() > 0 then obj:clear_animations() end -- анимации остановили
+		obj:add_animation( "vampire_0" ) --/ варианты: "wounded_2_out" | "idle"
+		local snd = sound_object( [[monsters\bloodsucker\sucking_attack]] )
+		if snd then snd:play_no_feedback( enemy, sound_object.s2d, 0, vector(), 5.0 ) end --/ озвучка 'засоса'
+		binder.timer_anim = tg + 2000 --Таймер на проигрывание анимки
 	end
 end
 
@@ -421,7 +417,6 @@ end
 --Пси-аттака некоторых собак
 function dog_attack( obj )
   if not may_attack() then return end
-  if obj.health < 0.05 then return end
   local enemy = obj:best_enemy()
   if not (
     enemy and enemy:id() == db.actor:id() and obj:see( enemy )
@@ -460,7 +455,6 @@ function dog_attack_phantom( obj )
   if not may_attack() then return end
   local binder = obj:binded_object()
   ogse_signals.get_mgr():reschedule(5000)
-  if obj.health < 0.05 then return end
   local enemy = obj:best_enemy()
   if not (
     enemy and enemy:id() == db.actor:id() and obj:see( enemy )
