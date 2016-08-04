@@ -19,12 +19,6 @@ function disable_talk_victim(first_speaker, second_speaker)
 	second_speaker:disable_talk()
 end
 
-function punch(first_speaker, second_speaker)
-	--abort("KICK ASS !!!!")
-	--xr_punch.punch[first_speaker:id()] = second_speaker
-	db.storage[second_speaker:id()].punch.enabled = true
-end
-
 function get_money_then_leave(first_speaker, second_speaker)
 	db.storage[first_speaker:id()].meet.enabled = false
 	db.storage[first_speaker:id()].robber.enabled = true
@@ -282,11 +276,11 @@ end
 --' DIALOG ALLOWED
 --'---------------------------------------------------------------------------------
 function dialog_allowed(object, victim, id)
-	if id ~= nil then
+	--if id ~= nil then
 --		log1("*DIALOGS*: dialog_allowed: %s", id)
-	else
+	--else
 --		log1("*DIALOGS*: dialog_allowed: nil")
-	end
+	--end
 	if db.storage[victim:id()].actor_dialogs ~= nil then
 		for k,v in pairs(db.storage[victim:id()].actor_dialogs) do
 			if v == id then return true end
@@ -295,11 +289,11 @@ function dialog_allowed(object, victim, id)
 	return false
 end
 function dialog_not_disable(object, victim, id)
-	if id ~= nil then
+	--if id ~= nil then
 --		log1("*DIALOGS*: dialog_disable:%s", id)
-	else
+	--else
 --		log1("*DIALOGS*: dialog_disable:nil")
-	end
+	--end
 	if db.storage[victim:id()].actor_disable ~= nil then
 		for k,v in pairs(db.storage[victim:id()].actor_disable) do
 			if v == id then return false end
@@ -515,32 +509,32 @@ end
 
 
 function actor_set_zombied(actor, npc)
-	log1("ACTOR NOW IN [ZOMBIED] COMMUNITY")
+	--log1("ACTOR NOW IN [ZOMBIED] COMMUNITY")
 	if db.actor and db.actor:dont_has_info("actor_set_zombied") and db.actor:alive() then
-		log1("ACTOR NOW [ZOMBIED] - PLAY EFFECTS")
+		--log1("ACTOR NOW [ZOMBIED] - PLAY EFFECTS")
 		ogse_quests.turn_pnv_off()
-		log1("ACTOR NOW [ZOMBIED] - 1")
+		--log1("ACTOR NOW [ZOMBIED] - 1")
 		clear_all_actor_community_info()
-		log1("ACTOR NOW [ZOMBIED] - 2")
+		--log1("ACTOR NOW [ZOMBIED] - 2")
 		db.actor:set_character_community("actor_zombied", 0, 0)
-		log1("ACTOR NOW [ZOMBIED] - 3")
+		--log1("ACTOR NOW [ZOMBIED] - 3")
 		db.actor:give_info_portion("actor_set_zombied")
-		log1("ACTOR NOW [ZOMBIED] - 4")
+		--log1("ACTOR NOW [ZOMBIED] - 4")
 		xr_companion.set_community_by_actor()
-		log1("ACTOR NOW [ZOMBIED] - 5")
+		--log1("ACTOR NOW [ZOMBIED] - 5")
 		level.add_pp_effector("deadcity_wake_old.ppe", 2007, false)
-		log1("ACTOR NOW [ZOMBIED] - 6")
+		--log1("ACTOR NOW [ZOMBIED] - 6")
 		level.add_cam_effector("camera_effects\\prison_1.anm", 100, false, "")
-		log1("ACTOR NOW [ZOMBIED] - 7")
+		--log1("ACTOR NOW [ZOMBIED] - 7")
 		soundtrack.set_zombie()
-		log1("ACTOR NOW [ZOMBIED] - END")
+		--log1("ACTOR NOW [ZOMBIED] - END")
 	elseif db.actor and db.actor:alive() then
-		log1("ACTOR ALREADY [ZOMBIED] - KILL_ACTOR")
+		--log1("ACTOR ALREADY [ZOMBIED] - KILL_ACTOR")
 		local object = nil
 		for npc_id, is_npc in pairs(db.creature) do
 			local npc = level.object_by_id(npc_id)
 			if npc and npc:alive() and not is_npc then
-				log1("ACTOR ALREADY [ZOMBIED] - KILL_ACTOR_OBJ_IS ["..npc:name().."]")
+				--log1("ACTOR ALREADY [ZOMBIED] - KILL_ACTOR_OBJ_IS ["..npc:name().."]")
 				object = npc
 			end
 		end	
@@ -552,11 +546,11 @@ function actor_set_zombied(actor, npc)
 			hit.power = 1000
 			hit.type = hit.explosion
 			if db.actor then
-				log1("ACTOR ALREADY [ZOMBIED] - KILL_ACTOR_HIT")
+				--log1("ACTOR ALREADY [ZOMBIED] - KILL_ACTOR_HIT")
 				db.actor:hit(hit)
 			end	
 		end
-		log1("ACTOR ALREADY [ZOMBIED] - END")
+		--log1("ACTOR ALREADY [ZOMBIED] - END")
 	end
 	return true
 end
