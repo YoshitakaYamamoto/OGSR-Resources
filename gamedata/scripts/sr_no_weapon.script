@@ -10,27 +10,17 @@ function action_no_weapon:__init( obj, storage )
 end
 
 function action_no_weapon:reset_scheme()
-	--printf("_bp: sr_idle: action_no_weapon:reset_scheme: self.object:name()='%s'", self.object:name())
-	
 	self.state = state_nowhere -- еще не€сно, в зоне он, или нет
 	
 	self:switch_state(db.actor)
 end
 
 function action_no_weapon:update( delta )
-	--printf("_br: sr_idle: action_no_weapon:update()")
-
-	--if not xr_logic.is_active( self.object, self.st ) then
-	--	return
-	--end
-
-	local actor = db.actor
-
-	if xr_logic.try_switch_to_another_section( self.object, self.st, actor ) then
+	if xr_logic.try_switch_to_another_section( self.object, self.st, db.actor ) then
 		return
 	end	
 	
-	self:switch_state( actor )
+	self:switch_state( db.actor )
 end
 
 function action_no_weapon:switch_state( actor )
@@ -53,18 +43,16 @@ end
 
 function action_no_weapon:zone_enter()
 	self.state = state_inside
---	bind_stalker.hide_weapon()
+	bind_stalker.hide_weapon()
 end
 
 function action_no_weapon:zone_leave()
 	self.state = state_outside
---	bind_stalker.restore_weapon()
+	bind_stalker.restore_weapon()
 end
 
 ---------------------------------------------------------------------------------------------------------------------
 function add_to_binder(npc, ini, scheme, section, storage)
-	printf("DEBUG: add_to_binder: scheme='%s', section='%s'", scheme, section)
-
 	local new_action = action_no_weapon(npc, storage)
 
 	-- «арегистрировать все actions, в которых должен быть вызван метод reset_scheme при изменении настроек схемы:
