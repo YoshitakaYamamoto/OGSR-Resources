@@ -96,7 +96,6 @@ load_scheme("turret_firmware","turret",      stype_heli)
 ----------------------------------------------------------------------
 -- Загрузка модулей рестрикторов:
 ----------------------------------------------------------------------
-load_scheme("sr_no_weapon",   "sr_no_weapon",   stype_restrictor)
 load_scheme("sr_tip",         "sr_tip",         stype_restrictor)
 load_scheme("sr_teleport",    "sr_teleport",    stype_restrictor)
 load_scheme("sr_sound",       "sr_sound",       stype_restrictor)
