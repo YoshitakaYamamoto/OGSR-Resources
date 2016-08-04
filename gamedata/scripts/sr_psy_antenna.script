@@ -1,481 +1,278 @@
---[[------------------------------------------------------------------------------------------------
-���� ���-���������. ���������� ����������� � �������� �� ���������� �� custom_data
---------------------------------------------------------------------------------------------------]]
-local psy_emitters_active = {}
-local updates_passed = 0
+-------------------------------------------------------------------------------------
+-- Зоны пси-излучения. Отыгрывают постпроцесс и фантомов по настройкам из custom_data
+-------------------------------------------------------------------------------------
+-- KRodin © 2016: переделал весь скрипт, исправил ошибки, оптимизировал.
+-------------------------------------------------------------------------------------
 
-local state_outside = 0 -- ����� �������
-local state_inside  = 1 -- ����� ������
-local state_void  = 2 -- ����������� ������
+psy_antenna = nil
 
-psy_antenna = false
+local psy_emitters_active = {} --Здесь хранятся имена пси-зон, внутри которых находится актор.
+local effectors = {} --Здесь хранятся данные активных эффекторов
+local subscribed = nil
 
 function is_actor_zombied_ivulnerable()
-	local lname = level.name()
-	if has_alife_info("actor_set_zombied") and not lname == "l09_deadcity_ogse" then
+	if has_alife_info("actor_set_zombied") and level.name() ~= "l09_deadcity_ogse" then
 		return true	
 	end
 	return false
 end
 
-class "PsyAntenna"
-function PsyAntenna:__init				()
--- ----------------------------------------------------------------------------------------
--- settings
--- ----------------------------------------------------------------------------------------
--- phantom gen
--- ----------------------------------------------------------------------------------------
-	self.phantom_max 					= 8 --10	-- max phantoms
-	self.phantom_spawn_probability		= 0	-- spawn probability (0..1)
-	self.phantom_spawn_radius			= 30.0	-- average radius 30.0m +-15m
-	self.phantom_spawn_height			= 2.5 --3	-- average height from actor pos +-1.5m
-	self.phantom_fov					= 45   -- ������ ������� ����� ������� �����, � ������� ����� ��������� �������
-	-- antenna
-	self.hit_amplitude					= 1.0	-- ������ ���� = self.hit_amplitude*self.hit_intensity
--- ----------------------------------------------------------------------------------------
--- class variables initialize
--- ----------------------------------------------------------------------------------------
-	self.eff_time						= 0
-	self.hit_time						= 0
-	self.phantom_time                   = 0
-	self.intensity_inertion				= 0.05	-- �������� ��������� ������������� ��/�������
-	self.hit_intensity					= 0
-	self.sound_intensity				= 0
-	self.sound_intensity_base			= 0	-- ������� �������������. � ��� ��������� ������� �� ��������� self.intensity_inertion	
-	self.postprocess_count				= 0  --'������� ������������������ �������������
-	self.postprocess					= {} --'��������� �������������
-
--- ----------------------------------------------------------------------------------------
--- sound
--- ----------------------------------------------------------------------------------------
-	self.sound_initialized				= false
-
-	self.sound_obj_right, self.sound_obj_left = xr_sound.get_sound_object("psy_voices", "random")
-
-	self.sound_obj_left.volume			= self.sound_intensity
-	self.sound_obj_right.volume			= self.sound_intensity
-	self.snd_volume						= level.get_snd_volume()
-	self.mute_sound_threshold			= 0 --' ������ �� �������� ����� �������� ���� ������. 0 - ����� ��������� ���������
-	self.max_mumble_volume				= 10
+class "PsyAntenna" --TODO: избавиться от класса.
+function PsyAntenna:__init()
+	self.sm = ogse_signals.get_mgr()
+-------------------------------------[НАСТРОЙКИ]-------------------------------------
+	self.phantom_max 				= 8 --10 -- Максимальное кол-во фантомов
+	self.phantom_spawn_radius		= 30 -- Макс. расстояние от актора, на котором могут спавниться фантомы
+	self.phantom_fov				= 45 -- ширина сектора перед глазами актёра, в котором могут рождаться фантомы
+	self.sound_obj_right, self.sound_obj_left = xr_sound.get_sound_object("psy_voices") --Звуки в голове
+	self.sound_obj_left.volume		= self.sound_intensity --Громкость звуков
+	self.sound_obj_right.volume		= self.sound_intensity --Громкость звуков
+	self.snd_volume					= level.get_snd_volume() --Нужно для корректного восстановления уровня громкости при отключении схемы.
+-------------------------------------------------------------------------------------
+--Параметры ниже читаются из кастомдаты
+	self.hit_intensity				= 0 --Интенсивность хита.
+	self.phantom_spawn_probability	= 0	--Вероятность спавна фантомов (0..1)
+	self.sound_intensity			= 0 --Интенсивность звуковых эффектов.
+	self.mute_sound_threshold		= 0 --Предел до которого можно занижать звук уровня. 0 - можно заглушить полностью.
 end
-function PsyAntenna:destroy				()
-	for k, v in pairs(self.postprocess) do
-		level.remove_pp_effector(v.idx)
+
+function PsyAntenna:unsubscribe()
+	if get_hud():GetCustomStatic("cs_psy_danger") then
+		get_hud():RemoveCustomStatic("cs_psy_danger") --Удаляем с худа предупреждение
 	end
-	self.postprocess					= {}
-	level.set_snd_volume				(self.snd_volume)
-end
-function PsyAntenna:construct			()
+	if self.sound_obj_left:playing() then
+		--log1("~~sound l stop!")
+		self.sound_obj_left:stop() --Останавливаем звуки в голове
+	end
+	if self.sound_obj_right:playing() then
+		--log1("~~sound r stop!")
+		self.sound_obj_right:stop()
+	end
+	level.set_snd_volume(self.snd_volume) --Возвращаем нормальную громкость
+	--log3("~~Sound volume after unsubscribe: %s", level.get_snd_volume())
+
+	self.sm:unsubscribe( subscribed ) --Отписываемся от апдейта
+	subscribed = nil
+	sr_psy_antenna.psy_antenna = nil --НЕ УДАЛЯТЬ!
+	--log2( "~~[%s]: unsubscribed from update", script_name() )
 end
 
-local checked_once = false
-
-function PsyAntenna:check_hang			()
-	--log1("!!DEBUG_PSY CHK_HANG!!!")
-	if db.actor and psy_antenna and psy_antenna.postprocess_count > 0 then
-		--log1("!!DEBUG_PSY DESTROUY!!!")
-		local flag_need_destroy = true
-		for k, v in pairs(psy_emitters_active) do
-			--log1("!!DEBUG_PSY----------------!!!")
-			--print_table_inlog(psy_emitters_active, "!!DEBUG_PSY_PP:")
-			--log1("!!DEBUG_PSY----------------!!!")
-			local emitter = db.zone_by_name[k]
-			if emitter and v == state_inside then
-				flag_need_destroy = false
-				if not checked_once then
-					local storage = db.storage[emitter:id()].sr_psy_antenna
-					local hit_intencity = storage.hit_intensity
-					if (hit_intencity == 0 and sr_psy_antenna.psy_antenna.hit_intensity > 0) then
-						--log1("!!DEBUG_PSY FIXING VALUES")
-						psy_antenna.sound_intensity_base = 0
-						psy_antenna.mute_sound_threshold = 0
-						psy_antenna.hit_intensity  = storage.hit_intensity
-						psy_antenna.phantom_spawn_probability = storage.phantom_prob
-						for k,v in pairs(self.postprocess) do
-							v.intensity = storage.intensity
-							v.intensity_base = storage.intensity
-						end
-					end					
-					checked_once = true
-				end				
-			end		
-		end
-		if flag_need_destroy ~= false then
-			--log1("!!DEBUG_PSY DESTROY ANTENNA!")
-			sr_psy_antenna.psy_antenna.sound_intensity_base = 0
-			sr_psy_antenna.psy_antenna.mute_sound_threshold = 0
-			sr_psy_antenna.psy_antenna.hit_intensity  = 0
-			sr_psy_antenna.psy_antenna.phantom_spawn_probability = 0
-			sr_psy_antenna.psy_antenna:destroy()
-			sr_psy_antenna.psy_antenna = false
-			sr_psy_antenna.psy_antenna = PsyAntenna()
-			sr_psy_antenna.psy_antenna:construct()	
-			return
-		end
-	end	
+function PsyAntenna:subscribe()
+	subscribed = { signal = "on_update", self = self, fun = self.update }
+	self.sm:subscribe( subscribed ) --Подписываемся на апдейт
+	sr_psy_antenna.psy_antenna = self --НЕ УДАЛЯТЬ!
+	--log2( "--[%s]: subscribed on update", script_name() )
 end
-function PsyAntenna:update_psy_hit(dt)
+
+function PsyAntenna:update_psy_hit()
 	local hud = get_hud()
 	local custom_static = hud:GetCustomStatic("cs_psy_danger")
 	if self.hit_intensity > 0.01 then
-		if custom_static == nil and not is_actor_zombied_ivulnerable() then
+		if not custom_static then
 			hud:AddCustomStatic("cs_psy_danger", true)
 			hud:GetCustomStatic("cs_psy_danger"):wnd():SetTextST("st_psy_danger")
 		end
 	else
-		if custom_static ~= nil then
+		if custom_static then
 			hud:RemoveCustomStatic("cs_psy_danger")
 		end
 	end
-	if time_global() - self.hit_time > 5000 then
-		self.hit_time					= time_global()
+	if not self.hit_time or time_global() - self.hit_time > 5000 then
+		self.hit_time = time_global()
+		if self.hit_intensity > 0.01 then
+			local psy_hit = hit()
+				psy_hit.power = self.hit_intensity
+				psy_hit.direction = vector():set( 0, 0, 0 )
+				psy_hit.impulse = 0
+				psy_hit.draftsman = db.actor
+				psy_hit.type = hit.telepatic
+			db.actor:hit(psy_hit)
 
-		local power						= self.hit_amplitude*self.hit_intensity
---		printf("HIT: power = %s", tostring(power))
-		if power > 0.01 then
-			local psy_hit 				= hit()
-			psy_hit.power 				= power
-			psy_hit.direction 			= vector():set( 0, 0, 0 )
-			psy_hit.impulse 			= 0
-			psy_hit.draftsman 			= db.actor
-			psy_hit.type 				= hit.telepatic
-			
-			local health_hit 				= hit()
-			health_hit.power 				= power
-			health_hit.direction 			= vector():set( 0, 0, 0 )
-			health_hit.impulse 			= 0
-			health_hit.draftsman 			= db.actor
-			health_hit.type 				= hit.wound			
-            if not is_actor_zombied_ivulnerable() then
-				db.actor:hit				(psy_hit)
-				db.actor:hit				(health_hit)
-				--log1("!!DEBUG_PSY HIT_ACT!!!")
-            end
-			if db.actor.health < 0.01 and db.actor:alive() and not is_actor_zombied_ivulnerable() then
-				db.actor:kill( db.actor )
-			end
+			local health_hit = hit()
+				health_hit.power = self.hit_intensity
+				health_hit.direction = vector():set( 0, 0, 0 )
+				health_hit.impulse = 0
+				health_hit.draftsman = db.actor
+				health_hit.type = hit.wound
+			db.actor:hit(health_hit)
 		end
 	end
 end
+
 function PsyAntenna:generate_phantoms()
-	if self.phantom_idle == nil then
+	if not self.phantom_time or time_global() - self.phantom_time > self.phantom_idle then
+		self.phantom_time = time_global()
 		self.phantom_idle = math.random(2000,5000)
-	end
-	if time_global() - self.phantom_time > self.phantom_idle then
-		self.phantom_time				= time_global()
-		self.phantom_idle = math.random(5000,10000)
 		if math.random() < self.phantom_spawn_probability then
 			if phantom_manager:phantom_count() < self.phantom_max then
 				local radius = self.phantom_spawn_radius * ( math.random()/2.0+0.5 )
-				local ang    = self.phantom_fov * math.random() - self.phantom_fov * 0.5
-				local dir    = vector_rotate_y( db.actor:direction(), ang )
+				local ang = self.phantom_fov * math.random() - self.phantom_fov * 0.5
+				local dir = vector_rotate_y( db.actor:direction(), ang )
 
 				phantom_manager.spawn_phantom( db.actor:position():add( dir:mul(radius) ) )
 			end
 		end
 	end
 end
-function PsyAntenna:update_sound()
-	if not self.sound_initialized then
-		self.sound_obj_left:play_at_pos		(db.actor, vector():set(-1, 0, 1), 0, sound_object.s2d + sound_object.looped)
-		self.sound_obj_right:play_at_pos	(db.actor, vector():set( 1, 0, 1), 0, sound_object.s2d + sound_object.looped)
 
+function PsyAntenna:update_sound() --TODO: перенести в zone_enter/leave
+	if not self.sound_initialized then
+		self.sound_obj_left:play_at_pos(db.actor, vector():set(-1, 0, 1), 0, sound_object.s2d + sound_object.looped)
+		self.sound_obj_right:play_at_pos(db.actor, vector():set( 1, 0, 1), 0, sound_object.s2d + sound_object.looped)
 		self.sound_initialized = true
 	end
 
+	--log3("--Snd Intensity: %s", self.sound_intensity)
 	local vol = 1 - ( self.sound_intensity ^ 3 ) * 0.9
-
 	if vol < self.mute_sound_threshold then
 		level.set_snd_volume( self.mute_sound_threshold )
 	else
 		level.set_snd_volume( vol )
 	end
+	--log3("--Sound volume: %s", level.get_snd_volume())
 
 	self.sound_obj_left.volume  = 1 / vol - 1
 	self.sound_obj_right.volume = 1 / vol - 1
 end
-function PsyAntenna:update_postprocess(pp)
-	if pp.intensity == 0 then
-		self.postprocess_count = self.postprocess_count - 1
-		level.remove_pp_effector(pp.idx)
-		return false
-	end
-	
-	level.set_pp_effector_factor(pp.idx, pp.intensity, 0.3)
-	return true
-end
+
 function PsyAntenna:update()
-	local dt = 35
-	self.eff_time					= self.eff_time + dt
+	self.sm:reschedule( 1000 ) --Раз в секунду достаточно
 
-	function update_intensity(intensity_base, intensity)
-		local di = self.intensity_inertion * dt * 0.001
-		local ii = intensity_base
-		if math.abs(intensity_base - intensity) >= di then
-			if intensity_base < intensity then
-				ii = intensity - di
-			else
-				ii = intensity + di
-			end
-		end
-
-		if		ii < 0.0 then ii = 0.0 
-		elseif	ii > 1.0 then ii = 1.0 end
-		return ii
-	end
-	
 	self:generate_phantoms()
-	
-	self.sound_intensity = update_intensity(self.sound_intensity_base, self.sound_intensity)
 	self:update_sound()
-	
-	for k,v in pairs(self.postprocess) do
-		v.intensity = update_intensity(v.intensity_base, v.intensity)
-		local exist = self:update_postprocess(v)
-		
-		if exist == false then
-			self.postprocess[k] = nil
-		end
-	end
-	
-	self:update_psy_hit(dt)
-	
-	self:check_hang()
-end
-function PsyAntenna:save(p)
-	p:w_float(self.hit_intensity)
-	p:w_float(self.sound_intensity)
-	p:w_float(self.sound_intensity_base)	
-	p:w_float(self.mute_sound_threshold)
-
-	p:w_u8(self.postprocess_count)
-	for k,v in pairs(self.postprocess) do
-		p:w_stringZ(k)	
-		p:w_float(v.intensity)	
-		p:w_float(v.intensity_base)	
-		p:w_u16(v.idx)	
-	end
+	if not is_actor_zombied_ivulnerable() then self:update_psy_hit() end
 end
 
-function PsyAntenna:load(p)
-	self.hit_intensity  = p:r_float()
-	self.sound_intensity  = p:r_float()	
-	self.sound_intensity_base = p:r_float()
-	self.mute_sound_threshold = p:r_float()
-
-	self.postprocess_count = p:r_u8()
-	
-	--log1("!!DEBUG_PSY WE ARE HIT ON: ["..tostring(self.postprocess_count).."]")
-	
-	self.postprocess = {}
-	for i=1, self.postprocess_count do
-		local k = p:r_stringZ()
-		local ii = p:r_float()
-		local ib = p:r_float()
-		local idx = p:r_u16()
-		self.postprocess[k] = {intensity_base = ib, intensity = ii, idx = idx}
-		level.add_pp_effector(k, idx, true)
-		level.set_pp_effector_factor(idx, ii)		
-	end
-end
 
 ----------------------------------------------------------------------------------------------------
--- ���������� ����� ��� space restrictor
+-- логическая схема для space restrictor
 ----------------------------------------------------------------------------------------------------
 class "action_psy_antenna"
 function action_psy_antenna:__init( obj, storage )
 	self.object = obj
-	self.st     = storage
-	self.state  = state_void --' ��� �� ����, � ���� ��, ��� ���
-	psy_emitters_active[self.object:name()] = self.state
+	self.st = storage
 end
-function action_psy_antenna:reset_scheme( loading )
---'	if loading then
---'		self.state = xr_logic.pstor_retrieve( self.object, "inside"  )
---'	else
-		if self.state == state_inside then
-			self:zone_leave()
-		end
 
-		self.state = state_void
-		psy_emitters_active[self.object:name()] = self.state
-
-		self:switch_state(db.actor)
-		
-		--log1("!!DEBUG_PSY LOADING: ["..tostring(self.object:name()).."] STATE ["..tostring(self.state).."]")
---'	end
---'	printf("[psy_antenna] reset_scheme %s, inside %s", tostring(loading), tostring(self.state))
+function action_psy_antenna:reset_scheme() --Вызывается ПОСЛЕ изменения настроек схемы, или после включения схемы.
+	self:zone_leave()
+	self:switch_state()
 end
-function action_psy_antenna:deactivate()
-	if self.state == state_inside then
+
+function action_psy_antenna:deactivate() --Вызывается при ПЕРЕД изменением настроек схемы / при переключении на другую схему.
+	self:zone_leave()
+end
+
+function action_psy_antenna:net_destroy() --Вызывается при удалении объекта / переходе в оффлайн.
+	self:zone_leave()
+end
+
+function action_psy_antenna:update() -- bind_restrictor.actor_update()
+	if xr_logic.try_switch_to_another_section( self.object, self.st, db.actor ) then
+		return
+	end
+
+	self:switch_state()
+end
+
+function action_psy_antenna:switch_state()
+	if self.object:inside( db.actor:position() ) then --Если актор находится в зоне действия рестриктора
+		self:zone_enter()
+	else --Если актор вне зоны действия рестриктора
 		self:zone_leave()
 	end
 end
-function action_psy_antenna:update( delta )
-	local actor = db.actor
 
-	if xr_logic.try_switch_to_another_section( self.object, self.st, actor ) then
-		return
-	end
-	
-	self:switch_state( actor )
-	
-	if actor and psy_antenna and psy_emitters_active ~= {} and psy_antenna.postprocess_count > 0 and updates_passed > 10 then
-	
-		--log1("!!DEBUG_PSY DESTROY_INITED: ["..tostring(self.object:name()).."] STATE ["..tostring(self.state).."]")
-		local flag_need_destroy = true
-		for k, v in pairs(psy_emitters_active) do
-			--print_table_inlog(psy_emitters_active, "!!DEBUG_PSY_PP:")
-			local emitter = db.zone_by_name[k]
-			if emitter and v == state_inside then
-				flag_need_destroy = false
-			end			
+function action_psy_antenna:zone_enter() --Действие по факту входа в зону действия рестриктора
+	if psy_emitters_active[self.object:name()] then return end --Если рестриктор уже есть в таблице - дальше делать нечего.
+
+	psy_emitters_active[self.object:name()] = true --Добавляем рестриктор в таблицу
+	self:check_subscribe() --Если надо, подписываемся на апдейт
+
+	psy_antenna.sound_intensity				= psy_antenna.sound_intensity + self.st.intensity
+	psy_antenna.mute_sound_threshold		= psy_antenna.mute_sound_threshold + self.st.mute_sound_threshold
+	psy_antenna.hit_intensity				= psy_antenna.hit_intensity + self.st.hit_intensity
+	psy_antenna.phantom_spawn_probability	= psy_antenna.phantom_spawn_probability + self.st.phantom_prob
+
+	local pp = self.st.postprocess
+	if pp ~= "nil" then
+		if not effectors[pp] then --Если эффектора нет в табице
+			local new_idx = nil
+			repeat --Поиск свободного id для эффектора. Да, это громоздкий способ, но другого в голову не пришло(
+				new_idx = math.random(1601, 1699)
+				for _, v in pairs(effectors) do
+					if v.idx == new_idx then
+						new_idx = nil
+						break
+					end
+				end
+			until new_idx ~= nil
+			effectors[pp] = { intensity = self.st.intensity, idx = new_idx } --Добавляем эффектор в таблицу
+			level.add_pp_effector(pp, effectors[pp].idx, true) --Запускаем его
+			--log3("--[action_psy_antenna:zone_enter] Add_pp_effector: %s %s", pp, effectors[pp])
+		else --Если такой же эффектор уже есть в таблице
+			effectors[pp].intensity = effectors[pp].intensity + self.st.intensity --Просто добавим ему интенсивности
 		end
-		if flag_need_destroy ~= false then
-			--log1("!!DEBUG_PSY DESTROY ANTENNA!")
-			self:zone_leave()
-			sr_psy_antenna.psy_antenna:destroy()
-			sr_psy_antenna.psy_antenna = false
-			sr_psy_antenna.psy_antenna = PsyAntenna()
-			sr_psy_antenna.psy_antenna:construct()			
-		end
-	end	
+		level.set_pp_effector_factor(effectors[pp].idx, effectors[pp].intensity) --Тут устанавливаем интенсивность эффектора
+		--log3("--[action_psy_antenna:zone_enter] Set Intensity for: %s %s", pp, effectors[pp])
+	end
+end
+
+function action_psy_antenna:zone_leave() --Действие по факту выхода из зоны действия рестриктора, или при удалении/отключении рестриктора
+	if not psy_emitters_active[self.object:name()] then return end --Если рестриктора уже нет в таблице - дальше делать нечего.
 	
-	if updates_passed < 100 then
-		updates_passed = updates_passed + 1
-	end
-	
-end
-function action_psy_antenna:switch_state( actor )
-	if self.state ~= state_inside then
-		-- ���� ��������� �� �� ������
-		if self.object:inside( actor:position() ) then
-			--log1("!!DEBUG_PSY INSIDE: ["..tostring(self.object:name()).."]")
-			self:zone_enter()
-			return
-		elseif self.state == state_void then
-			-- ������ �� ��������������� ���������
-			self.state = state_outside
-			psy_emitters_active[self.object:name()] = self.state
-			return
-		end
-	else
-		-- ���� ��������� �� ������
-		if not self.object:inside( actor:position() ) then
-			--log1("!!DEBUG_PSY LEAVE: ["..tostring(self.object:name()).."]")
-			self:zone_leave()
-			return
+	psy_emitters_active[self.object:name()] = nil --Удаляем рестриктор из таблицы
+	if not psy_antenna then return end --Если условие не истинно - дальше делать нечего
+
+	psy_antenna.sound_intensity				= psy_antenna.sound_intensity - self.st.intensity
+	psy_antenna.mute_sound_threshold		= psy_antenna.mute_sound_threshold - self.st.mute_sound_threshold
+	psy_antenna.hit_intensity				= psy_antenna.hit_intensity  - self.st.hit_intensity
+	psy_antenna.phantom_spawn_probability	= psy_antenna.phantom_spawn_probability - self.st.phantom_prob
+
+	local pp = self.st.postprocess
+	if pp ~= "nil" then
+		if effectors[pp] then --Если эффектор есть в таблице
+			effectors[pp].intensity = effectors[pp].intensity - self.st.intensity --Убавляем ему интенсивность
+			--log3("~~[action_psy_antenna:zone_leave] Set Intensity for: %s %s", pp, effectors[pp])
+			if effectors[pp].intensity <= 0 then --Если полученная интенсивность <= 0 , то:
+				level.remove_pp_effector(effectors[pp].idx) --Останавливаем эффектор, больше он не нужен
+				--log3("~~[action_psy_antenna:zone_leave] Remove_pp_effector: %s %s", pp, effectors[pp])
+				effectors[pp] = nil --И удаляем его из таблицы
+			else --Если интенсивность > 0 , то:
+				level.set_pp_effector_factor(effectors[pp].idx, effectors[pp].intensity) --Устанавливаем эту интенсивность эффектора.
+			end
 		end
 	end
-end
-function action_psy_antenna:zone_enter()
---'	printf("[psy_antenna] zone_enter")
-	self.state = state_inside
-	psy_emitters_active[self.object:name()] = self.state
 
-	psy_antenna.sound_intensity_base = psy_antenna.sound_intensity_base + self.st.intensity
-	psy_antenna.mute_sound_threshold = psy_antenna.mute_sound_threshold + self.st.mute_sound_threshold
-	psy_antenna.hit_intensity  = psy_antenna.hit_intensity  + self.st.hit_intensity
-	psy_antenna.phantom_spawn_probability = psy_antenna.phantom_spawn_probability + self.st.phantom_prob
-
---'	printf("[psy_antenna] zone_enter. hit_intensity=%s", tostring(psy_antenna.hit_intensity))
-
-	if self.st.postprocess == "nil" then
-		return
-	end
-
-	if psy_antenna.postprocess[self.st.postprocess] == nil then
-		psy_antenna.postprocess_count = psy_antenna.postprocess_count + 1
-		psy_antenna.postprocess[self.st.postprocess] = { intensity_base = 0, intensity = 0, idx = 1500+psy_antenna.postprocess_count}
-		level.add_pp_effector(self.st.postprocess, psy_antenna.postprocess[self.st.postprocess].idx, true)
-		level.set_pp_effector_factor(psy_antenna.postprocess[self.st.postprocess].idx, 0.01)
-	end
-	psy_antenna.postprocess[self.st.postprocess].intensity_base = psy_antenna.postprocess[self.st.postprocess].intensity_base + self.st.intensity		
-end
-function action_psy_antenna:zone_leave()
---'		printf("[psy_antenna] zone_leave. hit_intensity=%s", tostring(psy_antenna.hit_intensity))
-	self.state = state_outside
-	psy_emitters_active[self.object:name()] = self.state
-
-	psy_antenna.sound_intensity_base = psy_antenna.sound_intensity_base - self.st.intensity
-	psy_antenna.mute_sound_threshold = psy_antenna.mute_sound_threshold - self.st.mute_sound_threshold
-	psy_antenna.hit_intensity  = psy_antenna.hit_intensity  - self.st.hit_intensity
-
-	psy_antenna.phantom_spawn_probability = psy_antenna.phantom_spawn_probability - self.st.phantom_prob
-	
---'	printf("[psy_antenna] zone_leave. hit_intensity=%s, minus=%s", tostring(psy_antenna.hit_intensity), tostring(self.st.hit_intensity))
-
-	if self.st.postprocess == "nil" then
-		return
-	end
-
-	if psy_antenna.postprocess[self.st.postprocess] ~= nil then
-		psy_antenna.postprocess[self.st.postprocess].intensity_base = psy_antenna.postprocess[self.st.postprocess].intensity_base - self.st.intensity
-	end
-end
-function action_psy_antenna:save()
-	--'xr_logic.pstor_store( self.object, "inside", self.state )
+	self:check_subscribe() --Если надо, отписываемся от апдейта
 end
 
----------------------------------------------------------------------------------------------------------------------
-function save( p )
-    p = net_packet()
-    p:w_begin( 123 )
-    p:r_seek( 2 )
-
-	if psy_antenna and not utils.level_changing() then
-		p:w_bool( true )
-
-		psy_antenna:save( p )
-	else
-		p:w_bool( false )
-	end
-
-    ogse.save_var( script_name(), p, "chunk")
-end
-
-function load(p)
-	if ogse.var_exists( script_name() ) then
-		p = ogse.load_var( script_name() )
-	end
-
-	local b = p:r_bool()
-
-	if b then
-		if psy_antenna then
-			abort("sr_psy_antenna.psy_antenna already exists!")
+function action_psy_antenna:check_subscribe()
+	if next(psy_emitters_active) == nil then --Если таблица psy_emitters_active пуста
+		if subscribed then --И скрипт подписан на апдейт
+			psy_antenna:unsubscribe() --Отписываемся от апдейта
 		end
-
-		psy_antenna = PsyAntenna()
-		psy_antenna:construct()
-
-		psy_antenna:load(p)
+	else --Если в таблице что-то есть
+		if not subscribed then --И скрипт ещё не подписался на апдейт
+			PsyAntenna():subscribe() --Подписываемся на апдейт
+		end
 	end
 end
 
+
+-----------------------------------------------------------------------------------
 function add_to_binder(npc, ini, scheme, section, storage)
-	printf("DEBUG: add_to_binder: scheme='%s', section='%s'", scheme, section)
-
-	if not psy_antenna then
-		psy_antenna = PsyAntenna()
-		psy_antenna:construct()
-	end
-
 	local new_action = action_psy_antenna(npc, storage)
-
-	-- ���������������� ��� actions, � ������� ������ ���� ������ ����� reset_scheme ��� ��������� �������� �����:
+	-- Зарегистрировать все actions, в которых должен быть вызван метод reset_scheme при изменении настроек схемы:
 	xr_logic.subscribe_action_for_events(npc, storage, new_action)
 end
 
-function set_scheme(npc, ini, scheme, section, gulag_name)
+function set_scheme(npc, ini, scheme, section)
 	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 
-	st.intensity     = utils.cfg_get_number(ini, section, "eff_intensity", npc, true) * 0.01
-	st.postprocess	 = utils.cfg_get_string(ini, section, "postprocess", npc, false, "", "psy_antenna.ppe")
-	
-	st.hit_intensity = utils.cfg_get_number(ini, section, "hit_intensity", npc, true) * 0.01
-	st.phantom_prob  = utils.cfg_get_number(ini, section, "phantom_prob",  npc, false, 0) * 0.01
-	
-	st.mute_sound_threshold   = utils.cfg_get_number(ini, section, "mute_sound_threshold",  npc, false, 0)
+	st.intensity = get_float(section, "eff_intensity", 0, ini) * 0.01
+	st.postprocess = get_string(section, "postprocess", "psy_antenna.ppe", ini)
+	st.hit_intensity = get_float(section, "hit_intensity", 0, ini) * 0.01
+	st.phantom_prob  = get_float(section, "phantom_prob", 0, ini) * 0.01
+	st.mute_sound_threshold = get_float(section, "mute_sound_threshold", 0, ini)
 end

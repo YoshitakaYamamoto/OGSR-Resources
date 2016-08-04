@@ -25,13 +25,6 @@ function actor_init(npc)
 	npc:bind_object(actor_binder(npc))
 end
 
-local game_difficulty_by_num = {
-	[0] = "gd_novice",
-	[1] = "gd_stalker",
-	[2] = "gd_veteran",
-	[3] = "gd_master"
-	}
-
 ----------------------------------------------------------------------------------------------------------------------
 class "actor_binder" (object_binder)
 ----------------------------------------------------------------------------------------------------------------------
@@ -128,11 +121,6 @@ function actor_binder:net_destroy()
 
 	self.object:set_callback(callback_ex.entity_alive_before_hit, nil)
 	self.object:set_callback(callback_ex.on_before_use_item, nil)
-
-	if sr_psy_antenna.psy_antenna then
-		sr_psy_antenna.psy_antenna:destroy()
-		sr_psy_antenna.psy_antenna = false
-	end
 
 	self.am:call("on_destroy")
 end
@@ -543,7 +531,6 @@ function actor_binder:save(packet)
 	xr_logic.pstor_save_all(self.object, packet)
 	treasure_manager.save(packet)
 	task_manager.save(packet)
-	sr_psy_antenna.save(packet)
 
 	self.am:call("on_save", packet)
 	self.am:call("on_save_after_all")
@@ -553,14 +540,14 @@ function actor_binder:after_save()
 	self.am:call( "on_after_save" )
 end
 ----------------------------------------------------------------------------------------------------------------------
+local game_difficulty_by_num = {"gd_novice", "gd_stalker", "gd_veteran", "gd_master"}
 function actor_binder:load(reader)
 	local game_difficulty = ogse.load_var("game_difficulty", 3) --Загружаем уровень сложности
-	cmd("g_game_difficulty", game_difficulty_by_num[game_difficulty]) --и устанавливаем его.
+	cmd("g_game_difficulty", game_difficulty_by_num[game_difficulty + 1]) --и устанавливаем его.
 
 	xr_logic.pstor_load_all(self.object, reader)
 	treasure_manager.load(reader)
 	task_manager.load(reader)
-	sr_psy_antenna.load(reader)
 
 	self.am:call("on_load", reader)
 end
