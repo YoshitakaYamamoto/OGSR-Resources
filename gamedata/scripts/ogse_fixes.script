@@ -63,6 +63,10 @@ function del_buggy_objects() --Удаление из игры глючных о�
 		"esc_guns_remontnik_zone_no_weapon",
 		"trader_zone",
 --------------------------------------------------------
+----------Рестрикторы удалённой схемы sr_sleep-----------
+		"rad_sleep_room",
+		"mil_sr_sleep_1",
+--------------------------------------------------------
 	}
 	for _, n in ipairs( names ) do
 		local sobj = alife():object( n )
