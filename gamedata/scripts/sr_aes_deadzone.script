@@ -1,10 +1,7 @@
---[[------------------------------------------------------------------------------------------------
-«она смерти на „јЁ— (2)
---------------------------------------------------------------------------------------------------]]
+------------------------------------
+-- «она смерти
+------------------------------------
 
-----------------------------------------------------------------------------------------------------
---  ласс, отвечающий за постпроцесс
-----------------------------------------------------------------------------------------------------
 function check_on_generators()
 	if not ogse.check_game() then 
 		return false 
@@ -17,6 +14,9 @@ function check_on_generators()
 end
 
 
+----------------------------------------------------------------------------------------------------
+--  ласс, отвечающий за постпроцесс
+----------------------------------------------------------------------------------------------------
 -------------------
 class "PPEffector" (effector)
 -------------------
@@ -80,7 +80,6 @@ function action_postprocess:deactivate()
 if not has_alife_info("pri_what_the_fuck") or check_on_generators() then
 	if self.state == state_inside then
        self.pp:finish 	    ()
-	   level.set_snd_volume (self.snd_volume)
 	   self:zone_leave      ()
 	end
 end
@@ -124,11 +123,6 @@ function action_postprocess:update (delta)
 	
 	self.actor_inside = self.object:inside (db.actor:position ())
 	
-	--if self.actor_inside == true then
-	   --printf ("[%d]ACTOR IN DEAD ZONE !!!", time_global ()) 
-	--else
-	   --printf ("[%d]ACTOR NOT IN DEAD ZONE !!!", time_global ())   
-	--end
 	self:update_hit (delta)
 end
 -------------------
@@ -143,7 +137,6 @@ if not has_alife_info("pri_what_the_fuck") or check_on_generators() then
     if time_global () - self.hit_time < 1000 then
        return 
     end    
-    --printf ("HIT POWER = %f", self.hit_power)
     self.hit_time = time_global ();
     local h = hit ();
     h.power = self.hit_power
