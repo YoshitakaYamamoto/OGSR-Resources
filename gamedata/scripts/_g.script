@@ -7,7 +7,7 @@ pairs_old = pairs
 pairs = function(t)
      if not t or type(t)~="table" then
           log1("!! error, try to call 'pairs' with " .. tostring(t) .. " param")
-          log1(debug.traceback())
+          log3(debug.traceback())
           return
      end
      return pairs_old(t)
@@ -493,19 +493,19 @@ function get_clsid(npc)
 			elseif string.find(npc:name(), "single_player") then  -- ‡ÍÚÓ
 				return npc:clsid()
 			else
-				log1(debug.traceback())
+				log3(debug.traceback())
 				log1("!!DEBUG_GETCLSID NO_SRVOBJ ["..tostring(id).."]"..npc:name())
 				return nil
 			end
 		elseif type(npc.id) == "number" then
 			return npc:clsid()
 		else
-			log1(debug.traceback())
+			log3(debug.traceback())
 			log1("!!DEBUG_GETCLSID GET_SOMETHING_STRANGE")
 			return nil
 		end
 	else
-		log1(debug.traceback())
+		log3(debug.traceback())
 		log1("!!DEBUG_GETCLSID DEAD_ON_ARRIVAL")
 		return nil
 	end
@@ -689,7 +689,7 @@ function abort(fmt, ...)
 		log1(msg_crash[i])
 	end
 	ogse_debug.dump_actor_codes()
-	log1(debug.traceback())
+	log3(debug.traceback())
 	log1("œŒ—À≈ƒÕ≈≈ —ŒŒ¡Ÿ≈Õ»≈ —»—“≈Ã€ OFFLINE_ALIFE: "..amk_offline_alife.last_debug_message)
 	log1("Œœ»—¿Õ»≈ Œÿ»¡ »: "..message)
 	cmd("flush")
@@ -1026,67 +1026,67 @@ function dbg_sys_ini:__init()
 end
 function dbg_sys_ini:line_count(sec)
 	log3("dbg_sys_ini:line_count: %s", sec)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:line_count(sec)
 end
 function dbg_sys_ini:section_exist(sec)
 	log3("dbg_sys_ini:section_exist: %s", sec)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:section_exist(sec)
 end
 function dbg_sys_ini:line_exist(sec, param)
 	log3("dbg_sys_ini:line_exist: %s - %s", sec, param)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:line_exist(sec, param)
 end
 function dbg_sys_ini:r_bool(sec, param)
 	log3("dbg_sys_ini:r_bool: %s - %s", sec, param)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:r_bool(sec, param)
 end
 function dbg_sys_ini:r_float(sec, param)
 	log3("dbg_sys_ini:r_float: %s - %s", sec, param)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:r_float(sec, param)
 end
 function dbg_sys_ini:r_clsid(sec, param)
 	log3("dbg_sys_ini:r_clsid: %s - %s", sec, param)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:r_clsid(sec, param)
 end
 function dbg_sys_ini:r_s32(sec, param)
 	log3("dbg_sys_ini:r_s32: %s - %s", sec, param)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:r_s32(sec, param)
 end
 function dbg_sys_ini:r_u32(sec, param)
 	log3("dbg_sys_ini:r_u32: %s - %s", sec, param)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:r_u32(sec, param)
 end
 function dbg_sys_ini:r_vector(sec, param)
 	log3("dbg_sys_ini:r_vector: %s - %s", sec, param)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:r_vector(sec, param)
 end
 function dbg_sys_ini:r_string_wq(sec, param)
 	log3("dbg_sys_ini:r_string_wq: %s - %s", sec, param)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:r_string_wq(sec, param)
 end
 function dbg_sys_ini:r_string(sec, param)
 	log3("dbg_sys_ini:r_string: %s - %s", sec, param)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:r_string(sec, param)
 end
 function dbg_sys_ini:r_token(...)
 	log3("dbg_sys_ini:r_token: %s - %s", sec, param)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:r_token(...)
 end
 function dbg_sys_ini:r_line(sec, line_num)
 	log3("dbg_sys_ini:r_line: %s - %s", sec, line_num)
-	log1(debug.traceback())
+	log3(debug.traceback())
 	return orig_sys_ini:r_line(sec, line_num)
 end
 
