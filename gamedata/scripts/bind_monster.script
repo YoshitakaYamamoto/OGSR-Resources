@@ -67,9 +67,6 @@ function generic_object_binder:net_spawn(sobject)
 		end
 	end
 
-	ogse_debug.process_monster(self.object, "m_spw", 2)
-	news_main_spawn.on_spawn(self.object)
-
 	ogse_debug.process_monster(self.object, "m_spw", 6)
 	if not self.object:alive() then
 		--' Наносим небольшой импульс вперед.

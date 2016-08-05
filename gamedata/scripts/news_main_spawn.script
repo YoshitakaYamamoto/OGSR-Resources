@@ -6,8 +6,6 @@
 
 --/ Модуль сообщений о появившихся монстрах /--
 
-
-local random_news = sys_ini:r_s32("options","random_news")
 local spawn_message_flag = sys_ini:r_s32("options","spawn_message_flag")
 
 local spawn_komm_message_prob = 0.5 -- общая вероятность комментариев к сообщениям о монстрах
@@ -137,8 +135,6 @@ local see_word_text={
 }
 
 function on_spawn(obj)
-if random_news == 1 then
-if spawn_message_flag == 0 then return end
 if isIndoor(level.name()) or isIndoor(get_object_levelname(obj)) or news_main_data.chk_Vibros() then return end
 	if (obj) then
 		if (_g.IsMonster(obj)) then
@@ -164,7 +160,6 @@ if isIndoor(level.name()) or isIndoor(get_object_levelname(obj)) or news_main_da
 		end
 		
 	end
-end
 end
 end
 
@@ -329,8 +324,7 @@ function isGameObject(obj)
 end
 
 function chek_warning_status(warn_stat)
-if spawn_message_flag == 0 then return false
-elseif spawn_message_flag == 1 then
+if spawn_message_flag == 1 then
 	if warn_stat == "red" then return true else return false end
 elseif spawn_message_flag == 2 then
 	if warn_stat == "red" or warn_stat == "amber" then return true else return false end

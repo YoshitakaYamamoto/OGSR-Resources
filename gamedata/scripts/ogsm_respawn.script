@@ -188,7 +188,7 @@ end
 -- ѕолучение списка всех монстров и укрытий на текущей локации
 function get_level_mobs()
 	local lname = level.name()
-	for i=1,65535 do
+	for i=1, 65534 do
 		local obj = alife():object(i)
 		if obj then
 			if string.find(obj:name(), "_hide_restrictor") then
@@ -293,7 +293,6 @@ function proceed_spawn(p_name, p_vector, p_lv, p_gv, p_count, p_port, p_fake)
 				if se_respawn.population_monster[p_name] then
 					se_respawn.population_monster[p_name] = se_respawn.population_monster[p_name] + 1
 				end			
-				news_main_spawn.on_spawn(sp_ob)
 			else	
 				-- log1("!!SE_RESPAWN> Ogsm_Respawn —ущество не прошло обе проверки "..p_name)
 			end
