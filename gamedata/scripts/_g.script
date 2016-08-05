@@ -3,6 +3,7 @@ log1("--...Инициализация расширений движка...")
 
 RvP()
 
+--[[
 pairs_old = pairs
 pairs = function(t)
      if not t or type(t)~="table" then
@@ -12,6 +13,7 @@ pairs = function(t)
      end
      return pairs_old(t)
 end
+]]
 
 
 if type(SetLog) == "function" and os and os.clock() < 30 then
