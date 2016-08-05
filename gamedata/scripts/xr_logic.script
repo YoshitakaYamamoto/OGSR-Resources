@@ -392,6 +392,13 @@ function activate_by_section(npc, ini, section, loading)
 			abort("object '%s': unable to determine scheme name from section name '%s'",
 				npc:name(), section)
 		end
+		-- schemes[scheme] даст имя файла (модуля), в котором реализована схема
+		-- _G[] даст указатель на неймспейс (таблицу) этого модуля
+		local filename = schemes[scheme]
+		if filename == nil then
+			log3("!!xr_logic: scheme %s is not registered in modules.script", scheme)
+			return
+		end
 
 		-- Загрузить оверрайды:
 		db.storage[npc_id].overrides = cfg_get_overrides(ini, section, npc)
@@ -399,12 +406,6 @@ function activate_by_section(npc, ini, section, loading)
 		-- Сбросить общие схемы:
 		reset_generic_schemes_on_scheme_switch(npc, scheme, section)
 
-		-- schemes[scheme] даст имя файла (модуля), в котором реализована схема
-		-- _G[] даст указатель на неймспейс (таблицу) этого модуля
-		local filename = schemes[scheme]
-		if filename == nil then
-			abort("xr_logic: scheme '%s' is not registered in modules.script", scheme)
-		end
     -- printf("_bp: calling module('%s')", filename)
 		if not _G[filename] then
 			abort("xr_logic: can't call %s.set_scheme() - a nil value", filename)
