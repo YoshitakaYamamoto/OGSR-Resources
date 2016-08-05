@@ -7,7 +7,9 @@
 
 
 function bind( obj )
-  obj:bind_object( restrictor_binder( obj ) )
+	if not string.find(obj:name(), "_hide_restrictor") then --Рестрикторы укрытий биндить не нужно!
+		obj:bind_object( restrictor_binder( obj ) )
+	end
 end
 
 

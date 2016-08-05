@@ -1,13 +1,38 @@
 -----------------------------------------------------------------------
 --- ogse_hideouts.script
---- Модуль хранения и работы с реестром укрытий от выброса
---- Авторы: KamikaZze
+--- РњРѕРґСѓР»СЊ С…СЂР°РЅРµРЅРёСЏ Рё СЂР°Р±РѕС‚С‹ СЃ СЂРµРµСЃС‚СЂРѕРј СѓРєСЂС‹С‚РёР№ РѕС‚ РІС‹Р±СЂРѕСЃР°
+--- РђРІС‚РѕСЂС‹: KamikaZze
 --- version 1.0 (29/08/2012)
 -----------------------------------------------------------------------
 function attach(sm)
-	sm:subscribe({signal = "on_spawn", fun = this.on_spawn})
-	sm:subscribe({signal = "on_update", fun = this.on_update, queued = true})
+	sm:subscribe({signal = "on_update", fun = this.update_shelter_icon, queued = true})
+	sm:subscribe({signal = "on_info", fun = this.on_info})
 end
+
+
+--Р’С‹Р±СЂРѕСЃ РЅР°С‡РёРЅР°РµС‚СЃСЏ - СЃС‚Р°РІРёРј РјРµС‚РєРё РЅР° СѓРєСЂС‹С‚РёСЏ. Р’С‹Р±СЂРѕСЃ Р·Р°РєРѕРЅС‡РёР»СЃСЏ - СЃРЅРёРјР°РµРј РјРµС‚РєРё.
+function on_info(npc, info)
+	if info == "pre_blowout" or info == "net_signal" then
+		for _, v in ipairs(ogsm_respawn.restrictor_list) do
+			local sobj = alife():object(v.id)
+			if level.name() == object_level_name(sobj) then
+				local pk = xs_netpk.space_restrictor( sobj )
+				if pk:isOk() then
+					local data = pk:get()
+					local cd = data.custom_data:getTable()
+					if cd.sr_mapspot then
+						if info == "pre_blowout" then
+							level_tasks.add_location_by_id(v.id, cd.sr_mapspot.location, cd.sr_mapspot.hint)
+						else
+							level_tasks.remove_location_by_id(v.id, cd.sr_mapspot.location)
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 
 local dev = device()
 
@@ -27,15 +52,9 @@ function update_shelter_icon()
 	local color = GetARGB(transparency_level,0,155,255)
 	st:SetColor(color)
 end
-function on_spawn()
-	update_shelter_icon()
-end
 
-function on_update()
-	update_shelter_icon()
-end
 
--- Нужно ли нам прятаться вообще и нервничать
+-- РќСѓР¶РЅРѕ Р»Рё РЅР°Рј РїСЂСЏС‚Р°С‚СЊСЃСЏ РІРѕРѕР±С‰Рµ Рё РЅРµСЂРІРЅРёС‡Р°С‚СЊ
 function check_not_need_hide(obj)
 	if obj and obj:alive() then
 		for k,v in pairs(ogsm_respawn.restrictor_list) do
@@ -53,7 +72,7 @@ function check_not_need_hide(obj)
 end
 
 -- ogse_hideouts.npc_inside_safe_zone(db.actor)
--- Проверка нахождения непися в безопасной зоне
+-- РџСЂРѕРІРµСЂРєР° РЅР°С…РѕР¶РґРµРЅРёСЏ РЅРµРїРёСЃСЏ РІ Р±РµР·РѕРїР°СЃРЅРѕР№ Р·РѕРЅРµ
 function npc_inside_safe_zone(obj)
 	local location = level.name()
 	
