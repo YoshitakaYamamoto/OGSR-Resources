@@ -271,9 +271,9 @@ function validate_accessibility(npc,ppname)
 			if nearest_anoms ~= {} then
 				for k, v in pairs(nearest_anoms) do
 					if ogse_anomaly.get_anomaly_mode(k) ~= "anom_off" and v.dist <= (v.radius+2) and not string.find(npc:name(), "dik_the_drifter") then -- для дика не производим валидацию
-						log1("MOVE_MGR found anomaly "..v.sect.." on point "..ppname.." for "..npc:name())
+						--log1("MOVE_MGR found anomaly "..v.sect.." on point "..ppname.." for "..npc:name())
 						ogse_anomaly_evader.remove_restriction(npc, k)
-						log1("MOVE_MGR removed anomaly "..v.sect.." on point "..ppname.." for "..npc:name())
+						--log1("MOVE_MGR removed anomaly "..v.sect.." on point "..ppname.." for "..npc:name())
 					end					
 				end
 			end

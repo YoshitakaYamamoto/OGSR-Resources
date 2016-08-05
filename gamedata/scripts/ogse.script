@@ -2023,16 +2023,16 @@ function fix_restrictors(npc)
 	for k, v in pairs(t) do
 		if not xr_gulag.valid_restrictors[v] then
 			npc:remove_restrictions("", v)
-			log1("Invalid in restriction ["..v.."] for ["..npc:name().."], removed")
+			log1("[OGSE] Invalid in restriction ["..v.."] for ["..npc:name().."], removed")
 		else	
 			if pk and pk:isOk() then
 				local data = pk:get()
 				local base_out_restr = data.base_out_restrictors
 				if base_out_restr ~= "" then
 					for base in string.gmatch(base_out_restr, "[^,]+") do
-						log1("NPC "..npc:name().." RESTRICTOR "..base)
+						--log1("[OGSE] NPC "..npc:name().." RESTRICTOR "..base)
 						if v == base then
-							log1("IN Restriction ["..v.."] changed to OUT for ["..npc:name().."], according spawn")
+							log1("[OGSE] IN Restriction ["..v.."] changed to OUT for ["..npc:name().."], according spawn")
 							npc:remove_restrictions("", v)
 							npc:add_restrictions(v, "")
 						end
@@ -2047,7 +2047,7 @@ function fix_restrictors(npc)
 	for k, v in pairs(t) do
 		if not xr_gulag.valid_restrictors[v] then
 			npc:remove_restrictions(v, "")
-			log1("Invalid out restriction ["..v.."] for ["..npc:name().."], removed")
+			log1("[OGSE] Invalid out restriction ["..v.."] for ["..npc:name().."], removed")
 		end
 	end	
 end
