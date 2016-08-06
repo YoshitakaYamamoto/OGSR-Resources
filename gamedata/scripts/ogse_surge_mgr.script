@@ -5,7 +5,6 @@
 -------------------------------------------------------------------------------
 
 function attach(sm) -- для менеджера сигналов
-	sm:subscribe({signal = "on_update",          fun = this.on_actor_update})
 	sm:subscribe({signal = "on_first_update",    fun = this.on_first_update})
 	sm:subscribe({signal = "on_info",            fun = this.on_get_info})
 	sm:subscribe({signal = "on_spawn",           fun = this.on_actor_spawn})
@@ -52,7 +51,7 @@ local military_phantom_types = {
 	"zombie_phantom_2", 
 	"dog_phantom_2", 
 	"flesh_phantom_2"
-	}
+}
 	
 local escape_phantom_types = {
 	"phantom_flesh_1",
@@ -65,77 +64,7 @@ local escape_phantom_types = {
 	"zombie_phantom_2", 
 	"dog_phantom_2", 
 	"flesh_phantom_2"
-	}
-	
-local zombi_types = {
-	"zombie_weak",
-	"zombie_strong", 
-	"zombie_normal", 
-	"zombie_v_strong", 
-	"zombie_v_normal", 
-	"zombie_immortal", 
-	"rat_weak",  
-	"zombie_plague", 
-	"zombie_ghost", 
-	"zombie_old" 
-	}
-	
-local cat_types = {
-	"cat_v_normal",
-	"cat_weak", 
-	"cat_v_strong" 
-	}
-	
-local anomaly = {
-	"electra_movable1",
-	"jarka_movable" 
-	}
-	
-local dog_types = {
-	"dog_weak",
-	"dog_normal", 
-	"dog_strong", 
-	"dog_v_strong", 
-	"pseudodog_weak", 
-	"pseudodog_normal", 
-	"pseudodog_strong",  
-	"pseudodog_v_strong", 
-	"phantom_dog_1" 
-	}
-	
-local claw_types = {
-	"boar_weak",
-	"boar_normal", 
-	"boar_strong", 
-	"flesh_weak", 
-	"flesh_normal", 
-	"flesh_strong", 
-	"flesh_v_strong" 
-	}
-	
-local snork_types = {
-	"phantom_snork_1",
-	"snork_weak", 
-	"snork_normal", 
-	"snork_strong", 
-	"phantom_snork_4" 
-	}
-	
-local hard_monsters_types = {
-	"phantom_krovosos_1",
-	"phantom_krovosos_2", 
-	"gigant_normal", 
-	"gigant_strong", 
-	"chimera_weak", 
-	"chimera_strong", 
-	"bloodsucker_weak", 
-	"bloodsucker_normal", 
-	"bloodsucker_normal",
-	"bloodsucker_strong",
-	"bloodsucker_v_strong",
-	"bloodsucker_v_strong2",
-	"sceleton_weak"
-	}
+}
 
 local lname
 local is_indoor = false
@@ -156,7 +85,7 @@ function can_start_surge_now()
 	   (lname == "l12_stancia") or 
 	   (lname == "l12_stancia_2") or
 	   (lname == "l13_generators_ogse") 
-	   )
+	)
 end
 function get_first_surge_wait_time()
 	local wait_time_sec = (first_surge_wait_time + (math.random() - 0.5) * first_surge_time_disp) * 3600
@@ -219,6 +148,7 @@ end
 
 function set_info_blow()
 	db.actor:give_info_portion("blowout")
+	run_blowout_timer()
 end
 
 function set_no_net_signal()
@@ -652,8 +582,32 @@ end
 -- 30			"surge_process_stage_14"	ogse_surge_20	завершение выброса
 -- 10			"surge_process_stage_15"	ogse_surge_21	финализация, вороны
 
-local deferred_actions = nil -- запрос на выполнение отложенных действий
+local deferred_actions -- запрос на выполнение отложенных действий
 -- делаем что-то для обновления текущего состояния
+local blowout_t
+function run_blowout_timer()
+  if not blowout_t then
+    blowout_t = check_blowout_timer():start()
+  end
+end
+
+class "check_blowout_timer" ( ogse_qt.quick_timer )
+function check_blowout_timer:__init() super()
+end
+
+function check_blowout_timer:condition()
+  return not ( deferred_actions or db.actor:has_info( "blowout" ) )
+end
+
+function check_blowout_timer:action()
+  blowout_t = nil
+end
+
+function check_blowout_timer:update()
+  ogse_signals.get_mgr():reschedule( 1000 )
+  on_actor_update()
+end
+
 function on_actor_update()
 	if deferred_actions then
 		local info_action = deferred_actions.on_info_deferred
@@ -698,7 +652,8 @@ function on_first_update() -- выполняем восстановление временных эффектов, флаго
 				if info_action then
 					parse_and_process_surge_stage(info_action)
 				end
-				deferred_actions = stage_actions		
+				deferred_actions = stage_actions
+				run_blowout_timer()
 				break
 			end
 		end
@@ -711,6 +666,7 @@ function on_get_info(npc, info_id)
 	if action_item then
 		surge_log("surge stage: %s", tostring(info_id))
 		deferred_actions = action_item -- запрашиваем выполнение отложенных действий
+		run_blowout_timer()
 		local info_action = action_item.on_info
 		if info_action then
 			log1("!!SURGE_DEBUG: info["..tostring(info_id).."]")
