@@ -3,6 +3,6 @@ local fname = fs:update_path("$game_scripts$", "personal_test.lua")
 function main()
 	local chunk, err = dofile(fname)
 	if err then
-		get_console():execute("err="..tostring(string.gsub(err, " ", "_")))
+		log1("!!"..err)
 	end
 end

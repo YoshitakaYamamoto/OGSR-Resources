@@ -430,10 +430,6 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 local update_was_never_called = true
 function actor_binder:update(delta)
-	--// Для персональных функций, в обновлениях. Phoenix
-	--personal_update.main()
-	--//End
-
 	ogse_debug.check_npc()
 	ogse_debug.check_monsters()	
 	ogse_debug.check_gulag()	
