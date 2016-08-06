@@ -689,11 +689,7 @@ function motivator_binder:death_callback(victim, who)
 		end
 	end
 
-	ogse_debug.process_npc(victim, "dth", 2)
-	ogse.deadmans_table[victim:id()] = tostring(game.time()).."_"..tostring(who:id())
-
 	ogse_debug.process_npc(victim, "dth", 21)	
-	local name = tostring(victim:name())
 	ogse_hitfx.npc_on_death(victim, who)
 
 	ogse_debug.process_npc(victim, "dth", 3)

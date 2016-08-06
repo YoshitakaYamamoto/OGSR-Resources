@@ -11,6 +11,7 @@ function attach(sm)
 	sm:subscribe({signal = "on_first_update",	fun = this.on_actor_first_update})
 	sm:subscribe({signal = "on_save",			fun = this.on_game_save})
 	sm:subscribe({signal = "on_spawn",			fun = this.on_game_load})
+	sm:subscribe({signal = "on_update",			fun = this.show_time})
 end
 
 game_time_factor = 0
@@ -20,7 +21,7 @@ local min_alarm_fov_vol = sys_ini:r_s32("options","min_fov_volume")
 local ammo_on_belt = sys_ini:r_s32("options","ammunition_on_belt")
 local quest_dead_on_arrival = {}
 ---------------------------------------------------------------
-deadmans_table = {}
+deadmans_table = {} -- см. dsh_deadmans_table_proxy.script
 -- Формат хранения:
 -- [id] = { time_died = time_when_killed, killer = who:id() }
 ---------------------------------------------------------------
@@ -1281,10 +1282,6 @@ function()
 	end
 end,
 function()
-	ogse_debug.process_actor("upd_a", 24)
-	show_time() -- Выводим время на HUD
-end,
-function()
 	ogse_debug.process_actor("upd_a", 19)
 	check_doa_kills() -- Проверка убиванцев по выходу в оффлайн
 end,
@@ -1299,37 +1296,6 @@ end,
 function()
 	ogse_debug.process_actor("upd_a", 37)
 	xr_companion.check_in_car() -- Поездки в машине с напарником
-end,
-function()
-	ogse_debug.process_actor("upd_a", 39)
--- зачистка таблички сохраненных трупиков
-	if not deadmans_table then deadmans_table = {} end
-	for k, v in pairs(deadmans_table) do
-		local time_died, killer = 1, 1
-		local a = 0
-		for word in string.gfind(v, "%d+") do
-			if a == 0 then
-				time_died = tonumber(word)
-			else
-				killer = tonumber(word)
-			end
-			a = a + 1
-		end
-		local sobj = alife():object(k)
-		if not sobj then
-			deadmans_table[k] = nil
-		else
-			sobj = alife():object(killer)
-			if not sobj then
-				deadmans_table[k] = nil
-			else
-				if (time_died+(30*60*1000)) <= game.time() then
-					deadmans_table[k] = nil
-				end
-			end
-		end
-	end
--- зачистка таблички сохраненных трупиков
 end,
 function()
 	ogse_debug.process_actor("upd_a", 40)
@@ -1502,9 +1468,6 @@ function on_game_load()
 	ogse_debug.process_actor("a_spw", 111)
 	se_respawn.check_zone_population()
 
-	ogse_debug.process_actor("a_spw", 113)
-	deadmans_table = load_var( "ogse.deadmans_table", {}, "table" )
-
 	ogse_debug.process_actor("a_spw", 115)
 	get_console():execute("unbind contacts") --Отключаем в PDA вкладку "Контакты"
 
@@ -1609,8 +1572,6 @@ function on_game_save(packet)
 	save_var("q_doa", quest_dead_on_arrival, "array")
 
 	se_respawn.check_zone_population() --Проверим численность
-
-	save_var( "ogse.deadmans_table", deadmans_table, "table" )
 end
 
 function check_doa_kills()
@@ -1667,6 +1628,7 @@ end
 
 -------------------Выводим время на HUD-------------------
 function show_time()
+	ogse_signals.get_mgr():reschedule( 1000 )
 	local hud = get_hud()
 	local time_h = sr_timer.time2str(level.get_time_hours())
 	local time_m = sr_timer.time2str(level.get_time_minutes())
