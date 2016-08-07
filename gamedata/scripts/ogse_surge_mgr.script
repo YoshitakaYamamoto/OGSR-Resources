@@ -787,20 +787,6 @@ function proceed_art_spawn(section, count)
 	end
 end
 
--- Спавн фантомов
-function play_phantoms()
-	if math.random() < 0.5 then
-		if phantom_manager:phantom_count() < 5 then
-			local yaw = math.pi*2.0*math.random()
-			local radius = 30*(math.random()/2.0+0.5)
-			local height = 2.5*math.random()
-			local a_pos = db.actor:position()
-			local pos = vector():set(math.sin(yaw)*radius+a_pos.x,a_pos.y+height,math.cos(yaw)*radius+a_pos.z)
-			phantom_manager.spawn_phantom(pos)
-		end
-	end
-end
-
 local horror_objects_db = {
 	l01_escape = {
 		horror = {prob = 0.25, use_surge_count = true, 
