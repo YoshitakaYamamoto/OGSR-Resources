@@ -1264,7 +1264,7 @@ local anom_enum = time_global()
 local watchdog --НЕ ТРОГАТЬ! Здесь не должно быть никакого значения!
 local func --Тоже самое.
 local watchdog_tbl = { --АПДЕЙТЫ С НИЗКИМ ПРИОРИТЕТОМ!
-function()
+function() --TODO: Перенести в ui_rad.script, или вообще удалить
 	ogse_debug.process_actor("upd", 11)
 	if db.actor.radiation >= 0.7 then --Вывод сообщения о большой радиации
 		local hud = get_hud()
@@ -1341,14 +1341,10 @@ function()
 	ogse_debug.process_actor("upd_a", 36087)
 	ogsm_quests.actor_zombied_fx() -- Постэффект зомбирования актора
 end,
-function()
-	ogse_debug.process_actor("upd", 813)
-	task_manager.actor_update()
-end,
 ------------------------------------------------Квестовые апдейты---------------------------------------------
 function()
 	ogse_debug.process_actor("upd_a", 29)
-	ogse_quests_fix.check_radar_off() -- Багфикс радара
+	ogse_quests_fix.check_radar_off() -- Багфикс радара TODO Оптимизировать
 end,
 --[[function()
 	ogse_debug.process_actor("upd_a", 36)

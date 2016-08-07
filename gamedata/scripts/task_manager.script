@@ -212,12 +212,19 @@ function CRandomTask:__init()
 		--' По самовыдаваемости
 		if v.init_condition ~= nil then
 			table.insert(self.task_id_self_inited, k)
+			if not self.subscribed then
+				self.subscribed = {
+					signal = "on_update", self = self, fun = self.actor_update,
+					queued = true
+				}
+				ogse_signals.get_mgr():subscribe( self.subscribed )
+			end
 		end
 	end
 end
 --' Сохранение
 function CRandomTask:save(p)
-	printf("^^^ SAVE")
+	--printf("^^^ SAVE")
 -----------------------
 	p = net_packet()
 	p:w_begin( 123 )
@@ -257,7 +264,7 @@ function CRandomTask:save(p)
 end
 --' Загрузка
 function CRandomTask:load(p)
-	printf("^^^ LOAD")
+	--printf("^^^ LOAD")
 --------------------------------------------------------------
 	if ogse.var_exists( script_name() .. ".task_info") then
 		p = ogse.load_var( script_name() .. ".task_info")
@@ -353,7 +360,7 @@ function has_item_to_bring(task_desc)
 end
 
 function CRandomTask:have_completed_job(actor, npc)
-	print_table(self.active_task_by_type)
+	--print_table(self.active_task_by_type)
 	local parent = self:get_parent(npc)
 	for k,v in pairs(self.active_task_by_type) do
 --		printf("have_completed_job: %s", tostring(v))
@@ -373,7 +380,7 @@ end
 function CRandomTask:action_give_task(actor, npc, p1, p2)
 	local task = CGameTask()
 	
-	printf("p1 = %s p2 = %s", tostring(p1), tostring(p2))
+	--printf("p1 = %s p2 = %s", tostring(p1), tostring(p2))
 
 	local task_desc = self.task_info[self.task_id_by_yes_phrase_id[p2]]
 --[[	
@@ -395,9 +402,9 @@ function CRandomTask:action_give_task(actor, npc, p1, p2)
 	--' Выбираем текущую цель квеста
 	if task_desc.target_objects ~= nil then
 		self.task_info[self.task_id_by_yes_phrase_id[p2]].selected_target = task_desc.target_objects[math.random(table.getn(task_desc.target_objects))]
-		printf("TARGET DEBUG INFO")
-		printf("selected = %s", tostring(self.task_info[self.task_id_by_yes_phrase_id[p2]].selected_target))
-		print_table(task_desc.target_objects)
+		--printf("TARGET DEBUG INFO")
+		--printf("selected = %s", tostring(self.task_info[self.task_id_by_yes_phrase_id[p2]].selected_target))
+		--print_table(task_desc.target_objects)
 	end
 
 	if task_desc.type == "eliminate_lager" then
@@ -470,10 +477,10 @@ function CRandomTask:task_complete(p1, p2)
 
 	local sel_task = self.task_info[self.active_task_by_type[p1]]
 	if sel_task == nil then
-		printf("!!!")
-		print_table(self.active_task_by_type)
-		printf("!!!")
-		print_table(self.task_info)
+		--printf("!!!")
+		--print_table(self.active_task_by_type)
+		--printf("!!!")
+		--print_table(self.task_info)
 		abort("WRONG RANDOM TASK %s %s", tostring(p1), tostring(p2))
 	end
 
@@ -539,10 +546,10 @@ function CRandomTask:task_fail(p1, p2)
 		local sel_task = self.task_info[self.active_task_by_type[p1]]
 		
 		if sel_task == nil then
-			printf("!!!")
-			print_table(self.active_task_by_type)
-			printf("!!!")
-			print_table(self.task_info)
+			--printf("!!!")
+			--print_table(self.active_task_by_type)
+			--printf("!!!")
+			--print_table(self.task_info)
 			abort("WRONG RANDOM TASK %s %s", tostring(p1), tostring(p2))
 		end
 
@@ -753,6 +760,7 @@ function CRandomTask:check_task_props(task_id)
 end
 --' Проверяем можем ли мы сейчас выдать какой либо самоинициализующийся таск
 function CRandomTask:actor_update()
+	ogse_signals.get_mgr():reschedule( 1000 )
 	for k,v in pairs(self.task_id_self_inited) do
 		if self.task_info[v].status == "normal" then
 			self:check_task_props(v)
@@ -1045,11 +1053,11 @@ function CRandomTask:unregister_target(obj)
 	end
 end
 function CRandomTask:stats(obj)
-	printf("### TASK STATISTIC ###")
+	--printf("### TASK STATISTIC ###")
 	for k,v in pairs(self.task_info) do
 		if v.init_condition ~= nil then
-			printf("[%s] %s : %s", v.status, k, tostring(v.enabled_props))
-			print_table(v.init_condition)
+			--printf("[%s] %s : %s", v.status, k, tostring(v.enabled_props))
+			--print_table(v.init_condition)
 		end
 	end
 end
@@ -1203,10 +1211,6 @@ function task_fail(p1, p2)
 end
 function task_callback(p1, p2, state)
 	return get_random_task():task_callback(p1, p2, state)
-end
-
-function actor_update()
-	get_random_task():actor_update()
 end
 
 function cleanup_actor()
