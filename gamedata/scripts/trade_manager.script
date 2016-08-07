@@ -153,15 +153,16 @@ function update( npc, forced )
   local str = xr_logic.pick_section_from_condlist(
     db.actor, npc, tt.buy_condition
   )
-  if not tt.current_buy_condition or tt.current_buy_condition ~= str then
+  if str and (not tt.current_buy_condition or tt.current_buy_condition ~= str) then
     --log2( "~~TRADE UPDATE[%s]: buy condition = %s", npc:name(), str )
     npc:buy_condition( tt.config, str )
     tt.current_buy_condition = str
   end
 
+  --log3( "~~TRADE UPDATE [%s]: tt.sell_condition: [%s]", npc:name(), tt.sell_condition )
   str = xr_logic.pick_section_from_condlist( db.actor, npc, tt.sell_condition )
-  if not tt.current_sell_condition or tt.current_sell_condition ~= str then
-    --log2( "~~TRADE UPDATE[%s]: sell condition = %s", npc:name(), str )
+  --log3( "~~TRADE UPDATE [%s]: sell condition = %s", npc:name(), str or "nil" )
+  if str and (not tt.current_sell_condition or tt.current_sell_condition ~= str) then
     npc:sell_condition( tt.config, str )
     tt.current_sell_condition = str
   end
@@ -174,7 +175,7 @@ function update( npc, forced )
       return
     end
     str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_supplies )
-    if not tt.current_buy_supplies or tt.current_buy_supplies ~= str then
+    if str and (not tt.current_buy_supplies or tt.current_buy_supplies ~= str) then
       -- log2( "TRADE UPDATE[%s]: buy_supplies = %s", npc:name(), str )
       npc:buy_supplies( tt.config, str )
       add_buy_supplies( npc, tt.config, str )
