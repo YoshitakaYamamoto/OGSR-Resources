@@ -7,6 +7,7 @@ end
 
 function on_npc_death(victim, who)
 	ogse.deadmans_table[victim:id()] = tostring(game.time()).."_"..tostring(who:id())
+	run_deadmans_timer()
 end
 
 function on_load()
