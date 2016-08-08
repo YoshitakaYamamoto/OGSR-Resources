@@ -82,7 +82,7 @@ function begin_sleep(desired_sleep_time)
 	-- каждый час сна делим на периоды по три минуты (20 отсчётов на час)
 	local sleep_counts = math.ceil(desired_sleep_time * 20)
 	local dt_ms = math.ceil(desired_sleep_time * 3600 * 1000 / sleep_counts)
-	local actor_binder = db.actor:binded_object()
+	--local actor_binder = db.actor:binded_object()
 	local prev_health = db.actor.health
 	for i=1,sleep_counts do
 		-- переводим стрелки

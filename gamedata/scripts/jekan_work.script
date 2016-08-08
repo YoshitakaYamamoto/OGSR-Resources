@@ -1792,8 +1792,8 @@ end
 
 function spawn_gorbovsky_dead()
 	local sobj = ogse.spawn_object(spawn_db.bar_dr_gorbovsky)
-	local obj = alife():story_object(story_ids.bar_dr_gorbovsky)
-	local obj_id = obj.id
+	--local obj = alife():story_object(story_ids.bar_dr_gorbovsky)
+	--local obj_id = obj.id
 	ogse.kill_offline_npc(sobj)
 end
 
