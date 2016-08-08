@@ -96,7 +96,7 @@ function CTreasure:__init()
 end
 --' Юзание инициатора (возможность выдать тайник)
 function CTreasure:use(npc)
-	printf("TREASURE USE")
+	--printf("TREASURE USE")
 
 	local se_obj = alife():object(npc:id())
 	if se_obj and se_obj.treasure_processed == true then
@@ -252,21 +252,23 @@ function CTreasure:give_treasure(k)
 		end
 		
 	end
-  		
-	if need_workaround then	self.loss_workaround_queue[v.target] = item_ids	end
-		
-		news_manager.send_treasure(v.name)
-		
-		level_tasks.add_location_by_id(obj.id, "treasure", text)
-	
-		--' Пометим тайник как выданный
-		self.treasure_info[k].active = true
-		self.treasure_info[k].done = true
-	
-	else
-		printf("TREASURE %s, target doesnt exist", k)
+
+	if need_workaround then
+		self.loss_workaround_queue[v.target] = item_ids
+		run_workaround_timer()
 	end
-		
+
+	news_manager.send_treasure(v.name)
+
+	level_tasks.add_location_by_id(obj.id, "treasure", text)
+
+	--' Пометим тайник как выданный
+	self.treasure_info[k].active = true
+	self.treasure_info[k].done = true
+
+	--else
+		--printf("TREASURE %s, target doesnt exist", k)
+	end
 end
 
 
@@ -379,4 +381,28 @@ function load(p)
 end
 function clear_treasure_manager()
 	treasure_manager = nil
+end
+
+
+local workaround_t
+function run_workaround_timer()
+  if not workaround_t then
+    workaround_t = check_workaround_timer():start()
+  end
+end
+
+class "check_workaround_timer" ( ogse_qt.quick_timer )
+function check_workaround_timer:__init() super()
+end
+
+function check_workaround_timer:condition()
+  return next( get_treasure_manager().loss_workaround_queue ) == nil
+end
+
+function check_workaround_timer:action()
+  workaround_t = nil
+end
+
+function check_workaround_timer:update()
+  get_treasure_manager():loss_workaround()
 end

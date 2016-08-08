@@ -1286,10 +1286,6 @@ function()
 	check_doa_kills() -- Проверка убиванцев по выходу в оффлайн
 end,
 function()
-	ogse_debug.process_actor("upd_a", 28)
-	treasure_manager.get_treasure_manager():loss_workaround() -- Запускаем затычку от возможной потери содержимого тайников
-end,
-function()
 	ogse_debug.process_actor("upd_a", 30)
 	aem_manager.get_aem():update() -- Обновление арены
 end,
