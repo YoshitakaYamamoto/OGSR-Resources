@@ -1559,8 +1559,6 @@ end
 -- Коллбэк на запись сейва
 function on_game_save(packet)
 	save_var("q_doa", quest_dead_on_arrival, "array")
-
-	se_respawn.check_zone_population() --Проверим численность
 end
 
 
