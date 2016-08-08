@@ -1282,10 +1282,6 @@ function() --TODO: Перенести в ui_rad.script, или вообще удалить
 	end
 end,
 function()
-	ogse_debug.process_actor("upd_a", 19)
-	check_doa_kills() -- Проверка убиванцев по выходу в оффлайн
-end,
-function()
 	ogse_debug.process_actor("upd_a", 30)
 	aem_manager.get_aem():update() -- Обновление арены
 end,
@@ -1541,6 +1537,7 @@ function on_game_load()
 
 	ogse_debug.process_actor("a_spw", 1120)
 	quest_dead_on_arrival = load_var("q_doa", {}, "array") --Квестовые умиранцы 
+	run_doa_timer()
 
 	ogse_debug.process_actor("a_spw", 1127)
 	if db.actor:has_info("esc_heli_go") and db.actor:dont_has_info("tutorial_wounded_start") then --Восстановим сценку с вертолётом
@@ -1566,7 +1563,35 @@ function on_game_save(packet)
 	se_respawn.check_zone_population() --Проверим численность
 end
 
-function check_doa_kills()
+
+function add_to_doa(obj)
+	if obj then
+		table.insert(quest_dead_on_arrival, obj.id)
+		run_doa_timer()
+	end
+end
+
+local doa_t
+function run_doa_timer()
+  if not doa_t then
+    doa_t = check_doa_timer():start( true )
+  end
+end
+
+class "check_doa_timer" ( ogse_qt.quick_timer )
+function check_doa_timer:__init() super()
+end
+
+function check_doa_timer:condition()
+  return next(quest_dead_on_arrival) == nil
+end
+
+function check_doa_timer:action()
+  doa_t = nil
+end
+
+function check_doa_timer:update()
+	ogse_signals.get_mgr():reschedule( 1000 )
 	for k, v in pairs(quest_dead_on_arrival) do
 		local obj = level.object_by_id(v)
 		if obj and obj:alive() then
@@ -1578,29 +1603,21 @@ function check_doa_kills()
 	end
 end
 
-function add_to_doa(obj)
-	if obj then
-		table.insert(quest_dead_on_arrival, obj.id)
-	end
-end
 
 function kill_offline_npc(obj)
 	if obj then
-
 		add_to_doa(obj)
-		
+
 		local pk = xs_netpk.monster(obj)
 		if not pk:isOk() then
 			pk = xs_netpk.stalker(obj)
 		end
-		
 		local data = pk:get()
 		data.health = 0
 		data.updhealth = 0
 		pk:set(data)
 		obj.offline_dead = 1
 		smart_terrain.on_death( obj.id )
-		
 	end
 end
 
