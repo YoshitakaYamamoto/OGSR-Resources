@@ -9,7 +9,6 @@ function attach(sm)
 	sm:subscribe({signal = "on_take",			fun = this.on_item_take})
 	sm:subscribe({signal = "on_update",			fun = this.on_actor_update})
 	sm:subscribe({signal = "on_first_update",	fun = this.on_actor_first_update})
-	sm:subscribe({signal = "on_save",			fun = this.on_game_save})
 	sm:subscribe({signal = "on_spawn",			fun = this.on_game_load})
 	sm:subscribe({signal = "on_update",			fun = this.show_time})
 end
@@ -19,7 +18,6 @@ local fov_vol = sys_ini:r_s32("options","fov_volume")
 local max_alarm_fov_vol = sys_ini:r_s32("options","max_fov_volume")
 local min_alarm_fov_vol = sys_ini:r_s32("options","min_fov_volume")
 local ammo_on_belt = sys_ini:r_s32("options","ammunition_on_belt")
-local quest_dead_on_arrival = {}
 ---------------------------------------------------------------
 deadmans_table = {} -- см. dsh_deadmans_table_proxy.script
 -- Формат хранения:
@@ -1290,28 +1288,6 @@ function()
 	xr_companion.check_in_car() -- Поездки в машине с напарником
 end,
 function()
-	ogse_debug.process_actor("upd_a", 40)
-	db.remove_deadman() -- Уборка трупов и лута
-end,
-function()
-	ogse_debug.process_actor("upd_a", 41)
--- Обновление баг-таймера
-	if time_global() > buggy_timer then
-		for k, v in pairs(db.creature) do
-			local obj = level.object_by_id(k)
-			local sobj = alife():object(k)
-			if obj and obj:alive() == false and v == true and obj:object("device_torch") and obj:name() ~= "single_player" and sobj.offline_dead == 0 then
-				-- log1("UNREGISTERED BODY FOUND - TO DELAYED "..obj:id().." "..obj:name())
-				-- db.actor:give_game_news("ВНИМАНИЕ! Обнаружен потенциально повреждённый неразрегистрированный труп! Объект: "..obj:character_name().." ИД: "..obj:id().." Профиль: "..obj:profile_name().." Будет произведена попытка разрегистрации и удаления объекта!", "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
-				if not db.delayed[obj:id()] then db.delayed[obj:id()] = obj:id() end
-			end
-		end
-		buggy_timer = buggy_timer + math.random(20000,25000)
-	end
--- Обновление баг-таймера
-	db.remove_delayed() -- Удаление глючных трупов с битым пстором
-end,
-function()
 	ogse_debug.process_actor("upd_a", 45)
 -- Периодическая проверка численности
 	if time_global() > anom_enum then
@@ -1535,10 +1511,6 @@ function on_game_load()
 		end
 	end
 
-	ogse_debug.process_actor("a_spw", 1120)
-	quest_dead_on_arrival = load_var("q_doa", {}, "array") --Квестовые умиранцы 
-	run_doa_timer()
-
 	ogse_debug.process_actor("a_spw", 1127)
 	if db.actor:has_info("esc_heli_go") and db.actor:dont_has_info("tutorial_wounded_start") then --Восстановим сценку с вертолётом
 		local spw_1 = tonumber(load_variable("heli_quest_1",nil))
@@ -1556,56 +1528,9 @@ function on_game_load()
 	end
 end
 
--- Коллбэк на запись сейва
-function on_game_save(packet)
-	save_var("q_doa", quest_dead_on_arrival, "array")
-end
-
-
-function add_to_doa(obj)
-	if obj then
-		table.insert(quest_dead_on_arrival, obj.id)
-		run_doa_timer()
-	end
-end
-
-local doa_t
-function run_doa_timer()
-  if not doa_t then
-    doa_t = check_doa_timer():start( true )
-  end
-end
-
-class "check_doa_timer" ( ogse_qt.quick_timer )
-function check_doa_timer:__init() super()
-end
-
-function check_doa_timer:condition()
-  return next(quest_dead_on_arrival) == nil
-end
-
-function check_doa_timer:action()
-  doa_t = nil
-end
-
-function check_doa_timer:update()
-	ogse_signals.get_mgr():reschedule( 1000 )
-	for k, v in pairs(quest_dead_on_arrival) do
-		local obj = level.object_by_id(v)
-		if obj and obj:alive() then
-			obj:kill(obj)
-			quest_dead_on_arrival[k] = nil
-		elseif obj then	
-			quest_dead_on_arrival[k] = nil
-		end
-	end
-end
-
 
 function kill_offline_npc(obj)
 	if obj then
-		add_to_doa(obj)
-
 		local pk = xs_netpk.monster(obj)
 		if not pk:isOk() then
 			pk = xs_netpk.stalker(obj)

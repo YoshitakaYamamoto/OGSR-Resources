@@ -316,7 +316,7 @@ function motivator_binder:net_spawn(sobject)
 		st.loaded_gulag_name = st.gulag_name
 	end
 
---TODO: Удалить
+--[=[
 	if has_alife_info("bar_heli_scene_stay_online") then
 		if string.find(self.object:name(), "bar_ecolog_professor") then
 			local gulag = xr_gulag.get_npc_gulag(self.object)
@@ -326,7 +326,7 @@ function motivator_binder:net_spawn(sobject)
 			end		
 		end		
 	end
-	
+]=]
 	ogse_debug.process_npc(self.object, "s_spw", 4)
 
 	-- Все CALLBACK-и ставить здесь:
@@ -390,9 +390,7 @@ function motivator_binder:net_spawn(sobject)
 			ogse_debug.process_npc(self.object, "s_spw", 75)
 			self:clear_callbacks()
 
-			ogse_debug.process_npc(self.object, "s_spw", 76)
-			-- добавим в постмортем-обработчик
-			db.add_deadman(self.object, self.object)
+			self.object:iterate_inventory(death_manager.keep_item)
 
 			ogse_debug.process_npc(self.object, "s_spw", 77)
 			s_obj.offline_dead = game.time()+(1*24*60*60*1000)
@@ -412,27 +410,20 @@ function motivator_binder:net_spawn(sobject)
 				end				
 			end
 
-			self.am:call( "on_npc_spawn", self.object, self )
-			ogse_debug.process_npc(self.object, "s_spw", 0)
-			return true
+			--self.am:call( "on_npc_spawn", self.object, self )
+			--ogse_debug.process_npc(self.object, "s_spw", 0)
+			--return true
 		end
 
-		self.am:call( "on_npc_spawn", self.object, self )
+		--self.am:call( "on_npc_spawn", self.object, self )
 		ogse_debug.process_npc(self.object, "s_spw", 0)
 		return true
 	end
 
 	ogse_debug.process_npc(self.object, "s_spw", 8)
-	-- Для зомбированных чуваков говорим что аномалий не существует
-	if self.object:character_community() == "zombied" then
-		local manager = self.object:motivation_action_manager()
-		manager:remove_evaluator  (stalker_ids.property_anomaly)
-		manager:add_evaluator   (stalker_ids.property_anomaly, property_evaluator_const(false))
-	else
-		local manager = self.object:motivation_action_manager()
-		manager:remove_evaluator  (stalker_ids.property_anomaly)
-		manager:add_evaluator   (stalker_ids.property_anomaly, property_evaluator_const(false))
-	end
+	local manager = self.object:motivation_action_manager()
+	manager:remove_evaluator(stalker_ids.property_anomaly)
+	manager:add_evaluator(stalker_ids.property_anomaly, property_evaluator_const(false))
 
 	ogse_debug.process_npc(self.object, "s_spw", 9)
 	if xr_combat_companion then
@@ -715,10 +706,6 @@ function motivator_binder:death_callback(victim, who)
 
 	ogse_debug.process_npc(victim, "dth", 9)
 	self:clear_callbacks()
-
-	ogse_debug.process_npc(victim, "dth", 10)
-	-- добавим в постмортем-обработчик
-	db.add_deadman(self.object, victim)
 
 	ogse_debug.process_npc(victim, "dth", 11)
 	-- добавление опыта за убийство
