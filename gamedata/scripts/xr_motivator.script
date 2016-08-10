@@ -735,10 +735,6 @@ function motivator_binder:death_callback(victim, who)
 		end		
 	end
 
-	ogse_debug.process_npc(victim, "dth", 17)
-	--// xr_companion
-	xr_companion.companion_death(self.object)
-
 	ogse_debug.process_npc(victim, "dth", 18)
 	xr_effects.bar_territory_death(self.object, who)
 

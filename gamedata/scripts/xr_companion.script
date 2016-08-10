@@ -20,7 +20,44 @@
 -- bandit			- бандит
 -- mil_stalker		- военсталкер
 ----------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------  
+
+local sm = ogse_signals.get_mgr()
+local subscribed
+
+function subscribe(id)
+	if not subscribed then
+		subscribed = {
+			{ signal = "on_first_update",	fun = this.on_first_update },
+			{ signal = "on_update",			fun = this.check_in_car, queued = true },
+			{ signal = "on_npc_death",		fun = this.companion_death },
+		}
+		for _, v in pairs(subscribed) do
+			sm:subscribe(v)
+		end
+		--log3("--[%s] subscribed signals", script_name())
+	end
+	xr_combat_companion.subscribe(id)
+end
+
+function unsubscribe(id)
+	if subscribed and next(companions) == nil then
+		for _, v in pairs(subscribed) do
+			sm:unsubscribe(v)
+		end
+		subscribed = nil
+		--log3("~~[%s] UNsubscribed signals", script_name())
+	end
+	xr_combat_companion.unsubscribe(id)
+end
+
+
+function on_first_update()
+	for k, _ in pairs(companions) do
+		check_teleport(k, ogse_car_control.current_car) --KRodin: исправлено. В оригинальном ОГСЕ работало неправильно.
+	end
+end
+
+----------------------------------------------------------------------------------------------------
 number_of_companions = 0
 companions = {}
 
@@ -673,7 +710,7 @@ end
 -----------------------------------------------------
 -- Функция для перехода с локации на локацию
 -----------------------------------------------------
-function check_teleport(npc_id)
+function check_teleport(npc_id, in_car)
 	local actor = db.actor
 	local cur_level_name = load_var_companion(npc_id,"c_lvl","none")
 	-- если локация всё та же, нет никакой надобности насиловать постоянно хранилище
@@ -695,6 +732,9 @@ function check_teleport(npc_id)
 		pos.x = pos.x + 6
 		pos.z = pos.z -- + 2
 		alife():teleport_object("_", pos, lvid, gvid, npc_id)
+		if in_car then
+			s_npc.force_offline = true
+		end
 	end
 end
 -----------------------------------------------------
@@ -725,6 +765,8 @@ function is_inside_my_car()
 end
 
 function check_in_car()
+	sm:reschedule( math.random(2000, 3000) )
+
 	local car = ogse_car_control.current_car
 	if car then
 		-- выводим в оффлайн
@@ -984,7 +1026,9 @@ function companion_death(npc)
 			db.actor:give_game_news(game.translate_string("companion_messages").." "..npc:character_name().." "..game.translate_string("companion_died"), "ui\\ui_iconsTotal", Frect():set(0,235,83,47), 0, 15000)
 		else
 			db.actor:give_game_news(game.translate_string("companion_messages").." "..npc:character_name().." "..game.translate_string("companion_died_bad"), "ui\\ui_iconsTotal", Frect():set(0,235,83,47), 0, 15000)
-		end	
+		end
+
+		unsubscribe(npc:id())
 	end
 end
 
@@ -1441,6 +1485,8 @@ function action_companion_activity:execute()
 		self.object:set_character_community(comm, 0, 0)
 		trade_manager.trade_init(self.object, "misc\\trade_generic.ltx")	
 		xr_companion.companions[self.object:id()] = nil
+
+		unsubscribe(self.object:id())
 	end	
 	
 end
@@ -1667,8 +1713,9 @@ function enable_scheme(npc, ini)
 		if tostring(flag) == "1" then
 			--log1("[XR COMPANION.ENABLE_SCHEME] REMOVING ALL RESTRICTIONS FOR "..npc:name())
 			--npc:remove_all_restrictions()
-			log1("xr_companion scheme online "..tostring(npc:id()))
 			companions[npc:id()] = "companion"
+			subscribe(npc:id())
+			--log3("--[%s.enable_scheme] subscribed: [%s]", script_name(), npc:name())
 			companion_weapon[npc:id()] = load_var_companion(npc:id(), "weapon_behavior", "anything")			
 			local behavior = load_var_companion(npc:id(), "companion_behavior", beh_walk_simple)
 			init_danger_settings(npc)
@@ -1698,13 +1745,14 @@ end
 function is_companion_se(obj)
 	local community = obj:community()
 		if suitable_communities[community] then
-		if not string.find(obj:profile_name(), "bar_arena_stalker") and obj:health() > 0 then
-			xr_companion.companions[obj.id] = community
+		if obj:health() > 0 then
 			local flag = load_var_companion(obj.id, "is_companion", 0)
 			if tostring(flag) == "1" then
 				--log1("!!COMP FND OFFLINE! "..obj:profile_name())
 				xr_companion.companions[obj.id] = "companion"
 				xr_companion.number_of_companions = xr_companion.number_of_companions + 1
+				subscribe(obj.id)
+				--log3("--[%s.is_companion_se] called subscribe!", script_name())
 			end
 		end
 	end

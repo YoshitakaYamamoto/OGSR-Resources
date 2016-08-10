@@ -809,6 +809,8 @@ function companion_start_following(npc, actor)
 		
 		st_c.enabled = true
 		st_c.behavior = xr_companion.beh_walk_simple
+
+		xr_companion.subscribe(npc:id())
 	end	
 end
 
@@ -836,6 +838,8 @@ function companion_stop_following(npc, actor)
 	level_tasks.remove_location_by_id(npc:id(), "alife_presentation_companion")
 	xr_companion.companions[npc:id()] = nil
 	xr_gulag.resetJob(npc)
+
+	xr_companion.unsubscribe(npc:id())
 end
 
 function quest_companion_stop_following(npc, actor)
@@ -859,6 +863,8 @@ function quest_companion_stop_following(npc, actor)
 	level_tasks.remove_location_by_id(npc:id(), "alife_presentation_companion")
 	xr_companion.companions[npc:id()] = nil
 	xr_gulag.resetJob(npc)
+
+	xr_companion.unsubscribe(npc:id())
 end
 
 function is_companion(actor, npc)

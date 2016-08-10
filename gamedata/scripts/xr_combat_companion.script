@@ -6,55 +6,73 @@
 -- Версия 1.95 (09/02/2015)
 ----------------------------------------------------------------------------------------------------
 
-function attach( sm )
-  --sm:subscribe({ signal = "on_monster_death",	fun = this.on_death })
-  --sm:subscribe({ signal = "on_monster_spawn",	fun = this.on_monster_spawn })
-  sm:subscribe({ signal = "on_npc_death",		fun = this.on_death })
+function attach( sm ) --Нужно для того, чтобы не было вылетов после перехода НПС в оффлайн/онлайн.
   sm:subscribe({ signal = "on_npc_spawn",		fun = this.on_npc_spawn })
-  sm:subscribe({ signal = "on_npc_hit",			fun = this.on_npc_hit })
-  sm:subscribe({ signal = "on_hit",				fun = this.on_hit })
+  sm:subscribe({ signal = "on_npc_net_destroy",	fun = this.on_npc_net_destroy })
 end
 
-function on_monster_spawn( obj, binder )
-  if not obj:alive() then return end
-  local s = {
-    [ "signal" ] = "on_monster_update." .. obj:id(),
-    [ "fun"    ] = this.on_monster_update,
-    [ "queued" ] = true,
-  }
-  binder[ script_name() .. ".subscribed" ] = s
-  ogse_signals.get_mgr():subscribe( s )
+function on_npc_spawn( obj )
+	local id = obj:id()
+	if obj:alive() and xr_companion.is_companion(id) then
+		subscribe( id )
+		--log3("--[%s.on_npc_spawn] subscribed", script_name())
+	end
 end
 
-function on_death( obj, who )
-  local binder     = obj:binded_object()
-  local subscribed = binder[ script_name() .. ".subscribed" ]
-  if subscribed then
-    ogse_signals.get_mgr():unsubscribe( subscribed )
-  end
+function on_npc_net_destroy( obj )
+	local id = obj:id()
+	if obj:alive() and xr_companion.is_companion(id) then
+		unsubscribe( id )
+		--log3("~~[%s.on_npc_net_destroy] UNsubscribed", script_name())
+	end
 end
 
-function on_monster_update( obj )
-  process_enemy( db.actor, obj )
+
+local sm = ogse_signals.get_mgr()
+local subscribed
+local subscribed_objs = {}
+
+function subscribe( id )
+	if not subscribed then
+		subscribed = { signal = "on_hit", fun = this.on_hit }
+		sm:subscribe(subscribed)
+		--log3("--[%s] subscribed signal 'on_hit'", script_name())
+	end
+
+	if not subscribed_objs[id] then
+		local s = {
+			{ signal = "on_npc_update."..id,	fun = this.on_npc_update },
+			{ signal = "on_npc_hit",			fun = this.on_npc_hit },
+		}
+		for _, v in pairs(s) do
+			sm:subscribe( v )
+		end
+		subscribed_objs[id] = s
+		--log3("--[%s] subscribed signals", script_name())
+	end
 end
 
-function on_npc_spawn( obj, binder )
-  if not obj:alive() then return end
-  local s = {
-    [ "signal" ] = "on_npc_update." .. obj:id(),
-    [ "fun"    ] = this.on_npc_update,
-    --[ "queued" ] = true,
-  }
-  binder[ script_name() .. ".subscribed" ] = s
-  ogse_signals.get_mgr():subscribe( s )
+function unsubscribe( id )
+	if subscribed and next(xr_companion.companions) == nil then
+		sm:unsubscribe(subscribed)
+		subscribed = nil
+		--log3("~~[%s] UNsubscribed signal 'on_hit'", script_name())
+	end
+
+	if subscribed_objs[id] then
+		for _, v in pairs(subscribed_objs[id]) do
+			sm:unsubscribe( v )
+		end
+		subscribed_objs[id] = nil
+		--log3("~~[%s] UNsubscribed signals", script_name())
+	end
 end
+
 
 function on_npc_update( obj )
---log3("!!Combat companion npc update for [%s]", obj:id())
-  --process_enemy( db.actor, obj )
-  if xr_companion.is_companion(obj:id()) then
-    reprioritize_targets(obj)
-  end
+	if xr_companion.is_companion(obj:id()) then
+		reprioritize_targets(obj)
+	end
 end
 
 function on_npc_hit(obj, amount, local_direction, who, bone_index)
@@ -64,14 +82,15 @@ function on_npc_hit(obj, amount, local_direction, who, bone_index)
 end
 
 function on_hit(obj, amount, local_direction, who, bone_index)
-	if current_companion then
-		local companion = level.object_by_id(current_companion)
+	for id, _ in pairs(xr_companion.companions) do
+		local companion = level.object_by_id(id)
 		if companion then
 			hit_callback(companion, who, amount)
 		end
 	end
 end
 
+--------------------------------------------------------------------------------------------
 
 local debug_flag = false		-- включить отладочный вывод
 
