@@ -46,12 +46,12 @@ function on_monster_spawn( obj, binder )
         })
       end
     elseif obj:clsid() == clsid.controller_s then
-	  table.insert( subscribed, {
-        [ "signal" ] = s_name,
-        [ "fun"    ] = this.controller_attack,
-        [ "queued" ] = true,
-        [ "__unsubscribe_on_death" ] = true,
-      })
+	  --table.insert( subscribed, {
+      --  [ "signal" ] = s_name,
+      --  [ "fun"    ] = this.controller_attack,
+      --  [ "queued" ] = true,
+      --  [ "__unsubscribe_on_death" ] = true,
+      --})
       table.insert( subscribed, {
         [ "signal" ] = s_name,
         [ "fun"    ] = this.controller_psy_attack,
@@ -133,7 +133,7 @@ end
 
 
 function may_attack()
-  if has_alife_info("actor_set_zombied") then return false end
+  if ogse_car_control.in_btr or has_alife_info("actor_set_zombied") then return false end
   return true
 end
 
@@ -304,6 +304,7 @@ function electro_himera_attack( obj )
 end
 
 
+--[=[
 --Удар контролёра руками из Зова ѕрипяти (Автор: demover123)
 function controller_attack( obj )
   local target = obj:best_enemy()
@@ -356,7 +357,7 @@ function controller_attack( obj )
     obj:add_animation( "stand_walk_fwd_" .. i, true )
   end
 end
-
+--]=]
 
 --Контроллёр запускает фантомов, зомбирует сталкеров и выбивает из рук оружие
 local hard_phantom_types = {"phantom_snork_4", "phantom_chimera_2", "phantom_krovosos_2"}
@@ -379,7 +380,7 @@ function controller_psy_attack( obj )
 			end
 		end
 ----------------------------------------------------------------------
-		if npc:id() == db.actor:id() and obj:see(npc) then
+		if npc:id() == db.actor:id() and obj:see(npc) and may_attack() then
 			if not may_attack() then return end
 			if obj:position():distance_to(npc:position()) < math.random(10, 100) then
 				local binder = obj:binded_object()
@@ -521,7 +522,6 @@ end
 
 --Взрывающийся зомби
 function blow_zombie_rusty(obj)
-	if not may_attack() then return end
 	local best_enemy = obj:best_enemy()
 	if
 		obj
@@ -549,7 +549,7 @@ function blow_zombie(p_obj)
 	end
 
 	local enemy = p_obj:best_enemy()
-	if enemy and p_obj:position():distance_to(enemy:position()) < 5 then
+	if enemy and p_obj:position():distance_to(enemy:position()) < 5 and may_attack() then
 		local zh = hit()
 		zh.type = hit.explosion
 		zh:bone("pelvis")
