@@ -11,7 +11,7 @@ local effectors = {} --Здесь хранятся данные активных
 local subscribed = nil
 
 function is_actor_zombied_ivulnerable()
-	if has_alife_info("actor_set_zombied") and level.name() ~= "l09_deadcity_ogse" then
+	if (has_alife_info("actor_set_zombied") and level.name() ~= "l09_deadcity_ogse") or ogse_car_control.in_btr then
 		return true	
 	end
 	return false
@@ -131,8 +131,16 @@ function PsyAntenna:update()
 	self.sm:reschedule( 1000 ) --Раз в секунду достаточно
 
 	self:generate_phantoms()
+
 	self:update_sound()
-	if not is_actor_zombied_ivulnerable() then self:update_psy_hit() end
+
+	if not is_actor_zombied_ivulnerable() then
+		self:update_psy_hit()
+	else
+		if get_hud():GetCustomStatic("cs_psy_danger") then
+			get_hud():RemoveCustomStatic("cs_psy_danger") --Удаляем с худа предупреждение
+		end
+	end
 end
 
 
@@ -167,7 +175,7 @@ function action_psy_antenna:update() -- bind_restrictor.actor_update()
 end
 
 function action_psy_antenna:switch_state()
-	if self.object:inside( db.actor:position() ) and not ogse_car_control.in_btr then --Если актор находится в зоне действия рестриктора и не находится в танке
+	if self.object:inside( db.actor:position() ) then --Если актор находится в зоне действия рестриктора
 		self:zone_enter()
 	else --В противном случае
 		self:zone_leave()
