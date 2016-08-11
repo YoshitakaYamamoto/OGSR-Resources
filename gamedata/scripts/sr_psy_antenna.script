@@ -167,9 +167,9 @@ function action_psy_antenna:update() -- bind_restrictor.actor_update()
 end
 
 function action_psy_antenna:switch_state()
-	if self.object:inside( db.actor:position() ) then --Если актор находится в зоне действия рестриктора
+	if self.object:inside( db.actor:position() ) and not ogse_car_control.in_btr then --Если актор находится в зоне действия рестриктора и не находится в танке
 		self:zone_enter()
-	else --Если актор вне зоны действия рестриктора
+	else --В противном случае
 		self:zone_leave()
 	end
 end
