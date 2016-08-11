@@ -1305,10 +1305,6 @@ function()
 	ogsm_quests.actor_zombied_fx() -- Постэффект зомбирования актора
 end,
 ------------------------------------------------Квестовые апдейты---------------------------------------------
-function()
-	ogse_debug.process_actor("upd_a", 29)
-	ogse_quests_fix.check_radar_off() -- Багфикс радара TODO Оптимизировать
-end,
 --[[function()
 	ogse_debug.process_actor("upd_a", 36)
 	ogsm_quests.actor_af_transmut_8_fx() -- Постэффект ношения "Ока" актором
@@ -1417,8 +1413,6 @@ function on_actor_first_update()
 	else
 		cmd("g_ammunition_on_belt off")	
 	end
-
-	ogse_quests_fix.clean_level() -- Очищаем уровни от трупов во фриплее
 end
 
 -- Загружаем все переменные, которые нужно, вызывается при загрузке игры автоматически
@@ -1802,24 +1796,27 @@ function reputation_up_20(stalker, player)
 	db.actor:change_character_reputation(20)
 end
 
---*************************************************Таймеры с визуальным счётчиком на худе*************************************************
------------------- таймер со счётчиком на экране --------------------------------
+--************************************************[Таймеры с визуальным счётчиком на худе]************************************************
+--==============================[Таймер со счётчиком на экране]=================================
 class "visual_timer" (ogse_st_mgr.delayed_fun_start)
 function visual_timer:__init(name) super(name)
 	self._class = script_name()..".visual_timer"
 end
 function visual_timer:start(...)
-	--
 	self.on_hud_show_desc = {signal = "on_hud_show", self = self, fun = self.on_hud_show}
 	ogse_signals.get_mgr():subscribe(self.on_hud_show_desc)
+	local hud = get_hud()
+	hud:AddCustomStatic("hud_timer_2", true)
+	hud:AddCustomStatic("hud_timer_text_2", true)
+
 	return ogse_st_mgr.delayed_fun_start.start(self, ...)
 end
 function visual_timer:stop()
+	ogse_signals.get_mgr():unsubscribe(self.on_hud_show_desc)
 	local hud = get_hud()
 	hud:RemoveCustomStatic("hud_timer_2")
 	hud:RemoveCustomStatic("hud_timer_text_2")
-	--
-	ogse_signals.get_mgr():unsubscribe(self.on_hud_show_desc)
+
 	ogse_st_mgr.delayed_fun_start.stop(self)
 end
 function visual_timer:on_hud_show()
@@ -1846,15 +1843,21 @@ function visual_timer:condition()
 	local m = math.floor(dt/60 - h*60)
 	local s = math.floor(dt - h*3600 - m*60)
 	local txt = string.format("%02d:%02d:%02d", h, m, s)
-	local hud = get_hud()
-	hud:AddCustomStatic("hud_timer_2", true)
-	local st_text = hud:AddCustomStatic("hud_timer_text_2", true)
-	if st_text then
-		st_text:wnd():SetText(txt)
-	end
+	get_hud():GetCustomStatic("hud_timer_text_2"):wnd():SetText(txt)
 	return false
 end
------------------- таймер со счётчиком на экране и дополниельным условием останова -----------------
+
+-------------[Обёртки для упрощённого запуска]-----------
+function start_visual_timer(name, delay, fname, ...)
+	return visual_timer(name):set_delay(delay):init(fname, ...):start(true)
+end
+function start_visual_gtimer(name, delay, fname, ...)
+	return visual_timer(name):set_gdelay(delay):init(fname, ...):start(true)
+end
+---------------------------------------------------------
+--==============================================================================================
+
+--=============[Таймер со счётчиком на экране и дополнительным условием останова]===============
 class "conditional_visual_timer" (visual_timer)
 function conditional_visual_timer:__init(name) super(name)
 	self._class = script_name()..".conditional_visual_timer"
@@ -1863,38 +1866,41 @@ function conditional_visual_timer:init(cond_name, action_name, ...)
 	self.cond_name = cond_name
 	self.user_condition = loadstring("return "..self.cond_name.."(...)")
 	ASSERT(self.user_condition, "conditional_visual_timer:init: can not compile function with the name '"..tostring(self.cond_name).."'")
+
 	return ogse_st_mgr.delayed_fun_start.init(self, action_name, ...)
 end
 function conditional_visual_timer:condition()
 	visual_timer.condition(self) -- всегда возвращает false
+
 	return self.user_condition(unpack(self.fun_params))
 end
 function conditional_visual_timer:load(packet)
 	self.cond_name = packet:r_stringZ()
 	self.user_condition = loadstring("return "..self.cond_name.."(...)")
 	ASSERT(self.user_condition, "conditional_visual_timer:load: can not compile function with the name '"..tostring(self.cond_name).."'")
+
 	ogse_st_mgr.delayed_fun_start.load(self, packet)
 end
 function conditional_visual_timer:save(packet)
 	packet:w_stringZ(self.cond_name)
+
 	ogse_st_mgr.delayed_fun_start.save(self, packet)
 end
 
------ обёртки для классов таймеров с визуальным счётчиком --------------------------------
--- только по времени
-function start_visual_timer(name, delay, fname, ...)
-	return visual_timer(name):set_delay(delay):init(fname, ...):start(true)
-end
-function start_visual_gtimer(name, delay, fname, ...)
-	return visual_timer(name):set_gdelay(delay):init(fname, ...):start(true)
-end
--- с дополнительным условием останова
-function start_conditional_visual_timer(name, delay, cond_name, act_name, ...)
+-------------[Обёртки для упрощённого запуска]-----------
+function start_conditional_visual_timer(name, --Имя таймера. Если nil - будет сгенерировано автоматически.
+										delay, --Время до срабатывания (в секундах)
+										cond_name, --Имя функции - условия для остановки таймера. Пример: script_name()..".fix_restrictors" Функция будет запускаться на каждом апдейте с аргументами {...} Если вернёт true - таймер остановится.
+										act_name, --Имя функции, которая запустится при срабатывании таймера. Запускается с аргументами {...} Пример: script_name()..".fix_restrictors"
+										... --Аргументы для функций cond_name и act_name. Могут быть типа string, number, boolean. А можно и вообще без аргументов вызывать.
+										)
 	return conditional_visual_timer(name):set_delay(delay):init(cond_name, act_name, ...):start(true)
 end
 function start_conditional_visual_gtimer(name, delay, cond_name, act_name, ...)
 	return conditional_visual_timer(name):set_gdelay(delay):init(cond_name, act_name, ...):start(true)
 end
+---------------------------------------------------------
+--==============================================================================================
 --****************************************************************************************************************************************
 
 function fix_restrictors(npc)
