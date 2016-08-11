@@ -87,14 +87,6 @@ function PsyAntenna:update_psy_hit()
 				psy_hit.draftsman = db.actor
 				psy_hit.type = hit.telepatic
 			db.actor:hit(psy_hit)
-
-			local health_hit = hit()
-				health_hit.power = self.hit_intensity
-				health_hit.direction = vector():set( 0, 0, 0 )
-				health_hit.impulse = 0
-				health_hit.draftsman = db.actor
-				health_hit.type = hit.wound
-			db.actor:hit(health_hit)
 		end
 	end
 end
