@@ -1,5 +1,6 @@
 --' Ключем является группировка персонажа. Значением является таблица, содержашая имена секций предметов.
 local item_by_community = {}
+local community_list = { "def_box", "small_box_generic", "small_box_ussr", "small_box_nato", "small_box_army", "small_box_science", "big_box_generic", "big_box_dungeons", "big_box_arsenal"}	
 
 --' Множители и минимаксы для выпадения вещей в зависимости от уровня
 local mul_by_level = {}
@@ -8,13 +9,9 @@ local count_by_level = {}
 --' Предметы, относящиеся к патронам. Их надо спаунить другим методом.
 local ammo_sections = {}
 
-class "ph_item_box"
+local configured = false
 
-function ph_item_box:__init(obj)
-	self.obj = obj
-
-	local community_list = { "def_box", "small_box_generic", "small_box_ussr", "small_box_nato", "small_box_army", "small_box_science", "big_box_generic", "big_box_dungeons", "big_box_arsenal"}	
-	
+function configure()
 	for k,v in pairs(community_list) do
         --' Необходимо заполнить таблицу
         item_by_community[v] = {}
@@ -23,14 +20,14 @@ function ph_item_box:__init(obj)
 		    local id, value = "", ""
 		    for i=0,n-1 do
 			    result, id, value	= sys_ini:r_line(v,i,"","")
-                item_by_community[v][id] = 100*tonumber(value)
+                item_by_community[v][id] = tonumber(value)
 		    end
         end
     end
- 
+
 	--' Множители и минимаксы для выпадения вещей в зависимости от уровня
     local level_name = level.name()
-	
+
 	if not sys_ini:section_exist(level_name) then
 		level_name = "default"
 	end
@@ -45,7 +42,7 @@ function ph_item_box:__init(obj)
     local item_count_section = "item_count_" .. level.get_game_difficulty()
     local n = sys_ini:line_count(item_count_section)
 	for i=0,n-1 do
-		result, id, value	= sys_ini:r_line(item_count_section,i,"","")
+		result, id, value = sys_ini:r_line(item_count_section,i,"","")
         --' Нужно распарсить value в два значения
         local t = parse_nums(value)
 		if t[1] == nil then
@@ -56,7 +53,7 @@ function ph_item_box:__init(obj)
         if max == nil then
             max = min
         end
-        
+
         if mul_by_level[id] == nil then
             mul_by_level[id] = 0
         end
@@ -67,44 +64,51 @@ function ph_item_box:__init(obj)
         count_by_level[id] = {min = min, max = max}
 	end        
 	--' Предметы, относящиеся к патронам. Их надо спаунить другим методом.
-   ammo_sections = {}
     local n = sys_ini:line_count("ammo_sections")
 	local id, value = "", ""
 	for i=0,n-1 do
 		result, id, value	= sys_ini:r_line("ammo_sections",i,"","")
         ammo_sections[id] = true
-	end        
-	        
-	
-	
+	end
+end
+
+class "ph_item_box"
+function ph_item_box:__init(obj)
+	if not configured then
+		configure()
+		configured = true
+	end
+
+	self.obj = obj
+
+	local ini = self.obj:spawn_ini()
+	self.items = r_items(ini, "drop_box", "items")
+
+	local community	= get_string( "drop_box", "community", "def_box", ini )
+	--' Доспавниваем необходимое количество итемов:
+    --' Необходимо составить список объектов которые могут быть заспавнены для персонажа
+    self.random_items = item_by_community[community]
+	--' Если комьюнити задана не верно, то ставим дефолт и срем в лог.
+	if not self.random_items then 
+		self.random_items = item_by_community["def_box"]
+	end
 end
 
 function ph_item_box:spawn_items()
-	local spawn_items = {}
-	local ini = self.obj:spawn_ini()
-	local community	= utils.cfg_get_string(ini, "drop_box", "community", self.obj, false, "", "def_box")
-	local items = r_items(ini, "drop_box", "items")
-	if items then
-		for k,v in pairs(items) do
+	if self.items then
+		for k,v in pairs(self.items) do
 			create_obligatory_items(self.obj, v.section, v.count)
 		end
 		return
 	end
-			
-	--' Доспавниваем необходимое количество итемов:
-    --' Необходимо составить список объектов которые могут быть заспавнены для персонажа
-    local spawn_items = item_by_community[community]
-	--' Если комьюнити задана не верно, то ставим дефолт и срем в лог.
-	if spawn_items == nil then 
-		local spawn_items = {}
-        local spawn_items = item_by_community["def_box"]
-	end
-    
-    for k,v in pairs(spawn_items) do		
+
+    for k, rnd in pairs(self.random_items) do		
 		--' По каждому объекту необходимо получить количество
 		local number = math.ceil(math.random(count_by_level[k].min, count_by_level[k].max))
-		--' Необходимо заспавнить нужное количество.
-		 create_items(self.obj, k, number, v)			
+		if number > 0 and rnd > 0 then
+			--' Необходимо заспавнить нужное количество.
+			create_items(self.obj, k, number, rnd)
+		end
     end
 end	
 
@@ -112,26 +116,25 @@ end
 function create_items(obj, section, number, rnd)
     --log3("create_items %s of %s", tostring(number), tostring(section))
     if ammo_sections[section] == true then
-		if math.random(100) <= rnd	then
-				
-			if number > 0 then
-				local position = vector():set(0,0,0)
-				position.x = obj:position().x + math.random(-30,30)/100
-				position.z = obj:position().z + math.random(-30,30)/100
-				position.y = obj:position().y + math.random(30,50)/100
+		if math.random() <= rnd	then
+			local position = vector():set(0,0,0)
+			position.x = obj:position().x + math.random(-30,30)/100
+			position.z = obj:position().z + math.random(-30,30)/100
+			position.y = obj:position().y + math.random(30,50)/100
 
-				se_respawn.create_ammo(section,	
-					    position,
-						obj:level_vertex_id(),	
-						obj:game_vertex_id(),
-						65535,
-						number)
-			end
+			se_respawn.create_ammo(
+				section,	
+				position,
+				obj:level_vertex_id(),	
+				obj:game_vertex_id(),
+				65535,
+				number
+			)
 		end
     else
         for i=1,number do
 			--' Проверяем вероятность появить каждый объект в отдельности
-            if math.random(100) <=  rnd then
+            if math.random() <=  rnd then
 				local position = vector():set(0,0,0)
 				position.x = obj:position().x + math.random(-30,30)/100
 				position.z = obj:position().z + math.random(-30,30)/100
