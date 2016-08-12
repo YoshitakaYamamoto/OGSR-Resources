@@ -950,10 +950,7 @@ function check_gorkom_books()
 			alife():release(se_obj, true)
 			if monster then
 				monster:kill(monster)
-				switch_offline(monster) --на всякий случай выпихнем в оффлайн перед удалением
-				dsh.timeout(300, function() --Типа безопасное удаление
-					death_manager.shedule_release(monster)
-				end)
+				checker_minefield.add_to_delete(monster:id())
 			end			
 		end
 	end

@@ -565,10 +565,7 @@ function blow_zombie(p_obj)
 		hand_spawned_flag = true
 	end
 
-	switch_offline(p_obj) --на всякий случай выпихнем в оффлайн перед удалением
-	dsh.timeout(300, function() --Типа безопасное удаление
-		death_manager.shedule_release(p_obj)
-	end)
+	checker_minefield.add_to_delete(p_obj:id())
 end
 
 --************************************Квестовые функции, перенесено из ogsm_mutants.script**********************************
