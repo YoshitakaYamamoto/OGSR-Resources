@@ -137,6 +137,12 @@ function on_load()
   for _, pk in ipairs( chunks ) do
     local timer_id    = pk:r_stringZ()
     local timer_class = pk:r_stringZ()
+
+	if timer_class == "ogse.timer_new" then --Затычка для того, чтобы старые таймеры не вызывали вылеты. УБРАТЬ С НИ!!!!
+		  registry[ timer_id ] = nil
+		  break
+	end
+
     local f, msg = loadstring( "return " .. timer_class .. "(...)" )
     ASSERT( f, msg )
     local timer = f( timer_id )
@@ -154,6 +160,12 @@ function on_load_old()
   for _, timer_id in ipairs( timers_list ) do
     local timer_chunk = ogse.load_var( storage_guid .. "_" .. timer_id )
     local timer_class = timer_chunk:r_stringZ()
+
+	if timer_class == "ogse.timer_new" then --Затычка для того, чтобы старые таймеры не вызывали вылеты. УБРАТЬ С НИ!!!!
+		  registry[ timer_id ] = nil
+		  break
+	end
+
     local f, msg = loadstring( "return " .. timer_class .. "(...)" )
     ASSERT( f, msg )
     local timer = f( timer_id )

@@ -498,48 +498,29 @@ function send_tip(news_text, header, timeout, showtime, sender, sound)
 end
 
 --****************************************ТАЙМЕРЫ - НАЧАЛО.*************************************************
---KRodin перевёл все функции на систему ogse_st_mgr.script
---Для создания новых таймеров использовать ТОЛЬКО ogse_st_mgr.script!!!
-class "timer_new" (ogse_st_mgr.savable_timer)
-function timer_new:__init(timer_id) super(timer_id)
-	self._class = script_name()..".timer_new"
-end
-function timer_new:set_data(timer_name,timer_action)
-	self.name = timer_name
-	self.action = timer_action
-end
-function timer_new:load(packet)
-	self.name = packet:r_stringZ()
-	self.action = packet:r_stringZ()
-end
-function timer_new:save(packet)
-	packet:w_stringZ(self.name)
-	packet:w_stringZ(self.action)
-end
-function timer_new:taction()
-	__do_timer_action(self.name,self.action)
-end
-
-function start_timer(name,delay,action)
+--KRodin: перевёл эти дерьмотаймеры на систему ogse_st_mgr.script
+--По-хорошему, надо бы от них избавиться, но тут слишком много работы.
+--НИ В КОЕМ СЛУЧАЕ НЕ ПОЛЬЗУЙТЕСЬ ЭТИМИ ТАЙМЕРАМИ В БУДУЩЕМ!
+function start_timer(name, delay, action)
 	if not delay then return end
 	if not action then action = "" end
+log3("~~Starting timer: [%s_%s]", name, action)
 
-	local t = timer_new(tostring(name.."_"..action.."_"..delay)) --Нужно сложное имя, чтобы не было повторов в названиях таймеров
-	t:set_data(name,action)
-	t:set_delay(delay)
-	t:start()
+	ogse_st_mgr.delayed_fun_start()
+	:set_delay( delay )
+	:init( script_name()..".__do_timer_action", name, action )
+	:start(delay < 300)
 end
 
-function g_start_timer(name,delay_d,delay_h,delay_m,action)
+function g_start_timer(name, delay_d, delay_h, delay_m, action)
 	if not delay_d or not delay_h or not delay_m then return end
 	if not action then action = "" end
+log3("~~Starting gtimer: [%s_%s]", name, action)
 
-	local delay_general = delay_d * 24 * 3600 + delay_h * 3600 + delay_m * 60 --переводим в секунды
-
-	local t = timer_new(tostring(name.."_"..action.."_"..delay_general)) --Нужно сложное имя, чтобы не было повторов в названиях таймеров
-	t:set_data(name,action)
-	t:set_gdelay(delay_general)
-	t:start()
+	ogse_st_mgr.delayed_fun_start()
+	:set_gdelayDHMS( delay_d, delay_h, delay_m, 0 )
+	:init( script_name()..".__do_timer_action", name, action )
+	:start(delay_m > 0 and delay_m < 20)
 end
 
 local selector = {
