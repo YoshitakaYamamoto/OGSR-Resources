@@ -388,10 +388,8 @@ function heli_blow_up( obj )
 	
 	st.last_alt       = heli:GetRealAltitude()
 	st.alt_check_time = time_global() + 1000
-	
-	if checker_minefield.to_delete[obj:id()] == nil then
-		checker_minefield.to_delete[obj:id()] = obj:id()
-	end		
+
+	ogse.start_tmr(nil, math.random(15, 30), "checker_minefield.add_to_delete", obj:id())
 end
 
 function heli_silent_remove( obj )
@@ -406,8 +404,6 @@ function heli_silent_remove( obj )
 	
 	st.last_alt       = heli:GetRealAltitude()
 	st.alt_check_time = time_global() + 1000
-	
-	if checker_minefield.to_delete[obj:id()] == nil then
-		checker_minefield.to_delete[obj:id()] = obj:id()
-	end		
+
+	ogse.start_tmr(nil, math.random(15, 30), "checker_minefield.add_to_delete", obj:id())
 end

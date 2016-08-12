@@ -396,8 +396,6 @@ function actor_binder:actor_hit_callback(obj, amount, local_direction, who, bone
 
 	ogse_critical_hit.check_critical(amount, bone_index, who)
 
-	checker_minefield.on_act_hit()
-
 	self.am:call("on_hit", obj, amount, local_direction, who, bone_index)
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -440,7 +438,7 @@ function actor_binder:update(delta)
 --=====================================================================================================
 	if update_was_never_called then
 ----------------------------------------------------------------------------------------------
-		if not has_alife_info("storyline_actor_start") and (level.name() == "l01_escape") then
+		if not has_alife_info("storyline_actor_start") then
 
 			self.am:call("on_storyline_start")
 

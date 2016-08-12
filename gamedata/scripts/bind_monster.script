@@ -105,9 +105,7 @@ function generic_object_binder:net_spawn(sobject)
 				db.actor:give_game_news(game.translate_string("bind_monster_debug21")..self.object:id()..game.translate_string("bind_monster_debug2")..self.object:name()..game.translate_string("bind_monster_debug22"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
 			end
 
-			if checker_minefield.to_delete[self.object:id()] == nil and db.actor:position():distance_to(self.object:position()) >= 100 then
-				checker_minefield.to_delete[self.object:id()] = self.object:id()
-			end
+			checker_minefield.add_to_delete(self.object:id())
 		end
 		ogse_debug.process_monster(self.object, "m_spw", 0)
 		return true
@@ -221,9 +219,6 @@ function generic_object_binder:death_callback(victim, who)
 	--проверка на аномалии  
 	ogse_death_artefact.on_death(victim, who)
 
-	ogse_debug.process_monster(victim, "dth", 7)
-	if checker_minefield then checker_minefield.mine_hit(victim,who) end
-
 	ogse_debug.process_monster(victim, "dth", 8)
 	--' Наносим небольшой импульс вперед.
 	local h = hit()
@@ -266,9 +261,6 @@ function generic_object_binder:hit_callback(obj, amount, local_direction, who, b
 	if self.st.hit then
 		xr_logic.issue_event(self.object, self.st.hit, "hit_callback", obj, amount, local_direction, who, bone_index)
 	end
-
-	ogse_debug.process_monster(self.object, "hit", 3)
-	if checker_minefield then checker_minefield.mine_hit(obj,who) end
 
 	ogse_debug.process_monster(self.object, "hit", 4)
 	smart_monster_parts.main_check(obj, amount, local_direction, who, bone_index)

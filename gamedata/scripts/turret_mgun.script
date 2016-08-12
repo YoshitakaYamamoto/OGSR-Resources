@@ -85,11 +85,7 @@ function turret_binder:check_health()
 		explode_turret(self.object)
 	end
 	if not self.st.alive and not heli:isVisible(db.actor) then
-		--alife():release(se_obj)
-		if checker_minefield.to_delete[self.object:id()] == nil then
-			checker_minefield.to_delete[self.object:id()] = self.object:id()
-		end
-		--checker_minefield.to_delete[table.getn(checker_minefield.to_delete) + 1] = self.object:id()
+		checker_minefield.add_to_delete(self.object:id())
 	end
 end
 

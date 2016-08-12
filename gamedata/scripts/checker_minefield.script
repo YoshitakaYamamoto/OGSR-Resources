@@ -1,13 +1,29 @@
- -- Скрипт работы с минным полем. OGSE team.
- -- Авторы: Mixser, Stalbar, KamikaZze.
- 
+-- Скрипт работы с минным полем. OGSE team.
+-- Авторы: Mixser, Stalbar, KamikaZze.
+
+function attach(sm)
+	sm:subscribe({ signal = "on_spawn",				fun = this.startup })
+	sm:subscribe({ signal = "on_storyline_start",	fun = this.set_gsc_mine })
+	sm:subscribe({ signal = "on_hit",				fun = this.on_act_hit })
+	sm:subscribe({ signal = "on_npc_hit",			fun = this.mine_hit })
+	sm:subscribe({ signal = "on_npc_death",			fun = this.mine_hit })
+	sm:subscribe({ signal = "on_monster_hit",		fun = this.mine_hit })
+	sm:subscribe({ signal = "on_monster_death",		fun = this.mine_hit })
+end
+
 ----------------
-to_delete = {} -- таблица для кандидатов для удаления (как мины, так и турели)
+local to_delete = {} -- таблица для кандидатов для удаления (турели, глючные трупы). Когда то тут удалялись мины, но теперь они удаляются другим методом.
 minefield_table = {} -- таблица для мин
 local data = {}
 local act_hlth = 1
 ----------------
-local debug_flag = false
+
+function add_to_delete(id)
+	if not to_delete[id] then
+		to_delete[id] = id
+		run_del_mines_timer()
+	end
+end
 
 function isGameObject(obj)
 	local bResult = false
@@ -26,7 +42,7 @@ function get_obj(id)
 end
 
 function set_gsc_mine()
-	for i=1,65535 do
+	for i=1,65534 do
 		local obj = alife():object(i)
 		if obj and obj:section_name() == "zone_mine_field" then -- обьект существует и так же найдена секция.
 			data = m_net_utils.get_anomaly_data(obj)
@@ -37,7 +53,7 @@ function set_gsc_mine()
 end
 
 function reset_restrictors(anom_id)
-	for i=1,65535 do
+	for i=1,65534 do
 		local sobj = alife():object(i)
 		if sobj and (IsStalker(sobj) or IsMonster(sobj)) then -- обьект существует и так же найдена секция.
 			if IsStalker(sobj) then
@@ -64,7 +80,7 @@ function reset_restrictors(anom_id)
 end
 
 function startup()
-	for i=1,65535 do
+	for i=1,65534 do
 		local obj = alife():object(i)
 		if obj and obj:section_name() == "zone_mine_field" then -- обьект существует и так же найдена секция.
 			local status = ogse_anomaly.get_anomaly_mode(i)
@@ -91,7 +107,7 @@ function on_act_hit()
 	end
 end
 
-function mine_hit(victim, killer)
+function mine_hit(victim)
 	if victim then
 		local m_obj
 		if (isGameObject(victim)) then
@@ -106,38 +122,14 @@ function mine_hit(victim, killer)
 end
 
 function mine_remove(victim)
-	if debug_flag then
-		ogse_debug.process_actor("upd_a", 4521)
-	end
 	local radius = 2
 	if victim then
-		if debug_flag then
-			ogse_debug.process_actor("upd_a", 4522)
-		end	
 		local vic_pos = level.object_by_id(victim:id()):position()
-		if debug_flag then
-			ogse_debug.process_actor("upd_a", 4523)
-			if minefield_table then
-				-- print_table_inlog_v2(minefield_table, "ACHTUNG_MINEN_2! >")
-			end			
-		end		
 		for k,v in pairs(minefield_table) do
-			if debug_flag then
-				ogse_debug.process_actor("upd_a", 4524)
-			end
 			local mine = level.object_by_id(v)
 			if mine then
-				if debug_flag then
-					ogse_debug.process_actor("upd_a", 4525)
-				end
 				local mine_pos = mine:position()
-				if debug_flag then
-					ogse_debug.process_actor("upd_a", 4526)
-				end				
 				if vic_pos:distance_to(mine_pos) <= radius then
-					if debug_flag then
-						ogse_debug.process_actor("upd_a", 4527)
-					end
 					minefield_table[v] = nil
 --					mine:disable_anomaly()
 					ogse_anomaly.set_anomaly_mode(v, "anom_off")
@@ -146,44 +138,41 @@ function mine_remove(victim)
 				end
 			end
 		end
-		if debug_flag then
-			ogse_debug.process_actor("upd_a", 4528)
-		end		
 	end
 end
 
 function delete_mines()
-	if debug_flag then
-		ogse_debug.process_actor("upd_a", 4511)
-		if to_delete then
-			-- print_table_inlog_v2(to_delete, "ACHTUNG_MINEN! >")
-		end
-	end
-	for k,v in pairs(to_delete) do
-		-- -- log1("Объекты на удаление: "..tostring(k).." "..tostring(v))
-		if debug_flag then
-			ogse_debug.process_actor("upd_a", 4512)
-		end
-		local obj = alife():object(v)
-        if obj then
-			if debug_flag then
-				ogse_debug.process_actor("upd_a", 4513)
-			end
-			alife():release(obj, true)
-			if debug_flag then
-				ogse_debug.process_actor("upd_a", 4514)
-			end			
-			-- попробуем удалить - если не удастся, на следущем цикле попробуем опять и так до тех пор пока не удалим
-            -- -- log1("Удаляем объект "..tostring(obj.id))
+	for k, v in pairs(to_delete) do
+		local sobj = alife():object(v)
+		if sobj then
+			--log3("~~Try to delete object [%s]", sobj:name())
+			alife():release(sobj, true)
 		else
-			if debug_flag then
-				ogse_debug.process_actor("upd_a", 4515)
-			end			
-			-- -- log1("Объект удален успешно, зачищаем пропись "..tostring(k))
 			to_delete[k] = nil
-			if debug_flag then
-				ogse_debug.process_actor("upd_a", 4516)
-			end			
-        end
+		end
 	end
+end
+
+
+local del_mines_t
+function run_del_mines_timer()
+  if not del_mines_t then
+    del_mines_t = check_del_mines_timer():start()
+  end
+end
+
+class "check_del_mines_timer" ( ogse_qt.quick_timer )
+function check_del_mines_timer:__init() super()
+end
+
+function check_del_mines_timer:condition()
+  return next(to_delete) == nil
+end
+
+function check_del_mines_timer:action()
+  del_mines_t = nil
+end
+
+function check_del_mines_timer:update()
+  delete_mines()
 end

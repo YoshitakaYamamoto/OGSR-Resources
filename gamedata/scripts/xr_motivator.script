@@ -405,9 +405,7 @@ function motivator_binder:net_spawn(sobject)
 					log1("--ВНИМАНИЕ! Обнаружен уже обработанный погибший в оффлайне! Объект: ИД: "..self.object:id().." ИМЯ:"..self.object:name().." Будет произведено удаление объекта!")
 					db.actor:give_game_news(game.translate_string("bind_monster_debug21")..self.object:id()..game.translate_string("bind_monster_debug2")..self.object:name()..game.translate_string("bind_monster_debug22"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
 				end
-				if checker_minefield.to_delete[self.object:id()] == nil and db.actor:position():distance_to(self.object:position()) >= 100 then
-					checker_minefield.to_delete[self.object:id()] = self.object:id()
-				end				
+				checker_minefield.add_to_delete(self.object:id())
 			end
 
 			--self.am:call( "on_npc_spawn", self.object, self )
@@ -632,9 +630,6 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 		end
 	end
 
-	ogse_debug.process_npc(self.object, "hit", 10)
-	if checker_minefield then checker_minefield.mine_hit(obj,who) end
-
 	ogse_debug.process_npc(self.object, "hit", 12)
 	local warn_timer = time_global()
 	if not ogse.is_quest_npc(obj) and not xr_companion.is_companion(obj:id()) then
@@ -714,10 +709,6 @@ function motivator_binder:death_callback(victim, who)
 	ogse_debug.process_npc(victim, "dth", 13)
 	--проверка на аномалии  
 	ogse_death_artefact.on_death(victim, who)
-
-	ogse_debug.process_npc(victim, "dth", 14)
-	--проверка на мины
-	if checker_minefield then checker_minefield.mine_hit(victim,who) end
 
 	ogse_debug.process_npc(victim, "dth", 16)
 	local community = self.object:character_community()

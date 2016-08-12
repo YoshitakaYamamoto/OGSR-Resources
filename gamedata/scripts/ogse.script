@@ -1273,15 +1273,6 @@ function()
 -- Периодическая проверка численности
 end,
 function()
-	ogse_debug.process_actor("upd_a", 46)
-	if checker_minefield then
-		if time_global() > mine_timer then
-			checker_minefield.delete_mines() -- Обработка мин
-			mine_timer = mine_timer + math.random(15000, 20000)
-		end
-	end
-end,
-function()
 	ogse_debug.process_actor("upd_a", 36087)
 	ogsm_quests.actor_zombied_fx() -- Постэффект зомбирования актора
 end,
@@ -1421,7 +1412,6 @@ function on_game_load()
 		ogsm_respawn.first_run()
 		ogse_spawns.traders_spawn()
 		ogse_spawns.sidr_guard_spawn()
-		checker_minefield.set_gsc_mine()
 		db.actor:give_info_portion("encyclopedy_tutorial_jump")
 		db.actor:give_info_portion("encyclopedy_tutorial_crouch")
 		db.actor:give_info_portion("encyclopedy_tutorial_sprint")
@@ -1450,9 +1440,6 @@ function on_game_load()
 	cmd("r2_lens_dirt_control on") --грязь на линзе
 	cmd("cam_inert 0") --KRodin: сбрасываем инерцию камеры в 0
 -----------------------KD: end-------------------------
-
-	ogse_debug.process_actor("a_spw", 120)
-	checker_minefield.startup() --Проверка мин
 
 	ogse_debug.process_actor("a_spw", 1110)
 	db.register_all_quest_zones()
@@ -1642,7 +1629,7 @@ function quest_spawn_ex(section, total, spawn_item)
 end
 
 function kill_crow()
-	for k=1,65355 do
+	for k = 1, 65534 do
 		local crow = level.object_by_id(k)
 		if crow and string.find(crow:name(), "m_crow") then
 			local hit = hit()
@@ -1651,10 +1638,9 @@ function kill_crow()
 			hit.draftsman = crow
 			hit.power = 10
 			hit.type = hit.strike
-			if crow then
-				crow:hit(hit)
-			end
-			checker_minefield.to_delete[k]=k
+			crow:hit(hit)
+
+			ogse.start_tmr(nil, math.random(150, 300), "checker_minefield.add_to_delete", k)
 		end
 	end
 end
