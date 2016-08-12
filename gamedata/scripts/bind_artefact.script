@@ -3,8 +3,8 @@ function init(obj)
 end
 
 class "artefact_binder" (object_binder)
--- default methods
 function artefact_binder:__init(obj) super(obj)
+	self.first_update = false
 end
 
 function artefact_binder:load(reader)
@@ -49,5 +49,13 @@ end
 
 function artefact_binder:update(delta)
 	object_binder.update(self, delta)
-	-- reserved for future use 
+
+	if not self.first_update then
+		local item = self.object
+		local ps   = item:get_physics_shell()
+		if ps and not item:parent() then
+			ps:apply_force( 0, item:mass() * 1300, 0 )
+		end
+		self.first_update = true
+	end
 end
