@@ -34,15 +34,19 @@ local subscribed_objs = {}
 
 function subscribe( id )
 	if not subscribed then
-		subscribed = { signal = "on_hit", fun = this.on_hit }
-		sm:subscribe(subscribed)
+		subscribed = {
+			{ signal = "on_hit", fun = this.on_hit },
+			{ signal = "on_npc_hit", fun = this.on_npc_hit },
+		}
+		for _, v in pairs(subscribed) do
+			sm:subscribe( v )
+		end
 		--log3("--[%s] subscribed signal 'on_hit'", script_name())
 	end
 
 	if not subscribed_objs[id] then
 		local s = {
-			{ signal = "on_npc_update."..id,	fun = this.on_npc_update },
-			{ signal = "on_npc_hit",			fun = this.on_npc_hit },
+			{ signal = "on_npc_update."..id, fun = this.on_npc_update },
 		}
 		for _, v in pairs(s) do
 			sm:subscribe( v )
@@ -54,7 +58,9 @@ end
 
 function unsubscribe( id )
 	if subscribed and next(xr_companion.companions) == nil then
-		sm:unsubscribe(subscribed)
+		for _, v in pairs(subscribed) do
+			sm:unsubscribe( v )
+		end
 		subscribed = nil
 		--log3("~~[%s] UNsubscribed signal 'on_hit'", script_name())
 	end
