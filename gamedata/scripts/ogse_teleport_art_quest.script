@@ -4,6 +4,12 @@
 --- Mixser, Phoenix (c) OGS Evolution Team                                      
 --- version 1.1 (15/03/2012)                                             
 -----------------------------------------------------------------------
+
+function attach(sm)
+	sm:subscribe({ signal = "on_first_update", fun = this.check_actor_leave_zone })
+end
+
+
 local spawn_db = ogse_spawn_db.script_spawn_registry.ogse_teleport_art_quest
 local total_debug = false
 

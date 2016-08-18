@@ -2,7 +2,51 @@
 ------------------ 2010 FEAR93, KamikaZze для OGSE -------------------------
 --------------------------- по мотивам Р.М.А. ------------------------------
 
+function attach(sm)
+	sm:subscribe({signal = "on_spawn", fun = this.on_spawn})
+end
+
+local sm = ogse_signals.get_mgr()
+local subscribed
+function subscribe()
+	if has_alife_info("esc_heli_go") and not has_alife_info("tolik_help") then
+		if not subscribed then
+			log1("--PMA Escape subscribed!")
+			subscribed = { signal = "on_update", fun = this.show_heli_scene --[[, queued = true]] }
+			sm:subscribe(subscribed)
+		end
+	end
+end
+function unsubscribe()
+	if subscribed then
+		log1("~~PMA Escape UNsubscribed!")
+		sm:unsubscribe(subscribed)
+		subscribed = nil
+	end
+end
+
+
+local deadman = {}
 local spawn_db = ogse_spawn_db.script_spawn_registry.pma_escape
+
+function on_spawn()
+	if has_alife_info("esc_heli_go") and not has_alife_info("tutorial_wounded_start") then
+		local spw_1 = tonumber(ogse.load_variable("heli_quest_1", nil))
+		local spw_2 = tonumber(ogse.load_variable("heli_quest_2", nil))
+		local spw_3 = tonumber(ogse.load_variable("heli_quest_3", nil))
+		if spw_1 then
+			deadman[spw_1] = spw_1
+		end
+		if spw_2 then
+			deadman[spw_2] = spw_2
+		end
+		if spw_3 then
+			deadman[spw_3] = spw_3
+		end
+	end
+
+	subscribe()
+end
 
 --Взял ли ГГ артефакт
 function have_artefact(actor, trader)
@@ -130,8 +174,6 @@ function greet_actor()
 	db.actor:give_info_portion("no_kill_actor")
 end
 
-deadman = {}
-
 function esc_hit_heli_actor()
 	heli = level_object_by_sid(story_ids.esc_helicopter)
 	local st = db.storage[heli:id()]
@@ -161,7 +203,7 @@ function on_timer_hel1()
 			npc:hit(blow1)
 		end		
 	end	
-	if actor ~= nil and actor:dont_has_info("tutorial_wounded_start")  then
+	if actor and actor:dont_has_info("tutorial_wounded_start")  then
 		if not has_alife_info("artefact_done") then 
 			set_msg()
 		else
@@ -293,16 +335,16 @@ end
 
 --' спавн вертолёта и Толика
 function esc_heli() 
-	local actor = db.actor
-	if actor ~= nil and actor:dont_has_info("esc_heli_go") then
-		actor:give_info_portion("esc_heli_go") --'Спавн вертолёта
+	if db.actor and db.actor:dont_has_info("esc_heli_go") then
+		db.actor:give_info_portion("esc_heli_go") --'Спавн вертолёта
 		soundtrack.heli_attacks()
+
+		subscribe()
 	end
 end
 
 function esc_heli_scene()
-	local actor = db.actor
-	if actor ~= nil then
+	if db.actor then
 		--log1("HELI_SCENE: Старт сценки")
 		esc_heli() --' спавн вертолёта и Толика
 		esc_hit_heli()
@@ -382,6 +424,8 @@ function show_heli_scene()
 				end	
 			end
 		end
+	else
+		unsubscribe()
 	end
 end	
 
@@ -453,24 +497,16 @@ function esc_tolike_help()
 end
 
 function disble_tolik_help() 
-local actor = db.actor
-    actor:disable_info_portion("tutorial_wounded_start") 
-    actor:disable_info_portion("tutorial_wounded_give_info")
+	db.actor:disable_info_portion("tutorial_wounded_start") 
+	db.actor:disable_info_portion("tutorial_wounded_give_info")
 end
 
 --'Даём ГГ аптечку
 function give_medkit_for_tolik(first_speaker, second_speaker)
- local actor = db.actor
-    if actor ~= nil and actor:object("medkit") == nil then
-      dialogs.relocate_item_section(second_speaker, "medkit", "in")
-    end
+	if db.actor and not db.actor:object("medkit") then
+		dialogs.relocate_item_section(second_speaker, "medkit", "in")
+	end
 end
-
-function esc_tolik_dead()
-local actor = db.actor
-  return actor:give_info_portion("tutorial_wounded_death") ~=nil
-end
-
 
 function tolike_in_lager()
 	local news  = game.translate_string("pma_esc_quest_msg_6_text")		 
@@ -481,6 +517,5 @@ end
 
 
 function down_rep()
- actor = db.actor
- actor:change_character_reputation(-20)
+	db.actor:change_character_reputation(-20)
 end

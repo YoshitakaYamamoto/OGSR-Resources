@@ -1236,7 +1236,6 @@ end
 
 --*****************************************************[Переменные для апдейта актора]******************************************************
 local psyzones_flag = sys_ini:r_s32("options","psyzones_flag")
-local mine_timer = time_global()
 local anom_enum = time_global()
 
 local watchdog --НЕ ТРОГАТЬ! Здесь не должно быть никакого значения!
@@ -1272,24 +1271,6 @@ function()
 	end
 -- Периодическая проверка численности
 end,
-function()
-	ogse_debug.process_actor("upd_a", 36087)
-	ogsm_quests.actor_zombied_fx() -- Постэффект зомбирования актора
-end,
-------------------------------------------------Квестовые апдейты---------------------------------------------
---[[function()
-	ogse_debug.process_actor("upd_a", 36)
-	ogsm_quests.actor_af_transmut_8_fx() -- Постэффект ношения "Ока" актором
-end,]]
-function()
-	ogse_debug.process_actor("upd_a", 8)
-	ogse_teleport_art_quest.check_actor_leave_zone()
-end,
-function()
-	ogse_debug.process_actor("upd_a", 22)
-	PMA_escape.show_heli_scene() -- Сценка с вертушкой на Кордоне
-end,
-------------------------------------------Конец квестовых апдейтов--------------------------------------------
 }
 --*******************************************************************************************************************************************
 
@@ -1446,9 +1427,6 @@ function on_game_load()
 
 	anom_enum = anom_enum + 15000
 
-	ogse_debug.process_actor("a_spw", 1113)
-	ogsm_quests.kruglov_help_chek() --Проверка помощи Круглову
-
 	ogse_debug.process_actor("a_spw", 1117)
 	ogsm_respawn.get_level_mobs() --Получаем список всех монстров и укрытий
 
@@ -1465,22 +1443,6 @@ function on_game_load()
 					ogsm_respawn.psy_list[k] = nil
 				end
 			end
-		end
-	end
-
-	ogse_debug.process_actor("a_spw", 1127)
-	if db.actor:has_info("esc_heli_go") and db.actor:dont_has_info("tutorial_wounded_start") then --Восстановим сценку с вертолётом
-		local spw_1 = tonumber(load_variable("heli_quest_1",nil))
-		local spw_2 = tonumber(load_variable("heli_quest_2",nil))
-		local spw_3 = tonumber(load_variable("heli_quest_3",nil))
-		if spw_1 then
-			PMA_escape.deadman[spw_1] = spw_1
-		end
-		if spw_2 then
-			PMA_escape.deadman[spw_2] = spw_2
-		end
-		if spw_3 then
-			PMA_escape.deadman[spw_3] = spw_3
 		end
 	end
 end
@@ -1765,7 +1727,7 @@ end
 
 --************************************************[Таймеры с визуальным счётчиком на худе]************************************************
 --==============================[Таймер со счётчиком на экране]=================================
-class "visual_timer" (ogse_st_mgr.delayed_fun_start)
+class "visual_timer" (ogse_st_mgr.savable_timer)
 function visual_timer:__init(name) super(name)
 	self._class = script_name()..".visual_timer"
 end
@@ -1776,7 +1738,18 @@ function visual_timer:start(...)
 	hud:AddCustomStatic("hud_timer_2", true)
 	hud:AddCustomStatic("hud_timer_text_2", true)
 
-	return ogse_st_mgr.delayed_fun_start.start(self, ...)
+	return ogse_st_mgr.savable_timer.start(self, ...)
+end
+function visual_timer:init( action_name, ... )
+	self.action_name = action_name
+	self.user_action = loadstring( "return " .. self.action_name .. "( ... )" )
+	ASSERT(
+		self.user_action,
+		"visual_timer:init: can not compile function with the name '%s'",
+		tostring( self.action_name )
+	)
+	self.fun_params = { ... }
+	return self
 end
 function visual_timer:stop()
 	ogse_signals.get_mgr():unsubscribe(self.on_hud_show_desc)
@@ -1784,7 +1757,27 @@ function visual_timer:stop()
 	hud:RemoveCustomStatic("hud_timer_2")
 	hud:RemoveCustomStatic("hud_timer_text_2")
 
-	ogse_st_mgr.delayed_fun_start.stop(self)
+	ogse_st_mgr.savable_timer.stop(self)
+end
+function visual_timer:load( packet )
+  self.action_name = packet:r_stringZ()
+  self.user_action = loadstring( "return " .. self.action_name .. "( ... )" )
+  ASSERT(
+    self.user_action,
+    "visual_timer:load: can not compile function with the name '%s'",
+    tostring( self.action_name )
+  )
+  local array_item = ogse_unist.read_item_from_packet( packet )
+  ASSERT(
+    array_item.type == ogse_unist.types.array,
+   "visual_timer:load: wrong parameters readed"
+  )
+  self.fun_params = array_item:get_value()
+end
+function visual_timer:save( packet )
+  packet:w_stringZ( self.action_name )
+  local array_item = ogse_unist.create_item( "", self.fun_params, "array" )
+  ogse_unist.write_item_to_packet( packet, array_item )
 end
 function visual_timer:on_hud_show()
 	local hud = get_hud()
@@ -1813,6 +1806,9 @@ function visual_timer:condition()
 	get_hud():GetCustomStatic("hud_timer_text_2"):wnd():SetText(txt)
 	return false
 end
+function visual_timer:taction()
+  self.user_action( unpack( self.fun_params ) )
+end
 
 -------------[Обёртки для упрощённого запуска]-----------
 function start_visual_timer(name, delay, fname, ...)
@@ -1834,7 +1830,7 @@ function conditional_visual_timer:init(cond_name, action_name, ...)
 	self.user_condition = loadstring("return "..self.cond_name.."(...)")
 	ASSERT(self.user_condition, "conditional_visual_timer:init: can not compile function with the name '"..tostring(self.cond_name).."'")
 
-	return ogse_st_mgr.delayed_fun_start.init(self, action_name, ...)
+	return visual_timer.init(self, action_name, ...)
 end
 function conditional_visual_timer:condition()
 	visual_timer.condition(self) -- всегда возвращает false
@@ -1846,13 +1842,14 @@ function conditional_visual_timer:load(packet)
 	self.user_condition = loadstring("return "..self.cond_name.."(...)")
 	ASSERT(self.user_condition, "conditional_visual_timer:load: can not compile function with the name '"..tostring(self.cond_name).."'")
 
-	ogse_st_mgr.delayed_fun_start.load(self, packet)
+	visual_timer.load(self, packet)
 end
 function conditional_visual_timer:save(packet)
 	packet:w_stringZ(self.cond_name)
 
-	ogse_st_mgr.delayed_fun_start.save(self, packet)
+	visual_timer.save(self, packet)
 end
+function conditional_visual_timer:action() end --На всякий случай, чтобы тут гарантировано ничего не выполнялось.
 
 -------------[Обёртки для упрощённого запуска]-----------
 function start_conditional_visual_timer(name, --Имя таймера. Если nil - будет сгенерировано автоматически.

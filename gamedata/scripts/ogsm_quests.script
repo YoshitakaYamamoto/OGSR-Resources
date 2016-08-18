@@ -1,6 +1,43 @@
 ---------------------- Квестовые функции для OGSM 2.x -------------------------
 ------------------------- Copyright 2007-2008 DEXXX ---------------------------
 
+function attach(sm)
+	sm:subscribe({ signal = "on_spawn", fun = this.on_spawn })
+	sm:subscribe({ signal = "on_info",  fun = this.on_info })
+end
+
+local sm = ogse_signals.get_mgr()
+local subscribed
+function subscribe()
+	if has_alife_info("actor_set_zombied") and db.actor:alive() then
+		if not subscribed then
+			--log1("--Actor zombied fx subscribed!")
+			subscribed = { signal = "on_update", fun = this.actor_zombied_fx --[[, queued = true]] }
+			sm:subscribe(subscribed)
+		end
+	end
+end
+function unsubscribe()
+	if subscribed then
+		--log1("~~Actor zombied fx UNsubscribed!")
+		sm:unsubscribe(subscribed)
+		subscribed = nil
+	end
+end
+
+function on_spawn()
+	subscribe()
+
+	kruglov_help_chek()
+end
+
+function on_info(npc, info_id)
+	if info_id == "actor_set_zombied" then
+		subscribe()
+	end
+end
+
+
 local vdk_cnt = 0
 local blood = 0
 local bl_sound = sound_object([[heart\2]])
@@ -52,22 +89,12 @@ function kruglov_help_chek()
 		if level.name() ~= "l06_rostok" then
 			db.actor:give_info_portion("bar_rescue_research_fail")
 --------------Убиваем круглова------------
-			local kruglov = level_object_by_sid (story_ids.bar_ecolog_professor)
+			local kruglov = alife():story_object(story_ids.bar_ecolog_professor)
 			ogse.kill_offline_npc(kruglov)
 ------------------------------------------
 		end
 	end
 end
-
---[[Убиваем Круглова, если ему не помогли и провалили задание
-function kruglov_kill()
-	if level.name() == "l06_rostok" then
-		local npc = level_object_by_sid (story_ids.bar_ecolog_professor)
-		if npc ~= nil and npc:alive() == true then
-		npc:kill(npc)
-		end
-	end
-end]]
 
 -- Функция передача экзоскелета от Борова за убийство Фраера
 function kill_fraer_complete(first_speaker, second_speaker) 
@@ -118,31 +145,8 @@ end
 -- Проверка, пьян ли актор
 function drunk()
 	return db.actor.alcohol > 0.01
-	--[[local time = level.get_time_days()*60*24+level.get_time_hours()*60+level.get_time_minutes()
-	local end_time = tonumber(ogse.load_variable("drnk", 0))
-	if time < end_time then
-	return true
-	else
-		ogse.del_variable("drnk")
-	return false
-	end]]
 end
 
-
--- Проверка, пьян ли актор, если да, то даем защиту от пси
--- как эффект, связанный с состоянием актора, перенесено отсюда в ogse_healing.script
---[[function check_drunk()
-if db.actor.psy_health < 0.99 then
-	local time = level.get_time_days()*60*24+level.get_time_hours()*60+level.get_time_minutes()
-	local end_time = tonumber(ogse.load_variable("drnk", 0))
-	if time < end_time then
-		db.actor.psy_health = 0.0015
-	else
-		ogse.del_variable("drnk")
-	end
-end
-end
-]]
 
 -- Наложение постэффекта зомбирования актора
 local zombied_fx_flag = false
@@ -165,28 +169,26 @@ local zmb_fx_sound_initialized = false
 
 function actor_zombied_fx()
 
-local function zmb_fx_remark()
-	local rnd = math.random(1, 12)
-	local remark = "characters_voice\\human_01\\zombied\\states\\idle\\idle_"..rnd
-	local snd = sound_object(remark)
-	if snd and not snd:playing() then
-		snd:play_at_pos(db.actor, db.actor:position(), 0, sound_object.s3d)
---		snd:play_no_feedback(db.actor, sound_object.s3d, 0, db.actor:position(), 1.0)
+	local function zmb_fx_remark()
+		local snd = sound_object("characters_voice\\human_01\\zombied\\states\\idle\\idle_"..math.random(1, 12))
+		if snd and not snd:playing() then
+			snd:play_at_pos(db.actor, db.actor:position(), 0, sound_object.s3d)
+			--snd:play_no_feedback(db.actor, sound_object.s3d, 0, db.actor:position(), 1.0)
+		end
 	end
-end
 
-local function zmb_fx_noise()
-	if not zmb_fx_sound_initialized then
-		zmb_fx_sound_obj_right:play_at_pos (db.actor, vector():set(-1, 0, 1), 0, sound_object.s2d + sound_object.looped) 
-		zmb_fx_sound_obj_left:play_at_pos (db.actor, vector():set(1, 0, 1), 0, sound_object.s2d + sound_object.looped)
-		zmb_fx_sound_obj_heart:play_at_pos (db.actor, vector():set(0, 0, 0), 0, sound_object.s2d + sound_object.looped)
+	local function zmb_fx_noise()
+		if not zmb_fx_sound_initialized then
+			zmb_fx_sound_obj_right:play_at_pos (db.actor, vector():set(-1, 0, 1), 0, sound_object.s2d + sound_object.looped) 
+			zmb_fx_sound_obj_left:play_at_pos (db.actor, vector():set(1, 0, 1), 0, sound_object.s2d + sound_object.looped)
+			zmb_fx_sound_obj_heart:play_at_pos (db.actor, vector():set(0, 0, 0), 0, sound_object.s2d + sound_object.looped)
 
-		zmb_fx_sound_initialized = true
+			zmb_fx_sound_initialized = true
+		end
+		zmb_fx_sound_obj_right.volume = fx_factor^2
+		zmb_fx_sound_obj_left.volume = fx_factor^2
+		zmb_fx_sound_obj_heart.volume = fx_factor
 	end
-	zmb_fx_sound_obj_right.volume = fx_factor^2
-	zmb_fx_sound_obj_left.volume = fx_factor^2
-	zmb_fx_sound_obj_heart.volume = fx_factor
-end
 
 	local uptime = time_global()
 	if uptime < premeter_time then return end
@@ -250,6 +252,7 @@ end
 			end
 		end
 	else
+		unsubscribe()
 		if zombied_fx_flag then
 			level.remove_pp_effector(2100)
 			zombied_fx_flag = false
@@ -273,199 +276,6 @@ end
 				zmb_fx_sound_obj_heart:stop() 
 			end
 			zmb_fx_sound_initialized = false
-		end
-	end
-
-end
-
-
--- Наложение постэффекта ношения "Ока" актором
-local tsm_8_fx_chk = true
-local tsm_8_fx_stored = false
-local tsm_8_fx_flag = false
-local tsm_8_fx_strong_flag = false
-local tsm_8_fx_fatal_flag = false
-local tsm_8_fx_all_max_factor = 7		-- общий предел подсчёта степени эффекта
-local tsm_8_fx_max_factor = 0.4			-- предел интенсивности звуковых и визуальных эффектов
-local tsm_8_fx_all_factor = 0			-- стартовое состояние общей интенсивности эффекта
-local tsm_8_fx_factor = 0				-- стартовое состояние интенсивности звуковых и визуальных эффектов
-local tsm_8_fx_factor_progress = 0.0005	-- изменение в секунду интенсивности эфектов
-local tsm_8_fx_factor_dk = 2			-- коэффициент изменения в секунду интенсивности эфектов при отходняке
-local tsm_8_premeter_time = time_global() + 100
-local tsm_8_meter_time = time_global() + 1000
-local tsm_8_meter2_time = time_global() + 100000
-
-local phantom_idle
-local phantom_time = 0
-local phantom_max = 10					-- max phantoms
-local phantom_spawn_probability = 0.15	-- spawn probability (0..1)
-local phantom_spawn_radius = 20.0		-- average radius 30.0m +-15m
-local phantom_fov = 80					-- ширина сектора перед глазами актёра, в котором могут рождаться фантомы
-
-
-local tsm_8_fx_sound_obj_right, tsm_8_fx_sound_obj_left = xr_sound.get_sound_object("psy_voices", "random")
-local tsm_8_fx_sound_initialized = false
-
-function actor_af_transmut_8_fx()
-
-	if tsm_8_fx_chk then
-		if tonumber(ogse.load_variable("tsm_8_fx_all_factor", 0)) ~= 0 then
-			tsm_8_fx_stored = true
-			tsm_8_fx_chk = false
-		end
-	end
-
-local function generate_phantoms()
-	if phantom_idle == nil then
-		phantom_idle = math.random(2000,5000)
-	end
-	if time_global() - phantom_time > phantom_idle then
-		phantom_time = time_global()
-		phantom_idle = math.random(15000,30000)
-		if math.random() < phantom_spawn_probability * tsm_8_fx_all_factor then
-			if phantom_manager:phantom_count() < phantom_max then
-				local radius = phantom_spawn_radius * ( math.random()/2.0+0.5 )
-				local ang = phantom_fov * math.random() - phantom_fov * 0.5
-				local dir = vector_rotate_y( db.actor:direction(), ang )
-
-				phantom_manager.spawn_phantom( db.actor:position():add( dir:mul(radius) ) )
-			end
-		end
-	end
-end
-local function tsm_8_fx_noise()
-	if not tsm_8_fx_sound_initialized then
-		tsm_8_fx_sound_obj_right:play_at_pos (db.actor, vector():set(-1, 0, 1), 0, sound_object.s2d + sound_object.looped) 
-		tsm_8_fx_sound_obj_left:play_at_pos (db.actor, vector():set(1, 0, 1), 0, sound_object.s2d + sound_object.looped)
-
-		tsm_8_fx_sound_initialized = true
-	end
-	tsm_8_fx_sound_obj_right.volume = tsm_8_fx_factor
-	tsm_8_fx_sound_obj_left.volume = tsm_8_fx_factor
-end
-
-	local uptime = time_global()
-	if uptime < tsm_8_premeter_time then return end
-	tsm_8_premeter_time = uptime + 100
-	if inventory.belt["af_transmut_8"] and db.actor:dont_has_info("actor_set_zombied") and db.actor:alive() then
-		if not tsm_8_fx_flag then
-			tsm_8_fx_stored = true
-			if tonumber(ogse.load_variable("tsm_8_fx_zombi_time", 0)) == 0 then
-				ogse.save_variable("tsm_8_fx_zombi_time", game.time()+5000000*ogse.game_time_factor)
-			end
-			level.add_pp_effector("psy_antenna.ppe", 2110, true)
-			tsm_8_fx_all_factor = tonumber(ogse.load_variable("tsm_8_fx_all_factor", 0))
-			if tsm_8_fx_all_factor > tsm_8_fx_max_factor then
-				tsm_8_fx_factor = tsm_8_fx_max_factor
-			else
-				tsm_8_fx_factor = tsm_8_fx_all_factor
-			end
-			level.set_pp_effector_factor(2110, tsm_8_fx_factor)
-			tsm_8_fx_flag = true
-		else
---			db.actor.psy_health = -0.001
-			if uptime > tsm_8_meter_time then
-				tsm_8_meter_time = uptime + 1000
-				if tsm_8_fx_all_factor  + tsm_8_fx_factor_progress <= tsm_8_fx_all_max_factor then
-					tsm_8_fx_all_factor = tsm_8_fx_all_factor  + tsm_8_fx_factor_progress
-					ogse.del_variable("tsm_8_fx_all_factor")
-					ogse.save_variable("tsm_8_fx_all_factor", tsm_8_fx_all_factor)
-				end
-				if tsm_8_fx_factor <= tsm_8_fx_max_factor then
-					tsm_8_fx_factor = tsm_8_fx_factor + tsm_8_fx_factor_progress
-				end
-				if tsm_8_fx_factor <= tsm_8_fx_max_factor then
-					level.set_pp_effector_factor(2110, tsm_8_fx_factor)
-				else
-					if not tsm_8_fx_strong_flag then
-						tsm_8_fx_strong_flag = true
-					end
-					if uptime > tsm_8_meter2_time then
-						tsm_8_meter2_time = uptime + 100000
-						local tsm_8_fx_zombi_time = tonumber(ogse.load_variable("tsm_8_fx_zombi_time", 0))
-						if game.time() > tsm_8_fx_zombi_time then
-							dialogs.actor_set_zombied()
-						end
-						if (tsm_8_fx_zombi_time - game.time()) < 715000*ogse.game_time_factor and not tsm_8_fx_fatal_flag then
-							level.add_pp_effector("escape.ppe", 2111, true)
-							level.set_pp_effector_factor(2111, 0.5)
-							tsm_8_fx_fatal_flag = true
-						end
-					end
-				end
-				tsm_8_fx_noise()
-				if tsm_8_fx_strong_flag then
-					generate_phantoms()
-				end
-			end
-		end
-	elseif (not inventory.belt["af_transmut_8"]) and tsm_8_fx_stored and db.actor:dont_has_info("actor_set_zombied") and db.actor:alive() then
-		if not tsm_8_fx_flag then
-			level.add_pp_effector("psy_antenna.ppe", 2110, true)
-			tsm_8_fx_all_factor = tonumber(ogse.load_variable("tsm_8_fx_all_factor", 0))
-			if tsm_8_fx_all_factor > tsm_8_fx_max_factor then
-				tsm_8_fx_factor = tsm_8_fx_max_factor
-			else
-				tsm_8_fx_factor = tsm_8_fx_all_factor
-			end
-			level.set_pp_effector_factor(2110, tsm_8_fx_factor)
-			tsm_8_fx_flag = true
-		else
-			if uptime > tsm_8_meter_time then
-				tsm_8_meter_time = uptime + 1000
-				if tsm_8_fx_all_factor  - tsm_8_fx_factor_progress*tsm_8_fx_factor_dk > 0 then
-					tsm_8_fx_all_factor = tsm_8_fx_all_factor  - tsm_8_fx_factor_progress*tsm_8_fx_factor_dk
-					ogse.del_variable("tsm_8_fx_all_factor")
-					ogse.save_variable("tsm_8_fx_all_factor", tsm_8_fx_all_factor)
-				else
-					ogse.del_variable("tsm_8_fx_all_factor")
-					ogse.del_variable("tsm_8_fx_zombi_time")
-					tsm_8_fx_stored = false
-				end
-				if (tsm_8_fx_all_factor < tsm_8_fx_max_factor) and (tsm_8_fx_factor - tsm_8_fx_factor_progress*tsm_8_fx_factor_dk > 0) then
-					tsm_8_fx_factor = tsm_8_fx_factor - tsm_8_fx_factor_progress*tsm_8_fx_factor_dk
-					if tsm_8_fx_strong_flag then
-						tsm_8_fx_strong_flag = false
-					end
-				else
-					if not tsm_8_fx_strong_flag then
-						tsm_8_fx_strong_flag = true
-					end
-				end
-				if tsm_8_fx_fatal_flag then
-					tsm_8_fx_fatal_flag = false
-					level.add_pp_effector("escape.ppe", 2111, false)
-				end
-				if uptime > tsm_8_meter2_time then
-					tsm_8_meter2_time = uptime + 100000
-					local tsm_8_fx_zombi_time = tonumber(ogse.load_variable("tsm_8_fx_zombi_time", 0))
-					if tsm_8_fx_zombi_time ~= 0 then
-						ogse.save_variable("tsm_8_fx_zombi_time", tsm_8_fx_zombi_time + 100000*ogse.game_time_factor*tsm_8_fx_factor_dk)
-					end
-				end
-
-				tsm_8_fx_noise()
-				if tsm_8_fx_strong_flag then
-					generate_phantoms()
-				end
-			end
-		end
-	else
-		if tsm_8_fx_flag then
-			level.remove_pp_effector(2110)
-			tsm_8_fx_flag = false
-			if tsm_8_fx_strong_flag then
-				tsm_8_fx_strong_flag = false
-			end
-			ogse.del_variable("tsm_8_fx_all_factor")
-			ogse.del_variable("tsm_8_fx_zombi_time")
-			if tsm_8_fx_sound_obj_right:playing() then 
-				tsm_8_fx_sound_obj_right:stop() 
-			end
-			if tsm_8_fx_sound_obj_left:playing() then 
-				tsm_8_fx_sound_obj_left:stop() 
-			end
-			tsm_8_fx_sound_initialized = false
 		end
 	end
 
