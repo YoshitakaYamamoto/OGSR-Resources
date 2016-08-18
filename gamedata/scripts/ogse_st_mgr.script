@@ -89,7 +89,7 @@ get_timer("my_timer"):stop() -- передумали и остановили
 function attach(sm)
   sm:subscribe({ signal = "on_load",   fun = this.on_load   })
   sm:subscribe( {signal = "on_save",   fun = this.on_save   })
-  --sm:subscribe( {signal = "on_update", fun = this.on_update })
+  sm:subscribe( {signal = "on_update", fun = this.on_update })
 end
 
 
@@ -150,8 +150,8 @@ function on_load()
     timer.loaded = true
     timer:start( timer._high_priority )
   end
-  --sort_all_timers()
-  log2( "[%s]: %s timers loaded", script_name(), table.getn( chunks ) )
+  sort_all_timers()
+  log2( "--[%s]: %s timers loaded", script_name(), table.getn( chunks ) )
 end
 
 
@@ -175,7 +175,7 @@ function on_load_old()
   end
   ogse.delete_var( root_guid )
   log2(
-    "[%s]: %s old timers loaded", script_name(), table.getn( timers_list )
+    "~~[%s]: %s old timers loaded", script_name(), table.getn( timers_list )
   )
 end
 
@@ -192,11 +192,11 @@ function on_save()
     timer:_aux_save( pk )
   end
   ogse.save_var( script_name() .. ".chunks", chunks, "array", "chunk" )
-  log2( "[%s]: %s timers saved", script_name(), table.getn( chunks ) )
+  log2( "--[%s]: %s timers saved", script_name(), table.getn( chunks ) )
 end
 
 
---[=[
+
 local g_high_queue = {}
 local g_lowp_queue = {}
 local r_high_queue = {}
@@ -288,7 +288,7 @@ function process_r_queue( q, n )
     end
   end
 end
-]=]
+
 
 -------------------------------------------------------------------------------
 --< базовый класс сохраняемого таймера для отслеживания произвольного события >
@@ -551,7 +551,6 @@ function delayed_fun_start:save( packet )
   ogse_unist.write_item_to_packet( packet, array_item )
 end
 
---[[
 function delayed_fun_start:start( high_priority )
   self._start_time    = self._start_time or game.get_game_time()
   self._high_priority = high_priority
@@ -562,7 +561,10 @@ end
 function delayed_fun_start:stop()
   unregister_any_timer( self )
 end
-]]
+
+function delayed_fun_start:condition()
+  return false
+end
 
 function delayed_fun_start:taction()
   self.user_action( unpack( self.fun_params ) )
