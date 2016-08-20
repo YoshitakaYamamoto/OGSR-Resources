@@ -174,9 +174,7 @@ function on_load_old()
     ogse.delete_var( storage_guid .. "_" .. timer_id )
   end
   ogse.delete_var( root_guid )
-  log2(
-    "~~[%s]: %s old timers loaded", script_name(), table.getn( timers_list )
-  )
+  log2( "~~[%s]: %s old timers loaded", script_name(), table.getn( timers_list ) )
 end
 
 
@@ -251,10 +249,16 @@ end
 
 
 function on_update()
+--local t = profile_timer()
+--t:start()
+
   process_r_queue( r_high_queue    )
   process_r_queue( r_lowp_queue, 1 )
   process_g_queue( g_high_queue    )
   process_g_queue( g_lowp_queue, 1 )
+
+--t:stop()
+--log3("--ST MGR Update time: [%s]", t:time())
 end
 
 function process_g_queue( q, n )

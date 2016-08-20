@@ -416,6 +416,7 @@ function update_action (npc, script, ...)
     npc:command (act, false)
 end
 
+
 --/ парсит строку вида "ааа, ббб, ввв ..." в таблицу { "ааа", "ббб", "ввв", ... }
 function parse_names( s )
 	local t = {}
@@ -450,32 +451,6 @@ function parse_nums( s )
     return t
 end
 
---[[function r_2nums( spawn_ini, section, line, def1, def2 )
-	--log3("r_2nums: %s, %s", section, line)
-	if spawn_ini:line_exist( section, line ) then
-		-- если default-ов больше, чем значений в ini, то забить недостающие последним значением из ini
-		local s = spawn_ini:r_string( section, line )
-		--log3("r_2nums: %s", s)
-		local t = parse_nums( s )
-		ASSERT(#t<=2, "r_2nums: incorrect line '%s'", tostring(s))
-		return (t[1] or def1), (t[2] or def2)
-	else
-		return def1, def2
-	end
-end]]
-
-function r_2strings( spawn_ini, section, line, def1, def2 )
-	if spawn_ini:line_exist( section, line ) then
-		-- если default-ов больше, чем значений в ini, то забить недостающие последним значением из ini
-		local s = spawn_ini:r_string( section, line )
-		--log3("r_2nums: %s", s)
-		local t = parse_names( s )
-		ASSERT(#t<=2, "r_2nums: incorrect line '%s'", tostring(s))
-		return (t[1] or def1), (t[2] or def2)
-	else
-		return def1, def2
-	end
-end
 
 --/ проверяет, есть ли объект в онлайне
 function is_object_online(obj_id)
@@ -680,20 +655,21 @@ local msg_crash = {
 	[9] = game.translate_string("msg_crash_1_text"),
 }
 
-local crash_counter = 0
+--local crash_counter = 0
 local crash_text = game.translate_string("msg_crash_text")
 
 -- Крешнуть игру (после вывода сообщения об ошибке в лог)
 function abort(fmt, ...)
-	log1("info-"..fmt)
-	local message = string.format(fmt, ...)
 	for i = 0,9 do
 		log1(msg_crash[i])
 	end
+
 	ogse_debug.dump_actor_codes()
+
 	log3(debug.traceback())
-	log1("ПОСЛЕДНЕЕ СООБЩЕНИЕ СИСТЕМЫ OFFLINE_ALIFE: "..amk_offline_alife.last_debug_message)
-	log1("ОПИСАНИЕ ОШИБКИ: "..message)
+	--log1("КРАТКОЕ ОПИСАНИЕ ОШИБКИ: "..fmt)
+	log1("ПОЛНОЕ ОПИСАНИЕ ОШИБКИ:")
+	log3(fmt, ...)
 	cmd("flush")
 
 	local hud = get_hud()
@@ -702,30 +678,25 @@ function abort(fmt, ...)
 		hud:AddCustomStatic("btr_critical", true)
 		critical = hud:GetCustomStatic("btr_critical"):wnd()
 		critical:SetText(crash_text)
-	end	
-	
-	if crash_counter == 0 then
-		crash_counter = crash_counter + 1	
-		log1("ABORT: fail(message)")
-		fail(message)
-	elseif crash_counter == 1 then
+	end
+
+	--if crash_counter == 0 then
+		--crash_counter = crash_counter + 1	
+		fail("КРАТКОЕ ОПИСАНИЕ ОШИБКИ: "..fmt)
+	--[=[elseif crash_counter == 1 then
 		crash_counter = crash_counter + 1
-		log1("ABORT: 1/crash")	
+		--log1("ABORT: 1/crash")	
 		local crash
 		local ooops = 1/crash
 	elseif crash_counter == 2 then
 		crash_counter = crash_counter + 1
-		log1("ABORT: string.format")	
+		--log1("ABORT: string.format")	
 		string.format("%s")		
-	--elseif crash_counter == 3 then
-	--	crash_counter = crash_counter + 1
-	--	log1("ABORT: log3")	
-	--	log3("%s")		
 	else
 		crash_counter = crash_counter + 1
-		log1("get_console():execute quit")
-		cmd("quit")
-	end
+		--log1("get_console():execute quit")
+		cmd("quit")]=]
+	--end
 end
 
 --/ проверяет целую часть числа на нечётность
@@ -1303,7 +1274,7 @@ local tostring_all_tbl = {
 	["userdata"] =	function() return "[[USERDATA]]" end,
 	["thread"] =	function() return "[[THREAD]]" end,
 }
---Конвертирование чего угодно в строку. Используется как компонент функции log3.
+--Конвертирование чего угодно в строку. Использовать только для вывода в лог!
 function tostring_all(obj, ind) --ind - служебный аргумент для распечатки "таблиц в таблицах". НЕ ТРОГАТЬ ЕГО!!!
 	return tostring_all_tbl[type(obj)](obj, ind)
 end

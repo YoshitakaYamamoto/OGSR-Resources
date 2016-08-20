@@ -96,8 +96,8 @@ function save()
 --      )
     end
   end
-  log2(
-    "[RELATIONS] RELATION TABLE SIZE IS %s: %s items",
+  log3(
+    "--[RELATIONS] RELATION TABLE SIZE IS [%s]: [%s] items",
     table.getn( chunks ), cnt
   )
   ogse.save_var( script_name() .. ".chunks", chunks, "array", "chunk" )
@@ -113,7 +113,7 @@ function load()
   local chunks = ogse.load_var_safe( script_name() .. ".chunks" )
   local cnt    = 0
   if chunks then
-    log2( "[RELATIONS] RELATION TABLE SIZE IS %s", table.getn( chunks ) )
+    log3( "--[RELATIONS] RELATION TABLE SIZE IS [%s]", table.getn( chunks ) )
     for _, pk in ipairs( chunks ) do
       local to_id   = pk:r_u16()
       local to_size = pk:r_u16()
@@ -142,7 +142,7 @@ function load()
 --        )
       end
     end
-    log2( "[RELATIONS] RELATION TABLE LOADED: %s items!", cnt )
+    log3( "--[RELATIONS] RELATION TABLE LOADED: [%s] items!", cnt )
   end
 end
 
@@ -150,7 +150,7 @@ end
 function load_old( pk )
   if pk then
     local table_size = pk:r_u16()
-    log2( "[RELATIONS] OLD RELATION TABLE SIZE IS %s", tostring( table_size ) )
+    log3( "~~[RELATIONS] OLD RELATION TABLE SIZE IS [%s]", table_size )
     for i = 1, table_size do
       local to_id   = pk:r_u16()
       local to_size = pk:r_u16()
@@ -178,7 +178,7 @@ function load_old( pk )
 --        )
       end
     end
-    log1( "[RELATIONS] OLD RELATION TABLE LOADED!" )
+    log1( "~~[RELATIONS] OLD RELATION TABLE LOADED!" )
     ogse.delete_var( "ogse_relation_reverse_table" )
   end
 end

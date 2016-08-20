@@ -1,15 +1,14 @@
--- -*- mode: lua; coding: windows-1251-dos -*-
--------------------------------------------------------------------------------
---|  ogse_unist.script                                                      |--
---|   Универсальная система хранения пользовательских данных                |--
---| Malandrinus, OGS Evolution Team, 2011                                   |--
---| version 1.0                                                             |--
--------------------------------------------------------------------------------
+-----------------------------------------------------------
+--| ogse_unist.script
+--| Универсальная система хранения пользовательских данных
+--| Malandrinus, OGS Evolution Team, 2011
+--| version 1.0
+-----------------------------------------------------------
 -- Использование:
--- ogse.save_variable(name, value [,type]) -- сохранить переменную
--- ogse.load_variable(name [,default_value [,type]]) -- прочитать переменную
--- ogse.variable_exists(name) -- проверить существование переменной
--- ogse.delete_variable(name) -- удалить переменную, чтобы освободить место
+-- ogse.save_var(name, value [,type]) -- сохранить переменную
+-- ogse.load_var(name [,default_value [,type]]) -- прочитать переменную
+-- ogse.var_exists(name) -- проверить существование переменной
+-- ogse.delete_var(name) -- удалить переменную, чтобы освободить место
 -- name - строка с уникальным именем переменной
 -- value - значение
 -- type - строка с типом. Это в ряде случаев необязательный параметр. 
@@ -86,16 +85,16 @@ end
 
 
 function print_storage_usage()
-  log1( "-- --==<| Printing storage usage information |>==-- -" )
-  log1( "number of storages: " .. st_count_item.value )
+  log1( "----==<| Printing storage usage information |>==--" )
   for i = 1, st_count_item.value do
     local st        = st_objects[ i ]
     local items_cnt = 0
     for _, _ in pairs( st.data ) do
       items_cnt = items_cnt + 1
     end
-    log2( "%d : total space = %d, free space = %d, items count = %d", i, st.total_space, st:free_space(), items_cnt )
+    log3( "~~[%s]: total space = [%s], free space = [%s], items count = [%s]", i, st.total_space, st:free_space(), items_cnt )
   end
+  log1( "----==<| Printing storage usage information - END |>==--" )
 end
 
 
@@ -103,11 +102,11 @@ function print_storage()
   print_storage_usage()
   local types_inv = {}
   for k, v in pairs( types ) do types_inv[ v ] = k end
-  log1( "-- --==<| Printing storage content |>==-- -" )
+  log1( "----==<| Printing storage content |>==--" )
   for name, item in pairs( storage ) do
-    log2( "name = '%s', type = '%s', data_size = %d, full size = %d", name, types_inv[ item.type ], item:data_size(), item.size )
-    log1( item:get_string() )
+    log3( "Name = ["..name.."], type = ["..types_inv[ item.type ].."], data_size = ["..item:data_size().."], full size = ["..item.size.."]\n"..item:get_string() )
   end
+  log1( "----==<| Printing storage content - END |>==--" )
 end
 
 
@@ -165,13 +164,9 @@ function create_item( name, value, typ, subtype )
       return table_element( name, value )
     elseif lua_type == "nil" then
       -- надо подумать, что делать, вылетать или сохранять nil
-      abort(
-        string.format(
-          "ogse_unist.create_item: trying set nil value for variable with name '%s'",
-          name
-        )
-      )
-    else
+      abort("ogse_unist.create_item: trying set nil value for variable with name %s", name )
+	else
+	  abort("ogse_unist.create_item: trying set %s value for variable with name %s", lua_type, name)
     end
   end
 end
@@ -192,9 +187,9 @@ function read_item_from_packet( r_packet )
   local pos2 = r_packet:r_tell()
   ASSERT(
     pos2 - pos1 == item.size,
-    "read_item_from_packet: item reported size is different from actually readed data: name_len="
-      .. item.name:len() .. " value=" .. item:get_string()
-      .. " item.size = " .. item.size .. " written=" .. ( pos2 - pos1 )
+	"read_item_from_packet: item reported size is different from actually readed data: name_len = ["
+      .. item.name:len() .. "], value = [" .. item:get_string()
+      .. "], item.size = [" .. item.size .. "], written = [" .. ( pos2 - pos1 ) .."]"
   )
   return item
 end
@@ -209,9 +204,9 @@ function write_item_to_packet( w_packet, item )
   local pos2 = w_packet:w_tell()
   ASSERT(
     pos2 - pos1 == item.size,
-    "write_item_to_packet: item reported size is different from actually written data: name_len="
-      .. item.name:len() .. " value=" .. item:get_string()
-      .. " item.size = " .. item.size .. " written=" .. ( pos2 - pos1 )
+	"write_item_to_packet: item reported size is different from actually written data: name_len = ["
+      .. item.name:len() .. "], value = [" .. item:get_string()
+      .. "], item.size = [" .. item.size .. "], written = [" .. ( pos2 - pos1 ) .."]"
   )
 end
 
@@ -271,7 +266,7 @@ function on_load()
     )
   end
   --ASSERT(ready, "ogse_unist.on_init: storage was not succesfully created")
-  ogse_unist.print_storage_usage()
+  ogse_unist.print_storage--[[_usage]]()
 end
 
 
@@ -445,7 +440,7 @@ function u8_element:header_size()
 end
 
 function u8_element:get_string()
-  return tostring( self.value )
+  return tostring_all(self.value)
 end
 
 function u8_element:read_value( r_packet )
@@ -544,7 +539,7 @@ function string_element:__init( name, value ) super( name, value )
 end
 
 function string_element:get_string()
-  return self:get_value()
+  return tostring_all(self.value)
 end
 
 function string_element:data_size()
@@ -621,7 +616,7 @@ function vector_element:get_value()
 end
 
 function vector_element:get_string()
-  return "not implemented"
+  return tostring_all(self.value) --"[[not implemented]]"
 end
 
 function vector_element:read_value( data )
@@ -690,7 +685,7 @@ end
 function array_element:get_string()
   local s = ""
   for i, v in ipairs( self.value ) do
-    s = s .. i .. ": [" .. v.type .. "] " .. v:get_string() .. '\n'
+    s = s .. "[" .. tostring_all(i) .. "] = " .. v:get_string() .. ',\n'
   end
   return s
 end
@@ -786,8 +781,7 @@ end
 function table_element:get_string()
   local s = ""
   for _, v in ipairs( self.value ) do
-    s = s .. "[" .. v[1].type .. "] " .. tostring( v[ 1 ].value ) .. ": ["
-      .. v[ 2 ].type .. "] " .. tostring( v[ 2 ].value ) .. '\n'
+    s = s .. "[" .. tostring_all(v[ 1 ].value) .. "] = " .. tostring_all(v[ 2 ].value) .. ',\n'
   end
   return s
 end

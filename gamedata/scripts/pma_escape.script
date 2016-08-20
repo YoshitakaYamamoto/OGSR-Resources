@@ -11,7 +11,7 @@ local subscribed
 function subscribe()
 	if has_alife_info("esc_heli_go") and not has_alife_info("tolik_help") then
 		if not subscribed then
-			log1("--PMA Escape subscribed!")
+			--log1("--PMA Escape subscribed!")
 			subscribed = { signal = "on_update", fun = this.show_heli_scene --[[, queued = true]] }
 			sm:subscribe(subscribed)
 		end
@@ -19,7 +19,7 @@ function subscribe()
 end
 function unsubscribe()
 	if subscribed then
-		log1("~~PMA Escape UNsubscribed!")
+		--log1("~~PMA Escape UNsubscribed!")
 		sm:unsubscribe(subscribed)
 		subscribed = nil
 	end
