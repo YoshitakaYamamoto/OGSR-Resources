@@ -180,7 +180,7 @@ function pkm_binder:check_health()
 	if not self.alive then
 		self.heli:ClearEnemy()
 		self.heli:Die()
-		ogse.start_tmr(nil, math.random(15, 30), "checker_minefield.add_to_delete", self.object:id())
+		ogse.start_gtmr(nil, math.random(150, 300), "checker_minefield.add_to_delete", self.object:id())
 	end
 end
 

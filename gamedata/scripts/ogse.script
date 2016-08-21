@@ -1555,18 +1555,19 @@ function quest_spawn_ex(section, total, spawn_item)
 end
 
 function kill_crow()
+	local lname = level.name()
 	for k = 1, 65534 do
 		local crow = level.object_by_id(k)
-		if crow and string.find(crow:name(), "m_crow") then
+		if crow and crow:section() == "m_crow" and object_level_name(crow) == lname then
 			local hit = hit()
-			hit.direction = vector():set(0,0,0)
-			hit.impulse = 10
-			hit.draftsman = crow
-			hit.power = 10
-			hit.type = hit.strike
+				hit.direction = vector():set(0,0,0)
+				hit.impulse = 10
+				hit.draftsman = crow
+				hit.power = 10
+				hit.type = hit.strike
 			crow:hit(hit)
 
-			ogse.start_tmr(nil, math.random(150, 300), "checker_minefield.add_to_delete", k)
+			ogse.start_gtmr(nil, math.random(150, 300), "checker_minefield.add_to_delete", k)
 		end
 	end
 end
