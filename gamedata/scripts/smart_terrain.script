@@ -173,7 +173,7 @@ end
 
 function se_smart_terrain:initialize_if_needed()
 	if not self.initialized then
-		sim_statistic.update()
+		--sim_statistic.update()
 
 		self:get_se_objs()
 
@@ -209,7 +209,7 @@ function se_smart_terrain:get_se_objs()
   for id, v in pairs( self.npc_info ) do
     local obj = sim:object( id )
     if obj then
-	  sim_statistic.add( obj )
+	  --sim_statistic.add( obj )
       self:fill_npc_info( obj, v )
     else
       log2(
@@ -610,7 +610,7 @@ function se_smart_terrain:register_npc( obj )
 
 	self.gulag:addObject( obj.id ) -- таки добавили объект
 
-	sim_statistic.add( obj )
+	--sim_statistic.add( obj )
 
 	self.gulag:update() -- обновили
 
@@ -645,7 +645,7 @@ function se_smart_terrain:unregister_npc( obj )
 
 	obj:clear_smart_terrain()
 
-	sim_statistic.remove( obj )
+	--sim_statistic.remove( obj )
 
 --'	if sim_statistic.show_stalker_spot == true and obj:alive() then
 --'		local community, rank = sim_statistic.getNpcType(obj)
@@ -748,14 +748,15 @@ function se_smart_terrain:is_gulag_available()
 	if self.gparams.cond then
 		-- то используем их
 		local bb = xr_logic.pick_section_from_condlist( db.actor_proxy, self, self.gparams.cond ) ~= nil
-		self:show_smart_debug_spot(bb)
+		--self:show_smart_debug_spot(bb)
 		return bb
 	else -- если специальных условий нет
-		self:show_smart_debug_spot(true)
+		--self:show_smart_debug_spot(true)
 		return true -- то значит всегда можно работать
 	end
 end
 
+--[=[
 function se_smart_terrain:show_smart_debug_spot(avail)
 	if sim_statistic.show_smart_spot == true then
 		--' Показать отметку
@@ -794,6 +795,7 @@ function se_smart_terrain:show_smart_debug_spot(avail)
 		end		
 	end
 end
+--]=]
 
 -- в гулаг поступил первый персонаж и он начинает работать
 -- название в целом запутывает! Это не создание, а скорее активация гулага
@@ -910,7 +912,7 @@ function se_smart_terrain:register_if_needed()
 		self.gulag:initialize()
 	end
 
-	sim_statistic.reinit()
+	--sim_statistic.reinit()
 
 	-- Регистрация в таскменеджере
 	task_manager.get_random_task():register_target(self)

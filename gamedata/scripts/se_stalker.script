@@ -48,7 +48,7 @@ military_online_npc = {
 	[story_ids.Mil_Master_Max] = true, -- Макс
 	[story_ids.Mil_Cook]       = true, -- повар
 }
-local debug_flag = true
+--local debug_flag = true
 
 local tmp_stalkers = {}
 
@@ -75,9 +75,6 @@ function se_stalker:__init (section) super (section)
 	self.was_in_smart_terrain = false
 
 	self.death_dropped = 0 --Генерил ли персонаж выпадаемые предметы или нет. (0 - нет, 1 - да)
-
-	--' Test for dima
-	self.dont_spawn_online = false
 	
 	--' Флаг смерти в оффлайне
 	self.offline_dead = 0
@@ -105,17 +102,8 @@ function se_stalker:get_job_online()
 	end
 end
 --------------------
-
-local test_off = {
-
-
-}
-
 function se_stalker:can_switch_offline ()
 	local can_be_offline = false
-	if test_off[self:name()] then
-		return true
-	end	
 	if self.force_offline then
 		can_be_offline = true
 	else	
@@ -139,9 +127,6 @@ function se_stalker:can_switch_offline ()
 end
 --------------------
 function se_stalker:can_switch_online ()
-	if test_off[self:name()] then
-		return false
-	end	
 	if self.force_offline then
 		return false
 	end
@@ -150,9 +135,6 @@ function se_stalker:can_switch_online ()
 	end		
 	if cannot_be_offline(self) then
 		return true
-	end
-	if self.dont_spawn_online == true then
-		return false
 	end
 
 	if self:get_job_online() ~= nil then
@@ -266,21 +248,21 @@ function se_stalker:on_register()
 --		ogse_anomaly.get_stalker(self.id)
 --	end
 
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker register start "..self:name())
-	end
+	--end
 
 	cse_alife_human_stalker.on_register( self )
 	
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker register 1 "..self:name())
-	end	
+	--end	
 	
 	xr_companion.is_companion_se(self)
 	
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker register 2 "..self:name())
-	end
+	--end
 
 	if(actor_stats.add_to_ranking~=nil)then
 		local community = self:community()
@@ -292,9 +274,9 @@ function se_stalker:on_register()
 		end
 	end
 	
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker register 3 "..self:name())
-	end
+	--end
 	
 	if xr_companion.is_companion(self.id) then
 		--' Не брать задания алайфа
@@ -304,18 +286,19 @@ function se_stalker:on_register()
 		task_manager.get_random_task():register_target(self)	
 	end
 	
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker register 4 "..self:name())
-	end	
+	--end	
 	
 	if self:alive() and self:smart_terrain_id() == 65535 then
 		self:brain():update()
 	end
 	
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker register 5 "..self:name())
-	end
+	--end
 
+--[=[
 	--' Нарисовать мапспот с собой
 	if sim_statistic.show_stalker_spot == true and self:alive() then
 	
@@ -428,7 +411,8 @@ function se_stalker:on_register()
 			"\\nHEALTH: "..self:health()	)
 		-- end
 	end
-	
+--]=]
+
 	--if debug_flag then
 		-- log1("se_stalker register 6 "..self:name())
 		-- log1("se_stalker register end "..self:name())
@@ -452,38 +436,38 @@ function se_stalker:on_unregister()
 
 	--ogse_offline_alife.stalkers[self.id] = nil
 
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker unregister start "..self:name())
-	end
+	--end
 
 	cse_alife_human_stalker.on_unregister(self)
 	
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker unregister 1 "..self:name())
-	end	
+	--end	
 
 	--' Убрать мапспот с собой
-	if sim_statistic.show_stalker_spot == true then
-		local community, rank = sim_statistic.getNpcType(self)
-		level_tasks.remove_location_by_id(self.id, "alife_presentation_"..community)
-	end
+	--if sim_statistic.show_stalker_spot == true then
+	--	local community, rank = sim_statistic.getNpcType(self)
+	--	level_tasks.remove_location_by_id(self.id, "alife_presentation_"..community)
+	--end
 	
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker unregister 2 "..self:name())
-	end	
+	--end	
 
 	smart_terrain.unregister_npc(self)
 	
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker unregister 3 "..self:name())
-	end	
+	--end	
 
 	--' Отрегистрация в таскменеджере
 	task_manager.get_random_task():unregister_target(self)
 	
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker unregister 4 "..self:name())
-	end	
+	--end	
 	
 	if(actor_stats.remove_from_ranking~=nil)then
 		local community = self:community()
@@ -496,9 +480,9 @@ function se_stalker:on_unregister()
 		actor_stats.remove_from_ranking(self.id)
 	end
 	
-	if debug_flag then
+	--if debug_flag then
 		-- log1("se_stalker unregister end "..self:name())
-	end	
+	--end	
 	
 end
 --------------------
@@ -511,14 +495,16 @@ function se_stalker:on_death(killer)
 	cse_alife_human_stalker.on_death(self, killer)
 
 	--' Убрать мапспот с собой
-	if sim_statistic.show_stalker_spot == true then
-		local community, rank = sim_statistic.getNpcType(self)
-		level_tasks.remove_location_by_id(self.id, "alife_presentation_"..community)
+	--if sim_statistic.show_stalker_spot == true then
+	--	local community, rank = sim_statistic.getNpcType(self)
+	--	level_tasks.remove_location_by_id(self.id, "alife_presentation_"..community)
+	--end
+
+	-- Удаление меток с квестовых персонажей
+	if level.map_has_object_spot(self.id, "green_location") ~= 0 then
+		level_tasks.remove_location_by_id(self.id, "green_location") 
 	end
-	
-	--' Удаление меток с квестовых персонажей
-	level_tasks.remove_location_by_id(self.id, "green_location") 
-	
+
 	-- почистим отношения
 	local sm = ogse_signals.get_mgr()
 	sm:call("on_release_npc", self.id)
