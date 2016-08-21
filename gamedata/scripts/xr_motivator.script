@@ -448,7 +448,6 @@ function motivator_binder:net_spawn(sobject)
 		manager:add_evaluator(ogsm_hideout.property_blowout, property_evaluator_const(false))
 		manager:add_evaluator(ogsm_hideout.property_hideout_lost, property_evaluator_const(false))
 		manager:add_evaluator(ogsm_hideout.property_inhide, property_evaluator_const(false))
-		manager:add_evaluator(ogsm_hideout.property_psyzoned, property_evaluator_const(false))
 	end
 
 	ogse_debug.process_npc(self.object, "s_spw", 11)
@@ -1040,7 +1039,6 @@ function addCommonPrecondition(action)
 		action:add_precondition(world_property(ogsm_hideout.property_blowout, false))
 		action:add_precondition(world_property(ogsm_hideout.property_hideout_lost, false))
 		action:add_precondition(world_property(ogsm_hideout.property_inhide, false))
-		action:add_precondition(world_property(ogsm_hideout.property_psyzoned, false))
 	end
 
 	if xrs_ai then xrs_ai.addCommonPrecondition(action) end

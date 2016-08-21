@@ -1,4 +1,4 @@
--- Схема поведения НПС при выбросе, попадании в псизоны и прилёте вертушек для OGSЕ --
+-- Схема поведения НПС при выбросе и прилёте вертушек для OGSЕ --
 				--- включает Deadly Blowout by KamikaZze ----
 ------ Copyright 2007-2008 DEXXX, 2009 KamikaZze, небольшие фрагменты Monnoroch ------
 
@@ -6,13 +6,11 @@ property_base = 12221
 property_blowout = property_base+1
 property_hideout_lost = property_base+2
 property_inhide = property_base+3
-property_psyzoned = property_base+4
 --property_enemyactor = property_base+5
 act_base = 13332
 act_hideout = act_base+1
 act_psy_effect = act_base+2
 act_inhide = act_base+3
-act_psyzoned = act_base+4
 
 local debug_flag = false
 local restrictions_off = true --false
@@ -168,30 +166,6 @@ function is_hostile(comm,target)
 end
 
 ---<< from Monnoroch AI
-
-function is_specific_npc(npc)
-	if string.find(npc:name(),"esc_millitary_near_anomaly") and not ogse.has_info("esc_kvest_know_do_mils_near_anomaly_take_item") and not ogse.has_info("esc_kvest_know_do_mils_near_anomaly_complete") and not ogse.has_info("esc_kvest_know_do_mils_near_anomaly_fail") then
-		return true
-	end
-	if npc:story_id() == 34 or npc:story_id() == 35 or npc:story_id() == 38 then
-		return true
-	end
-	return false
-end
-
---- Эта функция возвращает нам вертекс на точку для убегания из пси-зоны
-function escape_point(npc, center_id, position_id, radius, min_radius)
-
-	local pos = level.vertex_position(center_id+math.random(9000)-math.random(9000))
-
-    local i = 1
-    while(level.vertex_position(position_id):distance_to(pos) < min_radius and i < 20) do
-		pos = level.vertex_position(center_id+math.random(9000)-math.random(9000))
-        i = i + 1
-    end
-
-    return (pos)
-end
 
 local backup_restrictions_out = {}
 local backup_restrictions_in = {}
@@ -392,64 +366,6 @@ function evaluator_inhide:evaluate()
 	return self.st.inhide == true
 end 
 
--- << Добавлено Kamikazze - этот эвалуатор определяет, не попали ли мы пси-аномалию
-class "evaluator_psyzoned" (property_evaluator)
-function evaluator_psyzoned:__init(name, storage) super (nil, name)
-	self.st = storage
-end
-function evaluator_psyzoned:evaluate()
-
-	local enabled = false
-	if not enabled then return false end -- выбегание из пси-зон отключено. Не нужно.
-
-	if count_update <= engage_after_update then
-		return false
-	end
-
-	if not check_timer[self.object:id()] then check_timer[self.object:id()] = time_global() end
-	
-	if nonehide_npc[self.object:name()] 
-	or ogse.is_quest_npc(self.object)
-	or xr_companion.is_companion(self.object:id()) 
-	or ogse_hideouts.check_not_need_hide(self.object)	
-	then
-		return false
-	end	
-
-	self.st.psyzoned = false
-	if has_alife_info("blowout") then return self.st.psyzoned end
-	if ogsm_respawn.psy_list then
-		for k, v in pairs(ogsm_respawn.psy_list) do
-			local psy_zn = db.zone_by_name[v:name()]
-			if psy_zn 
-			and self.object 
-			and self.object:character_community() ~= "zombied" 
-			and self.object:character_community() ~= "ecolog" 
-			and self.object:character_community() ~= "monolith"  then
-				if psy_zn:inside(self.object:position()) then
-					self.st.psyzoned = true
-				end
-			end
-		end
-	end	
-
-	if time_global() > check_timer[self.object:id()] then
-		if self.st.psyzoned == true then
-			in_psy[self.object:id()] = true
-			check_timer[self.object:id()] = time_global() + 5000
-		else	
-			in_psy[self.object:id()] = false
-			check_timer[self.object:id()] = time_global() + 1000
-			zombietime[self.object:id()] = nil
-			psi_timer[self.object:id()] = nil
-		end
-	end
-
-	if in_psy[self.object:id()] and in_psy[self.object:id()] == true then
-		ogse_debug.add_active_eval( self.object, script_name(), "psyzoned" )
-	end	
-	return in_psy[self.object:id()] == true
-end 
 
 -- Создаем оператор - направляем НПС в укрытие
 class "action_hideout" (action_base)
@@ -735,66 +651,6 @@ function action_inhide:finalize()
 	npc_go[npc:id()] = 0
 end
 
--- << Добавлено Kamikazze - это действие определяет, что мы делаем в пси-аномалии
---- TODO: Переключить на out-рестриктор
-class "action_escape" (action_base)
-function action_escape:__init(name, storage) super (nil, name)
-	self.st = storage
-end
-function action_escape:initialize()
-	action_base.initialize(self)
-	local npc = self.object
-	if not zombietime[npc:id()] then
-		zombietime[npc:id()] = time_global() + 30000
-	end
-	if not psi_timer[npc:id()] then
-		psi_timer[npc:id()] = time_global() + 4000
-	end		
-	self.vertex = npc:level_vertex_id()
-	if not self.lvid then
-		self.lvid = escape_point(npc, self.vertex, self.vertex, 40, 25)
-	end
-end
-function action_escape:execute()
-	action_base.execute(self)
-	local npc = self.object
-	local uptime = time_global()
-	local timer = time_global()
-	if not zombietime[npc:id()] then
-		zombietime[npc:id()] = time_global() + 30000
-	end	
-	npc:clear_animations()
-	if npc:animation_count()>0 then return end
-	npc:set_movement_type(move.run)
-	npc:set_body_state(move.standing)
-	npc:movement_enabled(true)
-	npc:set_mental_state(anim.panic)
-	npc:disable_talk()
-	if (uptime and zombietime[npc:id()]) and uptime < zombietime[npc:id()] then
-		if npc:level_vertex_id() == self.lvid or (timer and timer > psi_timer[npc:id()]) then
-			--state_mgr.set_state( script_name(), npc,"assault")					
-			self.vertex = npc:level_vertex_id()
-			self.lvid = escape_point(npc, self.vertex, self.vertex, 40, 25)
-			utils.send_to_nearest_accessible_vertex(npc, self.lvid) 
-			psi_timer[npc:id()] = time_global() + 4000
-		else	
-			--state_mgr.set_state( script_name(), npc,"assault")	
-			utils.send_to_nearest_accessible_vertex(npc, self.lvid) 
-		end
-	else
-		if not ogse.is_quest_npc(npc) then
-			npc:set_character_community("zombied",0,0)
-			log1("[OGSE HIDEOUT] REMOVING ALL RESTRICTIONS FOR "..npc:name())
-			npc:remove_all_restrictions()
-		end
-	end
-end
-function action_escape:finalize()
-	local npc = self.object
-	npc:set_mental_state(anim.danger)
-	action_base.finalize(self)
-end
-
 
 -- Добавляем в планировщик нашу схему
 function add_to_binder(object, char_ini, scheme, section, st)
@@ -812,9 +668,6 @@ function add_to_binder(object, char_ini, scheme, section, st)
 
 	manager:remove_evaluator(property_inhide)
 	manager:add_evaluator(property_inhide, evaluator_inhide("evaluator_inhide", st))
-
-	manager:remove_evaluator(property_psyzoned)
-	manager:add_evaluator(property_psyzoned, evaluator_psyzoned("evaluator_psyzoned", st))	
 	
 	-- manager:remove_evaluator(property_enemyactor)
 	-- manager:add_evaluator(property_enemyactor, evaluator_enemyactor("evaluator_enemyactor", st))		
@@ -826,7 +679,6 @@ function add_to_binder(object, char_ini, scheme, section, st)
 	action:add_precondition(world_property(stalker_ids.property_danger, false))
 	action:add_precondition(world_property(property_hideout_lost, false))
 	action:add_precondition(world_property(property_inhide, false))
-	action:add_precondition(world_property(property_psyzoned, false))
 	action:add_precondition(world_property(property_blowout, true))
 	action:add_effect(world_property(property_blowout, false))
 	manager:add_action(act_hideout, action)
@@ -836,7 +688,6 @@ function add_to_binder(object, char_ini, scheme, section, st)
 	action:add_precondition(world_property(property_wounded, false))
 	action:add_precondition(world_property(property_blowout, false))
 	action:add_precondition(world_property(property_inhide, false))
-	action:add_precondition(world_property(property_psyzoned, false))
 	action:add_precondition(world_property(property_hideout_lost, true))
 	action:add_effect(world_property(property_hideout_lost, false))
 	manager:add_action(act_psy_effect, action)
@@ -848,42 +699,27 @@ function add_to_binder(object, char_ini, scheme, section, st)
 	action:add_precondition(world_property(stalker_ids.property_danger, false))
 	action:add_precondition(world_property(property_blowout, false))
 	action:add_precondition(world_property(property_hideout_lost, false))
-	action:add_precondition(world_property(property_psyzoned, false))
 	action:add_precondition(world_property(property_inhide, true))
 	action:add_effect(world_property(property_inhide, false))
 	manager:add_action(act_inhide, action)
 
-	local action = action_escape("action_escape", st)
-	action:add_precondition(world_property(stalker_ids.property_alive, true))
-	action:add_precondition(world_property(property_wounded, false))	
-	action:add_precondition(world_property(property_blowout, false))
-	action:add_precondition(world_property(property_hideout_lost, false))	
-	action:add_precondition(world_property(property_psyzoned, true))
-	action:add_effect(world_property(property_psyzoned, false))
-	manager:add_action(act_psyzoned, action)	
-	
-	action = manager:action(stalker_ids.action_alife_planner)
+	local action = manager:action(stalker_ids.action_alife_planner)
 	action:add_precondition(world_property(property_blowout, false))
 	action:add_precondition(world_property(property_hideout_lost, false))
 	action:add_precondition(world_property(property_inhide, false))
-	action:add_precondition(world_property(property_psyzoned, false))
 
 	action = manager:action(stalker_ids.action_combat_planner)
 	action:add_precondition(world_property(property_hideout_lost, false))
-	action:add_precondition(world_property(property_psyzoned, false))
 
 	action = manager:action(stalker_ids.action_danger_planner)
 	action:add_precondition(world_property(property_blowout, false))
 	action:add_precondition(world_property(property_inhide, false))
 	action:add_precondition(world_property(property_hideout_lost, false))
-	action:add_precondition(world_property(property_psyzoned, false))
 	
 	action = manager:action(state_mgr_to_idle_alife)
 	action:add_precondition(world_property(property_blowout, false))
 	action:add_precondition(world_property(property_inhide, false))
 	action:add_precondition(world_property(property_hideout_lost, false))
-	action:add_precondition(world_property(property_psyzoned, false))
-
 end
 
 
@@ -898,8 +734,3 @@ function disable_scheme(npc, scheme)
 		st.enabled = false
 	end
 end
-
-
--- Схема поведения НПС при выбросе, попадании в псизоны и прилёте вертушек для OGSЕ --
-				--- включает Deadly Blowout by KamikaZze ----
----------------- Copyright 2007-2008 DEXXX, 2009 KamikaZze ----------------------

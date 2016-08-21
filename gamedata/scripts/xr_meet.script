@@ -471,7 +471,6 @@ function add_to_binder(object, char_ini, scheme, section, st)
 		action:add_precondition(world_property(ogsm_hideout.property_blowout, false))
 		action:add_precondition(world_property(ogsm_hideout.property_hideout_lost, false))
 		action:add_precondition(world_property(ogsm_hideout.property_inhide, false))
-        action:add_precondition(world_property(ogsm_hideout.property_psyzoned, false))
 	end
 
 	action:add_effect (world_property(properties["contact"], 			false))
