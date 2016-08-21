@@ -547,6 +547,7 @@ function delayed_fun_start:load( packet )
    "delayed_fun_start:load: wrong parameters readed"
   )
   self.fun_params = array_item:get_value()
+  --log3("[%s] Loading timer: id: [%s], class: [%s], action_name = [%s], fun_params = [%s]", script_name(), self._id, self._class, self.action_name, self.fun_params)
 end
 
 function delayed_fun_start:save( packet )

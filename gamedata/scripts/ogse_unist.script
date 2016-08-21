@@ -266,7 +266,7 @@ function on_load()
     )
   end
   --ASSERT(ready, "ogse_unist.on_init: storage was not succesfully created")
-  ogse_unist.print_storage--[[_usage]]()
+  ogse_unist.print_storage_usage()
 end
 
 
