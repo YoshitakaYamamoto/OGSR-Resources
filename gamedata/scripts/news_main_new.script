@@ -156,7 +156,6 @@ local anser_blu_out_text = {
 
 -- Выброс кончился
 function vubros_out_msg()
-if random_news == 1 then
 if math.random() < 0.7 then	
 	if post_message_prob == 1 and not isIndoor(level.name()) then
 		local from1 = gen_names_strings()
@@ -175,7 +174,6 @@ if math.random() < 0.7 then
 			end
 		end
 	end
-end
 end
 end
 

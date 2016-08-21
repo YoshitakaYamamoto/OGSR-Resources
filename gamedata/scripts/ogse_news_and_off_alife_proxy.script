@@ -16,6 +16,7 @@ function attach(sm)
 		end
 		sm:subscribe({ signal = "on_spawn",		fun = this.on_spawn })
 		sm:subscribe({ signal = "on_update",	fun = this.on_update, queued = true })
+		sm:subscribe({ signal = "on_after_blowout",	fun = this.on_after_blowout })
 		if spawn_message_flag > 0 then
 			sm:subscribe({ signal = "on_monster_spawn",	fun = this.on_monster_spawn })
 		end
@@ -36,6 +37,11 @@ end
 
 function on_update()
 	news_main_data.show_news_main()
+end
+
+function on_after_blowout()
+	news_main_data.on_connect_vbs() -- выдаем сообщение о коннекте
+	news_main_new.vubros_out_msg() -- сообщение о завершении выброса
 end
 -----------------------------------------------------------------
 function on_spawn_amk_news()
