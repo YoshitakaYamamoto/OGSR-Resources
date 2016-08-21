@@ -265,10 +265,12 @@ function drop_manager:__init(npc)
 end
 
 function drop_manager:create_release_item()
+	--log3("~~Called drop_manager:create_release_item() for [%s]", self.npc:name())
 	--' Спрашиваем у серверного объекта генерились ли предметы
 	local se_obj = alife():object(self.npc:id())
-	if not se_obj or se_obj.death_droped then return end
-	se_obj.death_droped = true
+	if not se_obj or se_obj.death_dropped > 0 then return end
+	se_obj.death_dropped = 1
+	--log3("--Creating release_items for [%s]", self.npc:name())
 
 	--// xr_companion
 	if xr_companion.is_companion(self.npc:id()) then

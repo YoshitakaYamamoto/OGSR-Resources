@@ -2,7 +2,7 @@
 Изменения script_version:
 	3 - сохранение поля job_online
 	5 - сохранение поля was_in_smart_terrain
-	6 - сохранение поля death_droped
+	6 - сохранение поля death_dropped
 ]]
 bar_exceptions = {
    [4294967296] = true,
@@ -74,13 +74,10 @@ function se_stalker:__init (section) super (section)
 	-- посещал ли сталкер хоть один smart_terrain
 	self.was_in_smart_terrain = false
 
-	self.death_droped = false --'Генерил ли персонаж выпадаемые предметы или нет.
+	self.death_dropped = 0 --Генерил ли персонаж выпадаемые предметы или нет. (0 - нет, 1 - да)
 
 	--' Test for dima
 	self.dont_spawn_online = false
-
-	--' Вызывался ли генератор ссылок на тайники.
-	self.treasure_processed = false
 	
 	--' Флаг смерти в оффлайне
 	self.offline_dead = 0
@@ -204,12 +201,9 @@ function se_stalker:STATE_Write (packet)
 	packet:w_bool(self.was_in_smart_terrain)
 	
 	ogse_debug.process_npc(self, "npc_sv", 14)
-	
-	local ddw=0
-	if self.death_droped then ddw=ddw+1 end
-	if self.treasure_processed then ddw=ddw+2 end
-	packet:w_u8(ddw)
-	
+
+	packet:w_u8(self.death_dropped)
+
 	ogse_debug.process_npc(self, "npc_sv", 15)
 
 	if self.id ~= 65535 then
@@ -250,17 +244,14 @@ function se_stalker:STATE_Read (packet, size)
 		self.was_in_smart_terrain = packet:r_bool()
 	end
 	if self.script_version >= 6 then
-		local ddw=packet:r_u8()
-		self.death_droped=bit_and(ddw,1)==1
-		self.treasure_processed=bit_and(ddw,2)==2
+
+		self.death_dropped = packet:r_u8()
+
 		if self.id ~= 65535 then
 			self.offline_dead = packet:r_u32()
 			self.s_storage = packet:r_stringZ() -- если есть, загрузим из сохранённой строки			
 		end
 	end
-	
-
-
 end
 --------------------
 function se_stalker:on_before_register()

@@ -95,15 +95,7 @@ function CTreasure:__init()
 	self.loss_workaround_queue = {}
 end
 --' Юзание инициатора (возможность выдать тайник)
-function CTreasure:use(npc)
-	--printf("TREASURE USE")
-
-	local se_obj = alife():object(npc:id())
-	if se_obj and se_obj.treasure_processed == true then
-		return
-	end
-	se_obj.treasure_processed = true
-	
+function CTreasure:use(npc)	
 	--' Нужно рандомно выбрать один из тайников.
 	local avail = {}
 	local tr_sum = 0
