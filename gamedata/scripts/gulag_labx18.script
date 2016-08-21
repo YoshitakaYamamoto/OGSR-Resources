@@ -212,12 +212,6 @@ end
 
 
 function load_states(gname, type)
-	if type == "dar_poltergeist_tele_round" then        
-		return function(gulag)
-			return 0
-		end
-	end
-
 	if type == "dar_com_center_poltergeist" then        
 		return function(gulag)
 			return 0
@@ -299,10 +293,6 @@ function checkStalker(npc_community, gulag_type, npc_rank, se_obj)
 end
 
 function checkMonster(npc_community, gulag_type, npc_rank, se_obj)
-	if gulag_type == "dar_poltergeist_tele_round" then
-		return npc_community == "poltergeist"
-	end
-
 	if gulag_type == "dar_com_center_poltergeist" then
 		return npc_community == "poltergeist"
 	end

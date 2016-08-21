@@ -9,6 +9,7 @@ function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_info",            fun = this.on_get_info})
 	sm:subscribe({signal = "on_spawn",           fun = this.on_actor_spawn})
 end
+
 local debug_logging = get_console():get_bool("write_debug_log")
 local fsurgelog = nil
 
@@ -33,7 +34,6 @@ local base_surge_wait_time  = sys_ini:r_s32("options","t_surge") --36 --get_floa
 local surge_wait_time_disp  = 4  -- разброс времени ожидания, час.
 local surge_postpone_time   = 10 -- [час.], время откладывания выброса в случае невозможности его начать по сюжетным ограничениям
 local horror_flag           = sys_ini:r_s32("options","horror_flag")
-local psyzones_flag         = sys_ini:r_s32("options","psyzones_flag")
 local horror_time_proshow   = sys_ini:r_s32("options","horror_time_proshow")
 
 local sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror]])
@@ -462,20 +462,8 @@ function on_surge_end()
 
 	ogse_anomaly.add_anom(level.name(), true)
 	ogse_anomaly.need_disable_anomaly = true
-	if psyzones_flag == 2 then
-		ogsm_psyzones.psy_blow_flags()
-		ogsm_psyzones.spawn_psy()
-	end
-	local add_spawn = ogse_additional_spawn.additional_spawn()
-	
-	if add_spawn.additional_spawn_accept == 1 then
-		die_actor_counter = 0
-		add_spawn:spawn_creatures() -- вызов функции
-	end
-	add_spawn = nil -- чистим неиспользуемое
-	
+
 	this.horror_and_arts()
-	ogsm_respawn.level_spawn()
 	move_mgr.invalidate_pp_accessibility()
 	db.actor:disable_info_portion("blowout")
 	db.actor:disable_info_portion("pre_blowout2")

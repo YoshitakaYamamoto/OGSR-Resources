@@ -24,88 +24,7 @@ bar_count_enemies = 0
 bar_count_monsters = 0
 bar_count_loners = 0
 bar_count_dolgers = 0
--------------------------------------------------------
----' Регулярная проверка численности и доспавн
--------------------------------------------------------
---[[function check_bar_population()
 
-	--' Обнулим счётчики
-
-	bar_count_enemies = 0
-	bar_count_monsters = 0
-	bar_count_loners = 0
-	bar_count_dolgers = 0
-	
-	local actor_vid = game_graph():vertex(alife():actor().m_game_vertex_id):level_id()
-	
-	for id=1,65535 do
-		local npc = alife():object(id)
-		if npc then
-			local npc_vid 	= game_graph():vertex(npc.m_game_vertex_id):level_id()	
-			if actor_vid == npc_vid then
-				if IsStalker(npc) and npc:alive() then
-					if not ogse.is_quest_npc(npc) then
-						if npc:community() == "stalker" or 
-							npc:community() == "csky" or
-							npc:community() == "ecolog" then
-							bar_count_loners = bar_count_loners + 1
-						elseif npc:community() == "dolg" then	
-							bar_count_dolgers = bar_count_dolgers + 1
-						elseif npc:community() == "monolith" or
-							npc:community() == "military" or
-							npc:community() == "killer" or
-							npc:community() == "freedom" or
-							npc:community() == "bandit" or
-							npc:community() == "zombied" then	
-							bar_count_enemies = bar_count_enemies + 1						
-						end
-					end
-				elseif IsMonster(npc) and npc:alive() then
-						bar_count_monsters = bar_count_monsters + 1
-				end
-			end
-		end
-	end
-	
-	-- log1("Сводка Населения Бара:")
-	-- log1("одиночки: "..tostring(bar_count_loners))
-	-- log1("долг: "..tostring(bar_count_dolgers))
-	-- log1("монстры: "..tostring(bar_count_monsters))
-	-- log1("враги: "..tostring(bar_count_enemies))
-	
-	if bar_count_loners < min_loners_on_bar 
-	and se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] 
-	then
-		local number_ct = math.floor(min_loners_on_bar - bar_count_loners)/6
-		if number_ct >= 1 then
-			stalker1( actor, npc, number_ct )
-			stalker2( actor, npc, number_ct )
-			stalker3( actor, npc, number_ct )
-			-- log1("Мало одиночек. Производим спавн.")
-		else
-			stalker1( actor, npc, 1 )
-			stalker2( actor, npc, 1 )
-			stalker3( actor, npc, 1 )
-			-- log1("Мало одиночек. Производим спавн.")			
-		end
-	end
-	
-	if bar_count_dolgers < min_dolgers_on_bar
-	and se_respawn.population_factions["dolg"] < se_respawn.factions_limit["dolg"] 
-	then
-		local number_ct = math.floor(min_dolgers_on_bar - bar_count_dolgers)/5
-		if number_ct >= 1 then
-			dolg1( actor, npc, number_ct )
-			dolg2( actor, npc, number_ct )
-			-- log1("Мало долговцев. Производим спавн.")
-		else
-			dolg1( actor, npc, 1 )
-			dolg2( actor, npc, 1 )
-			-- log1("Мало долговцев. Производим спавн.")			
-		end
-	end	
-	
-end]]
 -------------------------------------------------------
 ---' Проверки разрешения на спавн
 -------------------------------------------------------
@@ -280,11 +199,10 @@ function random_bar_attack( actor, npc)
 			enemy_count = max_enemies_on_bar-math.random(5,7)
 			local level_spawn_db = spawn_db[cur_level_spawn]
 			local i = table.getn(level_spawn_db)
-			if se_respawn.population_factions[enemy_group] < se_respawn.factions_limit[enemy_group] then
+			--if se_respawn.population_factions[enemy_group] < se_respawn.factions_limit[enemy_group] then
 				ogse.quest_spawn_ex(current_enemy, enemy_count, level_spawn_db[i])
 				give_text_message(enemy_group,cur_level_spawn,enemy_count)
-			end
-			
+			--end
 		end
 	else
 	 -- Спавним монстров
@@ -372,53 +290,53 @@ end
 -------------------------------------------------------
 function barman_room( actor, npc )
 --'Одиночки и долговцы в каморке у бармена
-	if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then
+	--if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then
 		ogse.quest_spawn_ex(stalkers_plus_dolg[math.random(3,#stalkers_plus_dolg)], 1, spawn_db.barman_room)
-	end
+	--end
 end
 
 function stalker1( actor, npc, number )
 	--'Одиночки на Росток	
 	if not number then
-		if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then
+		--if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then
 			ogse.quest_spawn_ex(stalkers_all_types[math.random(#stalkers_all_types)], math.random(1,2), spawn_db.stalker1_1)
 			ogse.quest_spawn_ex(stalkers_all_types[math.random(#stalkers_all_types)], math.random(2,3), spawn_db.stalker1_2)
-		end
+		--end
 	elseif number and number > 0 then
-		if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then
+		--if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then
 			ogse.quest_spawn_ex(stalkers_all_types[math.random(#stalkers_all_types)], number, spawn_db.stalker1_3)
 			ogse.quest_spawn_ex(stalkers_all_types[math.random(#stalkers_all_types)], number, spawn_db.stalker1_4)
-		end
+		--end
 	end
 end
 
 function stalker2( actor, npc, number )
 	--'Одиночки на Росток
 	if not number then	
-		if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then
+		--if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then
 			ogse.quest_spawn_ex(stalkers_all_types[math.random(#stalkers_all_types)], math.random(2,3), spawn_db.stalker2_1)
 			ogse.quest_spawn_ex(stalkers_all_types[math.random(#stalkers_all_types)], math.random(1,2), spawn_db.stalker2_2)
-		end
+		--end
 	elseif number and number > 0 then
-		if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then	
+		--if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then	
 			ogse.quest_spawn_ex(stalkers_all_types[math.random(#stalkers_all_types)], number, spawn_db.stalker2_3)
 			ogse.quest_spawn_ex(stalkers_all_types[math.random(#stalkers_all_types)], number, spawn_db.stalker2_4)
-		end
+		--end
 	end
 end
 
 function stalker3( actor, npc, number )
 	--'Одиночки на Росток
 	if not number then	
-		if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then	
+		--if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then	
 			ogse.quest_spawn_ex(stalkers_all_types[math.random(#stalkers_all_types)], math.random(2,3), spawn_db.stalker3_1)
 			ogse.quest_spawn_ex(stalkers_all_types[math.random(#stalkers_all_types)], math.random(1,2), spawn_db.stalker3_2)
-		end
+		--end
 	elseif number and number > 0 then
-		if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then	
+		--if se_respawn.population_factions["stalker"] < se_respawn.factions_limit["stalker"] then	
 			ogse.quest_spawn_ex(stalkers_all_types[math.random(#stalkers_all_types)], number, spawn_db.stalker3_3)
 			ogse.quest_spawn_ex(stalkers_all_types[math.random(#stalkers_all_types)], number, spawn_db.stalker3_4)
-		end
+		--end
 	end
 end
 -------------------------------------------------------
@@ -427,7 +345,7 @@ end
 -------------------------------------------------------
 function dolg1( actor, npc, number )
 	--'Долг на Росток -- основная база
-	if se_respawn.population_factions["dolg"] < se_respawn.factions_limit["dolg"] then
+	--if se_respawn.population_factions["dolg"] < se_respawn.factions_limit["dolg"] then
 		if not number then
 			ogse.quest_spawn_ex(dolg_all_types[math.random(#dolg_all_types)], math.random(1,2), spawn_db.dolg1_1)
 			ogse.quest_spawn_ex(dolg_all_types[math.random(#dolg_all_types)], 2,                spawn_db.dolg1_2)
@@ -437,12 +355,12 @@ function dolg1( actor, npc, number )
 			ogse.quest_spawn_ex(dolg_all_types[math.random(#dolg_all_types)], number, spawn_db.dolg1_5)
 			ogse.quest_spawn_ex(dolg_all_types[math.random(#dolg_all_types)], number, spawn_db.dolg1_6)
 		end
-	end
+	--end
 end
 
 function dolg2( actor, npc, number )
 	--'Долг на Росток -- блокпосты
-	if se_respawn.population_factions["dolg"] < se_respawn.factions_limit["dolg"] then
+	--if se_respawn.population_factions["dolg"] < se_respawn.factions_limit["dolg"] then
 		if not number then
 			ogse.quest_spawn_ex(dolg_all_types[math.random(#dolg_all_types)], math.random(2,3), spawn_db.dolg2_1)
 			ogse.quest_spawn_ex(dolg_all_types[math.random(#dolg_all_types)], math.random(1,3), spawn_db.dolg2_2)
@@ -450,7 +368,7 @@ function dolg2( actor, npc, number )
 			ogse.quest_spawn_ex(dolg_all_types[math.random(#dolg_all_types)], number, spawn_db.dolg2_3)
 			ogse.quest_spawn_ex(dolg_all_types[math.random(#dolg_all_types)], number, spawn_db.dolg2_4)
 		end
-	end
+	--end
 end
 
 -------------------------------------------------------
@@ -497,42 +415,42 @@ end
 
 function bandits2( actor, npc )
 	--'Бандиты на необитаемой территории со стороны дикой территории
-	if se_respawn.population_factions["bandit"] < se_respawn.factions_limit["bandit"] then
+	--if se_respawn.population_factions["bandit"] < se_respawn.factions_limit["bandit"] then
 		ogse.quest_spawn_ex(bandits[math.random(#bandits)], math.random(3), spawn_db.bandits2)
-	end
+	--end
 end
 
 function bandits3( actor, npc )
 	--'Бандиты  со стороны армейских складов
-	if se_respawn.population_factions["bandit"] < se_respawn.factions_limit["bandit"] then
+	--if se_respawn.population_factions["bandit"] < se_respawn.factions_limit["bandit"] then
 		ogse.quest_spawn_ex(bandits[math.random(#bandits)], math.random(3), spawn_db.bandits3)
-	end
+	--end
 end
 
 function bandit7( actor, npc )
 	if has_alife_info("val_actor_has_borov_key") then 
 		--'Спавн бандитов перед собаками
-		if se_respawn.population_factions["bandit"] < se_respawn.factions_limit["bandit"] then
+		--if se_respawn.population_factions["bandit"] < se_respawn.factions_limit["bandit"] then
 			ogse.quest_spawn_ex(bandits[math.random(#bandits)], math.random(3), spawn_db.bandit7)
-		end
+		--end
 		-- -- log1("bandit7() completed")	
 	end
 end	
 
 function bandit8( actor, npc )
 	--'Спавн бандитов перед собаками
-	if se_respawn.population_factions["bandit"] < se_respawn.factions_limit["bandit"] then
+	--if se_respawn.population_factions["bandit"] < se_respawn.factions_limit["bandit"] then
 		ogse.quest_spawn_ex(bandits[math.random(#bandits)], math.random(3), spawn_db.bandit8)
-	end
+	--end
 	-- -- log1("bandit8() completed")	
 end
 
 function bandit9( actor, npc )
 	-- -- log1("bandit9() called")		
 	--'Спавн бандитов со стороны ДТ
-	if se_respawn.population_factions["bandit"] < se_respawn.factions_limit["bandit"] then
+	--if se_respawn.population_factions["bandit"] < se_respawn.factions_limit["bandit"] then
 		ogse.quest_spawn_ex(bandits[math.random(#bandits)], math.random(3), spawn_db.bandit9)
-	end	
+	--end	
 	-- -- log1("bandit9() completed")	
 end
 
@@ -541,15 +459,15 @@ end
 ---' Укурки
 -------------------------------------------------------
 function freedom1( actor, npc )
-	if se_respawn.population_factions["freedom"] < se_respawn.factions_limit["freedom"] then
+	--if se_respawn.population_factions["freedom"] < se_respawn.factions_limit["freedom"] then
 		ogse.quest_spawn_ex("mil_freedom_respawn_3", math.random(2), spawn_db.freedom1)
-	end
+	--end
 end
 
 function freedom2( actor, npc )
-	if se_respawn.population_factions["freedom"] < se_respawn.factions_limit["freedom"] then
+	--if se_respawn.population_factions["freedom"] < se_respawn.factions_limit["freedom"] then
 		ogse.quest_spawn_ex("mil_freedom_respawn_2", math.random(2), spawn_db.freedom2)
-	end
+	--end
 end
 
 function freedom3( actor, npc )
@@ -558,9 +476,9 @@ end
 
 function freedom4( actor, npc )
 	if has_alife_info("rad_start_svoboda_vs_dolg") then
-		if se_respawn.population_factions["freedom"] < se_respawn.factions_limit["freedom"] then
+		--if se_respawn.population_factions["freedom"] < se_respawn.factions_limit["freedom"] then
 			ogse.quest_spawn_ex("mil_freedom_respawn_3", math.random(2), spawn_db.freedom4)
-		end
+		--end
 	end	
 end
 
@@ -571,18 +489,18 @@ end
 function killer1( actor, npc )
 	-- -- log1("killer1() called")
 		--'Спавн наёмников возле перехода на Дикую территорию
-	if se_respawn.population_factions["killer"] < se_respawn.factions_limit["killer"] then
+	--if se_respawn.population_factions["killer"] < se_respawn.factions_limit["killer"] then
 		ogse.quest_spawn_ex(killers[math.random(#killers)], math.random(2), spawn_db.killer1)
-	end
+	--end
 	-- -- log1("killer1() completed")	
 end
 
 function killer2( actor, npc )
 	-- -- log1("killer2() called")		
 	--'Спавн наёмников возле перехода на Дикую территорию
-	if se_respawn.population_factions["killer"] < se_respawn.factions_limit["killer"] then
+	--if se_respawn.population_factions["killer"] < se_respawn.factions_limit["killer"] then
 		ogse.quest_spawn_ex(killers[math.random(#killers)], math.random(2), spawn_db.killer2)
-	end
+	--end
 	-- -- log1("killer2() completed")	
 end
 
@@ -594,9 +512,9 @@ function killer4( actor, npc )
 	-- -- log1("killer4() called")
 	if has_alife_info("val_actor_has_borov_key") then 		
 		--'Спавн наёмников после документов X18
-		if se_respawn.population_factions["killer"] < se_respawn.factions_limit["killer"] then
+		--if se_respawn.population_factions["killer"] < se_respawn.factions_limit["killer"] then
 			ogse.quest_spawn_ex("ros_killer_respawn_2", math.random(4), spawn_db.killer4)
-		end
+		--end
 	end	
 	-- -- log1("killer4() completed")
 end
@@ -605,9 +523,9 @@ function killer5( actor, npc )
 	-- -- log1("killer5() called")
 	if has_alife_info("val_actor_has_borov_key") then	
 		--'Спавн наёмников после документов X18
-		if se_respawn.population_factions["killer"] < se_respawn.factions_limit["killer"] then
+		--if se_respawn.population_factions["killer"] < se_respawn.factions_limit["killer"] then
 			ogse.quest_spawn_ex("ros_killer_respawn_3", math.random(2), spawn_db.killer2)
-		end
+		--end
 	end
 	-- -- log1("killer5() completed")	
 end
@@ -616,9 +534,9 @@ function killer6( actor, npc )
 	-- -- log1("killer6() called")
 	if has_alife_info("val_actor_has_borov_key") then 	
 		--'Спавн наёмников после документов X18
-		if se_respawn.population_factions["killer"] < se_respawn.factions_limit["killer"] then
+		--if se_respawn.population_factions["killer"] < se_respawn.factions_limit["killer"] then
 			ogse.quest_spawn_ex("mil_killer_respawn_4", math.random(2), spawn_db.killer1)
-		end		
+		--end		
 	end	
 	-- -- log1("killer6() completed")
 end
@@ -631,9 +549,9 @@ end
 function zombied1( actor, npc )
 	if has_alife_info("val_actor_has_borov_key") then 	
 		--'Спавн зомбированных сталкеров после  X16
-		if se_respawn.population_factions["zombied"] < se_respawn.factions_limit["zombied"] then
+		--if se_respawn.population_factions["zombied"] < se_respawn.factions_limit["zombied"] then
 			ogse.quest_spawn_ex("rad_zombied_respawn_1", math.random(2), spawn_db.zombied1)
-		end		
+		--end		
 	end	
 end
 
@@ -642,9 +560,9 @@ function zombied2( actor, npc )
 	--get_console():execute("flush")
 	-- -- log1("zombied2() called")		
 	--'Спавн зобмированных сталкеров после  X16
-	if se_respawn.population_factions["zombied"] < se_respawn.factions_limit["zombied"] then
+	--if se_respawn.population_factions["zombied"] < se_respawn.factions_limit["zombied"] then
 		ogse.quest_spawn_ex("rad_zombied_respawn_2", math.random(2), spawn_db.zombied2)
-	end	
+	--end	
 	-- -- log1("zombied2() completed")	
 	--log1("GHOST TEST 16")
 	--get_console():execute("flush")
@@ -656,9 +574,9 @@ end
 
 function zombied5( actor, npc )
 	--'Спавн зомбированных сталкеров после  X16
-	if se_respawn.population_factions["zombied"] < se_respawn.factions_limit["zombied"] then
+	--if se_respawn.population_factions["zombied"] < se_respawn.factions_limit["zombied"] then
 		ogse.quest_spawn_ex("yan_zombied_respawn_2", math.random(3), spawn_db.zombied5)
-	end	
+	--end	
 end
 
 ---------------Copyright_Quest_2009-------------------

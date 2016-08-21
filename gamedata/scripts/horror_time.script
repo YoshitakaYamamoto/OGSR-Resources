@@ -6,7 +6,6 @@
 --/ Схема пси-выброса /--
 ------------------------------------------------------------------------------------------
 local horror_flag = sys_ini:r_s32("options","horror_flag")
-local psyzones_flag = sys_ini:r_s32("options","psyzones_flag")
 
 function attach(sm)
 	if horror_flag == 1 then
@@ -272,10 +271,6 @@ end
 function horror_begin()
 -- log1("Инициализация старта пси-выброса")
 	if horror_flag ~= 1 then return end
-	if ogsm_psyzones and (psyzones_flag == 1) then 
-		ogsm_psyzones.psy_blow_flags()
-		ogsm_psyzones.spawn_psy()
-	end
 	ogse.save_variable("horror_time_end_time", game.time()+math.random(25,50)*10000*ogse.game_time_factor)
 	db.actor:give_info_portion("horror_time")
 	-- заполняем таблицу звуков пси-выброса

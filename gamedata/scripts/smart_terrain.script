@@ -419,9 +419,9 @@ function se_smart_terrain:smart_terrain_accepts_obj( obj, obj_agreement )
 			return false -- то не подходит
 		end
 		-- выполнить проверку, заданную скриптом для конкретного уровня (обычно соответствие типа гулага и параметров непися)
-		--if not xr_gulag.checkNpc( community, is_stalker, self.gparams.type, obj:rank(), obj ) then
-		--	return false
-		--end
+		if not xr_gulag.checkNpc( community, is_stalker, self.gparams.type, obj:rank(), obj ) then
+			return false
+		end
 		-- если есть работа
 		return self.gulag:is_there_any_suitable_job( self:fill_npc_info( obj ), obj_agreement == agreed_exclusive )
 	else
@@ -942,7 +942,7 @@ end
 -- вызывается из gulag:beginJob( obj_id )
 function se_smart_terrain:call_respawn()
 	if self.gparams.respawn then
-		se_respawn.spawn( self.gparams.respawn )
+		dsh_respawn.spawn( self.gparams.respawn )
 	end
 end
 

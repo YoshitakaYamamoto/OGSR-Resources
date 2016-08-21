@@ -6,11 +6,26 @@
 --- version 1.1 (30/08/2011)                                             
 -----------------------------------------------------------------------
 
+--TODO: ‘павнить только монстров
+
+local additional_spawn_accept = get_u32("options", "additional_spawn") -- опциЯ в конфигураторе (1 - включено, 0 - выключено)
+
+function attach(sm)
+	if additional_spawn_accept == 1 then
+		sm:subscribe({signal = "on_after_blowout", fun = this.on_after_blowout})
+	end
+end
+
+function on_after_blowout()
+	local add_spawn = additional_spawn()
+	add_spawn:spawn_creatures() -- вызов функции
+	add_spawn = nil -- чистим неиспользуемое
+end
+
+
 class "additional_spawn"
 
-function additional_spawn:__init()
-	self.additional_spawn_accept = sys_ini:r_s32("options","additional_spawn") -- опция в конфигураторе (1 - включено, 0 - выключено)
-	
+function additional_spawn:__init()	
 	self.creatures = {"human","mutant"} -- список существ
 	self.human_list = {"bandits", "army", "dolg", "freedom", "mercenary", "zombied", "monolith"} -- наименование группировок
 	self.mutant_list = {"dogs", "cats", "pseudodogs", "fleshes", "boars", "zombies", "izloms",
@@ -150,11 +165,9 @@ end
 
 -- Функция генерации людей/мутантов. Вызывать нужно из внешнего скрипта!
 function additional_spawn:spawn_creatures()
-	if self.additional_spawn_accept == 1 then -- а нужно ли спавнить?
-		if self.level_spawn[level.name()] then -- есть ли запрет на дополнительный спавн на этой локации?
-			self:human_spawn() -- спавним людей
-			self:mutant_spawn() -- спавним мутантов
-		end
+	if self.level_spawn[level.name()] then -- есть ли запрет на дополнительный спавн на этой локации?
+		self:human_spawn() -- спавним людей
+		self:mutant_spawn() -- спавним мутантов
 	end
 end
 
@@ -209,13 +222,14 @@ for ind = 1, count do
 
     local community = get_string(section, "community", "nil")
     local rank = get_string(section, "spec_rank", "nil")
-	local check_1 =  se_respawn.check_npc_spawn_allowed(section, community, rank)
-	local check_2 =  se_respawn.check_monster_spawn_allowed(section, community, rank)
-	if check_1 == true or check_2 == true then
+	--local check_1 =  se_respawn.check_npc_spawn_allowed(section, community, rank)
+	--local check_2 =  se_respawn.check_monster_spawn_allowed(section, community, rank)
+	--if check_1 == true or check_2 == true then
 		if pos and new_lv and new_gv then
 			local obj = dsh.create_free_mob(section, pos, new_lv, new_gv)
+			log3("~~[%s] Spawned obj: [%s], id: [%s], level: [%s]", script_name(), obj:name(), obj.id, object_level_name(obj))
 		end	
-		if obj then
+		--[[if obj then
 			local str = community.."_"..rank
 			if se_respawn.population_human[str] then
 				se_respawn.population_human[str] = se_respawn.population_human[str] + 1
@@ -228,11 +242,9 @@ for ind = 1, count do
 					se_respawn.population_monster[section] = se_respawn.population_monster[section] + 1
 				end
 			end	
-		end	
-	else
+		end]]
+	--else
 		-- log1("!!SE_RESPAWN> Add_Spawn Существо не прошло обе проверки "..section)
-	end
-end	
-
-
+	--end
+end
 end

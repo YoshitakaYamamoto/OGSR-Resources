@@ -59,6 +59,7 @@ addons = {
 	"dsh_monster_attack",
 	"dsh_ogse_relations",
 	"dsh_deadmans_table_proxy",
+	"dsh_respawn",
 	"clear_garbage",
 	"trade_manager",
 	"xr_combat_companion",
@@ -85,6 +86,9 @@ addons = {
 	"pma_escape",
 	"ogsm_quests",
 	"ogse_teleport_art_quest",
+	"ogse_deadcity_zombies_respawn",
+	"ogse_additional_spawn",
+	"ogsm_respawn",
 	"xr_sound", --должен быть перед инвентарём!
 	"inventory", --должен быть предпоследним!
 -----------------------------------------------

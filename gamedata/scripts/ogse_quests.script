@@ -739,8 +739,6 @@ function prepare_pripyat()
 	disable_sar_entrance()	
 	-- Перемещаем актора, засчитываем все задания
 	db.actor:set_actor_position(vector():set(1035.12,-0.0999,229.564))
-	-- Спавним монстров
-	ogsm_respawn.level_spawn()	
 end
 
 local this_pain = xr_sound.get_safe_sound_object([[actor\pain_3]])

@@ -382,12 +382,6 @@ function give_items(actor, npc, p)
     end
 end
 
-function respawner_spawn(actor, npc, p)
-    if p[1] then
-		se_respawn.spawn(p[1])
-    end
-end
-
 function play_particle_on_path(actor, npc, p)
     local name = p[1]
     local path = p[2]

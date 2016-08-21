@@ -537,15 +537,6 @@ local selector = {
 		del_variable("smn")
 	end,
 
-	["rfx"] = function(params_string)
-		ogse_quests_fix.radar_fix()
-	end,
-
-	["rsp"] = function(params_string)
-		ogsm_respawn.level_spawn()
-		g_start_timer("rsp",0, vars.t_spawn+math.random(-1,1), 0)
-	end,
-
 	["kol"] = function(params_string)
 		local h = hit ()
 		h.direction = vector():set(0, 0, 0)
@@ -1235,9 +1226,6 @@ function on_item_take(obj)
 end
 
 --*****************************************************[Переменные для апдейта актора]******************************************************
-local psyzones_flag = sys_ini:r_s32("options","psyzones_flag")
-local anom_enum = time_global()
-
 local watchdog --НЕ ТРОГАТЬ! Здесь не должно быть никакого значения!
 local func --Тоже самое.
 local watchdog_tbl = { --АПДЕЙТЫ С НИЗКИМ ПРИОРИТЕТОМ!
@@ -1261,15 +1249,6 @@ end,
 function()
 	ogse_debug.process_actor("upd_a", 30)
 	aem_manager.get_aem():update() -- Обновление арены
-end,
-function()
-	ogse_debug.process_actor("upd_a", 45)
--- Периодическая проверка численности
-	if time_global() > anom_enum then
-		se_respawn.check_zone_population()
-		anom_enum = time_global() + math.random(60000, 80000)
-	end
--- Периодическая проверка численности
 end,
 }
 --*******************************************************************************************************************************************
@@ -1371,11 +1350,7 @@ end
 -- Загружаем все переменные, которые нужно, вызывается при загрузке игры автоматически
 function on_game_load()
 
-	ogse_debug.process_actor("a_spw", 111)
-	se_respawn.check_zone_population()
-
-	ogse_debug.process_actor("a_spw", 115)
-	get_console():execute("unbind contacts") --Отключаем в PDA вкладку "Контакты"
+	cmd("unbind", "contacts") --Отключаем в PDA вкладку "Контакты"
 
 	ogse_debug.process_actor("a_spw", 117)
 	id_cleaner.check_ids() --проверка количества идентификаторов
@@ -1389,8 +1364,6 @@ function on_game_load()
 
 	-- Первый запуск мода
 	if db.actor:dont_has_info("storyline_actor_start") then
-		g_start_timer("rsp",0, 5+math.random(-1,1), 0)
-		ogsm_respawn.first_run()
 		ogse_spawns.traders_spawn()
 		ogse_spawns.sidr_guard_spawn()
 		db.actor:give_info_portion("encyclopedy_tutorial_jump")
@@ -1399,11 +1372,23 @@ function on_game_load()
 		db.actor:give_info_portion("encyclopedy_tutorial_binocular")
 		db.actor:give_info_portion("encyclopedy_tutorial_relation")
 		db.actor:give_info_portion("encyclopedy_tutorial_wound")
+	--Спавн пластинок --TODO: Перенести в модуль музавтомата, наверно.
+	spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_1)
+	spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_2)
+	spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_3)	
+	spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_5)
+	spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_6)
+	spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_8)
+	spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_9)	
+	spawn_object_rand(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_4)
+	spawn_object_rand(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_7)
+	--Зомби на Радаре с рукой-артефактом
+	dsh.create_free_mob("rad_zombie_rusty", vector():set(359, -45, -111), 1, 1940)
 	end
 
 ------------KD: установка настроек графики------------
 	-- шмапы
-	log1("[KD] applying graphics settings")
+	--log1("[KD] applying graphics settings")
 	cmd("r2_ls_depth_bias -0.00005")
 	cmd("r2_ls_depth_scale 1.00001")
 	cmd("r2_sun_depth_far_bias -0.00001")
@@ -1424,27 +1409,6 @@ function on_game_load()
 
 	ogse_debug.process_actor("a_spw", 1110)
 	db.register_all_quest_zones()
-
-	anom_enum = anom_enum + 15000
-
-	ogse_debug.process_actor("a_spw", 1117)
-	ogsm_respawn.get_level_mobs() --Получаем список всех монстров и укрытий
-
-	ogse_debug.process_actor("a_spw", 1119)
-	if ogsm_psyzones then --Спавним, если надо, пси-зоны
-		if psyzones_flag ~= 0 then
-			ogsm_psyzones.spawn_on_load()
-		else
-			if ogsm_respawn.psy_list then
-				for k, v in pairs(ogsm_respawn.psy_list) do
-					if v then
-						alife():release(v, true)
-					end
-					ogsm_respawn.psy_list[k] = nil
-				end
-			end
-		end
-	end
 end
 
 
