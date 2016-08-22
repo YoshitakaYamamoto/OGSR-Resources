@@ -616,7 +616,7 @@ function vector_element:get_value()
 end
 
 function vector_element:get_string()
-  return tostring_all(self.value) --"[[not implemented]]"
+  return string.format("%9.3f, %9.3f, %9.3f", self.value.x, self.value.y, self.value.z)
 end
 
 function vector_element:read_value( data )
