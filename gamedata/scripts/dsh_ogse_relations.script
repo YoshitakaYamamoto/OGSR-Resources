@@ -184,6 +184,17 @@ function load_old( pk )
 end
 
 
+local friends_comm = {
+	["trader"] = true,
+	["stalker"] = true,
+	["dolg"] = true,
+	["freedom"] = true,
+	["ecolog"] = true,
+	["csky"] = true,
+	["quest_stalker"] = true,
+	["gunsmith"] = true,
+	["guider"] = true,
+}
 local attitude_neutal_threshold = get_float(
   "game_relations", "attitude_neutal_threshold"
 )
@@ -196,6 +207,8 @@ function on_npc_spawn( npc, binder )
   if db.actor:character_community() ~= "actor" then return end
   local sobj = alife():object( npc:id() )
   if not sobj then return end
+  local comm = npc:character_community()
+  if not friends_comm[ comm ] then return end
   if
     fix_rel_exceptions[ npc:name() ]
     or fix_rel_exceptions[ npc:profile_name() ]
@@ -205,7 +218,6 @@ function on_npc_spawn( npc, binder )
 
   local p_gw = npc:goodwill( db.actor )
   if p_gw < attitude_neutal_threshold then
-    local comm = npc:character_community()
     local c_gw = relation_registry.community_goodwill( comm, db.actor:id() )
     if
       c_gw >= attitude_neutal_threshold
