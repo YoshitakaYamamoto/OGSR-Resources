@@ -190,8 +190,9 @@ function do_not_touch(item)
 end
 
 function cannot_take_that(npc)
-	if npc then
-		if npc:story_id() == 351 or
+	if not npc then return false end
+
+	return ogse.is_quest_npc( npc ) or
 		   npc:character_community()=="zombied" or
 		   npc:character_community()=="trader" or 
 		   npc:character_community()=="arena_enemy" or 
@@ -202,10 +203,7 @@ function cannot_take_that(npc)
 		   string.find(npc:name(), "ecolog") or 
 		   string.find(npc:name(), "specnaz") or 
 		   string.find(npc:name(), "scientist") or
-		   string.find(npc:name(), "mil_freedom_member0021") then return true else return false 
-		end		
-	end
-	return false
+		   string.find(npc:name(), "mil_freedom_member0021")
 end
 
 function max_weight(npc)
