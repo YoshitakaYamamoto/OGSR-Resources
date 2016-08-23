@@ -54,7 +54,8 @@ function on_update( obj, delta )
       ( dist < 25 and 100 )
       or ( dist <  50 and 200 )
       or ( dist < 100 and 500 )
-      or math.random( 1000, 2000 )
+      or ( dist < 200 and math.random( 1000, 2000 ) )
+      or math.random( 2000, 4000 )
     )
   end
 end

@@ -23,6 +23,7 @@ function on_death( obj )
   local s      = binder[ script_name() .. ".subscribed" ]
   if s then
     ogse_signals.get_mgr():unsubscribe( s )
+    binder[ script_name() .. ".subscribed" ] = nil
   end
 end
 

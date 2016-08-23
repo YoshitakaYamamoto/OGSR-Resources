@@ -288,7 +288,7 @@ function generic_object_binder:net_destroy()
 	ogse_car_control.unregister_target(self.object)
 	ogse_scripted_btr.unregister_target(self.object)
 
-	self.am:call( "on_monster_net_destroy", self.object )
+	self.am:call( "on_monster_net_destroy", self.object, self )
 	self.am:cleanup_signal_subs( "on_monster_update." .. self.object:id() )
 
 	object_binder.net_destroy(self)
