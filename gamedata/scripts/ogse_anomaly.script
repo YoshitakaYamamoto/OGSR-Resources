@@ -584,31 +584,20 @@ end
 
 
 -- Проверяем, попадает ли аномалия в "bad-зону"
-function bad_zone(p_vector, l_name, psy)
-	local lname = (l_name ~=nil and l_name or level.name())
-
-	--[[	local function inside_zone(obj_position, zone)
-		return obj_position ~= nil and zone ~= nil and zone:inside(obj_position)
-	end
-	
-	for k,v in pairs(ogsm_respawn.restrictor_list) do
-		local obj = level.object_by_id(v.id)
-		if obj and inside_zone(p_vector, obj) then
-			return true
-		end
-	end]]
-	
-	for k, v in pairs(ogsm_respawn.restrictor_list) do
-		if v then
-			local obj = alife():object(v.id)
-			if p_vector:distance_to(obj.position) <= 40 then
-				return true
+function bad_zone(p_vector)
+	for _, id in pairs(ogse_hideouts.restrictor_list) do
+		local sobj = alife():object(id)
+		if sobj then
+			local c, radius = ogse_hideouts.get_community_hide(sobj)
+			if radius then
+				if p_vector:distance_to(sobj.position) <= (tonumber(radius) + 15) then --Запрещено спавнить аномалии рядом с укрытиями
+					return true
+				end
 			end
 		end
 	end
 
 	return false
-
 end
 
 local vector_o = vector()
@@ -786,7 +775,7 @@ function lc_protect(p_vector, l_name, psy)
 end
 
 
--- Ищем точки входа на локации
+--[=[Ищем точки входа на локации
 function lc_collect(lname)
 	lc = {}
 	for a = 1, 65535 do
@@ -811,7 +800,7 @@ function lc_collect(lname)
 		end
 	end
 end
-
+--]=]
 
 -- Проверяем исключения локаций
 function chek_exclusion_location(lname)

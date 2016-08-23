@@ -3764,7 +3764,7 @@ function question_of_immortality_fisrt_part_spawn_chameleon()
 --		local art_pos = level.vertex_position(art_lvid)
 		local art_lvid, art_pos
 		local max_dist = 6
-		local actor_hide = ogsm_respawn.get_current_hide(db.actor)
+		local actor_hide = ogse_hideouts.get_current_hide(db.actor)
 		while max_dist < 30 do
 			art_lvid = level.vertex_in_direction(db.actor:level_vertex_id(), direction, max_dist)
 			art_pos = level.vertex_position(art_lvid)

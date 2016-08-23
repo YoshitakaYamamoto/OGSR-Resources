@@ -375,7 +375,7 @@ end
 function action_hideout:initialize()
 	action_base.initialize(self)
 	local npc = self.object
-	self.hide = ogsm_respawn.get_nearest_hide(npc)
+	self.hide = ogse_hideouts.get_nearest_hide(npc)
 	self.st.dest_lvid = nil
 	self.st.deadman = 0
 	if self.hide then
@@ -595,7 +595,7 @@ function action_inhide:initialize()
 	npc:clear_animations()
 	npc:set_detail_path_type(move.line)
 	npc:set_path_type(game_object.level_path)
-	self.hide = ogsm_respawn.get_nearest_hide(npc)
+	self.hide = ogse_hideouts.get_nearest_hide(npc)
 	if self.hide then 
 		self.vertex = self.hide.obj:level_vertex_id()
 		self.offset = vector():set(math.random()*3-1, 0, math.random()*3-1)

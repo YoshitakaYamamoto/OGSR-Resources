@@ -5,13 +5,9 @@
 
 --KRodin: Респавн выключен. Теперь скрипт просто спавнит монстров после выброса и при первом запуске игры.
 
---TODO: Выяснить, почему так часто вызывается get_community_hide
-
 local additional_spawn_accept = get_u32("options", "additional_spawn")
 
 function attach(sm)
-	sm:subscribe({signal = "on_spawn", fun = this.get_level_mobs}) --Обработка укрытий от выброса. НЕ ОТКЛЮЧАТЬ!
-
 	sm:subscribe({signal = "on_storyline_start", fun = this.first_run}) --Спавн разных монстров на локациях при первом запуске игры.
 	if additional_spawn_accept == 1 then --Если включен доп.спавн после выброса
 		sm:subscribe({signal = "on_after_blowout", fun = this.level_spawn}) --Спавним монстров на текущей локации.
@@ -19,78 +15,11 @@ function attach(sm)
 end
 
 
-restrictor_list = {}
-
-
 --Вызывается из конфигов. Надо удалить.
 function spawn_in_sar()
 end
 -- Тоже самое
 function spawn_in_agr()
-end
-
-
-
--- Получаем ближайшее к НПС укрытие его группировки
-function get_nearest_hide(npc)
-	local hideout_list = {}
-	for k,v in pairs(restrictor_list) do
-		local community, radius = get_community_hide(v)
-		local obj = level.object_by_id(v.id)
-		if obj and string.find(community, npc:character_community()) then
-			local npc_pos = npc:position()
-			local hide_pos = obj:position()
-			local distance = npc_pos:distance_to(hide_pos)
-			local hide = {obj = obj, rad = radius, dist = distance}
-			table.insert(hideout_list, hide)
-		end
-	end
-	table.sort(hideout_list, function(a,b) return a.dist < b.dist end)
-	local nearest_hide = hideout_list[1]
-	return nearest_hide
-end
-
--- Получаем текущее укрытие для непися
-function get_current_hide(npc) --Подобное есть в скрипте огсе_хидеоут, не? Вызывается из таскс_функтора
-	for k,v in pairs(restrictor_list) do
-		local obj = level.object_by_id(v.id)
-		if obj and obj:inside(npc:position()) then
-			return obj
-		end
-	end
-	return "none"
-end
-
--- Считываем параметры укрытия
-function get_community_hide(obj)
-	if not obj then return "none" end
-
-	local pk = xs_netpk.space_restrictor( obj )
-	if pk:isOk() then
-		local data = pk:get()
-		local cd = data.custom_data:getTable()
-		if
-			not cd.parameters
-			or not cd.parameters.community
-			or not cd.parameters.radius
-		then
-			return "none"
-		end
-		--log3("[%s.get_community_hide] parameters of [%s]: %s, %s", script_name(), obj:name(), cd.parameters.community, cd.parameters.radius)
-		return cd.parameters.community, cd.parameters.radius
-	end
-end
-
--- Получение списка всех укрытий на текущей локации
-function get_level_mobs() --Нужная функция, не отключать!
-	for i = 1, 65534 do
-		local obj = alife():object(i)
-		if obj then
-			if string.find(obj:name(), "_hide_restrictor") then
-				table.insert(restrictor_list, obj)
-			end
-		end
-	end
 end
 
 

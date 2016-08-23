@@ -4,6 +4,7 @@
 
 addons = {
 	"dunin_ammo", --должен быть первым!
+	"ogse_hideouts", --Должен быть перед менеджером аномалий!
 	"ogse_anomaly", --должен быть вторым!
 	"ogse", --должен быть третьим!
 	"ogse_detectors", --должен быть четвертым!
@@ -17,7 +18,6 @@ addons = {
 	"ogse_sleep_mgr",
 	"ogse_weather_mgr",
 	"ogse_surge_mgr",
-	"ogse_hideouts",
 	"ogse_lights_mgr",
 	"ogse_mental_fix",
 	"ogse_actor_conditions_mgr",

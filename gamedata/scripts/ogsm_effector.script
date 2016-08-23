@@ -61,7 +61,7 @@ function action_postprocess:update(delta)
 	
 	self.actor_inside = self.object:inside(db.actor:position())
 	
-	if self.actor_inside == true and not ogse_hideouts.npc_inside_safe_zone(db.actor) then
+	if self.actor_inside == true --[[and not ogse_hideouts.npc_inside_safe_zone(db.actor)]] then
 	
 		if not has_alife_info("actor_set_zombied") then
 			self:play_sounds()

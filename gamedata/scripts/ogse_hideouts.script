@@ -4,31 +4,124 @@
 --- Авторы: KamikaZze
 --- version 1.0 (29/08/2012)
 -----------------------------------------------------------------------
+
 function attach(sm)
+	sm:subscribe({signal = "on_spawn", fun = this.init})
 	sm:subscribe({signal = "on_update", fun = this.update_shelter_icon, queued = true})
 	sm:subscribe({signal = "on_info", fun = this.on_info})
+end
+
+restrictor_list = {} --Массив с id рестрикторов укрытий во ВСЕЙ Зоне. Используется в менеджере аномалий.
+local restr_list_on_curr_level = {} --Массив с id рестрикторов укрытий на текущей локации.
+
+function init() --Получение списка всех укрытий
+	if ogse.var_exists("restrictor_list") then --Если нашли в хранилище - загрузим оттуда.
+		restrictor_list = ogse.load_var("restrictor_list")
+		--log3("LOAD RESTRICTORS HIDEOUTS! TBL: %s", restrictor_list)
+	else --В хранилище нету - значит придётся перебирать 65k объектов.
+		for i = 1, 65534 do
+			local sobj = alife():object(i)
+			if sobj then
+				if string.find(sobj:name(), "_hide_restrictor") then
+					table.insert(restrictor_list, sobj.id) --Добавляем в таблицу
+				end
+			end
+		end
+		--log3("SCAN RESTRICTORS HIDEOUTS! TBL: %s", restrictor_list)
+	end
+
+	for i = #restrictor_list, 1 , -1 do --Цикл в обратном порядке, чтобы корректно работал table.remove.
+		local id = restrictor_list[i]
+		local sobj = alife():object(id)
+		if sobj then
+			if level.name() == object_level_name(sobj) then --Если укрытие находится на текущей локации, заносим его в таблицу restr_list_on_curr_level
+				table.insert(restr_list_on_curr_level, id)
+			end
+		else --Рестриктора нет - значит удаляем из таблицы.
+			table.remove(restrictor_list, i)
+		end
+	end
+
+	--log3("RESTRICTORS HIDEOUTS ON CURRENT LEVEL! TBL: %s", restr_list_on_curr_level)
+	ogse.save_var("restrictor_list", restrictor_list, "array", "u16") --Сохраняем, чтобы больше никогда не делать тут перебор 65k объектов. Оптимизация!
+end
+
+
+-- Получаем ближайшее к НПС укрытие его группировки
+function get_nearest_hide(npc)
+	local hideout_list = {}
+	for _, id in pairs(restr_list_on_curr_level) do
+		local obj = level.object_by_id(id)
+		local community, radius = get_community_hide(obj)
+		if obj and string.find(community, npc:character_community()) then
+			local npc_pos = npc:position()
+			local hide_pos = obj:position()
+			local distance = npc_pos:distance_to(hide_pos)
+			local hide = {obj = obj, rad = radius, dist = distance}
+			table.insert(hideout_list, hide)
+		end
+	end
+	table.sort(hideout_list, function(a,b) return a.dist < b.dist end)
+	local nearest_hide = hideout_list[1]
+	return nearest_hide
+end
+
+-- Получаем текущее укрытие для непися
+function get_current_hide(npc) --Вызывается из таскс_функтора
+	for _, id in pairs(restr_list_on_curr_level) do
+		local obj = level.object_by_id(id)
+		if obj and obj:inside(npc:position()) then
+			return obj
+		end
+	end
+	return "none"
+end
+
+local hideouts_data = {} --Кэш настроек укрытий, чтобы не дёргать постоянно нет-пакет
+function get_community_hide(obj) --Считываем параметры укрытия
+	if not obj then return "none" end
+
+	local id = obj:name()
+	if hideouts_data[id] then
+		--log3("[%s.get_community_hide] parameters of [%s]: %s, %s", script_name(), obj:name(), hideouts_data[id]())
+		return hideouts_data[id]()
+	end
+
+	local pk = xs_netpk.space_restrictor( obj )
+	if pk:isOk() then
+		local data = pk:get()
+		local cd = data.custom_data:getTable()
+		if
+			not cd.parameters
+			or not cd.parameters.community
+			or not cd.parameters.radius
+		then
+			hideouts_data[id] = function() return "none" end
+			return "none"
+		end
+		hideouts_data[id] = function() return cd.parameters.community, cd.parameters.radius end
+		return cd.parameters.community, cd.parameters.radius
+	end
 end
 
 
 --Выброс начинается - ставим метки на укрытия. Выброс закончился - снимаем метки.
 function on_info(npc, info)
 	if info == "pre_blowout" or info == "net_signal" then
-		for _, v in ipairs(ogsm_respawn.restrictor_list) do
-			local sobj = alife():object(v.id)
-			if level.name() == object_level_name(sobj) then
-				local pk = xs_netpk.space_restrictor( sobj )
-				if pk:isOk() then
-					local data = pk:get()
-					local cd = data.custom_data:getTable()
-					if cd.sr_mapspot then
-						if info == "pre_blowout" then
-							log3("~~[%s] Adding mapspots on hideouts!", script_name())
-							level_tasks.add_location_by_id(v.id, cd.sr_mapspot.location, cd.sr_mapspot.hint)
-						else
-							log3("~~[%s] Removing mapspots from hideouts!", script_name())
-							if level.map_has_object_spot(v.id, cd.sr_mapspot.location) ~= 0 then
-								level_tasks.remove_location_by_id(v.id, cd.sr_mapspot.location)
-							end
+		for _, id in pairs(restr_list_on_curr_level) do
+			local sobj = alife():object(id)
+			local pk = xs_netpk.space_restrictor( sobj )
+			if pk:isOk() then
+				local data = pk:get()
+				local cd = data.custom_data:getTable()
+				if cd.sr_mapspot then
+					if info == "pre_blowout" then
+						log3("~~[%s] Adding mapspots on hideouts!", script_name())
+						level_tasks.add_location_by_id(id, cd.sr_mapspot.location, cd.sr_mapspot.hint)
+					else
+						log3("~~[%s] Removing mapspots from hideouts!", script_name())
+						if level.map_has_object_spot(id, cd.sr_mapspot.location) ~= 0 then
+							level_tasks.remove_location_by_id(id, cd.sr_mapspot.location)
 						end
 					end
 				end
@@ -61,10 +154,10 @@ end
 -- Нужно ли нам прятаться вообще и нервничать
 function check_not_need_hide(obj)
 	if obj and obj:alive() then
-		for k,v in pairs(ogsm_respawn.restrictor_list) do
-			local zone = level.object_by_id(v.id)
-			if zone and utils.npc_in_zone(obj, zone) then
-				local community, radius = ogsm_respawn.get_community_hide(v)
+		for _, id in pairs(restr_list_on_curr_level) do
+			local zone = level.object_by_id(id)
+			if zone and zone:inside(obj:position()) then
+				local community, radius = get_community_hide(zone)
 				if string.find(community, "fake") then
 					return true
 				end
@@ -75,7 +168,6 @@ function check_not_need_hide(obj)
 	return false
 end
 
--- ogse_hideouts.npc_inside_safe_zone(db.actor)
 -- Проверка нахождения непися в безопасной зоне
 function npc_inside_safe_zone(obj)
 	local location = level.name()
@@ -89,13 +181,13 @@ function npc_inside_safe_zone(obj)
 			return true
 		end
 	
-		for k,v in pairs(ogsm_respawn.restrictor_list) do
-			local zone = level.object_by_id(v.id)
-			if zone and utils.npc_in_zone(obj, zone) then
+		for _, id in pairs(restr_list_on_curr_level) do
+			local zone = level.object_by_id(id)
+			if zone and zone:inside(obj:position()) then
 				return true
 			end
-		end		
-	else	
+		end
+	else
 		return false
 	end
 	return false
