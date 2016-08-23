@@ -255,7 +255,6 @@ function on_take_from_box(box, item, sitem)
 		if car_info_wnd then -- и сейчас активно акно с информацией о машине
 			car_info_wnd:update_info() -- то обновляем его
 		end
-		return true -- и завершаем цепочку вызовов, поскольку остальным здесь делать нечего
 	end
 end
 

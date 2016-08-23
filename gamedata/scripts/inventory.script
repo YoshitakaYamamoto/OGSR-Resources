@@ -268,9 +268,9 @@ function check_remove_gasmask()
 	local bio_belt = db.actor:item_in_slot(10)
 	if not bio_belt then return end
 
-	if have_gasmask() then
-		local sect = bio_belt:section()
-		if sect == "af_maska_1" or sect == "af_maska_2" then
+	local sect = bio_belt:section()
+	if sect == "af_maska_1" or sect == "af_maska_2" then
+		if have_gasmask() then
 			db.actor:move_to_ruck(bio_belt)
 			counter = counter + 1
 			if counter == 1 then
