@@ -33,20 +33,6 @@ ASSERT(walk_accel, "ogse_actor_conditions_mgr: 'actor:walk_accel' parameter not 
 local min_walk_accel = 6
 local def_jump_power = get_float( "actor_condition", "jump_power" )
 ASSERT(def_jump_power, "ogse_actor_conditions_mgr: 'actor_condition:jump_power' parameter not found!")
-local jump_weight_power = get_float( "actor_condition", "jump_weight_power" )
-ASSERT(jump_weight_power, "ogse_actor_conditions_mgr: 'actor_condition:jump_weight_power' parameter not found!")
-local overweight_jump_k = get_float( "actor_condition", "overweight_jump_k" )
-ASSERT(overweight_jump_k, "ogse_actor_conditions_mgr: 'actor_condition:overweight_jump_k' parameter not found!")
-local def_walk_power = get_float( "actor_condition", "walk_power" )
-ASSERT(def_walk_power, "ogse_actor_conditions_mgr: 'actor_condition:walk_power' parameter not found!")
-local walk_weight_power = get_float( "actor_condition", "walk_weight_power" )
-ASSERT(walk_weight_power, "ogse_actor_conditions_mgr: 'actor_condition:walk_weight_power' parameter not found!")
-local overweight_walk_k = get_float( "actor_condition", "overweight_walk_k" )
-ASSERT(overweight_walk_k, "ogse_actor_conditions_mgr: 'actor_condition:overweight_walk_k' parameter not found!")
-local def_max_weight = get_float( "inventory", "max_weight" )
-ASSERT(def_max_weight, "ogse_actor_conditions_mgr: 'inventory:max_weight' parameter not found!")
-local def_max_walk_weight = get_float( "actor_condition", "max_walk_weight")
-ASSERT(def_max_walk_weight, "ogse_actor_conditions_mgr: 'actor_condition:max_walk_weight' parameter not found!")
 local jump_speed = get_float( "actor", "jump_speed" )
 ASSERT(jump_speed, "ogse_actor_conditions_mgr: 'actor:jump_speed' parameter not found!")
 local run_coef = get_float("actor", "run_coef")
@@ -63,8 +49,6 @@ end
 
 local cached_item_cond_effects = {}
 local function get_item_cond_effect( item )
-  if not item or not alife():object( item:id() ) then return end
-
   local section = item:section()
   local ef = cached_item_cond_effects[ section ]
   if not ef then
@@ -73,8 +57,6 @@ local function get_item_cond_effect( item )
     ef.health_restore_speed			= get_float( section, "health_restore_speed",   0 )
     ef.bleeding_restore_speed		= get_float( section, "bleeding_restore_speed", 0 )
     ef.power_restore_speed			= get_float( section, "power_restore_speed",    0 )
-    ef.additional_inventory_weight	= get_float( section, "additional_inventory_weight",  0 )
-    ef.additional_inventory_weight2	= get_float( section, "additional_inventory_weight2", 0 )
     ef.psy_health_restore_speed		= get_float( section, "psy_health_restore_speed", 0 )
 --------Эффекты ношения экзоскелетов--------
 	local exo_section = get_string(section, "exo_section", nil)
@@ -100,7 +82,6 @@ function on_update()
   or not ( db.actor and db.actor:alive() ) then return end
 
   local act = db.actor
-  --log3("%04d/%02d/%02d %02d:%02d:%02d.%03d", unpack(pt))
   local previous_check_time = game.CTime()
   previous_check_time:set( unpack( pt ) )
   local current_time = game.get_game_time()
@@ -144,29 +125,16 @@ function on_update()
   local summary_sprint_factor				= sprint_koef + ext.sprint_factor
   local summary_run_factor					= run_coef + ext.run_factor
   local summary_run_back_factor				= run_back_coef + ext.run_back_factor
-  local summary_max_weight					= def_max_weight
   local cur_jump_power						= def_jump_power
   local cur_walk_accel						= (walk_accel - min_walk_accel) + ext.walk_accel
-  local af_additional_inventory_weight		= 0
-  local af_additional_inventory_weight2		= 0
   local new_cam_inert						= 0
 
-  -- неучтённые в движке эффекты от артефактов на поясе
-  for i = 0, act:belt_count() - 1 do
-    local item = act:item_on_belt( i )
-    local ef = get_item_cond_effect( item )
-    if ef then
-      local satiety_restore_speed		= adjust_satiety_restore_speed( ef.satiety_restore_speed )
-      summary_satiety_effect			= summary_satiety_effect + satiety_restore_speed
-      af_additional_inventory_weight	= af_additional_inventory_weight + ef.additional_inventory_weight
-      af_additional_inventory_weight2	= af_additional_inventory_weight2 + ef.additional_inventory_weight2
-      summary_max_weight				= summary_max_weight + ef.additional_inventory_weight2
-      summary_psy_health_effect			= summary_psy_health_effect + ef.psy_health_restore_speed
-    end
-  end
+  local satiety_restore_speed = adjust_satiety_restore_speed( inventory.on_belt_restore_speed( "satiety_restore_speed" ) )
+  summary_satiety_effect    = summary_satiety_effect + satiety_restore_speed
+  summary_psy_health_effect = summary_psy_health_effect + inventory.on_belt_restore_speed( "psy_health_restore_speed" )
 
   -- эффекты от брони
-  local armor = db.actor:get_current_outfit()
+  local armor = act:get_current_outfit()
   if armor then
     local ef = get_item_cond_effect( armor )
     if ef then
@@ -180,7 +148,6 @@ function on_update()
 	  summary_sprint_factor				= summary_sprint_factor + ef.sprint_factor_dif
 	  summary_run_factor				= summary_run_factor + ef.run_factor_dif
 	  summary_run_back_factor			= summary_run_back_factor + ef.run_back_factor_dif
-      summary_max_weight				= summary_max_weight + ef.additional_inventory_weight2
     end
   end
 
@@ -195,8 +162,6 @@ function on_update()
     summary_health_effect = summary_health_effect + hadd
   end
   --TODO: учесть потерю сил и здоровья от недосыпа
-  --TODO: оптимизировать вычисление суммарного эффекта,
-  --сделать это только по факту изменения объектов на поясе
   act.satiety = summary_satiety_effect * dt
   -- ограничиваем снизу. TODO: может учесть это в самом движке
   if act.satiety < 0 then act:set_actor_condition_float( nil, 0.0, 256 ) end
@@ -239,29 +204,6 @@ function on_update()
   set_run_factor(summary_run_factor)
 
   set_run_back_factor(summary_run_back_factor)
-
-  --Артефакты теперь тоже могут увеличивать переносимый вес
-  if af_additional_inventory_weight > 0 then
-    db.actor:set_actor_max_walk_weight( def_max_walk_weight + af_additional_inventory_weight )
-  end
-  if af_additional_inventory_weight2 > 0 then
-    db.actor:set_actor_max_weight( def_max_weight + af_additional_inventory_weight2 )
-  end
-
-  --Если экзоскелет переносит 170 кг., то сил на перенос 170-и
-  --кг. должно тратиться столько же, как на перенос 80-и кг. в одном
-  --свитере.
-  if db.actor:get_inventory_weight() > summary_max_weight then
-    set_overweight_jump_k( overweight_jump_k )
-    set_overweight_walk_k( overweight_walk_k )
-    set_jump_weight_power( jump_weight_power )
-    set_walk_weight_power( walk_weight_power )
-  else
-    set_overweight_jump_k( 1 )
-    set_overweight_walk_k( 1 )
-    set_jump_weight_power( jump_weight_power * ( def_max_weight / summary_max_weight ) )
-    set_walk_weight_power( walk_weight_power * ( def_max_weight / summary_max_weight ) )
-  end
 
   if act.satiety < light_hunger_limit then
     cur_walk_accel = cur_walk_accel * ( act.satiety / light_hunger_limit )
