@@ -131,20 +131,24 @@ function on_info(npc, info)
 end
 
 
-local dev = device()
-
+local saved_aspect = 0
+local static_name
 function update_shelter_icon()
+	ogse_signals.get_mgr():reschedule(500)
 	local hud = get_hud()
-	local static_name
-	if dev.aspect_ratio < 0.7 then
-		static_name = "shelter_static_16"
-		hud:RemoveCustomStatic("shelter_static")
-	else
-		static_name = "shelter_static"
-		hud:RemoveCustomStatic("shelter_static_16")
+	local aspect = device().width / device().height
+	if saved_aspect ~= aspect then
+		--log3("~~Update hideout icon! Aspect: [%s]", aspect)
+		saved_aspect = aspect
+		if static_name then hud:RemoveCustomStatic(static_name) end
+		if aspect < 0.7 then
+			static_name = "shelter_static_16"
+		else
+			static_name = "shelter_static"
+		end
+		hud:AddCustomStatic(static_name, true)
 	end
-	
-	local st = hud:AddCustomStatic(static_name, true):wnd()
+	local st = hud:GetCustomStatic(static_name):wnd()
 	local transparency_level = npc_inside_safe_zone(db.actor) and 200 or 0
 	local color = GetARGB(transparency_level,0,155,255)
 	st:SetColor(color)

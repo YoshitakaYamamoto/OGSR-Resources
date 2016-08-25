@@ -45,7 +45,7 @@ local sleeping_now = false
 function is_sleep_active()
 	return sleeping_now
 end
-local dev = device()
+
 --
 local awakening_time -- "time" - когда проснулся последний раз
 local last_need_for_sleep -- "float" - накопленная необходимость во сне в секундах !!!на момент окончания последнего сна!!!
@@ -192,8 +192,7 @@ local function update_sleep_static(warn_lvl)
 	hud:RemoveCustomStatic("can_not_sleep_static")
 	--log("update_sleep_static: warn_lvl=%d\n", warn_lvl)
 	if warn_lvl > 0 then
-		--log("dev.aspect_ratio=%5.2f\n", dev.aspect_ratio)
-		local wide_scr = dev.aspect_ratio < 0.7
+		local wide_scr = device().width / device().height < 0.7
 		local static_name
 		if remained_sleep_suppression_time() > 0 then
 			static_name = wide_scr and "can_not_sleep_static_16" or "can_not_sleep_static"
@@ -207,7 +206,7 @@ end
 local last_effector_time = 0
 local last_aspect_ratio = 0
 function update_sleep_effects(force_update)
-	local current_aspect_ratio = dev.aspect_ratio
+	local current_aspect_ratio = device().width / device().height
 	--log1("sleep suppresion = "..tostring(remained_sleep_suppression_time()))
 	local depr_factor = sleep_deprivation_factor()
 	-- сперва обновляем уровень недосыпа и индикатор

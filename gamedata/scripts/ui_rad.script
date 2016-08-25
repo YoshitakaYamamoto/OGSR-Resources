@@ -17,11 +17,12 @@ local cfg = {
 }
 
 function attach(sm)
-	sm:subscribe({ signal = "on_update",	fun = this.update })
+	sm:subscribe({ signal = "on_update", fun = this.update })
 end
 
 function update()
 	if not db.actor then return end
+	ogse_signals.get_mgr():reschedule(500)
 
 	local bDetected = false
 	if db.actor:item_in_slot(8) then
@@ -37,8 +38,10 @@ function update_hud( sect_name, params, bDetected, val )
 	if hud then
 		local custom_static_rad_back = hud:GetCustomStatic( params.hud_back  )
 		local custom_static_rad      = hud:GetCustomStatic( params.hud_level )
-		if  ( device().width / device().height ) ~= params.saved_aspect then
-			params.saved_aspect = device().aspect_ratio
+		local aspect = device().width / device().height
+		if aspect ~= params.saved_aspect then
+			--log3("~~Update ui rad! Aspect: [%s]", aspect)
+			params.saved_aspect = aspect
 			if custom_static_rad_back then
 				hud:RemoveCustomStatic( params.hud_back  )
 			end

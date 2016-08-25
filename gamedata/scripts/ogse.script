@@ -504,7 +504,7 @@ end
 function start_timer(name, delay, action)
 	if not delay then return end
 	if not action then action = "" end
-log3("~~Starting timer: [%s_%s]", name, action)
+	--log3("~~Starting timer: [%s_%s]", name, action)
 
 	ogse_st_mgr.delayed_fun_start()
 	:set_delay( delay )
@@ -515,7 +515,7 @@ end
 function g_start_timer(name, delay_d, delay_h, delay_m, action)
 	if not delay_d or not delay_h or not delay_m then return end
 	if not action then action = "" end
-log3("~~Starting gtimer: [%s_%s]", name, action)
+	--log3("~~Starting gtimer: [%s_%s]", name, action)
 
 	ogse_st_mgr.delayed_fun_start()
 	:set_gdelayDHMS( delay_d, delay_h, delay_m, 0 )
@@ -1447,11 +1447,11 @@ function show_time()
 	local hud = get_hud()
 	local time_h = sr_timer.time2str(level.get_time_hours())
 	local time_m = sr_timer.time2str(level.get_time_minutes())
-	if not hud:GetCustomStatic("hud_timer_text1") then 
-		hud:AddCustomStatic("hud_timer_text1", true)
+	local cs = hud:GetCustomStatic("hud_timer_text1")
+	if not cs then
+		cs = hud:AddCustomStatic("hud_timer_text1", true)
 	end
-	cs = hud:GetCustomStatic("hud_timer_text1"):wnd()
-	cs:SetText(time_h..":"..time_m)
+	cs:wnd():SetText(time_h..":"..time_m)
 end
 -----------------------------------------------------------
 
@@ -1640,9 +1640,8 @@ class "MonologueMsg" (CUIScriptWnd)
 
 function MonologueMsg:__init(txt) super()
 	local xml = CScriptXmlInit()
-	local dev = device()
 	
-	if dev.aspect_ratio > 0.7 then
+	if device().width / device().height > 0.7 then
 		xml:ParseFile("ui_ogse_monologue_msg.xml") -- 4^3
 	else
 		xml:ParseFile("ui_ogse_monologue_msg_16.xml") -- 16^9
