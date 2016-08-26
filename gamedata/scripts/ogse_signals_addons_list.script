@@ -4,10 +4,11 @@
 
 addons = {
 	"dunin_ammo", --должен быть первым!
+	"death_manager", --должен быть после перепаковщика патронов!
 	"ogse_hideouts", --Должен быть перед менеджером аномалий!
-	"ogse_anomaly", --должен быть вторым!
-	"ogse", --должен быть третьим!
-	"ogse_detectors", --должен быть четвертым!
+	"ogse_anomaly",
+	"ogse",
+	"ogse_detectors", --должен быть где-то в начале!
 	"ogse_addons",
 	"ogse_bind_weapon",
 	"ogse_unist",
@@ -74,7 +75,6 @@ addons = {
 	"sr_light",
 	"xrs_grenade",
 	"xrs_medic",
-	"death_manager",
 	"amkii_equip",
 	"xs_netpk",
 	"xs_stor",

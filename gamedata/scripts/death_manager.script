@@ -1,5 +1,6 @@
 
 function attach( sm )
+  sm:subscribe({ signal = "on_spawn", fun = this.init_drop_settings})
   sm:subscribe({ signal = "on_npc_death", fun = this.on_death })
   sm:subscribe({ signal = "on_npc_first_update", fun = this.on_first_update })
 end
@@ -353,12 +354,33 @@ function keep_item(npc, item)
 	end
 end
 
+
+-------------------------------------------------------------------------------------------------
 function shedule_release(item)
 	if item then
 		if not deferred_release[item:id()] then
 			deferred_release[item:id()] = time_global()
+			run_shedule_release_timer()
 		end
 	end
+end
+
+local shedule_release_t
+function run_shedule_release_timer()
+  if not shedule_release_t then
+    shedule_release_t = check_shedule_release_timer():start()
+  end
+end
+
+class "check_shedule_release_timer" ( ogse_qt.quick_timer )
+function check_shedule_release_timer:__init() super()
+end
+function check_shedule_release_timer:condition()
+  release_deferred_ammo()
+  return next(deferred_release) == nil
+end
+function check_shedule_release_timer:action()
+  shedule_release_t = nil
 end
 
 function release_deferred_ammo()
@@ -392,6 +414,8 @@ function release_deferred_ammo()
 		end		
 	end
 end
+-------------------------------------------------------------------------------------------------
+
 
 --' Функция вызывается для каждого предмета в инвентаре убитого напарника
 function companion_item(npc, item)

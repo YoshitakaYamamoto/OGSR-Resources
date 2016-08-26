@@ -1,168 +1,115 @@
 
 function attach(sm)
-	sm:subscribe({signal = "on_take", fun = this.on_take}) --должен вызываться первым сигналом в on_take!
+	sm:subscribe({signal = "on_spawn", fun = this.init})
+	sm:subscribe({signal = "on_take",  fun = this.on_take}) --РґРѕР»Р¶РµРЅ РІС‹Р·С‹РІР°С‚СЊСЃСЏ РїРµСЂРІС‹Рј РІ on_take!
 end
 
--- nv080209 - adjustments per Russian forum discussion
-ammo = {}
-local inited = false
-local repack = false 
 
---------
--- инициализация переменных, выполняется единожды
---------
-function init()
-	local i, result, section, value
-	local n = sys_ini:line_count("death_gen_ammo_sections")	--список патронов возьмём из "death_generic.ltx"
-	for i=0,n-1 do
+ammo = {} --РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РІРѕ РјРЅРѕРіРёС… СЃРєСЂРёРїС‚Р°С…
+local repack = false
+
+function init() --РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРµСЂРµРјРµРЅРЅС‹С…, РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РµРґРёРЅРѕР¶РґС‹
+	local result, section, value
+	local n = sys_ini:line_count("death_gen_ammo_sections")	--СЃРїРёСЃРѕРє РїР°С‚СЂРѕРЅРѕРІ РІРѕР·СЊРјС‘Рј РёР· "death_generic.ltx"
+	for i = 0, n - 1 do
 		result, section, value = sys_ini:r_line("death_gen_ammo_sections",i,"","")
 		ammo[section] = {}
 		ammo[section].repack = false
 		ammo[section].box = sys_ini:r_u32(section, "box_size")
 	end
-	repack = false
-	inited = true
 end
 
 --------
--- вызывается при добавлении в инвентарь ГГ любых патрон
---  obj - game_object добавляемой пачки
--- здесь будем только ставить флажки о необходимости проверки,
--- саму проверку и перепаковку сделаем в апдейте актёра,
--- если перепаковку делать прям здесь, то будет глюк при загрузки и
--- при взятии из нычки кучи патрон (взять всё)
+-- РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё РґРѕР±Р°РІР»РµРЅРёРё РІ РёРЅРІРµРЅС‚Р°СЂСЊ Р“Р“ Р»СЋР±С‹С… РїР°С‚СЂРѕРЅ
+-- Р·РґРµСЃСЊ Р±СѓРґРµРј С‚РѕР»СЊРєРѕ СЃС‚Р°РІРёС‚СЊ С„Р»Р°Р¶РєРё Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїСЂРѕРІРµСЂРєРё,
+-- СЃР°РјСѓ РїСЂРѕРІРµСЂРєСѓ Рё РїРµСЂРµРїР°РєРѕРІРєСѓ СЃРґРµР»Р°РµРј РІ Р°РїРґРµР№С‚Рµ Р°РєС‚С‘СЂР°,
+-- РµСЃР»Рё РїРµСЂРµРїР°РєРѕРІРєСѓ РґРµР»Р°С‚СЊ РїСЂСЏРј Р·РґРµСЃСЊ, С‚Рѕ Р±СѓРґСѓС‚ СЃРёР»СЊРЅС‹Рµ С‚РѕСЂРјРѕР·Р°
+-- РїСЂРё РІР·СЏС‚РёРё РёР· РЅС‹С‡РєРё РєСѓС‡Рё РїР°С‚СЂРѕРЅ (РІР·СЏС‚СЊ РІСЃС‘)
 --------
 function on_take(obj, s_obj)
-	if obj:clsid() ~= clsid.wpn_ammo then return end
+	if device().precache_frame > 1 then return end --Р’Рѕ РІСЂРµРјСЏ Р·Р°РіСЂСѓР·РєРё РЅРёС‡РµРіРѕ РЅРµ РґРµР»Р°РµРј
 
-	if not inited then init() end
-	
-	if not obj.section then
-		log1("##WARNING! Actor pickup buggy ammopack, removing it.")
-		db.actor:drop_item(obj)
-		return true --заканчиваем цепочку вызовов, т.к объект глючный.
-	end
-	
 	local section = s_obj:section_name()
-	if ammo[section] ~= nil then
-		if ammo[section].repack == false then
+	if ammo[section] then
+		--log3("~~[%s.on_take] Size of [%s]: [%s], default in box: [%s]", script_name(), obj:name(), get_ammo_size(obj), ammo[section].box)
+		if not ammo[section].repack then
 			if get_ammo_size(obj) < ammo[section].box then
 				ammo[section].repack = true
 				repack = true
+				run_repack_ammo_timer()
 			end
 		end
-		return true --Вроде бы патроны более в on_take нигде не нужны, можно закончить цепочку вызовов.
+		return true --Р’СЂРѕРґРµ Р±С‹ РїР°С‚СЂРѕРЅС‹ Р±РѕР»РµРµ РІ on_take РЅРёРіРґРµ РЅРµ РЅСѓР¶РЅС‹, РјРѕР¶РЅРѕ Р·Р°РєРѕРЅС‡РёС‚СЊ С†РµРїРѕС‡РєСѓ РІС‹Р·РѕРІРѕРІ.
 	end
 end
 
---------
--- вызывается из апдейта актёра
--- проверяет наличие флажков и вызывает процедуру переупаковки
---------
-local updates_count = 0
-local engage_after = 20
 
-function on_update() --НЕ ПЕРЕВОДИТЬ НА СИГНАЛЫ! Вызывается из биндера актора предпоследним на апдейте!
-	if updates_count < engage_after then
-		updates_count = updates_count + 1
-		return
-	end
+function on_update() --РџРѕРёСЃРє РІ РёРЅРІРµРЅС‚Р°СЂРµ РЅРµРїРѕР»РЅС‹С… РїР°С‡РµРє Рё РёС… РїРµСЂРµСѓРїР°РєРѕРІРєР°
+	if not repack then return end
 	if level.get_inventory_wnd():IsShown() then return end
-	if repack then
-		local section, data
-		for section, data in pairs(ammo) do
-			if data.repack then
-				repack_ammo(section, data.box)
-				data.repack = false
-			end
-		end
-		repack = false
-	end
-end
 
---------
--- переупаковка патронов заданного типа
---  section - строка, имя секции (тип патрон)
---  box_size - колличество патрон в полной пачке
--- сначало составляем список неполных пачек, затем
--- удаляем их и создаём нужное колличество полных
---------
-function repack_ammo(section, box_size)
-	--log3("!!AMMO_DEBUG repack_ammo('%s')", section)
-	local s, t = enum_ammo(section, box_size)
-	if (s > 0) and (table.getn(t) > 1) then
-		--log3("!!AMMO_DEBUG repacking(magazins=%d, bullets=%d)", table.getn(t), s)
-		local sim = alife()
-		local pos = db.actor:position()
-		local lvid = db.actor:level_vertex_id()
-		local gvid = db.actor:game_vertex_id()
-		local pid = db.actor:id()
-
-		for i, id in pairs(t) do
-			local s_obj = sim:object(id)
-			if s_obj then
-				local obj = level.object_by_id(id)
-				if obj then
-					death_manager.shedule_release(obj)
-					db.actor:drop_item(obj)
-				end
-			end
-		end
-
-		while s >= box_size do
-			sim:create_ammo(section, pos, lvid, gvid, pid, box_size)
-			s = s - box_size
-		end
-
-		if s > 0 then
-			sim:create_ammo(section, pos, lvid, gvid, pid, s)
-		end
-	end
-end
-
---------
--- пробегаемся по инветарю ГГ и собираем инфу о неполных пачках
---  section - строка, имя секции (тип патрон)
---  box_size - колличество патрон в полной пачке
--- возвращает сумарное колличество патрон в неполных пачках и массив id-шников этих пачек
---------
-function enum_ammo(section, box_size)
-	local i, obj, size
-	local s = 0
-	local t = {}
-	for i=0, db.actor:object_count()-1 do
-		obj = db.actor:object(i)
-		if obj and obj.id then
-			local sobj = alife():object(obj:id())
-			if sobj then
-				if sobj:section_name() == section then
-					size = get_ammo_size(obj)
-					-- if size < box_size then
-					if size ~= box_size then
-						table.insert(t, obj:id())
-						s = s + size
+	local repack_tbl = {}
+	db.actor:inventory_for_each(function(obj, npc)
+		if npc:is_in_ruck(obj) then
+			local sect = obj:section()
+			local ammo_data = ammo[sect]
+			if ammo_data and ammo_data.repack then
+				local size = get_ammo_size(obj)
+				if size < ammo_data.box then
+					if not repack_tbl[sect] then
+						repack_tbl[sect] = {["size"] = size, ["remove_ids"] = {obj:id()}}
+					else
+						repack_tbl[sect]["size"] = repack_tbl[sect]["size"] + size
+						table.insert(repack_tbl[sect]["remove_ids"], obj:id())
 					end
 				end
-			else
-				if obj.name and not string.find(obj:name(), "bolt") then
-					-- глюкавая пачка, удалить
-					log1("##WARNING! Praparing to delete virtual object ["..obj:id().."]")
-					death_manager.shedule_release(item)
-					log1("##WARNING! Trying to delete virtual object ["..obj:name().."]")
+			end
+		end
+	end)
+
+	for k, v in pairs(repack_tbl) do
+		if #v.remove_ids > 1 and v.size > 0 then
+			for i = 1, #v.remove_ids do
+				local id = v.remove_ids[i]
+				local obj = level.object_by_id(id)
+				if obj then
+					db.actor:drop_item(obj) --РќР• Р—РђРљРћРњРњР•РќРўРР РћР’РђРўР¬ РќР Р’ РљРћР•Рњ РЎР›РЈР§РђР•!!!
+					death_manager.shedule_release(obj)
 				end
 			end
-		elseif obj then
-			-- если вообще есть хоть что выкинуть
-			-- ехай нахуй навсегда (с) Ленинград
-			log1("##WARNING! Praparing to delete partially invalid virtual object")
-			death_manager.shedule_release(item)
+			--log3("--[%s] Create ammo! Section: [%s], size: [%s]", script_name(), k, v.size)
+			se_respawn.create_ammo(k, db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id(), v.size)
 		end
 	end
-	return s, t
+
+	for k, v in pairs(ammo) do
+		if v.repack then ammo[k].repack = false end
+	end
+	repack = false
 end
 
+
+local repack_ammo_t
+function run_repack_ammo_timer()
+  if not repack_ammo_t then
+    repack_ammo_t = check_repack_ammo_timer():start()
+  end
+end
+
+class "check_repack_ammo_timer" ( ogse_qt.quick_timer )
+function check_repack_ammo_timer:__init() super()
+end
+function check_repack_ammo_timer:condition()
+  on_update()
+  return not repack
+end
+function check_repack_ammo_timer:action()
+  repack_ammo_t = nil
+end
+
+
 --------
--- возвращает колличество патрон в пачке
+-- РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕР»Р»РёС‡РµСЃС‚РІРѕ РїР°С‚СЂРѕРЅ РІ РїР°С‡РєРµ
 -- http://www.amk-team.ru/forum/index.php?showtopic=10538&p=713968
 --------
 function get_ammo_size(obj)
