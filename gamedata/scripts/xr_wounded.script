@@ -103,9 +103,9 @@ function evaluator_wound:evaluate()
 
 	if tostring(xr_logic.pstor_retrieve(self.object, "wounded_state")) ~= "nil" then
 		ogse_debug.add_active_eval( self.object, script_name(), "wounded" )
-		if string.find(npc:name(), "bar_arena_kaligula") then
-			npc:remove_restrictions("bar_arena_restrictor","")
-		end
+		--if string.find(npc:name(), "bar_arena_kaligula") then --KRodin: А зачем оно тут вообще нужно?
+		--	npc:remove_restrictions("bar_arena_restrictor","")
+		--end
 		return true
 	else
 		return false
