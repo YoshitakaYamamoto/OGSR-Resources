@@ -655,7 +655,7 @@ local msg_crash = {
 	[9] = game.translate_string("msg_crash_1_text"),
 }
 
---local crash_counter = 0
+local crash_counter = 0
 local crash_text = game.translate_string("msg_crash_text")
 
 -- Крешнуть игру (после вывода сообщения об ошибке в лог)
@@ -680,23 +680,23 @@ function abort(fmt, ...)
 		critical:SetText(crash_text)
 	end
 
-	--if crash_counter == 0 then
-		--crash_counter = crash_counter + 1	
+	if crash_counter == 0 then
+		crash_counter = crash_counter + 1	
 		fail("КРАТКОЕ ОПИСАНИЕ ОШИБКИ: "..fmt)
-	--[=[elseif crash_counter == 1 then
+	elseif crash_counter == 1 then
 		crash_counter = crash_counter + 1
-		--log1("ABORT: 1/crash")	
+		log1("ABORT: 1/crash")	
 		local crash
 		local ooops = 1/crash
 	elseif crash_counter == 2 then
 		crash_counter = crash_counter + 1
-		--log1("ABORT: string.format")	
+		log1("ABORT: string.format")	
 		string.format("%s")		
 	else
 		crash_counter = crash_counter + 1
-		--log1("get_console():execute quit")
-		cmd("quit")]=]
-	--end
+		log1("get_console():execute quit")
+		cmd("quit")
+	end
 end
 
 --/ проверяет целую часть числа на нечётность
