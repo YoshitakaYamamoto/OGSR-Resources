@@ -46,12 +46,12 @@ function on_monster_spawn( obj, binder )
         })
       end
     elseif obj:clsid() == clsid.controller_s then
-	  --table.insert( subscribed, {
-      --  [ "signal" ] = s_name,
-      --  [ "fun"    ] = this.controller_attack,
-      --  [ "queued" ] = true,
-      --  [ "__unsubscribe_on_death" ] = true,
-      --})
+	  table.insert( subscribed, {
+        [ "signal" ] = s_name,
+        [ "fun"    ] = this.controller_attack,
+        [ "queued" ] = true,
+        [ "__unsubscribe_on_death" ] = true,
+      })
       table.insert( subscribed, {
         [ "signal" ] = s_name,
         [ "fun"    ] = this.controller_psy_attack,
@@ -304,60 +304,30 @@ function electro_himera_attack( obj )
 end
 
 
---[=[
---Удар контролёра руками из Зова ѕрипяти (Автор: demover123)
 function controller_attack( obj )
-  local target = obj:best_enemy()
-  if target and obj:see( target ) and IsStalker(target) then
-    local binder = obj:binded_object()
-    if not binder.attack_get_hit then
-      binder.attack_get_hit             = time_global() + 100
-      binder.attack_start_anim_hit_cont = true
-    elseif binder.attack_get_hit <= time_global() then
-      local dist = obj:position():distance_to( target:position() )
-      if dist <= 2.0 then
-        if binder.attack_start_anim_hit_cont then
-          if obj:animation_count() > 0 then
-            obj:clear_animations()
-          end
-          obj:add_animation(
-            "stand_walk_fwd_" .. math.random( 0, 1 ), true
-          )
-          obj:play_cycle( "stand_attack_1", true )
-          local song_start = xr_sound.get_safe_sound_object(
-            "monsters\\controller\\controller_hit_2"
-          )
-          song_start:play_at_pos(
-            obj, obj:position(), sound_object.s3d
-          )
-          binder.attack_start_anim_hit_cont = false
-        end
-        if not binder.attack_hit_to_enemy then
-          binder.attack_hit_to_enemy = time_global() + 1000 --300
-        elseif binder.attack_hit_to_enemy <= time_global() then
-          level.add_cam_effector(
-            "camera_effects\\hit_back_left.anm", 777, false, ""
-          )
-          local h = hit()
-          h.draftsman = obj
-          h.direction = vector():set( 0, 0, 0 )
-          h:bone( "bip01_spine" )
-          h.power     = 0.4
-          h.impulse   = 1
-          h.type      = hit.wound
-          target:hit( h )
-          binder.attack_hit_to_enemy = nil
-          binder.attack_get_hit      = nil
-        end
-      end
+  if not may_attack() then return end
+  local attack_dist = 60
+  local dist = obj:position():distance_to( db.actor:position() )
+  ogse_signals.get_mgr():reschedule(
+    ( dist < attack_dist and 500 )
+    or ( dist < attack_dist * 2 and 1000 )
+    or 5000
+  )
+  if dist > attack_dist then return end
+  local enemy = obj:best_enemy()
+  if not ( enemy and enemy:id() == db.actor:id() and obj:see( enemy ) ) then return end
+  if math.random() < 0.5 then
+    local dir = device().cam_dir
+    local x   = dir.x - ( 1.5 - 3 * math.random() )
+    local y   = dir.y
+    local z   = dir.z - ( 1.5 - 3 * math.random() )
+    dir = vector()
+    dir:set( x, y, z )
+    local h = dir:getH()
+    local p = dir:getP()
+    db.actor:set_camera_direction( vector():set( -h, -p, 0 ) )
     end
-  end
-  if obj:animation_count() < 1 then
-    local i = math.random( 0, 5 )
-    obj:add_animation( "stand_walk_fwd_" .. i, true )
-  end
 end
---]=]
 
 --Контроллёр запускает фантомов, зомбирует сталкеров и выбивает из рук оружие
 local hard_phantom_types = {"phantom_snork_4", "phantom_chimera_2", "phantom_krovosos_2"}
