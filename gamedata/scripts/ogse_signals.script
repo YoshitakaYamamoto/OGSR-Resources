@@ -132,10 +132,10 @@ function signals_mgr:__init( name, modules_list, scan_for_autoattaching_modules 
       for mgr_name, count in pairs( unfinished_count ) do
         if count > 0 then       -- если есть незавершённые вызовы
           log3( debug.traceback() )
-          local n = table.getn( self.slots_in_process )
+          local n = #self.slots_in_process
           if n > 0 then
             local slot = self.slots_in_process[ n ]
-            log3( "[%s]: signal on top: %s, script_name = %s", script_name(), slot.signal, slot.script_name )
+            log3( "[%s]: signal on top: [%s], script_name = [%s]", script_name(), slot.signal, slot.script_name )
           end
           abort( "Signal manager '"..mgr_name.."' crushed:\nOne of the calls hung! See stack dump for details." ) -- RIP
         end
@@ -144,17 +144,6 @@ function signals_mgr:__init( name, modules_list, scan_for_autoattaching_modules 
     level.add_call( hanged_calls_check, function() end ) -- сторожевой таймер
     checking_initialized = true
   end
-end
-
-
-local function compare_safe( a, b )
-  local function a_eq_b( a, b ) return a == b end
-  local err, res = pcall( a_eq_b, a, b )
-  if err then return res end
-  local function a_neq_b( a, b ) return a ~= b end
-  local err, res = pcall( a_neq_b, a, b )
-  if err then return not res end
-  abort( "compare_safe: neither == nor ~= not working for compared objects" )
 end
 
 
@@ -219,13 +208,8 @@ function signals_mgr:make_empty_signal( signal )
     [ "next_in_scheduled" ] = 1,
   }
   if
-    signal == "on_update"
-    or signal == "on_monster_update"
-    or signal == "on_npc_update"
-    or signal == "on_physic_obj_update"
-    or string.find( signal, "on_monster_update.", 1, true )
-    or string.find( signal, "on_npc_update.", 1, true )
-    or string.find( signal, "on_ph_update.", 1, true )
+    string.find( signal, "update" )
+	and not string.find( signal, "first_update" )
   then
     t.time_limited = true
   else
@@ -316,6 +300,7 @@ function signals_mgr:call( signal_name, ... )
     unfinished_count[ self.mgr_name ] = unfinished_count[ self.mgr_name ] + 1
     self:process_call( signal_name, slots, ... )
     unfinished_count[ self.mgr_name ] = unfinished_count[ self.mgr_name ] - 1
+
     if self.to_unsubscribe and unfinished_count[ self.mgr_name ] == 0 then
       -- если нет незавершённых вызовов, то можно по-настоящему
       -- удалять промаркированные для отписки слоты
@@ -326,9 +311,10 @@ function signals_mgr:call( signal_name, ... )
       end
       self.to_unsubscribe = nil
     end
+
     if slots.reschedule_queue and slots.next_in_queue == 1 then
       slots.reschedule_queue = false
-      if table.getn( slots.queue ) > 1 then
+      if #slots.queue > 1 then
         table.sort(
           slots.queue, function( a, b ) return a.timeout < b.timeout end
         )
@@ -336,7 +322,7 @@ function signals_mgr:call( signal_name, ... )
     end
     if slots.reschedule_scheduled and slots.next_in_scheduled == 1 then
       slots.reschedule_scheduled = false
-      if table.getn( slots.scheduled ) > 1 then
+      if #slots.scheduled > 1 then
         table.sort(
           slots.scheduled, function( a, b ) return a.timeout < b.timeout end
         )
@@ -348,19 +334,17 @@ end
 
 function signals_mgr:process_call( signal_name, slots, ... )
   local work_time = 0
-  -- сперва срабатывают все высокоприоритетные сигналы
-  while slots.next_in_normal <= table.getn( slots.normal ) do
-    local slot = slots.normal[ slots.next_in_normal ]
-    -- при рекурсивных вызовах отписанные, но ещё не удалённые
-    -- слоты, необходимо пропустить
-    if slot.unsubscribed then
-      slots.next_in_normal = slots.next_in_normal + 1
+---------------------------------------------------------------------------------------------
+  while slots.next_in_normal <= #slots.normal do --Цикл выполнится для всех слотов в таблице slots.normal
+    local slot = slots.normal[ slots.next_in_normal ] --slots.next_in_normal - индекс текущего слота в таблице slots.normal. Его и будем пробовать запускать.
+    if slot.unsubscribed then --Если этот слот отписан, но ещё не удалён
+      slots.next_in_normal = slots.next_in_normal + 1 --Переходим следующему слоту
     else
       local result
       table.insert( self.slots_in_process, slot )
       local pt = profile_timer()
       pt:start()
-      if slot.self then
+      if slot.self then --Запуск слота
         result = slot.fun( slot.self, ... )
       else
         result = slot.fun( ... )
@@ -368,71 +352,70 @@ function signals_mgr:process_call( signal_name, slots, ... )
       pt:stop()
       work_time = work_time + pt:time()
       table.remove( self.slots_in_process )
-      if slot.timeout then
-        slots.reschedule_scheduled = true
-        slot.scheduled = true
-        table.insert( slots.scheduled, slot )
-        table.remove( slots.normal, slots.next_in_normal )
-      else
-        slots.next_in_normal = slots.next_in_normal + 1
+      if slot.timeout then --Если время выполнения слота, ему задали таймаут для следующего запуска
+        slots.reschedule_scheduled = true --Нужно пересортировать scheduled очередь
+        slot.scheduled = true --Помечаем, что слот теперь в scheduled очереди
+        table.insert( slots.scheduled, slot ) --Добавляем его в scheduled очередь
+        table.remove( slots.normal, slots.next_in_normal ) --И удаляем из normal очереди
+		--Здесь не нужно делать slots.next_in_normal = slots.next_in_normal + 1, т.к на место удалённого слота поднимется следующий после него
+      else --Таймаут не задали
+        slots.next_in_normal = slots.next_in_normal + 1 --Переходим к следующему слоту
       end
-      if slots.time_limited then
-        if work_time >= 30000 then
-          log3(
-            "[%s]: signal '%s' time limited in 'normal' queue: %s. Last call spent %s, script_name = %s. Next is %s from %s.",
+      if slots.time_limited then --Если время запуска сигнала ограничено, т.е. это какой-нибудь update
+        if work_time >= 30000 then --Если вызов сигнала идет слишком долго
+          log3( --Выведем в лог информации, какой слот у нас так тормозит
+            "~~[%s]: signal [%s] time limited in 'normal' queue: [%s]. Last call spent [%s], script_name = [%s]. Next is [%s] from [%s].",
             script_name(), signal_name, work_time,
             pt:time(), slot.script_name,
-            slots.next_in_normal, table.getn( slots.normal )
+            slots.next_in_normal, #slots.normal
           )
-          return
+          return --Вообще завершаем process_call.
         end
-      else
-        -- вызов заявил, что он финальный в цепочке вызовов
-        if result then break end
+      else --Если это НЕ какой-нибудь update
+        if result then break end --Если вызванный слот вернул true, цикл прерываем. Для апдейтов это делать на мой взгляд бессмысленно, т.к они постоянно пересортировываются.
       end
     end
   end
-  while slots.next_in_scheduled <= table.getn( slots.scheduled ) do
-    slot = slots.scheduled[ slots.next_in_scheduled ]
-    if slot.unsubscribed then
-      slots.next_in_scheduled = slots.next_in_scheduled + 1
+---------------------------------------------------------------------------------------------
+  while slots.next_in_scheduled <= #slots.scheduled do --Цикл выполнится для всех слотов в таблице slots.scheduled
+    slot = slots.scheduled[ slots.next_in_scheduled ] --slots.next_in_scheduled - индекс текущего слота в таблице slots.scheduled. Его и будем пробовать запускать.
+    if slot.unsubscribed then --Если этот слот отписан, но ещё не удалён
+      slots.next_in_scheduled = slots.next_in_scheduled + 1 --Переходим к следующему слоту
     else
-      if slot.timeout > time_global() then break end
-      local result
+      if slot.timeout > time_global() then break end --Если время таймаута для этого слота не истекло, значит рано запускать и все последующие, т.к слоты отсортированы по таймауту. Прерываем цикл.
       table.insert( self.slots_in_process, slot )
       local pt = profile_timer()
       pt:start()
-      if slot.self then
-        result = slot.fun( slot.self, ... )
+      if slot.self then --Запуск слота
+        slot.fun( slot.self, ... )
       else
-        result = slot.fun( ... )
+        slot.fun( ... )
       end
+      --Думаю, в этой очереди не нужно прерывать цикл после слота, вернувшего true, т.к последовательность вызовов постоянно меняется при пересортировке.
       pt:stop()
       work_time = work_time + pt:time()
       table.remove( self.slots_in_process )
-      slots.reschedule_scheduled = true
-      slots.next_in_scheduled = slots.next_in_scheduled + 1
-      if slots.time_limited and work_time >= 30000 then
-        log3(
-          "[%s]: signal '%s' time limited in 'scheduled' queue: %s. Last call spent %s, script_name = %s. Next is %s from %s.",
+      slots.reschedule_scheduled = true --Нужна пересортировка
+      slots.next_in_scheduled = slots.next_in_scheduled + 1 --Переходим к следующему слоту
+      if slots.time_limited and work_time >= 30000 then --Если вызов сигнала идет слишком долго
+        log3( --Выведем в лог информации, какой слот у нас так тормозит
+          "~~[%s]: signal [%s] time limited in 'scheduled' queue: [%s]. Last call spent [%s], script_name = [%s]. Next is [%s] from [%s].",
           script_name(), signal_name, work_time,
           pt:time(), slot.script_name,
-          slots.next_in_scheduled, table.getn( slots.scheduled )
+          slots.next_in_scheduled, #slots.scheduled
         )
-        return
+        return --Вообще завершаем process_call.
       end
     end
   end
   slots.next_in_normal    = 1
   slots.next_in_scheduled = 1
-  -- затем срабатывает очередной сигнал в очереди, если имеется
-  local wrapped = self:try_call_queued( slots, ... )
-  if wrapped then
-    -- если ничего не удалось выполнить и перешли в начало очереди
-    if slots.reschedule_queue then
-      -- пересортируем очередь, если нужно
+---------------------------------------------------------------------------------------------
+  local wrapped = self:try_call_queued( signal_name, slots, ... ) --Затем срабатывает очередной сигнал в очереди, если имеется
+  if wrapped then --если ничего не удалось выполнить и перешли в начало очереди
+    if slots.reschedule_queue then --Если нужна пересортировка, пересортировываем очередь.
       slots.reschedule_queue = false
-      if table.getn( slots.queue ) > 1 then
+      if #slots.queue > 1 then
         table.sort(
           slots.queue, function( a, b ) return a.timeout < b.timeout end
         )
@@ -442,49 +425,51 @@ function signals_mgr:process_call( signal_name, slots, ... )
     -- выполнить первый обработчик. Ну, что бы этот апдейт не был
     -- холостым. Результат нам уже не важен, т.к. либо он будет
     -- выполнен, либо нам просто сейчас нечего делать.
-    self:try_call_queued( slots, ... )
+    self:try_call_queued( signal_name, slots, ... )
   end
-  if work_time > 30000 then
-    log3( "[%s]: signal '%s' is too slow: %s", script_name(), signal_name, work_time )
+---------------------------------------------------------------------------------------------
+  if work_time > 30000 then --Чтобы знать какие сигналы много жрут
+    log3( "~~[%s]: signal [%s] is too slow: [%s]", script_name(), signal_name, work_time )
   end
 end
 
 
-function signals_mgr:try_call_queued( slots, ... )
-  local slot    = slots.queue[ slots.next_in_queue ]
+function signals_mgr:try_call_queued( signal_name, slots, ... )
+  local slot    = slots.queue[ slots.next_in_queue ] --slots.next_in_queue - индекс текущего слота в таблице slots.queue. Его и будем пробовать запускать.
   local wrapped = false
   if slot then
-    if not slot.unsubscribed then -- очень маловероятно, но на всякий случай
-      if slot.timeout <= time_global() then
-        slot.timeout = 0
+    if not slot.unsubscribed then --Если этот слот не отписан. Маловероятно, но на всякий случай.
+      if slot.timeout <= time_global() then --Если слот уже пора запускать (истекло время таймаута)
+        slot.timeout = 0 --обнуляем таймаут
         table.insert( self.slots_in_process, slot )
-        if slot.self then
+        if slot.self then --Запуск слота
           slot.fun( slot.self, ... )
         else
           slot.fun( ... )
         end
         table.remove( self.slots_in_process )
-        if slot.timeout > 0 then
-          slots.reschedule_queue = true
+        if slot.timeout > 0 then --Если в вызванной функции задан таймаут для следующего запуска
+          slots.reschedule_queue = true --Нужна пересортировка
         end
-      else
-        if slots.next_in_queue > 1 then
-          wrapped = true
+      else --Если запускать этот слот ещё рано
+        if slots.next_in_queue > 1 then --Если это НЕ первый слот в очереди
+          wrapped = true --Надо на этом же апдейте попробовать запустить следующий слот
         end
-        slots.next_in_queue = 1
+        slots.next_in_queue = 1 --Если рано запускать текущий слот, значит рано запускать и все последующие, т.к они отсортированы по таймауту. Поэтому следующим слотом будем запускать первый в очереди.
+        return wrapped --Больше здесь делать нечего. Выходим.
       end
     end
-    slots.next_in_queue = slots.next_in_queue + 1
-    if slots.next_in_queue > table.getn( slots.queue ) then
-      slots.next_in_queue = 1
+    slots.next_in_queue = slots.next_in_queue + 1 --Индекс следующего слота
+    if slots.next_in_queue > #slots.queue then --Если индекс больше чем кол-во слотов в очереди, значит это был последний слот.
+      slots.next_in_queue = 1 --Следующим запущенным слотом будет первый в очереди.
     end
   end
-  return wrapped
+  return wrapped --Фух, закончили.
 end
 
 
 function signals_mgr:reschedule( timeout )
-  local n = table.getn( self.slots_in_process )
+  local n = #self.slots_in_process
   ASSERT( n > 0, "empty slots_in_process table" )
   local slot   = self.slots_in_process[ n ]
   slot.timeout = time_global() + timeout
