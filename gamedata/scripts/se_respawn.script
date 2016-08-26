@@ -6,6 +6,9 @@
 --Затычка для совместимости.
 class "se_respawn" (cse_alife_space_restrictor)
 function se_respawn:__init(s) super(s) end
+function se_respawn:keep_saved_data_anyway()
+	return true
+end
 ------------------------------------------------
 
 
