@@ -71,7 +71,7 @@ end
 
 local counter = 0
 function remove_m134() --Чтобы М134 можно было использовать только при надетом экзоскелете.
-	if device().precache_frame >= 1 then return end
+	if device().precache_frame > 1 then return end
 
 	local m134 = db.actor:item_in_slot(2)
 	if m134 and m134:section() == "wpn_m_134" then

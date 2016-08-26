@@ -339,7 +339,7 @@ function dsh_respawner:create( prob )
         if
           sobj:smart_terrain_id() == 65535
         then
-		  log3("!!SPAWNING [%s] -> [%s], NO SMART_TERRAIN AVAILABLE!!!", self.name, spawn_section)
+		  --log3("!!SPAWNING [%s] -> [%s], NO SMART_TERRAIN AVAILABLE!!!", self.name, spawn_section)
           alife():release( sobj, true )
           return false
         end
@@ -349,7 +349,7 @@ function dsh_respawner:create( prob )
     table.insert( self.spawned_obj, sobj.id )
     all_spawned_obj[ sobj.id ] = self.name
 
-	log3("--SPAWNING [%s] -> [%s]", self.name, spawn_section)
+	--log3("--SPAWNING [%s] -> [%s]", self.name, spawn_section)
     return true
   end
 end

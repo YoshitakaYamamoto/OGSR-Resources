@@ -78,7 +78,7 @@ local function get_item_cond_effect( item )
 end
 
 function on_update()
-  if device().precache_frame > 0
+  if device().precache_frame > 1
   or not ( db.actor and db.actor:alive() ) then return end
 
   local act = db.actor
