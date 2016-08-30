@@ -183,6 +183,12 @@ function se_smart_terrain:initialize_if_needed()
 	end
 end
 
+
+function se_smart_terrain:is_initialized()
+  return self.initialized
+end
+
+
 -- зарезервировать места для эксклюзивных персонажей
 -- выполняется строго один раз как часть initialize_if_needed
 function se_smart_terrain:preserve_exclusives()
@@ -424,9 +430,8 @@ function se_smart_terrain:smart_terrain_accepts_obj( obj, obj_agreement )
 		end
 		-- если есть работа
 		return self.gulag:is_there_any_suitable_job( self:fill_npc_info( obj ), obj_agreement == agreed_exclusive )
-	else
-		return false -- если не эксклюзив для этого смарта и места нет, то не подходит
 	end
+	return false -- если не эксклюзив для этого смарта и места нет, то не подходит
 end
 
 --[[ подходит ли гулаг объекту?
@@ -508,17 +513,13 @@ function se_smart_terrain:enabled(obj)
 	self:initialize_if_needed() -- но на всякий случай...
 
 	-- если гулаг активен (по cond_list из кастомдаты смарта) и не заблокировано добавление персонажей
-	if self:is_gulag_available() then
+	if self:is_gulag_available() and not self.population_locked then
 		local b = self:obj_accepts_smart_terrain( obj ) -- если смарт подходит неписю
-		if self.population_locked then
-			return b == agreed_exclusive -- если гулаг заблокирован, то принимать только экслюзивных неписей
-		else
-			local a = self:smart_terrain_accepts_obj( obj, b ) -- и непись подходит смарту
-			return a
-		end
-	else
-		return false
+		local a = self:smart_terrain_accepts_obj( obj, b ) -- и непись подходит смарту
+
+		return a -- возвращаем в движок результат
 	end
+	return false
 end
 
 -- возвращает меру подходящести персонажа смарттерейну.
