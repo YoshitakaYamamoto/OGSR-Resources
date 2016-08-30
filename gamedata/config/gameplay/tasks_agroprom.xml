@@ -147,3 +147,20 @@
 		<infoportion_complete>yan_find_vasilyev_end</infoportion_complete>
 	</objective>
 </game_task>
+
+<!-- Выдача переходов на Топь Кротом, если погиб Дезертир -->
+<game_task id="agr_help_krot_give_info_about_lc" prio="10">
+	<title>agr_dezerter_report_read_text</title>
+	<objective>
+		<icon>ui_iconsTotal_find_item</icon>
+		<infoportion_complete>agr_dezerter_report_read</infoportion_complete>
+		<article>agr_help_krot_info_about_lc</article>
+	</objective>
+	<objective>
+		<text>agr_dezerter_report_read_text</text>
+		<map_location_type hint="agr_dezerter_report_read_text">crlc_small</map_location_type>
+		<object_story_id>agr_simulation_box_1</object_story_id>
+		<infoportion_complete>agr_dezerter_report_read</infoportion_complete>
+	</objective>
+</game_task>
+<!-- Выдача переходов на Топь Кротом, если погиб Дезертир -->

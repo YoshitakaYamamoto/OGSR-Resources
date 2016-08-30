@@ -515,7 +515,7 @@ prior = 1
 [tm_find_item_1]
 type = find_item
 community = actor
-;condlist = {+agroprom_military_case_done}
+condlist = {+esc_kvest_sdelka_with_mils_complete}
 text = tm_find_item_1_text
 description = tm_find_item_1_descr
 parent = trader
@@ -904,7 +904,7 @@ prior = 2
 [barmen_find_item_2]
 type = find_item
 community = actor
-condlist = {+bar_darklab_document_done}
+condlist = {+bar_darklab_document_done -player_have_crowbar}
 text = barmen_find_item_2_text
 description = barmen_find_item_2_descr
 parent = barman
@@ -1404,7 +1404,7 @@ target = mil_village
 reward_reputation = +10
 reward_relation = dolg, +100, freedom, -100
 reward_rank = 8
-reward_item = wpn_val_m1, ammo_9x39_ap, ammo_9x39_ap, ammo_9x39_ap, ammo_9x39_ap, ammo_9x39_ap, ammo_9x39_ap, ammo_9x39_ap
+reward_item = wpn_val, ammo_9x39_ap, ammo_9x39_ap, ammo_9x39_ap, ammo_9x39_ap, ammo_9x39_ap, ammo_9x39_ap, ammo_9x39_ap
 time = 172800
 idle_time = 2592000
 prior = 3
@@ -2190,7 +2190,7 @@ time = 172800
 [hunter_eliminate_lager]
 type = eliminate_lager
 community = actor
-condlist = {=gulag_population_ge(mil_hunters_bloodsucker:1)}
+condlist = {=gulag_population_ge(mil_hunters_bloodsucker:1) -hunter_bloodsucker_killed}
 text = hunter_eliminate_lager_text
 description = hunter_eliminate_lager_descr
 parent = hunter
@@ -2200,6 +2200,7 @@ reward_reputation = +20
 reward_rank = 3
 reward_item = af_dummy_glassbeads
 time = 172800
+info = hunter_bloodsucker_killed
 
 ;tasks for lisiy	
 [lisiy_kill_stalker]	

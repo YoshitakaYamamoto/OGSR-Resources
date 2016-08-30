@@ -778,7 +778,7 @@
 		 <object_story_id>Escape_Trader</object_story_id>
 		 <infoportion_complete>esc_kvest_killers_mined_lager_kill_killers</infoportion_complete>
 		 <infoportion_fail>esc_kvest_killers_mined_lager_2_fail</infoportion_fail>
-		<function_fail>_m._file_update</function_fail>
+		<!--function_fail>_m._file_update</function_fail-->
 		 <article>esc_kvest_killers_mined_lager_2_info</article>
 	</objective>
 	<objective>
@@ -804,7 +804,7 @@
 		<object_story_id>Escape_Trader</object_story_id>
 		<infoportion_complete>esc_kvest_killers_mined_lager_2_complete</infoportion_complete>
 		<infoportion_fail>esc_kvest_killers_mined_lager_3_kill_killers_fail</infoportion_fail>
-		<function_fail>_m._file_update</function_fail>
+		<!--function_fail>_m._file_update</function_fail-->
 		<article>esc_kvest_killers_mined_lager_3_info</article>
 	</objective>
 	<objective>
@@ -833,7 +833,7 @@
 			<object_story_id>bar_Barman</object_story_id>
 			<infoportion_complete>bar_kvest_friend_of_barman_complete</infoportion_complete>
 			<infoportion_fail>bar_kvest_friend_of_barman_fail</infoportion_fail>
-			<function_fail>_m._file_update</function_fail>
+			<!--function_fail>_m._file_update</function_fail-->
 			<article>bar_kvest_friend_of_barman_info</article>
 		</objective>
 		<objective>
@@ -873,7 +873,7 @@
 			<text>bar_kvest_friend_of_barman_2_help</text>
 			<infoportion_complete>bar_kvest_friend_of_barman_spasti_complete</infoportion_complete>
 			<function_complete>tasks_functor.bar_kvest_friend_of_barman_check_status_of_bomb</function_complete>
-			<function_fail>_m._file_update</function_fail>
+			<!--function_fail>_m._file_update</function_fail-->
 		</objective>
 		<objective>
 			<text>bar_kvest_friend_of_barman_2_return</text>
@@ -910,7 +910,7 @@
 	<objective>
 		 <icon>ui_iconsTotal_find_item</icon>
 		 <text>bar_kvest_sdelka_dolg_and_killers_slezhka_text_task</text>
-		<map_location_type hint="bar_barman">blue_location</map_location_type>
+		<map_location_type hint="bar_barmen_name">blue_location</map_location_type>
 		<object_story_id>bar_Barman</object_story_id>
 		 <infoportion_complete>bar_kvest_sdelka_dolg_and_killers_slezhka_complete</infoportion_complete>
 		 <infoportion_fail>bar_kvest_sdelka_dolg_and_killers_plennik_death</infoportion_fail>
@@ -927,11 +927,11 @@
 	<objective>
 		<text>bar_kvest_sdelka_dolg_and_killers_slezhka_text4_task</text>
         <function_complete>tasks_functor.kill_killers_on_sdelka</function_complete>
-				<function_fail>_m._file_update</function_fail>
+				<!--function_fail>_m._file_update</function_fail-->
     </objective>
 	<objective>
 		<text>bar_kvest_sdelka_dolg_and_killers_slezhka_text_task</text>
-		<map_location_type hint="bar_barman">blue_location</map_location_type>
+		<map_location_type hint="bar_barmen_name">blue_location</map_location_type>
 		<object_story_id>bar_Barman</object_story_id>
 		<infoportion_complete>bar_kvest_sdelka_dolg_and_killers_slezhka_complete</infoportion_complete>
 		<infoportion_fail>bar_kvest_sdelka_dolg_and_killers_plennik_death</infoportion_fail>
@@ -979,7 +979,7 @@
 		</objective>
 		<objective>
 			<text>captive_on_agr_mill_base_save_return_to_barman</text>
-			<map_location_type hint="bar_barman">blue_location</map_location_type>
+			<map_location_type hint="bar_barmen_name">blue_location</map_location_type>
 			<object_story_id>bar_Barman</object_story_id>
 			<infoportion_complete>captive_on_agr_mill_base_complete</infoportion_complete>
 		</objective>
@@ -1108,7 +1108,7 @@
 		 <map_location_type hint="esc_kvest_help_teterev_text3_task">blue_location</map_location_type>
 		 <object_story_id>esc_teterev</object_story_id>
 		 <infoportion_complete>esc_kvest_help_teterev_complete</infoportion_complete>
-		 <function_fail>_m._file_update</function_fail>
+		 <!--function_fail>_m._file_update</function_fail-->
 		 <infoportion_fail>esc_kvest_help_teterev_fail</infoportion_fail>
 		 <article>esc_kvest_help_teterev_info</article>
 	</objective>
@@ -1117,7 +1117,7 @@
 		 <map_location_type hint="esc_kvest_help_teterev_text4_task">blue_location</map_location_type>
 		 <object_story_id>esc_bandit_of_teterev_leader</object_story_id>
 		 <function_complete>tasks_functor.take_art_for_teterev</function_complete>
-		  <function_fail>_m._file_update</function_fail>
+		  <!--function_fail>_m._file_update</function_fail-->
     </objective>
 	<objective>
 		<text>esc_kvest_help_teterev_text2_task</text>
@@ -1137,7 +1137,7 @@
 		 <text>esc_kvest_qest_on_elevator_text2_task</text>
 		 <function_complete>tasks_functor.esc_qest_on_elevator_go_to</function_complete>
 		 <infoportion_fail>esc_kvest_qest_on_elevator_chek_fail</infoportion_fail>
-		  <function_fail>_m._file_update</function_fail>
+		  <!--function_fail>_m._file_update</function_fail-->
 		 <article>esc_kvest_qest_on_elevator_chek_info</article>
 	</objective>
 	<objective>
@@ -1189,7 +1189,7 @@
 	<objective>
 		<icon>ui_iconsTotal_find_item</icon>
 		<text>esc_kvest_qest_on_elevator_text6_task</text>
-		<map_location_type hint="bar_barman">blue_location</map_location_type>
+		<map_location_type hint="bar_barmen_name">blue_location</map_location_type>
 		<object_story_id>bar_Barman</object_story_id>
 		<infoportion_complete>esc_kvest_qest_on_elevator_kill_sniper_complete</infoportion_complete>
 		<function_fail>tasks_functor.esc_qest_on_elevator_kill_sniper_fail</function_fail>
@@ -1205,7 +1205,7 @@
 	</objective>
 	<objective>
 		<text>esc_kvest_qest_on_elevator_text6_task</text>
-		<map_location_type hint="bar_barman">blue_location</map_location_type>
+		<map_location_type hint="bar_barmen_name">blue_location</map_location_type>
 		<object_story_id>bar_Barman</object_story_id>
 		<infoportion_complete>esc_kvest_qest_on_elevator_kill_sniper_complete</infoportion_complete>
 		<infoportion_fail>esc_kvest_qest_on_elevator_kill_sniper_fail</infoportion_fail>
@@ -1347,7 +1347,7 @@
 		 <icon>ui_iconsTotal_find_item</icon>
 		 <text>scary_mistery_of_the_yantar_text18_task</text>
 		 <function_complete>tasks_functor.have_zapis_treasure_of_figa</function_complete>
-<function_fail>_m._file_update</function_fail>
+<!--function_fail>_m._file_update</function_fail-->
 		 <article>yan_kvest_help_to_chuk_search_treasure_figa_info</article>
 	</objective>
 	<objective>

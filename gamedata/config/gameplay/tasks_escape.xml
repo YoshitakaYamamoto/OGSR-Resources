@@ -167,7 +167,6 @@
 </game_task>
 
 <!--NEW: first task from trader-->
-
 <game_task id="esc_flash_task" prio="495">
 	<title>tutorial_help_wounded</title>
 	<objective>
@@ -246,10 +245,6 @@
 	</objective>
 </game_task>
 
-
-
-
-
 <!-- DotPack -->
 <game_task id="escape_trader_artnabor" prio="300">
 	<title>escape_trader_artnabor</title>
@@ -293,7 +288,7 @@
 		<map_location_type hint="tolik">green_location</map_location_type>
 		<object_story_id>Escape_tutorial_wounded</object_story_id>
 		<infoportion_complete>find_tolik_vodka</infoportion_complete>
-		<function_fail>ogsm_quests.escape_tasks.tolik_death</function_fail>
+		<function_fail>ogsm_quests.tolik_death</function_fail>
 	</objective>
 </game_task>
 
@@ -937,3 +932,35 @@
 		<infoportion_fail>222</infoportion_fail>
 	</objective>
 </game_task>
+
+<!-- Мирное получение Форта-15 у майора Кузнецова по заданию Сидоровича -->
+<!-- ищем водку и ломоть мяса для Кузнецова -->
+<game_task id="find_af_and_vodka" prio="10">
+    <title>find_af_and_vodka</title>
+    <objective>
+        <icon>ui_iconsTotal_locations</icon>
+        <infoportion_complete>find_af_and_vodka_for_kuzya_done</infoportion_complete>
+		<infoportion_fail>esc_kuzn_killed</infoportion_fail>
+		<article>find_af_and_vodka</article>
+    </objective>
+    <objective>
+        <text>find_af_1</text>
+		<function_complete>escape_dialog.actor_has_af</function_complete>
+		<infoportion_set_complete>actor_fond_af</infoportion_set_complete>
+		<infoportion_fail>esc_kuzn_killed</infoportion_fail>
+    </objective>
+	<objective>
+        <text>find_vodka_1</text>
+		<function_complete>escape_dialog.actor_has_vodka</function_complete>
+		<infoportion_set_complete>actor_fond_vodka</infoportion_set_complete>
+		<infoportion_fail>esc_kuzn_killed</infoportion_fail>
+    </objective>
+    <objective>
+        <text>find_af_and_vodka_1</text>
+		<map_location_type hint="find_af_and_vodka_text">blue_location</map_location_type>
+		<object_story_id>esc_kuznetsov</object_story_id>
+		<infoportion_complete>find_af_and_vodka_for_kuzya_done</infoportion_complete>
+		<infoportion_fail>esc_kuzn_killed</infoportion_fail>
+    </objective>
+</game_task>
+<!-- Мирное получение Форта-15 у майора Кузнецова по заданию Сидоровича -->

@@ -254,3 +254,51 @@
         <object_story_id>dar_codedoor_2</object_story_id>
     </objective>
 </game_task>
+
+<!-- Мирное получение документов у Жеки Дуплета в лаборатории 18 -->
+<!-- ищем золотую рыбку для Жеки Дуплета -->
+<game_task id="find_af_gold_fish" prio="10">
+    <title>find_af_gold_fish</title>
+    <objective>
+        <icon>ui_iconsTotal_artefact</icon>
+        <infoportion_complete>find_af_gold_fish_done</infoportion_complete>
+		<infoportion_fail>dar_explorer_dead</infoportion_fail>
+		<article>find_af_gold_fish</article>
+    </objective>
+    <objective>
+        <text>find_af_gold_fish_1</text>
+		<function_complete>dar_dialogs.explorer_has_af</function_complete>
+		<infoportion_set_complete>dar_explorer_fond_af</infoportion_set_complete>
+		<infoportion_fail>dar_explorer_dead</infoportion_fail>
+    </objective>
+    <objective>
+        <text>find_af_gold_fish_2</text>
+        <icon>ui_iconsTotal_artefact</icon>
+		<infoportion_complete>find_af_gold_fish_done</infoportion_complete>
+		<infoportion_fail>dar_explorer_dead</infoportion_fail>
+    </objective>
+</game_task>
+
+<!-- добываем деньги для Жеки Дуплета -->
+<game_task id="find_money" prio="10">
+    <title>find_money</title>
+    <objective>
+        <icon>ui_iconsTotal_found_money</icon>
+        <infoportion_complete>find_money_done</infoportion_complete>
+		<infoportion_fail>dar_explorer_dead</infoportion_fail>
+		<article>find_money</article>
+    </objective>
+    <objective>
+        <text>find_money_1</text>
+		<function_complete>dar_dialogs.explorer_has_money</function_complete>
+		<infoportion_set_complete>dar_explorer_fond_money</infoportion_set_complete>
+		<infoportion_fail>dar_explorer_dead</infoportion_fail>
+    </objective>
+    <objective>
+        <text>find_money_2</text>
+        <icon>ui_iconsTotal_lost_money</icon>
+		<infoportion_complete>find_money_done</infoportion_complete>
+		<infoportion_fail>dar_explorer_dead</infoportion_fail>
+    </objective>
+</game_task>
+<!-- Мирное получение документов у Жеки Дуплета в лаборатории 18 -->

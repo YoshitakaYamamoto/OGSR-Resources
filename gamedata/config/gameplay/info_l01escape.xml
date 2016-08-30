@@ -473,6 +473,9 @@
 		<task>find_flash_5</task>
 		<action>jekan_work.spawn_esc_digger</action>
 	</info_portion>
+	<info_portion id="talked_with_lukash_about_flash">
+		<action>jekan_work.spawn_flash_5</action>
+	</info_portion>
 	<info_portion id="first_quest_info">
 		<task>find_first_shron</task>
 	</info_portion>
@@ -735,4 +738,23 @@
 		<article>tanya_diary_article_2</article>
 	</info_portion>
 	
+	<info_portion id="odin_raz_i_hvatit"></info_portion>
+	
+	<!-- Мирное получение Форта-15 у майора Кузнецова по заданию Сидоровича -->
+	<info_portion id="find_fort_m1"></info_portion>
+	
+	<info_portion id="find_af_and_vodka_for_kuzya">
+		<task>find_af_and_vodka</task>
+	</info_portion>
+	<info_portion id="esc_actor_has_vodka"></info_portion>
+	<info_portion id="esc_actor_has_af"></info_portion>
+	<info_portion id="actor_fond_vodka">
+		<action>escape_dialog.send_message_vodka</action>
+	</info_portion>
+	<info_portion id="actor_fond_af">
+		<action>escape_dialog.send_message_af_mincer_meat</action>
+	</info_portion>
+	<info_portion id="find_af_and_vodka_for_kuzya_done"></info_portion>
+	<info_portion id="esc_bridge_pass_first"></info_portion>
+	<!-- Мирное получение Форта-15 у майора Кузнецова по заданию Сидоровича -->
 </game_information_portions>

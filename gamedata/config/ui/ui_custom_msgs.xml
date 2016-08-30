@@ -313,7 +313,7 @@
 	</monster_claws>
 	
 	<main_task  x="200" y="120" width="600" height="60" complex_mode="1">
-		<text align="c" font="graffiti32"  r="240" g="217" b="182" a="0"/>
+		<text align="c" font="graffiti32"  r="240" g="217" b="182" a="255"/>
 	</main_task>
 	
 	<main_task_lc  x="200" y="120" width="600" height="60" complex_mode="1">
@@ -515,11 +515,13 @@
         <text x="0" y="0" font="graffiti32" r="216" g="186" b="140" a="200" align="l"/>
     </quicklaunch_hint_9>		
 
-
-
 <blow x="30" y="450" width="32" height="32" stretch="1">
 	<texture>ui\blow</texture>
 	 <text x="40" y="0" r="255" g="128" b="0" a="200" font="graffiti22">Blowout!</text>
 </blow>
-	<!-- Light Scopes-->
+
+<!-- adjust_mode HUD -->		
+	<hud_cross_wpn x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_pricel</texture>
+	</hud_cross_wpn>
 </header>

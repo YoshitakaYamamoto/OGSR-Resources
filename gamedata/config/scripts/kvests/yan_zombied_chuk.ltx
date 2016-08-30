@@ -6,6 +6,7 @@
 active = walker
 combat_ignore = combat_ignore
 on_death = death
+combat_ignore_keep_when_attacked = true
 
 [death]
 on_info = %+yan_kvest_help_to_chuk_death%
@@ -14,7 +15,8 @@ on_info = %+yan_kvest_help_to_chuk_death%
 path_walk = yan_zombied_chuk_walk
 path_look = yan_zombied_chuk_look
 danger = danger_condition
-combat_ignore_cond = {-blalbalbalbalbal}
+combat_ignore_cond = always
+combat_ignore_keep_when_attacked = true
 
 [smart_terrains]
 none = true
@@ -23,4 +25,4 @@ none = true
 ignore_distance = 0
 
 [combat_ignore]
-combat_ignore_cond = {-blalbalbalbalbal}
+combat_ignore = always

@@ -744,6 +744,7 @@
 #include "gameplay\character_criticals_4.xml"
 		<start_dialog>esc_provodnik_start</start_dialog>
 #include "gameplay\character_dialogs_unic.xml"
+		<actor_dialog>dm_dialog_guider_script</actor_dialog>
 
 	</specific_character>				
 
@@ -1953,13 +1954,13 @@
 <!----Торговец оружием и ремонтник в деревне новичков на Кордоне ---->		
 	<specific_character id="esc_guns_remontnik" team_default = "1">
 		<name>esc_guns_remontnik_name</name>
-		<icon>ui_npc_missing</icon> <!--ЗАМЕНИТЬ: новис+маска>-->
+		<icon>ui_npc_esc_guns_remontnik</icon>
 		<map_icon x="0" y="0"></map_icon>
 		<bio>esc_guns_remontnik_bio</bio>
 		<!-- <class>esc_guns_remontnik</class> -->
 		<class>gunstrader</class>
 		<!-- <community>stalker</community> -->	
-		<community>trader</community>
+		<community>gunsmith</community>
 		<rank>693</rank>
 		<reputation>-69</reputation>
 		<money min="100000" max="100000" infinitive="1"/>
@@ -1970,10 +1971,7 @@
 		
 		<supplies>
 			[spawn] \n
-			wpn_pb = 1, prob = 0.99 \n
-
-#include "gameplay\character_drugs.xml" \n
-#include "gameplay\character_food.xml"				
+			wpn_pb = 1, prob = 0.99			
 		</supplies>
 
 #include "gameplay\character_criticals_4.xml"

@@ -2,6 +2,7 @@
 <game_dialogs>
 	<dialog id="kuznetsov_about_job">
 		<precondition>dialogs.is_not_wounded1</precondition>
+		<dont_has_info>odin_raz_i_hvatit</dont_has_info>
 		<phrase_list>
 			<phrase id="1">
 				<text>kuznetsov_about_job_1</text>
@@ -64,6 +65,7 @@
 			</phrase>
 			<phrase id="14">
 				<text>kuznetsov_about_job_14</text>
+				<give_info>odin_raz_i_hvatit</give_info>
 				<action>dialogs.break_dialog</action>
 			</phrase>
 			<phrase id="0">
@@ -1123,6 +1125,7 @@
 	</dialog>
 	<dialog id="find_vodka">
 		<precondition>ogsm_quests.has_five_vodkas</precondition>
+		<has_info>look_tolik_vodka</has_info>
 		<dont_has_info>find_tolik_vodka</dont_has_info>
 		<phrase_list>
 			<phrase id="1">
@@ -2383,6 +2386,7 @@
 			</phrase>
 		</phrase_list>
 	</dialog>
+	<!-- Мирное получение Форта-15 у майора Кузнецова по заданию Сидоровича -->
 	<dialog id="esc_bridge_soldiers_start">
 		<precondition>dialogs.is_not_wounded1</precondition>
 		<phrase_list>
@@ -2405,12 +2409,179 @@
 			<phrase id="15">
 				<text>esc_bridge_soldiers_start_15</text>
 			</phrase>
+			<phrase id="12_1">
+				<precondition>escape_dialog.actor_dont_has_fort_m1</precondition>
+				<dont_has_info>find_af_and_vodka_for_kuzya</dont_has_info>
+				<dont_has_info>find_af_and_vodka_for_kuzya_done</dont_has_info>
+				<disable_info>esc_actor_has_af</disable_info>
+				<disable_info>esc_actor_has_vodka</disable_info>
+				<action>escape_dialog.actor_has_af</action>
+				<action>escape_dialog.actor_has_vodka</action>
+				<text>esc_bridge_soldiers_start_12_1</text>
+				<next>12_2</next>
+			</phrase>
+			<phrase id="12_2">
+				<text>esc_bridge_soldiers_start_12_2</text>
+				<next>12_3</next>
+			</phrase>
+			<phrase id="12_3">
+				<text>esc_bridge_soldiers_start_12_3</text>
+				<next>12_4</next>
+			</phrase>
+			<phrase id="12_4">
+				<text>esc_bridge_soldiers_start_12_4</text>
+				<next>12_5</next>
+			</phrase>
+			<phrase id="12_5">
+				<text>esc_bridge_soldiers_start_12_5</text>
+				<next>12_6</next>
+			</phrase>
+			<phrase id="12_6">
+				<text>esc_bridge_soldiers_start_12_6</text>
+				<next>12_7</next>
+				<next>12_8</next>
+				<next>12_9</next>
+				<next>12_10</next>
+			</phrase>
+			<phrase id="12_7">
+				<dont_has_info>esc_actor_has_af</dont_has_info>
+				<dont_has_info>esc_actor_has_vodka</dont_has_info>
+				<text>esc_bridge_soldiers_start_12_7</text>
+				<next>12_11</next>
+			</phrase>
+			<phrase id="12_8">
+				<has_info>esc_actor_has_af</has_info>
+				<has_info>esc_actor_has_vodka</has_info>
+				<text>esc_bridge_soldiers_start_12_8</text>
+				<give_info>find_af_and_vodka_for_kuzya_done</give_info>
+				<action>escape_dialog.actor_take_away_af_and_vodka</action>
+				<next>12_12</next>
+			</phrase>
+			<phrase id="12_9">
+				<has_info>esc_actor_has_af</has_info>
+				<dont_has_info>esc_actor_has_vodka</dont_has_info>
+				<text>esc_bridge_soldiers_start_12_7</text>
+				<next>12_11</next>
+			</phrase>
+			<phrase id="12_10">
+				<dont_has_info>esc_actor_has_af</dont_has_info>
+				<has_info>esc_actor_has_vodka</has_info>
+				<text>esc_bridge_soldiers_start_12_7</text>
+				<next>12_11</next>
+			</phrase>
+			<phrase id="12_11">
+				<text>esc_bridge_soldiers_start_12_9</text>
+				<give_info>find_af_and_vodka_for_kuzya</give_info>
+			</phrase>
+			<phrase id="12_12">
+				<text>esc_bridge_soldiers_start_12_10</text>
+				<action>escape_dialog.esc_kuzia_give_away_fort_m1</action>
+				<next>12_13</next>
+			</phrase>
+			<phrase id="12_13">
+				<text>esc_bridge_soldiers_start_12_11</text>
+				<disable_info>find_af_and_vodka_for_kuzya</disable_info>
+				<disable_info>esc_actor_has_vodka</disable_info>
+				<disable_info>esc_actor_has_af</disable_info>
+				<disable_info>actor_fond_vodka</disable_info>
+				<disable_info>actor_fond_af</disable_info>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+			<phrase id="12_21">
+				<has_info>find_af_and_vodka_for_kuzya</has_info>
+				<dont_has_info>find_af_and_vodka_for_kuzya_done</dont_has_info>
+				<disable_info>esc_actor_has_af</disable_info>
+				<disable_info>esc_actor_has_vodka</disable_info>
+				<action>escape_dialog.actor_has_af</action>
+				<action>escape_dialog.actor_has_vodka</action>
+				<text>esc_bridge_soldiers_start_12_21</text>
+				<next>12_22</next>
+				<next>12_23</next>
+				<next>12_24</next>
+				<next>12_25</next>
+			</phrase>
+			<phrase id="12_22">
+				<has_info>esc_actor_has_af</has_info>
+				<dont_has_info>esc_actor_has_vodka</dont_has_info>
+				<text>esc_bridge_soldiers_start_12_22</text>
+			</phrase>
+			<phrase id="12_23">
+				<dont_has_info>esc_actor_has_af</dont_has_info>
+				<has_info>esc_actor_has_vodka</has_info>
+				<text>esc_bridge_soldiers_start_12_23</text>
+			</phrase>
+			<phrase id="12_24">
+				<dont_has_info>esc_actor_has_af</dont_has_info>
+				<dont_has_info>esc_actor_has_vodka</dont_has_info>
+				<text>esc_bridge_soldiers_start_12_24</text>
+			</phrase>
+			<phrase id="12_25">
+				<has_info>esc_actor_has_af</has_info>
+				<has_info>esc_actor_has_vodka</has_info>
+				<text>esc_bridge_soldiers_start_12_25</text>
+				<next>12_26</next>
+			</phrase>
+			<phrase id="12_26">
+				<text>esc_bridge_soldiers_start_12_26</text>
+				<give_info>find_af_and_vodka_for_kuzya_done</give_info>
+				<action>escape_dialog.actor_take_away_af_and_vodka</action>
+				<next>12_12</next>
+			</phrase>
 			<phrase id="24">
 				<text>esc_bridge_soldiers_start_24</text>
 				<next>25</next>
 			</phrase>
 			<phrase id="25">
 				<text>esc_bridge_soldiers_start_25</text>
+			</phrase>
+			<phrase id="32">
+				<text>esc_bridge_soldiers_start_32</text>
+				<next>33</next>
+				<next>35</next>
+			</phrase>
+			<phrase id="33">
+				<dont_has_info>esc_bridge_pass_first</dont_has_info>
+				<text>esc_bridge_soldiers_start_33</text>
+				<next>34</next>
+			</phrase>
+			<phrase id="34">
+				<text>esc_bridge_soldiers_start_34</text>
+				<give_info>esc_bridge_pass_on</give_info>
+				<give_info>esc_bridge_pass_first</give_info>
+				<next>37</next>
+			</phrase>
+			<phrase id="35">
+				<has_info>esc_bridge_pass_first</has_info>
+				<text>esc_bridge_soldiers_start_35</text>
+				<next>36</next>
+				<next>38</next>
+			</phrase>
+			<phrase id="36">
+				<text>esc_bridge_soldiers_start_36</text>
+				<precondition>escape_dialog.has_soldiers_bribe</precondition>
+				<action>escape_dialog.give_soldiers_bribe</action>
+				<give_info>esc_bridge_pass_on</give_info>
+				<next>37</next>
+			</phrase>
+			<phrase id="37">
+				<text>esc_bridge_soldiers_start_37</text>
+			</phrase>
+			<phrase id="38">
+				<text>esc_bridge_soldiers_start_38</text>
+				<next>39</next>
+			</phrase>
+			<phrase id="39">
+				<text>esc_bridge_soldiers_start_39</text>
+			</phrase>
+			<phrase id="3">
+				<text/>
+				<dont_has_info>esc_bridge_pass_on</dont_has_info>
+				<has_info>find_af_and_vodka_for_kuzya_done</has_info>
+				<next>31</next>
+			</phrase>
+			<phrase id="31">
+				<text>esc_bridge_soldiers_start_31</text>
+				<next>32</next>
 			</phrase>
 			<phrase id="2">
 				<text/>
@@ -2419,23 +2590,35 @@
 			</phrase>
 			<phrase id="21">
 				<text>esc_bridge_soldiers_start_21</text>
+				<next>12_1</next>
+				<next>12_21</next>
+				<next>22</next>
+			</phrase>
+			<phrase id="22">
+				<text>esc_bridge_soldiers_start_22</text>
+				<action>dialogs.break_dialog</action>
 			</phrase>
 			<phrase id="11">
 				<text>esc_bridge_soldiers_start_11</text>
 				<next>12</next>
+				<next>12_1</next>
+				<next>12_21</next>
 			</phrase>
 			<phrase id="1">
 				<text/>
 				<dont_has_info>esc_bridge_pass_on</dont_has_info>
+				<dont_has_info>find_af_and_vodka_for_kuzya_done</dont_has_info>
 				<next>11</next>
 			</phrase>
 			<phrase id="0">
 				<text/>
 				<next>1</next>
 				<next>2</next>
+				<next>3</next>
 			</phrase>
 		</phrase_list>
 	</dialog>
+	<!-- Мирное получение Форта-15 у майора Кузнецова по заданию Сидоровича -->
 	<dialog id="escape_lager_volk_info">
 		<has_info>esc_kill_bandits_quest_done</has_info>
 		<precondition>task_manager.wolf_is_on_cordon</precondition>
@@ -3295,7 +3478,7 @@
 			<phrase id="5">
 				<text>escape_trader_start_dialog_5</text>
 				<next>52</next>
-				<!-- Есть флэшка -->
+				<!-- Есть флешка -->
 				<next>56</next>
 				<!-- Нету флэшки -->
 			</phrase>
@@ -3543,7 +3726,7 @@
 			</phrase>
 			<phrase id="77122">
 				<text>escape_trader_start_dialog_77122</text>
-				<!--action>ogse.give_binocl_to_actor</action-->
+				<action>ogse.give_binocl_to_actor</action>
 				<give_info>wolf_start_dialogs</give_info>
 				<next>1012</next>
 			</phrase>
@@ -3586,7 +3769,7 @@
 			</phrase>
 			<phrase id="77151">
 				<text>escape_trader_start_dialog_77151</text>
-				<!--action>ogse.give_binocl_to_actor</action-->
+				<action>ogse.give_binocl_to_actor</action>
 				<next>1012</next>
 			</phrase>
 			<phrase id="132453">
@@ -6051,4 +6234,3 @@
 		</phrase_list>
 	</dialog>
 </game_dialogs>
-

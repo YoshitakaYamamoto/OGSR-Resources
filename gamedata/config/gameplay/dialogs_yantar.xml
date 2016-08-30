@@ -1091,7 +1091,7 @@
 	<dialog id="teleport_trap_research_art_dialog">
 		<has_info>yan_kill_brain_done</has_info>
 		<dont_has_info>ogse_teleport_trap_research_art_start</dont_has_info>
-		<dont_has_info>ogse_teleport_trap_quest_denied</dont_has_info>
+		<!--dont_has_info>ogse_teleport_trap_quest_denied</dont_has_info-->
 		<phrase_list>
 			<phrase id="0">
 				<text>teleport_trap_research_art_dialog_0</text>
@@ -1126,7 +1126,7 @@
 			</phrase>
 			<phrase id="321">
 				<text>teleport_trap_research_art_dialog_321</text>
-				<give_info>ogse_teleport_trap_quest_denied</give_info>
+				<!--give_info>ogse_teleport_trap_quest_denied</give_info-->
 			</phrase>
 		</phrase_list>
 	</dialog>
@@ -1167,7 +1167,7 @@
 -->
 	<dialog id="teleport_trap_catch_art_dialog">
 		<has_info>ogse_teleport_trap_research_art_actor_finish_dead_zone</has_info>
-		<dont_has_info>ogse_teleport_trap_quest_denied</dont_has_info>
+		<!--dont_has_info>ogse_teleport_trap_quest_denied</dont_has_info-->
 		<dont_has_info>ogse_teleport_trap_catch_art_start</dont_has_info>
 		<phrase_list>
 			<phrase id="0">
@@ -1219,7 +1219,7 @@
 				<text>teleport_trap_catch_art_711</text>
 			</phrase>
 			<phrase id="721">
-				<give_info>ogse_teleport_trap_quest_denied</give_info>
+				<!--give_info>ogse_teleport_trap_quest_denied</give_info-->
 				<text>teleport_trap_catch_art_721</text>
 			</phrase>
 		</phrase_list>

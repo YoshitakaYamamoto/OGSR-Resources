@@ -204,6 +204,7 @@ repair_compatibility     = light_outfit
 
 additional_inventory_weight		= 70
 additional_inventory_weight2	= 80
+without_exoskeleton = novice_outfit				;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [novice_outfit_exo2_repair]:novice_outfit_repair
@@ -328,8 +329,8 @@ repair_compatibility     = light_outfit
 tech_complication          = 110
 
 ; Параметры для экзоскелетов
-;exo1 = outfit_bandit_m1_exo1
-;exo2 = outfit_bandit_m1_exo2
+exo1 = outfit_bandit_m1_exo1
+exo2 = outfit_bandit_m1_exo2
 
 [outfit_bandit_m1_repair]:novice_outfit_repair
 
@@ -385,6 +386,7 @@ tech_complication          = 110
 
 additional_inventory_weight = 70
 additional_inventory_weight2 = 80
+without_exoskeleton = outfit_bandit_m1			;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [outfit_bandit_m1_exo2_repair]:novice_outfit_repair
@@ -424,7 +426,7 @@ chemical_burn_protection	=	0.35
 strike_protection	=	0.35
 wound_protection	=	0.38
 explosion_protection	=	0.4
-fire_wound_protection	=	0.27 ;fake parameter real values in bones_koeff_protection below
+fire_wound_protection	=	0.29 ;fake parameter real values in bones_koeff_protection below
 
 bones_koeff_protection = gilet_antigas_damage
 
@@ -505,6 +507,7 @@ repair_compatibility     = heavy_outfit
 
 additional_inventory_weight = 70
 additional_inventory_weight2 = 80
+without_exoskeleton = stalker_outfit			;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [stalker_outfit_exo2_repair]:stalker_outfit_repair
@@ -588,6 +591,8 @@ repair_compatibility     = heavy_outfit
 
 additional_inventory_weight = 70
 additional_inventory_weight2 = 80
+without_exoskeleton = outfit_stalker_m1					;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
+
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [outfit_stalker_m1_exo2_repair]:stalker_outfit_repair
@@ -608,8 +613,8 @@ inv_grid_y						= 27
 cost				= 31240
 
 power_loss      = 0.7
-additional_inventory_weight = 10
-additional_inventory_weight2 = 10
+additional_inventory_weight = 15
+additional_inventory_weight2 = 15
 
 ; Параметры для ремонта
 tech_complication          = 800
@@ -636,6 +641,7 @@ description			= stalker_outfit_exo1_description_m2
 full_icon_name		= npc_icon_outfit_stalker_m2_exo1
 cost				= 43240
 
+fire_wound_protection	=	0.36
 strike_protection	=	0.38
 wound_protection	=	0.4
 
@@ -676,6 +682,8 @@ repair_compatibility     = heavy_outfit
 
 additional_inventory_weight = 80
 additional_inventory_weight2 = 90
+without_exoskeleton = outfit_stalker_m2					;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
+
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [stalker_outfit_m2_exo2_repair]:outfit_stalker_m2_repair
@@ -914,8 +922,8 @@ description			= dolg_outfit_exo1_description
 full_icon_name		= npc_icon_dolg_outfit_exo1
 cost				= 40400
 
-strike_protection	=	0.39
-wound_protection	=	0.41
+strike_protection	=	0.4
+wound_protection	=	0.42
 
 power_loss      = 0.11
 additional_inventory_weight = 50
@@ -954,6 +962,8 @@ repair_compatibility     = heavy_outfit
 
 additional_inventory_weight = 70
 additional_inventory_weight2 = 80
+without_exoskeleton = dolg_outfit					;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
+
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [dolg_outfit_exo2_repair]:dolg_outfit_repair
@@ -976,7 +986,7 @@ full_icon_name		= npc_icon_dolg_outfit_m1
 cost				= 32340
 
 burn_protection	=	0.24
-strike_protection	=	0.38
+strike_protection	=	0.4
 wound_protection	=	0.61
 explosion_protection	=	0.44
 
@@ -1047,6 +1057,8 @@ repair_compatibility    = heavy_outfit
 
 additional_inventory_weight = 80
 additional_inventory_weight2 = 90
+without_exoskeleton = outfit_dolg_m1					;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
+
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [outfit_dolg_m1_exo2_repair]:outfit_dolg_m1_repair
@@ -1161,6 +1173,8 @@ repair_compatibility     = heavy_outfit
 
 additional_inventory_weight = 70
 additional_inventory_weight2 = 80
+without_exoskeleton = svoboda_heavy_outfit		;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
+
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [svoboda_heavy_outfit_exo2_repair]:svoboda_heavy_outfit_repair
@@ -1202,7 +1216,7 @@ chemical_burn_protection	=	0.3
 strike_protection	=	0.5
 wound_protection	=	0.53
 explosion_protection	=	0.40
-fire_wound_protection	=	0.28 ;fake parameter real values in bones_koeff_protection below
+fire_wound_protection	=	0.33 ;fake parameter real values in bones_koeff_protection below
 
 bones_koeff_protection = gilet_antigas_damage
 
@@ -1275,6 +1289,8 @@ repair_compatibility     = middle_outfit
 
 additional_inventory_weight = 70
 additional_inventory_weight2 = 80
+without_exoskeleton = killer_outfit				;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
+
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [killer_outfit_exo2_repair]:killer_outfit_repair
@@ -1367,6 +1383,8 @@ tech_complication          = 1200
 
 additional_inventory_weight = 70
 additional_inventory_weight2 = 80
+without_exoskeleton = outfit_killer_m1			;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
+
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [outfit_killer_m1_exo2_repair]:killer_outfit_repair
@@ -1481,6 +1499,8 @@ repair_compatibility     = heavy_outfit
 
 additional_inventory_weight = 70
 additional_inventory_weight2 = 80
+without_exoskeleton = monolit_outfit			;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
+
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [monolit_outfit_exo2_repair]:monolit_outfit_repair
@@ -1527,7 +1547,7 @@ full_icon_name		= npc_icon_monolit_outfit_m1_exo1
 cost				= 66740
 
 strike_protection	=	0.38
-wound_protection	=	0.4
+wound_protection	=	0.42
 
 power_loss      = 0.12
 additional_inventory_weight = 50
@@ -1565,6 +1585,8 @@ repair_compatibility     = heavy_outfit
 
 additional_inventory_weight = 70
 additional_inventory_weight2 = 80
+without_exoskeleton = monolit_outfit_m1			;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
+
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [monolit_outfit_m1_exo2_repair]:monolit_outfit_m1_repair
@@ -1709,10 +1731,10 @@ shock_protection	=	0.87
 radiation_protection	=	0.9
 telepatic_protection	=	0.7
 chemical_burn_protection	=	0.93
-strike_protection	=	0.3
-wound_protection	=	0.33
-explosion_protection	=	0.37
-fire_wound_protection	=	0.40 ;fake parameter real values in bones_koeff_protection below
+strike_protection	=	0.32
+wound_protection	=	0.34
+explosion_protection	=	0.38
+fire_wound_protection	=	0.38 ;fake parameter real values in bones_koeff_protection below
 
 bones_koeff_protection = kombez_kupol_damage
 
@@ -1770,7 +1792,7 @@ chemical_burn_protection	=	0.2
 strike_protection	=	0.43
 wound_protection	=	0.40
 explosion_protection	=	0.35
-fire_wound_protection	=	0.27 ;fake parameter real values in bones_koeff_protection below
+fire_wound_protection	=	0.29 ;fake parameter real values in bones_koeff_protection below
 
 bones_koeff_protection = gilet_mask_damage
 
@@ -1851,6 +1873,8 @@ repair_compatibility     = middle_outfit
 
 additional_inventory_weight = 70
 additional_inventory_weight2 = 80
+without_exoskeleton = soldier_outfit		;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
+
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [soldier_outfit_exo2_repair]:soldier_outfit_repair
@@ -1889,8 +1913,8 @@ telepatic_protection	=	0.1
 chemical_burn_protection	=	0.4
 strike_protection	=	0.7
 wound_protection	=	0.73
-explosion_protection	=	0.45
-fire_wound_protection	=	0.40 ;fake parameter real values in bones_koeff_protection below
+explosion_protection	=	0.46
+fire_wound_protection	=	0.45 ;fake parameter real values in bones_koeff_protection below
 
 bones_koeff_protection = kombez_helmet_damage
 
@@ -1966,6 +1990,8 @@ repair_compatibility     = heavy_outfit
 
 additional_inventory_weight = 70
 additional_inventory_weight2 = 80
+without_exoskeleton = specops_outfit			;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
+
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [specops_outfit_exo2_repair]:specops_outfit_repair
@@ -2049,6 +2075,8 @@ repair_compatibility     = heavy_outfit
 
 additional_inventory_weight = 70
 additional_inventory_weight2 = 80
+without_exoskeleton = outfit_specnaz_m1			;формат записи параметра: without_exoskeleton = секция костюма, получаемого при демонтаже экзокаркаса
+
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [outfit_specnaz_m1_exo2_repair]:outfit_specnaz_m1_repair
@@ -2107,7 +2135,7 @@ strike_immunity				= 0.007
 telepatic_immunity			= 0.00
 wound_immunity				= 0.01
 explosion_immunity			= 0.01
-fire_wound_immunity			= 0.015
+fire_wound_immunity			= 0.013
 
 [military_outfit_repair]
 tech_complication          = 850

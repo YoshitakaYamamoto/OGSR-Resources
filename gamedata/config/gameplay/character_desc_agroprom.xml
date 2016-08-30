@@ -71,6 +71,9 @@
 		<actor_dialog>agr_krot_find_ammo_box_find</actor_dialog>
 		<actor_dialog>agr_krot_find_ammo_box_end</actor_dialog>
 		<actor_dialog>agr_krot_find_ammo_box_give</actor_dialog>
+<!-- Выдача переходов на Топь Кротом, если погиб Дезертир -->
+		<actor_dialog>agr_krot_give_info_about_lc</actor_dialog>
+<!-- Выдача переходов на Топь Кротом, если погиб Дезертир -->
 #include "gameplay\character_dialogs_unic.xml"		
 	</specific_character>
 
@@ -396,7 +399,7 @@
 		<supplies>
 			[spawn] \n
 			wpn_ak74n_ak74n30_ironsight \n
-			ammo_5.45x39_ap \n
+			ammo_5.45x39_fmj \n
 			wpn_pm \n
 			ammo_9x18_pmm \n
 			grenade_f1 = 2 \n
@@ -463,7 +466,7 @@
 		<supplies>
 			[spawn] \n
 			wpn_ak74n_ak74n30_ironsight \n
-			ammo_5.45x39_ap \n
+			ammo_5.45x39_fmj \n
 			wpn_pm \n
 			ammo_9x18_pmm \n
 			grenade_f1 = 2 \n
@@ -564,7 +567,7 @@
 		<supplies>
 			[spawn] \n
 			wpn_ak74n_ak74n30_ironsight \n
-			ammo_5.45x39_ap \n
+			ammo_5.45x39_fmj \n
 			wpn_pm \n
 			ammo_9x18_pmm \n
 			grenade_f1 = 2 \n
@@ -597,7 +600,7 @@
 		<supplies>
 			[spawn] \n
 			wpn_ak74n_ak74n30_ironsight \n
-			ammo_5.45x39_ap \n
+			ammo_5.45x39_fmj \n
 			wpn_pm \n
 			ammo_9x18_pmm \n
 			grenade_f1 = 2 \n
@@ -977,7 +980,7 @@
 	wpn_saiga12c \n
 	ammo_12x70_kart \n
 	wpn_ak102_ak10230_stok_kobra \n
-	ammo_5.45x39_ap \n
+	ammo_5.56x45_ap \n
 	device_torch \n
 #include "gameplay\character_drugs.xml"
 	</supplies>

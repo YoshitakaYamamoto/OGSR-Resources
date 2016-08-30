@@ -212,5 +212,11 @@
 	
     <info_portion id="agr_military_trader_intro">
 	</info_portion>	 		
-		 
+	
+	<!-- Выдача переходов на Топь Кротом, если погиб Дезертир -->
+	<info_portion id="agr_krot_give_info_about_lc">
+		<action>tasks_functor.agr_swamp_ratcatcher_spawn_report_about_lc</action>
+		<task>agr_help_krot_give_info_about_lc</task>
+	</info_portion>
+	<!-- Выдача переходов на Топь Кротом, если погиб Дезертир -->
 </game_information_portions>

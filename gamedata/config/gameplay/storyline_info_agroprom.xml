@@ -40,6 +40,9 @@
      <article id="agr_find_ghost_descr" name="agr_find_ghost" article_type="task" group="agr_find_ghost/0">
         <text>agr_find_ghost_descr</text>
     </article>
-
-
-  
+	
+	<!-- Выдача переходов на Топь Кротом, если погиб Дезертир -->
+	<article id="agr_help_krot_info_about_lc" name="agr_dezerter_report_read" article_type="task" group="agr_help_krot_give_info_about_lc/0">
+		<text>agr_help_krot_info_about_lc_descr</text>
+	</article>
+	<!-- Выдача переходов на Топь Кротом, если погиб Дезертир -->

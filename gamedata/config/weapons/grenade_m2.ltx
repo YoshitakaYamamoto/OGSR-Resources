@@ -20,15 +20,16 @@ inv_weight			    = 0.35
 cost					= 100
 
 ;------------------------------ O.G.S.E. sound remake -----------------------
-snd_checkout = weapons\grenade\grenade_checkout
+snd_checkout = weapons\grenade\grenade_checkout, 0.5
+;раста snd_checkout 	= weapons\generic_checkout
 ;----------------------------------------------------------------------------
 
 force_min			= 10	; ~30% от максимума
-force_const			= 25 ;20
-force_max			= 40 ;30
-force_grow_speed		= 17.5 ;2 ;30
+force_const			= 25
+force_max			= 40
+force_grow_speed	= 17.5
 
-destroy_time			= 2500;3500
+destroy_time		= 2500
 
 wm_size             = 0.1
 
@@ -65,18 +66,27 @@ anim_throw_idle		= attack_0_idle
 anim_throw_act		= attack_0_act	
 anim_throw_end		= attack_0_end
 
+
+
+
 ;-----------------------------------------------------------------------------------
 ; Ручная противопехотная граната оборонительного типа Ф-1 "лимонка"
-;-----------------------------------------------------------------------------------
+; общий все гранаты с запалом 	600 гр
+; заряд ВВ - тротил 			60 гр
+; возможная дальность броска	30-45 м
+; разлет осколков				30 м
+; задержка перед взрывом 		3.2 - 4.2 сек
+; количество осколков			до 200 шт
+;---------------------------------------------------
 [grenade_f1]:grenade_hand
 grenade_remove_time		= 60000
 detonation_threshold_hit= 200
 $spawn 					= "weapons\grenades_f1"
-visual					= weapons\grenade\wpn_f_1.ogf
-inv_name				= grenade-f1
-inv_name_short			= grenade-f1
+visual					= weapons\grenade\wpn_f1.ogf
+inv_name				= grenade-f_1
+inv_name_short			= grenade-f_1_s
 inv_weight				= 0.63
-description				= enc_weapons1_grenade-f1
+description				= enc_weapons1_grenade-f_1
 
 inv_grid_x				= 9
 inv_grid_y				= 9
@@ -90,9 +100,9 @@ hud						= grenade_f1_hud
 
 cost					= 400 ;80
 
-blast					= 20 ;2
+blast					= 20
 blast_r					= 10
-blast_impulse			= 150 ;350
+blast_impulse			= 150	;350
 ;delete
 blast_impulse_factor	 = 1
 
@@ -102,11 +112,12 @@ frag_hit				= 1.7
 frag_hit_impulse		= 300
 
 hit_type_blast			= explosion
-hit_type_frag			= explosion
+hit_type_frag			= explosion	;fire_wound
 
 up_throw_factor			= 1.2
 
 explode_particles		= nc\grenade_full
+;раста explode_particles	= explosions\explosion_01
 
 light_color		        = 1.9,1.4,0.5
 light_range		        = 25.0
@@ -118,23 +129,48 @@ explode_duration		= 3		;подолжительность взрыва (с)
 
 ;------------------------------ O.G.S.E. sound remake -----------------------
 ;звуки
-snd_explode  = weapons\grenade\grenade_f1
+;snd_explode  = weapons\grenade\grenade_f1
+snd_explode 	= weapons\explo\t_f1_explosion
 ;----------------------------------------------------------------------------
 
 [grenade_f1_hud]:grenade_hand_hud
-visual              = weapons\grenade\wpn_f_1_hud.ogf
+visual              		= weapons\grenade\wpn_f1_hud.ogf
+
+orientation         		= -4.399999,1.0,-2.0
+position            		= -0.0965,-0.163,0.131
+
+fire_point					= 0,0,0
+fire_bone					= wpn_body
+
+anim_show					= draw
+anim_hide					= holster
+anim_idle					= idle
+anim_playing				= idle
+anim_throw_begin			= throw_begin
+anim_throw_idle				= throw_idle
+anim_throw_act				= act	
+anim_throw_end				= end
+anim_idle_sprint    		= idle_sprint
+
+
 
 ;-----------------------------------------------------------------------------------
 ; Ручная противопехотная граната наступательного типа РГД-5
-;-----------------------------------------------------------------------------------
+; общий все гранаты с запалом 		400 гр
+; заряд ВВ - тротил 			110
+; возможная дальность броска		40-50 м
+; разлет осколков			25 м
+; задержка перед взрывом 		3.5 - 4.5 сек
+;---------------------------------------------------
+
 [grenade_rgd5]:grenade_hand
 $spawn 				= "weapons\grenades\rgd5"
 class				= G_RGD5
-visual				= weapons\grenade\wpn_rgd_5.ogf
-inv_name			= grenade-rgd5
-inv_name_short		= grenade-rgd5
+visual				= weapons\grenade\wpn_rgd5.ogf
+inv_name			= grenade-rgd_5
+inv_name_short		= grenade-rgd_5_s
 inv_weight			= 0.31
-description			= enc_weapons1_grenade-rgd5
+description			= enc_weapons1_grenade-rgd_5
 
 inv_grid_x			= 10
 inv_grid_y			= 9
@@ -146,26 +182,27 @@ kill_msg_height		= 23
 
 hud			= grenade_rgd5_hud
 force_max		= 30
-force_grow_speed	= 15;2 ;30
+force_grow_speed	= 15
 
 cost			= 300
-blast			= 15 ;1.50
+blast			= 15
 blast_r			= 7
-blast_impulse		= 150 ;350
+blast_impulse	= 150
 ;delete
 blast_impulse_factor = 1
 
-frags			= 20 ;12
+frags			= 20
 frags_r			= 25
 frag_hit		= 1.5
 frag_hit_impulse	= 240
 
 hit_type_blast		= explosion
-hit_type_frag		= explosion
+hit_type_frag		= fire_wound
 
 up_throw_factor		 = 1.2
 
 explode_particles		= nc\grenade_full
+;раста explode_particles	= explosions\explosion_01
 
 light_color		         = 1.9,1.4,0.5
 light_range		         = 14.0
@@ -178,7 +215,8 @@ explode_duration		 = 5		;подолжительность взрыва (с)
 
 ;------------------------------ O.G.S.E. sound remake -----------------------
 ;звуки
-snd_explode  = weapons\grenade\grenade_rgd5
+;snd_explode  = weapons\grenade\grenade_rgd5
+snd_explode 	= weapons\explo\t_rgd5_explosion
 ;----------------------------------------------------------------------------   
 
 wm_size                  = 0.3
@@ -187,62 +225,125 @@ grenade_remove_time		= 60000
 detonation_threshold_hit	= 350
 
 [grenade_rgd5_hud]:grenade_hand_hud
-position            = 0,0,0
-visual              = weapons\grenade\wpn_rgd_5_hud.ogf
+visual              		= weapons\grenade\wpn_rgd5_hud.ogf
+orientation         		= -4.399999,1.0,-2.0
+position            		= -0.0965,-0.163,0.131
+
+fire_point					= 0,0,0
+fire_bone					= wpn_body
+
+throw_point					= 0.0,0.4,0.3
+throw_dir					= 0,0,1
+
+anim_show					= draw
+anim_hide					= holster
+anim_idle					= idle
+anim_playing				= idle
+anim_throw_begin			= throw_begin
+anim_throw_idle				= throw_idle
+anim_throw_act				= act	
+anim_throw_end				= end
+anim_idle_sprint    		= idle_sprint
+
+
+
 
 ;-----------------------------------------------------------------------------------
 ; Осветительная граната ГО
+;Ручная светозвуковая граната «Заря-2»
+;МГИФ.771913.041, запал У-515 (унифицирован с УЗРГМ-2), осколочное и термическое воздействие, светозвуковой состав (88-40)
+;Калий хлорнокислый...................................KClO4.......63%
+;Порошок алюминиевый АСД-1...................Al.Mg.......37%
+;На поверхности корпуса имеется маркировка, нанесенная эмалью белого цвета или краской черного цвета и содержащая название гранаты: "Заря-2", а также информацию о порядковом номере изделия в партии, номере партии, в составе которой изготовлено изделие, годе изготовления изделия (две последние цифры).
+;Масса, кг - 0,175
+;Звуковое давление на расстоянии 10 м, дБ - до 180
+;Сила света, кд - до 30 млн.
+;Время замедления, с. - 4+1
 ;-----------------------------------------------------------------------------------
 [grenade_light]:grenade_hand
 $spawn			= "weapons\grenades\light"
-visual			= weapons\grenade\wpn_gr_light.ogf
-inv_name		= st_grenade_light
-inv_name_short	= st_grenade_lights
-description		= enc_weapons1_grenade_light
-inv_grid_x		= 20
-inv_grid_y		= 3
+;visual			= weapons\grenade\wpn_gr_light.ogf
+visual						= weapons\grenade\wpn_zarya2.ogf
+inv_name		= grenade-light
+inv_name_short	= grenade-light_s
+description		= enc_weapons1_grenade-light
+inv_weight					= 0.63
+inv_grid_x		= 78	;20
+inv_grid_y		= 6		;3
 
 hud			= grenade_light_hud
 
 cost			= 200
 
-blast			= 0
-blast_r			= 0
-blast_impulse		= 0
+blast			= 0			;3.20
+blast_r			= 0			;8
+blast_impulse	= 0			;350
 ;delete
-blast_impulse_factor	= 0
+blast_impulse_factor	= 0	;1
 
-frags			= 0
-frags_r			= 0
-frag_hit		= 0
-frag_hit_impulse	= 0
+frags			= 0			;300
+frags_r			= 0			;40
+frag_hit		= 0			;2.8
+frag_hit_impulse	= 0		;240
 
-hit_type_blast		= strike
-hit_type_frag		= explosion
+hit_type_blast		= strike	;explosion
+hit_type_frag		= explosion	;fire_wound
 
-up_throw_factor		= 0
+up_throw_factor		= 0		;1.2
 
 explode_particles	= anomaly2\artefact\artefact_gravi
+;раста explode_particles			= explosions\explosion_01
 
 light_color		= 1.4,1.6,1.5
 light_range		= 50
 light_time		= 47
 
+;раста
+;light_color		         	= 1.9,1.4,0.5
+;light_range		         	= 25.0
+;light_time 		         	= 0.85
+
 ;трассы от осколков
 fragment_speed		= 50
 
 hide_in_explosion	= false
-explode_duration	= 40	;подолжительность взрыва (с)
+explode_duration	= 40	;3	;прдолжительность взрыва (с)
 explode_hide_duration	= 40	;время, через которое гранату надо сделать невидимой (с)
 dynamic_explosion_particles = true
 
 ;------------------------------------------------------------------------------------------
 ;звук
 snd_explode		= anomaly\bfuzz_blowout
+;раста
+;snd_explode 	= weapons\explo\t_f1_explosion
 ;------------------------------------------------------------------------------------------
 
+
 [grenade_light_hud]:grenade_hand_hud
-visual			= weapons\grenade\wpn_gr_light_hud.ogf
+fire_point					= 0,0,0
+fire_bone					= wpn_body
+
+orientation         		= -4.399999,1.0,-2.0
+position            		= -0.0965,-0.163,0.131
+
+;visual			= weapons\grenade\wpn_gr_light_hud.ogf
+visual              		= weapons\grenade\wpn_zarya2_hud.ogf
+
+throw_point				 	= 0.0,0.4,0.3
+throw_dir				 	= 0,0,1
+
+anim_show					= draw
+anim_hide					= holster
+anim_idle					= idle
+anim_playing				= idle
+anim_throw_begin			= throw_begin
+anim_throw_idle				= throw_idle
+anim_throw_act				= act	
+anim_throw_end				= end
+anim_idle_sprint    		= idle_sprint
+
+
+
 
 ;-----------------------------------------------------------------------------------
 ; Ручная дымовая граната РДГ
@@ -250,30 +351,31 @@ visual			= weapons\grenade\wpn_gr_light_hud.ogf
 [grenade_gd-05]:grenade_hand
 $spawn 				= "weapons\grenades\gd-05"
 visual				= weapons\grenade\wpn_gd_05.ogf
-inv_name			= st_grenade_gd5
-inv_name_short		= st_grenade_gd5
-description			= enc_weapons1_grenade-gd05
-inv_grid_x			= 20
-inv_grid_y			= 2
+inv_name			= grenade-rdgm
+inv_name_short		= grenade-rdgm
+description			= enc_weapons1_grenade-rdgm
+inv_grid_x			= 78	;20
+inv_grid_y			= 7		;2
+
 hud					= grenade_gd-05_hud
 
-blast				= 0;150
-blast_r				= 0;8
+blast				= 0
+blast_r				= 0
 blast_impulse		= 0
 ;delete
 blast_impulse_factor = 0
 
-frags				= 0;12
-frags_r				= 0
-frag_hit			= 0;50
-frag_hit_impulse	= 0
+frags						= 0
+frags_r						= 0
+frag_hit					= 0
+frag_hit_impulse			= 0
 
-hit_type_blast		= strike
-hit_type_frag		= explosion
+hit_type_blast				= strike
+hit_type_frag				= explosion	;fire_wound
 
 up_throw_factor		= 0
 
-explode_particles		 = explosions\explosion_dym
+explode_particles		 = amik\explosion\explosion_dym		;explosions\explosion_dym
 
 light_color		         = 0.9,0.6,0.5
 light_range		         = 2.0
@@ -288,25 +390,46 @@ explode_hide_duration	 = 10		;время, через которое гранату надо сделать невидимо
 dynamic_explosion_particles = true
 
 ;------------------------------ O.G.S.E. sound remake -----------------------
-snd_explode = weapons\grenade\grenade_gd05
+;snd_explode = weapons\grenade\grenade_gd05
+snd_explode = weapons\grenade_gd05
 ;----------------------------------------------------------------------------
 
 [grenade_gd-05_hud]:grenade_hand_hud
-visual              = weapons\grenade\wpn_gd_05_hud.ogf
+fire_point					= 0,0,0
+fire_bone					= wpn_body
+
+orientation         		= -4.399999,1.0,-2.0
+position            		= -0.0965,-0.163,0.131
+
+visual              		= weapons\grenade\wpn_gd_05_hud.ogf
+
+throw_point				 	= 0.0,0.4,0.3
+throw_dir				 	= 0,0,1
+
+anim_show					= draw
+anim_hide					= holster
+anim_idle					= idle
+anim_playing				= idle
+anim_throw_begin			= throw_begin
+anim_throw_idle				= throw_idle
+anim_throw_act				= act	
+anim_throw_end				= end
+anim_idle_sprint    		= idle_sprint
+
 
 ;-----------------------------------------------------------------------------------
-; Граната газовая
+; Граната газовая РГР или РГК-60РД
 ;-----------------------------------------------------------------------------------
 [grenade_gas]:grenade_hand
 $spawn 				= "weapons\grenades\g_gas"
 class				= G_RGD5
-visual				= weapons\grenade\wpn_rgd_5.ogf
-inv_name			= grenade_gas
-inv_name_short		= grenade_gas_s
-description			= enc_weapons1_grenade_gas
+visual				= weapons\grenade\wpn_gg_05.ogf
+inv_name			= grenade-rgr
+inv_name_short		= grenade-rgr_s
+description			= enc_weapons1_grenade-rgr
 
-inv_grid_x			= 20
-inv_grid_y			= 1
+inv_grid_x			= 78	;20
+inv_grid_y			= 8		;1
 
 kill_msg_x			= 240
 kill_msg_y			= 123
@@ -316,9 +439,9 @@ kill_msg_height		= 23
 hud			        = grenade_gas_hud
 
 force_max		    = 30
-force_grow_speed	= 15;2 ;30
+force_grow_speed	= 15
 
-cost			    = 300	;40
+cost			    = 300
 
 blast			= 10 ;1.50
 blast_r			= 10
@@ -359,5 +482,21 @@ snd_explode         = ambient\underground\steam_2
 ;------------------------------------------------------------------------------------------
 
 [grenade_gas_hud]:grenade_hand_hud
-position            = 0,0,0
-visual              = weapons\grenade\wpn_rgd_5_hud.ogf
+fire_point					= 0,0,0
+fire_bone					= wpn_body
+orientation         		= -4.399999,1.0,-2.0
+position            		= -0.0965,-0.163,0.131
+visual              		= weapons\grenade\wpn_gg_05_hud.ogf
+
+throw_point					= 0.0,0.4,0.3
+throw_dir					= 0,0,1
+
+anim_show					= draw
+anim_hide					= holster
+anim_idle					= idle
+anim_playing				= idle
+anim_throw_begin			= throw_begin
+anim_throw_idle				= throw_idle
+anim_throw_act				= act	
+anim_throw_end				= end
+anim_idle_sprint    		= idle_sprint

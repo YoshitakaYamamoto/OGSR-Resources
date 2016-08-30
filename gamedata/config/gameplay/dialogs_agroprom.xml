@@ -244,12 +244,13 @@
 			</phrase>
 			<phrase id="1">
 				<text>agr_swamp_ratcatcher_lc_info_1</text>
-				<!-- <action>ogse_lc_mngr.lc1_agr_esc</action> --> <!-- насколько я понял этого перехода больше не будет -->
+				<!-- <action>ogse_lc_mngr.lc1_agr_esc</action> -->
+				<!-- насколько я понял этого перехода больше не будет -->
 				<give_info>agr_info_lc</give_info>
 				<next>2</next>
 			</phrase>
 			<phrase id="2">
-				<text> agr_swamp_ratcatcher_lc_info_2</text>
+				<text>agr_swamp_ratcatcher_lc_info_2</text>
 				<next>3</next>
 			</phrase>
 			<phrase id="3">
@@ -388,10 +389,10 @@
 	</dialog>
 	<!--Квест Крота на патроны-->
 	<dialog id="agr_krot_find_ammo_box_start">
-		<dont_has_info>agr_help_krot_ammo_box_pause</dont_has_info> 
-		<dont_has_info>agr_help_krot_ammo_box_find</dont_has_info> 
-		<dont_has_info>agr_help_krot_ammo_box_complete</dont_has_info> 
-		<has_info>agr_help_krot_ammo_box_start</has_info> 
+		<dont_has_info>agr_help_krot_ammo_box_pause</dont_has_info>
+		<dont_has_info>agr_help_krot_ammo_box_find</dont_has_info>
+		<dont_has_info>agr_help_krot_ammo_box_complete</dont_has_info>
+		<has_info>agr_help_krot_ammo_box_start</has_info>
 		<has_info>agr_help_krot_done</has_info>
 		<has_info>agr_find_gunslinger_cache_start</has_info>
 		<phrase_list>
@@ -456,15 +457,15 @@
 			<phrase id="1021">
 				<text>agr_krot_find_ammo_box_1021</text>
 				<give_info>agr_help_krot_ammo_box_find</give_info>
-			<action>jekan_work.spawn_ammo_box</action>
+				<action>jekan_work.spawn_ammo_box</action>
 			</phrase>
 		</phrase_list>
 	</dialog>
 	<dialog id="agr_krot_find_ammo_box_find">
-		<dont_has_info>agr_help_krot_ammo_box_find</dont_has_info> 
-		<dont_has_info>agr_help_krot_ammo_box_complete</dont_has_info> 
-		<has_info>agr_help_krot_ammo_box_start</has_info> 
-		<has_info>agr_help_krot_ammo_box_pause</has_info> 
+		<dont_has_info>agr_help_krot_ammo_box_find</dont_has_info>
+		<dont_has_info>agr_help_krot_ammo_box_complete</dont_has_info>
+		<has_info>agr_help_krot_ammo_box_start</has_info>
+		<has_info>agr_help_krot_ammo_box_pause</has_info>
 		<phrase_list>
 			<phrase id="0">
 				<text>agr_krot_find_ammo_box_23</text>
@@ -513,15 +514,15 @@
 			<phrase id="1021">
 				<text>agr_krot_find_ammo_box_1021</text>
 				<give_info>agr_help_krot_ammo_box_find</give_info>
-			<action>jekan_work.spawn_ammo_box</action>
+				<action>jekan_work.spawn_ammo_box</action>
 			</phrase>
 		</phrase_list>
 	</dialog>
 	<dialog id="agr_krot_find_ammo_box_end">
 		<precondition>jekan_work.check_avail_ammo_box</precondition>
-		<dont_has_info>agr_help_krot_ammo_box_complete</dont_has_info> 
-		<has_info>agr_help_krot_ammo_box_start</has_info> 
-		<has_info>agr_help_krot_ammo_box_find</has_info> 
+		<dont_has_info>agr_help_krot_ammo_box_complete</dont_has_info>
+		<has_info>agr_help_krot_ammo_box_start</has_info>
+		<has_info>agr_help_krot_ammo_box_find</has_info>
 		<phrase_list>
 			<phrase id="0">
 				<text>agr_krot_find_ammo_box_200</text>
@@ -529,20 +530,20 @@
 			</phrase>
 			<phrase id="1">
 				<text>agr_krot_find_ammo_box_2011</text>
-				<dont_has_info>agr_help_krot_ammo_box_complete</dont_has_info> 
+				<dont_has_info>agr_help_krot_ammo_box_complete</dont_has_info>
 				<action>jekan_work.check_remove_ammo_box</action>
 			</phrase>
 		</phrase_list>
 	</dialog>
 	<dialog id="agr_krot_find_ammo_box_give">
-		<dont_has_info>agr_help_krot_ammo_box_give</dont_has_info> 
-		<has_info>agr_help_krot_ammo_box_complete</has_info> 
-		<has_info>agr_help_krot_ammo_box_start</has_info> 
-		<has_info>agr_help_krot_ammo_box_find</has_info> 
-		<has_info>agr_help_krot_ammo_box_find_1</has_info> 
-		<has_info>agr_help_krot_ammo_box_find_2</has_info> 
-		<has_info>agr_help_krot_ammo_box_find_3</has_info> 
-		<has_info>agr_help_krot_ammo_box_find_4</has_info> 
+		<dont_has_info>agr_help_krot_ammo_box_give</dont_has_info>
+		<has_info>agr_help_krot_ammo_box_complete</has_info>
+		<has_info>agr_help_krot_ammo_box_start</has_info>
+		<has_info>agr_help_krot_ammo_box_find</has_info>
+		<has_info>agr_help_krot_ammo_box_find_1</has_info>
+		<has_info>agr_help_krot_ammo_box_find_2</has_info>
+		<has_info>agr_help_krot_ammo_box_find_3</has_info>
+		<has_info>agr_help_krot_ammo_box_find_4</has_info>
 		<phrase_list>
 			<phrase id="0">
 				<text>agr_krot_find_ammo_box_202</text>
@@ -578,7 +579,6 @@
 			</phrase>
 		</phrase_list>
 	</dialog>
-
 	<dialog id="agr_factory_stalker_about">
 		<precondition>dialogs.dialog_allowed</precondition>
 		<phrase_list>
@@ -979,5 +979,22 @@
 			</phrase>
 		</phrase_list>
 	</dialog>
+	<!-- Выдача переходов на Топь Кротом, если погиб Дезертир -->
+	<dialog id="agr_krot_give_info_about_lc">
+		<has_info>agr_help_krot_ammo_box_give</has_info>
+		<has_info>agr_dezerter_died</has_info>
+		<dont_has_info>agr_dezerter_report_read</dont_has_info>
+		<dont_has_info>agr_krot_give_info_about_lc</dont_has_info>
+		<phrase_list>
+			<phrase id="0">
+				<text>agr_krot_give_info_about_lc_1</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>agr_krot_give_info_about_lc_2</text>
+				<give_info>agr_krot_give_info_about_lc</give_info>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<!-- Выдача переходов на Топь Кротом, если погиб Дезертир -->
 </game_dialogs>
-

@@ -22,7 +22,8 @@ target = actor
 meet = meet@swamp_doc
 combat_ignore_cond = always
 reactions  = ignore
-on_info = {+unic_krovosos_quest_complete} remark@idle2
+on_info = {+unic_krovosos_quest_complete -unic_pseudodog_quest_talk} remark@idle2
+on_info2 = {+unic_krovosos_quest_complete +unic_pseudodog_quest_talk} remark@idle3
 
 [remark@idle2]
 anim = guard

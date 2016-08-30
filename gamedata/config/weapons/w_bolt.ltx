@@ -1,3 +1,7 @@
+;Болт
+;модели, текстуры: GSC
+;Анимации: Ларин Александр aka Anim_rouge (SWMT)
+;---------------------------------------------------
 [bolt]:identity_immunities
 class				= II_BOLT
 cform				= skeleton
@@ -63,7 +67,7 @@ throw_dir			= 0,0,1
 
 [bolt_hud]
 fire_point          = 0.05, 0.0, 0.1
-fire_bone           = bolt_0
+fire_bone           = wpn_body
 
 orientation         = 0,0,0
 position            = 0,0,0
@@ -73,26 +77,14 @@ throw_point			= 0,0.4,0.3
 throw_dir			= 0,0,0
 
 ;АНИМАЦИИ ПРИ ВИДЕ ИЗ ГЛАЗ
-anim_show			= draw3 ;draw
-anim_hide			= holster_0
-anim_idle			= idle_0
-anim_playing		= idle_01
-anim_throw_begin	= attack_0_begin
-anim_throw_idle		= attack_0_idle
-anim_throw_act		= attack_0_act	
-anim_throw_end		= attack_0_end
-anim_idle_sprint    = idle_sprint   ;вдруг когда-нибудь пригодится
-
-;допустимые анимации
-;idle_01         ;перекидывание из руки в руку
-;idle_0          ;покачивание руки
-;holster_0       ;убрать
-;draw3           ;подбрасывание
-;draw
-;attack_0
-;attack_0_idle
-;attack_0_act
-;attack_0_begin
-;attack_0_end
-;idle_sprint   ;анимация при беге, сработала бы, но anim_idle_sprint для данного класса почему-то отсутствует
+anim_show			= draw
+anim_hide			= holster
+anim_idle			= idle
+anim_playing		= idle_playing
+anim_throw_begin	= throw_1_start
+anim_throw_idle		= throw_2_idle
+anim_throw_act		= throw_3_act	
+anim_throw_end		= throw_4_end
+anim_idle_sprint    = idle_sprint		;вдруг когда-нибудь пригодится
+;анимация при беге, сработала бы, но anim_idle_sprint для данного класса почему-то отсутствует
 ;чтобы понять, как должно было выглядеть, можно подставить к anim_show, например anim_show=idle_sprint

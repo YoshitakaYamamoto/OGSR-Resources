@@ -140,7 +140,7 @@ cform				= skeleton
 visual				= physics\box\expl_dinamit.ogf
 radius				= 1
 ;script_binding		= stalker.object_init
-quest_item			= true
+quest_item			= false
 
 description         = item_dynamite_esc_desc
 inv_name			= item_dynamite_esc_name
@@ -261,9 +261,9 @@ description         = yan_good_psy_helmet_desc
 inv_name			= yan_good_psy_helmet_name
 inv_name_short		= yan_good_psy_helmet_name
 inv_weight			= 0.5
-inv_grid_width		= 1
-inv_grid_height		= 1
-inv_grid_x			= 7
+inv_grid_width		= 2
+inv_grid_height		= 2
+inv_grid_x			= 6
 inv_grid_y			= 39
 auto_attach			= false
 
@@ -314,7 +314,7 @@ quest_item			= true
 description         = yan_bad_psy_helmet_desc
 inv_name			= yan_bad_psy_helmet_name
 inv_name_short		= yan_bad_psy_helmet_name
-inv_grid_x			= 2
+inv_grid_x			= 0
 inv_grid_y			= 18
 cost				= 1000
 slot				= 10
@@ -736,7 +736,7 @@ inv_weight			= 0.3
 inv_grid_x			= 27
 inv_grid_y			= 40
 quest_item			= false
-cost				= 10000
+cost				= 15000
 jump_height			= 0.5
 particles			= ; anomaly2\artefact\artefact_mincer
 
@@ -922,7 +922,7 @@ inv_weight			= 0.4
 inv_grid_x			= 56
 inv_grid_y			= 38
 
-cost				= 9900
+cost				= 10000
 
 jump_height			= 0.1
 
@@ -954,32 +954,21 @@ explosion_immunity = 1.0
 fire_wound_immunity 	=	1.0
 
 
-[af_skull]:af_base
+[af_skull]:identity_immunities
 $spawn				= "devices\quest_items\af_skull"
 visual				= physics\dead_body\skelet_head.ogf
+class				= II_ATTCH
+cform				= skeleton
 description			= enc_zone_artifact_af_skull
 inv_name			= af_skull_name
 inv_name_short		= af_skull_name
 inv_weight			= 0.5
 inv_grid_x			= 29
 inv_grid_y			= 40
+inv_grid_width		= 1
+inv_grid_height		= 1
 quest_item			= false
 cost				= 5000
-jump_height			= 0.1
-particles			= ; anomaly2\artefact\artefact_mincer
-lights_enabled = true
-trail_light_color = 0.2,0.8,0.3
-trail_light_range = 3.0
-
-artefact_activation_seq		= af_activation_mincer
-;скорости увеличения (уменьшения) 
-power_restore_speed = 0.0
-bleeding_restore_speed = 0.0
-radiation_restore_speed = 0.0
-satiety_restore_speed = 0.0
-health_restore_speed =	0.0
-
-hit_absorbation_sect = af_skull_absorbation
 
 [af_skull_absorbation]
 burn_immunity     = 1.0				;коэффициенты иммунитета 
@@ -1278,7 +1267,7 @@ inv_name_short		= af_candle_name
 inv_weight			= 0.5
 inv_grid_x			= 52
 inv_grid_y			= 38
-cost				= 5000
+cost				= 6000
 jump_height			= 0
 particles			= explosions\group_items\heli_trace_flame
 lights_enabled = true
@@ -1351,7 +1340,7 @@ inv_name_short		= af_ray_name
 inv_weight			= 0.5
 inv_grid_x			= 60
 inv_grid_y			= 38
-cost				= 5000
+cost				= 7000
 can_trade			= false
 jump_height			= 0
 particles			= ghoul\fx-06-blue-glow
