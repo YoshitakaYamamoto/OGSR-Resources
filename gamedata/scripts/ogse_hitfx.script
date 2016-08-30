@@ -42,14 +42,14 @@ local effect_for_wpn = {
 	["wpn_val"] = "hit_fx\\hit_eagleu",
 	["wpn_vintorez"] = "hit_fx\\hit_eagleu",
 	["wpn_vintorez_m1"] = "hit_fx\\hit_eagleu", 
-	["wpn_val_m1"] = "hit_fx\\hit_eagleu",
 	["wpn_svu"] = "hit_fx\\hit_pblow",
 	["wpn_svu_m1"] = "hit_fx\\hit_pblow",
 	["wpn_swd"] = "hit_fx\\hit_pblow",
 	["wpn_gauss"] = "hit_fx\\hit_gauss",
 	["wpn_pkm"] = "hit_fx\\hit_pblow",
 	["wpn_m_134"] = "hit_fx\\hit_pblow",
-	["wpn_rpg7"] = "hit_fx\\hit_expl"
+	["wpn_rpg7"] = "hit_fx\\hit_expl",
+	["wpn_awm"] = "hit_fx\\hit_pblow",
 }
 
 function get_effect_for_curr_weapon(sect)
@@ -66,6 +66,7 @@ function get_effect_for_curr_weapon(sect)
 end
 
 function npc_on_death(victim, who)
+	if not who:alive() then return end
 	local cur_weapon = who:active_item()
 	if cur_weapon then
 		local cur_weapon_sec = cur_weapon:section()

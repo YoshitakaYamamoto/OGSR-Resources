@@ -1,10 +1,9 @@
 ----------------- —хема пост-процессинга пси-зон дл€ OGSM 2.x -----------------
-
 ------------------------- Copyright 2007-2008 DEXXX ---------------------------
 
 local particles = {}
-local sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror]])
-local sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror]])
+local sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
+local sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
 
 class "PPEffector" (effector)
 
@@ -179,8 +178,3 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 end
-
-
------------------ —хема пост-процессинга пси-зон дл€ OGSM 2.x -----------------
-
-------------------------- Copyright 2007-2008 DEXXX ---------------------------

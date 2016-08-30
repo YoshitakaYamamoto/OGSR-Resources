@@ -18,7 +18,7 @@ path_look = drifter_look_base
 combat_ignore_cond = always
 meet = meet@water
 danger = danger_condition
-on_info = {+dik_goto_pos1 -af_light_have} walker@p, {+af_light_have} walker@final_1, {+drifter_dog_dead} remark@res
+on_info = {+dik_goto_pos1} walker@p, {+af_light_have} walker@final_1, {+drifter_dog_dead} remark@res
 
 [walker@p]
 path_walk = drifter_walk_pos_0
@@ -27,7 +27,7 @@ combat_ignore_cond = always
 danger = danger_condition
 meet = no_meet
 on_signal       = arrived | remark@dog
-on_info = {+drifter_dog_dead} remark@res, {+dog_meets_danger_end -af_light_have} walker@p1, {+af_light_have} walker@final_1
+on_info = {+drifter_dog_dead} remark@res, {+af_light_have} walker@final_1
 
 [walker@p0]
 path_walk = drifter_walk_pos_0
@@ -44,7 +44,7 @@ combat_ignore_cond = always
 danger = danger_condition
 meet = no_meet
 on_signal       = arrived | remark@p1  %+kulg_zasada_1%
-on_info = {+drifter_dog_dead} remark@res, {+kulg_zasada_1_boets_1_dead +kulg_zasada_1_boets_2_dead +kulg_zasada_1_boets_3_dead} walker@p2
+on_info = {+drifter_dog_dead} remark@res
 
 [remark@p1]
 anim = help_me
@@ -64,7 +64,7 @@ combat_ignore_cond = always
 danger = danger_condition
 meet = no_meet
 on_signal       = arrived | remark@p2  %+kulg_zasada_2%
-on_info = {+drifter_dog_dead} remark@res, {+kulg_zasada_2_boets_1_dead +kulg_zasada_2_boets_2_dead +dog_on_pos_3_2} walker@p3_1
+on_info = {+drifter_dog_dead} remark@res
 
 [remark@p2]
 anim = help_me
@@ -82,7 +82,7 @@ combat_ignore_cond = always
 danger = danger_condition
 meet = no_meet
 on_signal       = arrived | remark@p3_1  %+kulg_zasada_3_1%
-on_info = {+drifter_dog_dead} remark@res, {+kulg_zasada_3_1_boets_1_dead +kulg_zasada_3_1_boets_2_dead} walker@p3
+on_info = {+drifter_dog_dead} remark@res
 
 [remark@p3_1]
 anim = help_me
@@ -100,7 +100,7 @@ combat_ignore_cond = always
 danger = danger_condition
 meet = no_meet
 on_signal       = arrived | remark@p3  %+kulg_zasada_3%
-on_info = {+drifter_dog_dead} remark@res, {+kulg_zasada_3_boets_1_dead +kulg_zasada_3_boets_2_dead} walker@before_ochyag
+on_info = {+drifter_dog_dead} remark@res
 
 [remark@p3]
 anim = help_me
@@ -176,7 +176,7 @@ on_signal = action_end | walker@final %=drifter_resurrection%
 [remark@dog]
 anim = caution
 snd = drifter_to_dog
-snd_anim_sync = false
+snd_anim_sync = true
 no_move = true
 meet = no_meet
 target = 7064
@@ -184,7 +184,7 @@ combat_ignore_cond = always
 danger = danger_condition
 reactions  = ignore
 on_info = {+drifter_dog_dead} remark@res
-on_signal = sound_end | walker@p0
+on_signal = action_end | walker@p0
 
 [walker@final]
 path_walk = drifter_walk_final

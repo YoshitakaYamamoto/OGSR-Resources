@@ -448,15 +448,6 @@ function give_reward_killers(first_speaker, second_speaker)
 	dialogs.relocate_money(first_speaker, 15000, "in")
 end
 
---' Soldiers on bridge
-function has_soldiers_bribe(actor, npc)
-	return actor:money() >= 1500
-end
-
-function give_soldiers_bribe(actor, npc)
-	dialogs.relocate_money(npc, 1500, "out")	
-end
-
 function fox_pay_money(actor, npc)
 	dialogs.relocate_money(npc, 2500, "in")	
 	treasure_manager.get_treasure_manager():give_treasure("esc_secret_truck_goods")
@@ -480,3 +471,80 @@ function delete_dynamite_box(actor, npc)
 		alife():release(dynamite, true)
 	end
 end
+
+
+-- Мирное получение Форта-15 у майора Кузнецова по заданию Сидоровича
+--' Soldiers on bridge
+function has_soldiers_bribe(actor, npc)
+	if has_alife_info("find_af_and_vodka_for_kuzya_done") then
+		return actor:money() >= 500
+	else
+		return actor:money() >= 1500
+	end
+end
+
+function give_soldiers_bribe(actor, npc)
+	if has_alife_info("find_af_and_vodka_for_kuzya_done") then
+		dialogs.relocate_money(npc, 500, "out")	
+	else
+		dialogs.relocate_money(npc, 1500, "out")	
+	end
+end
+
+-- проверка отсутствия форта-15 у гг
+function actor_dont_has_fort_m1()
+	if has_alife_info("find_fort_m1") then
+		return db.actor:object("wpn_fort_m1") == nil
+	end
+end
+
+-- проверка наличия ломтя мяса у гг
+function actor_has_af()
+	if db.actor:object("af_mincer_meat") ~= nil then
+		db.actor:give_info_portion("esc_actor_has_af")
+	end
+	
+	if has_alife_info("find_af_and_vodka_for_kuzya") then
+		return	db.actor:object("af_mincer_meat") ~= nil
+	end
+end
+
+-- проверка наличия водки у гг
+function actor_has_vodka()
+	if db.actor:object("vodka") ~= nil then
+		db.actor:give_info_portion("esc_actor_has_vodka")
+	end
+	
+	if has_alife_info("find_af_and_vodka_for_kuzya") then
+		return	db.actor:object("vodka") ~= nil
+	end
+end
+
+-- сообщение, что найден ломоть мяса
+function send_message_af_mincer_meat()
+	news_manager.send_tip(db.actor, "finde_af_mincer_meat", nil, nil, 6000, nil)
+end
+
+-- сообщение, что найдена водка
+function send_message_vodka()
+	news_manager.send_tip(db.actor, "finde_vodka", nil, nil, 6000, nil)
+end
+
+-- гг отдает ломоть мяса и водку Кузнецову
+function actor_take_away_af_and_vodka(actor, npc)
+	if db.actor:object("af_mincer_meat") ~= nil then
+		dialogs.relocate_item_section(npc, "af_mincer_meat", "out")
+	end
+	
+	if db.actor:object("vodka") ~= nil then
+		dialogs.relocate_item_section(npc, "vodka", "out")
+	end
+end
+
+-- Кузнецов отдает форт-15 гг, удаляем форт-15 из инвенторя Кузнецова
+function esc_kuzia_give_away_fort_m1(actor, npc)
+local npc = level_object_by_sid(032)
+	dialogs.relocate_item_section(npc, "wpn_fort_m1", "in")
+	ogse.remove_item_from_inventory_by_name("wpn_fort_m1", npc)
+end
+-- Мирное получение Форта-15 у майора Кузнецова по заданию Сидоровича

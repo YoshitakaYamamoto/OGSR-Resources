@@ -131,6 +131,9 @@ function CRandomTask:__init()
 		if sys_ini:line_exist(id, "target") then
 			curr_task_info.target		= sys_ini:r_string(id, "target")
 		end
+		if sys_ini:line_exist(id, "info") then
+			curr_task_info.info			= sys_ini:r_string(id, "info")
+		end
 		if sys_ini:line_exist(id, "text") then
 			curr_task_info.text			= sys_ini:r_string(id, "text")
 		end
@@ -224,7 +227,6 @@ function CRandomTask:__init()
 end
 --' Сохранение
 function CRandomTask:save(p)
-	--printf("^^^ SAVE")
 -----------------------
 	p = net_packet()
 	p:w_begin( 123 )
@@ -241,7 +243,7 @@ function CRandomTask:save(p)
 		p:w_bool(v.enabled)	
 		p:w_bool(v.enabled_props)
 		p:w_stringZ(v.status)
-		p:w_u32(v.selected_target or -1)
+		p:w_u32(v.selected_target or 4294967295)
 		utils.w_CTime(p, v.last_task_time)
 	end
 
@@ -264,7 +266,6 @@ function CRandomTask:save(p)
 end
 --' Загрузка
 function CRandomTask:load(p)
-	--printf("^^^ LOAD")
 --------------------------------------------------------------
 	if ogse.var_exists( script_name() .. ".task_info") then
 		p = ogse.load_var( script_name() .. ".task_info")
@@ -279,12 +280,14 @@ function CRandomTask:load(p)
 		self.task_info[id].status = p:r_stringZ()
 
 		local selected_target = p:r_u32()
-		if selected_target ~= -1 then
+		if selected_target ~= 4294967295 then
 			self.task_info[id].selected_target = selected_target
 		end
 		self.task_info[id].last_task_time = utils.r_CTime(p)
 		
-		if self.task_info[id].type == "defend_lager" then                                                           
+		-- здесь адский баг. Активный selected_target может быть _только_ у выданнх квестов, в остальном случае там -1.
+		-- Тут проверяем активность таска. Параллельно правим еще в функции проверки завершенности таска на всякий случай.
+		if self.task_info[id].type == "defend_lager" and self.task_info[id].selected_target then     
 			local defend_object = alife():object(self.task_info[id].selected_target)                                  
 			local sm_ini = defend_object:spawn_ini()                                                                  
 			self.task_info[id].defend_target = utils.cfg_get_number(sm_ini, "random_task", "defend_target", nil, true)
@@ -455,6 +458,13 @@ function CRandomTask:action_give_task(actor, npc, p1, p2)
 			v.enabled = false
 		end
 	end
+-- Мирное получение Форта-15 у майора Кузнецова по заданию Сидоровича
+-- проверяем, является ли предмет фортом-15, и если да, выдаём инфопоршень
+	if task_desc.target == "wpn_fort_m1" then
+		db.actor:give_info_portion("find_fort_m1")
+	end
+-- проверяем, является ли предмет фортом-15, и если да, выдаём инфопоршень
+-- Мирное получение Форта-15 у майора Кузнецова по заданию Сидоровича
 end
 --' Отказ игроком от квеста
 function CRandomTask:action_refuse_task(actor, npc, p1, p2)
@@ -503,11 +513,14 @@ function CRandomTask:task_complete(p1, p2)
 			if oo and oo.gulag:get_population_comed() == 0 then
 --			if oo and oo.gulag:really_alive_pop() == 0 then
 				self.task_info[self.active_task_by_type[p1]].status = "completed"
+				if self.task_info[self.active_task_by_type[p1]].info then
+					db.actor:give_info_portion(self.task_info[self.active_task_by_type[p1]].info)
+				end
 				return true
 			end
 		elseif string.find(p1, "defend_lager") ~= nil then
 			--' Квест выполнен потому что рейд прекратился
-			if xr_gulag.getGulagState(sel_task.defend_target) == 0 then
+			if sel_task.defend_target and xr_gulag.getGulagState(sel_task.defend_target) == 0 then
 				self.task_info[self.active_task_by_type[p1]].status = "completed"
 				return true
 			end
@@ -863,6 +876,13 @@ function CRandomTask:task_reward(npc, actor, p1, p2)
 					can_finish = false
 				else
 					dialogs.relocate_item_section(npc, task_desc.target, "out")
+-- Мирное получение Форта-15 у майора Кузнецова по заданию Сидоровича
+-- проверяем, является ли предмет фортом-15, и если да, удаляем инфопоршень
+					if task_desc.target == "wpn_fort_m1" then
+						db.actor:disable_info_portion("find_fort_m1") 
+					end
+-- проверяем, является ли предмет фортом-15, и если да, удаляем инфопоршень
+-- Мирное получение Форта-15 у майора Кузнецова по заданию Сидоровича
 				end
 			end
 			

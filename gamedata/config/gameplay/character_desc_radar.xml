@@ -1495,8 +1495,8 @@
   		<crouch_type>-1</crouch_type>
 		<supplies>
 			[spawn] \n
-			wpn_ak74n_ak74n30_side_rail_1p29 = 1, scope \n
-			ammo_5.45x39_fmj \n
+			wpn_ak74n_ak74n30_ironsight = 1, scope \n
+			ammo_5.45x39_ap \n
 			wpn_bm16 \n
 			ammo_12x70_kart \n
 #include "gameplay\character_drugs.xml" \n

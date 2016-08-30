@@ -1,14 +1,3 @@
-; “ульский “окарев
-;-(правлено SR)-------------------------------------
-; калибр 					7.62x25 мм
-; длина ствола 				 мм
-; магазин					8
-; вес						0,854 кг			
-; эффективна€ дальность стрельбы	 м
-; прицельна€ дальность		---
-; дульна€ скорость пули		 м/с
-; темп стрельбы				 в/м
-;---------------------------------------------------
 [wpn_tt]:identity_immunities,base_wpn_zoom
 GroupControlSection			= spawn_group
 discovery_dependency 		= 
@@ -20,7 +9,7 @@ cform                    	= skeleton
 class                    	= WP_PM
 min_radius               	= 0
 max_radius               	= 30
-description					= enc_weapons1_wpn-tt
+description					= enc_weapons1_wpn_tt
 
 ef_main_weapon_type = 0
 ef_weapon_type				= 5
@@ -43,7 +32,7 @@ slot 				 		= 1		; // primary
 animation_slot		 		= 1		; type of the animation that will be used
 
 inv_name					= wpn_tt
-inv_name_short				= wpn_tt
+inv_name_short				= wpn_tt_short
 inv_weight				= 0.7
 
 inv_grid_width				= 2
@@ -58,8 +47,8 @@ kill_msg_height		= 27
 
 ;-----------------------------------------------------------------------------------
 ;базова€ дисперси€
-fire_dispersion_base		= 0.35  ;угол (в градусах) базовой дисперсии оружи€ (оружи€ зажатого в тисках)
-;control_inertion_factor		= 1.12f
+fire_dispersion_base		= 0.2  ;угол (в градусах) базовой дисперсии оружи€ (оружи€ зажатого в тисках)
+control_inertion_factor		= 1.12f
 
 ;отдача
 cam_relax_speed         	= 7.0	;скорость возврата в исходное положение
@@ -71,14 +60,14 @@ cam_max_angle			= 12.0	;максимальный угол отдачи
 cam_max_angle_horz		= 8.0	;(degree) maximum shot horizontal degree 
 cam_step_angle_horz		= 1.5	;(degree) size of step camera moved in horizontal position while shooting
 
-fire_dispersion_condition_factor = 4	;увеличение дисперсии в процентах при максимальном износе 
+fire_dispersion_condition_factor = 3	;увеличение дисперсии в процентах при максимальном износе 
 misfire_probability 		= 0.002	;веро€тность осечки при максимальном износе
 misfire_condition_k			= 0.05 
-condition_shot_dec 			= 0.0007 ;увеличение износа при каждом выстреле
+condition_shot_dec 			= 0.0008 ;увеличение износа при каждом выстреле
 ;-----------------------------------------------------------------------------------
 
 direction           = 0, 0, 1
-fire_point               	= 0.0, 0.131, 0.198 
+fire_point			= -0.005000,0.130000,0.220000
 
 flame_particles		= weapons\generic_weapon_pistol
 smoke_particles		= weapons\generic_shoot_00
@@ -95,10 +84,10 @@ PDM_crouch	 		= 0.9
 PDM_crouch_no_acc 	= 0.85
 
 ; ttc
-hit_power           = 0.5			;было 0.51
-hit_impulse		 	= 100
+hit_power           = 0.51
+hit_impulse		 	= 15
 hit_type 			= fire_wound
-;hit_rate			= 1.85
+hit_rate			= 1.85
 
 fire_distance       = 75
 bullet_speed		= 480			
@@ -109,14 +98,14 @@ use_aim_bullet		= false		;ѕоддерживаетс€ ли перва€ суппер пул€
 time_to_aim			= 1.0	
 
 silencer_hit_power  = 0.45
-silencer_hit_impulse	 	= 75
+silencer_hit_impulse	 	= 15
 silencer_fire_distance   	= 50
 silencer_bullet_speed	 	= 400
 
 hud                 = wpn_tt_hud
 normal              = 0, 1, 0
-position                 	= -0.030,-0.092,-0.015
-orientation 				= 0, 0, 1
+position            = -0.021, -0.09, 0.0
+orientation         = 0, 0, 0
 
 ;--STRAP PARAMETERS-----------------------------------------------------------------
 ;strap_position     = -0.1,-0.45,0.2			; position (offset) and orientation of the weapon when it is strapped
@@ -161,21 +150,14 @@ silencer_light_var_range	= 0.5
 silencer_light_time 		= 0.2
 
 ;------------------------------ O.G.S.E. sound remake -----------------------
-;snd_draw			= weapons\fort_draw
-;snd_holster			= weapons\generic_holster
-;snd_shoot			= weapons\tt_shot
-;snd_empty			= weapons\pistol_empty
-;snd_reload			= weapons\tt_reload, 0.8
-;snd_close			= weapons\generic_close
-;snd_silncer_shot	= weapons\p_silent4
+snd_draw			= weapons\fort_draw
+snd_holster			= weapons\generic_holster
+snd_shoot			= weapons\tt_shot
+snd_empty			= weapons\pistol_empty
+snd_reload			= weapons\tt_reload, 0.8
+snd_close			= weapons\generic_close
+snd_silncer_shot	= weapons\p_silent4
 ;-----------------------------------------------------------------------------
-snd_draw					= weapons\tt33\draw
-snd_holster					= weapons\tt33\holster
-snd_shoot					= weapons\tt33\shoot
-snd_empty					= weapons\tt33\empty
-snd_reload					= weapons\tt33\reload
-snd_close					= weapons\tt33\close
-snd_silncer_shot		    = weapons\tt33\shoot_sil
 
 ;-----------------------------------------------------------------------------
 ;-- HUD DESCRIPTION
@@ -184,60 +166,43 @@ snd_silncer_shot		    = weapons\tt33\shoot_sil
 
 allow_inertion		= true
 
-;shell_point					= 0,0,-0.35
-;fire_point					= 0,0,-0.35
-fire_bone                	= muzzle
+shell_point			= 0.000000,0.02000,-0.4
+fire_point          = 0.000000,0.02000,-0.4
 
-shell_point					= 0.01, -0.02, -0.38
-fire_point					= 0.01, -0.008, -0.38
-
-;position             		= -0.01,-0.17,-0.1
-;orientation                 = 2,2,0
-
-;sto1en
-position					= -0.01, -0.161, -0.040
-orientation					= 0.00, 0.50, 0.00
-
+fire_bone           = wpn_body
+orientation         = 0,0,0
+position            = 0.15,-0.06,0.25 ; перва€ влево\вправо ; втора€ вверх\вниз ;треть€ fov 0, 0, 0
 visual              = weapons\tt\wpn_tt_hud.ogf
 
 anim_holster		= holster
 anim_idle			= idle
-anim_empty					= idle_empty
-anim_reload					= reload
+anim_empty			= empty
+anim_reload			= reload_full
 anim_reload_empty	= reload_empty
 anim_draw			= draw
 anim_draw_empty		= draw_empty
-anim_shoot					= shoot
-anim_shot_last				= shoot_last
-anim_close					= holster_empty
+anim_shoot			= shot
+anim_shot_last		= shot_last
+anim_close			= close
 anim_idle_aim		= idle_aim
 anim_idle_sprint	= idle_sprint
 
 ;смещени€ HUD дл€ режима приближени€
-;zoom_offset					= -0.106175,0.040000,-0.050000
-;zoom_rotate_x				= 0.015300
-;zoom_rotate_y				= 0.034700
-
-;sto1en
-zoom_offset			= -0.109875,0.032300,-0.050000
-zoom_rotate_x		= -0.011700
-zoom_rotate_y		= 0.000100
+zoom_offset		= -0.15,0.062,-0.12
+zoom_rotate_x	= 0
+zoom_rotate_y	= 0
 
 ;пр€чем перекрестие прицела в зуме
 zoom_hide_crosshair		= true
 
 ;врем€ поворота HUD (сек)
-zoom_rotate_time			= 0.15
-rotate_time					= 0.15
-
+zoom_rotate_time		= 0.1
+rotate_time			= 0.1
 
 [wpn_tt_repair]
 tech_complication = 350
 repair_compatibility = tt
 
-
-
-;--------------------------------------------------------------------------------
 [wpn_tt_m1]:wpn_tt
 $spawn              = "weapons\tt_m1"					; option for Level Editor
 
@@ -259,8 +224,8 @@ ironsight_zoom_factor		= 1.0
 
 
 [wpn_tt_m1_hud]:wpn_tt_hud
-;visual              = weapons\tt\wpn_tt_m1_hud.ogf
+visual              = weapons\tt\wpn_tt_m1_hud.ogf
 
 [wpn_tt_m1_repair]
 tech_complication = 350
-repair_compatibility = tt
+repair_compatibility = tt_m1

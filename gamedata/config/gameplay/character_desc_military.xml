@@ -71,7 +71,6 @@
 		
 		<start_dialog>mil_screw_dialog</start_dialog>
 		<actor_dialog>mil_screw_upgrade_weapon</actor_dialog>
-		<actor_dialog>mil_trader_repair</actor_dialog>
 		<actor_dialog>shurup_car_trade</actor_dialog>
 #include "gameplay\character_dialogs.xml"		
 	</specific_character>
@@ -283,7 +282,6 @@
 		<actor_dialog>find_mikluha_dialog_2</actor_dialog>
 		<actor_dialog>scalp_dialog</actor_dialog>
 		<actor_dialog>find_mikluha_dialog_no_klondike</actor_dialog>
-		<actor_dialog>find_filin_dialog</actor_dialog>
 		<actor_dialog>tm_freedom_dialog</actor_dialog>
 		<actor_dialog>tm_freedom_reward</actor_dialog>	
 		<actor_dialog>final_battle_freedom_dialog</actor_dialog>
@@ -324,7 +322,7 @@
 #include "gameplay\character_criticals_5.xml"
 
 		<start_dialog>mil_trader_dialog</start_dialog>
-		<!--actor_dialog>mil_trader_repair</actor_dialog-->
+		<actor_dialog>mil_trader_repair</actor_dialog>
 		<actor_dialog>actor_take_arsenal_key_dialog</actor_dialog>
 <!--		<actor_dialog>find_filin_screw_dialog</actor_dialog>  -->
 #include "gameplay\character_dialogs_unic.xml"

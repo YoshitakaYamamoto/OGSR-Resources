@@ -1,0 +1,142 @@
+
+
+local posx = 0
+local posy = 0
+local width = 0
+local height = 0
+local p_dx = 0
+local p_dy =0
+local p_width = 0
+local p_height = 0
+local saved_aspect = 0
+local saved_width = -1
+
+function update(bShow)
+	if (db.actor == nil) then return end
+	
+	local screen = device()
+	local scr_width = screen.width
+	local scr_height = screen.height
+	
+	local screen_aspect_ratio = ui_rad.orig_aspect
+	
+	if scr_width > 0 and scr_height > 0 then
+		screen_aspect_ratio = scr_width / scr_height
+	end
+	
+	local hud_fuel = get_hud()
+	local wnd_
+	if (hud_fuel) then
+		local custom_static_fuel_back = hud_fuel:GetCustomStatic("hud_fuel_back")
+		local custom_static_fuel = hud_fuel:GetCustomStatic("hud_fuel_level")
+		if (screen_aspect_ratio ~= saved_aspect) then
+			if (math.abs(screen_aspect_ratio - saved_aspect) > 0.1) then
+				saved_aspect = screen_aspect_ratio
+				if(custom_static_fuel_back) then hud_fuel:RemoveCustomStatic("hud_fuel_back") end
+				if(custom_static_fuel) then hud_fuel:RemoveCustomStatic("hud_fuel_level") end
+				custom_static_fuel_back = nil
+				custom_static_fuel = nil
+			end
+		end
+		local cDetected = false
+		if car_trade.current_car and car_trade.inside_the_car == true then
+			cDetected = true
+		end		
+		if (cDetected == false or bShow == false) then
+			if (custom_static_fuel_back) then hud_fuel:RemoveCustomStatic("hud_fuel_back") end
+			if (custom_static_fuel) then hud_fuel:RemoveCustomStatic("hud_fuel_level") end
+			return
+		end
+		
+		if (custom_static_fuel_back == nil or custom_static_fuel == nil) then
+			if (screen_aspect_ratio > 1.4) then --widescreen. Use coords from maingame_16.xml		
+				read_params(true)
+			else --normal -- Use coords from maingame.xml
+				read_params()
+			end		
+
+			if custom_static_fuel_back == nil then
+				hud_fuel:AddCustomStatic("hud_fuel_back", true)
+				custom_static_fuel_back = hud_fuel:GetCustomStatic("hud_fuel_back")
+				if (custom_static_fuel_back and custom_static_fuel_back.wnd) then
+					 wnd_ = custom_static_fuel_back:wnd()
+					 if (wnd_) then
+						wnd_:SetWndPos(posx, posy)
+						wnd_:SetHeight(height)
+						wnd_:SetWidth(width)
+					end
+				end
+			end
+			if custom_static_fuel == nil then
+				hud_fuel:AddCustomStatic("hud_fuel_level", true)
+				custom_static_fuel = hud_fuel:GetCustomStatic("hud_fuel_level")
+				if (custom_static_fuel and custom_static_fuel.wnd) then
+					wnd_ = custom_static_fuel:wnd()
+					if(wnd_) then
+						wnd_:SetWndPos(posx + p_dx, posy + p_dy)
+						wnd_:SetHeight(p_height)
+						wnd_:SetWidth(p_width)
+					end
+				end
+			end
+		end
+		
+		local car = level.object_by_id(car_trade.current_car)
+		local car_fuel = car:get_fuel()
+		local car_fuel_tank = car:get_fuel_tank()
+		
+		local new_width = 1/car_fuel_tank*car_fuel * p_width
+		if (saved_width ~= new_width) then
+			if car_fuel > 0.0 then
+				if custom_static_fuel then
+					custom_static_fuel:wnd():SetWidth(new_width)
+				end
+			else
+				if custom_static_fuel then
+					custom_static_fuel:wnd():SetWidth(new_width)
+				end
+			end
+		end
+	end
+end
+
+function read_params(bWide)
+	local section = ""
+	local ui_fuel_ini = ini_file("misc\\ui_fuel.ltx")
+	local id, value = "", "", result
+	local n = 0	
+	section = "ui_fuel"
+	if bWide == true then section = "ui_fuel_wide" end
+	if (ui_fuel_ini and ui_fuel_ini:section_exist(section)) then
+		n = ui_fuel_ini:line_count(section)
+		for i=0, n-1 do
+			result, id, value = ui_fuel_ini:r_line(section, i, "", "")
+			if (id == "x") then
+				posx = value
+			elseif(id == "y") then
+				posy = value
+			elseif(id == "width") then
+				width = value
+			elseif(id == "height") then
+				height = value
+			end
+		end
+	end
+	section = "ui_fuel_progress"
+	if bWide == true then section = "ui_fuel_progress_wide" end
+	if (ui_fuel_ini and ui_fuel_ini:section_exist(section)) then
+		n = ui_fuel_ini:line_count(section)		
+		for i=0, n-1 do
+			result, id, value = ui_fuel_ini:r_line(section, i, "", "")
+			if (id == "dx") then
+				p_dx = value
+			elseif(id == "dy") then
+				p_dy = value
+			elseif(id == "width") then
+				p_width = value
+			elseif(id == "height") then
+				p_height = value
+			end
+		end
+	end	
+end

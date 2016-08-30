@@ -632,16 +632,20 @@ end
 
 -- Спавн сталкера-искателя и документов в X-18
 function dar_stalker_explorer_spawn()
-if level.name() == "l04u_labx18" then
-	if has_alife_info("dar_run_quest") and not has_alife_info("bar_darklab_document_done") and not has_alife_info("dar_stalker_explorer_spawned") then
+	if level.name() == "l04u_labx18" then
+		if has_alife_info("dar_run_quest") and not has_alife_info("bar_darklab_document_done") and not has_alife_info("dar_stalker_explorer_spawned") then
 --SPAWN_V1
 		--local obj = alife():create ("dar_stalker_explorer", vector():set(-15.60, 6, 1.60), 1, 1109)
 --SPAWN_V2
 		local obj = ogse.spawn_object(spawn_db.dar_stalker_explorer_spawn)
-		alife():create("dar_document3", obj.position, obj.m_level_vertex_id, obj.m_game_vertex_id, obj.id)
-		db.actor:give_info_portion("dar_stalker_explorer_spawned")
+			ogse.spawn_item_in_inv("dar_document3", obj)
+-- Мирное получение документов у Жеки Дуплета в лаборатории 18
+			jeka_id = obj.id
+			xr_logic.pstor_store(db.actor,"jeka_id_s", obj.id) 
+-- Мирное получение документов у Жеки Дуплета в лаборатории 18
+			db.actor:give_info_portion("dar_stalker_explorer_spawned")
+		end
 	end
-end
 end
 
 -- Квест на пустышки от торговца

@@ -310,15 +310,16 @@ function generic_object_binder:net_save_relevant()
 end
 
 function generic_object_binder:save(packet)
-	xr_logic.pstor_store(self.object, "is_invulnerable", self.object:invulnerable())
+	if string.find(self.object:name(), "crow_") then return false end
 
-	if string.find(self.object:name(), "crow_") then
-		return false
+	if self.object:clsid() ~= clsid.script_trader then
+		xr_logic.pstor_store(self.object, "is_invulnerable", self.object:invulnerable())
 	end
 
 	object_binder.save(self, packet)
 
 	xr_logic.save_obj(self.object, packet)
+
 	if self.object:clsid() == clsid.script_trader then
 		trade_manager.save(self.object, packet)
 	end
@@ -353,9 +354,7 @@ function horz_angle(vec1,vec2)
 end]]
 
 function generic_object_binder:load(reader)
-	if string.find(self.object:name(), "crow_") then
-		return false
-	end
+	if string.find(self.object:name(), "crow_") then return false end
 
 	self.loaded = true
 
@@ -369,8 +368,8 @@ function generic_object_binder:load(reader)
 
 	if self.object:clsid() == clsid.script_trader then
 		trade_manager.load(self.object, reader)
+	else
+		local is_invulnerable = xr_logic.pstor_retrieve(self.object, "is_invulnerable", false)
+		self.object:invulnerable(is_invulnerable)
 	end
-
-	local is_invulnerable = xr_logic.pstor_retrieve(self.object, "is_invulnerable", false)
-	self.object:invulnerable(is_invulnerable)
 end

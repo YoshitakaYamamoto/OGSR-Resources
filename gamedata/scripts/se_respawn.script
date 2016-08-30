@@ -10,18 +10,3 @@ function se_respawn:keep_saved_data_anyway()
 	return true
 end
 ------------------------------------------------
-
-
-function create_ammo(section, position, lvi, gvi, pid, num)
-	local num_in_box = get_u32(section, "box_size")
-
-	while num > num_in_box do
-		local sitem = alife():create_ammo(section, position, lvi, gvi, pid, num_in_box)
-		local sammo = alife():object(sitem.id)
-		sammo:use_ai_locations(false)
-		num = num - num_in_box
-	end
-	local sitem = alife():create_ammo(section, position, lvi, gvi, pid, num)
-	local sammo = alife():object(sitem.id)
-	sammo:use_ai_locations(false)
-end

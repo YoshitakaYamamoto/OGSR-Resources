@@ -2545,6 +2545,7 @@ function if_svyaznoy_is_dead()
 end
 
 function rad_kvest_dobrozhelatel_spawn_letter_in_treasure()
+	if db.actor:has_info("rad_kvest_dobrozhelatel_help_to_svyaznoy") then return end
 	local text = game.translate_string("rad_kvest_dobrozhelatel_spawn_letter_in_treasure_text")
 	ogse.send_tip(text, "Доброжелатель:", 0, 10, "stalker", "task")
 	db.actor:give_info_portion("rad_kvest_dobrozhelatel_letter_start")

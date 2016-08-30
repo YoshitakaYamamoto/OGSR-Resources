@@ -38,7 +38,7 @@ end
 
 --лучше наверное оставить в главном модуле lfs и грузить им.
 if not lfs then
-	abort("check lfs namespace")
+	fail("check lfs namespace")
 end
 for file in lfs.dir(path) do
 	log1("file: "..file)
@@ -585,6 +585,11 @@ function IsMonster (object, class_id)
 	return (id and monster_classes[id] == true)
 end
 -------------------------------------------------------------------------------------------
+function IsActor (object, class_id)
+	local id = class_id or get_clsid(object)
+	return (id and id == clsid.actor)
+end
+-------------------------------------------------------------------------------------------
 function IsStalker (object, class_id)
 	local id = class_id or get_clsid(object)
 	return (id and stalker_classes[id] == true)
@@ -951,6 +956,7 @@ ammo_section["ammo_7.62x39_fmj"]	= true
 ammo_section["ammo_7.62x39_ap"]	    = true
 ammo_section["ammo_flame"]          = true
 ammo_section["ammo_arbolt"]         = true
+ammo_section["ammo_8.6x70_lm"]		= true
 
 quest_section = {}
 quest_section["btr_control_module_upgrade"]	= true
@@ -1190,8 +1196,12 @@ function get_vector(section, param, def_val, ini_file)
 	if ini:line_exist(section, param) then
 		local pos = get_names(section, param, ini)
 		return vector():set(tonumber(pos[1]), tonumber(pos[2]), tonumber(pos[3]))
-	else
-		return def_val
+	else 
+		if def_val then
+			return def_val
+		else
+			return vector():set(0,0,0)
+		end
 	end
 end
 
@@ -1236,7 +1246,6 @@ function level_system_name_by_lid(lid)
 end
 function level_name_by_level_system_name(lname)
 	return game.translate_string(lname)
-	--string.lower(lname))
 end
 --системное имя уровня
 function level_system_name_by_gvid(gvid)

@@ -1,0 +1,14 @@
+-- Не загорается пламя у динамических костров. 
+-- Исследовал проблему - оказалось, что удалены костровые аномалии с пламенем
+-- Хочу подменить функцию alife():release, чтобы узнать какой скрипт их удаляет
+
+function attach(sm)
+
+end
+
+local prev_release = alife().release
+function alife_simulator:release(sobj, dummy)
+	ASSERT(sobj, "release null object")
+	ASSERT(not string.find(sobj:name(), "zone_flame_small"), "release flame object [%s]", sobj:name())
+	return prev_release(self, sobj, dummy)
+end

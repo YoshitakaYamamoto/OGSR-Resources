@@ -1762,7 +1762,7 @@
 		<rank>201</rank>
 		<reputation>90</reputation>
 
-		<visual>actors\unic\npc_freeman</visual>
+		<visual>actors\novice\green_stalker_9</visual>
 		<snd_config>characters_voice\human_01\newbie\</snd_config>
 		<crouch_type>0</crouch_type>
 
@@ -2890,64 +2890,6 @@
 
 #include "gameplay\character_criticals_3.xml"
 #include "gameplay\character_dialogs_unic.xml"
-
-	</specific_character>
-	
-	<specific_character id="bar_ecolog_dead_default1" team_default = "1">
-		<name>GENERATE_NAME_science</name>
-		<icon>ui_npc_u_stalker_ecolog</icon>
-		<map_icon x="1" y="6"/>
-		<bio>ros_ecolog_guard_bio</bio>
-
-		<class>bar_ecolog_dead</class>
-		<community>ecolog</community>
-		<terrain_sect>stalker_ecolog_terrain</terrain_sect>
-		<money min="12000" max="15000" infinitive="0"/>
-
-		<rank>650</rank>
-		<reputation>50</reputation>
-
-		<visual>actors\ecolog\stalker_ecolog_dead</visual>
-		<snd_config>characters_voice\human_02\ecolog\</snd_config>
-		<crouch_type>1</crouch_type>
-		<supplies>
-			[spawn] \n
-			wpn_pm \n
-			ammo_9x18_pmm \n
-#include "gameplay\character_items.xml"\n
-#include "gameplay\character_drugs.xml"
-		</supplies>
-
-#include "gameplay\character_criticals_3.xml"
-
-	</specific_character>
-	
-	<specific_character id="bar_ecolog_dead_default2" team_default = "1">
-		<name>GENERATE_NAME_science</name>
-		<icon>ui_npc_u_stalker_ecolog</icon>
-		<map_icon x="1" y="6"/>
-		<bio>ros_ecolog_guard_bio</bio>
-
-		<class>bar_ecolog_dead</class>
-		<community>ecolog</community>
-		<terrain_sect>stalker_ecolog_terrain</terrain_sect>
-		<money min="12000" max="15000" infinitive="0"/>
-
-		<rank>650</rank>
-		<reputation>50</reputation>
-
-		<visual>actors\ecolog\stalker_ecolog_dead</visual>
-		<snd_config>characters_voice\human_03\ecolog\</snd_config>
-		<crouch_type>1</crouch_type>
-		<supplies>
-			[spawn] \n
-			wpn_pm \n
-			ammo_9x18_pmm \n
-#include "gameplay\character_items.xml"\n
-#include "gameplay\character_drugs.xml"
-		</supplies>
-
-#include "gameplay\character_criticals_3.xml"
 
 	</specific_character>
 

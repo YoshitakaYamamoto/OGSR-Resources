@@ -1123,7 +1123,6 @@
 	</dialog>
 	<dialog id="find_vodka">
 		<precondition>ogsm_quests.has_five_vodkas</precondition>
-		<has_info>look_tolik_vodka</has_info>
 		<dont_has_info>find_tolik_vodka</dont_has_info>
 		<phrase_list>
 			<phrase id="1">
@@ -3296,7 +3295,7 @@
 			<phrase id="5">
 				<text>escape_trader_start_dialog_5</text>
 				<next>52</next>
-				<!-- Есть флешка -->
+				<!-- Есть флэшка -->
 				<next>56</next>
 				<!-- Нету флэшки -->
 			</phrase>
@@ -3544,7 +3543,7 @@
 			</phrase>
 			<phrase id="77122">
 				<text>escape_trader_start_dialog_77122</text>
-				<action>ogse.give_binocl_to_actor</action>
+				<!--action>ogse.give_binocl_to_actor</action-->
 				<give_info>wolf_start_dialogs</give_info>
 				<next>1012</next>
 			</phrase>
@@ -3587,7 +3586,7 @@
 			</phrase>
 			<phrase id="77151">
 				<text>escape_trader_start_dialog_77151</text>
-				<action>ogse.give_binocl_to_actor</action>
+				<!--action>ogse.give_binocl_to_actor</action-->
 				<next>1012</next>
 			</phrase>
 			<phrase id="132453">

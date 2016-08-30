@@ -216,6 +216,8 @@ function CTreasure:give_treasure(k)
 			while left > box_size do
 				if vv.section ~= nil then
 					new_obj = sim:create_ammo(vv.section, pos, lvid, gvid, pid, box_size)
+					local sammo = alife():object(new_obj.id)
+					sammo:use_ai_locations(false)
 					table.insert(item_ids, new_obj.id)
 					left = left - box_size
 				end
@@ -223,6 +225,8 @@ function CTreasure:give_treasure(k)
 		if left > 0 then
 			if vv.section ~= nil then
 				new_obj = sim:create_ammo(vv.section, pos, lvid, gvid, pid, left)
+				local sammo = alife():object(new_obj.id)
+				sammo:use_ai_locations(false)
 				table.insert(item_ids, new_obj.id)
 			end	
 		end

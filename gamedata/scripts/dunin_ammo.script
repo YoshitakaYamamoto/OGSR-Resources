@@ -78,7 +78,7 @@ function on_update() --Поиск в инвентаре неполных пач�
 				end
 			end
 			--log3("--[%s] Create ammo! Section: [%s], size: [%s]", script_name(), k, v.size)
-			se_respawn.create_ammo(k, db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id(), v.size)
+			ogse.spawn_ammo_in_inv(k, v.size)
 		end
 	end
 

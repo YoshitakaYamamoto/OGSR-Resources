@@ -108,6 +108,9 @@ function evaluator_medic:__init(name, storage) super (nil, name)
 	self.a.next_medic_change_pos = 0
 end
 function evaluator_medic:evaluate()
+	if not self.object:alive() then
+		return false
+	end
 
 	if xr_wounded.is_wounded(self.object) or self.object:best_enemy() then
 		return false
@@ -205,14 +208,7 @@ function action_medic:execute()
 		if npc:accessible(wounded_vtx) then
 			self.a.tgt_vertex = wounded_vtx
 		else
-			local diff = wounded_npc:bone_position("bip01_spine"):sub(wounded_npc:position())
-			local lengt = diff:magnitude()*2.5
-			local test_lvid = npc:vertex_in_direction(wounded_vtx,diff,lengt)
-			if not npc:accessible(test_lvid) then
-				self.a.tgt_vertex = npc:accessible_nearest(level.vertex_position(test_lvid), vector():set(0,0,0))
-			else	
-				self.a.tgt_vertex = test_lvid
-			end			
+			self.a.tgt_vertex = npc:accessible_nearest(level.vertex_position(wounded_vtx), vector():set(0,0,0))
 		end
 	end
 	

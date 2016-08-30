@@ -1,29 +1,20 @@
-; РџРёСЃС‚РѕР»РµС‚ РњР°РєР°СЂРѕРІР°
-;-(РїСЂР°РІР»РµРЅРѕ SR)-------------------------------------
-; РєР°Р»РёР±СЂ 					9С…18 РјРј
-; РґР»РёРЅР° СЃС‚РІРѕР»Р° 				93.5 РјРј
-; РјР°РіР°Р·РёРЅ					8
-; РІРµСЃ Р±РµР· РјР°РіР°Р·РёРЅР°			0.73
-; СЌС„С„РµРєС‚РёРІРЅР°СЏ РґР°Р»СЊРЅРѕСЃС‚СЊ СЃС‚СЂРµР»СЊР±С‹	25 Рј
-; РїСЂРёС†РµР»СЊРЅР°СЏ РґР°Р»СЊРЅРѕСЃС‚СЊ		---
-; РґСѓР»СЊРЅР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ РїСѓР»Рё		315 Рј/СЃ
-; С‚РµРјРї СЃС‚СЂРµР»СЊР±С‹				30 РІ/СЃ
-;---------------------------------------------------
+; Пистолет Макарова модернезированый - ПММ
+;--------------------------------------
 [wpn_pm]:identity_immunities,base_wpn_zoom
-GroupControlSection			= spawn_group
-discovery_dependency 		= 
+GroupControlSection		= spawn_group
+discovery_dependency 	= 
 $spawn                  = "weapons\pm"					; option for Level Editor
 $npc			 		= on		; option for Level Editor
-$prefetch 					= 8
+$prefetch 				= 8
 scheduled            	= off              ; option for ALife Simulator
-cform                    	= skeleton
-class                    	= WP_PM
-min_radius               	= 0
+cform                   = skeleton
+class                   = WP_PM
+min_radius              = 0
 max_radius              = 20
-description					= enc_weapons1_wpn-pm
+description				= enc_weapons1_wpn-pm
 
 ef_main_weapon_type		= 0
-ef_weapon_type				= 5
+ef_weapon_type			= 5
 
 ;-----------------------------------------------------------------------------------
 holder_range_modifier	= 0.7
@@ -32,88 +23,86 @@ holder_fov_modifier		= 1.5
 
 cost					= 1600
 
-ammo_elapsed		 		= 8
+ammo_elapsed		 	= 12
+ammo_mag_size		 	= 12
+ammo_class		 		= ammo_9x18_fmj, ammo_9x18_pmm
 
-ammo_mag_size		 		= 8
-ammo_class		 			= ammo_9x18_fmj, ammo_9x18_pmm
+hand_dependence			= 1
 
-
-hand_dependence			 	= 1
-
-slot 				 		= 1
+slot 				 	= 1
 animation_slot		 	= 1		; type of the animation that will be used
-single_handed				= 1
+single_handed			= 1
 
-inv_name					= wpn-pm
-inv_name_short				= wpn-pm
+inv_name				= wpn-pm
+inv_name_short			= wpn-pm
 inv_weight				= 0.76
 
-inv_grid_width				= 1
-inv_grid_height				= 1
-inv_grid_x					= 18
-inv_grid_y					= 6
+inv_grid_width			= 1
+inv_grid_height			= 1
+inv_grid_x				= 18
+inv_grid_y				= 6
 
-kill_msg_x					= 227
-kill_msg_y					= 82
-kill_msg_width				= 27
-kill_msg_height				= 23
+kill_msg_x			= 227
+kill_msg_y			= 82
+kill_msg_width		= 27
+kill_msg_height		= 23
 
 ;-----------------------------------------------------------------------------------
-;Р±Р°Р·РѕРІР°СЏ РґРёСЃРїРµСЂСЃРёСЏ
-fire_dispersion_base		= 0.27 	;СѓРіРѕР» (РІ РіСЂР°РґСѓСЃР°С…) Р±Р°Р·РѕРІРѕР№ РґРёСЃРїРµСЂСЃРёРё РѕСЂСѓР¶РёСЏ (РѕСЂСѓР¶РёСЏ Р·Р°Р¶Р°С‚РѕРіРѕ РІ С‚РёСЃРєР°С…)
-;control_inertion_factor		= 1.10f
+;базовая дисперсия
+fire_dispersion_base		= 0.27 	;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor		= 1.10f
 disp_rate 			= 1.85
 
-;РѕС‚РґР°С‡Р°
-cam_relax_speed         	= 8;1.0	;СЃРєРѕСЂРѕСЃС‚СЊ РІРѕР·РІСЂР°С‚Р° РІ РёСЃС…РѕРґРЅРѕРµ РїРѕР»РѕР¶РµРЅРёРµ
+;отдача
+cam_relax_speed         	= 8;1.0	;скорость возврата в исходное положение
 cam_relax_speed_ai        	= 120.75
-cam_dispersion          	= 2	;СѓРІРµР»РёС‡РµРЅРёСЏ СѓРіР»Р° (РІ РіСЂР°РґСѓСЃР°С…) СЃ РєР°Р¶РґС‹Рј РІС‹СЃС‚СЂРµР»РѕРј
-cam_dispersion_inc		= 0.3	;СѓРІРµР»РёС‡РµРЅРёe cam_dispersion СЃ РєР°Р¶РґС‹Рј РІС‹СЃС‚СЂРµР»РѕРј
-cam_dispertion_frac		= 1.0	;СЃС‚РІРѕР» Р±СѓРґРµС‚ РїРѕРґС‹РјР°С‚СЊСЃСЏ РЅР° cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
-cam_max_angle			= 15.0	;РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СѓРіРѕР» РѕС‚РґР°С‡Рё
+cam_dispersion          	= 2	;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc		= 0.3	;увеличениe cam_dispersion с каждым выстрелом
+cam_dispertion_frac		= 1.0	;ствол будет подыматься на cam_dispersion*cam_dispertion_frac +- cam_dispersion*(1-cam_dispertion_frac)
+cam_max_angle			= 15.0	;максимальный угол отдачи
 cam_max_angle_horz		= 5.0	;(degree) maximum shot horizontal degree 
 cam_step_angle_horz		= 1.0	;(degree) size of step camera moved in horizontal position while shooting
 
-fire_dispersion_condition_factor= 3.5	;СѓРІРµР»РёС‡РµРЅРёРµ РґРёСЃРїРµСЂСЃРёРё РІ РїСЂРѕС†РµРЅС‚Р°С… РїСЂРё РјР°РєСЃРёРјР°Р»СЊРЅРѕРј РёР·РЅРѕСЃРµ 
-misfire_probability 		= 0.001	;РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ РѕСЃРµС‡РєРё РїСЂРё РјР°РєСЃРёРјР°Р»СЊРЅРѕРј РёР·РЅРѕСЃРµ 
-misfire_condition_k					= 0.05
-condition_shot_dec 			= 0.0002 ;СѓРІРµР»РёС‡РµРЅРёРµ РёР·РЅРѕСЃР° РїСЂРё РєР°Р¶РґРѕРј РІС‹СЃС‚СЂРµР»Рµ
+fire_dispersion_condition_factor= 3.5	;увеличение дисперсии в процентах при максимальном износе 
+misfire_probability 		= 0.001	;вероятность осечки при максимальном износе 
+misfire_condition_k			= 0.05
+condition_shot_dec 			= 0.0002 ;увеличение износа при каждом выстреле
 ;-----------------------------------------------------------------------------------
 
 direction                	= 0, 0, 1
-fire_point               	= 0.0, 0.14, 0.15
+fire_point               	= 0.0, 0.127, 0.117
 
-flame_particles				= amik\weapons\flame_particles\flame_particles_04
-smoke_particles				= amik\weapons\smoke_particles\p_smoke_particles_02
+flame_particles				= weapons\generic_weapon_pistol
+smoke_particles				= weapons\generic_shoot_00
 
-shell_point		 			= 0.05, 0.12, -0.05
+shell_point		 			= 0.00, 0.127, 0.03
 shell_dir		 			= 0.0, 0.0, 0.4
-shell_particles	 			= amik\weapons\9x18\9x18_r_00
+shell_particles	 			= weapons\generic_shells00_right
 
 rpm_empty_click 	 		= 150
 
-PDM_disp_base 				= 1.0
+PDM_disp_base 			= 1.0
 PDM_disp_vel_factor 		= 0.7
 PDM_disp_accel_factor 		= 0.7
-PDM_crouch	 				= 1.0
-PDM_crouch_no_acc 			= 1.0
+PDM_crouch	 		= 1.0
+PDM_crouch_no_acc 		= 1.0
 
 ; ttc
 hit_power               = 0.43
-hit_impulse		 	= 60
-hit_type 					= fire_wound
-;hit_rate			= 1.85
+hit_impulse		 	= 15
+hit_type = fire_wound
+hit_rate			= 1.85
 
-fire_distance           	= 50 
-bullet_speed			= 360	;РЅР°С‡Р°Р»СЊРЅР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ РїСѓР»Рё
+fire_distance           = 50
+bullet_speed			= 360	;начальная скорость пули
 rpm                     = 270;300
 ; end ttc
 
-use_aim_bullet				= false		;РџРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ Р»Рё РїРµСЂРІР°СЏ СЃСѓРїРїРµСЂ РїСѓР»СЏ
+use_aim_bullet				= false		;Поддерживается ли первая суппер пуля
 time_to_aim					= 1.0	
 
 silencer_hit_power      = 0.39
-silencer_hit_impulse	= 40
+silencer_hit_impulse	= 5
 silencer_fire_distance   	= 50
 silencer_bullet_speed	 	= 290
 
@@ -121,6 +110,12 @@ hud                      	= wpn_pm_hud
 normal                   	= 0, 1, 0
 position                 	= -0.021, -0.09, 0.0
 orientation              	= 0, 0, 1
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;strap_position         		= -0.1,-0.45,0.2			; position (offset) and orientation of the weapon when it is strapped
+;strap_orientation      		= 1.57,0,0						; (3rd person view)
+;strap_bone0					= bip01_spine2
+;strap_bone1					= bip01_spine1
 
 visual                   	= weapons\pm\wpn_pm.ogf
 
@@ -132,12 +127,12 @@ light_time 		 			= 0.2
 
 ;addons
 scope_status				= 0
-silencer_status				= 0
+silencer_status				= 2
 grenade_launcher_status		= 0
 
 zoom_enabled				= true
 
-weapon_remove_time			= 5000 	;РІСЂРµРјСЏ СѓРЅРёС‡С‚РѕР¶РµРЅРёСЏ РѕСЂСѓР¶РёСЏ (СЃ СѓС‡РµС‚РѕРј TimeFactor) РґР»СЏ РјСѓР»СЊС‚РёРїР»РµРµСЂР°
+weapon_remove_time			= 5000 	;время уничтожения оружия (с учетом TimeFactor) для мультиплеера
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; silencer
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -158,14 +153,18 @@ silencer_light_var_color	= 0.05
 silencer_light_var_range	= 0.5
 silencer_light_time 		= 0.2
 
-
-snd_draw					= weapons\pm\draw
-snd_holster					= weapons\pm\holster
-snd_shoot					= weapons\pm\shot
-snd_silncer_shot			= weapons\pm\silencer
-snd_empty					= weapons\pm\empty, 0.7
-snd_reload					= weapons\pm\reload
-snd_close					= weapons\pm\close
+;------------------------------ O.G.S.E. sound remake -----------------------
+;звуки
+snd_draw					= weapons\pm\pm_draw
+snd_holster					= weapons\pistol_holster
+snd_shoot					= weapons\pm\pm_shoot
+snd_shoot1					= weapons\pm\pm_shoot1
+snd_shoot2					= weapons\pm\pm_shoot2
+snd_shoot3					= weapons\pm\pm_shoot3
+snd_empty					= weapons\pm\pm_empty
+snd_reload					= weapons\pm\pm_reload, 0.8
+snd_close					= weapons\pm\pm_close
+snd_silncer_shot			= weapons\pm\pm_shot_sil
 ;-----------------------------------------------------------------------------
 
 ;-----------------------------------------------------------------------------
@@ -175,61 +174,41 @@ snd_close					= weapons\pm\close
 
 allow_inertion		= true
 
-;shell_point		        	= -0.015,0.028,-0.271
-;fire_point					= 0.0000,0.040,-0.3000
-fire_bone                	= wpn_body
+shell_point			= 0.000000,0.02000,-0.4
+fire_point          = 0.000000,0.02000,-0.4
+fire_bone 			= wpn_body
 
-;sto1en
-shell_point          		= 0.080, -0.0078, -0.118
-fire_point					= 0.01, 0.03, -0.24
+orientation			= 0, 0, 0
+position            = 0.15,-0.06,0.25 ; первая влево\вправо ; вторая вверх\вниз ;третья fov 0, 0, 0
+visual 				= weapons\pm\wpn_pm_hud.ogf
 
-;position                 	= -0.021000,-0.160000,0.002500
-;orientation              	= -0.500000,1.000000,1.149999
-
-;sto1en
-position					= -0.01, -0.155, -0.050
-orientation					= 0.00, 0.50, 0.00
-
-visual                   	= weapons\pm\wpn_pm_hud.ogf
-
-anim_holster				= holster
-anim_holster_empty			= holster_empty
-anim_idle					= idle
-anim_empty					= empty
-anim_reload					= reload
-anim_reload_empty			= reload_full
-anim_reload_misfire			= reload_full
-anim_draw					= draw
-anim_draw_empty				= draw_empty
-anim_shoot					= shoot
-anim_shot_last				= shoot_last
-anim_close					= holster
-anim_idle_aim				= idle_aim
-anim_idle_sprint			= idle_sprint
-anim_idle_sprint_empty		= idle_sprint_empty
+anim_holster		= holster
+anim_idle			= idle
+anim_empty			= empty
+anim_reload			= reload_full
+anim_reload_empty	= reload_empty
+anim_draw			= draw
+anim_draw_empty		= draw_empty
+anim_shoot			= shot
+anim_shot_last		= shot_last
+anim_close			= close
+anim_idle_aim		= idle_aim
+anim_idle_sprint	= idle_sprint
 
 ;-----------------------------------------------------------------------------
-;СЃРјРµС‰РµРЅРёСЏ HUD РґР»СЏ СЂРµР¶РёРјР° РїСЂРёР±Р»РёР¶РµРЅРёСЏ
-;zoom_offset					= -0.097500,0.048700,0.000000
-;zoom_rotate_x				= 0.004600
-;zoom_rotate_y				= -0.015700
+;смещения HUD для режима приближения
+zoom_offset		= -0.151,0.062,-0.12
+zoom_rotate_x	= 0
+zoom_rotate_y	= 0
 
-;sto1en
-zoom_offset			= -0.106100,0.039400,-0.023000
-zoom_rotate_x		= -0.007400
-zoom_rotate_y		= -0.008800
 ;-----------------------------------------------------------------------------
-;РїСЂСЏС‡РµРј РїРµСЂРµРєСЂРµСЃС‚РёРµ РїСЂРёС†РµР»Р° РІ Р·СѓРјРµ
-zoom_hide_crosshair			= true						
+;прячем перекрестие прицела в зуме
+zoom_hide_crosshair		= true
 
-;+full_close_anim 			= true
-;collide_hud 				= false
-
-
-;РІСЂРµРјСЏ РїРѕРІРѕСЂРѕС‚Р° HUD (СЃРµРє)
-zoom_rotate_time			= 0.1
-rotate_time					= 0.1
+;время поворота HUD (сек)
+zoom_rotate_time		= 0.1
+rotate_time			= 0.1
 
 [wpn_pm_repair]
 tech_complication = 400
-repair_compatibility = pm
+repair_compatibility = pm                = 

@@ -3204,7 +3204,12 @@ function give_cheb_deadcity_msg()
 	soundtrack.cheb_talking()
 --	local kolya = ogse.spawn_object(spawn_db.stalker_kolya)
 --	ogse.kill_offline_npc(kolya)
+	local sKolya = alife():story_object(story_ids.stalker_kolya)
+	if not sKolya then
+		sKolya = alife():create(11268)
+	end
 	level_tasks.add_location_by_sid(story_ids.stalker_kolya, "crlc_big", "find_kolya")
+	ogse.spawn_item_in_inv("af_kolya", sKolya)
 end
 
 function cheb_ready_msg()

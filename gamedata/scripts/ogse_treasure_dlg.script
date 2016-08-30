@@ -1,0 +1,168 @@
+--[[ ---------------------------------------------------------------------------------------------------
+ File        : ogse_treasure_dlg.script
+ Description : Выдача тайников с вероятностью, что тайник будет пустой в диалогах с ранеными.
+ Copyright   : 2012 © OGSE Mod Team
+ Author      : Stalk15
+ Last update : 31.08.2012 
+--]]----------------------------------------------------------------------------------------------------
+local EnableTreasureOnHelp, EnableGoToFuck, EnablePlease = false, false, false
+
+--////////////////     Диалоги     ////////////////--
+function init_fast_give_dlg(dlg)
+    local phrase
+    phrase = dlg:AddPhrase("dm_general_help_medkit", "0", "", -10000)
+		phrase:GetPhraseScript():AddAction("dialogs.transfer_medkit")
+    phrase = dlg:AddPhrase("dm_fast_give_medkit_1", "1", "0", -10000)
+		phrase:GetPhraseScript():AddPrecondition("ogse_treasure_dlg.PreEnableTreasureOnHelp")
+    phrase = dlg:AddPhrase("dm_fast_give_medkit_2", "2", "0", -10000)	
+		phrase:GetPhraseScript():AddPrecondition("ogse_treasure_dlg.PreEnableTreasureOnHelp1")
+	phrase = dlg:AddPhrase("dm_fast_give_medkit_3", "3", "1", -10000)
+		phrase:GetPhraseScript():AddAction("ogse_treasure_dlg.UpActorReputation5")	
+		phrase:GetPhraseScript():AddAction("dialogs.break_dialog")
+	phrase = dlg:AddPhrase("dm_fast_give_medkit_4", "4", "2", -10000)
+		phrase:GetPhraseScript():AddAction("ogse_treasure_dlg.GiveTreasure0")	
+		phrase:GetPhraseScript():AddAction("dialogs.break_dialog")
+	phrase = dlg:AddPhrase("dm_fast_give_medkit_5", "5", "2", -10000)
+		phrase:GetPhraseScript():AddAction("ogse_treasure_dlg.UpActorReputation10")
+		phrase:GetPhraseScript():AddAction("dialogs.break_dialog")
+end
+
+function init_medkit_on_treasure_dlg(dlg)
+    local phrase
+    phrase = dlg:AddPhrase("dm_medkit_on_treasure_0", "0", "", -10000)
+		phrase:GetPhraseScript():AddAction("ogse_treasure_dlg.DownActorReputation5")
+	phrase = dlg:AddPhrase("dm_medkit_on_treasure_1", "1", "0", -10000)
+		phrase:GetPhraseScript():AddPrecondition("ogse_treasure_dlg.PreEnableGoToFuck")		
+	phrase = dlg:AddPhrase("dm_medkit_on_treasure_2", "2", "0", -10000)
+		phrase:GetPhraseScript():AddPrecondition("ogse_treasure_dlg.PreEnableGoToFuck1")
+	phrase = dlg:AddPhrase("dm_medkit_on_treasure_3", "3", "1", -10000)
+		phrase:GetPhraseScript():AddAction("ogse_treasure_dlg.DownActorReputation15")	
+		phrase:GetPhraseScript():AddAction("dialogs.break_dialog")		
+	phrase = dlg:AddPhrase("dm_medkit_on_treasure_4", "4", "2", -10000)
+		phrase:GetPhraseScript():AddAction("dialogs.transfer_medkit")
+		phrase:GetPhraseScript():AddAction("ogse_treasure_dlg.GiveTreasure50")		
+		phrase:GetPhraseScript():AddAction("dialogs.break_dialog")
+end
+
+function init_not_for_you_medkit_dlg(dlg)
+	local phrase
+	phrase = dlg:AddPhrase("dm_not_for_you_medkit_0", "0", "", -10000)
+	phrase = dlg:AddPhrase("dm_not_for_you_medkit_1", "1", "0", -10000)
+		phrase:GetPhraseScript():AddPrecondition("ogse_treasure_dlg.PreEnablePlease")
+	phrase = dlg:AddPhrase("dm_not_for_you_medkit_2", "2", "0", -10000)
+		phrase:GetPhraseScript():AddPrecondition("ogse_treasure_dlg.PreEnablePlease1")
+	phrase = dlg:AddPhrase("dm_not_for_you_medkit_3", "3", "1", -10000)
+		phrase:GetPhraseScript():AddAction("ogse_treasure_dlg.DownActorReputation20")		
+		phrase:GetPhraseScript():AddAction("dialogs.break_dialog")
+	phrase = dlg:AddPhrase("dm_not_for_you_medkit_4", "4", "1", -10000)
+		phrase:GetPhraseScript():AddAction("dialogs.transfer_medkit")
+		phrase:GetPhraseScript():AddAction("ogse_treasure_dlg.GiveTreasure90")
+		phrase:GetPhraseScript():AddAction("dialogs.break_dialog")
+	phrase = dlg:AddPhrase("dm_not_for_you_medkit_5", "5", "1", -10000)
+		phrase:GetPhraseScript():AddAction("dialogs.break_dialog")
+	phrase = dlg:AddPhrase("dm_not_for_you_medkit_4", "7", "2", -10000)
+		phrase:GetPhraseScript():AddAction("dialogs.transfer_medkit")
+		phrase:GetPhraseScript():AddAction("ogse_treasure_dlg.GiveTreasure70")
+		phrase:GetPhraseScript():AddAction("dialogs.break_dialog")
+	phrase = dlg:AddPhrase("dm_not_for_you_medkit_5", "8", "2", -10000)
+		phrase:GetPhraseScript():AddAction("dialogs.break_dialog")
+	phrase = dlg:AddPhrase("dm_not_for_you_medkit_6", "6", "2", -10000)
+		phrase:GetPhraseScript():AddAction("dialogs.transfer_medkit")
+		phrase:GetPhraseScript():AddAction("ogse_treasure_dlg.GiveTreasure60")
+		phrase:GetPhraseScript():AddAction("ogse_treasure_dlg.DownActorReputation25")		
+		phrase:GetPhraseScript():AddAction("dialogs.break_dialog")
+end
+
+function init_has_not_medkit_dlg(dlg)
+    local phrase
+    phrase = dlg:AddPhrase("dm_has_not_maedkit_0", "0", "", -10000)
+		phrase:GetPhraseScript():AddAction("dialogs.break_dialog")
+end
+
+
+--////////////////     Условия     ////////////////--
+--/игрок просит тайник
+function PrecondRequestTreasure(first_speaker, second_speacker)
+	local r, Com1, Com2, relationto
+	Com1 = first_speaker:character_community() Com2 = second_speacker:character_community() relationto = second_speacker:relation(first_speaker) 
+	if Com1 == Com2 or relationto == game_object.friend then
+		r = 0.05
+	elseif relationto == game_object.neutral then
+		r = 0.25
+	elseif relationto == game_object.enemy then
+		r = 0.95
+	end
+	return math.random() < r
+end
+
+--/нпс предлагает тайник
+function PreEnableTreasureOnHelp()
+	if math.random() < 0.8 then
+		EnableTreasureOnHelp = false
+		return true
+	else
+		EnableTreasureOnHelp = true
+		return false	
+	end
+end
+
+function PreEnableTreasureOnHelp1()
+	return EnableTreasureOnHelp
+end
+
+--/нпс не хочет говорить про тайник
+function PreEnableGoToFuck()
+	if math.random() < 0.2 then
+		EnableGoToFuck = false
+		return true
+	else
+		EnableGoToFuck = true
+		return false	
+	end
+end
+
+function PreEnableGoToFuck1()
+	return EnableGoToFuck
+end
+
+--/нпс умоляет игрока
+function PreEnablePlease()
+	if math.random() < 0.5 then
+		EnablePlease = false
+		return true
+	else
+		EnablePlease = true
+		return false	
+	end
+end
+
+function PreEnablePlease1()
+	return EnablePlease
+end
+
+function GetCoefOfRep(first_speaker, second_speacker)
+	if second_speacker:relation(first_speaker) == game_object.neutral then
+		return 1.5
+	elseif second_speacker:relation(first_speaker) == game_object.friend then
+		return 2
+	end
+	return 1
+end
+
+--/Создание функций понижения/повышения репутации, выдачи тайников
+function InitFunctions()
+	local tNumsReps = {5, 10, 15, 20, 25}
+	local tRndGiveTreasure = {0, 50, 60, 70, 90}
+    for k, v in pairs(tNumsReps) do
+		this["UpActorReputation"..v] = 
+			function(first_speaker, second_speacker) db.actor:change_character_reputation(db.actor:character_reputation() + v) end
+		this["DownActorReputation"..v] =
+			function(first_speaker, second_speacker) db.actor:change_character_reputation(db.actor:character_reputation() - (v * GetCoefOfRep(first_speaker, second_speacker))) end
+	end
+    for kk, vv in pairs(tRndGiveTreasure) do
+		this["GiveTreasure"..vv] = 
+			function(actor, npc) treasure_manager.get_treasure_manager():GiveRndTreasureFromDialog(npc, 0, vv) end
+	end
+end
+InitFunctions()
+

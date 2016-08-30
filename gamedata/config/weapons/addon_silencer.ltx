@@ -6,6 +6,25 @@ cform           = skeleton
 $prefetch 		= 32
 inv_weight		= 0.2
 
+[wpn_addon_sil_1143_p]:wpn_sil
+$spawn			= "weapons\upgrade\sil_1143_p" ; option for Level Editor
+visual          = weapons\upgrade\sil_1143_p.ogf
+description		= enc_arsenal_sil_1143_p
+
+cost			= 750
+
+inv_name		= ars-sil_1143_p
+inv_name_short	= ars-sil_1143_p
+inv_grid_width	= 1
+inv_grid_height	= 1
+inv_grid_x		= 32
+inv_grid_y		= 37
+
+bullet_hit_power_k	= 0.8
+bullet_speed_k	 	= 0.8
+fire_dispersion_base_k = 1.25
+cam_dispersion_k	= 0.8
+
 [wpn_addon_sil_556_ar]:wpn_sil
 $spawn			= "weapons\upgrade\sil_556_ar" ; option for Level Editor
 visual          = weapons\upgrade\sil_556_ar.ogf
@@ -36,7 +55,7 @@ inv_name_short	= wpn-9mm_nato-silencer
 inv_grid_width	= 1
 inv_grid_height	= 1
 inv_grid_x		= 18
-inv_grid_y		= 1
+inv_grid_y		= 4
 
 bullet_hit_power_k	= 0.8
 bullet_speed_k	 	= 0.8
@@ -57,10 +76,10 @@ cost			= 1700
 
 inv_name		= wpn-addon-silencer
 inv_name_short	= wpn-addon-silencer
-inv_grid_width	= 2
+inv_grid_width	= 1
 inv_grid_height	= 1
-inv_grid_x		= 76	;18
-inv_grid_y		= 7		;1
+inv_grid_x		= 18
+inv_grid_y		= 1
 
 bullet_hit_power_k	= 0.8
 bullet_speed_k	 	= 0.8
@@ -161,6 +180,7 @@ cam_dispersion_k	= 0.8
 ;;;;;;;;;;;;;;;;;;;Прибор малошумной стрельбы "Глушитель тактический автоматный" АТГ 
 ;?универсал (под 5,7 и 5 НАТО)
 ;(при использовании обтюратора 6Ч7, возможно ведение беззвучной и беспламенной стрельбы 7,62-мм патронами «УС»)
+
 [wpn_addon_sil_545_atg]:wpn_sil
 $spawn			= "weapons\addons\sil_545_atg" ; option for Level Editor
 visual          = weapons\upgrade\atg.ogf
@@ -175,27 +195,6 @@ inv_grid_width	= 1
 inv_grid_height	= 1
 inv_grid_x		= 70
 inv_grid_y		= 10
-
-bullet_hit_power_k	= 0.8
-bullet_speed_k	 	= 0.8
-fire_dispersion_base_k = 1.25
-cam_dispersion_k	= 0.8
-
-
-;;;;;;;;;;;;;;;;;;;Прибор малошумной стрельбы для 45 калибра
-[wpn_addon_sil_1143_p]:wpn_sil
-$spawn			= "weapons\upgrade\sil_1143_p" ; option for Level Editor
-visual          = weapons\upgrade\sil_1143_p.ogf
-description		= enc_arsenal_sil_1143_p
-
-cost			= 750
-
-inv_name		= ars-sil_1143_p
-inv_name_short	= ars-sil_1143_p
-inv_grid_width	= 1
-inv_grid_height	= 1
-inv_grid_x		= 32
-inv_grid_y		= 37
 
 bullet_hit_power_k	= 0.8
 bullet_speed_k	 	= 0.8

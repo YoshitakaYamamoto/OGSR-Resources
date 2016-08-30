@@ -14,7 +14,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-[ammo_5.45x39_fmj]:ammo_base
+[ammo_5.45x39_fmj]:identity_immunities
 GroupControlSection	= spawn_group
 discovery_dependency = 
 $spawn			= "weapons\ammo\ammo_5.45x39_fmj" ; option for Level Editor
@@ -48,7 +48,7 @@ tracer			= on
 wm_size         = 0.0545
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-[ammo_5.45x39_ap]:ammo_base
+[ammo_5.45x39_ap]:identity_immunities
 GroupControlSection	= spawn_group
 discovery_dependency = 
 $spawn			= "weapons\ammo\ammo_5.45x39_ap" ; option for Level Editor
@@ -106,8 +106,8 @@ inv_weight		= 0.0105
 belt = true
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 66
-inv_grid_y			= 9			;9 без подписи	;8 подписанный
+inv_grid_x			= 60
+inv_grid_y			= 2
 visual	= weapons\magazines\mag_30_545x39.ogf
 cost = 120
 
@@ -123,8 +123,8 @@ inv_weight		= 0.0105
 belt = true
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 66
-inv_grid_y			= 9			;9 без подписи	;8 подписанный
+inv_grid_x			= 60
+inv_grid_y			= 2
 visual	= weapons\magazines\mag_30_545x39.ogf
 cost = 120
 
@@ -140,8 +140,8 @@ inv_weight		= 0.0105
 belt = true
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 70
-inv_grid_y			= 9			;9 без подписи	;8 подписанный
+inv_grid_x			= 59
+inv_grid_y			= 9
 visual	= weapons\magazines\mag_45_545x39.ogf
 cost = 180
 
@@ -157,42 +157,42 @@ inv_weight		= 0.0105
 belt = true
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 70
-inv_grid_y			= 9			;9 без подписи	;8 подписанный
+inv_grid_x			= 59
+inv_grid_y			= 9
 visual	= weapons\magazines\mag_45_545x39.ogf
 cost = 180
 
-[mag_60_5.45x39_fmj]:ammo_5.45x39_fmj
+[mag_75_5.45x39_fmj]:ammo_5.45x39_fmj
 box_size	= 1
-mag_size	= 60
+mag_size	= 75
 script_binding  = ammo_manager.init
-wm_section	= wm_5.45x39a60
-inv_name		= mag_60_5.45x39
+wm_section	= wm_5.45x39a75
+inv_name		= mag_75_5.45x39
 description		= desc_load_5.45x39_fmj
-inv_name_short	= mag_60_5.45x39_fmj_s
+inv_name_short	= mag_75_5.45x39_fmj_s
 inv_weight		= 0.0105
 belt = true
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 71
-inv_grid_y			= 9			;9 без подписи	;8 подписанный
+inv_grid_x			= 59
+inv_grid_y			= 7
 visual	= weapons\magazines\mag_75_545x39.ogf
 cost = 250
 
-[mag_60_5.45x39_ap]:ammo_5.45x39_ap
+[mag_75_5.45x39_ap]:ammo_5.45x39_ap
 box_size	= 1
-mag_size	= 60
+mag_size	= 75
 script_binding  = ammo_manager.init
-wm_section	= wm_5.45x39b60
-inv_name		= mag_60_5.45x39
+wm_section	= wm_5.45x39b75
+inv_name		= mag_75_5.45x39
 description		= desc_load_5.45x39_ap
-inv_name_short	= mag_60_5.45x39_ap_s
+inv_name_short	= mag_75_5.45x39_ap_s
 inv_weight		= 0.0105
 belt = true
 inv_grid_width		= 1
 inv_grid_height		= 1
-inv_grid_x			= 71
-inv_grid_y			= 9			;9 без подписи	;8 подписанный
+inv_grid_x			= 59
+inv_grid_y			= 7
 visual	= weapons\magazines\mag_75_545x39.ogf
 cost = 250
 
@@ -212,11 +212,11 @@ inv_weight = 0.3
 description		= desc_mag_e
 inv_weight = 0.3
 
-[mag_60_5.45x39_fmj_e]:mag_60_5.45x39_fmj
+[mag_75_5.45x39_fmj_e]:mag_75_5.45x39_fmj
 description		= desc_mag_e
 inv_weight = 0.9
 
-[mag_60_5.45x39_ap_e]:mag_60_5.45x39_ap
+[mag_75_5.45x39_ap_e]:mag_75_5.45x39_ap
 description		= desc_mag_e
 inv_weight = 0.9
 

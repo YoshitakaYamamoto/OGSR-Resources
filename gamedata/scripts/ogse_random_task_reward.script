@@ -131,7 +131,8 @@ function random_task_reward:get_money_by_type()
 			elseif self.task_info.type == "monster_part" then self.money_koef = sys_ini:r_float("rndm_tsk_rwrd_money_koef", "monster_part")
 				elseif self.task_info.type == "find_item" then self.money_koef = sys_ini:r_float("rndm_tsk_rwrd_money_koef", "find_item")
 		end
-		return self.money_koef*sys_ini:r_u32(self:get_quest_target(self.task_info.task_name), "cost")
+		local mon = self.money_koef*sys_ini:r_u32(self:get_quest_target(self.task_info.task_name), "cost")
+		return (mon - math.fmod(mon, 10))
 	else
 		return sys_ini:r_u32("rndm_tsk_rwrd_"..self.trader.."_"..self.task_info.type.."_money", self.task_info.difficult.."_money")
 	end

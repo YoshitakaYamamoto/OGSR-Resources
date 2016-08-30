@@ -4,35 +4,25 @@
 
     <!--Zombie-->
 
-    <article id="mutant_zombie_general" name="Zombie" group="Mutants">
-        <texture>ui_npc_monster_zombie_normal</texture>
-        <text>enc_mutant_zombie_general</text>
-    </article>
-	
-	<article id="mutant_zombieg_general" name="Zombieg" group="Mutants">
+    <article id="mutant_zombieg_general" name="Zombieg" group="Mutants">
         <texture>ui_npc_monster_zombie_ghost</texture>
         <text>enc_mutant_zombieg_general</text>
     </article>
 
-    <article id="mutant_zombie_rusty" name="Zombie_rusty" group="Mutants">
+    <article id="mutant_zombie_general" name="Zombie" group="Mutants">
+        <texture>ui_npc_monster_zombie_normal</texture>
+        <text>enc_mutant_zombie_general</text>
+    </article>
+
+    <article id="enc_zombie_rusty" name="Zombie_rusty" group="Mutants">
         <texture>ui_npc_monster_zombie_rusty</texture>
         <text>enc_mutant_zombie_rusty</text>
     </article>
-	
-    <article id="enc_zombie_rusty" name="Zombie_plague" group="Mutants">
-        <texture>ui_npc_monster_zombie_plague</texture>
-        <text>enc_mutant_zombie_plague</text>
-    </article>	
 
-    <article id="mutant_zombie_plague" name="Zombie_plague" group="Mutants">
-        <texture>ui_npc_monster_zombie_plague</texture>
-        <text>enc_mutant_zombie_plague</text>
-    </article>
-	
     <article id="enc_zombie_plague" name="Zombie_plague" group="Mutants">
         <texture>ui_npc_monster_zombie_plague</texture>
         <text>enc_mutant_zombie_plague</text>
-    </article>	
+    </article>
 
     <!--CHIMERA-->
 

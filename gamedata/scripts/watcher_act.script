@@ -203,7 +203,8 @@ function cannot_take_that(npc)
 		   string.find(npc:name(), "ecolog") or 
 		   string.find(npc:name(), "specnaz") or 
 		   string.find(npc:name(), "scientist") or
-		   string.find(npc:name(), "mil_freedom_member0021")
+		   string.find(npc:name(), "mil_freedom_member0021") or
+		   string.find(npc:name(), "pri_followers")
 end
 
 function max_weight(npc)

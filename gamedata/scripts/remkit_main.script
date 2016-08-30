@@ -125,22 +125,12 @@ function compatibility_item(item, repaired_item) --Проверка совмес
 	local ammo_1 = get_string_wq(item:section(), "ammo_class", nil)
 	local ammo_2 = get_string_wq(repaired_item:section(), "ammo_class", nil)
 	if not ammo_1 or not ammo_2 then return false end
-	if ammo_1 == ammo_2 then return true else return false end
+	return ammo_1 == ammo_2
 -----------------------------------------------------------------------------------------------
 end
 
 function play_repair_sound()
-	local remkit_sounds = {
-		[1] = [[scripts\remkit\ui_repairweapon_01]],
-		[2] = [[scripts\remkit\ui_repairweapon_02]],
-		[3] = [[scripts\remkit\ui_repairweapon_03]],
-		[4] = [[scripts\remkit\ui_repairweapon_04]],
-		[5] = [[scripts\remkit\ui_repairweapon_05]],
-		[6] = [[scripts\remkit\ui_repairweapon_06]],
-		[7] = [[scripts\remkit\ui_repairweapon_07]],
-	}
-	local rnd = math.random(1, 7)
-	soundtrack.s_play_no_feedback(remkit_sounds[rnd])
+	soundtrack.s_play_no_feedback("scripts\\remkit\\ui_repairweapon_0"..math.random(7))
 end
 
 --========================================ОСНОВНОЕ МЕНЮ, ЗАПУСКАЕТСЯ СРАЗУ ПОСЛЕ ЗАПУСКА РЕМКИТА===========================================
@@ -275,14 +265,13 @@ function remkit:rep_trans()
 		local new_state = tonumber(car_state) + 0.5
 		if new_state > 1 then
 			s_car:SetfHealth(1)
-			s_car:SetExplodeTime(120000)
 		else
 			s_car:SetfHealth(new_state)
-			s_car:SetExplodeTime(120000)
 		end
+		s_car:SetExplodeTime(120000)
 		play_repair_sound()
 	end
-	self:GetHolder():start_stop_menu (self,true)
+	self:GetHolder():start_stop_menu(self,true)
 	self.dlg = nil
 	collectgarbage("collect")
 end

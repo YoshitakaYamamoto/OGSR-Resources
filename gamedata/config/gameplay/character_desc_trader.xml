@@ -25,7 +25,7 @@
 	wpn_saiga12c \n
 	ammo_12x70_kart \n
 	wpn_ak102_ak10230_stok_kobra \n
-	ammo_5.56x45_ap \n
+	ammo_5.45x39_ap \n
 	device_torch \n
 #include "gameplay\character_drugs.xml"
 	</supplies>
@@ -131,6 +131,7 @@
 	</supplies>
 
 	<actor_dialog>merc_trader</actor_dialog>
+	<actor_dialog>dm_help_wounded_medkit_dialog</actor_dialog>
 <!--	<actor_dialog>merc_trader_lc_info</actor_dialog> -->
 #include "gameplay\character_dialogs_unic.xml"
 </specific_character>

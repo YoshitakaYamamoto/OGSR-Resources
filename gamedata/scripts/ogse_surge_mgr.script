@@ -36,8 +36,8 @@ local surge_postpone_time   = 10 -- [час.], время откладывания выброса в случае 
 local horror_flag           = sys_ini:r_s32("options","horror_flag")
 local horror_time_proshow   = sys_ini:r_s32("options","horror_time_proshow")
 
-local sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror]])
-local sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror]])
+local sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
+local sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
 
 
 local military_phantom_types = {

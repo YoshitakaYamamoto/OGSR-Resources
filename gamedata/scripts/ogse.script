@@ -995,49 +995,65 @@ function __do_timer_action(select_string, params_string)
 end
 --****************************************ТАЙМЕРЫ - КОНЕЦ.*************************************************
 
--- Спавним несколько объектов в инвентарь
-function spawn_items_in_inv(section,npc,num)
-	for i=1,num do
-		spawn_item_in_inv(section,npc)
+-----------------------------------------------------------------------------------------------------------
+function spawn_items_in_inv(section, npc, num) --Спавним несколько объектов в инвентарь
+	for i=1, num do
+		spawn_item_in_inv(section, npc)
 	end
-end
--- Спавним объекты в инвентарь
-function spawn_item_in_inv(section,npc)
-	local npc = (npc or db.actor)
-	local sobj_abstr = alife():create(section, npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id())
-	if sobj_abstr then
-		if npc:id() == db.actor:id() then
-			return alife():object(sobj_abstr.id)
-		else
-			level.client_spawn_manager():add(sobj_abstr.id, -1, fix_spawn_item_in_inv, npc) --Фикс пропадания доспавненного предмета при сейв/лоаде
-			return sobj_abstr
-		end
-	else	
-		log1("!!Error spawn_item_in_inv sect ["..tostring(section).."] npc ["..npc:name().."]")	
-		return false
-	end	
-end
-function fix_spawn_item_in_inv(npc, id, sobj_abstr)
-    npc:transfer_item(sobj_abstr, npc)
 end
 
--- Спавним патроны в инвентарь --пока что используется только для спавна патронов актору. При спавне патронов неписю, скорее всего нужен фикс пропадания как в функции выше.
-function spawn_ammo_in_inv(section,number,npc)
-	local npc = (npc or db.actor)
-	log1("~~spawn_ammo_in_inv sect ["..tostring(section).."] npc ["..npc:name().."]")	
-	if number > 0 then
-		local sobj_abstr = se_respawn.create_ammo(section,
-				npc:position(),
-				npc:level_vertex_id(),
-				npc:game_vertex_id(),
-				npc:id(),
-				number)
-		if not sobj_abstr then
-			return false
+function spawn_item_in_inv(section, npc) --Спавним объекты в инвентарь
+	local npc = npc or db.actor
+	local sobj_abstr, id
+	if type(npc.id) == "function" then
+		id = npc:id()
+		sobj_abstr = alife():create(section, npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), id)
+	else
+		id = npc.id
+		sobj_abstr = alife():create(section, npc.position, npc.level_vertex_id, npc.game_vertex_id, id)
+	end
+	ASSERT(sobj_abstr, "[ogse.spawn_item_in_inv] Can't create object with section [%s] in inv [%s]", section or "nil", npc:name() or "nil")
+	if id ~= db.actor:id() then
+		level.client_spawn_manager():add(sobj_abstr.id, -1, fix_spawn_item_in_inv, npc) --Фикс пропадания доспавненного предмета при сейв/лоаде
+	end
+	return alife():object(sobj_abstr.id)
+end
+
+-- Спавним патроны в инвентарь
+function spawn_ammo_in_inv(section, num, npc)
+	if num <= 0 then return end
+	local npc = npc or db.actor
+
+	local pos, lvi, gvi, pid
+	if type(npc.id) == "function" then
+		pos, lvi, gvi, pid = npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id()
+	else
+		pos, lvi, gvi, pid = npc.position, npc.level_vertex_id, npc.game_vertex_id, npc.id
+	end
+
+	local is_actor = pid == db.actor:id()
+	local num_in_box = get_u32(section, "box_size")
+	while num > num_in_box do
+		local sitem = alife():create_ammo(section, pos, lvi, gvi, pid, num_in_box)
+		local sammo = alife():object(sitem.id)
+		sammo:use_ai_locations(false)
+		if not is_actor then
+			level.client_spawn_manager():add(sammo.id, -1, fix_spawn_item_in_inv, npc) --Фикс пропадания доспавненного предмета при сейв/лоаде
 		end
-		return alife():object(sobj_abstr.id)
+		num = num - num_in_box
+	end
+	local sitem = alife():create_ammo(section, pos, lvi, gvi, pid, num)
+	local sammo = alife():object(sitem.id)
+	sammo:use_ai_locations(false)
+	if not is_actor then
+		level.client_spawn_manager():add(sammo.id, -1, fix_spawn_item_in_inv, npc) --Фикс пропадания доспавненного предмета при сейв/лоаде
 	end
 end
+
+function fix_spawn_item_in_inv(npc, id, sobj_abstr) --Фикс пропадания доспавненного предмета при сейв/лоаде
+    npc:transfer_item(sobj_abstr, npc)
+end
+-----------------------------------------------------------------------------------------------------------
 
 -- Удаляем объект из игры
 function remove_item(item_to_remove)
@@ -1260,67 +1276,108 @@ function on_actor_update() --Колбэк на апдейт ГГ
 	ogse_debug.process_actor("upd_a", 0)
 end
 
+function make_guider_happy_again(obj_id, obj)
+	obj:set_character_community("ecolog", 0, 0)
+end
+
 -- Запуск вызовов при первом апдейта актора
 function on_actor_first_update()
-	if db.actor:dont_has_info("OGSE_LIANA_PATCH_3_FIX") then
-		local names = {
-			"liana_00",
-			"liana_01",
-			"liana_02",
-			"liana_03",
-			"liana_04",
-			"liana_05",
-			"liana_06",
-		}
-		for _, n in ipairs( names ) do
-			local sobj = alife():object( n )
-			if sobj then
-				alife():release( sobj )
+	if db.actor:has_info("storyline_actor_start") then		
+		if db.actor:dont_has_info("OGSE_LIANA_PATCH_3_FIX") then
+			if level.name() ~= "l08u_brainlab" then
+				-- баг с лианами
+				local obj = alife():object("liana_00")
+				if obj then
+					alife():release(obj, true)
+				end
+				obj = alife():object("liana_01")
+				if obj then
+					alife():release(obj, true)
+				end
+				obj = alife():object("liana_02")
+				if obj then
+					alife():release(obj, true)
+				end
+				obj = alife():object("liana_03")
+				if obj then
+					alife():release(obj, true)
+				end
+				obj = alife():object("liana_04")
+				if obj then
+					alife():release(obj, true)
+				end
+				obj = alife():object("liana_05")
+				if obj then
+					alife():release(obj, true)
+				end
+				obj = alife():object("liana_06")
+				if obj then
+					alife():release(obj, true)
+				end
+				alife():create(5929)
+				alife():create(5930)
+				alife():create(5931)
+				alife():create(5932)
+				alife():create(5933)
+				alife():create(5934)
+				alife():create(5935)
 			end
+			db.actor:give_info_portion("OGSE_LIANA_PATCH_3_FIX")
 		end
-		alife():create(5929)
-		alife():create(5930)
-		alife():create(5931)
-		alife():create(5932)
-		alife():create(5933)
-		alife():create(5934)
-		alife():create(5935)
-		db.actor:give_info_portion("OGSE_LIANA_PATCH_3_FIX")
-	end
-
-	if db.actor:dont_has_info("OGSE_KOLYA_PATCH_10_FIX") then
-		-- варианты: 
-		-- 1) Коля еще не заспавнен
-		-- 2) Коля заспавнен, есть, еще не найден
-		-- 3) Коля заспавнен, пропал, еще не найден
-		-- 4) Коля найден, квест закончен
-		if db.actor:dont_has_info("cheb_found_kolya") then
-		-- не вариант 4
-			-- в вариантах 1 и 3 надо всего лишь заспавнить колю и все
-			local kolya = alife():story_object(story_ids.stalker_kolya)
-			if kolya then
-			-- вариант 2. Удаляем колю, снимая с него метку
-				level_tasks.remove_location_by_sid(story_ids.stalker_kolya, "crlc_big")
-				alife():release(kolya)
+		if db.actor:dont_has_info("OGSE_KOLYA_PATCH_10_FIX") then
+			-- варианты: 
+			-- 1) Коля еще не заспавнен
+			-- 2) Коля заспавнен, есть, еще не найден
+			-- 3) Коля заспавнен, пропал, еще не найден
+			-- 4) Коля найден, квест закончен
+			if db.actor:dont_has_info("cheb_found_kolya") then
+			-- не вариант 4
+				-- в вариантах 1 и 3 надо всего лишь заспавнить колю и все
+				local kolya = alife():story_object(story_ids.stalker_kolya)
+				if kolya then
+				-- вариант 2. Удаляем колю, снимая с него метку
+					level_tasks.remove_location_by_sid(story_ids.stalker_kolya, "crlc_big")
+					alife():release(kolya)
+				end
+				alife():create(11268)
+				if db.actor:has_info("deadcity_first_enter") then
+					level_tasks.add_location_by_sid(story_ids.stalker_kolya, "crlc_big", "find_kolya")
+				end
 			end
-			alife():create(11269)
-			if db.actor:has_info("deadcity_first_enter") then
-				level_tasks.add_location_by_sid(story_ids.stalker_kolya, "crlc_big", "find_kolya")
-			end
+			
+			db.actor:give_info_portion("OGSE_KOLYA_PATCH_10_FIX")
 		end
-		
-		db.actor:give_info_portion("OGSE_KOLYA_PATCH_10_FIX")
-	end
-
-	if db.actor:dont_has_info("OGSE_PATCH_8_FIX") then
-		if db.actor:dont_has_info("dead_stalker_start_dialog_2") then
-			local obj = alife():story_object(story_ids.x18_death_stalker)
-			if obj then
-				alife():release(obj, true)
-				dark_valley_u_spawn.dead_stalker()
+		if db.actor:dont_has_info("OGSE_PATCH_8_FIX") then
+			if db.actor:dont_has_info("dead_stalker_start_dialog_2") then
+				local obj = alife():story_object(story_ids.x18_death_stalker)
+				if obj then
+					alife():release(obj, true)
+					dark_valley_u_spawn.dead_stalker()
+				end
 			end
+			db.actor:give_info_portion("OGSE_PATCH_8_FIX")
 		end
-		db.actor:give_info_portion("OGSE_PATCH_8_FIX")
+		if db.actor:dont_has_info("OGSE_PATCH_10_1_FIX") then
+			local guider = alife():object("yantar_guider")
+			if guider then
+				level.client_spawn_manager():add(guider.id, -1, make_guider_happy_again)
+			end
+			
+			local af_kolya = nil
+			for i = 1,65535 do
+				local obj = alife():object(i)
+				if obj and obj:section_name() == "af_kolya" then
+					af_kolya = obj
+				end
+			end
+			if af_kolya then
+				alife():release(af_kolya, true)
+				if db.actor:has_info("cheb_found_kolya") and not db.actor:object("cheb") then
+					ogse.spawn_item_in_inv("af_kolya", alife():story_object(story_ids.stalker_kolya))
+				end
+			end
+			db.actor:give_info_portion("OGSE_PATCH_10_1_FIX")
+		end
 	end
 
 	-- Установка FOV
@@ -1366,6 +1423,7 @@ function on_game_load()
 	if db.actor:dont_has_info("storyline_actor_start") then
 		ogse_spawns.traders_spawn()
 		ogse_spawns.sidr_guard_spawn()
+		bar_spawn.arbalet()
 		db.actor:give_info_portion("encyclopedy_tutorial_jump")
 		db.actor:give_info_portion("encyclopedy_tutorial_crouch")
 		db.actor:give_info_portion("encyclopedy_tutorial_sprint")

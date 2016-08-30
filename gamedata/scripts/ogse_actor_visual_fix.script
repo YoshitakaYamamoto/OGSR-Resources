@@ -1,0 +1,62 @@
+-----------------------------------------------------------------------
+--- ogse_actor_visual_fix.script
+--- Исправление движкового бага с неправильным визуалом актора
+--- Malandrinus, KamikaZze
+--- version 1.2 (12/02/2013)
+-----------------------------------------------------------------------
+
+function attach(sm) -- для менеджера сигналов
+	-- sm:subscribe({signal = "on_item_to_slot", fun = this.on_item_to_slot})
+	-- sm:subscribe({signal = "on_drop", fun = this.on_drop})
+	-- sm:subscribe({signal = "on_item_to_ruck", fun = this.on_item_to_ruck})
+	-- sm:subscribe({signal = "on_take", fun = this.on_item_to_ruck})
+end
+
+local last_outfit = nil
+local function check_outfit_changing()
+	log1("!!ACTOR VISUAL check_outfit_changing")
+	local outfit = db.actor:get_current_outfit()
+	if not outfit then
+		log1("!!ACTOR VISUAL set sviter!")
+		db.actor:set_actor_visual([[actors\stalker_hero\stalker_sviter]])
+	elseif outfit then
+		local sect = outfit:section()
+		if sect == last_outfit then
+			log1("!!ACTOR VISUAL not changed!")
+		else
+			local ini = system_ini()
+			local visual = nil
+			if ini:section_exist(sect) then
+				if ini:line_exist(sect, "actor_visual") then
+					visual = ini:r_string(sect, "actor_visual")
+				end			
+			end
+			if visual then
+				log1("!!ACTOR VISUAL WILL CHANGE!")
+				db.actor:set_actor_visual(visual)
+			end			
+			log1("!!ACTOR VISUAL HAVE CHANGED!")
+			last_outfit = outfit
+		end		
+	end
+end
+
+function on_item_to_slot(obj, sobj)
+	if not sobj or not obj then return end
+	if not obj:is_outfit() then return end
+	last_outfit = db.actor:get_current_outfit()
+	check_outfit_changing()
+end
+
+function on_item_to_ruck(obj, sobj)
+	if not sobj or not obj then return end
+	if not obj:is_outfit() then return end
+	check_outfit_changing()
+end
+
+function on_drop(obj)
+	if not sobj or not obj then return end
+	if not obj:is_outfit() then return end
+	check_outfit_changing()
+end
+

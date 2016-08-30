@@ -1,5 +1,3 @@
-;Форт-12
-;---------------------------------------------------
 [wpn_fort]:identity_immunities,base_wpn_zoom
 GroupControlSection			= spawn_group
 discovery_dependency 		= 
@@ -26,7 +24,6 @@ ammo_elapsed		 		= 12
 ammo_mag_size		 		= 12
 ammo_class		 			= ammo_9x18_fmj, ammo_9x18_pmm
 
-
 hand_dependence		 		= 1
 single_handed				= 1
 
@@ -43,14 +40,14 @@ inv_grid_height				= 1
 inv_grid_x					= 10
 inv_grid_y					= 8
 
-kill_msg_x					= 104
-kill_msg_y					= 178
-kill_msg_width				= 28
-kill_msg_height				= 21
+kill_msg_x			= 104
+kill_msg_y			= 178
+kill_msg_width		= 28
+kill_msg_height		= 21
 
 ;-----------------------------------------------------------------------------------
 ;базовая дисперсия
-fire_dispersion_base		= 0.26  ;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+fire_dispersion_base		= 0.22  ;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
 control_inertion_factor		= 1.10f
 
 ;отдача
@@ -65,43 +62,43 @@ cam_step_angle_horz		= 0.7	;(degree) size of step camera moved in horizontal pos
 
 fire_dispersion_condition_factor = 3	;увеличение дисперсии в процентах при максимальном износе 
 misfire_probability 		= 0.001	;вероятность осечки при максимальном износе
-misfire_condition_k					= 0.05 
+misfire_condition_k			= 0.05 
 condition_shot_dec 			= 0.0009 ;увеличение износа при каждом выстреле
 ;-----------------------------------------------------------------------------------
 
 direction                	= 0, 0, 1
-fire_point					= 0.000000,0.150000,0.150000
+fire_point               	= 0.0, 0.148, 0.157
 
-flame_particles				= amik\weapons\flame_particles\flame_particles_04
-smoke_particles				= amik\weapons\smoke_particles\p_smoke_particles_02
+flame_particles		   		= weapons\generic_weapon_pistol
+smoke_particles		   		= weapons\generic_shoot_00
 rpm_empty_click 	 		= 200
 
 shell_point		 			= 0.05, 0.148, 0.053
 shell_dir		 			= 0.0, 0.0, 0.4
-shell_particles	 			= amik\weapons\9x18\9x18_r_00
+shell_particles	 			= weapons\generic_shells00_right
 
-PDM_disp_base 				= 1.0
+PDM_disp_base 			= 1.0
 PDM_disp_vel_factor 		= 0.6
 PDM_disp_accel_factor 		= 0.6
-PDM_crouch	 				= 1.0
-PDM_crouch_no_acc 			= 1.0
+PDM_crouch	 		= 1.0
+PDM_crouch_no_acc 		= 1.0
 
 ; ttc
-hit_power               = 0.44
-hit_impulse		 	= 65
-hit_type 					= fire_wound
+hit_power               = 0.45
+hit_impulse		 	= 15
+hit_type 			= fire_wound
 hit_rate			= 1.7
 
-fire_distance       		= 50 
+fire_distance       = 50
 bullet_speed		= 360	;начальная скорость пули
-rpm                 		= 300
+rpm                 = 300
 ; end ttc
 
 use_aim_bullet				= false		;Поддерживается ли первая суппер пуля
 time_to_aim					= 1.0	
 
-silencer_hit_power       	= 0.38
-silencer_hit_impulse	 	= 40
+silencer_hit_power       	= 0.32
+silencer_hit_impulse	 	= 90
 silencer_fire_distance   	= 100
 silencer_bullet_speed	 	= 220
 
@@ -110,8 +107,13 @@ normal                   	= 0, 1, 0
 position                 	= -0.021, -0.10, 0.0
 orientation              	= 0, 0, 0
 
-startup_ammo             	= 90
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;strap_position         		= -0.1,-0.45,0.2			; position (offset) and orientation of the weapon when it is strapped
+;strap_orientation      		= 1.57,0,0						; (3rd person view)
+;strap_bone0					= bip01_spine2
+;strap_bone1					= bip01_spine1
 
+startup_ammo             	= 90
 visual                   	= weapons\fort\wpn_fort.ogf
 
 light_color		 			= 0.6,0.5,0.3
@@ -122,19 +124,18 @@ light_time 		 			= 0.2
 
 ;addons
 scope_status				= 0
-silencer_status				= 0
+silencer_status				= 2
 grenade_launcher_status		= 0
 
 zoom_enabled				= true
 
 ;звуки
-snd_draw					= weapons\fort17\fort_draw
+snd_draw					= weapons\fort_draw
 snd_holster					= weapons\generic_holster
-snd_shoot					= weapons\fort17\fort_shoot
-snd_empty					= weapons\fort17\fort_empty
-snd_reload					= weapons\fort17\fort_reload
-snd_close					= weapons\fort17\fort_close
-snd_silncer_shot			= weapons\fort17\fort_shot_sil
+snd_shoot					= weapons\t_fort_shot         ;usp_shoot
+snd_empty					= weapons\pistol_empty
+snd_reload					= weapons\pm_reload, 0.8
+snd_close					= weapons\generic_close
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; silencer
@@ -149,57 +150,42 @@ silencer_y 					= -17
 
 ;silencer_flame_particles 	= weapons\generic_weapon01
 silencer_smoke_particles 	= weapons\generic_shoot_00
-
+snd_silncer_shot			= weapons\silencer4, 0.6 
 silencer_light_color		= 0.6,0.5,0.3
 silencer_light_range		= 0.01
 silencer_light_var_color	= 0.05
 silencer_light_var_range	= 0.5
 silencer_light_time 		= 0.2
 
-;-----------------------------------------------------------------------------
-;-- HUD DESCRIPTION
-;----------------------------------------------------------------------------- 
 [wpn_fort_hud]
 
 allow_inertion		= true
 
-;sto1en
-shell_point					= 0.015, -0.016, -0.34
-shell_bone              	= gilza
-fire_point					= 0.008, 0.021, -0.31
-fire_bone               	= muzzle
-
-;position					= -0.031,-0.17,0
-;orientation					= -0.5,1.,1.15
-
-;sto1en
-position					= -0.01, -0.155, -0.050
-orientation					= 0.00, 0.50, 0.00
-
+shell_point			= 0.000000,0.02000,-0.4
+fire_point          = 0.000000,0.02000,-0.4
+	
+fire_bone                	= wpn_body
+orientation					= 0, 0, 0
+position          		  = 0.15,-0.06,0.25 ; первая влево\вправо ; вторая вверх\вниз ;третья fov 0, 0, 0
 visual                   	= weapons\fort\wpn_fort_hud.ogf
 
-anim_holster				= holster
-anim_idle					= idle
-anim_empty					= idle_empty
-anim_reload					= reload
-anim_reload_empty			= reload_empty
-anim_draw					= draw
-anim_draw_empty				= draw_empty
-anim_shoot					= shoot
-anim_shot_last				= shoot_last
-anim_close					= holster
-anim_idle_aim				= idle_aim
-anim_idle_sprint			= idle_sprint
+anim_holster		= holster
+anim_idle			= idle
+anim_empty			= empty
+anim_reload			= reload
+anim_reload_empty	= reload_empty
+anim_draw			= draw
+anim_draw_empty		= draw_empty
+anim_shoot			= shot
+anim_shot_last		= shot_last
+anim_close			= close
+anim_idle_aim		= idle_aim
+anim_idle_sprint	= idle_sprint
 
 ;смещения HUD для режима приближения
-;zoom_offset					= -0.091000,0.054000,-0.051000
-;zoom_rotate_x				= 0.002500
-;zoom_rotate_y				= -0.007100
-
-;sto1en
-zoom_offset			= -0.108600,0.038300,-0.056100
-zoom_rotate_x		= -0.003000
-zoom_rotate_y		= -0.000700
+zoom_offset		= -0.15,0.062,-0.12
+zoom_rotate_x	= 0
+zoom_rotate_y	= 0
 
 ;прячем перекрестие прицела в зуме
 zoom_hide_crosshair		= true
@@ -207,6 +193,7 @@ zoom_hide_crosshair		= true
 ;время поворота HUD (сек)
 zoom_rotate_time		= 0.1
 rotate_time			= 0.1
+
 
 [wpn_fort_repair]
 tech_complication = 400

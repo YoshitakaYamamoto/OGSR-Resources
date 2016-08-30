@@ -114,7 +114,7 @@ class "exo_control" (CUIScriptWnd)
 function exo_control:__init() super()
 	local xml = CScriptXmlInit()
 	xml:ParseFile("ui_ogse_exo_control.xml")
-    self:Init(880, 264,32,32) -- само скриптовое окно размещаем там, где должна быть кнопка
+    self:Init(895, 264,32,32) -- само скриптовое окно размещаем там, где должна быть кнопка
 	self.btn = xml:Init3tButton("ui_ogse_exo_control", self) -- кнопка, ради которой всё и делается
 	self:Register(self.btn,"btn_exo_control")
 	self:AddCallback("btn_exo_control", ui_events.BUTTON_CLICKED, self.btn_action, self)

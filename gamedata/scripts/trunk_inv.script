@@ -383,6 +383,7 @@ function transfer_from_actor_to_trunk(id, trunk)
 	act:transfer_item(item, trunk)
 end
 
+--[=[
 function spawn_ammo_in_trunk(car, obj_section, count)
 	ASSERT(car, "spawn_item_in_trunk: nil car parameter")
 	local trunk = get_trunk_for_car(car)
@@ -390,6 +391,7 @@ function spawn_ammo_in_trunk(car, obj_section, count)
 	local lvid, gvid, id = trunk:level_vertex_id(), trunk:game_vertex_id(), trunk:id()
 	ogse.spawn_ammo_in_inv(obj_section, count, trunk)
 end
+--]=]
 
 function remove_item_from_trunk_by_section(car, obj_section)
 	local item = get_item_from_trunk_by_section(car, obj_section)
@@ -419,7 +421,7 @@ function get_nearest_car_by_section(sect_name)
 		--local car = level.object_by_id(k)
 		if car and car:section() == sect_name then
 			local actor_pos = db.actor:position()
-			local car_pos = car:bone_position("exhausts")
+			local car_pos = car:position() --car:bone_position("exhausts")
 			if actor_pos:distance_to(car_pos) < dist then
 				nearest_car = car
 				dist = actor_pos:distance_to(car_pos)
@@ -436,7 +438,7 @@ function get_car_nearby()
 		--local car = level.object_by_id(k)
 		if car then
 			local actor_pos = db.actor:position()
-			local car_pos = car:bone_position("exhausts")
+			local car_pos = car:position() --car:bone_position("exhausts")
 			if actor_pos:distance_to(car_pos) < dist then
 				nearest_car = car
 				dist = actor_pos:distance_to(car_pos)

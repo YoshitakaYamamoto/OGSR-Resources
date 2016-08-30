@@ -20,7 +20,7 @@ inv_weight			    = 0.35
 cost					= 100
 
 ;------------------------------ O.G.S.E. sound remake -----------------------
-snd_checkout = weapons\grenade\grenade_checkout, 0.5
+snd_checkout = weapons\grenade\grenade_checkout
 ;----------------------------------------------------------------------------
 
 force_min			= 10	; ~30% от максимума
@@ -122,18 +122,7 @@ snd_explode  = weapons\grenade\grenade_f1
 ;----------------------------------------------------------------------------
 
 [grenade_f1_hud]:grenade_hand_hud
-visual              = weapons\swmt\grenade\wpn_f1_hud.ogf
-position            = 0,0,0.2
-
-fire_bone           = wpn_body
-anim_show			= draw
-anim_hide			= holster
-anim_idle			= idle
-anim_playing		= idle_play
-anim_throw_begin	= throw_1_start
-anim_throw_idle		= throw_2_idle
-anim_throw_act		= throw_3_act	
-anim_throw_end		= throw_4_end
+visual              = weapons\grenade\wpn_f_1_hud.ogf
 
 ;-----------------------------------------------------------------------------------
 ; Ручная противопехотная граната наступательного типа РГД-5
@@ -198,18 +187,8 @@ grenade_remove_time		= 60000
 detonation_threshold_hit	= 350
 
 [grenade_rgd5_hud]:grenade_hand_hud
-position            = 0,0,0.2
-visual              = weapons\swmt\grenade\wpn_rgd5_hud.ogf
-
-fire_bone           = wpn_body
-anim_show			= draw
-anim_hide			= holster
-anim_idle			= idle
-anim_playing		= idle_play
-anim_throw_begin	= throw_1_start
-anim_throw_idle		= throw_2_idle
-anim_throw_act		= throw_3_act	
-anim_throw_end		= throw_4_end
+position            = 0,0,0
+visual              = weapons\grenade\wpn_rgd_5_hud.ogf
 
 ;-----------------------------------------------------------------------------------
 ; Осветительная граната ГО
@@ -314,3 +293,71 @@ snd_explode = weapons\grenade\grenade_gd05
 
 [grenade_gd-05_hud]:grenade_hand_hud
 visual              = weapons\grenade\wpn_gd_05_hud.ogf
+
+;-----------------------------------------------------------------------------------
+; Граната газовая
+;-----------------------------------------------------------------------------------
+[grenade_gas]:grenade_hand
+$spawn 				= "weapons\grenades\g_gas"
+class				= G_RGD5
+visual				= weapons\grenade\wpn_rgd_5.ogf
+inv_name			= grenade_gas
+inv_name_short		= grenade_gas_s
+description			= enc_weapons1_grenade_gas
+
+inv_grid_x			= 20
+inv_grid_y			= 1
+
+kill_msg_x			= 240
+kill_msg_y			= 123
+kill_msg_width		= 14
+kill_msg_height		= 23
+
+hud			        = grenade_gas_hud
+
+force_max		    = 30
+force_grow_speed	= 15;2 ;30
+
+cost			    = 300	;40
+
+blast			= 10 ;1.50
+blast_r			= 10
+blast_impulse		= 0
+;delete
+blast_impulse_factor = 1
+
+;--test of damage over time
+effective_radius	= 10
+hit_type			= chemical_burn
+min_start_power		= 0.9
+max_start_power		= 0.95
+
+frags				= 25
+frags_r				= 10
+frag_hit			= 25
+frag_hit_impulse	= 55
+
+hit_type_blast		= chemical_burn
+hit_type_frag		= chemical_burn
+
+up_throw_factor		 = 1.2
+
+explode_particles	= a_ufp_particles\gas_grenade
+
+light_color		    = 0.1,0.8,0.1
+light_range		    = 5.0
+light_time 		    = 5
+
+;трассы от осколков
+fragment_speed		= 45
+
+explode_duration	= 60	;подолжительность взрыва (с)
+
+;------------------------------------------------------------------------------------------
+;звук
+snd_explode         = ambient\underground\steam_2		
+;------------------------------------------------------------------------------------------
+
+[grenade_gas_hud]:grenade_hand_hud
+position            = 0,0,0
+visual              = weapons\grenade\wpn_rgd_5_hud.ogf
