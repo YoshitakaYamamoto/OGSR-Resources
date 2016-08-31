@@ -52,8 +52,8 @@ local snd_nv_stop_subvolume = 1		-- громкость звука выключе
 local btr_nightvision_section = "effector_nightvision_elite"	-- секция постпроцесса ПНВ БТР
 
 --уровень интенсивности постэффектов
-local nv_ppe_factor = 0.8			-- уровень интенсивности постэффекта ПНВ
-local nv_scope_ppe_factor = 0.7		-- уровень интенсивности постэффекта ночного режима прицела
+local nv_ppe_factor = 1.0 --0.8			-- уровень интенсивности постэффекта ПНВ
+local nv_scope_ppe_factor = 1.0 --0.7		-- уровень интенсивности постэффекта ночного режима прицела
 local nv_binocular_ppe_factor = 0.8	-- уровень интенсивности постэффекта ночного режима бинокля
 local nv_btr_ppe_factor = 1.0		-- уровень интенсивности постэффекта ПНВ БТР
 
