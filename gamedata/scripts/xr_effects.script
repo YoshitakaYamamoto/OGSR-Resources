@@ -2600,15 +2600,12 @@ end
 
 function aem_draw()
 	db.actor:set_character_community("trader",0,0)
-	aem_lights.draw()
 end
 
 function aem_win()
-	aem_lights.win()
 end
 
 function aem_foul()
-	aem_lights.foul()
 end
 
 function aem_death(actor, npc, p)

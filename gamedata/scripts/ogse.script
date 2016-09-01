@@ -6,11 +6,10 @@
 -----------------------------------------------------------------------
 
 function attach(sm)
-	sm:subscribe({signal = "on_take",			fun = this.on_item_take})
-	sm:subscribe({signal = "on_update",			fun = this.on_actor_update})
-	sm:subscribe({signal = "on_first_update",	fun = this.on_actor_first_update})
 	sm:subscribe({signal = "on_spawn",			fun = this.on_game_load})
+	sm:subscribe({signal = "on_first_update",	fun = this.on_actor_first_update})
 	sm:subscribe({signal = "on_update",			fun = this.show_time})
+	sm:subscribe({signal = "on_take",			fun = this.on_item_take})
 end
 
 game_time_factor = 0
@@ -1239,41 +1238,6 @@ function on_item_take(obj)
 		db.actor:give_info_portion("prof_zapiska_find")
 		return true
 	end
-end
-
---*****************************************************[Переменные для апдейта актора]******************************************************
-local watchdog --НЕ ТРОГАТЬ! Здесь не должно быть никакого значения!
-local func --Тоже самое.
-local watchdog_tbl = { --АПДЕЙТЫ С НИЗКИМ ПРИОРИТЕТОМ!
-function() --TODO: Перенести в ui_rad.script, или вообще удалить
-	ogse_debug.process_actor("upd", 11)
-	if db.actor.radiation >= 0.7 then --Вывод сообщения о большой радиации
-		local hud = get_hud()
-		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
-		if custom_static == nil then
-			hud:AddCustomStatic("cs_radiation_danger", true)
-			hud:GetCustomStatic("cs_radiation_danger"):wnd():SetTextST("st_radiation_danger")
-		end
-	else
-		local hud = get_hud()
-		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
-		if custom_static ~= nil then
-			hud:RemoveCustomStatic("cs_radiation_danger")
-		end
-	end
-end,
-function()
-	ogse_debug.process_actor("upd_a", 30)
-	aem_manager.get_aem():update() -- Обновление арены
-end,
-}
---*******************************************************************************************************************************************
-
-function on_actor_update() --Колбэк на апдейт ГГ
-	watchdog, func = next(watchdog_tbl, watchdog)
-	if func then func() end
-
-	ogse_debug.process_actor("upd_a", 0)
 end
 
 function make_guider_happy_again(obj_id, obj)

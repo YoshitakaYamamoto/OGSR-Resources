@@ -1,3 +1,25 @@
+
+function attach( sm )
+  sm:subscribe({ signal = "on_spawn", fun = this.on_spawn })
+end
+
+local actor = db.actor
+
+function on_spawn()
+  actor = db.actor
+  if level.name() == "l05_bar" then
+    ogse_signals.get_mgr():subscribe({
+      signal = "on_update", fun = this.on_update, queued = true
+    })
+  end
+end
+
+function on_update()
+  ogse_signals.get_mgr():reschedule( math.random( 5000, 6000 ) )
+  get_aem():update()
+end
+
+
 local time_open = 22	-- время (час) открытия арены, min = 0, max = 23
 local time_close = 6	-- время (час) закрытия, min = 0, max = 23
 local delay_min = 1		-- минимальное количество полных дней (суток) между закрытием и открытием арены, min = 0
@@ -410,11 +432,9 @@ function CArenaext:is_extro_name(name)
 	if info.group == "stakes" or info.group == "turnament" then
 		if xr_logic.pstor_retrieve(db.actor, "aem_team1") > 0 then
 			local team = xr_logic.pstor_retrieve(db.actor, info.team2, "")
-			aem_lights.win_team1()
 			return self.teams[team].extro == name
 		elseif xr_logic.pstor_retrieve(db.actor, "aem_team2") > 0 then
 			local team = xr_logic.pstor_retrieve(db.actor, info.team1, "")
-			aem_lights.win_team2()
 			return self.teams[team].extro == name
 		end
 	end
@@ -445,11 +465,6 @@ function CArenaext:on_death(npc, team)
 	elseif cnt == 0 and db.actor:dont_has_info("aem_fight_done") then
 		-- команда уничтожена, необходимо закончить бой
 		db.actor:give_info_portion("aem_fight_done")
-		-- мигалки для ставочных боёв
-		local info = self:description(self:current())
-		if info.group ~= "turnament" and info.group ~= "stakes" then
-			aem_lights.win()
-		end
 	end
 end
 
@@ -636,10 +651,6 @@ function CArenaext:cleanup()
 	
 	-- чтение LTX
 	local ini = dsh.cached_ini_file("misc\\aem_manager.ltx")
-	
-	-- возврат стандартного освещения на арене
-	aem_lights.remove_all_aem_lamps()
-	aem_lights.turn_arena_lamps_on()
 	
 	-- создание списка удаляемых инфопоршинов
 	local info = {}
@@ -1358,9 +1369,6 @@ function CArenaext:close()
 	
 	-- чистка арены (если делать в finish, то есть глюки)
 	xr_zones.purge_arena_items("bar_arena")
-	-- сброс освещения после боя
-	aem_lights.remove_all_aem_lamps()
-	
 
 	db.actor:disable_info_portion("aem_fight_done")
 	db.storage[db.actor:id()].pstor["aem_cr"] = nil

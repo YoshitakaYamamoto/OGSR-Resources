@@ -76,8 +76,6 @@ function register(object_factory)
 	cs_register(object_factory, "CMincer",                 "se_zones.se_zone_anom",               "ZS_GALAN", "zone_galant_s")
 	cs_register(object_factory, "CMincer",                 "se_zones.se_zone_anom",               "ZS_MINCE", "zone_mincer_s")
 
-	cs_register(object_factory, "hanging_lamp",            "aem_lights.se_lamp",                  "AEM_LAMP", "aem_lamp")
-
 	cs_register(object_factory, "CHelicopter",             "turret_mgun.se_turret_mgun",          "TURRETMG", "turret_mgun")
 	cs_register(object_factory, "CGameObject",             "ogse_base_storage.se_custom_storage", "CUST_ST",  "custom_storage")
 end
