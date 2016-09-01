@@ -34,18 +34,18 @@ end
 
 
 function check_mental( obj )
-  log3("~~[%s] Update check_mental for [%s]", script_name(), obj:name())
+  --log3("~~[%s] Update check_mental for [%s]", script_name(), obj:name())
   ogse_signals.get_mgr():reschedule( 5000 )
   local storage = db.storage[ obj:id() ].state_mgr
   ASSERT( storage, "state_mgr not found in db.storage: %s", obj:name() )
   local binder  = obj:binded_object()
   local mental  = state_lib.states[ storage.target_state ].mental
-  if xr_companion.is_companion( obj:id() ) then --KRodin: Если напарники будут зависать, попробовать этот кусок закомментировать.
-    if binder[ script_name() .. ".check_mental" ] then
-      binder[ script_name() .. ".check_mental" ] = nil
-	end
-    return
-  end
+  --if xr_companion.is_companion( obj:id() ) then --KRodin: Если напарники будут зависать, попробовать этот кусок закомментировать.
+  --  if binder[ script_name() .. ".check_mental" ] then
+  --    binder[ script_name() .. ".check_mental" ] = nil
+  --  end
+  --  return
+  --end
   if binder[ script_name() .. ".check_mental" ] then
     if mental and mental == anim.panic then
       log1(
@@ -62,7 +62,7 @@ function check_mental( obj )
         .. " is in panic - will check it for freezing."
       )
       binder[ script_name() .. ".check_mental" ] = true
-      ogse_signals.get_mgr():reschedule( 25000 )
+      ogse_signals.get_mgr():reschedule( xr_companion.is_companion( obj:id() ) and 10000 or 25000 )
     end
   end
 end
