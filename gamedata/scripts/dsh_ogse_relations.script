@@ -201,6 +201,7 @@ local attitude_neutal_threshold = get_float(
 local fix_rel_exceptions = {
   [ "mil_Dolg_specnaz_cherep" ] = true, -- Череп
   [ "mil_Dolg_specnaz_silence" ] = true, -- группа Черепа
+  [ "bar_arena_kaligula" ] = true,
 }
 
 function on_npc_spawn( npc, binder )
