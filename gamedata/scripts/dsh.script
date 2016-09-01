@@ -37,16 +37,18 @@ function wait_condition( ... )
 end
 -------------------------------------------------------------
 
+
 function set_condition( item, cond )
   item:set_condition( cond )
 end
 
-function remove_quotes( s )
+function remove_quotes( s ) --‚ырезать все кавычки из строки
   return string.gsub( s, "[ЗИ\"\']", "" )
 end
 
-function strip_quotes( s )
-  return string.gsub( s, "^%s*[ЗИ\"\']+%s*(.+)%s*[ЗИ\"\']+%s*$", "%1" )
+function strip_quotes( s ) --‘резать кавычки с начала и с конца строки
+  --return string.gsub( s, '^[ЗИ\"\']*(.-)[ЗИ\"\']*$', '%1') --‘резает ‚‘… кавычки слева и справа.
+  return string.gsub( s, '^[ЗИ\"\'](.*)[ЗИ\"\']$', '%1') --‘резает самую первую кавычку слева и самую последнюю кавычку справа.
 end
 
 
