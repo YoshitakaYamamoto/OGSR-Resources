@@ -103,11 +103,11 @@ normal           	        = 0, 1, 0
 position         	        = -0.021, -0.09, 0.05
 orientation      	        = 0, 0, 0
 
-visual = weapons\crossbow\w_cro.ogf
+visual = weapons\swmt\crossbow\wpn_crossbow_world.ogf
 light_disabled = true
 
 ;аддоны
-scope_status				= 1
+scope_status				= 0
 silencer_status				= 0
 grenade_launcher_status		= 0
 
@@ -125,22 +125,22 @@ snd_draw	= weapons\generic_draw
 snd_holster	= weapons\generic_holster, 0.0
 snd_shoot	= weapons\crossbow\crossbow_shoot
 snd_empty	= weapons\generic_empty, 0.0
-snd_reload	= weapons\crossbow\crossbow_reload
+snd_reload	= weapons\swmt\crossbow_reload
 snd_close	= weapons\generic_close, 0.0
 ;-----------------------------------------------------------------------------
 
 [wpn_crossbow_hud]
 shell_point		= 1.0, -0.06, 0.07
 fire_point               	= -0.140000,-0.001,0.030000
-fire_bone                	= xernyshka
-orientation             	= 1, 0.5, 0		
-position                	= 0.15, -0.41, 0.13
-visual                   	= weapons\crossbow\w_cro_hud.ogf
+fire_bone                	= wpn_body
+orientation             	= 0, 0, 0		
+position                	= 0.0, 0.0, 0.0
+visual                   	= weapons\swmt\crossbow\wpn_crossbow_hud.ogf
 
 ;анимации
 anim_holster = holster
 anim_idle = idle
-anim_empty =empty
+anim_empty = idle_empty
 anim_reload = reload
 anim_reload_empty = reload
 anim_draw = draw
@@ -148,12 +148,12 @@ anim_draw_empty = draw_empty
 anim_shoot = shoot
 anim_shot_last = shoot
 anim_close = holster
-anim_idle_aim = idle
-anim_idle_sprint	= sprint
+anim_idle_aim = idle_aim
+anim_idle_sprint	= idle_sprint
 
-zoom_offset		= -0.132600,0.0000,-0.178000
-zoom_rotate_x		= -0.009300
-zoom_rotate_y		= 0.000600
+zoom_offset		= -0.08455,0.05766,-0.2
+zoom_rotate_x		= 0.0
+zoom_rotate_y		= 0.0
 
 [wpn_crossbow_repair]
 tech_complication = 400
