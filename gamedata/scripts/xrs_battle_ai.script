@@ -402,33 +402,32 @@ end
 
 function check_is_enemy(npc, enemy)
 	if not npc or not enemy then return false end
-	if IsMonster(enemy) then return true end
+	--if IsMonster(enemy) then return true end --В оригинале огсе включено, у Dsh - выключено
 	local is_engine_enemy = npc:relation(enemy) == game_object.enemy
 	if is_engine_enemy then
-		return true
+		return npc:binded_object():enemy_callback( npc, enemy )
 	end
 	return false
 end
 
 function is_combat_ignore(npc)
-
-	st = db.storage[npc:id()].combat_ignore
-
-	if not st then
-		return false
-	end
-
-	if st.enabled then
-		local overrides = xr_logic.generic_scheme_overrides(npc)
-		if overrides and
-		   overrides.combat_ignore and
-		   db.actor and
-		   xr_logic.pick_section_from_condlist( db.actor, npc, overrides.combat_ignore.condlist ) ~= nil
-		then
-			return true
-		end
-	end
-	return false
+  st = db.storage[npc:id()].combat_ignore
+  if not st then return false end
+  if st.enabled then
+    local overrides = xr_logic.generic_scheme_overrides( npc )
+    db.storage[ npc:id() ].enemy = enemy
+    if
+      overrides
+      and overrides.combat_ignore
+      and db.actor
+      and xr_logic.pick_section_from_condlist(
+        db.actor, npc, overrides.combat_ignore.condlist
+      ) ~= nil
+    then
+      return true
+    end
+  end
+  return false
 end
 
 
