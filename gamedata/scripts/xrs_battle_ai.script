@@ -2775,6 +2775,7 @@ function IsShotgun(object)
 	if object then
 		local sect = object:section()
 		local wpn_class = get_string(sect, "weapon_class", nil)
+		--log3("~~[%s] weapon_class of [%s] is [%s]", script_name(), sect, wpn_class)
 		return (wpn_class and wpn_class == "shotgun")
 	end
 	return false
@@ -2791,6 +2792,7 @@ function IsSniperRifle(object)
 	if object then
 		local sect = object:section()
 		local wpn_class = get_string(sect, "weapon_class", nil)
+		--log3("~~[%s] weapon_class of [%s] is [%s]", script_name(), sect, wpn_class)
 		return (wpn_class and wpn_class == "sniper_rifle")
 	end
 	return false

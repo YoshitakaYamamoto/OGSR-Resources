@@ -588,54 +588,10 @@ function get_max_weapon_range(companion)
 	end
 end
 
-local shotguns = {
-
-["wpn_bm16"]			= true,
-["wpn_toz34_short"]		= true,
-["wpn_bm16_full"]		= true,
-["wpn_toz34"]			= true,
-["wpn_wincheaster1300"]	= true,
-["wpn_spas12"]			= true,
-["wpn_saiga12c"]		= true,
-["wpn_saiga12c_m1"]		= true,
-["wpn_sayga12k_sk1"]	= true
-
-}
-
-local sniper_rifles = {
-
-["wpn_svu"]				= true,
-["wpn_swd"]				= true,
-["wpn_gauss"]			= true,
-["wpn_awm"]				= true
-
-}
 
 local high_recoil_rapid_weapon = {
-
-["wpn_m_134"]				= true,
-
+	["wpn_m_134"] = true,
 }
-
-function IsShotgun(object)
-	if object then
-		local id = object:section()
-		if shotguns[id] then
-			return true
-		end
-	end
-	return false
-end
-
-function IsSniperRifle(object)
-	if object then
-		local id = object:section()
-		if sniper_rifles[id] then
-			return true
-		end
-	end
-	return false
-end
 
 function IsHighRecoilRapidFire(object)
 	if object then
@@ -646,6 +602,7 @@ function IsHighRecoilRapidFire(object)
 	end
 	return false
 end
+
 
 function combat_ranges(npc, enemy_is_npc)
 	if npc then
@@ -819,9 +776,9 @@ function set_weapons_fire(npc, enemy, weapon)
 			type_of_fire = object.fire1
 		end
 	
-		if IsShotgun(weapon) then
+		if xrs_battle_ai.IsShotgun(weapon) then
 			npc:set_item(type_of_fire, weapon, 1, 800)
-		elseif IsSniperRifle(weapon) then
+		elseif xrs_battle_ai.IsSniperRifle(weapon) then
 			npc:set_item(type_of_fire, weapon, 1, 500)
 		elseif IsHighRecoilRapidFire(weapon) then	
 			npc:set_item(type_of_fire, weapon, 5, 50)
@@ -912,13 +869,13 @@ function set_combat_sight(npc, enemy, weapon)
 	local distance = npc_pos:distance_to(enemy_pos)
 
 	if IsStalker(enemy) then
-		if IsShotgun(weapon) then
+		if xrs_battle_ai.IsShotgun(weapon) then
 			if enemy_pos.y < (npc_pos.y - 1) then
 				look_pos = enemy:bone_position("bip01_head")
 			else
 				look_pos = enemy:bone_position("bip01_neck")
 			end
-		elseif IsSniperRifle(weapon) then
+		elseif xrs_battle_ai.IsSniperRifle(weapon) then
 			look_pos = enemy:bone_position("eyelid_1")
 		elseif not IsHighRecoilRapidFire(weapon) then
 			if distance < 25 then
@@ -944,7 +901,7 @@ function set_combat_sight(npc, enemy, weapon)
 			look_pos = enemy:bone_position("bip01_pelvis")
 		end
 	else	
-		if IsSniperRifle(weapon) then
+		if xrs_battle_ai.IsSniperRifle(weapon) then
 			if enemy_pos.y < (npc_pos.y - 1) then
 				look_pos = enemy:bone_position("bip01_head")
 			else
