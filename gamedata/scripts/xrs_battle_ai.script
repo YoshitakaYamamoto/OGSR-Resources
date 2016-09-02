@@ -723,7 +723,7 @@ function action_altcombat:execute()
 	
 		last_enemy_id[npc:id()] = enemy:id()
 		enable_object(self.object, enemy)
-		self.object:set_relation(game_object.enemy, enemy)		
+		--self.object:set_relation(game_object.enemy, enemy)		
 		self.object:set_item(object.aim2, bw)
 		notify_friends(self.object, enemy)
 		
