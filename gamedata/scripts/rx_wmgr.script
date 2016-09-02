@@ -833,7 +833,7 @@ end
 
 
 function npc_update( npc, st )
-  ogse_signals.get_mgr():reschedule( 3000 )
+  ogse_signals.get_mgr():reschedule( math.random(1500, 3000) )
   if st and st.wm then
     if npc:best_enemy() then
       ogse_signals.get_mgr():reschedule( 1000 )
@@ -1211,7 +1211,7 @@ function on_npc_spawn( obj, binder )
   local s = {
     [ "signal" ] = "on_npc_update." .. obj:id(),
     [ "fun"    ] = this.on_npc_update,
-    [ "queued" ] = true,
+    --[ "queued" ] = true,
   }
   binder[ script_name() .. ".subscribed" ] = s
   ogse_signals.get_mgr():subscribe( s )
