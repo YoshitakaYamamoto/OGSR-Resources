@@ -196,6 +196,12 @@ local fire_queue_size = {
   [ "veteran"     ] = 3,
   [ "master"      ] = 3,
 }
+local far_fire_queue_size = {
+  [ "novice"      ] = 5,
+  [ "experienced" ] = 3,
+  [ "veteran"     ] = 1,
+  [ "master"      ] = 1,
+}
 
 --- отклонение прицела
 
@@ -240,7 +246,7 @@ local community_deviation_coeff = {
 	["zombied"] = 3, 
 	["ecolog"] = 1.3, 
 	["killer"] = 0.3, 
-	["monolith"] = 1, 
+	["monolith"] = 0.2,
 	["csky"] = 1, 
 	["quest_stalker"] = 1,
 	["gunsmith"] = 1, 
@@ -252,6 +258,8 @@ local community_deviation_coeff = {
 local radio_comms = {
 	["military"] = true,
 	["killer"] = true,
+	["monolith"] = true,
+	["dolg"] = true,
 }
 
 --- состояния стрельбы из укрытия, задел на будущее
@@ -2115,7 +2123,7 @@ function refresh_targets(npc)
 							targets_list[npc:id()][k] = nil
 						end					
 					else
-						if dist > 50 then
+						if dist > 100 then --было 50
 							disable_object(npc, check_target)
 							if primary_target[npc:id()] == k then
 								last_target[npc:id()][primary_target[npc:id()]] = time_global()
@@ -2126,7 +2134,7 @@ function refresh_targets(npc)
 					end
 				else
 					if check_is_enemy(npc, check_target) then
-						if dist > 100 then
+						if dist > 100 and k ~= db.actor:id() then
 							disable_object(npc, check_target)
 							if primary_target[npc:id()] == k then
 								last_target[npc:id()][primary_target[npc:id()]] = time_global()
@@ -2339,7 +2347,9 @@ function get_max_weapon_range(npc)
 		local act_item = npc:item_in_slot(a_sl)
 		if act_item then
 			local sect = act_item:section()
-			if sys_ini:section_exist(sect) and sys_ini:line_exist(sect, "max_radius") then
+			if sys_ini:section_exist(sect) and sys_ini:line_exist(sect, "fire_distance") then
+				return sys_ini:r_float(sect, "fire_distance") * 0.7
+			elseif sys_ini:section_exist(sect) and sys_ini:line_exist(sect, "max_radius") then
 				return sys_ini:r_float(sect, "max_radius")
 			elseif not sys_ini:section_exist(sect) then	
 				write_log("!!XRS_COMBAT_AI: WEAPON SECTION NOT EXIST ["..tostring(sect).."]")
@@ -2367,7 +2377,7 @@ function combat_ranges(npc, enemy_is_npc)
 			end
 	else
 		write_log("!!XRS_BATTLE_AI: Функция рассчета расстояний не получила параметр npc!")
-		return 30, 150
+		return 30, alife():switch_distance()
 	end
 end
 
@@ -2935,7 +2945,12 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 		elseif IsRPG(weapon) then
 			npc:set_item(type_of_fire, weapon, 1, time_aim.rpg)			
 		else
-			local q_size = fire_queue_size[ npc_rank ]
+			local q_size = 5
+			if     distance > 100 then
+			  q_size = far_fire_queue_size[ npc_rank ]
+			elseif distance > 25 then
+			  q_size = fire_queue_size[ npc_rank ]
+			end
 			npc:set_item(type_of_fire, weapon, q_size, time_aim.other)
 		end
 		
@@ -3153,7 +3168,7 @@ function set_combat_sight(npc, enemy, weapon)
 					look_pos = add_deviation(npc, enemy:bone_position("bip01_head"), weapon, distance)
 				end
 			else	
-				look_pos = add_deviation(npc, enemy:bone_position("bip01_head"), weapon, distance)
+				look_pos = add_deviation(npc, enemy:bone_position("bip01_neck"), weapon, distance)
 			end
 		end
 	else	
