@@ -146,10 +146,10 @@ local intros_by_diff = {
 		["master"]		= 200
 	},
 	["gd_master"] = {
-		["novice"]		= 400,
-		["experienced"]	= 300,
-		["veteran"]		= 200,
-		["master"]		= 100
+		["novice"]		= 100,
+		["experienced"]	= 75,
+		["veteran"]		= 50,
+		["master"]		= 25
 	}
 }
 
@@ -3072,16 +3072,8 @@ function add_deviation(npc, position, weapon, distance)
 	local npc_comm = npc:character_community()
 	local deviations = deviation_table[npc_rank]
 	local dev_coeff = community_deviation_coeff[npc_comm] or 1
-	if weapon then
-		if distance > maximum_firefight_dist then
-			return position
-		elseif distance > distant_combat_distance then
-			if IsSniperRifle( weapon ) then
-				dev_coeff = dev_coeff / 4
-			elseif ogse_addons.is_addon_installed(weapon, ogse_wpn_utils.addons_flags.scope) then
-				dev_coeff = dev_coeff / 2
-			end
-		end
+	if distance > distant_combat_distance then
+	  return position
 	end
  	if deviations then
 		position.x = position.x + math.random( (deviations.x*(-1))*dev_coeff, (deviations.x)*dev_coeff )
