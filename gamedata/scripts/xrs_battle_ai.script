@@ -270,6 +270,7 @@ local postcombat_states_full_weapon = {
 	[2] = "threat",
 }
 
+--[=[
 local shotguns = {
 
 ["wpn_bm16"]			= true,
@@ -293,6 +294,7 @@ local sniper_rifles = {
 ["wpn_gauss"]			= true
 
 }
+--]=]
 
 local grenade_launchers = {
 
@@ -2756,16 +2758,28 @@ end
 
 function IsShotgun(object)
 	if object then
+		local sect = object:section()
+		local wpn_class = get_string(sect, "weapon_class", nil)
+		return (wpn_class and wpn_class == "shotgun")
+	end
+	return false
+	--[=[if object then
 		local id = object:section()
 		if shotguns[id] then
 			return true
 		end
 	end
-	return false
+	return false]=]
 end
 
 function IsSniperRifle(object)
 	if object then
+		local sect = object:section()
+		local wpn_class = get_string(sect, "weapon_class", nil)
+		return (wpn_class and wpn_class == "sniper_rifle")
+	end
+	return false
+	--[=[if object then
 		local sect = object:section()
 		if sniper_rifles[sect] then return true end
 
@@ -2775,7 +2789,7 @@ function IsSniperRifle(object)
 			end
 		end
 	end
-	return false
+	return false]=]
 end
 
 function IsRPG(object)
