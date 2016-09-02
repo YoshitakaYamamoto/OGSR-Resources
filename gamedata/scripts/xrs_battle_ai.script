@@ -12,7 +12,10 @@ local time_to_hide = 5000			-- время, сколько примерно сидеть в укрытии, миллисс
 local time_to_maneuver = 2500		-- время, сколько стоять на точке маневрирования, миллиссекунд
 local close_combat_distance = 15	-- дистанция ближнего боя
 local distant_combat_distance = 35	-- дистанция когда бой уже не считается ближним
-local maximum_firefight_dist = 50	-- максимальная адекватная дистанция огневого боя
+-- максимальная адекватная дистанция огневого боя
+local maximum_firefight_dist = ( level.get_game_difficulty() == 3 and 150 )
+  or ( level.get_game_difficulty() == 2 and 100 )
+  or 50
 local sound_prob = 0.1				-- вероятность сказать фразу
 local cooldown_time = 20000			-- время запрета лута после боя
 local reprioritize_timeout = 1500 	-- интервал реприоретизации, мсек - нельзя делать слишком низким - будет судорожно метаться между целями
@@ -60,7 +63,7 @@ local diff_level = game_difficulty_by_num[game_difficulty]
 local restrictions_off = true --false
 
 local low_range_npc_aggr = 30
-local far_range_mon_aggr = 25
+local far_range_mon_aggr = 50 --25
 local low_range_mon_aggr = 5
 
 local combat_mult_npc = 0.5			-- множитель веса ближней цели неписей
@@ -3083,7 +3086,7 @@ function add_deviation(npc, position, weapon, distance)
 	local npc_comm = npc:character_community()
 	local deviations = deviation_table[npc_rank]
 	local dev_coeff = community_deviation_coeff[npc_comm] or 1
-	if distance > distant_combat_distance then
+	if distance > 50 then
 	  return position
 	end
  	if deviations then
