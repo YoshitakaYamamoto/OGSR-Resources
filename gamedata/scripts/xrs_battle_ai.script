@@ -2766,9 +2766,13 @@ end
 
 function IsSniperRifle(object)
 	if object then
-		local id = object:section()
-		if sniper_rifles[id] then
-			return true
+		local sect = object:section()
+		if sniper_rifles[sect] then return true end
+
+		for k, v in pairs(sniper_rifles) do --KRodin: Если по ключу в таблице секцию не нашли, значит перебираем всю таблицу в поисках вхождения ключа таблицы в секцию ствола. Это нужно для модульных стволов с кучей секций. Например, СВД (чтобы всю эту гору секций в таблицу не заносить).
+			if string.find(sect, k) then
+				return true
+			end
 		end
 	end
 	return false
