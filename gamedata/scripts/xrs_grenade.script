@@ -160,9 +160,9 @@ function evaluator_love_napalm_smell:evaluate()
 	local npc = self.object
 	
 	if no_grenades[npc:id()] then return false end
-	if xrs_battle_ai and xrs_battle_ai.is_combat_ignore(npc) then
-		return false
-	end		
+	--if xrs_battle_ai and xrs_battle_ai.is_combat_ignore(npc) then
+	--	return false
+	--end		
 	
 	if self.a.testing then
 		if not self.a.test_grenades.hi or not self.a.test_grenades.lo or

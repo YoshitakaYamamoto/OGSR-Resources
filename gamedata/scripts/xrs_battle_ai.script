@@ -386,7 +386,6 @@ end
 
 function check_is_enemy(npc, enemy)
 	if not npc or not enemy then return false end
-	--if IsMonster(enemy) then return true end --В оригинале огсе включено, у Dsh - выключено
 	local is_engine_enemy = npc:relation(enemy) == game_object.enemy
 	if is_engine_enemy then
 		return npc:binded_object():enemy_callback( npc, enemy )
@@ -394,7 +393,8 @@ function check_is_enemy(npc, enemy)
 	return false
 end
 
-function is_combat_ignore(npc)
+--[=[ --KRodin: отключил и оторвал все вызовы. Теперь тоже самое делает enemy_callback в функции check_is_enemy
+function is_combat_ignore( npc, enemy )
   st = db.storage[npc:id()].combat_ignore
   if not st then return false end
   if st.enabled then
@@ -413,6 +413,7 @@ function is_combat_ignore(npc)
   end
   return false
 end
+]=]
 
 
 local community_forbidden_locations = {
@@ -472,11 +473,26 @@ function evaluator_check_altcombat:evaluate()
 		reprioritize_targets(self.object)
 		check_for_grenades(self.object)
 	end
-	if is_combat_ignore(self.object) then
-		primary_target[self.object:id()] = nil
+
+	local targ_id = primary_target[self.object:id()]
+	if targ_id ~= nil then
+		local targ_obj = level.object_by_id(targ_id)
+		if targ_obj and targ_obj:alive() then
+			--log3("~~[%s] Checking target for [%s]: [%s]", script_name(), self.object:name(), targ_obj:name() or "nil")
+			if not check_is_enemy(self.object, targ_obj) then
+				primary_target[self.object:id()] = nil
+				in_combat[self.object:id()] = nil
+				return false
+			end	
+		else
+			primary_target[self.object:id()] = nil
+			in_combat[self.object:id()] = nil
+			return false
+		end
+	else
 		in_combat[self.object:id()] = nil
 		return false
-	end	
+	end
 
 	local bw = nil
 	local wm = rx_wmgr and rx_wmgr.get_wm(self.object)

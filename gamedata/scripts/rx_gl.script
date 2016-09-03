@@ -90,9 +90,9 @@ function evaluator_launch_grenade:evaluate()
 	if xr_wounded.is_wounded(npc) then
 		return false
 	end
-	if xrs_battle_ai and xrs_battle_ai.is_combat_ignore(npc) then
-		return false
-	end		
+	--if xrs_battle_ai and xrs_battle_ai.is_combat_ignore(npc) then
+	--	return false
+	--end		
 	local alt_be = nil
 	if xrs_battle_ai then
 		alt_be = xrs_battle_ai.get_target(npc)

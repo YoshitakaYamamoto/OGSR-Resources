@@ -92,10 +92,10 @@ function evaluator_facer:evaluate()
 		self.st.target = nil
 		return false
 	end	
-	if xrs_battle_ai and xrs_battle_ai.is_combat_ignore(npc) then
-		self.st.target = nil
-		return false
-	end	
+	--if xrs_battle_ai and xrs_battle_ai.is_combat_ignore(npc) then
+	--	self.st.target = nil
+	--	return false
+	--end	
 	local target = self.st.target and level.object_by_id(self.st.target)
 	local alt_be = nil
 	if xrs_battle_ai then
