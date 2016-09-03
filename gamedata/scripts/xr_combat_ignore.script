@@ -6,29 +6,17 @@ function attach( sm )
 end
 
 function enemy_callback( obj, enemy, result )
-  local st = db.storage[ obj:id() ].combat_ignore
-  if st and st.enabled then
-    local res = st.action:enemy_callback( obj, enemy )
-    if not res then
-      table.insert( result, res )
-      return true
-    end
+  if not is_enemy( obj, enemy ) then
+    table.insert( result, false )
+    return true
   end
 end
 
+function is_enemy( obj, enemy )
+  if obj:critically_wounded() then return true end
 
-function is_enemy( obj, enemy, st )
-  if obj:critically_wounded() then
-    return true
-  end
-
-  if not st then
-    st = db.storage[ obj:id() ].combat_ignore
-    if not st then
-      return true
-    end
-  end
-  if not st.enabled then return true end
+  local st = db.storage[ obj:id() ].combat_ignore
+  if not st or not st.enabled then return true end
 
   local overrides = xr_logic.generic_scheme_overrides( obj )
   db.storage[ obj:id() ].enemy = enemy
@@ -51,10 +39,6 @@ class "action_process_enemy"
 function action_process_enemy:__init( obj, storage )
 	self.object = obj
 	self.st     = storage
-end
-
-function action_process_enemy:enemy_callback( obj, enemy )
-	return is_enemy( obj, enemy, self.st )
 end
 
 function action_process_enemy:hit_callback(obj, amount, local_direction, who, bone_index)
