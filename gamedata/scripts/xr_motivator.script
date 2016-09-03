@@ -160,7 +160,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 
 	-- Если тип задан проверим реакцию на него
 	if snd_t and snd_t ~= "NIL" and not self:best_enemy() then
-		if IsStalker(who) and (self:relation(who) == game_object.enemy) then
+		if IsStalker(who) and (self:relation(who) == game_object.enemy) and self:binded_object():enemy_callback( self, who ) then
 			if snd_t == "WPN_empty" or
 			snd_t == "WPN_reload" or 
 			snd_t == "ITM_drop" or
@@ -1015,6 +1015,13 @@ function motivator_binder:on_item_take(obj)
 	end
 end
 
+--Функция проверяет, может ли объект вступать в бой с предполагаемым противником (enemy_st).
+--Если вернёт false - объект не будет вступать в бой.
+--Вызывается:
+--Одноименным калбеком из движка (для движковой боёвки)
+--Из xrs_battle_ai.check_is_enemy (скриптовая боёвка)
+--Из xr_danger
+--Из функции check_sound в мотиваторе
 function motivator_binder:enemy_callback( obj, enemy_st )
   local valid, enemy = validate_enemy_object( enemy_st )
   if valid then
