@@ -350,7 +350,7 @@ local last_target			= {}		-- последн€€ цель
 local last_enemy 			= {}		-- им€ последнего врага, чисто дл€ отладочных сообщений
 local last_enemy_id 		= {}		-- ид последнего врага
 local inited				= {}		-- инициализированы ли
-local monolith				= {}		-- неписи со скриптовой боевкой монолита
+--local monolith				= {}		-- неписи со скриптовой боевкой монолита
 local campers				= {}		-- неписи со скриптовой боевкой кемпера
 local bad_hide				= {}		-- ненадежное укрытие
 local locked_vertexes 		= {}		-- зан€тые вертексы
@@ -533,7 +533,7 @@ function evaluator_check_altcombat:evaluate()
 		campers[self.object:id()] = true
 		-- monolith[self.object:id()] = nil
 	else
-		monolith[self.object:id()] = nil
+		--monolith[self.object:id()] = nil
 		campers[self.object:id()] = nil
 	end	
 	local targ = have_fresh_deadman(self.object)
@@ -846,10 +846,10 @@ function action_altcombat:execute()
 		
 		time_hide[npc:id()] = nil
 		
-		if is_fanatic(npc) then
-			assist_point = select_position(npc, be)
-			last_algorythm = "select_pos_be"
-		else
+		--if is_fanatic(npc) then
+		--	assist_point = select_position(npc, be)
+		--	last_algorythm = "select_pos_be"
+		--else
 			if actor_at_height then
 				write_log("--XRS_BATTLE_AI: VARIANT_1_ENEMY_AT_HEIGHT "..npc:name())
 				if npc_rank == "novice" then
@@ -880,7 +880,7 @@ function action_altcombat:execute()
 					last_algorythm = "find_cover_1"
 				end
 			end
-		end
+		--end
 		
 		set_combat_sight(npc, be, bw)
 		if can_fire[npc:id()] then
@@ -908,10 +908,10 @@ function action_altcombat:execute()
 	
 		time_hide[npc:id()] = nil
 
-		if is_fanatic(npc) then
-			assist_point = select_position(npc, be)
-			last_algorythm = "select_pos_be"
-		else
+		--if is_fanatic(npc) then
+		--	assist_point = select_position(npc, be)
+		--	last_algorythm = "select_pos_be"
+		--else
 			if actor_at_height then
 				write_log("--XRS_BATTLE_AI: VARIANT_2_ENEMY_AT_HEIGHT "..npc:name())
 				if npc_rank == "novice" then
@@ -944,7 +944,7 @@ function action_altcombat:execute()
 					end
 				end	
 			end
-		end
+		--end
 
 		set_combat_sight(npc, be, bw)
 		if can_fire[npc:id()] then
@@ -974,16 +974,16 @@ function action_altcombat:execute()
 			time_hide[npc:id()] = time_global() + math.random(7000,15000) + (1000 * ogse.armor_type(npc))
 		end
 	
-		if is_fanatic(npc) then
-			assist_point = select_position(npc, be)
-			last_algorythm = "select_pos_be"
-			if can_fire[npc:id()] then
-				set_combat_state(npc, be, bw)
-				set_weapons_fire(npc, be, bw, true, npc_rank)
-			else	
-				set_transfer_state(npc, be)
-			end			
-		else
+		--if is_fanatic(npc) then
+		--	assist_point = select_position(npc, be)
+		--	last_algorythm = "select_pos_be"
+		--	if can_fire[npc:id()] then
+		--		set_combat_state(npc, be, bw)
+		--		set_weapons_fire(npc, be, bw, true, npc_rank)
+		--	else	
+		--		set_transfer_state(npc, be)
+		--	end			
+		--else
 			if actor_at_height then
 				write_log("--XRS_BATTLE_AI: VARIANT_3_ENEMY_AT_HEIGHT "..npc:name())
 				assist_point = find_cover(npc, be, 2)
@@ -1023,7 +1023,7 @@ function action_altcombat:execute()
 					end
 				end	
 			end
-		end		
+		--end		
 
 		set_combat_sight(npc, be, bw)
 		choose_idle_scheme(npc, "defence")
@@ -1036,12 +1036,12 @@ function action_altcombat:execute()
 			time_hide[npc:id()] = time_global() + math.random(7000,15000) + (1000 * ogse.armor_type(npc))
 		end
 	
-		if is_fanatic(npc) then
-			write_log("--XRS_BATTLE_AI: VARIANT_4_FANATIC "..npc:name())
-			assist_point =  select_enemy_pos(npc, be)
-			last_algorythm = "enemy_vertex"
+		--if is_fanatic(npc) then
+		--	write_log("--XRS_BATTLE_AI: VARIANT_4_FANATIC "..npc:name())
+		--	assist_point =  select_enemy_pos(npc, be)
+		--	last_algorythm = "enemy_vertex"
 			-- необходимо оформить как отдельный алгоритм
-		else
+		--else
 			if time_hide[npc:id()] < time_global() then
 				if actor_at_height then
 					write_log("--XRS_BATTLE_AI: VARIANT_4_ENEMY_AT_HEIGHT "..npc:name())
@@ -1101,7 +1101,7 @@ function action_altcombat:execute()
 				assist_point = find_cover(npc, be, 2)
 				last_algorythm = "find_cover_2"
 			end
-		end	
+		--end	
 		
 		set_combat_sight(npc, be, bw)
 		set_transfer_state(npc, be)
@@ -3994,13 +3994,13 @@ function is_sniper(npc)
 	end
 end
 
-function is_fanatic(npc)
-	if monolith[npc:id()] then
-		return true
-	else	
-		return false
-	end
-end
+--function is_fanatic(npc)
+	--if monolith[npc:id()] then
+	--	return true
+	--else	
+	--	return false
+	--end
+--end
 
 -----------------------------------------------------------------------
 --- Ѕиндер:
