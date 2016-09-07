@@ -40,12 +40,12 @@ function check_mental( obj )
   ASSERT( storage, "state_mgr not found in db.storage: %s", obj:name() )
   local binder  = obj:binded_object()
   local mental  = state_lib.states[ storage.target_state ].mental
-  --if xr_companion.is_companion( obj:id() ) then --KRodin: Если напарники будут зависать, попробовать этот кусок закомментировать.
-  --  if binder[ script_name() .. ".check_mental" ] then
-  --    binder[ script_name() .. ".check_mental" ] = nil
-  --  end
-  --  return
-  --end
+  if xr_companion.is_companion( obj:id() ) then --KRodin: Если напарники будут зависать, попробовать этот кусок закомментировать.
+    if binder[ script_name() .. ".check_mental" ] then
+      binder[ script_name() .. ".check_mental" ] = nil
+    end
+    return
+  end
   if binder[ script_name() .. ".check_mental" ] then
     if mental and mental == anim.panic then
       log1(
