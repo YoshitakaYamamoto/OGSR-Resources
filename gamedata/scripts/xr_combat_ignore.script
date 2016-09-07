@@ -6,32 +6,30 @@ function attach( sm )
 end
 
 function enemy_callback( obj, enemy, result )
-  if not is_enemy( obj, enemy ) then
-    table.insert( result, false )
-    return true
-  end
-end
+  --if obj:critically_wounded() then return end --Это тут вообще зачем?
 
-function is_enemy( obj, enemy )
-  if obj:critically_wounded() then return true end
+  if xr_companion.is_companion(obj:id()) then --Если напарник хочет атаковать кого-то, делаем проверку, может ли этот кто-то атаковать актора. Если нет - запрещаем атаку.
+	obj = enemy
+	enemy = db.actor
+  elseif xr_companion.is_companion(enemy:id()) then --Кто-то хочет атаковать напарника, делаем проверку, может ли этот кто-то атаковать актора. Если нет - запрещаем атаку.
+	enemy = db.actor
+  end
 
   local st = db.storage[ obj:id() ].combat_ignore
-  if not st or not st.enabled then return true end
+  if not st or not st.enabled then return end
 
   local overrides = xr_logic.generic_scheme_overrides( obj )
   db.storage[ obj:id() ].enemy = enemy
   if
     overrides
     and overrides.combat_ignore
-    and db.actor
     and xr_logic.pick_section_from_condlist(
       db.actor, obj, overrides.combat_ignore.condlist
     ) ~= nil
   then
-    return false
+    table.insert( result, false )
+    return true
   end
-
-  return true
 end
 
 
