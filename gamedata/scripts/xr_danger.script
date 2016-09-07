@@ -338,8 +338,12 @@ function evaluator_danger:evaluate()
 
 	-- отсеиваем по настройке combat_ignore/danger
 	if is_monster_obj or is_stalker_obj then
-		if not self.object:binded_object():enemy_callback( self.object, best_danger_object ) then
-			--log3("~~[%s.enemy_callback] Removing from danger: [%s], [%s]!", script_name(), self.object:name(), best_danger_object:name())
+		if self.object:relation(best_danger_object) == game_object.enemy then
+			if not self.object:binded_object():enemy_callback( self.object, best_danger_object ) then
+				--log3("~~[%s.enemy_callback] Removing from danger: [%s], [%s]!", script_name(), self.object:name(), best_danger_object:name())
+				return false
+			end
+		else
 			return false
 		end
 	end	
