@@ -1546,7 +1546,7 @@ function hit_callback(  obj, amount, local_direction, who, bone_index )
 	
 	hit_fx( obj, amount, who, bone_index )
 	
-	if amount and amount > 0.01 and npc:alive() and not xr_wounded.is_wounded(npc) then
+	if --[[amount and amount > 0.01 and]] npc:alive() and not xr_wounded.is_wounded(npc) then
 	
 		if IsStalker(who) then
 			if who:alive() then

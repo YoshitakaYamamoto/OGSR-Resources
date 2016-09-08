@@ -160,7 +160,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 
 	-- Если тип задан проверим реакцию на него
 	if snd_t and snd_t ~= "NIL" and not self:best_enemy() then
-		if IsStalker(who) and (self:relation(who) == game_object.enemy) and self:binded_object():enemy_callback( self, who ) then
+		if IsStalker(who) and self:relation(who) == game_object.enemy and self:binded_object():enemy_callback( self, who ) then
 			if snd_t == "WPN_empty" or
 			snd_t == "WPN_reload" or 
 			snd_t == "ITM_drop" or
@@ -210,7 +210,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 				--	xr_combat_companion.process_enemy(self, who)				
 				--end			
 			end
-		elseif IsStalker(who) and (self:relation(who) ~= game_object.enemy) then
+		elseif IsStalker(who) and self:relation(who) ~= game_object.enemy then
 			if snd_t == "ATTCK" or
 			snd_t == "BULLET" or
 			snd_t == "DIE" or
@@ -567,12 +567,15 @@ function motivator_binder:before_hit_callback(p_s_hit, p_ignore_flags)
 end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
+	if not amount or amount < 0.05 then return end --Выстрелы в воздух и хиты непонятного происхождения не учитывать!
+--log3("!!Called hit callback: obj: [%s], amount: [%s], local_direction: [%s], who: [%s], bone_index: [%s]", obj:name() or "nil", amount or "nil", local_direction or "nil", who:name() or "nil", bone_index or "nil")
+
 	if not self.object then
 		self.object = obj
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 1)
-	if xr_companion.is_companion(self.object:id()) and amount < 0.3 then
+	if amount < 0.3 and xr_companion.is_companion(self.object:id()) then --Зачем оно нужно? Типа напарник прекращает говорить когда слышит выстрелы где-то?
 		xr_sound.set_sound(self.object, nil)
 		stop_play_sound(self.object)
 	end
@@ -614,7 +617,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 7)
-	if amount > 0 then
+	--if amount > 0 then
 		sr_territory.issue_event(self.object, "hit_callback", obj, amount, local_direction, who, bone_index)
 		if self.object then
 			local drop, err_msg = pcall(xr_wounded.hit_callback,self.object:id())
@@ -629,7 +632,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 				db.actor:give_game_news(game.translate_string("xr_motivator_debug2"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
 			end				
 		end
-	end
+	--end
 
 	ogse_debug.process_npc(self.object, "hit", 12)
 	local warn_timer = time_global()
@@ -649,9 +652,9 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 13)
-	if amount > 0.05 then
+	--if amount > 0.05 then
 		xr_effects.bar_territory_hit(self.object, who)
-	end
+	--end
 
 	ogse_debug.process_npc(self.object, "hit", 16)
 
@@ -826,6 +829,7 @@ function motivator_binder:check_art_weapon()
 --' застревают на попытке 
 --' применения арта как оружия
 -------------------------------------
+	ogse_signals.get_mgr():reschedule( 1000 )
 	local item_in_slot = self.object:item_in_slot(1)
 	local act_item = self.object:active_item()
 	if act_item and item_in_slot and act_item:id() == item_in_slot:id() then
@@ -1024,18 +1028,11 @@ end
 --Из функции check_sound в мотиваторе
 function motivator_binder:enemy_callback( obj, enemy_st )
   local valid, enemy = validate_enemy_object( enemy_st )
-  if valid then
-    local result = {}
-    self.am:call( "on_npc_enemy_callback", obj, enemy, result )
-    for _, v in ipairs( result ) do
-      if not v then
-        obj:enable_memory_object( enemy, false )
-        return false
-      end
-    end
-    return true
-  end
-  return false
+  if not valid then return false end
+
+  local result = {}
+  self.am:call( "on_npc_enemy_callback", obj, enemy, result )
+  return result[1] ~= false
 end
 
 

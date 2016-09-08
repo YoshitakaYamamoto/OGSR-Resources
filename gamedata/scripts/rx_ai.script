@@ -55,7 +55,7 @@ function npc_death(npc,who)
 end
 
 function npc_hit(npc,amount,dir,who,bone_id) --Было закомментировано в мотиваторе в оригинале огсе.
-	if npc and amount ~= 0 then
+	if npc --[[and amount ~= 0]] then
 		issue_event(npc,"hit_callback",amount,dir,who,bone_id)
 	end
 end
