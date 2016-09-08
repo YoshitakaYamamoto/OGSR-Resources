@@ -295,12 +295,10 @@ function we_are_under_attack(enemy)
 	if target then
 		local actor_id		= db.actor:id()
 		local companion_id	= 0
-		for id, comm in pairs(xr_companion.companions) do
-			if comm == "companion" then
-				local companion = level.object_by_id(id)
-				if companion then
-					chk_comp[id] = true
-				end
+		for id, _ in pairs(xr_companion.companions) do
+			local companion = level.object_by_id(id)
+			if companion then
+				chk_comp[id] = true
 			end
 		end
 		if chk_comp == {} then
@@ -337,12 +335,10 @@ function register_as_target(enemy)
 	chk_comp = {}
 	local id = enemy:id()
 	if not targets_list[id] then
-		for ids, comm in pairs(xr_companion.companions) do
-			if comm == "companion" then
-				local companion = level.object_by_id(ids)
-				if companion then
-					chk_comp[ids] = true
-				end
+		for ids, _ in pairs(xr_companion.companions) do
+			local companion = level.object_by_id(ids)
+			if companion then
+				chk_comp[ids] = true
 			end
 		end
 		write_log("!!XR_COMBAT_COMP: REG_TARGET "..enemy:name())

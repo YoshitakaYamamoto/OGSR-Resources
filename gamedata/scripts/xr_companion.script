@@ -28,7 +28,7 @@ function subscribe(id)
 	if not subscribed then
 		subscribed = {
 			{ signal = "on_first_update",	fun = this.on_first_update },
-			{ signal = "on_update",			fun = this.check_in_car, queued = true },
+			{ signal = "on_update",			fun = this.check_in_car },
 			{ signal = "on_npc_death",		fun = this.companion_death },
 		}
 		for _, v in pairs(subscribed) do
@@ -743,14 +743,12 @@ function is_inside_my_car()
 	local car = ogse_car_control.current_car
 	if car then -- если ГГ уже в машине
 		local is_inside = 0
-		for id, comm in pairs(companions) do
-			if comm == "companion" then
-				local inside = load_var_companion(id,"in_car","false")
-				local last_car = tonumber(load_var_companion(id,"last_car",0))
-				if inside == "true" and tonumber(car:id()) == tonumber(last_car) then
-					is_inside = 1
-				end			
-			end
+		for id, _ in pairs(companions) do
+			local inside = load_var_companion(id,"in_car","false")
+			local last_car = tonumber(load_var_companion(id,"last_car",0))
+			if inside == "true" and tonumber(car:id()) == tonumber(last_car) then
+				is_inside = 1
+			end			
 		end
 		if is_inside == 1 then
 			return true
@@ -769,8 +767,7 @@ function check_in_car()
 	local car = ogse_car_control.current_car
 	if car then
 		-- выводим в оффлайн
-		for id, comm in pairs(companions) do
-			if comm == "companion" then
+		for id, _ in pairs(companions) do
 				local w_level = load_var_companion(id,"w_lvl",nil)
 				local icon = load_var_companion(id,"last_car",nil)
 				if not w_level or w_level == "" or w_level == "nil" then
@@ -796,12 +793,11 @@ function check_in_car()
 						end
 					end	
 				end
-			end
 		end
 	else
 		-- обратно в онлайн
-		for id, comm in pairs(companions) do
-			if comm == "companion" and not level.object_by_id(id) then
+		for id, _ in pairs(companions) do
+			if not level.object_by_id(id) then
 				local w_level = load_var_companion(id,"w_lvl",nil)
 				local s_npc = alife():object(id)
 				if s_npc and (not w_level or w_level == "" or w_level == "nil") then
@@ -885,7 +881,7 @@ function change_community_by_actor:save(packet)
 end
 
 function change_community_by_actor:action()
-	if companions[self.npc_id] and companions[self.npc_id] == "companion" then
+	if companions[self.npc_id] then
 		local obj = level.object_by_id(self.npc_id)
 		if obj:alive() then
 			local actor_comm = db.actor:character_community()
@@ -899,17 +895,15 @@ end
 function set_community_by_actor()
 	local actor_comm = db.actor:character_community()
 	local new_comm = community_by_actor(actor_comm)
-	for id, comm in pairs(companions) do
-		if comm == "companion" then
-			local obj = level.object_by_id(id)
-			local s_npc = alife():object(id)
-			if s_npc and obj and obj:alive() then
-				obj:set_character_community(new_comm, 0, 0)	
---				relation_registry.set_community_goodwill (new_comm, obj:id(), 0)
-			elseif not obj and s_npc then
-				change_community_by_actor(id):start()
-			end			
-		end	
+	for id, _ in pairs(companions) do
+		local obj = level.object_by_id(id)
+		local s_npc = alife():object(id)
+		if s_npc and obj and obj:alive() then
+			obj:set_character_community(new_comm, 0, 0)	
+--			relation_registry.set_community_goodwill (new_comm, obj:id(), 0)
+		elseif not obj and s_npc then
+			change_community_by_actor(id):start()
+		end			
 	end
 end
 
@@ -1013,7 +1007,7 @@ function companion_death(npc)
 		end	
 		
 		number_of_companions = number_of_companions - 1
-		xr_companion.companions[npc:id()] = nil
+		companions[npc:id()] = nil
 		
 		level_tasks.remove_location_by_id(npc:id(), "alife_presentation_companion")
 		
@@ -1474,16 +1468,16 @@ function action_companion_activity:execute()
 	if self.object:relation(db.actor) == game_object.enemy then
 		db.actor:give_game_news(self.object:character_name().." "..game.translate_string("companion_became_your_enemy_string"), "ui\\ui_iconsTotal", Frect():set(0,235,83,47), 0, 15000)
 		db.storage[self.object:id()].companion.enabled = false
-		xr_companion.number_of_companions = xr_companion.number_of_companions - 1
-		xr_companion.save_var_companion(self.object:id(), "is_companion", 0)
+		number_of_companions = number_of_companions - 1
+		save_var_companion(self.object:id(), "is_companion", 0)
 		level_tasks.remove_location_by_id(self.object:id(), "alife_presentation_companion")
 		local dead_friends = tonumber(ogse.load_variable("dead_fr", 0))
 		dead_friends = dead_friends + 1
 		ogse.save_variable("dead_fr", dead_friends)		
-		local comm = xr_companion.load_var_companion(self.object:id(), "orig_community", nil)
+		local comm = load_var_companion(self.object:id(), "orig_community", nil)
 		self.object:set_character_community(comm, 0, 0)
 		trade_manager.trade_init(self.object, "misc\\trade_generic.ltx")	
-		xr_companion.companions[self.object:id()] = nil
+		companions[self.object:id()] = nil
 
 		unsubscribe(self.object:id())
 	end	
@@ -1712,7 +1706,7 @@ function enable_scheme(npc, ini)
 		if tostring(flag) == "1" then
 			--log1("[XR COMPANION.ENABLE_SCHEME] REMOVING ALL RESTRICTIONS FOR "..npc:name())
 			--npc:remove_all_restrictions()
-			companions[npc:id()] = "companion"
+			companions[npc:id()] = true --"companion"
 			subscribe(npc:id())
 			--log3("--[%s.enable_scheme] subscribed: [%s]", script_name(), npc:name())
 			companion_weapon[npc:id()] = load_var_companion(npc:id(), "weapon_behavior", "anything")			
@@ -1733,12 +1727,7 @@ function disable_scheme(npc, scheme)
 end
 
 function is_companion(npc_id)
-	if npc_id then
-		if companions[npc_id] and companions[npc_id] == "companion" then
-			return true
-		end
-	end
-	return false
+	return npc_id and companions[npc_id]
 end
 
 function is_companion_se(obj)
@@ -1748,8 +1737,8 @@ function is_companion_se(obj)
 			local flag = load_var_companion(obj.id, "is_companion", 0)
 			if tostring(flag) == "1" then
 				--log1("!!COMP FND OFFLINE! "..obj:profile_name())
-				xr_companion.companions[obj.id] = "companion"
-				xr_companion.number_of_companions = xr_companion.number_of_companions + 1
+				companions[obj.id] = true --"companion"
+				number_of_companions = number_of_companions + 1
 				subscribe(obj.id)
 				--log3("--[%s.is_companion_se] called subscribe!", script_name())
 			end

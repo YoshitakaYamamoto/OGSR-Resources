@@ -36,7 +36,6 @@ function on_key_down(key, bind)
 	end
 end
 
-local friend = nil
 
 function open_radio_dialog()
 	local spwn = handradio(get_hud())
@@ -44,8 +43,6 @@ function open_radio_dialog()
 end
 
 class "handradio" (CUIScriptWnd)
-
-
 function handradio:__init(owner) super()
 	self.dlg = self
 	self.owner = owner
@@ -93,20 +90,16 @@ function handradio:InitControls()
 	
 	-- определяем доступность кнопок
 	self.btn_1:Enable(true)
-	
-	for id, comm in pairs(xr_companion.companions) do
-		if comm == "companion" then
-			local obj = level.object_by_id(id)
-			if obj and obj:alive() then
-				self.btn_2:Enable(true)
-				self.btn_3:Enable(true)
-				self.btn_4:Enable(true)
-				friend = obj
-				break
-			end	
-		end
-	end
 
+	for id, _ in pairs(xr_companion.companions) do
+		local obj = level.object_by_id(id)
+		if obj and obj:alive() then
+			self.btn_2:Enable(true)
+			self.btn_3:Enable(true)
+			self.btn_4:Enable(true)
+			break
+		end	
+	end
 end
 
 
@@ -208,16 +201,14 @@ function handradio:listen()
 end
 
 function handradio:call_friend()
-	for id, comm in pairs(xr_companion.companions) do
-		if comm == "companion" then
-			local friend = level.object_by_id(id)
-			if friend then
-				local st = db.storage[friend:id()]
-				if st and st.companion then
-					st.companion.behavior = xr_companion.beh_walk_simple
-					xr_companion.save_var_companion(friend:id(), "companion_behavior", st.companion.behavior)
-					xr_companion.save_var_companion(friend:id(),"w_lvl",nil)
-				end
+	for id, _ in pairs(xr_companion.companions) do
+		local friend = level.object_by_id(id)
+		if friend then
+			local st = db.storage[friend:id()]
+			if st and st.companion then
+				st.companion.behavior = xr_companion.beh_walk_simple
+				xr_companion.save_var_companion(friend:id(), "companion_behavior", st.companion.behavior)
+				xr_companion.save_var_companion(friend:id(),"w_lvl",nil)
 			end
 		end
 	end
@@ -228,16 +219,14 @@ function handradio:call_friend()
 end
 
 function handradio:stay_friend()
-	for id, comm in pairs(xr_companion.companions) do
-		if comm == "companion" then
-			local friend = level.object_by_id(id)
-			if friend then
-				local st = db.storage[friend:id()]
-				if st and st.companion then
-					st.companion.behavior = xr_companion.beh_wait_simple
-					xr_companion.save_var_companion(friend:id(), "companion_behavior", st.companion.behavior)
-					xr_companion.save_var_companion(friend:id(),"w_lvl",level.name())
-				end
+	for id, _ in pairs(xr_companion.companions) do
+		local friend = level.object_by_id(id)
+		if friend then
+			local st = db.storage[friend:id()]
+			if st and st.companion then
+				st.companion.behavior = xr_companion.beh_wait_simple
+				xr_companion.save_var_companion(friend:id(), "companion_behavior", st.companion.behavior)
+				xr_companion.save_var_companion(friend:id(),"w_lvl",level.name())
 			end
 		end
 	end
@@ -248,21 +237,19 @@ function handradio:stay_friend()
 end
 
 function handradio:hide_friend()
-	for id, comm in pairs(xr_companion.companions) do
-		if comm == "companion" then
-			local friend = level.object_by_id(id)
-			if friend then
-				local st = db.storage[friend:id()]
-				if st and st.companion then
-					st.companion.behavior = xr_companion.beh_hide_simple
-					xr_companion.save_var_companion(friend:id(), "companion_behavior", st.companion.behavior)
-					xr_companion.save_var_companion(friend:id(),"w_lvl",level.name())
-				end
+	for id, _ in pairs(xr_companion.companions) do
+		local friend = level.object_by_id(id)
+		if friend then
+			local st = db.storage[friend:id()]
+			if st and st.companion then
+				st.companion.behavior = xr_companion.beh_hide_simple
+				xr_companion.save_var_companion(friend:id(), "companion_behavior", st.companion.behavior)
+				xr_companion.save_var_companion(friend:id(),"w_lvl",level.name())
 			end
 		end
 	end
 	spawn_radio_if_used()	
-	self:GetHolder():start_stop_menu (self,true)
+	self:GetHolder():start_stop_menu(self,true)
 	self.dlg = nil
 	collectgarbage("collect")
 end

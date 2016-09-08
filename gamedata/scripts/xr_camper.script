@@ -25,9 +25,7 @@ function evaluator_end:evaluate()
 		return true
 	end	
 	--// xr_companion
-	if self.object:name() == "mil_freedom_stalker0010" then
-		printf("%s evaluate camper_end [%s]", self.object:name(), tostring(not xr_logic.is_active(self.object, self.a)))
-	end
+
 	return not xr_logic.is_active(self.object, self.a)
 end
 

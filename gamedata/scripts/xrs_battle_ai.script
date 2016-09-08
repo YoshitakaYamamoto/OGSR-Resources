@@ -1806,9 +1806,9 @@ function we_are_under_attack(npc, enemy)
 end
 
 function register_as_target_companions(npc)
-	for id, comm in pairs(xr_companion.companions) do
+	for id, _ in pairs(xr_companion.companions) do
 		local enemy = level.object_by_id(id)
-		if comm == "companion" and enemy then
+		if enemy then
 			if not targets_list[npc:id()] or not targets_list[npc:id()][id] then
 				if npc and npc:alive() and not xr_wounded.is_wounded(npc) then
 					local dist = npc:position():distance_to(enemy:position())

@@ -295,8 +295,7 @@ function Cmeet_manager:process_meet()
 	local key
 	local is_talking = self.npc:is_talking()
 	if isWeapon(db.actor:active_item())	and
-       self.npc:relation(db.actor) ~= game_object.friend and self:actor_targets_npc(self.npc) and
-	   (not xr_companion.is_companion(self.npc:id()))
+       self.npc:relation(db.actor) ~= game_object.friend and self:actor_targets_npc(self.npc) and not xr_companion.is_companion(self.npc:id())
     then
 		key = self:get_key_from_distance(self.a.meet_state_wpn)
 		if key ~= nil then
@@ -338,7 +337,7 @@ function Cmeet_manager:process_meet()
 end
 function Cmeet_manager:process_victim()
 	local key
-	if isWeapon(db.actor:active_item()) and (not xr_companion.is_companion(self.npc:id()))	then
+	if isWeapon(db.actor:active_item()) and not xr_companion.is_companion(self.npc:id())	then
 		key = self:get_key_from_distance(self.a.victim_wpn)
 		if key ~= nil then
 			return tostring(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.victim_wpn[key].state))
@@ -389,21 +388,20 @@ function Cmeet_manager:get_key_from_zone(t)
 end
 function Cmeet_manager:process_use()
 	local is_talking = self.npc:is_talking()
---	printf("MM1 %s %s", self.npc:name(), tostring(is_talking))
 	-- запрещаем юзать спящих
 	if xr_sleeper.is_npc_asleep(self.npc) then
 		if not xr_companion.is_companion(self.npc:id()) then
 			self.npc:disable_talk()
+			if is_talking then
+				self.npc:stop_talk()
+			end
 		end
 		self.disable_talk_weapon = false
-		if is_talking and not xr_companion.is_companion(self.npc:id()) then
-			self.npc:stop_talk()
-		end
 		return
 	end
 	
 	local t
-	if isWeapon(db.actor:active_item()) and (not xr_companion.is_companion(self.npc:id())) then
+	if isWeapon(db.actor:active_item()) and not xr_companion.is_companion(self.npc:id()) then
 		t = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.use_wpn)
 		if t == "false" then
 			self.disable_talk_weapon = true
@@ -426,10 +424,10 @@ function Cmeet_manager:process_use()
 	elseif t == "false" then
 		if not xr_companion.is_companion(self.npc:id()) then
 			self.npc:disable_talk()
-		if is_talking and not xr_companion.is_companion(self.npc:id()) then
-			self.npc:stop_talk()
+			if is_talking then
+				self.npc:stop_talk()
+			end
 		end
-	end
 	elseif t == "self" then
 		if not is_talking then
 --			printf("MM3 %s start talk", self.npc:name())
@@ -550,7 +548,7 @@ function init_meet(npc, ini, section, st, scheme)
 		def.syndata			= ""
 		def.precond			= "visibility"
 		def.abuse			= "false"
-	elseif (proxorov and npc:id() == proxorov:id() and db.actor:dont_has_info("master_quest_finished") and db.actor:has_info("master_quest_evac_colonel")) then
+	elseif proxorov and npc:id() == proxorov:id() and db.actor:dont_has_info("master_quest_finished") and db.actor:has_info("master_quest_evac_colonel") then
 		def.meet_state		= "10|wait"
 		def.meet_state_wpn	= "10|wait"
 		def.init_meet		= ""
