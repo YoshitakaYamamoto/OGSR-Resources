@@ -37,6 +37,7 @@ function subscribe( id )
 		subscribed = {
 			{ signal = "on_hit", fun = this.on_hit },
 			{ signal = "on_npc_hit", fun = this.on_npc_hit },
+			{ signal = "on_npc_enemy_callback", fun = this.on_npc_enemy_callback },
 		}
 		for _, v in pairs(subscribed) do
 			sm:subscribe( v )
@@ -96,6 +97,15 @@ function on_hit(obj, amount, local_direction, who, bone_index)
 	end
 end
 
+function on_npc_enemy_callback( obj, enemy, result )
+  if
+   ( xr_companion.is_companion(obj:id()) and enemy:relation(db.actor) ~= game_object.enemy ) --Если объект - напарник, проверяем отношение его врага к актору. Если это не враг актора, то и напарник не будет атаковать его.
+	or ( xr_companion.is_companion(enemy:id()) and obj:relation(db.actor) ~= game_object.enemy ) --Запрещаем атаковать напарника актора, если атакующий не является врагом актора.
+  then
+    table.insert( result, false )
+    return true
+  end
+end
 --------------------------------------------------------------------------------------------
 
 local debug_flag = false		-- включить отладочный вывод
@@ -247,7 +257,7 @@ end
 function hit_callback(companion, enemy, amount)
 	-- если объект был ранее забыт - очухиваем его, если нету в табличке - записываем в табличку
 	-- данная функция помещается в xr_motivator.hit_callback
-	if amount and amount > 0.02 and not enemy:id() == db.actor:id() then
+	if --[[amount and amount > 0.02 and]] not enemy:id() == db.actor:id() then
 		xr_companion.being_attacked = true
 		dont_touch_us = false
 		enable_object(companion, enemy)
@@ -265,7 +275,7 @@ end
 
 function process_enemy(npc, enemy)
 	-- проверка выбора врагом напарника или ГГ
-	-- данная функция помещается в апдейты монстров и неписей 
+	-- данная функция помещается в апдейты монстров и неписей
 	if enemy and enemy.clsid and (IsStalker(enemy) or IsMonster(enemy)) and enemy:alive() and enemy:id() ~= db.actor:id() and not xr_companion.is_companion(enemy:id()) then
 		write_log("!!!PROCESSING_"..enemy:name().." RESULT IS_STK ["..tostring(IsStalker(enemy)).."] IS_MNSTR ["..tostring(IsMonster(enemy)).."] CHK ["..tostring(we_are_under_attack(enemy)).."]")
 		if we_are_under_attack(enemy) then
