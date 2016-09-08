@@ -952,14 +952,6 @@ local selector = {
 	["thermite_bomb"] = function(params_string)
 		ogse_quests.blow_bidon_bomb()
 	end,
-
-	["final_mast_bl"] = function(params_string)
-		ogse_quests.final_scene_master_end()
-	end,
-
-	["final_mast"] = function(params_string)
-		ogse_quests.final_scene_master_talk()
-	end,	
 	
 	["master_notice"] = function(params_string)
 		ogse_quests.notify_actor_mg()

@@ -3,20 +3,24 @@
 turn_pnv_off = ogse_night_vision.turn_pnv_off --KRodin: НЕ УДАЛЯТЬ! Вызывается из многих мест.
 
 function attach(sm)
-	sm:subscribe({ signal = "on_sit_down_in_btr", fun = this.set_btr_fuel_empty })
-	sm:subscribe({ signal = "on_sit_down_in_btr", fun = this.set_btr_nonworking })
-	sm:subscribe({ signal = "on_exit_from_btr",	fun = this.set_btr_working })
--------------------
-	sm:subscribe({ signal = "on_item_to_belt",	fun = this.on_transponder_to_belt })
-	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.on_transponder_to_ruck })
--------------------
+------------------Общие функции----------------
 	sm:subscribe({ signal = "on_storyline_start", fun = this.spawn_black_dealer })
 	sm:subscribe({ signal = "on_storyline_start", fun = this.scape_doors_start })
 	sm:subscribe({ signal = "on_spawn",			fun = this.dar_stalker_explorer_spawn })
-	sm:subscribe({signal = "on_update",			fun = this.check_gorkom_books, queued = true})
-	sm:subscribe({signal = "on_update",			fun = this.check_colonel_dead, queued = true})
-	sm:subscribe({signal = "on_update",			fun = this.play_digger_motor_sound, queued = true})
-	sm:subscribe({signal = "on_update",			fun = this.make_colonel_follow, queued = true})
+	sm:subscribe({ signal = "on_update",		fun = this.check_gorkom_books, queued = true })
+	sm:subscribe({ signal = "on_update",		fun = this.play_digger_motor_sound, queued = true })
+-------------------Квест с БТР-----------------
+	sm:subscribe({ signal = "on_sit_down_in_btr", fun = this.set_btr_fuel_empty })
+	sm:subscribe({ signal = "on_sit_down_in_btr", fun = this.set_btr_nonworking })
+	sm:subscribe({ signal = "on_exit_from_btr",	fun = this.set_btr_working })
+-----Привести Полковника из МГ на блокпост-----
+	sm:subscribe({ signal = "on_spawn",			fun = this.check_subscribe_colonel_enemy_callback })
+	sm:subscribe({ signal = "on_spawn",			fun = this.check_subscribe_colonel_follow_signal })
+	sm:subscribe({ signal = "on_info",			fun = this.check_colonel_quest_infos })
+-------------------Транспондер-----------------
+	sm:subscribe({ signal = "on_item_to_belt",	fun = this.on_transponder_to_belt })
+	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.on_transponder_to_ruck })
+-----------------------------------------------
 end
 
 --/ спавн квестовых предметов для OGSE и скриптовые квесты /--
@@ -1279,61 +1283,96 @@ function master_dying()
 	end
 end
 
-function check_total_fail()
+
+function check_total_fail() --Вызывается из конфигов в нескольких местах
 	if db.actor:has_info("master_quest_total_failure") then
 		return true
 	end
 	local colonel = level_object_by_sid(story_ids.colonel_prohorov)
-	if colonel and not colonel:alive() then
+	if not colonel then
+		colonel = alife():story_object(story_ids.colonel_prohorov)
+	end
+	if not colonel or not colonel:alive() then
+		db.actor:give_info_portion("master_quest_colonel_dead")
+		check_subscribe_colonel_enemy_callback()
+
+		local wheel_id = ogse.load_var("colonel_chinook_wheel_id", -1, "u16")
+		if wheel_id ~= -1 then
+			local wheel = alife():object(wheel_id)
+			if wheel then
+				alife():release(wheel, true)
+			end
+			ogse.delete_var("colonel_chinook_wheel_id")
+		end
+
+		local layer_id = ogse.load_var("colonel_chinook_layer_id", -1, "u16")
+		if layer_id ~= -1 then
+			local layer = alife():object(layer_id)
+			if layer then
+				alife():release(layer, true)
+			end
+			ogse.delete_var("colonel_chinook_layer_id")
+		end
+
+		local helmet_id = ogse.load_var("colonel_helmet_id", -1, "u16")
+		if helmet_id ~= -1 then
+			local helmet = alife():object(helmet_id)
+			if helmet then
+				alife():release(helmet, true)
+			end
+			ogse.delete_var("colonel_helmet_id")
+		end
 		return true
 	end
 	return false
 end
 
-function colonel_follow_actor()
+function colonel_follow_actor() --Вызывается из конфигов
 	local colonel = level_object_by_sid(story_ids.colonel_prohorov)
 	if colonel and colonel:alive() then
 		dialogs.companion_start_following(colonel, db.actor)
 		dialogs.companion_beh_walk_simple(db.actor, colonel)
-		make_military_neutral_escape()
 		colonel:set_character_community("mil_stalker", 0, 0)
-		for id, comm in pairs(xr_companion.companions) do
-			if comm == "companion" then
-				local npc = level.object_by_id(id)
-				if npc then
-					npc:set_relation(game_object.friend, colonel)
-					npc:set_goodwill(2000, colonel)
-				end		
-			end
-		end
 	else
 		abort("ERROR! No colonel!")
 	end
 end
 
-function colonel_stop_follow_actor()
+function colonel_stop_follow_actor() --Вызывается из конфигов
 	local colonel = level_object_by_sid(story_ids.colonel_prohorov)
 	if colonel and colonel:alive() then
 		dialogs.companion_stop_following(colonel, db.actor)
 		colonel:set_character_community("military", 0, 0)
 		colonel:set_relation(game_object.friend, db.actor)
 		colonel:set_goodwill(2000, db.actor)
-		for id, comm in pairs(xr_companion.companions) do
-			if comm == "companion" then
-				local npc = level.object_by_id(id)
-				if npc then
-					npc:set_relation(game_object.friend, colonel)
-					npc:set_goodwill(2000, colonel)
-				end		
-			end
-		end		
 	else
 		abort("ERROR! No colonel!")	
 	end
 end
 
+function check_colonel_quest_infos(npc, info_id) --инфопорции выдаются из конфигов, поэтому пришлось проверять вот так
+	if info_id == "master_quest_finished" or info_id == "master_quest_evac_colonel" then
+		check_subscribe_colonel_enemy_callback()
+	elseif info_id == "master_quest_release_colonel" then
+		check_subscribe_colonel_follow_signal()
+	end
+end
+
+local colonel_follow_signal
+function check_subscribe_colonel_follow_signal() --Если надо подписать - подписываем функцию make_colonel_follow на апдейт, если надо отписать - отписываем.
+	if has_alife_info("master_quest_colonel_arrived") and not has_alife_info("master_quest_release_colonel") and not colonel_follow_signal then
+		--log3("--[%s] make_colonel_follow subscribed!", script_name())
+		colonel_follow_signal = { signal = "on_update", fun = this.make_colonel_follow }
+		ogse_signals.get_mgr():subscribe(colonel_follow_signal)
+	elseif colonel_follow_signal then
+		--log3("~~[%s] make_colonel_follow UNsubscribed!", script_name())
+		ogse_signals.get_mgr():unsubscribe(colonel_follow_signal)	
+		colonel_follow_signal = nil
+	end
+end
+
 function make_colonel_follow()
-	if db.actor:has_info("master_quest_colonel_arrived") and not db.actor:has_info("master_quest_colonel_talk") then
+	if db.actor:has_info("master_quest_colonel_arrived") and not db.actor:has_info("master_quest_colonel_talk") then --Пришли на блокпост и ещё не получили награду
 		local colonel = level_object_by_sid(story_ids.colonel_prohorov)
 		if colonel and colonel:alive() then
 			local dist = colonel:position():distance_to(db.actor:position())
@@ -1354,7 +1393,7 @@ function make_colonel_follow()
 				end
 			end		
 		end
-	elseif db.actor:has_info("master_quest_colonel_arrived") and db.actor:has_info("master_quest_colonel_talk") and not db.actor:has_info("master_quest_release_colonel") then	
+	elseif db.actor:has_info("master_quest_colonel_arrived") and db.actor:has_info("master_quest_colonel_talk") and not db.actor:has_info("master_quest_release_colonel") then --Пришли на блокпост, получили награду и... какая-то проверочная инфопорция, выдается в том же диалоге, но на другой фразе, после выдачи награды походу
 		local colonel = level_object_by_sid(story_ids.colonel_prohorov)
 		if colonel and colonel:alive() then
 			state_mgr.set_state( script_name(), colonel, "wait", {look_object = db.actor})
@@ -1362,32 +1401,19 @@ function make_colonel_follow()
 	end
 end
 
-function push_colonel_offline()
-   local s_npc = alife():story_object(story_ids.colonel_prohorov)
-   s_npc.force_offline = true
-end
-
-function push_colonel_online()
-   local s_npc = alife():story_object(story_ids.colonel_prohorov)
-   if s_npc then
-      s_npc.force_offline = nil -- отправляем обратно в онлайн
-   end
-end
-
-function final_scene_master()
+function final_scene_master() --Вызывается по инфопоршню master_quest_colonel_talk
 	local colonel = level_object_by_sid(story_ids.colonel_prohorov)
 	if colonel and colonel:alive() then
 		db.actor:give_info_portion("master_quest_colonel_military")
 		ogse_quests.turn_pnv_off()
 		level.add_pp_effector("agr_u_fade.ppe", 2268, false)
-		ogse.start_timer("final_mast_bl",3)
+		ogse_st_mgr.start_timer("final_mast_bl", 3, script_name()..".final_scene_master_end")
 	else
 		abort("ERROR! No colonel!")	
 	end
 end
 
-function final_scene_master_end()
-	push_colonel_offline()
+function final_scene_master_end() --вызывается по таймеру final_mast_bl
 	local colonel_srv = alife():story_object(story_ids.colonel_prohorov)
 	if colonel_srv then
 		ogse.teleport_npc(colonel_srv.id, vector():set(-116.05413818359,-30.054990768433,-386.22964477539))
@@ -1397,11 +1423,10 @@ function final_scene_master_end()
 	db.actor:set_actor_position(point:point(0))
 	local dir = look:point(0):sub(point:point(0))
 	db.actor:set_actor_direction(-dir:getH())
-	ogse.start_timer("final_mast",3)
+	ogse_st_mgr.start_timer("final_mast", 3, script_name()..".final_scene_master_talk")
 end
 
-function final_scene_master_talk()
-	push_colonel_online()
+function final_scene_master_talk() --вызывается по таймеру final_mast
 	local colonel = level_object_by_sid(story_ids.colonel_prohorov)
 	if colonel and colonel:alive() then
 		colonel:set_start_dialog("deadcity_quest_reward_dialog")
@@ -1411,179 +1436,99 @@ function final_scene_master_talk()
 	end
 end
 
-function reward_actor(first_speaker, second_speaker)
-	-- на фразе непися
-	---dialogs.relocate_item_section(second_speaker, "bla", "in")
+function reward_actor(first_speaker, second_speaker) --Выдача награды и завершение квеста. Вызывается из конфигов.
 	if has_alife_info("actor_set_zombied") then
 		tasks_functor.make_actor_normal()
-	end	
-	dialogs.set_actor_milstalker()
-	
-	relation_registry.set_community_goodwill("military", db.actor:id(), 2000)
-	for id, comm in pairs(xr_companion.companions) do
-		if comm == "companion" then
-			local npc = level.object_by_id(id)
-			if npc then
-				relation_registry.set_community_goodwill("military", npc:id(), 2000)
-			end		
-		end
-	end		
-	
-	
+	end
+
+	xr_gulag.setGulagRelation("esc_blokpost", game_object.neutral, db.actor)
+	xr_gulag.setGulagPersonalGoodwill("esc_blokpost", 500, db.actor)
+
 	dialogs.relocate_item_section(second_speaker, "mil_transponder", "in")
-	dialogs.relocate_item_section(second_speaker, "military_outfit", "in")
-	dialogs.relocate_item_section(second_speaker, "wpn_m16a1_sk1", "in")
+	dialogs.relocate_item_section(second_speaker, "military_outfit", "in") --лучше тут экзу выдавать, наверно
+	dialogs.relocate_item_section(second_speaker, "wpn_m16a1_sk1", "in") --TODO: Заменить на что-то более ценное. Пулемёт какой-нибудь уникальный, например.
 	dialogs.relocate_item_section(second_speaker, "wpn_addon_sil_556_ar", "in")
 	dialogs.relocate_item_section(second_speaker, "fake_wpn_addon_acog", "in")
-	
-	dialogs.relocate_money(second_speaker, 55000, "in")
-	
+
+	dialogs.relocate_money(second_speaker, 55000, "in") --а деньги можно и не выдавать, если прописать выше более серьезную награду
+
 	local colonel = level_object_by_sid(story_ids.colonel_prohorov)
 	colonel:restore_default_start_dialog()
 end
 
-function colonel_check_arrival()
+function colonel_check_arrival() --Проверка входа в рестриктор на блокпосту. Вызывается из конфигов
 	if db.actor:has_info("master_quest_finished") then
 		return true
 	end
 	local colonel = level_object_by_sid(story_ids.colonel_prohorov)
 	if colonel and colonel:alive() and utils.npc_in_zone(colonel, db.zone_by_name["esc_colonel_arrival_restrictor"]) then
 		if not db.actor:has_info("master_quest_colonel_arrived") then
-			write_log("!!DEBUG! FINAL WARNING")
 			db.actor:give_info_portion("master_quest_colonel_arrived")
+			check_subscribe_colonel_follow_signal()
 		end
 	end
-	make_colonel_follow()
 	return false
 end
 
-function check_colonel_dead()
-	local colonel = level_object_by_sid(story_ids.colonel_prohorov)
-	local colonel_sobj = alife():story_object(story_ids.colonel_prohorov)
-	if not colonel then
-		colonel = colonel_sobj
-	end	
-	if (colonel and not colonel:alive()) or not colonel_sobj then
-		db.actor:give_info_portion("master_quest_colonel_dead")
-		
-		local wheel_id = ogse.load_var("colonel_chinook_wheel_id", -1, "u16")
-		if wheel_id ~= -1 then
-			local wheel = alife():object(wheel_id)
-			if wheel then
-				alife():release(wheel, true)
-			end
-			ogse.delete_var("colonel_chinook_wheel_id")
+local colonel_enemy_callback
+function check_subscribe_colonel_enemy_callback() --Если надо подписать - подписываем, если надо отписать - отписываем.
+	if
+		has_alife_info("master_quest_evac_colonel") --Вышли с Полковником из МГ
+		and not has_alife_info("master_quest_finished") --Но ещё не пришли на блокпост
+		and not has_alife_info("master_quest_colonel_dead") --Полковник жив
+		and not colonel_enemy_callback --ещё не подписались на сигналы
+	then
+		--log3("--[%s] prohibit_military_attacks_actor subscribed!", script_name())
+		colonel_enemy_callback = {
+			{ signal = "on_npc_enemy_callback", fun = this.prohibit_military_attacks_actor },
+			{ signal = "on_npc_hit",            fun = this.on_npc_hit },
+		}
+		local sm = ogse_signals.get_mgr()
+		for _, s in ipairs( colonel_enemy_callback ) do
+			sm:subscribe( s )
 		end
-		
-		local layer_id = ogse.load_var("colonel_chinook_layer_id", -1, "u16")
-		if layer_id ~= -1 then
-			local layer = alife():object(layer_id)
-			if layer then
-				alife():release(layer, true)
-			end
-			ogse.delete_var("colonel_chinook_layer_id")
+	elseif colonel_enemy_callback then
+		--log3("~~[%s] prohibit_military_attacks_actor UNsubscribed!", script_name())
+		local sm = ogse_signals.get_mgr()
+		for _, s in ipairs( colonel_enemy_callback ) do
+			sm:unsubscribe( s )
 		end
-		
-		local helmet_id = ogse.load_var("colonel_helmet_id", -1, "u16")
-		if helmet_id ~= -1 then
-			local helmet = alife():object(helmet_id)
-			if helmet then
-				alife():release(helmet, true)
-			end
-			ogse.delete_var("colonel_helmet_id")
-		end
-		return
-	end
-	if colonel and colonel:alive() then
-		local lname = level.name()
-		local check_map = alife():level_name(game_graph():vertex(colonel_sobj.m_game_vertex_id):level_id())
-		if (lname == "l01_escape" and check_map == lname) 
-		and not db.actor:has_info("master_quest_finished") 
-		and db.actor:has_info("master_quest_evac_colonel") then
-			if relation_registry.community_goodwill ("military", db.actor:id()) < -50 or
-			community_relation.gulag_enemy_m("esc_blokpost") == true or
-			community_relation.gulag_enemy_m("esc_specnaz") == true or
-			community_relation.gulag_enemy_m("esc_bridge") == true 		
-			then
-				make_military_neutral_escape()
-				log1("!!Military neutral escape")
-			end
-			if not db.actor:has_info("esc_bridge_pass_on") then
-				db.actor:give_info_portion("esc_bridge_pass_on")
-			end	
-			if db.actor:has_info("esc_blockpost_alarm") then
-				db.actor:give_info_portion("esc_blockpost_normal")
-			end			
-		elseif lname == "l01_escape" and db.actor:has_info("master_quest_finished") then
-			if not db.actor:has_info("esc_bridge_pass_on") then
-				db.actor:give_info_portion("esc_bridge_pass_on")
-			end	
-			if db.actor:has_info("esc_blockpost_alarm") then
-				db.actor:give_info_portion("esc_blockpost_normal")
-			end
-		end
-	elseif db.actor:has_info("master_quest_finished") then	
-		if not db.actor:has_info("esc_bridge_pass_on") then
-			db.actor:give_info_portion("esc_bridge_pass_on")
-		end
-		if db.actor:has_info("esc_blockpost_alarm") then
-			db.actor:give_info_portion("esc_blockpost_normal")
-		end		
+		colonel_enemy_callback = nil
 	end
 end
 
-function make_military_neutral_escape()
+--Запрещаем военным атаковать актора и его напарников, если он ведёт полковника на блокпост.
+function prohibit_military_attacks_actor( obj, enemy, result )
+  if not IsStalker(enemy) then return end
 
--- esc_blokpost
--- esc_specnaz
--- esc_bridge
-
-	write_log("!!DEBUG! Making military friendly")
-	
-	relation_registry.set_community_goodwill ("military", db.actor:id(), 500)
-
-	xr_gulag.setGulagRelation ("esc_blokpost", game_object.neutral, db.actor)
-	xr_gulag.setGulagRelation ("esc_specnaz", game_object.neutral, db.actor)
-	xr_gulag.setGulagRelation ("esc_bridge", game_object.neutral, db.actor)
-
-	xr_gulag.setGulagPersonalGoodwill("esc_blokpost", 500, db.actor)
-	xr_gulag.setGulagPersonalGoodwill("esc_specnaz", 500, db.actor)
-	xr_gulag.setGulagPersonalGoodwill("esc_bridge", 500, db.actor)
-
-	local colonel = level_object_by_sid(story_ids.colonel_prohorov)
-	
-	if colonel then
-		relation_registry.set_community_goodwill ("military", colonel:id(), 1000)
-
-		xr_gulag.setGulagRelation ("esc_blokpost", game_object.friend, colonel)
-		xr_gulag.setGulagRelation ("esc_specnaz", game_object.friend, colonel)
-		xr_gulag.setGulagRelation ("esc_bridge", game_object.friend, colonel)
-
-		xr_gulag.setGulagPersonalGoodwill("esc_blokpost", 1000, colonel)
-		xr_gulag.setGulagPersonalGoodwill("esc_specnaz", 1000, colonel)
-		xr_gulag.setGulagPersonalGoodwill("esc_bridge", 1000, colonel)		
-	end
-	
--- вдруг у ГГ есть напарник
-
-	for id, comm in pairs(xr_companion.companions) do
-		if comm == "companion" then
-			local npc = level.object_by_id(id)
-			if npc then
-				relation_registry.set_community_goodwill ("military", npc:id(), 1000)
-
-				xr_gulag.setGulagRelation ("esc_blokpost", game_object.friend, npc)
-				xr_gulag.setGulagRelation ("esc_specnaz", game_object.friend, npc)
-				xr_gulag.setGulagRelation ("esc_bridge", game_object.friend, npc)
-
-				xr_gulag.setGulagPersonalGoodwill("esc_blokpost", 1000, npc)
-				xr_gulag.setGulagPersonalGoodwill("esc_specnaz", 1000, npc)
-				xr_gulag.setGulagPersonalGoodwill("esc_bridge", 1000, npc)			
-			end		
-		end
-	end	
-
+  if
+    ( obj:character_community() == "military" and (enemy:id() == db.actor:id() or xr_companion.is_companion(enemy:id())) ) --Запрещаем военным атаковать актора и его напарников
+	or ( enemy:character_community() == "military" and  xr_companion.is_companion(obj:id())) --Запрещаем напарникам актора атаковать военных
+  then
+    table.insert( result, false )
+    return true
+  end
 end
+
+function on_npc_hit( obj, amount, local_direction, who, bone_index ) --Военные нас не атакуют, а мы лезем в бой - квест провален!
+  if
+	obj:character_community() ~= "military"
+    or who:id() ~= db.actor:id()
+  then
+    return
+  end
+
+  db.actor:give_info_portion("master_quest_colonel_dead") --Чтобы провалить квест
+  check_subscribe_colonel_enemy_callback()
+
+  local colonel = level_object_by_sid(story_ids.colonel_prohorov)
+  if colonel and colonel:alive() then
+	dialogs.companion_stop_following(colonel, db.actor)
+	relation_registry.set_goodwill(colonel:id(), db.actor:id(), -3000) --делаем полковника врагом
+	colonel:set_character_community("military", 0, 0)
+  end
+end
+
 
 function timer_notify_actor_mg()
 	ogse.start_timer("master_notice",20)
@@ -1871,6 +1816,7 @@ function unblock_use_hotkeys()
 	end
 end
 
+
 local return_functions = {
 	["actor"] 			= dialogs.actor_clear_community,
 	["mil_stalker"] 	= dialogs.actor_clear_community,	
@@ -1887,9 +1833,9 @@ function on_transponder_to_belt(obj)
 			ogse.save_variable("actor_orig_comm", comm)
 			dialogs.set_actor_milstalker()
 		end
-		if not db.actor:has_info("esc_bridge_pass_on") then
-			db.actor:give_info_portion("esc_bridge_pass_on")
-		end
+		--if not db.actor:has_info("esc_bridge_pass_on") then
+		--	db.actor:give_info_portion("esc_bridge_pass_on")
+		--end
 		return true
 	end
 end
@@ -1901,9 +1847,9 @@ function on_transponder_to_ruck(obj)
 			local run_funct = return_functions[comm]
 			run_funct()		
 		end
-		if db.actor:has_info("esc_bridge_pass_on") then
-			db.actor:disable_info_portion("esc_bridge_pass_on")
-		end
+		--if db.actor:has_info("esc_bridge_pass_on") then
+		--	db.actor:disable_info_portion("esc_bridge_pass_on")
+		--end
 		return true
 	end
 end
