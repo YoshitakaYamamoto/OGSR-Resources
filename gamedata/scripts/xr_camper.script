@@ -361,6 +361,15 @@ function action_patrol:process_danger()
 		if is_still_alive == false then
 			return false
 		end
+
+		if self.object:relation(danger_obj) == game_object.enemy then
+			if not self.object:binded_object():enemy_callback( self.object, danger_obj ) then
+				--log3("~~[%s.enemy_callback] Removing from danger: [%s], [%s]!", script_name(), self.object:name(), danger_obj:name())
+				return false
+			end
+		else
+			return false
+		end
 	end
 	
 	-- Отсеиваем далёких монстров

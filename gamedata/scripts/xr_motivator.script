@@ -1025,6 +1025,7 @@ end
 --Одноименным калбеком из движка (для движковой боёвки)
 --Из xrs_battle_ai.check_is_enemy (скриптовая боёвка)
 --Из xr_danger
+--Из xr_camper.action_patrol:process_danger()
 --Из функции check_sound в мотиваторе
 function motivator_binder:enemy_callback( obj, enemy_st )
   local valid, enemy = validate_enemy_object( enemy_st )
