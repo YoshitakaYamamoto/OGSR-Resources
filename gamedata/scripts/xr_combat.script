@@ -1,10 +1,13 @@
---[[------------------------------------------------------------------------------------------------------------------
-ѕереключение боевых схем
---------------------------------------------------------------------------------------------------------------------]]
+-- Переключение боевых схем
 
+local forbidden_combat_types = {
+	["nil"] = true,
+	["monolith"] = true,
+	--["camper"] = true,
+}
 
 function set_combat_type( npc, actor, t )
-	-- это нужно дл€ функций в xr_conditions.script
+	-- это нужно для функций в xr_conditions.script
 	local be = npc:best_enemy()
 	if be and (IsMonster(be) or IsStalker(be)) and be:alive() then
 		db.storage[npc:id()].enemy = be
@@ -12,11 +15,7 @@ function set_combat_type( npc, actor, t )
 
 	local script_combat_type = xr_logic.pick_section_from_condlist( actor, npc, t.combat_type.condlist )
 
-	if script_combat_type == "nil" then
-		script_combat_type = nil
-	end
-
-	if script_combat_type == "monolith" then
+	if forbidden_combat_types[script_combat_type] then
 		script_combat_type = nil
 	end
 

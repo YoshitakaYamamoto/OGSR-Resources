@@ -351,7 +351,7 @@ local last_enemy 			= {}		-- имя последнего врага, чисто для отладочных сообщени
 local last_enemy_id 		= {}		-- ид последнего врага
 local inited				= {}		-- инициализированы ли
 --local monolith				= {}		-- неписи со скриптовой боевкой монолита
-local campers				= {}		-- неписи со скриптовой боевкой кемпера
+--local campers				= {}		-- неписи со скриптовой боевкой кемпера
 local bad_hide				= {}		-- ненадежное укрытие
 local locked_vertexes 		= {}		-- занятые вертексы
 local death_places			= {}		-- места смерти союзников, избегать их
@@ -526,16 +526,16 @@ function evaluator_check_altcombat:evaluate()
 		knife_scheme[self.object:id()] = nil
 	end
 
-	if self.st.script_combat_type == "zombied"  then
+	--if self.st.script_combat_type == "zombied"  then
 		-- monolith[self.object:id()] = true
-		campers[self.object:id()] = nil
-	elseif db.storage[self.object:id()].active_scheme == "camper" then
-		campers[self.object:id()] = true
+		--campers[self.object:id()] = nil
+	--elseif db.storage[self.object:id()].active_scheme == "camper" then
+		--campers[self.object:id()] = true
 		-- monolith[self.object:id()] = nil
-	else
+	--else
 		--monolith[self.object:id()] = nil
-		campers[self.object:id()] = nil
-	end	
+		--campers[self.object:id()] = nil
+	--end	
 	local targ = have_fresh_deadman(self.object)
 	if primary_target[self.object:id()] ~= nil then
 		local best_enemy = level.object_by_id(primary_target[self.object:id()])
@@ -1442,13 +1442,12 @@ function hit_fx( obj, amount, who, bone_index )
 		hit_timeout[obj:id()] = nil
 	end		
 	
-	local ini = sys_ini
 	local sect = active_item:section()
 	
 	local weap_class = 0
 	
-	if ini:section_exist(sect) and ini:line_exist(sect, "ef_weapon_type") then
-		weap_class = ini:r_s32(sect,"ef_weapon_type")
+	if sys_ini:section_exist(sect) and sys_ini:line_exist(sect, "ef_weapon_type") then
+		weap_class = sys_ini:r_s32(sect,"ef_weapon_type")
 	end
 	
 	if weap_class == 0 or weap_class == 1 then
@@ -2792,7 +2791,7 @@ function IsShotgun(object)
 		local sect = object:section()
 		local wpn_class = get_string(sect, "weapon_class", nil)
 		--log3("~~[%s] weapon_class of [%s] is [%s]", script_name(), sect, wpn_class)
-		return (wpn_class and wpn_class == "shotgun")
+		return wpn_class and wpn_class == "shotgun"
 	end
 	return false
 	--[=[if object then
@@ -2809,7 +2808,7 @@ function IsSniperRifle(object)
 		local sect = object:section()
 		local wpn_class = get_string(sect, "weapon_class", nil)
 		--log3("~~[%s] weapon_class of [%s] is [%s]", script_name(), sect, wpn_class)
-		return (wpn_class and wpn_class == "sniper_rifle")
+		return wpn_class and wpn_class == "sniper_rifle"
 	end
 	return false
 	--[=[if object then
@@ -3986,12 +3985,12 @@ function is_exclusion(npc)
 	end
 end
 
-function is_sniper(npc)
-	if campers[npc:id()] then
-		return true
-	else	
-		return false
-	end
+function is_sniper(obj)
+	local active_slot = obj:active_slot()
+	if active_slot == 4294967295 then return false end
+	local active_item = obj:item_in_slot(active_slot)
+
+	return active_item and IsSniperRifle(active_item)
 end
 
 --function is_fanatic(npc)
