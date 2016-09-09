@@ -1027,13 +1027,30 @@ end
 --Из xr_danger
 --Из xr_camper.action_patrol:process_danger()
 --Из функции check_sound в мотиваторе
+local enemy_callback_freq = 1000
 function motivator_binder:enemy_callback( obj, enemy_st )
   local valid, enemy = validate_enemy_object( enemy_st )
   if not valid then return false end
 
-  local result = {}
-  self.am:call( "on_npc_enemy_callback", obj, enemy, result )
-  return result[1] ~= false
+  local res, ttl
+  local cached = self[ script_name() .. ".cached" ]
+  if cached and cached[ enemy:id() ] then
+    res, ttl = unpack( cached[ enemy:id() ] )
+  end
+  if res == nil or ttl < time_global() then
+    --log3("~~Called add_cache_rec for [%s], [%s]", obj:name(), enemy:name())
+    local result = {}
+    self.am:call( "on_npc_enemy_callback", obj, enemy, result )
+    res = result[1] ~= false
+    if cached then
+      cached[ enemy:id() ] = { res, time_global() + enemy_callback_freq }
+    else
+      self[ script_name() .. ".cached" ] = {
+        [ enemy:id() ] = { res, time_global() + enemy_callback_freq }
+      }
+    end
+  end
+  return res
 end
 
 
