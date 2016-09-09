@@ -364,15 +364,6 @@ function evaluator_danger:evaluate()
 		return false
 	end
 	
-	write_log("!!XR_DANGER_19".." ["..self.object:name().."]")
-
-	-- Отсеиваем по зоне
-	if sr_danger.check_danger_position(best_danger:position()) then
-		write_log("!!XR_DANGER_ZONE".." ["..self.object:name().."]")
-		-- printf("DANGER [%s]->[%s] [FALSE] nodanger_zone", self.object:name(), best_danger_name)
-		return false
-	end
-	
 	write_log("!!XR_DANGER_20".." ["..self.object:name().."]")
 
 	-- Отсеиваем по информационным рестрикторам

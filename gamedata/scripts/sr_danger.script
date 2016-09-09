@@ -1,50 +1,47 @@
-----------------------------------------------------------------------------------------------------
--- Схема котроля за территорией
-----------------------------------------------------------------------------------------------------
+--РЎРґРµР»Р°РЅРѕ С‡С‚РѕР±С‹ Р±Р°РЅРґРёС‚С‹ РЅРµ СѓР±РёРІР°Р»Рё РїР»РµРЅРЅРѕРіРѕ РґРѕР»РіРѕРІС†Р° РїРѕРєР° РѕРЅ РЅР°С…РѕРґРёС‚СЃСЏ РІ С‚СЋСЂСЊРјРµ.
+--Рљ СЂРµСЃС‚СЂРёРєС‚РѕСЂР°Рј СЌС‚РѕС‚ СЃРєСЂРёРїС‚ Р±РѕР»СЊС€Рµ РЅРµ РёРјРµРµС‚ РЅРёРєР°РєРѕРіРѕ РѕС‚РЅРѕС€РµРЅРёСЏ.
+--KRodin (c) 2016
 
---Используется только в одном месте. В ТД.
---Вызывается из xr_danger.
-
-territory = {}
-
-class "danger_territory"
-function danger_territory:__init(obj, storage)
-	self.object = obj
-	self.st = storage
-end
-function danger_territory:update(delta)
-	if xr_logic.try_switch_to_another_section(self.object, self.st, db.actor) then
-		return
-	end	
-end
-function danger_territory:deactivate(delta)
-	sr_danger.territory[self.object:name()] = nil
+function attach(sm)
+	sm:subscribe({ signal = "on_spawn", fun = this.on_spawn })
 end
 
----------------------------------------------------------------------------------------------------------------------
-function add_to_binder(obj, ini, scheme, section, storage)
-	local new_action = danger_territory(obj, storage)
-	xr_logic.subscribe_action_for_events(obj, storage, new_action)
-end
-
-function set_scheme(obj, ini, scheme, section, gulag_name)
-	local st = xr_logic.assign_storage_and_bind(obj, ini, scheme, section)
-	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, obj)
-	sr_danger.territory[obj:name()] = true
-end
-
--- Проверяет отсеивается ли денжер по настройкам зоны.
--- Если возвращает true, то денжер отсеивается и его проверять не следует.
-function check_danger_position(position)
-	local key,value = 0,0
-	local t = 0
-	for key,value in pairs(sr_danger.territory) do
-		t = db.zone_by_name[key]
-		if t then
-			if t:inside(position) then
-				return true
-			end
-		end
+function on_spawn()
+	if level.name() == "l04_darkvalley" then
+		check_subscribe_enemy_callback()
 	end
-	return false
+end
+
+function on_info(npc, info_id)
+	if info_id == "val_prisoner_free" then --РРЅС„РѕРїРѕСЂС€РµРЅСЊ РІС‹РґР°С‘С‚СЃСЏ РєРѕРіРґР° Р°РєС‚РѕСЂ РѕСЃРІРѕР±РѕР¶РґР°РµС‚ РґРѕР»РіРѕРІС†Р° РёР· С‚СЋСЂСЊРјС‹. РџРѕСЃР»Рµ СЌС‚РѕРіРѕ СЃРєСЂРёРїС‚ РїСЂРµРєСЂР°С‰Р°РµС‚ СЂР°Р±РѕС‚Сѓ.
+		check_subscribe_enemy_callback()
+	end
+end
+
+local enemy_callback
+function check_subscribe_enemy_callback()
+	local sobj = alife():story_object(story_ids.val_prisoner)
+	local sm = ogse_signals.get_mgr()
+	if sobj and sobj:alive() and object_level_name(sobj) == "l04_darkvalley" and not has_alife_info("val_prisoner_free") and not enemy_callback then
+		enemy_callback = {
+			{ signal = "on_npc_enemy_callback", fun = this.on_npc_enemy_callback },
+			{ signal = "on_info", fun = this.on_info },
+		}
+		for _, s in ipairs( enemy_callback ) do
+			sm:subscribe( s )
+		end
+		--log3("~~[%s] Enemy callback subscribed!", script_name())
+	elseif enemy_callback then
+		for _, s in ipairs( enemy_callback ) do
+			sm:unsubscribe( s )
+		end
+		--log3("~~[%s] Enemy callback UNsubscribed!", script_name())
+	end
+end
+
+function on_npc_enemy_callback( obj, enemy, result )
+	if obj:story_id() == story_ids.val_prisoner or enemy:story_id() == story_ids.val_prisoner then --Р‘Р°РЅРґРёС‚С‹ РЅРµ Р°С‚Р°РєСѓСЋС‚ РґРѕР»РіРѕРІС†Р°, Р° РґРѕР»РіРѕРІРµС† РёС….
+		table.insert(result, false)
+		return true
+	end
 end

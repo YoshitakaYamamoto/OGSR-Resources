@@ -58,6 +58,7 @@ function del_buggy_objects() --Удаление из игры глючных о�
 		"rad_sleep_room",
 		"mil_sr_sleep_1",
 --------------------------------------------------------
+		"val_sacrifice_danger_zone", --Рестриктор удалённой схемы sr_danger
 	}
 	for _, n in ipairs( names ) do
 		local sobj = alife():object( n )
