@@ -34,8 +34,8 @@ on_update -- при переходе через границу погодного фрейма выполняет обновление пр
 
 function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_init", fun = this.on_actor_init})
-	sm:subscribe({signal = "on_update", fun = this.on_update})
-	sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
+	--sm:subscribe({signal = "on_update", fun = this.on_update})
+	--sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
 	sm:subscribe({signal = "on_first_update", fun = this.on_first_update})
 	sm:subscribe({signal = "on_save", fun = this.on_save})
 end
@@ -942,6 +942,7 @@ end
 class "WeatherManager"
 function WeatherManager:__init()
 	ogse_surge_mgr.surge_log("WeatherManager:__init")
+	self.sm = ogse_signals.get_mgr()
 	-- специальный запрос на сброс погоды
 	local wreset_marker_path =  getFS():update_path("$game_saves$", "wreset")
 	local ftmp = io.open(wreset_marker_path)
@@ -1027,17 +1028,16 @@ function WeatherManager:__init()
 		-- но для ясности пусть будет
 	end
 	-- подписываем менеджер на сигналы
-	local sm = ogse_signals.get_mgr()
 	self.upd_ev_desc = {signal = "on_update", self = self, fun = self.update}
-	sm:subscribe(self.upd_ev_desc)
+	self.sm:subscribe(self.upd_ev_desc)
 	self.sv_ev_desc = {signal = "on_save",   self = self, fun = self.on_save}
-	sm:subscribe(self.sv_ev_desc)
+	self.sm:subscribe(self.sv_ev_desc)
 	self.ld_ev_desc = {signal = "on_load",   self = self, fun = self.on_load}
-	sm:subscribe(self.ld_ev_desc)
+	self.sm:subscribe(self.ld_ev_desc)
 	self.spwn_ev_desc = {signal = "on_spawn",   self = self, fun = self.on_actor_spawn}
-	sm:subscribe(self.spwn_ev_desc)
+	self.sm:subscribe(self.spwn_ev_desc)
 	self.destr_ev_desc = {signal = "on_destroy",self = self, fun = self.on_destroy}
-	sm:subscribe(self.destr_ev_desc)
+	self.sm:subscribe(self.destr_ev_desc)
 	--
 	ogse_surge_mgr.surge_log("WeatherManager:__init - END")
 end
@@ -1052,16 +1052,15 @@ function WeatherManager:on_destroy()
 	ogse_surge_mgr.surge_log("WeatherManager:on_destroy - END")
 	--
 	-- отписываем менеджер от сигналов
-	local sm = ogse_signals.get_mgr()
-	sm:unsubscribe(self.upd_ev_desc)
+	self.sm:unsubscribe(self.upd_ev_desc)
 	self.upd_ev_desc = nil
-	sm:unsubscribe(self.sv_ev_desc)
+	self.sm:unsubscribe(self.sv_ev_desc)
 	self.sv_ev_desc = nil
-	sm:unsubscribe(self.ld_ev_desc)
+	self.sm:unsubscribe(self.ld_ev_desc)
 	self.ld_ev_desc = nil
-	sm:unsubscribe(self.spwn_ev_desc)
+	self.sm:unsubscribe(self.spwn_ev_desc)
 	self.spwn_ev_desc = nil
-	sm:unsubscribe(self.destr_ev_desc)
+	self.sm:unsubscribe(self.destr_ev_desc)
 	self.destr_ev_desc = nil
 end
 -- начальная инициализация при начале игры (когда не выполняется on_load)
@@ -1335,17 +1334,43 @@ local function setup_frame(p1, p2)
 	ogse_surge_mgr.surge_log("setup_frame - END")
 end
 
+--Функция рассчитывает и устанавливает в менеджере сигналов таймаут для следующего обновления погоды.
+local function change_new_update_time( current_time, next_update, forced, upd_slot, sm )
+	local cur_game_time = time2string(current_time, "%04d/%02d/%02d %02d:%02d:%02d.%03d", {'y','m','d','h','min','s','ms'})
+	local next_upd_game_time = time2string(next_update, "%04d/%02d/%02d %02d:%02d:%02d.%03d", {'y','m','d','h','min','s','ms'})
+	local game_time_delta = next_update:diffSec(current_time) --Посчитаем, через сколько игровых секунд нужно обновить погоду
+	local game_time_delta_ms = game_time_delta * 1000 --Переводим в игровые миллисекунды
+	local REAL_time_delta_ms = game_time_delta_ms / normal_time_factor --Конвертируем в РЕАЛЬНОЕ время
+	log3("~~[%s] Current game time: %s, \nNext update game time: %s, \nDelta in game seconds: [%s], \nDelta in game ms: [%s] \nTime Factor: [%s] \nDelta in REAL ms: [%s] \nCurrent global time: [%s] \nNext update global time: [%s]", script_name(), cur_game_time, next_upd_game_time, game_time_delta, game_time_delta_ms, normal_time_factor, REAL_time_delta_ms, time_global(), time_global() + REAL_time_delta_ms)
+	if not forced then --Если это обычный апдейт, вызванный менеджером сигналов
+		sm:reschedule( REAL_time_delta_ms ) --Устанавливаем таймаут для текущего слота
+	else --Если это вынужденный апдейт, вызванный НЕ из менеджера сигналов
+		sm:rechange_scheduled_time( upd_slot, REAL_time_delta_ms ) --Переустанавливаем таймаут для слота обновления другим методом, т.к. метод reschedule в этом случае не подходит.
+	end
+end
+
 -- функция вставляет за первым кадром последовательность кадров выброса
 -- при необходимости часть точек, перекрываемая выбросом, удаляется и также
 -- формируется дополнительная точка в конце для плавного перехода от окончания выброса к обычной погоде
 
 monitoring_weather_sect = nil
 
-function WeatherManager:update()
+function WeatherManager:update( forced ) --forced должен быть == true, если апдейт вызывается НЕ из менеджера сигналов (например, из ogse_sleep_mgr).
 	if not enabled then return end
+	--
+	log3("--[%s] Called %s update! Time_global: [%s]", script_name(), forced == true and "forced" or "normal", time_global())
+	--
 	local current_time = game.get_game_time()
-	if self.next_update and current_time < self.next_update then return end -- ещё рано
-
+	if self.next_update and current_time < self.next_update then -- Обновлять погоду ещё рано
+		if forced == true then --Апдейт вызван вынужденно, т.е после изменения игрового времени (например во время сна)
+			change_new_update_time( current_time, self.next_update, true, self.upd_ev_desc, self.sm ) --Пересчитываем и переустанавливаем таймаут в менеджере сигналов с учётом изменившегося времени.
+			log3("--[%s] Timeout rechanged. Update not needed!", script_name())
+			return
+		else
+			return
+		end
+	end
+	--
 	ogse_surge_mgr.surge_log("WeatherManager:update - new point")
 	self:update_forecast() -- обновляем прогноз независимо от того, используем ли эту погоду
 	-- проверяем начало выброса, первый кадр имеет флажок surge_start = true
@@ -1373,6 +1398,9 @@ function WeatherManager:update()
 	end
 	--
 	self.next_update = afc:get_p2().time
+	--
+	change_new_update_time( current_time, self.next_update, forced == true, self.upd_ev_desc, self.sm )
+	--
 	-- устанавливаем скриптовую погоду, если прописана дефолтовая погода
 	local script_weather_section = afc:get_p1().data.section
 	if self.script_weather_enabled then
@@ -1389,4 +1417,7 @@ function WeatherManager:update()
 	--	process_weather_section_inf(script_weather_section) -- выдать
 	--end
 	--self:check_and_fail()
+	--
+	log3("--[%s] Weather %s updated!", script_name(), forced == true and "forced" or "normal")
+	--
 end
