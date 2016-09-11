@@ -64,7 +64,6 @@ local normal_time_factor = get_float("alife", "time_factor")
 -- при первом впдейте после загрузки ставим стандартное значение
 function on_first_update()
 	level.set_time_factor(normal_time_factor)
-	ogse.game_time_factor = normal_time_factor
 	local next_time = get_surge_time()
 	if next_time < -1 then
 		log1("!!Surge is fucked up, resetting")

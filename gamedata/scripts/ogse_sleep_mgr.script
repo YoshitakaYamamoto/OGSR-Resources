@@ -141,6 +141,7 @@ function begin_sleep(desired_sleep_time)
 	end
 	db.actor:update_condition()
 	db.actor.power = 1
+	ogse.show_time(true) --После сна принудительно обновляем время на худе
 	set_ignore_game_state_update()
 	sleeping_now = false
 	break_sleep_request = false

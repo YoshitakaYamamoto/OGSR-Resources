@@ -12,7 +12,7 @@ function attach(sm)
 	sm:subscribe({signal = "on_take",			fun = this.on_item_take})
 end
 
-game_time_factor = 0
+game_time_factor = get_float("alife", "time_factor")
 local fov_vol = sys_ini:r_s32("options","fov_volume")
 local max_alarm_fov_vol = sys_ini:r_s32("options","max_fov_volume")
 local min_alarm_fov_vol = sys_ini:r_s32("options","min_fov_volume")
@@ -1456,16 +1456,19 @@ function check_offline_npc(obj)
 end
 
 -------------------Выводим время на HUD-------------------
-function show_time()
-	ogse_signals.get_mgr():reschedule( 1000 )
+function show_time( forced ) --forced должен быть true, если апдейт вызван не из менеджера сигналов (например, из ogse_sleep_mgr).
+	if forced ~= true then
+		ogse_signals.get_mgr():reschedule( 60000 / game_time_factor )
+	end
 	local hud = get_hud()
-	local time_h = sr_timer.time2str(level.get_time_hours())
-	local time_m = sr_timer.time2str(level.get_time_minutes())
 	local cs = hud:GetCustomStatic("hud_timer_text1")
 	if not cs then
 		cs = hud:AddCustomStatic("hud_timer_text1", true)
 	end
-	cs:wnd():SetText(time_h..":"..time_m)
+	local h = level.get_time_hours()
+	local m = level.get_time_minutes()
+	local txt = (h >= 10 and h or "0"..h)..":"..(m >= 10 and m or "0"..m)
+	cs:wnd():SetText(txt)
 end
 -----------------------------------------------------------
 
