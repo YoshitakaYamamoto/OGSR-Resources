@@ -127,17 +127,14 @@ end
 function on_first_update()
 	if level.name() ~= "l09_deadcity_ogse" or db.actor:has_info("master_quest_soup_ready") then return end
 
-	for id = 1, 65534 do
+	for id, is_npc in pairs(db.creature) do
 		local npc = alife():object(id)
-		if npc then
-			local sect = npc:section_name()
-			if IsStalker(npc) and npc:alive() then
-				if object_level_name(npc) == "l09_deadcity_ogse" then
-					if npc:community() == "zombied" then	
-						if not ogse.is_quest_npc(npc) then
-							table.insert(deadcity_zombies, id)
-						end						
-					end
+		if npc and is_npc and npc:alive() then
+			if object_level_name(npc) == "l09_deadcity_ogse" then
+				if npc:community() == "zombied" then	
+					if not ogse.is_quest_npc(npc) then
+						table.insert(deadcity_zombies, id)
+					end						
 				end
 			end
 		end
