@@ -27,7 +27,6 @@ local subscribed
 function subscribe(id)
 	if not subscribed then
 		subscribed = {
-			{ signal = "on_first_update",	fun = this.on_first_update },
 			{ signal = "on_update",			fun = this.check_in_car },
 			{ signal = "on_npc_death",		fun = this.companion_death },
 		}
@@ -48,13 +47,6 @@ function unsubscribe(id)
 		--log3("~~[%s] UNsubscribed signals", script_name())
 	end
 	xr_combat_companion.unsubscribe(id)
-end
-
-
-function on_first_update()
-	for k, _ in pairs(companions) do
-		check_teleport(k, ogse_car_control.current_car) --KRodin: исправлено. В оригинальном ОГСЕ работало неправильно.
-	end
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -668,7 +660,7 @@ end
 -- 4) Актор на другом уровне, схема "следуй за мной" -- телепортируем за актором
 -- 5) Актор на другом уровне, схема "жди тут" -- не принимать задания алайфа, стоять на месте
 -----------------------------------------------------
--- check_teleport - проверка нужно ли телепортироваться на другую локацию, использует добавленную в движок teleport_object (точнее она там была, и её восстановили)
+-- teleport_on_actor_level - Телепортация напарника на другую локацию, использует добавленную в движок teleport_object (точнее она там была, и её восстановили)
 -- для оригинальной игры НЕ подходит, в ней нужно использовать примерно такую конструкцию:
 -- local changer = {pos = nil, lv = nil, gv = nil}
 
@@ -709,31 +701,16 @@ end
 -----------------------------------------------------
 -- Функция для перехода с локации на локацию
 -----------------------------------------------------
-function check_teleport(npc_id, in_car)
-	local actor = db.actor
-	local cur_level_name = load_var_companion(npc_id,"c_lvl","none")
-	-- если локация всё та же, нет никакой надобности насиловать постоянно хранилище
-	if cur_level_name ~= level.name() then
-		save_var_companion(npc_id,"c_lvl",level.name())
-	else
-		return
-	end	  
-	-- Проверим, нужно ли ждать на другом уровне
-	local s_npc = alife():object(npc_id)
-	local actor_vid = game_graph():vertex(alife():actor().m_game_vertex_id):level_id()
-	local npc_vid 	= game_graph():vertex(s_npc.m_game_vertex_id):level_id()
-	local w_level = load_var_companion(npc_id,"w_lvl",nil)
-	if (not w_level or w_level == "" or w_level == "nil") and actor_vid ~= npc_vid and actor then
+function teleport_on_actor_level(npc_id, s_npc)
+	if level.name() ~= object_level_name(s_npc) then
+		local actor = db.actor
 		-- недурно бы телепортнуться
 		local gvid = alife():actor().m_game_vertex_id 
 		local lvid = alife():actor().m_level_vertex_id
 		local pos = alife():actor().position
-		pos.x = pos.x + 6
+		pos.x = pos.x + 5
 		pos.z = pos.z -- + 2
 		alife():teleport_object("_", pos, lvid, gvid, npc_id)
-		if in_car then
-			s_npc.force_offline = true
-		end
 	end
 end
 -----------------------------------------------------
@@ -773,10 +750,11 @@ function check_in_car()
 				if not w_level or w_level == "" or w_level == "nil" then
 					local npc = level.object_by_id(id)
 					if npc and car then
-						local distance = npc:position():distance_to(car:position())  
 						local s_npc = alife():object(id)
-						local inside = load_var_companion(id,"in_car","false")
 						if s_npc then
+							teleport_on_actor_level(id, s_npc) --Если напарник на другой локации, телепортируем его
+							local distance = npc:position():distance_to(car:position())  
+							local inside = load_var_companion(id,"in_car","false")
 							if distance > 7 and inside == "false" then
 								return
 							end
@@ -801,6 +779,7 @@ function check_in_car()
 				local w_level = load_var_companion(id,"w_lvl",nil)
 				local s_npc = alife():object(id)
 				if s_npc and (not w_level or w_level == "" or w_level == "nil") then
+					teleport_on_actor_level(id, s_npc) --Если напарник на другой локации, телепортируем его
 					local pos = alife():actor().position
 					local last_car = tonumber(load_var_companion(id,"last_car",0))
 					pos.x = pos.x + 4
