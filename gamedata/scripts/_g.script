@@ -1664,15 +1664,13 @@ function is_16_9_mode()
 	local dev = device()
 	return dev.width / dev.height > 1.34
 end
--- вернуть значение v, ограниченное сверху и снизу значениями l и u
-function math.clamp(v, l, u)
-	if v < l then 
-		return l
-	elseif v > u then 
-		return u
-	end
-	return v
+
+-- выравнивание значения n в пределы от min до max
+math.clamp = function( n, min, max )
+	if min>max then min,max=max,min end
+	return (n>max and max) or (n<min and min) or n
 end
+
 -- округление к ближайшему
 function math.round(v)
 	return math.floor(v + 0.5)
@@ -1685,6 +1683,7 @@ end
 function math.similar(a1, a2, tol)
 	return math.abs(a1 - a2) <= tol
 end
+
 -- смещения полей в структуре SHit, т.е. параметры хита
 hit_offset = {
   Time              = 0,  -- 4, insigned int
