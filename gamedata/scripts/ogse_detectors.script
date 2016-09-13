@@ -13,24 +13,108 @@
 -----------------------------------------------------------------------
 
 function attach(sm)
-	sm:subscribe({signal = "on_item_to_slot",	fun = this.on_item_to_slot})
 	sm:subscribe({signal = "on_first_update",	fun = this.on_first_update})
-	sm:subscribe({signal = "on_update",			fun = this.on_update})
-	sm:subscribe({signal = "on_key_down",		fun = this.on_key_down})
+	sm:subscribe({signal = "on_item_to_slot",	fun = this.on_item_to_slot})
+	sm:subscribe({signal = "on_item_to_ruck",	fun = this.on_item_to_ruck})
+	sm:subscribe({signal = "on_drop",			fun = this.on_item_to_ruck})
+	sm:subscribe({signal = "on_destroy",		fun = this.remove_all_marks_from_minimap})
 end
 
-local MAX_ARTEFACTS = 8
+local subscribed
 
-local total_debug = get_con_bool("write_debug_log")
-function write_log(str)
-	if total_debug then
-		log1(str)
+function subscribe()
+	if not subscribed then
+		subscribed = {
+			{signal = "on_update", fun = this.on_update},
+			{signal = "on_key_down", fun = this.on_key_down},
+		}
+		for _, v in pairs(subscribed) do
+			ogse_signals.get_mgr():subscribe( v )
+		end
+		for id, _ in pairs(ogse_dbg_anomaly_binder.subscribed_anoms) do
+			local obj = level.object_by_id(id)
+			if obj then
+				local binder = obj:binded_object()
+				binder:subscribe()
+			end
+		end
+		--log3("--[%s] subscribed signals, anom tbl: %s", script_name(), ogse_dbg_anomaly_binder.subscribed_anoms)
+		ogse_dbg_anomaly_binder.autosubscribe = true
+	end
+end
+
+function unsubscribe()
+	if subscribed then
+		for _, v in pairs(subscribed) do
+			ogse_signals.get_mgr():unsubscribe( v )
+		end
+		subscribed = nil
+		for id, _ in pairs(ogse_dbg_anomaly_binder.subscribed_anoms) do
+			local obj = level.object_by_id(id)
+			if obj then
+				local binder = obj:binded_object()
+				binder:unsubscribe()
+			end
+		end
+		--log3("~~[%s] UNsubscribed signals, anom tbl: %s", script_name(), ogse_dbg_anomaly_binder.subscribed_anoms)
+		ogse_dbg_anomaly_binder.autosubscribe = false
+	end
+end
+
+
+local id_detector_in_slot
+local last_detector_sect
+local det_radius = 0
+local anoms_to_show = {}
+
+function on_item_to_slot(obj)
+	local sect = obj:section()
+	if string.find(sect, "interactive_detector") then
+		id_detector_in_slot = obj:id()
+		last_detector_sect = sect
+		det_radius = get_u32(sect, "detection_radius", 0)
+		if device().precache_frame < 1 then
+			subscribe()
+		end
+	end
+end
+
+function on_item_to_ruck(obj)
+	if obj:id() == id_detector_in_slot then
+		remove_all_marks_from_minimap()
+		last_detector_sect = nil
+		id_detector_in_slot = nil
+		det_radius = 0
+		--write_log("!!Actor don't has detector. Cleaning hud tip!")					
+		set_hud_tip_clean() --Удалим подсказку с худа, а то она в некоторых случаях не удаляется
+		unsubscribe()
 	end
 end
 
 function on_first_update()
 	set_detector_mode(0, 9)
+
+	local obj = db.actor:item_in_slot(8)
+	if obj and string.find(obj:section(), "interactive_detector") then
+		subscribe()
+	end
 end
+
+function remove_all_marks_from_minimap()
+	for id, spot in pairs(anoms_to_show) do
+		remove_mark_from_minimap(id, spot)
+	end
+end
+
+
+--local total_debug = get_con_bool("write_debug_log")
+--function write_log(str)
+--	if total_debug then
+--		log1(str)
+--	end
+--end
+
+local MAX_ARTEFACTS = 8
 
 local snd_beep = xr_sound.get_safe_sound_object("detectors\\da-2_beep1")
 local detect_radius = 12
@@ -39,74 +123,6 @@ local click_peroid = 1500
 local miminal_click_period = 120
 local miminal_beep_period = 150
 geiger_radius = 15
-
-minimap_detectors = {
-	["_mosquito_bald"] = "anomaly_bald_location",
-	["_mincer"] = "anomaly_minc_location",
-	["_gravi_zone"] = "anomaly_grav_location",
-	["_radioactive"] = "anomaly_rad_location",
-	["_witches_galantine"] = "anomaly_elec_location",
-	--["_mine_field"] = "anomaly_mine_location",
-	["_zharka_static"] = "anomaly_burn_location",
-	["_ameba"] = "anomaly_hvat_location",
-	["_hvatalka"] = "anomaly_hvat_location",
-	["_liana"] = "anomaly_liana_location",
-	["_burning_fuzz"] = "anomaly_hvat_location",
-	["_buzz"] = "anomaly_buzz_location",
-}
-
-local detectors_presets = {
-	["interactive_detector_simple"] = {
-		["_mosquito_bald"] = true,
-		["_mincer"] = true,
-		["_gravi_zone"] = true,
-		["_witches_galantine"] = false,
-		--["_mine_field"] = false,
-		["_zharka_static"] = false,
-		["_ameba"] = false,
-		["_hvatalka"] = false,
-		["_liana"] = false,
-		["_burning_fuzz"] = false,
-		["_buzz"] = false,
-	},
-	["interactive_detector_advanced"] = {
-		["_mosquito_bald"] = true,
-		["_mincer"] = true,
-		["_gravi_zone"] = true,
-		["_witches_galantine"] = true,
-		--["_mine_field"] = false,
-		["_zharka_static"] = true,
-		["_ameba"] = false,
-		["_hvatalka"] = false,
-		["_liana"] = false,
-		["_burning_fuzz"] = false,
-		["_buzz"] = true,		
-	},
-	["interactive_detector_elite"] = {
-		["_mosquito_bald"] = true,
-		["_mincer"] = true,
-		["_gravi_zone"] = true,
-		["_witches_galantine"] = true,
-		--["_mine_field"] = false,
-		["_zharka_static"] = true,
-		["_ameba"] = true,
-		["_hvatalka"] = true,
-		["_liana"] = true,
-		["_burning_fuzz"] = true,
-		["_buzz"] = true,		
-	},
-}
-
-local last_detector_sect = ""
-local det_radius = 0
-
-function on_item_to_slot(obj)
-	local sect = obj:section()
-	if string.find(sect, "interactive_detector") then
-		last_detector_sect = sect
-		det_radius = get_u32(sect, "detection_radius", 0)
-	end
-end
 
 local strange_zones_by_frequency = {
 	[0] = {name = "", id = 0},
@@ -130,25 +146,25 @@ function are_actor_in_strange_zone()
 end
 
 function check_actor_in_zone_action(frequency)
-	write_log("!!IMPULSE_SCANNER check ["..tostring(frequency).."]")
+	--write_log("!!IMPULSE_SCANNER check ["..tostring(frequency).."]")
 	if not strange_zones_by_frequency[frequency] then
-		write_log("!!IMPULSE_SCANNER INVALID FREQ ["..tostring(frequency).."]")
+		--write_log("!!IMPULSE_SCANNER INVALID FREQ ["..tostring(frequency).."]")
 		return
-	else	
-		write_log("!!IMPULSE_SCANNER check zone ["..tostring(strange_zones_by_frequency[frequency].name).."]")
+	--else	
+		--write_log("!!IMPULSE_SCANNER check zone ["..tostring(strange_zones_by_frequency[frequency].name).."]")
 	end	
 	if xr_conditions.actor_in_zone(nil,nil,{strange_zones_by_frequency[frequency].name}) then
 		soundtrack.afscanner_click3()
-		write_log("!!IMPULSE_SCANNER check info [".."strangezone"..tostring(strange_zones_by_frequency[frequency].id).."_rebuild".."]")
+		--write_log("!!IMPULSE_SCANNER check info [".."strangezone"..tostring(strange_zones_by_frequency[frequency].id).."_rebuild".."]")
 		if db.actor:has_info("strangezone"..tostring(strange_zones_by_frequency[frequency].id).."_rebuild") then
 			if jekan_work["afscanner_impulse"..tostring(strange_zones_by_frequency[frequency].id)] then
-				write_log("!!IMPULSE_SCANNER START_FUNC [jekan_work.".."afscanner_impulse"..tostring(strange_zones_by_frequency[frequency].id).."]")
+				--write_log("!!IMPULSE_SCANNER START_FUNC [jekan_work.".."afscanner_impulse"..tostring(strange_zones_by_frequency[frequency].id).."]")
 				jekan_work["afscanner_impulse"..tostring(strange_zones_by_frequency[frequency].id)]()
-			else
-				write_log("!!IMPULSE_SCANNER CANT_FIND!!! [jekan_work.".."afscanner_impulse"..tostring(strange_zones_by_frequency[frequency].id).."]")
+			--else
+				--write_log("!!IMPULSE_SCANNER CANT_FIND!!! [jekan_work.".."afscanner_impulse"..tostring(strange_zones_by_frequency[frequency].id).."]")
 			end
 		elseif db.actor:has_info("strangezone"..tostring(strange_zones_by_frequency[frequency].id).."_has_same_art") then
-			write_log("!!IMPULSE_SCANNER check info [".."strangezone"..tostring(strange_zones_by_frequency[frequency].id).."_has_same_art".."]")
+			--write_log("!!IMPULSE_SCANNER check info [".."strangezone"..tostring(strange_zones_by_frequency[frequency].id).."_has_same_art".."]")
 			news_manager.send_tip(db.actor, "strange_zone_af_need_reload", nil, "anomal", 5000, nil)
 		else
 			news_manager.send_tip(db.actor, "strangezone_empty", nil, "anomal", 5000, nil)
@@ -156,51 +172,6 @@ function check_actor_in_zone_action(frequency)
 	end
 end
 
-function actor_has_detector()
-	local detector_in_slot = db.actor:item_in_slot(8)
-	return ( detector_in_slot and string.find(detector_in_slot:section(), "interactive_detector") )
-end
-
-function actor_has_elite_detector()
-	local detector_in_slot = db.actor:item_in_slot(8)
-	return ( detector_in_slot and detector_in_slot:section() == "interactive_detector_elite" )
-end
-
-function marks_on_minimap(obj)
-	if
-		not actor_has_elite_detector()
-		or obj:position():distance_to(db.actor:position()) > det_radius
-	then
-		return "none"
-	end
-
-	if obj then
-		local sect = obj:section()
-		if not string.find(sect, "nodetect") then
-			for k, v in pairs(minimap_detectors) do
-				if string.find(sect, k) then
-					return v
-				end
-			end
-		end
-	end
-	return "none"
-end
-
-function is_detectable_by_current_detector(obj)
-	local detector_preset = detectors_presets[last_detector_sect]
-	if detector_preset and obj then
-		local sect = obj:section()
-		if not string.find(sect, "nodetect") then
-			for k, v in pairs(detector_preset) do
-				if string.find(sect, k) and v == true then
-					return true
-				end
-			end	
-		end
-	end
-	return false
-end
 
 local hud_tip_text = "clean"
 
@@ -255,12 +226,11 @@ function set_hud_tip_upgrade()
 	end
 end
 
---******************************************[KRodin's FIX - Start]*********************************************
+
 local detector_hud_active = false
 local upgrade_mode_active = false
 local upgrade_frequency = 0
 local block_detector_keys = false
-
 ------------------------------------------------------------------------------------------------------
 --Служебный таймер, ждущий изменение активного слота.
 --Запускается при убирании/доставании детекторов и  блокирует вызов функции "on_key_down",
@@ -269,7 +239,7 @@ local block_detector_keys = false
 --И ещё, таймер можно запускать с аргументом-функцией, которая запустится по срабатыванию таймера.
 class "slot_change_timer" (ogse_qt.quick_timer)
 function slot_change_timer:__init(fun) --Запуск таймера
-	write_log("!!Starting timer! Block detector keys!")					
+	--write_log("!!Starting timer! Block detector keys!")					
 	block_detector_keys = true --Заблокируем вызов функции "on_key_down"
 	self.saved_act_slot = db.actor:active_slot() --Запоминаем активный слот
 	self.fun = fun
@@ -278,7 +248,7 @@ function slot_change_timer:condition() --Условие проверяется �
 	return db.actor:active_slot() ~= self.saved_act_slot --Сработает при смене активного слота
 end
 function slot_change_timer:action() --Действие по сработавшему условию
-	write_log("!!Timer is end! Unblock detector keys")					
+	--write_log("!!Timer is end! Unblock detector keys")					
 	if self.fun then self.fun() end --Если вызывали с аргументом, запускаем функцию-аргумент.
 	block_detector_keys = false --Разблокируем вызов функции "on_key_down"
 end
@@ -286,266 +256,296 @@ function start_slot_change_timer(fun) --Обёртка для упрощённо
 	slot_change_timer(fun):start()
 end
 ------------------------------------------------------------------------------------------------------
+local wpn_binds = {
+	[key_bindings.kWPN_1] = true,
+	[key_bindings.kWPN_2] = true,
+	[key_bindings.kWPN_3] = true,
+	[key_bindings.kWPN_4] = true,
+	[key_bindings.kWPN_5] = true,
+	[key_bindings.kWPN_6] = true,
+}
 
 function on_key_down(key, bind)
 	if block_detector_keys then --Если вызов функции не требуется
-		write_log("!!Function 'on_key_down' is blocked. Exit!")
+		--write_log("!!Function 'on_key_down' is blocked. Exit!")
 		return --Ничего не делать
 	end
-
-	if actor_has_detector() then --В слоте есть любой интерактивный детектор
 ------------------------------------------------------------------------------------------------------
-		if
-			level.main_input_receiver() --если открыто какое-то окно
-			and not level.get_inventory_wnd():IsShown() --и это не инвентарь
-			and not level.get_pda_wnd():IsShown() --и не ПДА
-		then
-			write_log("!!Input Receiver is active. Exit!")
-			return --Ничего не делать
-		end
+	if
+		level.main_input_receiver() --если открыто какое-то окно
+		and not level.get_inventory_wnd():IsShown() --и это не инвентарь
+		and not level.get_pda_wnd():IsShown() --и не ПДА
+	then
+		--write_log("!!Input Receiver is active. Exit!")
+		return --Ничего не делать
+	end
 ------------------------------------------------------------------------------------------------------
-		if db.actor:active_slot() == 8 then --Детектор в руках
-			write_log("!!Actor active slot == 8!")
-			detector_hud_active = true
-		else --Просто в слоте
-			write_log("!!Actor active slot ~= 8!")
-			detector_hud_active = false
-		end
+	if db.actor:active_slot() == 8 then --Детектор в руках
+		--write_log("!!Actor active slot == 8!")
+		detector_hud_active = true
+	else --Просто в слоте
+		--write_log("!!Actor active slot ~= 8!")
+		detector_hud_active = false
+	end
 ------------------------------------------------------------------------------------------------------
-		if
-			key == DIK_keys.DIK_8
-			or bind == key_bindings.kWPN_1
-			or bind == key_bindings.kWPN_2
-			or bind == key_bindings.kWPN_3
-			or bind == key_bindings.kWPN_4
-			or bind == key_bindings.kWPN_5
-			or bind == key_bindings.kWPN_6
-		then --Если нажали клавишу доставания чего-либо из слотов 1-8 (кроме 7, там доставать нечего)
-			if detector_hud_active then --Детектор в руках - значит убираем его
-				write_log("!!Actor removes detector!")					
-				if key == DIK_keys.DIK_8 then
-					db.actor:activate_slot(-1)
-				end
-				start_slot_change_timer(function() --Запускаем таймер на время убирания детектора.
-					set_hud_tip_clean() --Удаляем подсказку с худа
-				end)
-				return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
-			elseif key == DIK_keys.DIK_8 then --Детектора в руках нет - значит достанем его
-				write_log("!!Actor takes detector!")
-				db.actor:activate_slot(8)
-				start_slot_change_timer(function() --Запускаем таймер на время доставания детектора.
-					if
-						actor_has_elite_detector() --Если достали элитный детектор
-						and db.actor:object("afscanner") --И есть апгрейд для детектора
-					then
-						if upgrade_mode_active then
-							write_log("!!Set hud tip upgrade!")					
-							set_hud_tip_upgrade() --Включен режим апгрейда, покажем подсказку.
-						else
-							write_log("!!Set hud tip normal!")					
-							set_hud_tip_normal() --Включен обычный режим, покажем подсказку.
-						end
+	if key == DIK_keys.DIK_8 or wpn_binds[bind] then --Если нажали клавишу доставания чего-либо из слотов 1-8 (кроме 7, там доставать нечего)
+		if detector_hud_active then --Детектор в руках - значит убираем его
+			--write_log("!!Actor removes detector!")					
+			if key == DIK_keys.DIK_8 then
+				db.actor:activate_slot(-1)
+			end
+			start_slot_change_timer(function() --Запускаем таймер на время убирания детектора.
+				set_hud_tip_clean() --Удаляем подсказку с худа
+			end)
+			return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
+		elseif key == DIK_keys.DIK_8 then --Детектора в руках нет - значит достанем его
+			--write_log("!!Actor takes detector!")
+			db.actor:activate_slot(8)
+			start_slot_change_timer(function() --Запускаем таймер на время доставания детектора.
+				if
+					last_detector_sect == "interactive_detector_elite" --Если достали элитный детектор
+					and db.actor:object("afscanner") --И есть апгрейд для детектора
+				then
+					if upgrade_mode_active then
+						--write_log("!!Set hud tip upgrade!")					
+						set_hud_tip_upgrade() --Включен режим апгрейда, покажем подсказку.
+					else
+						--write_log("!!Set hud tip normal!")					
+						set_hud_tip_normal() --Включен обычный режим, покажем подсказку.
 					end
-				end)
-				return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
-			end
-		end
-------------------------------------------------------------------------------------------------------
-		if
-			not detector_hud_active --если в руках нет детектора
-			or not actor_has_elite_detector() --или в руках НЕ элитный детектор
-			or not db.actor:object("afscanner") --или нет апгрейда для детектора
-		then
-			write_log("!!Elite detector with afscanner not found! Deleting tip from hud!")
-			set_hud_tip_clean() --Удаляем подсказку с худа, а то она не удаляется в некоторых случаях.
-			return --больше здесь делать нечего
-		end
-------------------------------------------------------------------------------------------------------
-		if key == DIK_keys.DIK_K then
-			if not upgrade_mode_active then --проверить есть ли апгрейд и если есть включить режим
-				write_log("!!IMPULSE_SCANNER POWER_ON")
-				upgrade_frequency = 0
-				set_detector_mode(1, upgrade_frequency)
-				upgrade_mode_active = true
-				soundtrack.afscanner_click()
-				set_hud_tip_upgrade() --Если включен режим апгрейда, покажем соответствующую подсказку.
-			else --если режим апгрейда активен - выключить
-				write_log("!!IMPULSE_SCANNER POWER_OFF")
-				upgrade_frequency = 0
-				set_detector_mode(0, 9)
-				upgrade_mode_active = false
-				soundtrack.afscanner_off()
-				set_hud_tip_normal() --Если включен обычный режим, покажем соответствующую подсказку.
-			end			
+				end
+			end)
 			return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
 		end
+	end
 ------------------------------------------------------------------------------------------------------
-		if not upgrade_mode_active then --если режим апгрейда выключен
-			write_log("!!upgrade_mode in NOT active! - set_hud_tip_normal")
-			set_hud_tip_normal() --Покажем подсказку, чтобы в редких случаях она не исчезала
-			return --дальше нам делать нечего
-		else --если включен
-			write_log("!!upgrade_mode_active - set_hud_tip_upgrade")
-			set_hud_tip_upgrade() --Покажем подсказку, чтобы в некоторых случаях она не исчезала
-		end
+	if
+		not detector_hud_active --если в руках нет детектора
+		or last_detector_sect ~= "interactive_detector_elite" --или в руках НЕ элитный детектор
+		or not db.actor:object("afscanner") --или нет апгрейда для детектора
+	then
+		--write_log("!!Elite detector with afscanner not found! Deleting tip from hud!")
+		set_hud_tip_clean() --Удаляем подсказку с худа, а то она не удаляется в некоторых случаях.
+		return --больше здесь делать нечего
+	end
 ------------------------------------------------------------------------------------------------------
-		if key == DIK_keys.DIK_RETURN then  -- Enter --послать импульс на этой частоте
-			write_log("!!IMPULSE_SCANNER SEND_IMPULSE")
-			if not are_actor_in_strange_zone() then --мы вне зоны, предупредить
-				write_log("!!IMPULSE_SCANNER OUT_ZONE")
-				soundtrack.afscanner_click2()
-				news_manager.send_tip(db.actor, "actor_out_strangzone", nil, "anomal", 5000, nil)
-			else
-				write_log("!!IMPULSE_SCANNER IMPULSE_SENT")
-				check_actor_in_zone_action(upgrade_frequency)
-			end
-			return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
-		end
-------------------------------------------------------------------------------------------------------
-		if key == DIK_keys.DIK_COMMA then -- < --понизить частоту
-			if upgrade_frequency > 0 then
-				upgrade_frequency = upgrade_frequency - 1
-			end
-			write_log("!!IMPULSE_SCANNER SET FREQ IDX ["..tostring(upgrade_frequency).."]")
-			set_detector_mode(1, upgrade_frequency)	
-			soundtrack.afscanner_click()
-			return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
-		end
-------------------------------------------------------------------------------------------------------
-		if key == DIK_keys.DIK_PERIOD then -- > --повысить частоту
-			if upgrade_frequency < 8 then
-				upgrade_frequency = upgrade_frequency + 1
-			end		
-			write_log("!!IMPULSE_SCANNER SET FREQ IDX ["..tostring(upgrade_frequency).."]")					
+	if key == DIK_keys.DIK_K then
+		if not upgrade_mode_active then --проверить есть ли апгрейд и если есть включить режим
+			--write_log("!!IMPULSE_SCANNER POWER_ON")
+			upgrade_frequency = 0
 			set_detector_mode(1, upgrade_frequency)
+			upgrade_mode_active = true
 			soundtrack.afscanner_click()
-			return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
-		end
+			set_hud_tip_upgrade() --Если включен режим апгрейда, покажем соответствующую подсказку.
+		else --если режим апгрейда активен - выключить
+			--write_log("!!IMPULSE_SCANNER POWER_OFF")
+			upgrade_frequency = 0
+			set_detector_mode(0, 9)
+			upgrade_mode_active = false
+			soundtrack.afscanner_off()
+			set_hud_tip_normal() --Если включен обычный режим, покажем соответствующую подсказку.
+		end			
+		return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
+	end
 ------------------------------------------------------------------------------------------------------
-	else --Нет детектора
-		write_log("!!Actor don't has detector. Cleaning hud tip!")					
-		set_hud_tip_clean() --Удалим подсказку с худа, а то она в некоторых случаях не удаляется
+	if not upgrade_mode_active then --если режим апгрейда выключен
+		--write_log("!!upgrade_mode in NOT active! - set_hud_tip_normal")
+		set_hud_tip_normal() --Покажем подсказку, чтобы в редких случаях она не исчезала
+		return --дальше нам делать нечего
+	else --если включен
+		--write_log("!!upgrade_mode_active - set_hud_tip_upgrade")
+		set_hud_tip_upgrade() --Покажем подсказку, чтобы в некоторых случаях она не исчезала
+	end
+------------------------------------------------------------------------------------------------------
+	if key == DIK_keys.DIK_RETURN then  -- Enter --послать импульс на этой частоте
+		--write_log("!!IMPULSE_SCANNER SEND_IMPULSE")
+		if not are_actor_in_strange_zone() then --мы вне зоны, предупредить
+			--write_log("!!IMPULSE_SCANNER OUT_ZONE")
+			soundtrack.afscanner_click2()
+			news_manager.send_tip(db.actor, "actor_out_strangzone", nil, "anomal", 5000, nil)
+		else
+			--write_log("!!IMPULSE_SCANNER IMPULSE_SENT")
+			check_actor_in_zone_action(upgrade_frequency)
+		end
+		return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
+	end
+------------------------------------------------------------------------------------------------------
+	if key == DIK_keys.DIK_COMMA then -- < --понизить частоту
+		if upgrade_frequency > 0 then
+			upgrade_frequency = upgrade_frequency - 1
+		end
+		--write_log("!!IMPULSE_SCANNER SET FREQ IDX ["..tostring(upgrade_frequency).."]")
+		set_detector_mode(1, upgrade_frequency)	
+		soundtrack.afscanner_click()
+		return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
+	end
+------------------------------------------------------------------------------------------------------
+	if key == DIK_keys.DIK_PERIOD then -- > --повысить частоту
+		if upgrade_frequency < 8 then
+			upgrade_frequency = upgrade_frequency + 1
+		end		
+		--write_log("!!IMPULSE_SCANNER SET FREQ IDX ["..tostring(upgrade_frequency).."]")					
+		set_detector_mode(1, upgrade_frequency)
+		soundtrack.afscanner_click()
+		return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
+	end
+------------------------------------------------------------------------------------------------------
+end
+
+
+function remove_mark_from_minimap(id, spot)
+	--log3("Called removing location by id for [%s], Spot: [%s]", id, spot)
+	level_tasks.remove_location_by_id(id, spot)
+	anoms_to_show[id] = nil
+end
+
+function add_mark_on_minimap(id, sect)
+	local spot = ogse_detectors_data.mapspots_for_anoms[sect]
+	if spot then
+		--log3("Called adding location by id for [%s], Spot: [%s]", id, spot)
+		level_tasks.add_location_by_id(id, spot)
+		anoms_to_show[id] = spot
 	end
 end
---*******************************************[KRodin's FIX - End]**********************************************
 
 local last_beep = 0
+local function update_detector_sound(act_pos)
+	local hasanom, anomid, pos, cls, distance, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(act_pos)
+	local obj = level.object_by_id(anomid)
+	if hasanom and obj and ogse_anomaly.get_anomaly_mode(anomid) ~= "anom_off" and ogse_detectors_data.detectors_presets[last_detector_sect][sect_anom] then
+		if distance <= detect_radius then
+			local tg = time_global()
+			if last_beep == 0 then
+				snd_beep:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 10.0)
+				last_beep = tg
+			else
+				local mul_check = distance/detect_radius
+				local timeout_check = math.ceil(beep_period*mul_check)	
+				if timeout_check < miminal_beep_period then
+					timeout_check = miminal_beep_period
+				end
+				if tg > (last_beep+timeout_check) then
+					snd_beep:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 10.0)
+					last_beep = tg
+				end						
+			end
+		else
+			if last_beep > 0 then
+				last_beep = 0
+			end
+		end
+	end
+end
+
 local last_click = 0
 local geiger_snd = nil
-
-function on_update()
-	if actor_has_detector() then
-		local act_pos = db.actor:position()
--------------------------------------------------------------------------------------------------------------------------------
-		-- перебор онлайновых артефактов в таблице
-		local i = 0
-		for id, art in pairs (db.artefacts) do
-			-- проверяем, не в рюкзаке ли артефакт. Их детектировать не надо
-			if art:parent() == nil then
-				local art_pos = art:position()
-				local dist = act_pos:distance_to(art_pos)
-				-- проверка на попадание в радиус детектирования
-				if dist < det_radius and i < MAX_ARTEFACTS then
-					set_artefact_slot(i, art_pos.x, art_pos.y, art_pos.z)
-					i = i + 1
+local function update_geiger_sound()
+	local rads = ogse_dbg_anomaly_binder.get_max_radlevel()
+	if rads > 0 then
+		local rnd_val = rads
+		if rads < 8 then
+			rnd_val = rnd_val + 1
+		end
+		local tg = time_global()
+		if last_click == 0 then
+			geiger_snd = xr_sound.get_safe_sound_object("detectors\\geiger_"..math.random(rnd_val))
+			if geiger_snd then
+				geiger_snd:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 9.0)
+				last_click = tg
+			end
+		else
+			local shift_val = math.random(-500,500)
+			local timeout = math.ceil((click_peroid+shift_val)/rads)
+			if timeout < miminal_click_period then
+				timeout = miminal_click_period
+			end			
+			if tg > (last_click+timeout) then
+				geiger_snd = xr_sound.get_safe_sound_object("detectors\\geiger_"..math.random(rnd_val))
+				if geiger_snd then
+					geiger_snd:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 9.0)
+					last_click = tg
 				end
 			end
 		end
-		for j = i,MAX_ARTEFACTS-1 do
-			set_artefact_slot(j, 0, 0, 0)
-			j = j + 1
+	else	
+		if last_click > 0 then
+			last_click = 0
+		end		
+	end
+end
+
+
+function on_update()
+	local act_pos = db.actor:position()
+-------------------------------------------------------------------------------------------------------------------------------
+	-- перебор онлайновых артефактов в таблице
+	local i = 0
+	for id, art in pairs (db.artefacts) do
+		-- проверяем, не в рюкзаке ли артефакт. Их детектировать не надо
+		if not art:parent() then
+			local art_pos = art:position()
+			-- проверка на попадание в радиус детектирования
+			if act_pos:distance_to(art_pos) < det_radius and i < MAX_ARTEFACTS then
+				set_artefact_slot(i, art_pos.x, art_pos.y, art_pos.z)
+				i = i + 1
+			end
 		end
+	end
+	for j = i,MAX_ARTEFACTS-1 do
+		set_artefact_slot(j, 0, 0, 0)
+		j = j + 1
+	end
 --------------------------------------------------------------------------------------------------------------------------------
-		if actor_has_elite_detector() then
-			local k = 0
-			local anm_table = ogse_anomaly.get_all_nearest_anomalies_by_point_in_radius(act_pos, det_radius)
-			-- пересчитаем радиус без учета вертикальной координаты
---			write_log("elite detector update, pos "..tostring(act_pos.x)..", "..tostring(act_pos.y)..", "..tostring(act_pos.z)..", radius "..tostring(det_radius))
-			local act_pos_no_y = act_pos
-			act_pos_no_y.y = 0
-			local pair = 0
-			for id, anm in pairs (anm_table) do
+	if last_detector_sect == "interactive_detector_elite" then
+		local anm_table = ogse_anomaly.get_all_nearest_anomalies_by_point_in_radius(act_pos, det_radius)
+		-- пересчитаем радиус без учета вертикальной координаты
+		local act_pos_no_y = act_pos
+		act_pos_no_y.y = 0
+		local pair = 0
+		--
+		local new_anom_tbl = {}
+		--
+		for id, anm in pairs(anm_table) do
+			local obj = level.object_by_id(id)
+			if obj and ogse_anomaly.get_anomaly_mode(id) ~= "anom_off" and not string.find(anm.sect, "nodetect") then
+				--
+				if not anoms_to_show[id] then
+					add_mark_on_minimap(id, anm.sect) --Установили метку на миникарте
+				end
+				new_anom_tbl[id] = true
+				--
 				local pos_y = anm.pos.y
 				anm.pos.y = 0
 				anm.dist = anm.pos:distance_to(act_pos_no_y)
 				anm.pos.y = pos_y
 				pair = pair + 1
-			end
---			write_log("elite detector update, tables size "..tostring(pair))
-			table.sort(anm_table,function(a,b) return (a.dist+a.radius) < (b.dist+b.radius) end)
-			for id, anm in pairs (anm_table) do
-				local obj = level.object_by_id(id)
---				write_log("calculating anom with id "..id)
-				if obj and ogse_anomaly.get_anomaly_mode(id) ~= "anom_off" and not string.find(anm.sect, "nodetect") then
-					if k < MAX_ARTEFACTS then
-						set_anomaly_slot(k, anm.pos.x, anm.pos.y, anm.pos.z)
-						k = k + 1
-					end
-				end
-			end
-			for l = k,MAX_ARTEFACTS-1 do
-				set_anomaly_slot(l, 0, 0, 0)
-				l = l + 1
-			end
-		end
---------------------------------------------------------------------------------------------------------------------------------------
-		local hasanom, anomid, pos, cls, distance, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(act_pos)
-		local obj = level.object_by_id(anomid)
-		if hasanom and obj and ogse_anomaly.get_anomaly_mode(anomid) ~= "anom_off" and is_detectable_by_current_detector(obj) then
-			if distance <= detect_radius then
-				if last_beep == 0 then
-					snd_beep:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 10.0)
-					last_beep = time_global()
-				else
-					local mul_check = distance/detect_radius
-					local timeout_check = math.ceil(beep_period*mul_check)	
-					if timeout_check < miminal_beep_period then
-						timeout_check = miminal_beep_period
-					end
-					if time_global() > (last_beep+timeout_check) then
-						snd_beep:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 10.0)
-						last_beep = time_global()
-					end						
-				end
 			else
-				if last_beep > 0 then
-					last_beep = 0
-				end
+				anm_table[id] = nil
 			end
 		end
----------------------------------------------------------------------------------------------------------------------------------------
-		local rads = ogse_dbg_anomaly_binder.get_max_radlevel()
-		if rads > 0 then
-			local rnd_val = rads
-			if rads < 8 then
-				rnd_val = rnd_val + 1
+		--
+		for id, spot in pairs(anoms_to_show) do --Удаляем метки с аномалий, которые больше не нужно показывать на карте
+			if not new_anom_tbl[id] then
+				remove_mark_from_minimap(id, spot)
 			end
-		
-			if last_click == 0 then
-				geiger_snd = xr_sound.get_safe_sound_object("detectors\\geiger_"..tostring(math.random(1,rnd_val)))
-				if geiger_snd then
-					geiger_snd:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 9.0)
-					last_click = time_global()
-				end
-			else
-				local shift_val = math.random(-500,500)
-				local timeout = math.ceil((click_peroid+shift_val)/rads)
-				if timeout < miminal_click_period then
-					timeout = miminal_click_period
-				end			
-				if time_global() > (last_click+timeout) then
-					geiger_snd = xr_sound.get_safe_sound_object("detectors\\geiger_"..tostring(math.random(1,rnd_val)))
-					if geiger_snd then
-						geiger_snd:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 9.0)
-						last_click = time_global()
-					end
-				end
-			end
-		else	
-			if last_click > 0 then
-				last_click = 0
-			end		
 		end
-------------------------------------------------------------------------------------------------------------------------------------------
+		--
+		table.sort(anm_table,function(a,b) return (a.dist+a.radius) < (b.dist+b.radius) end)
+		local k = 0
+		for id, anm in pairs(anm_table) do
+			if k < MAX_ARTEFACTS then
+				set_anomaly_slot(k, anm.pos.x, anm.pos.y, anm.pos.z)
+				k = k + 1
+			end
+		end
+		for l = k,MAX_ARTEFACTS-1 do
+			set_anomaly_slot(l, 0, 0, 0)
+			l = l + 1
+		end
 	end
+-----------------------------------------
+	update_detector_sound(act_pos)
+-----------------------------------------
+	update_geiger_sound()
+-----------------------------------------
 end

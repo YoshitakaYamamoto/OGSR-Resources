@@ -1,35 +1,6 @@
 
-function init(obj)
---	log1("ogse_dbg_anomaly_binder.init")
-	local new_binder = anomaly_binder(obj)
-	obj:bind_object(new_binder)
-end
-
----------------------------------------------------------------------------------------------
-class "anomaly_binder" (object_binder)
-function anomaly_binder:__init(obj) super(obj)
-end 
-
-function anomaly_binder:reload(section)
---	log1("anomaly_binder:reload")
-end
-
-function anomaly_binder:reinit()
---	log1("anomaly_binder:reinit")
-end
-
-function anomaly_binder:net_spawn(data)
---	log1("anomaly_binder:net_spawn")
-	local anom = self.object
-	if anom then
-		local srv_obj = alife():object(anom:id())
-		if srv_obj then
-			ogse_anomaly.get_anom(srv_obj)
---			log1("anomaly_binder:net_spawn_register")
-		end	
-	end
-	return true
-end
+subscribed_anoms = {} --ключи - id радиоактивных аномалий, которые возможно подписать на сигналы, значения - подписана ли аномалия на апдейт (true/false)
+autosubscribe = false --Должны ли аномалии подписываться на апдейт автоматически при net_spawn
 
 local radzone_sect = {
 	["zone_radioactive"] = { warn = 1, last_warn = 4,  alarm = 8 },
@@ -39,20 +10,75 @@ local radzone_sect = {
 	["zone_radioactive_killing"] = { warn = 1, last_warn = 4,  alarm = 8 },
 	["handmade_zone_radioactive"] = { warn = 1, last_warn = 4,  alarm = 8 },
 }
-
 local radzone_deeps = {}
+
+function init(obj)
+	local new_binder = anomaly_binder(obj)
+	obj:bind_object(new_binder)
+end
+
+---------------------------------------------------------------------------------------------
+class "anomaly_binder" (object_binder)
+function anomaly_binder:__init(obj) super(obj)
+	self.sm = ogse_signals.get_mgr()
+end
+
+function anomaly_binder:unsubscribe()
+	if self.subscribed then
+		local id = self.object:id()
+		--
+		self.sm:unsubscribe( self.subscribed )
+		self.subscribed = nil
+		subscribed_anoms[id] = false
+		--log3("--Anom [%s] UNsubscribed from update", self.object:name())
+		--
+		if radzone_deeps[id] then
+			radzone_deeps[id] = nil
+		end
+	end
+end
+
+function anomaly_binder:subscribe()
+	if not self.subscribed then
+		self.subscribed = {
+			[ "signal" ] = "on_update",
+			[ "fun"    ] = self.get_rad_intensity,
+			[ "self"   ] = self,
+		}
+		self.sm:subscribe( self.subscribed )
+		subscribed_anoms[self.object:id()] = true
+		--log3("--Anom [%s] subscribed on update", self.object:name())
+	end
+end
+
+function anomaly_binder:net_spawn(data)
+	local id = self.object:id()
+	local srv_obj = alife():object(id)
+	if srv_obj then
+		ogse_anomaly.get_anom(srv_obj)
+		--log3("anomaly_binder:net_spawn_register [%s]", self.object:name())
+	end
+
+	if radzone_sect[self.object:section()] then
+		if autosubscribe then
+			self:subscribe()
+		else
+			subscribed_anoms[id] = false
+		end
+	end
+	return true
+end
 
 local geiger_warn = ogse_detectors.geiger_radius
 local actor_radlevel = 0
 local estimate_size = {}
-
-function get_rad_intensity(obj)
-	local intencity = radzone_sect[obj:section()]
+function anomaly_binder:get_rad_intensity()
+	local intencity = radzone_sect[self.object:section()]
 	if not intencity then return end
 	local actor_pos = db.actor:position()
-	local dist_to_actor = obj:position():distance_to(actor_pos)
-	local o_id = obj:id()
-	if obj:inside(actor_pos) and dist_to_actor > geiger_warn then	
+	local dist_to_actor = self.object:position():distance_to(actor_pos)
+	local o_id = self.object:id()
+	if self.object:inside(actor_pos) and dist_to_actor > geiger_warn then	
 		--- актор внутри радзоны, но дальше радиуса предупреждения - большая зона, считаем по крайним значениям
 		local low = intencity.warn
 		local high = intencity.alarm
@@ -66,7 +92,7 @@ function get_rad_intensity(obj)
 			rad_level = high
 		end		
 		radzone_deeps[o_id] = rad_level
-	elseif obj:inside(actor_pos) and dist_to_actor < geiger_warn then	
+	elseif self.object:inside(actor_pos) and dist_to_actor < geiger_warn then	
 		--- актор внутри радзоны, и меньше радиуса предупреждения - актор вошел внутрь, считаем по верхним значениям
 		local low = intencity.last_warn
 		local high = intencity.alarm
@@ -99,6 +125,12 @@ function get_rad_intensity(obj)
 		if radzone_deeps[o_id] then
 			radzone_deeps[o_id] = nil
 		end
+		self.sm:reschedule(
+			( dist_to_actor < geiger_warn * 2 and 200 )
+			or ( dist_to_actor < geiger_warn * 3 and math.random(1000, 1500) )
+			or ( dist_to_actor < geiger_warn * 4 and math.random(2500, 3000) )
+			or math.random(4000, 5000)
+		)
 	end
 end
 
@@ -112,49 +144,12 @@ function get_max_radlevel()
 	return radlevel
 end
 
-local anoms_to_show = {}
-
-function anomaly_binder:update()
-	get_rad_intensity(self.object)
-
-	local sid = self.object:id()
-	if not anoms_to_show[sid] then
-		anoms_to_show[sid] = false
-	end
-	local mark_text = ogse_detectors.marks_on_minimap(self.object)
-	if mark_text ~= "none" then
-		if level_tasks.is_map_spot_present_by_id(sid, mark_text) then
-			anoms_to_show[sid] = true
-		elseif anoms_to_show[sid] == false then
-			--log3("Called adding location by id for [%s], Spot: [%s]", sid, mark_text)
-			level_tasks.add_location_by_id(sid, mark_text)
-			anoms_to_show[sid] = true
-		end
-	elseif anoms_to_show[sid] == true then
-		for _, n in pairs( ogse_detectors.minimap_detectors ) do
-			if level_tasks.is_map_spot_present_by_id(sid, n) then
-				--log3("Called removing location by id for [%s], Spot: [%s]", sid, n)
-				level_tasks.remove_location_by_id(sid, n)
-				break
-			end
-		end
-		anoms_to_show[sid] = false
-	end
-end
+--function anomaly_binder:update()
+--end
 
 function anomaly_binder:net_destroy()
-	local sid = self.object:id()
-	if radzone_deeps[sid] then
-		radzone_deeps[sid] = nil
+	if radzone_sect[self.object:section()] then
+		self:unsubscribe()
+		subscribed_anoms[self.object:id()] = nil
 	end
-	if anoms_to_show[sid] == true then
-		for _, n in pairs( ogse_detectors.minimap_detectors ) do
-			if level_tasks.is_map_spot_present_by_id(sid, n) then
-				--log3("Called removing location by id for [%s], Spot: [%s]", sid, n)
-				level_tasks.remove_location_by_id(sid, n)
-				break
-			end
-		end
-		anoms_to_show[sid] = false
-	end	
 end
