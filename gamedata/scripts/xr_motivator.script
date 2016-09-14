@@ -829,7 +829,7 @@ function motivator_binder:check_art_weapon()
 --' застревают на попытке 
 --' применения арта как оружия
 -------------------------------------
-	ogse_signals.get_mgr():reschedule( 1000 )
+	ogse_signals.get_mgr():reschedule( math.random( 1000, 5000 ) )
 	local item_in_slot = self.object:item_in_slot(1)
 	local act_item = self.object:active_item()
 	if act_item and item_in_slot and act_item:id() == item_in_slot:id() then
@@ -855,10 +855,8 @@ function motivator_binder:check_art_weapon()
 				-- log1("TOSS WEAPON TO "..bw:section().." FROM "..tostring(rem_id))
 				if be then
 					self.object:set_item(object.fire1, bw)
-					return
 				else
 					self.object:set_item(object.idle, bw)
-					return
 				end
 			end
 		end
