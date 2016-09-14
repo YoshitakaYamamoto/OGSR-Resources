@@ -148,7 +148,6 @@ local classes = {
 -- В эту таблицу внести новые классы, если они добавлены в мод (см. скрипт class_registrator)
 -- Добавлены некоторые классы из ЗП, модов "Народнвя Солянка" (ТЧ) и "Lost Alpha" (ТЧ)
 local new_clsids = {
-	addons = {'wpn_scope_s'},
 	cars = {'car_s'},
 }
 	
