@@ -78,8 +78,7 @@ local function get_item_cond_effect( item )
 end
 
 function on_update()
-  if device().precache_frame > 1
-  or not ( db.actor and db.actor:alive() ) then return end
+  if device().precache_frame > 1 or not db.actor:alive() then return end
 
   local act = db.actor
   local previous_check_time = game.CTime()
@@ -172,10 +171,7 @@ function on_update()
     act.power = summary_power_effect * dt
   end
 
-  if
-    summary_bleeding_restore_effect > 0
-    or summary_bleeding_restore_effect < 0
-  then
+  if math.abs( summary_bleeding_restore_effect ) > 0 then
     if act:get_bleeding() > 0 then
       act:heal_wounds( summary_bleeding_restore_effect * dt )
     end
@@ -183,18 +179,12 @@ function on_update()
 
   --act.radiation = summary_radiation_restore_effect * dt
 
-  if
-    summary_psy_health_effect > 0
-    or summary_psy_health_effect < 0
-  then
+  if math.abs( summary_psy_health_effect ) > 0 then
     act.psy_health = summary_psy_health_effect * dt
   end
 
 --[[
-  if
-    summary_alcohol_effect > 0
-    or summary_alcohol_effect < 0
-  then
+  if math.abs( summary_alcohol_effect ) > 0 then
     act.alcohol = summary_alcohol_effect * dt
   end
 ]]
