@@ -12,7 +12,6 @@ function attach(sm)
 	sm:subscribe({signal = "on_update", fun = this.on_update, queued = true}) --KRodin: перевел на низкий приоритет
 	sm:subscribe({signal = "on_save", fun = this.on_save})
 end
---auto_attach = true
 --[[
 каждый час сна компенсирует количество часов бодрствования, задаваемое параметром
 	sleep_compensation_factor (по умолчанию == 3)

@@ -12,7 +12,6 @@ function attach(sm)
     sm:subscribe({signal = "on_first_update", fun = this.on_load})
 end
 
-auto_attach  = true
 musicbox_mem = {}
 music_dir    = 'characters_voice\\scenario\\mbox\\'
 logo_dir     = 'ui\\mbox\\'
