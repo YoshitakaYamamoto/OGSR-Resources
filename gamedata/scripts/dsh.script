@@ -35,6 +35,25 @@ function wait_condition( ... )
   tmout:start()
   return tmout
 end
+
+
+class "exec_on_update_timer" ( ogse_qt.quick_timer )
+function exec_on_update_timer:__init( fun, ... )
+  self.fun  = fun
+  self.args = { ... }
+end
+function exec_on_update_timer:condition()
+  return true
+end
+function exec_on_update_timer:update()
+  self.fun( unpack( self.args ) )
+end
+
+function exec_on_update( ... )
+  local tmout = exec_on_update_timer( ... )
+  tmout:start()
+  return tmout
+end
 -------------------------------------------------------------
 
 
@@ -42,13 +61,13 @@ function set_condition( item, cond )
   item:set_condition( cond )
 end
 
-function remove_quotes( s ) --‚ырезать все кавычки из строки
-  return string.gsub( s, "[ЗИ\"\']", "" )
+function remove_quotes( s ) --Вырезать все кавычки из строки
+  return string.gsub( s, "[«»\"\']", "" )
 end
 
-function strip_quotes( s ) --‘резать кавычки с начала и с конца строки
-  --return string.gsub( s, '^[ЗИ\"\']*(.-)[ЗИ\"\']*$', '%1') --‘резает ‚‘… кавычки слева и справа.
-  return string.gsub( s, '^[ЗИ\"\'](.*)[ЗИ\"\']$', '%1') --‘резает самую первую кавычку слева и самую последнюю кавычку справа.
+function strip_quotes( s ) --Срезать кавычки с начала и с конца строки
+  --return string.gsub( s, '^[«»\"\']*(.-)[«»\"\']*$', '%1') --Срезает ВСЕ кавычки слева и справа.
+  return string.gsub( s, '^[«»\"\'](.*)[«»\"\']$', '%1') --Срезает самую первую кавычку слева и самую последнюю кавычку справа.
 end
 
 
@@ -84,7 +103,7 @@ function set_none_smart_terrain( sobj )
   end
 end
 
--- ‘оздать свободного моба, которого не затЯнет в какой-нибудь гулаг.
+-- Создать свободного моба, которого не затянет в какой-нибудь гулаг.
 function create_free_mob( ... )
   is_creating_free_mob = true
   return alife():create( ... )

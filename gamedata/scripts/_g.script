@@ -1964,7 +1964,7 @@ end
 
 
 -- http://www.amk-team.ru/forum/topic/10538-x-ray-extensions/?p=1002890
-function normal_triangle( element ) -- нормаль треугольника, аргументом передавать элемент геометрии, который можно получить функцией level.get_target_element() или ray_pick.get_element()
+function normal_triangle( element ) -- возвращает нормаль треугольника, аргументом передавать элемент геометрии (который можно получить, например, функцией level.get_target_element() или ray_pick.get_element())
   local n = vector()
   local a = level.get_tri_vertex1( element ) --возвращает первую вершину статического треугольника.
   local b = level.get_tri_vertex2( element ) --возвращает вторую вершину статического треугольника.
@@ -1991,9 +1991,8 @@ wpn:play_hud_animation("reload", true)
 вызовом db.actor:set_hud_animation_callback_param(<целое число>).
 Так можно в колбеке различать, какая именно анимация закончилась.
 
-
-uint<remaining_time> get_hud_animation_remaining_time() - возвращает время, оставшееся до окончания текущей анимации.
-int<length> get_hud_animation_length(string<anim_name>) - возвращает длительность анимации по её имени.
+uint<remaining_time> get_hud_animation_remaining_time() - возвращает время в миллисекундах, оставшееся до окончания текущей анимации.
+int<length> get_hud_animation_length(string<anim_name>) - оставшееся время до окончания НЕ зацикленной анимации, меняется в реальном времени. Т.е. в начале, например твоей перезарядки метод вернет 2541, а в конце 0 (анимация закончена). Для зацикленных анимаций, НЕимеющих флаг Stop At End (idle, sprint и т.п.), всегда возвращает 0, т.к. они не имеют конца.
 bool<is_cyclic> is_cyclic_hud_animation() - возвратит true, если текущая анимация зациклена.
 bool<has_anim> has_hud_animation(string<anim_name>) - возвратит true, если анимация есть в модели.
 --]=]

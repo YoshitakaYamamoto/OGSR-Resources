@@ -6,9 +6,6 @@ function attach(sm)
 	sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
 end
 auto_attach = false
-local cact = db.actor
-local con = get_console()
-local dev = device()
 
 local translation_matrix      = _geom_helpers.translation_matrix
 local combine_transformations = _geom_helpers.combine_transformations
@@ -110,11 +107,11 @@ function sphere_visualizator:__init(center, radius, particle_name, pnum) super(p
 	self.edge_step = 0.05    -- угловой шаг, чем меньше, тем гуще будут точки
 	-- однако геометрическое расстояние также зависит от радиуса
 end
-local radv = vector() -- для оптимизации
+
 function sphere_visualizator:update()
 	for i=1,self.particles_number do
-		radv:setHP(math.pi*2.*(i-1)/self.particles_number, self.edge_progress)
-		self.current_pos[i]:set(self.center):mad(radv, self.radius)
+		vector():setHP(math.pi*2.*(i-1)/self.particles_number, self.edge_progress)
+		self.current_pos[i]:set(self.center):mad(vector(), self.radius)
 		self.edge_progress = self.edge_progress - self.edge_step
 		if self.edge_progress <= -(math.pi/2 - 0.5) then
 			self.edge_progress = math.pi/2 - 0.5
@@ -436,7 +433,7 @@ function obj_list_item:__init(zone, dist) super()
 	self.zdist:SetAutoDelete(true)
 	self:AttachChild(self.zdist)
 	self.zdist:SetWndRect(0,0,30,20)
-	--local dist = dev.cam_pos:distance_to(zone:position())
+	--local dist = device().cam_pos:distance_to(zone:position())
 	self.zdist:SetText(string.format("%5.1f", dist))
 	-- поле имени зоны
 	self.zname = CUIStatic()
@@ -852,7 +849,7 @@ function zone_editor_wnd:refresh()
 			if (fun and filters[fun]) or (self.filter_editor_saves:GetCheck() 
 				and obj:section() == "zone_editor_restrictor")
 			then
-				local dist = dev.cam_pos:distance_to(obj:position())
+				local dist = device().cam_pos:distance_to(obj:position())
 				table.insert(zlist, {dist, obj})
 			end
 		end
