@@ -311,11 +311,12 @@ function drop_manager:create_release_item()
 		if otf then
 			dsh.timeout(300, function()
 				local a = level.object_by_id(otf.id)
-				if a then a:set_condition((10+math.random(6,65))/100) end
+				if a then a:set_condition( (10+math.random(6,65))/100 ) end
 			end)
 		end
 	end
 
+--[=[ --Вот здесь этому доспавниванию не место вообще. Отключено. Кажется мне, что это не используется, но если что - переделать.
 	if has_alife_info("pri_trader_arny_task") and string.find(self.npc:name(), "aem_arny") then 
 		ogse.spawn_item_in_inv("zapiska", self.npc) 
 	end
@@ -325,6 +326,7 @@ function drop_manager:create_release_item()
 	if has_alife_info("pri_trader_freedom_task") and self.npc:name()=="mil_freedom_member0012" then 
 		ogse.spawn_item_in_inv("zapiska_m2", self.npc) 
 	end
+--]=]
 end
 
 --' Функция вызывается для каждого предмета в инвентаре убитого НПС
@@ -395,22 +397,22 @@ function release_deferred_ammo()
 			local parent = game_object:parent()
 			if v < time_global() then
 				if not parent then
-					write_log("!!DEFFERED_DEBUG DEBUG_DELETING_NORMAL "..tostring(s_obj.id))
+					--write_log("!!DEFFERED_DEBUG DEBUG_DELETING_NORMAL "..tostring(s_obj.id))
 					alife():release(s_obj, true)
 					deferred_release[k] = nil
 				else	
-					write_log("!!DEFFERED_DEBUG DEBUG_TELEPORT "..tostring(s_obj.id))
+					--write_log("!!DEFFERED_DEBUG DEBUG_TELEPORT "..tostring(s_obj.id))
 					parent:drop_item(game_object)
 				end
 			end
 		elseif s_obj then	
 			-- если только серверный - срочно убиваем
-			write_log("!!DEFFERED_DEBUG DEBUG_DELETING_SRV "..tostring(s_obj.id))
+			--write_log("!!DEFFERED_DEBUG DEBUG_DELETING_SRV "..tostring(s_obj.id))
 			alife():release(s_obj, true)
 			deferred_release[k] = nil
-		elseif game_object then
+		--elseif game_object then
 			-- если только геймобъект - он ещё не успел сдохнуть, сцуко, не трогаем его
-			write_log("!!DEFFERED_DEBUG DEBUG_DELETING_ONLY_GAMEOBJ")
+			--write_log("!!DEFFERED_DEBUG DEBUG_DELETING_ONLY_GAMEOBJ")
 		end		
 	end
 end
