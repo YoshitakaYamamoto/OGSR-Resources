@@ -53,7 +53,8 @@ addons = {
 	"bind_statpkm",
 	"horror_time",
 	"dsh",
-	"dsh_restore_active_slot",
+	"dsh_restore_active_slot", --Должен быть перед dsh_wpn_slots !
+	"dsh_wpn_slots",
 	"dsh_rukzak",
 	"dsh_particles",
 	"dsh_firebated",

@@ -54,7 +54,7 @@ function get_available_actions_for_slot(addon_sec, slot_num)
 	-- проверяем, что аддон можно установить в данный слот в автономной конфигурации (наличие оружия в слоте в данном случае не важно)
 	local new_wpn_sec = get_string(addon_sec, "standalone_shotgun_section")
 	if new_wpn_sec then -- этот аддон можно сконвертировать в ствол
-		local slot = get_u32(new_wpn_sec, "slot") -- слот этого слота
+		local slot = get_inv_item_slot( wpn ) --get_u32(new_wpn_sec, "slot") -- слот этого слота
 		if slot_num == slot then -- и этот слот совпадает с заданным
 			available_actions:set(slot_actions.take, true) -- можно взять
 		end
@@ -272,38 +272,36 @@ function get_shg_params_from_cd(swpn)
 	n = cd:r_u32("shg_params", "ammo_elapsed")
 	s = cd:r_string("shg_params", "ammo_section")
 	cond = cd:r_float("shg_params", "condition")
-	th = cd:r_float("shg_params", "expl_threshold")
-	return t,n,s,cond,th
+	return t,n,s,cond
 end
-function replace_shg_cd(data, t,n,s,cond,th)
+function replace_shg_cd(data, t,n,s,cond)
 	local cd = m_net_utils.parse_custom_data(data.custom)
 	cd.shg_params = {
 		ammo_type = t,
 		ammo_elapsed = n,
 		ammo_section = s,
 		condition = cond,
-		expl_threshold = th,
 	}
 	data.custom = m_net_utils.gen_custom_data(cd)
 end
 -- Функция установки свойств подствольника.
 -- Сразу после создания объекта надо с помощью этой функции прописать ему кастомдату
 -- в противном случае будут вылеты!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-function set_shg_params_to_cd(swpn,t,n,s,cond,th)
+function set_shg_params_to_cd(swpn,t,n,s,cond)
 	local data = m_net_utils.get_weapon_data(swpn)
-	replace_shg_cd(data, t,n,s,cond,th)
+	replace_shg_cd(data, t,n,s,cond)
 	m_net_utils.set_weapon_data(data,swpn)
 end
 
-function set_addon_shg_params_to_cd(sitem,t,n,s,cond,th)
+function set_addon_shg_params_to_cd(sitem,t,n,s,cond)
 	if s == "" or s == nil then s = "-" end
 	local data = m_net_utils.get_item_data(sitem)
-	replace_shg_cd(data, t,n,s,cond,th)
+	replace_shg_cd(data, t,n,s,cond)
 	m_net_utils.set_item_data(data,sitem)
 end
 
 function set_default_shg_params(sitem)
-	set_addon_shg_params_to_cd(sitem,0,0,"ammo_12x70_kart",1.0,0.2)
+	set_addon_shg_params_to_cd(sitem,0,0,"ammo_12x70_kart",1.0)
 end
 
 function print_cd(sitem)
@@ -320,25 +318,59 @@ function get_wpn_parameters(wpn, swpn_, sec_)
 	local rif = {}
 	local cur_t, cur_n = ogse_wpn_utils.get_active_ammo_type(wpn), wpn:get_ammo_in_magazine()
 	local ammo_sections = get_names(section, "ammo_class") -- получаем список секций патронов
-	local cur_s, cur_c, cur_th = ammo_sections[cur_t+1], wpn:condition(), swpn.blow_cond
-	local cd_t,cd_n,cd_s,cd_c,cd_th = get_shg_params_from_cd(swpn) -- получаем данные из кастомдаты текущего ствола
+	local cur_s, cur_c = ammo_sections[cur_t+1], wpn:condition()
+	local cd_t,cd_n,cd_s,cd_c = get_shg_params_from_cd(swpn) -- получаем данные из кастомдаты текущего ствола
 	if get_string(section, "shotgun_mode_section") then -- в режиме винтовки
 		-- заряды дробовика - в кастомдате, параметры винтовки - это активный боеприпас
-		shg.ammo_type, shg.ammo_elapsed, shg.ammo_sections, shg.condition, shg.blow_cond = cd_t,cd_n,cd_s,cd_c,cd_th
-		rif.ammo_type, rif.ammo_elapsed, rif.ammo_sections, rif.condition, rif.blow_cond = cur_t,cur_n,cur_s,cur_c,cur_th
+		shg.ammo_type, shg.ammo_elapsed, shg.ammo_sections, shg.condition = cd_t,cd_n,cd_s,cd_c
+		rif.ammo_type, rif.ammo_elapsed, rif.ammo_sections, rif.condition = cur_t,cur_n,cur_s,cur_c
 	elseif get_string(section, "rifle_mode_section") then -- в режиме дробовика
 		-- заряды дробовика - это активный боеприпас, параметры винтовки - в кастомдате
-		shg.ammo_type, shg.ammo_elapsed, shg.ammo_sections, shg.condition, shg.blow_cond = cur_t,cur_n,cur_s,cur_c,cur_th
-		rif.ammo_type, rif.ammo_elapsed, rif.ammo_sections, rif.condition, rif.blow_cond = cd_t,cd_n,cd_s,cd_c,cd_th
+		shg.ammo_type, shg.ammo_elapsed, shg.ammo_sections, shg.condition = cur_t,cur_n,cur_s,cur_c
+		rif.ammo_type, rif.ammo_elapsed, rif.ammo_sections, rif.condition = cd_t,cd_n,cd_s,cd_c
 	else
 		abort("get_shg_parameters: gun's section doesn't has appropriate parameters.")
 	end
 	return rif, shg
 end
 
+
+-- служебный таймер, ждущий выход объекта в онлайн
+class "go_online_watch_timer" (ogse_qt.quick_timer)
+function go_online_watch_timer:__init(npc_id, fun) super()
+	self.npc_id = npc_id
+	self.fun = fun
+end
+function go_online_watch_timer:condition()
+	return level.object_by_id(self.npc_id)
+end
+function go_online_watch_timer:action()
+	self.fun()
+end
+function start_go_online_watch_timer(id, fun)
+	go_online_watch_timer(id, fun):start()
+end
+
+local function move_weapon_to_slot(sobj, slot, is_slot_active) --KRodin: Сделано для поддержки равнозначных слотов
+	start_go_online_watch_timer(sobj.id, function() --Ждём появление клиентского объекта
+		local obj = level.object_by_id(sobj.id)
+		if db.actor:is_in_slot( obj ) then
+			db.actor:move_to_ruck( obj ) --Необходимо, иначе будут глюки и непонятные вылеты
+		end
+		set_inv_item_slot( obj, slot )
+		db.actor:move_to_slot(obj)
+		if is_slot_active then
+			db.actor:activate_slot( slot )
+		end
+
+		db.actor:invalidate_inventory()
+		update_inventory_window()
+	end)
+end
+
+
 -- назначение функции - по факту снятия аддона-дробовика сконвертировать ствол
 -- в версию без дробовика (фактически, с одним из стандартных подствольных гранатомётов, но снятым)
-
 function convert_after_shg_detached(cur_weapon)
 	ASSERT(cur_weapon, "convert_after_shg_detached: 'cur_weapon' is a nil reference. Check logic of your code.")
 	local cur_weapon_sect = cur_weapon:section()
@@ -368,17 +400,23 @@ function convert_after_shg_detached(cur_weapon)
 	modified_params.custom       = "" --cur_weapon_data.custom  -- кастомдату
 	
 	-- переносим данные дробовика в кастомдату аддона
-	set_addon_shg_params_to_cd(s_new_fake_addon,shg.ammo_type,shg.ammo_elapsed,shg.ammo_sections,shg.condition,shg.blow_cond)
+	set_addon_shg_params_to_cd(s_new_fake_addon,shg.ammo_type,shg.ammo_elapsed,shg.ammo_sections,shg.condition)
+
+	local cur_wpn_slot_engine = get_inv_item_slot( cur_weapon )
+	local cur_wpn_slot_cfg = get_u32(cur_weapon:section(), "slot")
+	local is_slot_active = db.actor:active_slot() == cur_wpn_slot_engine
 
 	db.actor:move_to_ruck(cur_weapon) -- освобождаем слот
 	sim:release(s_cur_weapon, true) -- удаляем старый ствол
-	-- 
+	--
 	modified_params.addon_flags = bit_and(cur_weapon_data.addon_flags, bit_not(addons_flags.gl)) -- снимаем флажок аддона
 	se_item.modified_params = modified_params
 
 	local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
-	s_cur_weapon.blow_cond = rif.blow_cond
-	
+	if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
+		move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
+	end
+
 	soundtrack.s_play_no_feedback([[interface\inv_attach_addon]])
 end
 -- служебная функция: по секции ствола и индексу типа патронов заспавнить нужное количество БП актору
@@ -401,7 +439,6 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 	modified_params.ammo_type    = cur_weapon_data.ammo_type       -- тип боеприпаса
 	modified_params.ammo_elapsed = cur_weapon_data.ammo_elapsed    -- количество боеприпаса
 	modified_params.custom       = cur_weapon_data.custom          -- кастомдату
-	modified_params.blow_cond    = s_cur_weapon.blow_cond
 	--
 	local sfake_addon = nil
 	local removed_addon_flags = 0
@@ -509,7 +546,7 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 					modified_params.ammo_elapsed = rif.ammo_elapsed        -- количество боеприпаса
 					modified_params.custom       = cur_weapon_data.custom  -- кастомдату
 
-					set_addon_shg_params_to_cd(s_new_fake_addon,shg.ammo_type,shg.ammo_elapsed,shg.ammo_sections,shg.condition,shg.blow_cond)
+					set_addon_shg_params_to_cd(s_new_fake_addon,shg.ammo_type,shg.ammo_elapsed,shg.ammo_sections,shg.condition)
 					
 				elseif removed_addon_flag == addons_flags.magazine then -- если снимаем магазин
 					-- надо вынуть все патроны и задать их нулевыми в стволе
@@ -531,6 +568,11 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 			end
 		end
 	end
+
+	local cur_wpn_slot_engine = get_inv_item_slot( cur_weapon )
+	local cur_wpn_slot_cfg = get_u32(cur_weapon:section(), "slot")
+	local is_slot_active = db.actor:active_slot() == cur_wpn_slot_engine
+
 	db.actor:move_to_ruck(cur_weapon) -- освобождаем слот, чтобы туда мог встать новый ствол
 	sim:release(s_cur_weapon, true) -- удаляем старый ствол
 	-- снимаем флажок снимаемого аддона. 
@@ -543,14 +585,16 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 	-- всегда попадают при этом в кастомдату скрытого ствола
 	--- внимание!!!!!1 не так !!!!!!!!!!!!!!!!!!
 	if sfake_addon and get_u32(real_addon_section, "is_shotgun") == 1 then
-		local t,n,s,c,th = get_shg_params_from_cd(sfake_addon)
-		replace_shg_cd(modified_params, t,n,s,c,th)
+		local t,n,s,c = get_shg_params_from_cd(sfake_addon)
+		replace_shg_cd(modified_params, t,n,s,c)
 	end
-	
 	se_item.modified_params = modified_params
+
 	local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
-	s_new_weapon.blow_cond = modified_params.blow_cond
-	
+	if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
+		move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
+	end
+
 	soundtrack.s_play_no_feedback([[interface\inv_attach_addon]])
 	-- удаляем  фейковый аддон, если не снимали
 	if sfake_addon then
@@ -692,7 +736,6 @@ function switch_shg_mode(wpn)
 		ammo_elapsed   = cur_weapon_data.ammo_elapsed,
 		ammo_section   = ammo_sections[cur_weapon_data.ammo_type+1],
 		condition      = cur_weapon_data.condition,
-		expl_threshold = s_cur_weapon.blow_cond,
 	}}
 	modified_params.custom = m_net_utils.gen_custom_data(new_custom_data)
 	-- запоминаемая информация - конец
@@ -708,11 +751,19 @@ function switch_shg_mode(wpn)
 	modified_params.ammo_elapsed = tonumber(cur_weapon_cd.shg_params.ammo_elapsed)
 	modified_params.condition    = tonumber(cur_weapon_cd.shg_params.condition)
 	--log1("move_to_ruck2")
+
+	local cur_wpn_slot_engine = get_inv_item_slot( wpn )
+	local cur_wpn_slot_cfg = get_u32(wpn:section(), "slot")
+	local is_slot_active = db.actor:active_slot() == cur_wpn_slot_engine
+
 	db.actor:move_to_ruck(wpn)
 	sim:release(s_cur_weapon, true)
 	se_item.modified_params = modified_params
+
 	local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
-	s_new_weapon.blow_cond = tonumber(cur_weapon_cd.shg_params.expl_threshold)
+	if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
+		move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
+	end
 end
 
 function get_sect_to_convert_after_shg_removed(wpn)
@@ -738,14 +789,14 @@ function convert_shg_to_addon(swpn)
 	local ammo_sections = get_names(cur_weapon_sect, "ammo_class") -- получаем список секций патронов
 	local ammo_sec = ammo_sections[data.ammo_type+1] -- и узнаём заряженную секцию
 	local s_new_fake_addon = ogse.spawn_item_in_inv(fake_addon_section)
-	set_addon_shg_params_to_cd(s_new_fake_addon,data.ammo_type,data.ammo_elapsed,ammo_sec,data.condition,swpn.blow_cond)
+	set_addon_shg_params_to_cd(s_new_fake_addon,data.ammo_type,data.ammo_elapsed,ammo_sec,data.condition)
 	sim:release(swpn, true)
 end
 function convert_addon_to_shg(saddon)
 	local cur_addon_sect = saddon:section_name()
 	local wpn_section = get_string(cur_addon_sect, "standalone_shotgun_section")
 	ASSERT(wpn_section, "convert_addon_to_shg: no section for convertion defined. Check parameter 'standalone_shotgun_section' in section: "..cur_addon_sect)
-	local t,n,s,cond,th = get_shg_params_from_cd(saddon)
+	local t,n,s,cond = get_shg_params_from_cd(saddon)
 	se_item.modified_params = {
 		ammo_type    = t,
 		ammo_elapsed = n,
@@ -753,7 +804,6 @@ function convert_addon_to_shg(saddon)
 	}
 	sim:release(saddon, true)
 	local s_new_weapon = ogse.spawn_item_in_inv(wpn_section)
-	s_new_weapon.blow_cond = th
 end
 -- следим за попаданием в инвентарь ствола XM-26 LSS в режиме автономного оружия для конвертации в аддон
 function on_item_to_ruck(obj, sobj)
@@ -783,12 +833,20 @@ function on_item_to_ruck(obj, sobj)
 					if not is_scope_installed(wpn) and new_wpn_section then
 --						log1("ON_ITEM_TO_RUCK: weapon "..wpn:name().." has no scope and has parameter scope_removed_section ("..new_wpn_section..")")
 						-- ага, нужная ситуация
+
+						local cur_wpn_slot_engine = get_inv_item_slot( wpn )
+						local cur_wpn_slot_cfg = get_u32(wpn:section(), "slot")
+						local is_slot_active = db.actor:active_slot() == cur_wpn_slot_engine
+
 						db.actor:move_to_ruck(wpn) -- освобождаем слот, чтобы туда мог встать новый ствол
 						sim:release(s_cur_weapon, true) -- удаляем старый ствол
 						se_item.modified_params = cur_weapon_data   -- переносим параметры старого ствола
 						se_item.modified_params.addon_flags = bit_and(cur_weapon_data.addon_flags, bit_not(addons_flags.scope)) -- снимаем флаг прицела, т.к. он не снимается сам
+
 						local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
-						s_new_weapon.blow_cond = cur_weapon_data.blow_cond
+						if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
+							move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
+						end
 					end
 				end
 			end
@@ -834,7 +892,7 @@ function on_take(obj, sobj)
 				end
 			end
 			if #items_for_convertion == 0 then  -- аддон есть, а ствола нету
-				set_addon_shg_params_to_cd(sobj,0,0,"",1.0,math.random(5, 25)*0.01)-- это какой-то приблудный аддон, надо бы ему вписать нормальные данные
+				set_addon_shg_params_to_cd(sobj,0,0,"",1.0)-- это какой-то приблудный аддон, надо бы ему вписать нормальные данные
 				--abort("on_take: Shotgun addon found without appropriate custom data") -- а нефиг
 			elseif #items_for_convertion == 1 then -- найден один ствол, это тот ствол, с которого сняли. Так и должно быть.
 				convert_after_shg_detached(items_for_convertion[1])

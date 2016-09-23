@@ -8,12 +8,11 @@ function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_item_to_slot", fun = this.on_item_to_slot})
 end
 
-local need_initialize_hud = nil
 function on_item_to_slot(item, sitem)
 	if item:is_weapon_magazined() then
 		local bnd = item:binded_object()
 		if bnd and bnd.wpn_binder then
-			need_initialize_hud = true
+			bnd.need_initialize_hud = true
 		end
 	end
 end
@@ -104,6 +103,7 @@ function wpn_binder:__init (obj) super(obj)
 	--self:dbg_log("wpn_binder:__init: sec = '%s', name = '%s', id = %d", self.object:section(), self.object:name(), self.object:id())
 	--self.spawned = false
 	self.wpn_binder = true
+	self.need_initialize_hud = false
 	local obj_section = obj:section()
 	-- читаем единожды все данные, связанные с секцией
 	self.is_gl = obj:is_weapon_gl()
@@ -251,7 +251,7 @@ function wpn_binder:update_hud_addons_visibility(arg1, arg2)
 	--self:dbg_log("hud_offset: %7.2f, %7.2f, %7.2f", unpack(ogse_wpn_utils.get_hud_offset(self.object)))
 	--self:dbg_log("hud_rotate: %7.2f, %7.2f", unpack(ogse_wpn_utils.get_hud_rotate(self.object)))
 
-	if need_initialize_hud then
+	if self.need_initialize_hud then
 		--self:dbg_log("wpn_binder:update_hud_addons_visibility - the very first")
 		-- гасим по умолчанию все управляемые скриптами кости
 		self:set_hud_bones_visibility(self.managed_bones, false)
@@ -266,7 +266,7 @@ function wpn_binder:update_hud_addons_visibility(arg1, arg2)
 			self.gl_mode = gl_mode
 		end
 		local addon_attached = desc.addon_attached_fun(self.object)
-		if desc.hud_attached ~= addon_attached or need_initialize_hud then
+		if desc.hud_attached ~= addon_attached or self.need_initialize_hud then
 			--print_table_inlog(desc)
 			desc.hud_attached = addon_attached
 			if desc.extra_actions then desc.extra_actions(self.object, desc) end
@@ -294,6 +294,6 @@ function wpn_binder:update_hud_addons_visibility(arg1, arg2)
 			desc.hud_set_cntr = desc.hud_set_cntr - 1
 		end
 	end
-	need_initialize_hud = false
+	self.need_initialize_hud = false
 	--self:dbg_log("wpn_binder:update_hud_addons_visibility - end")
 end

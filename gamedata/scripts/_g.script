@@ -1732,7 +1732,8 @@ callback_ex = {
 	["on_belt"]                      = 130,
 	["on_ruck"]                      = 131,
 	["on_slot"]                      = 132,
-
+	["on_select_item"]               = 133,
+ 
 	["on_after_save"]				 = 140,
 
 	["on_goodwill_change"]           = 145,
@@ -1939,6 +1940,15 @@ get_game_id = ogse_unist.get_game_id
 --Задать кол-во патронов в пачке
 function set_ammo_size(item, size)
 	item:set_go_int16(476, size)
+end
+
+
+function get_inv_item_slot( obj )
+	return obj:get_inventory_item_int( nil, 156 )
+end
+
+function set_inv_item_slot( obj, slot )
+	obj:set_inventory_item_int( 156, slot )
 end
 
 

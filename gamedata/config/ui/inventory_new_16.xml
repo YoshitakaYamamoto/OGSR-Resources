@@ -14,8 +14,8 @@
 		<texture>ui_slots_armory</texture>
 	</belt_slots>
 	
-	<dragdrop_belt x="132" y="288" width="450" height="51"
-            cell_width = "45" cell_height="51" rows_num="1" cols_num="10"/>
+	<dragdrop_belt x="40" y="288" width="630" height="51"
+            cell_width = "42" cell_height="45" rows_num="1" cols_num="15"/>
 
 	<!-- расположение икони броника в инвентаре -->
     <dragdrop_outfit x="910" y="120" width="76" height="135" 
@@ -25,32 +25,32 @@
 	<dragdrop_helmet x="918" y="48" width="60" height="72"
             cell_width = "30" cell_height="36" rows_num="2" cols_num="2"
             custom_placement="0"/>
-	<dragdrop_nv x="767" y="597" width="60" height="72"
+	<dragdrop_nv x="708" y="595" width="60" height="72"
             cell_width = "30" cell_height="36" rows_num="1" cols_num="2"
             custom_placement="0"/>
-	<dragdrop_torch x="767" y="652" width="60" height="72"
+	<dragdrop_torch x="708" y="650" width="60" height="72"
             cell_width = "30" cell_height="36" rows_num="1" cols_num="2"
             custom_placement="0"/>	
 			
-	<dragdrop_knife x="852" y="597" width="120" height="72"
+	<dragdrop_knife x="855" y="595" width="120" height="72"
             cell_width = "30" cell_height="36" rows_num="1" cols_num="3"
             custom_placement="0"/>
-    <dragdrop_pistol x="860" y="402" width="120" height="72"
-            cell_width = "30" cell_height="36" rows_num="2" cols_num="4"
+    <dragdrop_pistol x="710" y="402" width="270" height="72"
+            cell_width = "30" cell_height="36" rows_num="2" cols_num="9"
             custom_placement="0"/>
 
-    <dragdrop_automatic x="770" y="502" width="270" height="72"
-            cell_width = "30" cell_height="36" rows_num="2" cols_num="7"
-            custom_placement="1"/>
+    <dragdrop_automatic x="710" y="502" width="270" height="72"
+            cell_width = "30" cell_height="36" rows_num="2" cols_num="9"
+            custom_placement="1" vertical_placement="1"/>
 
 
-	<dragdrop_detector x="852" y="650" width="30" height="36"
+	<dragdrop_detector x="855" y="648" width="30" height="36"
             cell_width = "30" cell_height="36" rows_num="1" cols_num="1"
             custom_placement="0" show_grid="0"/>			
-	<dragdrop_biodetector x="912" y="650" width="30" height="36"
+	<dragdrop_biodetector x="917" y="648" width="30" height="36"
             cell_width = "30" cell_height="36" rows_num="1" cols_num="1"
             custom_placement="0" show_grid="0"/>
-	<dragdrop_binocular x="770" y="402" width="60" height="72"
+	<dragdrop_binocular x="782" y="602" width="60" height="72"
             cell_width = "30" cell_height="36" rows_num="2" cols_num="2"
             custom_placement="0"/>
 		

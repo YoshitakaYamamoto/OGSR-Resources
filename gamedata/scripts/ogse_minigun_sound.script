@@ -73,7 +73,8 @@ local counter = 0
 function remove_m134() --Чтобы М134 можно было использовать только при надетом экзоскелете.
 	if device().precache_frame > 1 then return end
 
-	local m134 = db.actor:item_in_slot(2)
+	for slot = 1, 2 do
+	local m134 = db.actor:item_in_slot(slot)
 	if m134 and m134:section() == "wpn_m_134" then
 		local outfit = db.actor:get_current_outfit()
 		if not outfit or not string.find( outfit:section(), "_exo" ) then
@@ -85,5 +86,6 @@ function remove_m134() --Чтобы М134 можно было использов
 			end
 		end
 		--return true
+	end
 	end
 end

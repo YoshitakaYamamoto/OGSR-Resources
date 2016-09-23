@@ -1,21 +1,3 @@
-table_group = {
-	["Diary"]=game.translate_string("bind_stalker_table_group_1_text"),
-	["Mutants"]=game.translate_string("bind_stalker_table_group_2_text"),
-	["Social"]=game.translate_string("bind_stalker_table_group_3_text"),
-	["Artifacts"]=game.translate_string("bind_stalker_table_group_4_text"),
-	["Klondike_Artifacts"]=game.translate_string("bind_stalker_table_group_4_text"),
-	["Anomalies"]=game.translate_string("bind_stalker_table_group_5_text"),
-	["Locations"]=game.translate_string("bind_stalker_table_group_6_text"),
-	["Zone-story"]=game.translate_string("bind_stalker_table_group_7_text"),
-	["Stories"]=game.translate_string("bind_stalker_table_group_8_text"),
-	["memuars"]=game.translate_string("bind_stalker_table_group_9_text"), 
-	["Found_PDA"]=game.translate_string("bind_stalker_table_group_10_text"), 
-	["st_operation_agroprom"]=game.translate_string("bind_stalker_table_group_1_text"),
-	["LabX18_information"]=game.translate_string("bind_stalker_table_group_1_text"), 
-	["aes_military_task"]=game.translate_string("bind_stalker_table_group_1_text"),
-	["Vehicles"]=game.translate_string("bind_stalker_table_group_1_text"),
-	["Hunter_tips"]=game.translate_string("bind_stalker_table_group_1_text"),
-}
 
 function init(obj)
 	xr_motivator.AddToMotivator(obj)
@@ -106,6 +88,7 @@ function actor_binder:net_destroy()
 	self.object:set_callback(callback_ex.on_belt, nil)
 	self.object:set_callback(callback_ex.on_ruck, nil)
 	self.object:set_callback(callback_ex.on_slot, nil)
+	self.object:set_callback(callback_ex.on_select_item, nil)
 	self.object:set_callback(callback_ex.on_hud_animation_end, nil)
 	self.object:set_callback(callback.hit, nil)
 	
@@ -152,6 +135,7 @@ function actor_binder:reinit()
 	self.object:set_callback(callback_ex.on_belt, self.item_to_belt, self)		-- перемещение предмета на пояс
 	self.object:set_callback(callback_ex.on_ruck, self.item_to_backpack, self)	-- перемещение предмета в рюкзак
 	self.object:set_callback(callback_ex.on_slot, self.item_to_slot, self)		-- перемещение предмета в слот
+	self.object:set_callback(callback_ex.on_select_item, self.on_select_item, self)
 	self.object:set_callback(callback_ex.on_hud_animation_end, self.hud_animation_end, self) -- вызывается в конце проигрывания анимации худа (только если используем play_hud_animation)
 	self.object:set_callback(callback_ex.on_goodwill_change, self.on_goodwill_change, self)		-- изменение отношений
 	--
@@ -276,10 +260,29 @@ function actor_binder:on_trade(item, sell_bye, money)
 	self.am:call("on_trade", item, sell_bye, money)
 end
 ----------------------------------------------------------------------------------------------------------------------
+local table_group = {
+	["Diary"]=game.translate_string("bind_stalker_table_group_1_text"),
+	["Mutants"]=game.translate_string("bind_stalker_table_group_2_text"),
+	["Social"]=game.translate_string("bind_stalker_table_group_3_text"),
+	["Artifacts"]=game.translate_string("bind_stalker_table_group_4_text"),
+	["Klondike_Artifacts"]=game.translate_string("bind_stalker_table_group_4_text"),
+	["Anomalies"]=game.translate_string("bind_stalker_table_group_5_text"),
+	["Locations"]=game.translate_string("bind_stalker_table_group_6_text"),
+	["Zone-story"]=game.translate_string("bind_stalker_table_group_7_text"),
+	["Stories"]=game.translate_string("bind_stalker_table_group_8_text"),
+	["memuars"]=game.translate_string("bind_stalker_table_group_9_text"), 
+	["Found_PDA"]=game.translate_string("bind_stalker_table_group_10_text"), 
+	["st_operation_agroprom"]=game.translate_string("bind_stalker_table_group_1_text"),
+	["LabX18_information"]=game.translate_string("bind_stalker_table_group_1_text"), 
+	["aes_military_task"]=game.translate_string("bind_stalker_table_group_1_text"),
+	["Vehicles"]=game.translate_string("bind_stalker_table_group_1_text"),
+	["Hunter_tips"]=game.translate_string("bind_stalker_table_group_1_text"),
+}
+
 function actor_binder:article_callback(npc, group, name, article_type)
 	if device().precache_frame >1 then return end
 
-	if table_group[group] ~= nil then -- yes, old school.. we use "~= nil"
+	if table_group[group] then
 		news_manager.send_encyclopedy(group == "Diary" and "diary" or "encyclopedy", group)
 		ogse.send_tip(game.translate_string(name), table_group[group], nil, 7)
 	end
@@ -501,6 +504,14 @@ function actor_binder:item_to_slot(obj)
 	if not sobj then return end
 
 	self.am:call("on_item_to_slot", obj, sobj)
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:on_select_item( obj )
+	if not obj then return end
+	local sobj = alife():object( obj:id() )
+	if not sobj then return end
+
+	self.am:call("on_select_item", obj, sobj)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:save(packet)
