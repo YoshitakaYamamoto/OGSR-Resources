@@ -89,6 +89,8 @@ function actor_binder:net_destroy()
 	self.object:set_callback(callback_ex.on_ruck, nil)
 	self.object:set_callback(callback_ex.on_slot, nil)
 	self.object:set_callback(callback_ex.on_select_item, nil)
+	self.object:set_callback(callback_ex.on_create_cell_item, nil)
+	
 	self.object:set_callback(callback_ex.on_hud_animation_end, nil)
 	self.object:set_callback(callback.hit, nil)
 	
@@ -136,6 +138,8 @@ function actor_binder:reinit()
 	self.object:set_callback(callback_ex.on_ruck, self.item_to_backpack, self)	-- перемещение предмета в рюкзак
 	self.object:set_callback(callback_ex.on_slot, self.item_to_slot, self)		-- перемещение предмета в слот
 	self.object:set_callback(callback_ex.on_select_item, self.on_select_item, self)
+	self.object:set_callback(callback_ex.on_create_cell_item, self.on_create_cell_item, self)
+
 	self.object:set_callback(callback_ex.on_hud_animation_end, self.hud_animation_end, self) -- вызывается в конце проигрывания анимации худа (только если используем play_hud_animation)
 	self.object:set_callback(callback_ex.on_goodwill_change, self.on_goodwill_change, self)		-- изменение отношений
 	--
@@ -512,6 +516,14 @@ function actor_binder:on_select_item( obj )
 	if not sobj then return end
 
 	self.am:call("on_select_item", obj, sobj)
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:on_create_cell_item( obj )
+	if not obj then return end
+	local sobj = alife():object( obj:id() )
+	if not sobj then return end
+
+	self.am:call("on_create_cell_item", obj, sobj)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:save(packet)
