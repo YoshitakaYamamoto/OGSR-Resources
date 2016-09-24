@@ -43,6 +43,8 @@ class "generic_physics_binder" (object_binder)
 function generic_physics_binder:__init(obj) super(obj)
 	self.initialized = false
 	self.loaded = false
+
+	self.am = ogse_signals.get_mgr()
 end 
 -- MARKER: reload
 function generic_physics_binder:reload(section)
@@ -142,10 +144,11 @@ function generic_physics_binder:load(reader)
 end
 -- MARKER: use_callback
 function generic_physics_binder:use_callback(obj, who)
-	--xr_use.notify_on_use(obj, who)
 	if self.st.active_section then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "use_callback", obj, who)
 	end
+
+	self.am:call( "on_ph_obj_use", self.object, who )
 end
 -- MARKER: hit_callback
 function generic_physics_binder:hit_callback(obj, amount, local_direction, who, bone_index)

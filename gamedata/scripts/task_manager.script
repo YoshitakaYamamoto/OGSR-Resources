@@ -5,6 +5,31 @@
 --- внесенные изменени€: рандомные награды за квесты, полна€ статистика
 -----------------------------------------------------------------------
 
+function attach( sm )
+	sm:subscribe({ signal = "on_task", fun = this.on_task })
+	sm:subscribe({ signal = "on_save", fun = this.save })
+	sm:subscribe({ signal = "on_load", fun = this.load })
+end
+
+function on_task(_task, _objective, _state)
+	task_callback(_task:get_id(), _objective:get_idx(), _state)
+	if _objective:get_idx() == 0 then
+		if _state == task.fail then
+			news_manager.send_task(db.actor, "fail", _task, _objective)
+		elseif _state == task.completed then
+			reward_by_task(_task)
+			news_manager.send_task(db.actor, "complete", _task, _objective)
+		else
+			news_manager.send_task(db.actor, "new", _task, _objective)
+		end
+	else
+		if _task:get_objective(0):get_state() == task.in_progress then
+			news_manager.send_task(db.actor, "update", _task, _objective)
+		end
+	end
+end
+
+
 rr_stop = true
 
 local random_task = nil
@@ -80,6 +105,7 @@ local hirers={
 
 class "CRandomTask"
 function CRandomTask:__init()
+	self.sm = ogse_signals.get_mgr()
 	--' Ќа конструкторе вычитываем LTX и создаем заготовки квестов.
 	self.task_phrase_id = 100
 
@@ -220,18 +246,17 @@ function CRandomTask:__init()
 					signal = "on_update", self = self, fun = self.actor_update,
 					queued = true
 				}
-				ogse_signals.get_mgr():subscribe( self.subscribed )
+				self.sm:subscribe( self.subscribed )
 			end
 		end
 	end
 end
 --' —охранение
-function CRandomTask:save(p)
------------------------
-	p = net_packet()
+function CRandomTask:save()
+	local p = net_packet()
 	p:w_begin( 123 )
 	p:r_seek( 2 )
------------------------
+
 	--' —читаем количество записей
 	local i = 0
 	for k,v in pairs(self.task_info) do
@@ -257,20 +282,17 @@ function CRandomTask:save(p)
 		p:w_stringZ(k) 
 		p:w_stringZ(v)
 	end
----------------------------------------------------------------
+
 	if p:w_tell() > 7900 then
 		cleanup_actor()
 	end
 	ogse.save_var( script_name() .. ".task_info", p, "chunk")
----------------------------------------------------------------
 end
 --' «агрузка
 function CRandomTask:load(p)
---------------------------------------------------------------
-	if ogse.var_exists( script_name() .. ".task_info") then
-		p = ogse.load_var( script_name() .. ".task_info")
-	end
---------------------------------------------------------------
+	if not ogse.var_exists( script_name() .. ".task_info") then return end
+	local p = ogse.load_var( script_name() .. ".task_info")
+
 	--' —читаем количество записей
 	local i = p:r_u8()
 	for k = 1,i do
@@ -773,7 +795,7 @@ function CRandomTask:check_task_props(task_id)
 end
 --' ѕровер€ем можем ли мы сейчас выдать какой либо самоинициализующийс€ таск
 function CRandomTask:actor_update()
-	ogse_signals.get_mgr():reschedule( 1000 )
+	self.sm:reschedule( math.random(1000, 1500) )
 	for k,v in pairs(self.task_id_self_inited) do
 		if self.task_info[v].status == "normal" then
 			self:check_task_props(v)
@@ -1237,11 +1259,11 @@ function cleanup_actor()
 	get_random_task():cleanup_actor()
 end
 
-function save(p)
-	get_random_task():save(p)
+function save()
+	get_random_task():save()
 end
-function load(p)
-	get_random_task():load(p)
+function load()
+	get_random_task():load()
 end
 function clear_task_manager()
 	random_task	 = nil

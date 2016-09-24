@@ -23,6 +23,7 @@ function generic_object_binder:reload(section)
 end
 
 function generic_object_binder:reinit()
+log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 	object_binder.reinit(self)
 
 	-- У торговца нет поддержки перемещения
@@ -36,10 +37,9 @@ function generic_object_binder:reinit()
 	self.object:set_callback(callback.patrol_path_in_point, self.waypoint_callback, self)
 	self.object:set_callback(callback.hit, self.hit_callback, self)
 	self.object:set_callback(callback.death, self.death_callback, self)
-	--if self.object:clsid() == clsid.script_trader then
-	--	self.object:set_callback(callback.use_object, self.use_callback, self)
-	--end
+	--self.object:set_callback(callback.use_object, self.use_callback, self)
 	self.object:set_callback(callback_ex.entity_alive_before_hit, self.before_hit_callback, self)
+log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
 function generic_object_binder:net_spawn(sobject)
@@ -159,7 +159,7 @@ function generic_object_binder:update(delta)
 end
 
 --function generic_object_binder:use_callback(obj, who)
---	self.am:call("npc_use", self.object, who)
+--	self.am:call("on_monster_use", self.object, who)
 --end
 
 function generic_object_binder:extrapolate_callback()
@@ -274,10 +274,9 @@ function generic_object_binder:hit_callback(obj, amount, local_direction, who, b
 end
 
 function generic_object_binder:net_destroy()
+log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 	self:clear_callbacks()
-	--if self.object:clsid() == clsid.script_trader then
-	--	self.object:set_callback(callback.use_object, nil)
-	--end
+	--self.object:set_callback(callback.use_object, nil)
 
 	local st = db.storage[self.object:id()]
 	if st and st.active_scheme then
@@ -294,6 +293,7 @@ function generic_object_binder:net_destroy()
 	self.am:cleanup_signal_subs( "on_monster_update." .. self.object:id() )
 
 	object_binder.net_destroy(self)
+log3("--[%s] End destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 end 
 
 function generic_object_binder:clear_callbacks()
@@ -357,6 +357,7 @@ function horz_angle(vec1,vec2)
 end]]
 
 function generic_object_binder:load(reader)
+log3("~~[%s] Start load [%s]", script_name(), self.object and self.object:name() or "nil")
 	if string.find(self.object:name(), "crow_") then return false end
 
 	self.loaded = true
@@ -375,6 +376,7 @@ function generic_object_binder:load(reader)
 		local is_invulnerable = xr_logic.pstor_retrieve(self.object, "is_invulnerable", false)
 		self.object:invulnerable(is_invulnerable)
 	end
+log3("--[%s] End load [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
 --Функция проверяет, может ли объект вступать в бой с предполагаемым противником (enemy_st).

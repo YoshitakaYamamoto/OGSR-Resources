@@ -107,12 +107,12 @@ function remove_all_marks_from_minimap()
 end
 
 
---local total_debug = get_con_bool("write_debug_log")
---function write_log(str)
---	if total_debug then
---		log1(str)
---	end
---end
+local total_debug = get_con_bool("write_debug_log")
+function write_log(str)
+	if total_debug then
+		log1(str)
+	end
+end
 
 local MAX_ARTEFACTS = 8
 

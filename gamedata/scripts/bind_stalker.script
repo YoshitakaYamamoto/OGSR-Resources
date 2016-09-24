@@ -61,6 +61,7 @@ function actor_binder:net_spawn(data)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:net_destroy()
+log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 
 	if(actor_stats.remove_from_ranking~=nil)then
 		actor_stats.remove_from_ranking(self.object:id())
@@ -105,9 +106,11 @@ function actor_binder:net_destroy()
 	self.object:set_callback(callback_ex.on_before_use_item, nil)
 
 	self.am:call("on_destroy")
+log3("--[%s] End destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:reinit()
+log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 	local npc_id = self.object:id()
 
 	db.storage[npc_id] = { }
@@ -148,6 +151,7 @@ function actor_binder:reinit()
 	self.object:set_callback(callback_ex.on_after_save, self.after_save, self)
 
 	self.am:call("on_reinit")
+log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
 function actor_binder:hud_animation_end(a1, blend_addr)
@@ -193,11 +197,9 @@ function actor_binder:debug_monster_follow_path(id, params)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:take_item_from_box(box, item)
+	if not box or not item then return end
 	local sobj = alife():object(item:id())
-	local story_id = box:story_id()
-	if not story_id or not sobj then return end
-
-	treasure_manager.take_item_from_box(box, story_id)
+	if not sobj then return end
 
 	self.am:call("on_take_from_box", box, item, sobj)
 end
@@ -404,30 +406,8 @@ function actor_binder:actor_hit_callback(obj, amount, local_direction, who, bone
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:task_callback(_task, _objective, _state)
-
-	ogse_debug.process_actor("tsk", 1)
-	task_manager.task_callback(_task:get_id(), _objective:get_idx(), _state)
-	ogse_debug.process_actor("tsk", 2)
-	if _objective:get_idx() == 0 then
-		ogse_debug.process_actor("tsk", 3)
-		if _state == task.fail then
-			news_manager.send_task(db.actor, "fail", _task, _objective)
-		elseif _state == task.completed then
-			task_manager.reward_by_task(_task)
-			news_manager.send_task(db.actor, "complete", _task, _objective)
-		else
-			news_manager.send_task(db.actor, "new", _task, _objective)
-		end
-	else
-		ogse_debug.process_actor("tsk", 4)
-		if _task:get_objective(0):get_state() == task.in_progress then
-			news_manager.send_task(db.actor, "update", _task, _objective)
-		end
-	end
-
 	self.am:call("on_task", _task, _objective, _state)
-
-	ogse_debug.process_actor("tsk", 0)
+	--ogse_debug.process_actor("tsk", 0)
 end
 ----------------------------------------------------------------------------------------------------------------------
 local update_was_never_called = true
@@ -530,8 +510,6 @@ function actor_binder:save(packet)
 	ogse.save_var("game_difficulty", level.get_game_difficulty()) --—охран€ем уровень сложности
 
 	xr_logic.pstor_save_all(self.object, packet)
-	treasure_manager.save(packet)
-	task_manager.save(packet)
 
 	self.am:call("on_save", packet)
 	self.am:call("on_save_after_all")
@@ -543,14 +521,14 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 local game_difficulty_by_num = {"gd_novice", "gd_stalker", "gd_veteran", "gd_master"}
 function actor_binder:load(reader)
+log3("~~[%s] Start load [%s]", script_name(), self.object and self.object:name() or "nil")
 	local game_difficulty = ogse.load_var("game_difficulty", 3) --«агружаем уровень сложности
 	cmd("g_game_difficulty", game_difficulty_by_num[game_difficulty + 1]) --и устанавливаем его.
 
 	xr_logic.pstor_load_all(self.object, reader)
-	treasure_manager.load(reader)
-	task_manager.load(reader)
 
 	self.am:call("on_load", reader)
+log3("--[%s] End load [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 ----------------------------------------------------------------------------------------------------------------------
 

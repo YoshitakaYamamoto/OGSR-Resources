@@ -277,6 +277,7 @@ end
 
 function motivator_binder:reinit()
     if not self.object then return end
+log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 
     object_binder.reinit(self)
 
@@ -292,6 +293,7 @@ function motivator_binder:reinit()
 		self.st.move_mgr = move_mgr.move_mgr(self.object)
 		self.st.move_mgr:initialize()
 	end
+log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
 function motivator_binder:net_spawn(sobject)
@@ -507,6 +509,7 @@ function motivator_binder:subscribe_updaters()
 end
 
 function motivator_binder:net_destroy()
+log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 	xr_logic.save_logic_online(self.object)
 
 	local st = db.storage[self.object:id()]
@@ -528,6 +531,7 @@ function motivator_binder:net_destroy()
 	self.am:cleanup_signal_subs( "on_npc_update." .. self.object:id() )
 
 	object_binder.net_destroy(self)
+log3("--[%s] End destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
 function motivator_binder:clear_callbacks()
@@ -771,7 +775,7 @@ function motivator_binder:use_callback(obj, who)
 		end
 	end
 
-	self.am:call("npc_use", self.object, who)
+	self.am:call("on_npc_use", self.object, who)
 
 	ogse_debug.process_npc(self.object, "use", 0)
 end
@@ -897,6 +901,7 @@ function motivator_binder:save(packet)
 end
 
 function motivator_binder:load(reader)
+log3("~~[%s] Start loading [%s]", script_name(), self.object and self.object:name() or "nil")
 	self.loaded = true
 
 	object_binder.load(self, reader)
@@ -925,6 +930,7 @@ function motivator_binder:load(reader)
 
 	local is_invulnerable = xr_logic.pstor_retrieve(self.object, "is_invulnerable", false)
 	self.object:invulnerable(is_invulnerable)
+log3("--[%s] End loading [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
 function motivator_binder:hear_callback(self, who, sound_type, sound_position, sound_power)

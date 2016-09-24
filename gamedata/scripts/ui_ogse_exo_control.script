@@ -15,7 +15,6 @@ function attach(sm)
 	sm:subscribe({ signal = "on_use",			fun = this.use_exo })
 end
 
-local sim = alife()
 
 local exo_condition = 1.0
 local outfit_condition = 1.0
@@ -28,7 +27,7 @@ function use_exo(use_object)
 		local exoskeleton_type = sys_ini:r_string(use_obj_section, "exoskeleton_type")
 		if exoskeleton_type then
 			local outfit_item = db.actor:item_in_slot(6)
-			if outfit_item and sim:object(outfit_item:id()) and
+			if outfit_item and alife():object(outfit_item:id()) and
 				not sys_ini:line_exist(outfit_item:section(), "without_exoskeleton") and
 				sys_ini:line_exist(outfit_item:section(), exoskeleton_type) 
 				then
@@ -53,7 +52,7 @@ exo_to_rust_condition = nil
 
 function detach_exo()
 	local outfit_item = db.actor:item_in_slot(6)
-	if outfit_item and sim:object(outfit_item:id()) then
+	if outfit_item and alife():object(outfit_item:id()) then
 		local outfit_sec = outfit_item:section()
 		if sys_ini:line_exist(outfit_sec, "without_exoskeleton") and sys_ini:line_exist(outfit_sec, "exo_section") then
 			local outfit_without_exo_section = sys_ini:r_string(outfit_sec, "without_exoskeleton")
@@ -75,11 +74,11 @@ function detach_exo()
 end
 
 function convert_outfit(outfit, new_outfit_section)
-	local sobj = sim:object(outfit:id())
+	local sobj = alife():object(outfit:id())
 	if sobj then
 		local outfit_condition = outfit:condition()
 		db.actor:move_to_ruck(outfit)
-		sim:release(sobj, true)
+		alife():release(sobj, true)
 		local s_new_outfit = ogse.spawn_item_in_inv(new_outfit_section, db.actor)
 		outfit_spawn_watcher(s_new_outfit.id, outfit_condition):start()
 	end
@@ -151,7 +150,7 @@ end
 function chek_button_accessibility()
 	local outfit_item = db.actor:item_in_slot(6)
 	local enabled = 
-		outfit_item and sim:object(outfit_item:id()) and
+		outfit_item and alife():object(outfit_item:id()) and
 		sys_ini:line_exist(outfit_item:section(), "without_exoskeleton") and 
 		sys_ini:line_exist(outfit_item:section(), "exo_section") and
 		can_detach_exo(outfit_item:section())

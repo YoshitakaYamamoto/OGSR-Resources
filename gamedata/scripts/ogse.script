@@ -1368,11 +1368,6 @@ function on_game_load()
 	ogse_debug.process_actor("a_spw", 117)
 	id_cleaner.check_ids() --проверка количества идентификаторов
 
-	ogse_debug.process_actor("a_spw", 118)
-	if db.storage[db.actor:id()].pstor == nil then	--Создаем хранилище актора
-		db.storage[db.actor:id()].pstor = {}
-	end
-
 	ogse_debug.process_actor("a_spw", 119)
 
 	-- Первый запуск мода

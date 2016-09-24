@@ -1191,7 +1191,8 @@ function pstor_save_all(obj, packet)
 		db.storage[npc_id].pstor = pstor
 	end
 
-	if obj:id() == db.actor:id() then
+	local is_actor = obj:id() == db.actor:id()
+	if is_actor then
 		packet = net_packet()
 		packet:w_begin( 123 )
 		packet:r_seek( 2 )
@@ -1221,7 +1222,7 @@ function pstor_save_all(obj, packet)
 		end
 	end
 
-	if obj:id() == db.actor:id() then
+	if is_actor then
 		ogse.save_var( script_name() .. ".actor_pstor", packet, "chunk")
 	end
 end
@@ -1234,8 +1235,12 @@ function pstor_load_all(obj, reader)
 		db.storage[npc_id].pstor = pstor
 	end
 
-	if obj:name() == "single_player" and ogse.var_exists( script_name() .. ".actor_pstor" ) then
-		reader = ogse.load_var( script_name() .. ".actor_pstor" )
+	if obj:name() == "single_player" then
+		if ogse.var_exists( script_name() .. ".actor_pstor" ) then
+			reader = ogse.load_var( script_name() .. ".actor_pstor" )
+		else
+			return
+		end
 	end
 
 	local ctr = reader:r_u32()
