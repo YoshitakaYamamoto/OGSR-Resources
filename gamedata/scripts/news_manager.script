@@ -238,11 +238,7 @@ function send_task(actor, type, task, objective)
 		db.actor:give_game_news(news_text, task_texture, task_rect, 0, 3000)
 	end
 
---[=[ --Отключено, т.к. конфликтует с ui_ogse_quicklaunch
-	if type == "new" or
-		type == "update"
-	then
-		--' Выдать новое подзадание
+	if type == "new" or type == "update" then --Выдать новое подзадание
 		if task:get_objectives_cnt() == objective:get_idx()+1 then
 			return
 		end
@@ -253,7 +249,6 @@ function send_task(actor, type, task, objective)
 	hud:AddCustomStatic("main_task", true)
 	hud:GetCustomStatic("main_task"):wnd():SetTextST(news_text)
 	hud:GetCustomStatic("main_task").m_endTime = time_global()/1000 + 5
---]=]
 end
 
 function send_encyclopedy(type, title)

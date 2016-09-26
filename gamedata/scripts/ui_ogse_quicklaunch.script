@@ -1,19 +1,18 @@
 -----------------------------------------------------------------------
 --- ui_ogse_quicklaunch.script
---- ������ ������� �������� OGSE
+--- Панель быстрых действий OGSE
 --- KamikaZze, Dusty79 (c) OGS Evolution Team
 --- version 1.7 (13/03/2011)
 -----------------------------------------------------------------------
 
 function attach(sm)
 	sm:subscribe({ signal = "on_key_down",	fun = this.chek_keys })
-	sm:subscribe({ signal = "on_update",	fun = this.check_quicklaunch_hint })
+	sm:subscribe({ signal = "on_key_up",	fun = this.on_key_up })
 end
 
+
 local strings = {}
-
 local strings_all = {
-
 	[1] = {text = game.translate_string("quicklaunch_string1")},
 	[2] = {text = "----------------------------"},
 	[3] = {text = game.translate_string("quicklaunch_string2"), keybind = 73},
@@ -25,7 +24,6 @@ local strings_all = {
 	
 }
 local strings_btr = {
-
 	[1] = {text = game.translate_string("btr_control_string1")},
 	[2] = {text = "----------------------------"},
 	[3] = {text = game.translate_string("btr_control_string2"), keybind = key_bindings.kWPN_FIRE},
@@ -36,104 +34,96 @@ local strings_btr = {
 	[8] = {text = game.translate_string("btr_control_string7"), keybind = key_bindings.kR_LOOKOUT},
 	[9] = {text = game.translate_string("btr_control_string8"), keybind = key_bindings.kL_LOOKOUT}
 }
-
 if ogse_car_control.need_companion_btr == true then
 	strings_btr[6] = {text = game.translate_string("btr_control_string9"), keybind = key_bindings.kWPN_3}
 end
 
-local tab = 0
 
-function check_quicklaunch_hint()
-    local hud = get_hud()
-    if hud:GetCustomStatic("main_task") then
-        if tab==0 then
-			if ogse_car_control.in_btr == true then
-				strings = strings_btr
-			else
-				strings = strings_all
+local keys_table = {
+	[ogse_rebind_key.get_key_preset_value("antirad_key")] = function()
+		local item = db.actor:object("antirad")
+		if item then
+			db.actor:eat(item)
+			ogse_screen_msg.show_message_use_item(item:section())
+		end
+		return true
+	end,
+	[ogse_rebind_key.get_key_preset_value("energy_drink_key")] = function()
+		local item = db.actor:object("energy_drink")
+		if item then
+			db.actor:eat(item)
+			ogse_screen_msg.show_message_use_item(item:section())
+		else
+			item = db.actor:object("dix")
+			if item then
+				db.actor:eat(item)
+				ogse_screen_msg.show_message_use_item(item:section())
 			end
-			local i = 1
-			while strings[i] do
-				local string_id = "quicklaunch_hint_"..tostring(i)
-				local quicklaunch = hud:GetCustomStatic(string_id)
-				if not quicklaunch then
-					hud:AddCustomStatic(string_id, true)
-					quicklaunch = hud:GetCustomStatic(string_id):wnd()
-					local key_name = ""
-					if strings[i].variable ~= nil then
-						key_name = ogse_rebind_key.dik_to_name(ogse_rebind_key.get_key_preset_value(strings[i].variable)) .. " = "
-					end
-					if strings[i].keybind ~= nil then
-						key_name = ogse_rebind_key.dik_to_name(bind_to_dik(strings[i].keybind)) .. " = "
-					end
-					local string_text = tostring(key_name..strings[i].text)
-					quicklaunch:SetText(string_text)
-				end
-				i = i + 1
-			end
-			tab = 1
-        end
-    else
-        if tab==1 then
-			local i = 1
-			while strings[i] do
-				local string_id = "quicklaunch_hint_"..tostring(i)
-				local quicklaunch = hud:GetCustomStatic(string_id)
-				if quicklaunch then
-					hud:RemoveCustomStatic(string_id)
-				end
-				i = i + 1
-			end
-			tab = 0
-        end
-    end
-end
+		end				
+		return true
+	end,
+	[ogse_rebind_key.get_key_preset_value("yod_key")] = function()
+		local item = db.actor:object("yod")
+		if item then
+			db.actor:eat(item)
+			ogse_screen_msg.show_message_use_item(item:section())
+		end			
+		return true
+	end,
+	[ogse_rebind_key.get_key_preset_value("bipsizon_key")] = function()
+		local item = db.actor:object("bipsizon")
+		if item then
+			db.actor:eat(item)
+			ogse_screen_msg.show_message_use_item(item:section())
+		end			
+		return true
+	end,
+	[ogse_rebind_key.get_key_preset_value("quicksave_key")] = function()
+		cmd("ogse_quick_save")
+		return true
+	end,
+}
 
 function chek_keys(key, bind)
 	if level.main_input_receiver() then return end
 
-		if key == ogse_rebind_key.get_key_preset_value("antirad_key") then
-			local item = db.actor:object("antirad")
-			if item then
-				local item_section = item:section()
-				db.actor:eat(item)
-				ogse_screen_msg.show_message_use_item(item_section)
-			end
-			return true
-		elseif key == ogse_rebind_key.get_key_preset_value("energy_drink_key") then
-			local item = db.actor:object("energy_drink")
-			if item then
-				local item_section = item:section()
-				db.actor:eat(item)
-				ogse_screen_msg.show_message_use_item(item_section)
-			else
-				item = db.actor:object("dix")
-				if item then
-					local item_section = item:section()
-					db.actor:eat(item)
-					ogse_screen_msg.show_message_use_item(item_section)
-				end
-			end				
-			return true
-		elseif key == ogse_rebind_key.get_key_preset_value("yod_key") then
-			local item = db.actor:object("yod")
-			if item then
-				local item_section = item:section()
-				db.actor:eat(item)
-				ogse_screen_msg.show_message_use_item(item_section)
-			end			
-			return true
-		elseif key == ogse_rebind_key.get_key_preset_value("bipsizon_key") then
-			local item = db.actor:object("bipsizon")
-			if item then
-				local item_section = item:section()
-				db.actor:eat(item)
-				ogse_screen_msg.show_message_use_item(item_section)
-			end			
-			return true
-		elseif key == ogse_rebind_key.get_key_preset_value("quicksave_key") then
-			cmd("ogse_quick_save")
-			return true
-		end				
+	local fun = keys_table[key]
+	if fun then return fun() end
+
+	if bind ~= 43 then return end --Хз, как этот бинд называется
+
+    local hud = get_hud()
+	strings = ogse_car_control.in_btr and strings_btr or strings_all
+	local i = 1
+	while strings[i] do
+		local string_id = "quicklaunch_hint_"..i
+		local quicklaunch = hud:GetCustomStatic(string_id)
+		if not quicklaunch then
+			hud:AddCustomStatic(string_id, true)
+			quicklaunch = hud:GetCustomStatic(string_id):wnd()
+			local key_name =
+				strings[i].variable
+				and ogse_rebind_key.dik_to_name(ogse_rebind_key.get_key_preset_value(strings[i].variable)) .. " = "
+				or strings[i].keybind
+				and ogse_rebind_key.dik_to_name(bind_to_dik(strings[i].keybind)) .. " = "
+				or ""
+			quicklaunch:SetText(key_name..strings[i].text)
+		end
+		i = i + 1
+	end
 end
 
+function on_key_up(key, bind)
+	if bind ~= 43 then return end --Хз, как этот бинд называется
+
+	local i = 1
+    local hud = get_hud()
+	while strings[i] do
+		local string_id = "quicklaunch_hint_"..i
+		local quicklaunch = hud:GetCustomStatic(string_id)
+		if quicklaunch then
+			hud:RemoveCustomStatic(string_id)
+		end
+		i = i + 1
+	end
+end
