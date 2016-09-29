@@ -5,9 +5,51 @@
 
 --/ ћодуль подрыва патрона в стволе при значительном износе оружи€ /--
 
+
 function attach(sm)
-	sm:subscribe({ signal = "on_update",	fun = this.update })
+	sm:subscribe({signal = "on_item_to_slot",	fun = this.on_item_to_slot})
+	sm:subscribe({signal = "on_item_to_ruck",	fun = this.on_item_to_ruck})
+	sm:subscribe({signal = "on_drop",			fun = this.on_item_to_ruck})
 end
+
+local current_blow_limit = math.random(5, 25)*0.01
+
+local bad_weapons_in_slots = {}
+local sm = ogse_signals.get_mgr()
+local subscribed
+
+function subscribe()
+	if not subscribed then
+		subscribed = {signal = "on_update", fun = this.update}
+		sm:subscribe( subscribed )
+		--log3("--[%s] subscribed!", script_name())
+	end
+end
+
+function unsubscribe()
+	if subscribed and next(bad_weapons_in_slots) == nil then
+		sm:unsubscribe( subscribed )
+		subscribed = nil
+		--log3("~~[%s] UNsubscribed!", script_name())
+	end
+end
+
+function on_item_to_slot(obj)
+	if obj:condition() <= current_blow_limit then
+		bad_weapons_in_slots[obj:id()] = true
+		--log3("--[%s] Adding in table: [%s]", script_name(), obj:name())
+		subscribe()
+	end
+end
+
+function on_item_to_ruck(obj)
+	if bad_weapons_in_slots[obj:id()] then
+		bad_weapons_in_slots[obj:id()] = nil
+		--log3("~~[%s] Removing from table: [%s]", script_name(), obj:name())
+		unsubscribe()
+	end
+end
+
 
 -- ћалый калибр (пистолеты, пистолеты-пулемЄты)
 local fx_snd_1 = "weapons\\wpn_explode"						-- звук, воспроизводимый как разрыв патрона в стволе
@@ -40,8 +82,6 @@ local explode_impulse_5 = 0.5
 local explode_power_5 = 1.2
 -- ѕараметры
 
-local current_blow_limit = math.random(5, 25)*0.01
-
 function update()
 	if not get_hud():GetCustomStatic("gun_jammed") or not db.actor:alive() then return end
 
@@ -49,8 +89,13 @@ function update()
 	if not active_item then return end
 	local s_wpn = alife():object(active_item:id())
 	if s_wpn then
-		if active_item:condition() < current_blow_limit then
+		if active_item:condition() <= current_blow_limit then
 			make_boom(active_item)
+			if bad_weapons_in_slots[active_item:id()] then
+				bad_weapons_in_slots[active_item:id()] = nil
+				--log3("~~[%s] Removing from table: [%s]", script_name(), active_item:name())
+				unsubscribe()
+			end
 		end
 	end
 end
