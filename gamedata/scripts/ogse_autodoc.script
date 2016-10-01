@@ -7,6 +7,64 @@
 -- Зависит от: ui_autodoc.script
 ----------------------------------------------------------------------------------------------------
 
+charges = {["h"] = 0, ["s"] = 0, ["r"] = 0}
+switch_on = {["ad"]	= false, ["h"] = false, ["s"] = false, ["r"] = false}
+ad_on_belt = false
+
+
+function attach(sm) -- для менеджера сигналов
+	sm:subscribe({signal = "on_use",  fun = this.on_use})
+	sm:subscribe({signal = "on_item_to_belt", fun = this.on_to_belt})
+	sm:subscribe({signal = "on_item_to_ruck", fun = this.on_to_ruck})
+	sm:subscribe({signal = "on_drop", fun = this.on_to_ruck})
+	sm:subscribe({signal = "on_load", fun = this.get_autodoc_states})
+	sm:subscribe({signal = "on_save", fun = this.save_autodoc_states})
+end
+
+local sm = ogse_signals.get_mgr()
+local subscribed
+
+function subscribe()
+	if not subscribed then
+		subscribed = {signal = "on_update", fun = this.check_autodoctor}
+		sm:subscribe( subscribed )
+		--log3("--[%s] subscribed!", script_name())
+	end
+end
+
+function unsubscribe()
+	if subscribed then
+		sm:unsubscribe( subscribed )
+		subscribed = nil
+		--log3("~~[%s] UNsubscribed!", script_name())
+	end
+end
+
+
+function on_to_belt(obj, sobj)
+	if obj:section() == "autodoctor" then
+		ad_on_belt = true
+		subscribe()
+		start_up()
+		return true --дальше тут нечего делать
+	end
+end
+
+function on_to_ruck(obj, sobj)
+	if obj:section() == "autodoctor" then
+		ad_on_belt = false
+		unsubscribe()
+		return true --сомневаюсь что он ещё где-то нужен
+	end
+end
+
+function check_autodoctor()
+	if switch_on.ad then
+		autohealing()
+	end
+end
+
+
 -- Global healing params of autodoctor / Параметры ИДЛК
 local full_charges 		= sys_ini:r_s32("autodoctor", "ad_full_charges")	-- Макс. кол-во зарядов в подсистемах ИДЛК
 local health_dlt		= sys_ini:r_float("autodoctor", "ad_health_dlt")	-- Шаг лечения
@@ -20,11 +78,7 @@ local max_rad_seconds 	= sys_ini:r_s32("autodoctor", "ad_max_rad_seconds")
 -- Мин. доза радиации, при воздействии которой дольше времени max_radiated_seconds, ИДЛК введёт антирад
 local threshold_r_min 	= sys_ini:r_float("autodoctor", "ad_threshold_r_min")
 
-charges = {["h"] = 0, ["s"] = 0, ["r"] = 0}
-switch_on = {["ad"]	= false, ["h"] = false, ["s"] = false, ["r"] = false}
-
 ---------------- Get and save charges count ---------------
-
 local started_up = false
 
 -- Загружаем количество зарядов в подсистемах автодока и их состояние
@@ -67,19 +121,6 @@ local message_head = "%c[255,160,160,160]"..game.translate_string("ogse_autodoc_
 local start_check = message_head.."%c[default] "..game.translate_string("ogse_autodoc_start_check_text")
 local ad_healing_msg = message_head.."%c[default] %c[255,0,230,0]"..game.translate_string("ogse_autodoc_ad_healing_msg_text")
 local ad_stimulator_msg = message_head.."%c[default] %c[255,0,230,0]"..game.translate_string("ogse_autodoc_ad_stimulator_msg_text")
-
-function attach(sm) -- для менеджера сигналов
-	sm:subscribe({signal = "on_use",  fun = this.on_use})
-	sm:subscribe({signal = "on_item_to_belt", fun = this.on_to_belt})
-	sm:subscribe({signal = "on_item_to_ruck", fun = this.on_to_ruck})
-	sm:subscribe({signal = "on_update", fun = this.check_autodoctor})
-	sm:subscribe({signal = "on_load", fun = this.get_autodoc_states})
-	sm:subscribe({signal = "on_save", fun = this.save_autodoc_states})
-end
-
-ad_on_belt = inventory.belt["autodoctor"]
-if ad_on_belt then start_up() end
-
 local cartriges_sections = {
 	["cartridge_a"] = "a",
 	["cartridge_h"] = "h",
@@ -88,11 +129,8 @@ local cartriges_sections = {
 }
 
 function on_use(obj, sobj)
-	--if not obj or not sobj then return end
-
 	local section = obj:section()
 	if section == "autodoctor" then
-		ad_on_belt = inventory.belt["autodoctor"]
 		if not ad_on_belt then
 			snd_obj = xr_sound.get_safe_sound_object([[device\pda\pda_news]])
 			msg_txt = game.translate_string("ogse_autodoc_is_not_on_belt_text")
@@ -106,7 +144,6 @@ function on_use(obj, sobj)
 	local par = cartriges_sections[section]
 	if par then
 		local restore_item = true
-		ad_on_belt = inventory.belt["autodoctor"]
 		if ad_on_belt then
 			restore_item = ad_recharge(par)
 		end
@@ -115,32 +152,6 @@ function on_use(obj, sobj)
 	end
 end
 
-function on_to_belt(obj, sobj)
-	--if not obj or not sobj then return end
-
-	if obj:section() == "autodoctor" and not ad_on_belt then
-		ad_on_belt = inventory.belt["autodoctor"]
-		start_up()
-	end
-end
-
-function on_to_ruck(obj, sobj)
-	--if not obj or not sobj then return end
-
-	if obj:section() == "autodoctor" then
-		ad_on_belt = inventory.belt["autodoctor"]
-	end
-end
-
-function check_autodoctor()
-	ad_on_belt = inventory.belt["autodoctor"]
-	if ad_on_belt and switch_on.ad then
-		if started_up == false then
-			start_up()
-		end		
-		autohealing()
-	end
-end
 
 -- таймер отсчёта тактов лечения кровотечения автодоком
 class "heal_wounds_timer" (ogse_qt.quick_timer)
@@ -368,40 +379,26 @@ function ad_recharge(subsys)
 	local snd_obj = nil
 	local msg_name = ""
 	local msg_txt = ""
---[[	
-	if(subsys=="h")
-	then
-		msg_name = "Лечебная"
-	elseif(subsys=="s")
-	then
-		msg_name = "Стимулирующая"
-	elseif(subsys=="r")
-	then
-		msg_name = "Антирадиационная"
-	end
-]]
+
 	msg_name = ((subsys=="h") and game.translate_string("ogse_autodoc_health_sys_name_text")) or ((subsys=="s") and game.translate_string("ogse_autodoc_stim_sys_name_text")) or ((subsys=="r") and game.translate_string("ogse_autodoc_antirad_sys_name_text"))
 	if(subsys=="a")
 	then
-		if(ad_cc == full_charges*3) -- Если все подсистемы полностью заряжены
-		then
-			--ogse.spawn_item_in_inv("cartridge_a")	-- спавним заюзанный картридж, типа не использовали
+		if ad_cc == (full_charges * 3) then --Если все подсистемы полностью заряжены
 			return true
 		end
 		charges["h"] = full_charges
 		charges["s"] = full_charges
 		charges["r"] = full_charges
 		msg_txt = string.format(game.translate_string("ogse_autodoc_pattern_1_text"), message_head, full_charges)
-----[[ 
+-- [=[ --KRodin: Странный комент. Он же не работает. А должен?
 		switch_on["h"] = true
 		switch_on["s"] = true
 		switch_on["r"] = true
 		save_autodoc_states()
---	]]
+--]=]
 	else
 		if(charges[subsys] == full_charges)	-- Если подсистема полностью заряжена
 		then
-			--ogse.spawn_item_in_inv("cartridge_"..subsys)	-- спавним заюзанный картридж, типа не использовали
 			return true
 		end
 		charges[subsys] = full_charges
