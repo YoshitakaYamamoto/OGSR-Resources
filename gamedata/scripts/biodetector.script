@@ -1,84 +1,210 @@
-------------- БИОРАДАР -------------
--- Dетектор живых форм, будь он неладен.
--- Автор Charsi
+------------- Р‘РРћР РђР”РђР  -------------
+-- DРµС‚РµРєС‚РѕСЂ Р¶РёРІС‹С… С„РѕСЂРј, Р±СѓРґСЊ РѕРЅ РЅРµР»Р°РґРµРЅ.
+-- РђРІС‚РѕСЂ Charsi
 -- Data 29.11.2012
--- переработка для OGSE KamikaZze 2012-2014
+-- РїРµСЂРµСЂР°Р±РѕС‚РєР° РґР»СЏ OGSE KamikaZze 2012-2014
+-- РћРїС‚РёРјРёР·Р°С†РёСЏ, РёСЃРїСЂР°РІР»РµРЅРёРµ РѕС€РёР±РѕРє: KRodin (c) 2016
 
-function attach(sm)
-	sm:subscribe({ signal = "on_update",	fun = this.update })
-	sm:subscribe({ signal = "on_use",		fun = this.on_use_item })
-end
+-- Р’РѕР»РЅР°, Р·Р°С‚СѓС…Р°РЅРёРµ С‚РѕС‡РµРє Рё Р·РІСѓРє РІС‹РєР»СЋС‡РµРЅС‹, РїРѕС‚РѕРјСѓ С‡С‚Рѕ 1.)СЌС‚Рѕ РіР»СЋС‡РЅРѕ 2.)РЅРµРєСЂР°СЃРёРІРѕ
 
--------------- настройки -----------
-local biomap_sweep_enabled = true -- включить волну
-local fading = true               -- затухание точек
-local sound_enabled = false		  -- играть ли звук
-------------------------------------
-local biomap_width = 256 -- пиксельная ширина биорадара
-local biomap_sweep_width = 220 --ширина статика волны
-local step_angle = 6/180 -- шаг за апдейт (скорость поворота)
+------------- РќР°СЃС‚СЂРѕР№РєРё ------------
+local max_dist = 90 --РњР°РєСЃ. СЂР°СЃСЃС‚РѕСЏРЅРёРµ РґРѕ С†РµР»Рё РІ РёРіСЂРѕРІС‹С… РјРµС‚СЂР°С…
+local biomap_width = 256 -- Krodin: РёР»Рё СЏ С‡С‚Рѕ-С‚Рѕ РЅРµ РїРѕРЅРёРјР°СЋ, РЅРѕ РїРѕ-РјРѕРµРјСѓ, СЌС‚Рѕ РЅРµ С€РёСЂРёРЅР°, Р° РєРѕРѕСЂРґРёРЅР°С‚С‹ С†РµРЅС‚СЂР° С‚РµРєСЃС‚СѓСЂС‹ Р±РёРѕСЂР°РґР°СЂР° (~256, ~256)
+local d = biomap_width/2 --KRodin: РџСѓСЃС‚СЊ С‚Р°Рє Рё Р±СѓРґРµС‚, РЅРµ С‚СЂРѕРіР°С‚СЊ!
+local screen_max_dist = 102 --РЁРёСЂРёРЅР° РёРјРµРЅРЅРѕ СЂР°РґР°СЂР° (РќРµ С‚РµРєСЃС‚СѓСЂС‹!) РІ РїРёРєСЃРµР»СЏС…
+local dot_size = 3 --Р Р°Р·РјРµСЂ С‚РѕС‡РєРё (С‡РµРј Р±РѕР»СЊС€Рµ - С‚РµРј С‚РѕС‡РєР° РєСЂСѓРїРЅРµРµ)
 -------------------------------------
-local dot_size = 3
+--local biomap_sweep_enabled = false -- KRodin: РІРѕР»РЅР° РѕС‚РєР»СЋС‡РµРЅР° РІРІРёРґСѓ РµС‘ РіР»СЋС‡РЅРѕСЃС‚Рё. Р”Р° Рё Р±РµР· РІРѕР»РЅС‹ Р±РёРѕСЂР°РґР°СЂ РІС‹РіР»СЏРґРёС‚ Р»СѓС‡С€Рµ, РєР°Рє РїРѕ РјРЅРµ.
+--local biomap_sweep_width = 180 --С€РёСЂРёРЅР° СЃС‚Р°С‚РёРєР° РІРѕР»РЅС‹.
+--local step_angle = 6/180 -- С€Р°Рі Р·Р° Р°РїРґРµР№С‚ (СЃРєРѕСЂРѕСЃС‚СЊ РїРѕРІРѕСЂРѕС‚Р°)
+--local sound_enabled = false -- РёРіСЂР°С‚СЊ Р»Рё Р·РІСѓРє
+--local snd_contact = xr_sound.get_safe_sound_object("motion_detector\\beep")
+--local snd_update = xr_sound.get_safe_sound_object("motion_detector\\pulse")
+--local angle = 0
+--local lim_angle = 1000*2*math.pi
+--local biomap_sweep
+-------------------------------------
 local dots = {}
-local d = 125
 local koef_x = 0
 local koef_x_old = 0
 local a,s,c,b,xa = 0,0,1,0,0
-local level_object_by_id = level.object_by_id
-local ms, mc, math_atan2 = math.sin, math.cos, math.atan2
-local angle = 0
-local lim_angle = 1000*2*math.pi
-local biomap_sweep = nil
-local need_show_by_sect = {}
-local max_dist = 46 --макс расстояние до цели (изначально 60)
-local screen_max_dist = 90 --макс расстояние в пикселях радара
-local _strfind = string.find
 
-local bio_marked = -- кого показывать по умолчанию
-{   
-	["bioradar_dog"] = true,
-    ["bioradar_flesh"] = true,
-    ["bioradar_boar"] = true,
-    ["bioradar_zombie"] = true,
-	["bioradar_stalker"] = true
+
+function attach(sm)
+	sm:subscribe({signal = "on_first_update",	fun = this.on_first_update})
+	sm:subscribe({signal = "on_use",		    fun = this.on_use_item})
+	sm:subscribe({signal = "on_item_to_slot",	fun = this.on_item_to_slot})
+	sm:subscribe({signal = "on_item_to_ruck",	fun = this.on_item_to_ruck})
+	sm:subscribe({signal = "on_drop",			fun = this.on_item_to_ruck})
+end
+
+local sm = ogse_signals.get_mgr()
+local subscribed
+
+function subscribe()
+	if not subscribed then
+		subscribed = {signal = "on_update",	fun = this.update}
+		sm:subscribe( subscribed )
+		--log3("--[%s] subscribed signals!", script_name())
+	end
+end
+
+function unsubscribe()
+	if subscribed then
+		sm:unsubscribe( subscribed )
+		subscribed = nil
+		bioradar_hide()
+		--log3("~~[%s] UNsubscribed signals!", script_name())
+	end
+end
+
+function on_item_to_slot(obj)
+	if obj:section() == "bioradar" then
+		subscribe()
+	end
+end
+
+function on_item_to_ruck(obj)
+	if obj:section() == "bioradar" then --Р±РёРѕСЂР°РґР°СЂ РІ Р—РѕРЅРµ РµСЃС‚СЊ РІ РµРґРёРЅСЃС‚РІРµРЅРЅРѕРј СЌРєР·РµРјРїР»СЏСЂРµ, РїРѕСЌС‚РѕРјСѓ РїСЂРѕРІРµСЂРєСѓ РїРѕ id РЅРµ РґРµР»Р°Р».
+		unsubscribe()
+	end
+end
+
+
+local firmware_item = { --[РЎРµРєС†РёСЏ РїСЂРѕС€РёРІРєРё] = { [РёРЅС„РѕРїРѕСЂС€РµРЅ] = { [РєР»Р°СЃСЃ СЃСѓС‰РµСЃС‚РІ, РєРѕС‚РѕСЂС‹С… РёРЅС„РѕРїРѕСЂС€РµРЅ СЂР°Р·СЂРµС€Р°РµС‚ РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ РЅР° Р±РёРѕСЂР°РґР°СЂРµ] = {С†РІРµС‚ РІ С„РѕСЂРјР°С‚Рµ С‚Р°Р±Р»РёС†С‹ r,g,b} } }
+  ['firmware_krovosos'] = {
+    ['bioradar_krovosos'] = {
+      [clsid.bloodsucker_s] = {255,0,120},
+    },
+  },
+  ['firmware_chimera'] = {
+    ['bioradar_chimera'] = {
+      [clsid.chimera_s] = {255,0,0},
+    },
+  },
+  ['firmware_burer'] = {
+    ['bioradar_burer'] = {
+      [clsid.burer_s] = {0,238,255},
+    },
+  },
+  ['firmware_psevdogigant'] = {
+    ['bioradar_psevdogigant'] = {
+      [clsid.gigant_s] = {255,0,0},
+    },
+  },
+  ['firmware_poltergeist'] = {
+    ['bioradar_poltergeist'] = {
+      [clsid.poltergeist_s] = {0,238,255},
+    },
+  },
+  ['firmware_tushkano'] = {
+    ['bioradar_tushkano'] = {
+      [clsid.tushkano_s] = {64,255,255},
+	  [112] = {164,25,150}, --РљСЂС‹СЃС‹
+    },
+  },
+  ['firmware_flesh'] = {
+    ['bioradar_flesh'] = {
+      [clsid.flesh_s] = {64,153,79},
+    },
+  },
+  ['firmware_kontroler'] = {
+    ['bioradar_kontroler'] = {
+      [clsid.controller_s] = {0,238,255},
+    },
+  },
+  ['firmware_psevdodog'] = {
+    ['bioradar_psevdodog'] = {
+      [clsid.pseudodog_s] = {171,94,23},
+	  [clsid.psy_dog_s] = {171,94,23},
+    },
+  },
+  ['firmware_dog'] = {
+    ['bioradar_dog'] = {
+      [clsid.dog_s] = {252,158,66},
+    },
+  },
+  ['firmware_snork'] = {
+    ['bioradar_snork'] = {
+      [clsid.snork_s] = {145,71,214},
+    },
+  },
+  ['firmware_zombie'] = {
+    ['bioradar_zombie'] = {
+      [clsid.zombie_s] = {127,127,127},
+	  [clsid.fracture_s] = {127,255,127},
+    },
+  },
+  ['firmware_cat'] = {
+    ['bioradar_cat'] = {
+      [clsid.cat_s] = {252,158,66},
+    },
+  },
+  ['firmware_boar'] = {
+    ['bioradar_boar'] = {
+      [clsid.boar_s] = {64,153,79},
+    },
+  },
+  ['firmware_stalker'] = {
+    ['bioradar_stalker'] = {
+       [clsid.script_stalker] = {255,255,255},
+       --[clsid.script_trader] = {255,255,255}, --С‚РѕСЂРіРѕРІС†Р° РЅРµС‚Сѓ РІ db.creature
+	   [clsid.actor] = {0,255,0},
+    },
+  },
 }
 
-local color_by_sect = {
---  секция = { R, G, B }
-	actor 			= {0,255,0},
-	stalker 		= {255,255,255},
-	bloodsucker		= {255,0,120},
-	pseudodog		= {171,94,23},
-	psy_dog			= {171,94,23},
-	tushkano		= {64,255,255},
-	flesh			= {64,153,79},
-	cat				= {252,158,66},
-	burer			= {0,238,255},
-	snork			= {145,71,214},
-	controller 		= {0,238,255},
-	gigant			= {255,0,0},
-	zombie			= {127,127,127},
-	poltergeist		= {0,238,255},
-	chimera			= {255,0,0},
-	boar			= {64,153,79},
-	--NarSol
-	rat				= {164,25,150},
-	tarakan_normal 	= {64,255,255},
-	tarakan_strong 	= {255,0,120},
-	bibliotekar 	= {94,3,80},
-	-- OGSE
-	izlom 			= {127,255,127}
-}
+local need_show_by_sect = {} --Р”Р»СЏ Р±С‹СЃС‚СЂРѕРіРѕ РґРѕСЃС‚СѓРїР° РїРѕ РєР»СЋС‡Сѓ
 
--- классс точки объекта
-class "dot"
-function dot:__init(o,is_stalker)
+function on_first_update()
+	local bio_marked = { --РљРѕРіРѕ РїРѕРєР°Р·С‹РІР°С‚СЊ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+		["bioradar_dog"] = true,
+		["bioradar_flesh"] = true,
+		["bioradar_boar"] = true,
+		["bioradar_zombie"] = true,
+		["bioradar_stalker"] = true
+	}
+	for k, v in pairs(bio_marked) do
+		if not has_alife_info(k) then
+			db.actor:give_info_portion(k)
+		end
+	end
+	--
+	for k, v in pairs(firmware_item) do
+		for p, t in pairs(v) do
+			if has_alife_info(p) then
+				for class, color in pairs(t) do
+					need_show_by_sect[class] = color
+				end
+			end
+		end
+	end
+end
+
+function on_use_item(obj)
+    local firmware_tbl = firmware_item[obj:section()]
+    if firmware_tbl then
+		for k, v in pairs(firmware_tbl) do
+			if not has_alife_info(k) then
+				db.actor:give_info_portion(k)
+			end
+			for class, color in pairs(v) do
+				need_show_by_sect[class] = color
+			end
+		end
+		return true
+    end
+end
+
+
+class "dot" --РљР»Р°СЃСЃ С‚РѕС‡РєРё РѕР±СЉРµРєС‚Р°
+function dot:__init(o, clsid, color)
 	self.o_id = o:id()
+	--log3("[%s] Adding dot with id [%s] for [%s]", script_name(), self.o_id, o:name())
 	dots[self.o_id] = self
 	self.alive = o:alive()
-	self.color = self.alive and self:get_color(o:section()) or {127,127,127}
-	self.a = fading and (self.o_id==0 and 255 or 0) or 255
-	self.need_show = IsStalker(o) or self:show_by_sect(o:section())
+	self.color = self.alive and color or {127,127,127}
+	self.a = --[[biomap_sweep_enabled and (self.o_id == 0 and 255 or 0) or]] 255
 	self.st = CUIStatic()
 	self.st:Init(1024,0,dot_size,dot_size)
 	self.st:InitTexture("biomap\\white_dot")
@@ -87,14 +213,10 @@ function dot:__init(o,is_stalker)
 	self.st:SetAutoDelete(true)
 	self.cnt = 0
 	self.st:SetWndPos(d * koef_x - 1,d)
-	self.st:SetColor(GetARGB(self.a,self.color[1],self.color[2],self.color[3]))
+	self.st:SetColor(GetARGB(self.a, unpack(self.color)))
 end
 
-local snd_contact = xr_sound.get_safe_sound_object("motion_detector\\beep")
-local snd_update = xr_sound.get_safe_sound_object("motion_detector\\pulse")
--- нарисовать точку
-function dot:draw(dir,obj_alive)
-
+function dot:draw(dir, obj_alive) --РќР°СЂРёСЃРѕРІР°С‚СЊ С‚РѕС‡РєСѓ
 	if self.cnt > 0 then
 		self.cnt = self.cnt - 1
 		return
@@ -104,30 +226,30 @@ function dot:draw(dir,obj_alive)
 	if z<=1 then
 		if self.alive and not obj_alive then
 			self.alive = false
-			if fading then
-				self.color = {127,127,127}
-			else
+			--if biomap_sweep_enabled then
+			--	self.color = {127,127,127}
+			--else
 				self.st:SetColor(GetARGB(self.a,127,127,127))
-			end
+			--end
 		end
 		local vx,vz = dir.x/max_dist * screen_max_dist , -dir.z/max_dist * screen_max_dist
 		local x,y = vx * c - vz * s , vx * s + vz * c
 		self.st:SetWndPos( (x + d)*koef_x - 1, y + d)
 		if self.o_id == 0 then self.cnt = 100000 return end
-		-------- угасание точек -------
-		if fading then
-			local u = math_atan2(y, x) * (180 / math.pi) + 180
-			if (xa > u and xa-u or u-xa) < 1.5 then
-				self.a = 255 
-				if sound_enabled and self.alive and not snd_contact:playing() then
-					snd_contact.volume = 0.2
-					snd_contact:play_at_pos (db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
-				end
-			elseif self.a > 2 then
-				self.a = self.a - 2
-			end
-			self.st:SetColor(GetARGB(self.a,self.color[1],self.color[2],self.color[3]))
-		end
+		-------- СѓРіР°СЃР°РЅРёРµ С‚РѕС‡РµРє -------
+		--if biomap_sweep_enabled then
+		--	local u = math.atan2(y, x) * (180 / math.pi) + 180
+		--	if (xa > u and xa-u or u-xa) < 1.5 then
+		--		self.a = 255 
+		--		if sound_enabled and self.alive and not snd_contact:playing() then
+		--			snd_contact.volume = 0.2
+		--			snd_contact:play_at_pos(db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
+		--		end
+		--	elseif self.a > 2 then
+		--		self.a = self.a - 2
+		--	end
+		--	self.st:SetColor(GetARGB(self.a, unpack(self.color)))
+		--end
 		---------------------------------
 	else
 		self.cnt = math.ceil(math.random(30,50)*z*z)
@@ -135,197 +257,98 @@ function dot:draw(dir,obj_alive)
 	end
 end
 
--- скрыть точку
-function dot:hide()
+function dot:hide() --РЎРєСЂС‹С‚СЊ С‚РѕС‡РєСѓ
 	self.st:SetWndPos(1024,0)
 end
 
--- получение цвета точки по секции объекта
-function dot:get_color(section)
-	if section=="dog_weak" or section=="dog_normal" or section=="dog_strong" then
-		  return {252,158,66}
-	end
-	return table.foreach(color_by_sect, function(k,v) if string.find(section,k) then return v end end ) or {255,255,0}
-end
-
--- можно ли отображать объект с секцией section
-function dot:show_by_sect(section)
-	return table.foreach(need_show_by_sect,function(k,v) if string.find(section,k) then return true end end ) or false
-end
-
--- объект прошивки = инфопоршен
-local firmware_item =
-{
-    ["firmware_dog"] 			= "bioradar_dog",
-    ["firmware_psevdodog"] 		= "bioradar_psevdodog",
-    ["firmware_flesh"] 			= "bioradar_flesh",
-    ["firmware_boar"] 			= "bioradar_boar",
-    ["firmware_tushkano"] 		= "bioradar_tushkano",
-    ["firmware_krovosos"] 		= "bioradar_krovosos",
-    ["firmware_burer"] 			= "bioradar_burer",
-    ["firmware_zombie"] 		= "bioradar_zombie",
-    ["firmware_snork"] 			= "bioradar_snork",
-    ["firmware_kontroler"] 		= "bioradar_kontroler",
-    ["firmware_poltergeist"] 	= "bioradar_poltergeist",
-    ["firmware_psevdogigant"] 	= "bioradar_psevdogigant",
-    ["firmware_cat"] 			= "bioradar_cat",
-    ["firmware_chimera"] 		= "bioradar_chimera",
-	["firmware_stalker"] 		= "bioradar_stalker",
-}
-
-local firmware = {
--- инфопоршен прошивки = { шаблоны для поиска в секции монстра}
-	["bioradar_dog"] 		= {"dog_weak","dog_normal","dog_strong"},
-	["bioradar_krovosos"] 	= {"krovosos","bloodsucker"},
-	["bioradar_psevdodog"] 	= {"dodog","psy_dog"},
-	["bioradar_tushkano"] 	= {"tushkano"},
-	["bioradar_flesh"] 		= {"flesh"},
-	["bioradar_cat"] 		= {"cat"},
-	["bioradar_burer"]		= {"burer"},
-	["bioradar_snork"]		= {"snork"},
-	["bioradar_kontroler"]	= {"controller"},
-	["bioradar_psevdogigant"]= {"gigant", "giant"},
-	["bioradar_poltergeist"]	= {"poltergeist"},
-	["bioradar_chimera"]	= {"chimera"},
-	["bioradar_boar"]			= {"boar"},
-	["bioradar_zombie"]		= {"zombie","izlom","fracture"},
-	["bioradar_stalker"]		= {"stalker","stalker_trader","stalker_diehard","bandit","quest_stalker","kulg_band","kulg_band_2","iskatel","gunsmith", "guider"}
-	}
-
-function on_use_item(obj)
-	--if obj == nil or alife():object(obj:id()) == nil then return end
-    local portion = firmware_item[obj:section()]
-    if portion ~= nil and not has_alife_info(portion) then
-        db.actor:give_info_portion(portion)
-		return true
-    end
-end
-
--- убирает радар с экрана
-function bioradar_hide()
-	if get_hud():GetCustomStatic("biomap") then
-		dots = {}
-		get_hud():RemoveCustomStatic("biomap")
-		if biomap_sweep_enabled then
-			get_hud():RemoveCustomStatic("biomap_sweep")
-			biomap_sweep = nil
-		end
-	end
-end
-
--- проверяет наличие прошивок ПО
--- и определяет список секций (точнее их шаблонов) для объектов, для которых доступно отображение точек
-function check_monster_parts_on_belt()
-	need_show_by_sect = {}
-	local bio_belt = nil
-	local bio_in_slot = db.actor:item_in_slot(12)
-    if bio_in_slot then
-        bio_belt = bio_in_slot:section()
-    end	
-	if bio_belt then
-		for soft,tt in pairs(firmware)do
-			if has_alife_info(soft) then
-				for _,m_sect in pairs(tt) do
-					need_show_by_sect[m_sect] = true
-				end
-			end
-		end
-	end
-end
 
 local old_angle = 0
--- вызывается из update биндера актора
--- обновление положения точек и/или волны
+-- РІС‹Р·С‹РІР°РµС‚СЃСЏ РёР· update Р±РёРЅРґРµСЂР° Р°РєС‚РѕСЂР°
+-- РѕР±РЅРѕРІР»РµРЅРёРµ РїРѕР»РѕР¶РµРЅРёСЏ С‚РѕС‡РµРє Рё/РёР»Рё РІРѕР»РЅС‹
 function update()
-
-	local bio_belt = nil
-	local bio_in_slot = db.actor:item_in_slot(12)
-    if bio_in_slot then
-        bio_belt = bio_in_slot:section()
-    end
-
-	if not (bio_belt and bio_belt == "bioradar") then bioradar_hide() return end
-	
-	for k,v in pairs(bio_marked)do
-		if not has_alife_info(k) then
-			db.actor:give_info_portion(k)
-		end
-	end	
-	
-	check_monster_parts_on_belt()
-	
-	-- скорректируем ширину под ш\ф
-	koef_x = (device().height/device().width) / (768/1024)
+	-- СЃРєРѕСЂСЂРµРєС‚РёСЂСѓРµРј С€РёСЂРёРЅСѓ РїРѕРґ С€\С„
+	local dev = device()
+	local hud = get_hud()
+	koef_x = (dev.height/dev.width) / (768/1024)
 	if koef_x ~= koef_x_old then
 		koef_x_old = koef_x
-		get_hud():RemoveCustomStatic("biomap")
-		get_hud():RemoveCustomStatic("biomap_sweep")
-		dots={}
+		hud:RemoveCustomStatic("biomap")
+		--if biomap_sweep_enabled then
+		--	hud:RemoveCustomStatic("biomap_sweep")
+		--	biomap_sweep = nil
+		--end
+		dots = {}
 	end
-	-- log1("BIOMAP INIT KOEFF: "..koef_x)
-	if not get_hud():GetCustomStatic("biomap") then
 
-		if biomap_sweep_enabled then
-			biomap_sweep = get_hud():AddCustomStatic("biomap_sweep"):wnd()
-			biomap_sweep:Init(1024 - 2 - (biomap_width + biomap_sweep_width)*koef_x/2,-2 + (biomap_width - biomap_sweep_width)/2,biomap_sweep_width*koef_x,biomap_sweep_width)
-			-- log1("BIOSWEEP INIT: "..tostring(1024 - 2 - (biomap_width + biomap_sweep_width)*koef_x/2)..","..tostring(-2 + (biomap_width - biomap_sweep_width)/2)..","..tostring(biomap_sweep_width*koef_x)..","..tostring(biomap_sweep_width))
-		end
-		
-		local biomap_static = get_hud():AddCustomStatic("biomap"):wnd()
+	if not hud:GetCustomStatic("biomap") then
+		--if biomap_sweep_enabled then
+		--	biomap_sweep = hud:AddCustomStatic("biomap_sweep"):wnd()
+		--	biomap_sweep:Init(1024 - 2 - (biomap_width + biomap_sweep_width)*koef_x/2,-2 + (biomap_width - biomap_sweep_width)/2,biomap_sweep_width*koef_x,biomap_sweep_width)
+		--end
+		local biomap_static = hud:AddCustomStatic("biomap"):wnd()
 		biomap_static:SetWndPos(1024 - biomap_width*koef_x,0)
 		biomap_static:SetWidth(biomap_width*koef_x)
 	end
-	
-	local actor_pos = db.actor:position()
-	local sim = alife()
-	local sdir = device().cam_dir
-	a = math_atan2(-sdir.x,sdir.z)
-	s,c = ms(a),mc(a)
-	
-	if biomap_sweep_enabled or fading then
-		angle = angle - step_angle
-		if angle < -lim_angle then angle = angle + lim_angle end
-	end
-	
-	if biomap_sweep_enabled then
-		biomap_sweep:SetHeading(angle) -- поворачиваем статик
-		if ((-1*angle) - (-1*old_angle)) > 6 and sound_enabled and not snd_update:playing() then
-			old_angle = angle
-			snd_update.volume = 0.3
-			snd_update:play_at_pos (db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
-		end		
-		if koef_x < 1 then -- коррекция волны на ш/ф
-			local delta = ms(angle)
-			delta = biomap_sweep_width*(koef_x-1)*delta*delta
-			local delta_x = biomap_sweep_width*koef_x*(1/koef_x)
-			local delta_y = biomap_sweep_width*(1/koef_x)
-			biomap_sweep:Init(1024 - 2 - biomap_width*koef_x/2 - delta_x/2,-1 + biomap_width/2 - delta_y/2,delta_x,delta_y)
-			-- log1("BIOSWEEP INIT HF: "..tostring(1024 - 2 - biomap_width*koef_x/2 - delta_x/2)..","..tostring(-1 + biomap_width/2 - delta_y/2)..","..tostring(delta_x)..","..tostring(delta_y))
+
+	local sdir = dev.cam_dir
+	a = math.atan2(-sdir.x,sdir.z)
+	s,c = math.sin(a), math.cos(a)
+
+	--if biomap_sweep_enabled then
+	--	angle = angle - step_angle
+	--	if angle < -lim_angle then angle = angle + lim_angle end
+	--end
+
+	--if biomap_sweep_enabled then
+	--	biomap_sweep:SetHeading(angle) -- РїРѕРІРѕСЂР°С‡РёРІР°РµРј СЃС‚Р°С‚РёРє
+	--	if sound_enabled and not snd_update:playing() and ((-1*angle) - (-1*old_angle)) > 6 then
+	--		old_angle = angle
+	--		snd_update.volume = 0.3
+	--		snd_update:play_at_pos(db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
+	--	end		
+	--	if koef_x < 1 then -- РєРѕСЂСЂРµРєС†РёСЏ РІРѕР»РЅС‹ РЅР° С€/С„
+	--		local delta = math.sin(angle)
+	--		delta = biomap_sweep_width*(koef_x-1)*delta*delta
+	--		local delta_x = biomap_sweep_width*koef_x*(1/koef_x)
+	--		local delta_y = biomap_sweep_width*(1/koef_x)
+	--		biomap_sweep:Init(1024 - 2 - biomap_width*koef_x/2 - delta_x/2,-1 + biomap_width/2 - delta_y/2,delta_x,delta_y)
+	--	end
+	--end
+
+	--if biomap_sweep_enabled then
+	--	xa = - math.fmod(angle*(180 / math.pi),360)
+	--end
+
+	local visible_objects = {}
+	for id, v in pairs(db.creature) do
+		local o = level.object_by_id(id)
+		if o then
+			local clsid = o:clsid()
+			local color = need_show_by_sect[clsid] --Р•СЃР»Рё РІ С‚Р°Р±Р»РёС†Рµ РµСЃС‚СЊ С†РІРµС‚ РґР»СЏ СЌС‚РѕРіРѕ РєР»Р°СЃСЃР° - РјРѕР¶РЅРѕ РїРѕРєР°Р·Р°С‚СЊ РѕР±СЉРµРєС‚ РЅР° Р±РёРѕСЂР°РґР°СЂРµ.
+			if dots[id] or color then
+				local d = dots[id] or dot(o, clsid, color)
+				visible_objects[id] = true
+				d:draw(o:position():sub(db.actor:position()), o:alive())
+			end
 		end
 	end
-
-	if fading then
-		xa = - math.fmod(angle*(180 / math.pi),360)
-	end
-	
-	for id,obj in pairs(db.storage) do
-		local so = sim:object(id)
-		if so then
-			local o = level_object_by_id(id)
-			if o then
-				local d = dots[id] or dot(o,is_stalker)
-				if d.need_show then
-					d:draw(o:position():sub(actor_pos),o:alive())
-				else
-					d:hide()
-				end
-			elseif dots[id] then
-				dots[id]:hide()
-			end
-		elseif dots[id] then
+	for id, dot in pairs(dots) do
+		if not visible_objects[id] then
+			--log3("~~[%s] hide dot for object with id: [%s]", script_name(), id)
 			dots[id]:hide()
 			dots[id] = nil
 		end
 	end
-	
+end
+
+function bioradar_hide() --РЈР±РёСЂР°РµС‚ СЂР°РґР°СЂ СЃ СЌРєСЂР°РЅР°
+	local hud = get_hud()
+	if hud:GetCustomStatic("biomap") then
+		dots = {}
+		hud:RemoveCustomStatic("biomap")
+		--if biomap_sweep_enabled then
+		--	hud:RemoveCustomStatic("biomap_sweep")
+		--	biomap_sweep = nil
+		--end
+	end
 end
