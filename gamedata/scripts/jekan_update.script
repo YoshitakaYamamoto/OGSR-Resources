@@ -3,8 +3,10 @@
 
 function attach(sm)
 	sm:subscribe({ signal = "on_use",			fun = this.on_use_item })
-	sm:subscribe({ signal = "on_update",		fun = this.upd_strange_zone_effects })
-	sm:subscribe({ signal = "on_update",		fun = this.thunderbird_visual_effect, queued = true })
+	sm:subscribe({ signal = "on_item_to_belt",	fun = this.on_thunderbird_to_belt })
+	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.on_thunderbird_to_ruck })
+	sm:subscribe({ signal = "on_drop",			fun = this.on_thunderbird_to_ruck })
+	sm:subscribe({ signal = "on_first_update",	fun = this.check_subscribe_strange_zone_effects })
 	sm:subscribe({ signal = "on_take",			fun = this.fake_arts_delete })
 	sm:subscribe({ signal = "on_take",			fun = this.cheburashka_greeting })
 	sm:subscribe({ signal = "on_take",			fun = this.dolg_zahvat })
@@ -639,45 +641,105 @@ function non_item_take(obj, who)
 end
 
 -- Артефакт Погодник -------------------------------------------------------------------------------
+local thunderbird_subscribed
+
+function thunderbird_subscribe()
+	if not thunderbird_subscribed then
+		thunderbird_subscribed = { signal = "on_update", fun = this.thunderbird_visual_effect }
+		ogse_signals.get_mgr():subscribe( thunderbird_subscribed )
+		log3("--[%s] thunderbird subscribed!", script_name())
+	end
+end
+
+function thunderbird_unsubscribe()
+	if thunderbird_subscribed then
+		ogse_signals.get_mgr():unsubscribe( thunderbird_subscribed )
+		thunderbird_subscribed = nil
+		log3("~~[%s] thunderbird UNsubscribed!", script_name())
+	end
+end
+
+function on_thunderbird_to_belt(obj)
+	if obj:section() == "af_thunderbird" then
+		thunderbird_subscribe()
+	end
+end
+
+function on_thunderbird_to_ruck(obj)
+	if obj:section() == "af_thunderbird" then
+		get_hud():RemoveCustomStatic("blow")
+		thunderbird_unsubscribe()
+	end
+end
 
 function thunderbird_visual_effect()
-	if not inventory.belt["af_thunderbird"] then return end
-
 	local hud = get_hud()
-	if db.actor then
-		local next_time = ogse_weather_mgr.get_surge_time()
-		local need_show_static = next_time < 2
-		if need_show_static then
-			hud:AddCustomStatic("blow", true)
-			local cs = hud:GetCustomStatic("blow"):wnd()
-			if cs then
-				if next_time < 2 and next_time >= 1 then
-					cs:SetText(game.translate_string("thunderbird_2h"))	
-				elseif next_time < 1 and next_time >= 0.5 then
-					cs:SetText(game.translate_string("thunderbird_1h"))	
-				elseif db.actor:dont_has_info("pre_blowout") then
-					cs:SetText(game.translate_string("thunderbird_halfh"))
-				else	
-					cs:SetText(game.translate_string("thunderbird_now"))
-				end
-				-- cs:SetText("До следующего выброса "..string.format("%4.2f",tostring(next_time)).." ч.")			
-			end
-		else
-			hud:RemoveCustomStatic("blow")
-		end
+	local sm = ogse_signals.get_mgr()
+	local next_time = ogse_weather_mgr.get_surge_time()
+	local cs = hud:GetCustomStatic("blow")
+	if not cs then
+		cs = hud:AddCustomStatic("blow", true)
+	end
+	cs = cs:wnd()
+
+	if next_time > 1 then
+		cs:SetText("До следующего выброса: "..math.floor(next_time).." ч.")
+		sm:reschedule( 60000 / ogse.game_time_factor )
+	elseif next_time >= 0.5 then
+		cs:SetText(game.translate_string("thunderbird_1h"))	
+		sm:reschedule( 60000 / ogse.game_time_factor )
+	elseif db.actor:dont_has_info("pre_blowout") then
+		cs:SetText(game.translate_string("thunderbird_halfh"))
+		sm:reschedule( math.random(1000, 2000) )
+	else	
+		cs:SetText(game.translate_string("thunderbird_now"))
+		sm:reschedule( math.random(1000, 2000) )
 	end
 end
 
 -- Ржавчина ----------------------------------------------------------------------------------------
-function upd_strange_zone_effects()
-	ogse_signals.get_mgr():reschedule(1000)
+function check_subscribe_strange_zone_effects()
+	for n = 1, 7 do
+		local zone = db.zone_by_name["strange_zone"..n]
+		if zone then
+			log3("--[%s.check_subscribe_strange_zone_effects] found zone [%s]. Subscribe!", script_name(), "strange_zone"..n)
+			ogse_signals.get_mgr():subscribe({ signal = "on_update", fun = this.upd_strange_zone_effects })
+			return
+		end
+	end
+end
 
-	if in_strange_zone() then
+function upd_strange_zone_effects()
+	local sm = ogse_signals.get_mgr()
+	local actor_in_strange_zone
+	local dist
+	for n = 1, 7 do
+		local zone = db.zone_by_name["strange_zone"..n]
+		if zone then
+			local actor_pos = db.actor:position()
+			local dist_new = zone:position():distance_to( actor_pos )
+			dist = ( (not dist) or (dist_new < dist) ) and dist_new or dist
+			actor_in_strange_zone = zone:inside(actor_pos)
+		end
+	end
+	if not dist then
+		log3("!![%s.upd_strange_zone_effects] ERROR!!! Zone not found!!!!", script_name())
+		sm:reschedule( 60000 )
+		return
+	end
+	if actor_in_strange_zone then
 		strange_zone_actor_particle()
 		rustyfield_effect1()
 		rustyfield_effect2()
 		rustyfield_effect3()
+		sm:reschedule( 1000 )
+		return
 	end
+	sm:reschedule(
+		( dist < 25 and 1000 )
+		or ( dist < 50 and math.random(3000, 4000) )
+		or math.random( 7000, 10000 )
+	)
 end
 
 function rustyfield_effect1()
@@ -717,13 +779,6 @@ function wpn_hit(wpn)
 	h.type = hit.explosion
 
 	wpn:hit(h)
-end
-
-function in_strange_zone()
-	return xr_conditions.actor_in_zone(nil,nil,{"strange_zone1"}) or xr_conditions.actor_in_zone(nil,nil,{"strange_zone2"}) or 
-		xr_conditions.actor_in_zone(nil,nil,{"strange_zone3"}) or xr_conditions.actor_in_zone(nil,nil,{"strange_zone4"}) or 
-		xr_conditions.actor_in_zone(nil,nil,{"strange_zone5"}) or xr_conditions.actor_in_zone(nil,nil,{"strange_zone6"}) or 
-		xr_conditions.actor_in_zone(nil,nil,{"strange_zone7"})
 end
 
 -- периодическое срабатывание странных аномалий
