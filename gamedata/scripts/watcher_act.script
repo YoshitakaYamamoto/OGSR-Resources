@@ -599,10 +599,18 @@ function ev_see_stuff:evaluate()
 	end
 	local res = getGObject(self.st) ~= nil
 	local npc = self.object
+--[=[-- Krodin: отключено по совету Naxac'a:
+		По зависающим неписям - я тут методом тыка выявил, что очень часто в этом виноват вызов
+		xr_logic.try_switch_to_another_section из watcher_act - некоторые неписи при переключении логики через неё виснут наглухо,
+		помогает только перезагрузка. По идее, его там быть не должно, это же постоянно работающая схема.
+		Но это такой соляночный костыль для принудительного переключения логики на случай несрабатывания этого же вызова из схемы -
+		например, того же Круглова вылечивает от зависов. У меня в Припяти постоянно "волкеры" из-за этого костыля висли.
+
 	local actsch = db.storage[npc:id()].active_scheme
 	if actsch and db.actor then
 		xr_logic.try_switch_to_another_section(npc, db.storage[npc:id()][actsch], db.actor)
 	end
+--]=]
 	local act_sec = db.storage[npc:id()].active_section or ""
 	if bad_situation(npc) then
 		if res then
