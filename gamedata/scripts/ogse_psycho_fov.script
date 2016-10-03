@@ -1,8 +1,46 @@
 --- психованный фов
 
-function attach(sm) -- для менеджера сигналов
-	sm:subscribe({signal = "on_update", fun = this.on_actor_update})
+function attach(sm)
+	sm:subscribe({signal = "on_first_update", fun = this.on_first_update})
 end
+
+function on_first_update()
+	if has_alife_info("fov_play_start") then
+		subscribe()
+	end
+end
+
+local sm = ogse_signals.get_mgr()
+local subscribed
+
+function subscribe()
+	if not subscribed then
+		subscribed = {signal = "on_update", fun = this.on_actor_update}
+		sm:subscribe( subscribed )
+		log3("--[%s] subscribed!", script_name())
+		level.add_cam_effector("camera_effects\\drunk.anm", 7447, true, "")
+	end
+end
+
+function unsubscribe()
+	if subscribed then
+		sm:unsubscribe( subscribed )
+		subscribed = nil
+		log3("~~[%s] UNsubscribed!", script_name())
+		level.remove_cam_effector(7447)
+	end
+end
+
+
+function fov_start()
+	db.actor:give_info_portion("fov_play_start")
+	subscribe()
+end
+
+function fov_end()
+	db.actor:give_info_portion("fov_play_end")
+end
+
 
 local fov_vol = sys_ini:r_s32("options","fov_volume")
 local max_alarm_fov_vol = 90
@@ -43,6 +81,7 @@ function on_actor_update()
 		end
 		play_sounds()
 	else
+		unsubscribe() --отписываемся от менеджера сигналов
 		if up_or_down ~= nil then
 			local current_fov = db.actor:get_camera_fov()
 			if current_fov < fov_vol then
@@ -58,45 +97,16 @@ function on_actor_update()
 	end
 end
 
-function fov_start()
-	db.actor:give_info_portion("fov_play_start")
-	level.add_cam_effector("camera_effects\\drunk.anm", 7447, true, "")
-end
-
-function fov_end()
-	db.actor:give_info_portion("fov_play_end")
-	level.remove_cam_effector(7447)
-end
-
 function play_sounds()
 	sound_obj_right.volume = 0.8
 	sound_obj_left.volume = 0.8
 
 	if not sound_obj_left:playing() then 
-		local i=math.random(1,4)
-		if i==1 then 
-			sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
-		elseif i==2 then
-			sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror2]])
-		elseif i==3 then
-			sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror3]])
-		elseif i==4 then
-			sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror4]])
-		end
-		sound_obj_left:play_at_pos (db.actor, vector():set(1, 0, 1), 0, sound_object.s2d) 
+		sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror]]..math.random(4))
+		sound_obj_left:play_at_pos(db.actor, vector():set(1, 0, 1), 0, sound_object.s2d) 
 	end
-
 	if not sound_obj_right:playing() then 
-		local j=math.random(1,4)
-		if j==1 then 
-			sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
-		elseif j==2 then
-			sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror2]])
-		elseif j==3 then
-			sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror3]])
-		elseif j==4 then
-			sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror4]])
-		end
-		sound_obj_right:play_at_pos (db.actor, vector():set(-1, 0, 1), 0, sound_object.s2d) 
+		sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror]]..math.random(4))
+		sound_obj_right:play_at_pos(db.actor, vector():set(-1, 0, 1), 0, sound_object.s2d) 
 	end
 end
