@@ -647,7 +647,7 @@ function thunderbird_subscribe()
 	if not thunderbird_subscribed then
 		thunderbird_subscribed = { signal = "on_update", fun = this.thunderbird_visual_effect }
 		ogse_signals.get_mgr():subscribe( thunderbird_subscribed )
-		log3("--[%s] thunderbird subscribed!", script_name())
+		--log3("--[%s] thunderbird subscribed!", script_name())
 	end
 end
 
@@ -655,7 +655,7 @@ function thunderbird_unsubscribe()
 	if thunderbird_subscribed then
 		ogse_signals.get_mgr():unsubscribe( thunderbird_subscribed )
 		thunderbird_subscribed = nil
-		log3("~~[%s] thunderbird UNsubscribed!", script_name())
+		--log3("~~[%s] thunderbird UNsubscribed!", script_name())
 	end
 end
 
@@ -702,7 +702,7 @@ function check_subscribe_strange_zone_effects()
 	for n = 1, 7 do
 		local zone = db.zone_by_name["strange_zone"..n]
 		if zone then
-			log3("--[%s.check_subscribe_strange_zone_effects] found zone [%s]. Subscribe!", script_name(), "strange_zone"..n)
+			--log3("--[%s.check_subscribe_strange_zone_effects] found zone [%s]. Subscribe!", script_name(), "strange_zone"..n)
 			ogse_signals.get_mgr():subscribe({ signal = "on_update", fun = this.upd_strange_zone_effects })
 			return
 		end

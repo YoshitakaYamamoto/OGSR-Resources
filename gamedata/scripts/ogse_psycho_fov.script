@@ -17,7 +17,7 @@ function subscribe()
 	if not subscribed then
 		subscribed = {signal = "on_update", fun = this.on_actor_update}
 		sm:subscribe( subscribed )
-		log3("--[%s] subscribed!", script_name())
+		--log3("--[%s] subscribed!", script_name())
 		level.add_cam_effector("camera_effects\\drunk.anm", 7447, true, "")
 	end
 end
@@ -26,7 +26,7 @@ function unsubscribe()
 	if subscribed then
 		sm:unsubscribe( subscribed )
 		subscribed = nil
-		log3("~~[%s] UNsubscribed!", script_name())
+		--log3("~~[%s] UNsubscribed!", script_name())
 		level.remove_cam_effector(7447)
 	end
 end

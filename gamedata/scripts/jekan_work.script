@@ -4821,7 +4821,7 @@ function house_items_subscribe()
 	if not house_items_subscribed then
 		house_items_subscribed = {signal = "on_update", fun = this.check_bind_avail_six_anom_house_items, queued = true}
 		ogse_signals.get_mgr():subscribe( house_items_subscribed )
-		log3("--[%s] house_items subscribed!", script_name())
+		--log3("--[%s] house_items subscribed!", script_name())
 	end
 end
 
@@ -4829,7 +4829,7 @@ function house_items_unsubscribe()
 	if house_items_subscribed then
 		ogse_signals.get_mgr():unsubscribe( house_items_subscribed )
 		house_items_subscribed = nil
-		log3("~~[%s] house_items UNsubscribed!", script_name())
+		--log3("~~[%s] house_items UNsubscribed!", script_name())
 	end
 end
 
