@@ -171,13 +171,13 @@ local backup_restrictions_out = {}
 local backup_restrictions_in = {}
 
 function process_restrictions(npc)
-	local name = npc:name()
-	local profile = npc:profile_name()
-	
 	if restrictions_off then
 		return
-	end	
-	
+	end
+
+	local name = npc:name()
+	local profile = npc:profile_name()
+
 	local restr_out = npc:out_restrictions()
 	local restr_in = npc:in_restrictions()
 	

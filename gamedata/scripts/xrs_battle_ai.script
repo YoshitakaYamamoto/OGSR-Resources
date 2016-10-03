@@ -3881,12 +3881,12 @@ function correct_position(gi,npc)
 end
 
 function process_restrictions(npc)
-	local name = npc:name()
-	local profile = npc:profile_name()
-	
 	if restrictions_off then
 		return
 	end
+
+	local name = npc:name()
+	local profile = npc:profile_name()
 	
 	if string.find(name, "sniper") or string.find(profile, "sniper")
 	or string.find(name, "watch") or string.find(profile, "watch")
@@ -3935,12 +3935,12 @@ end
 
 function restore_restrictions(npc)
 
-	local name = npc:name()
-	local profile = npc:profile_name()
-	
 	if restrictions_off then
 		return
-	end	
+	end
+
+	local name = npc:name()
+	local profile = npc:profile_name()
 
 	if string.find(name, "sniper") or string.find(profile, "sniper")
 	or string.find(name, "watch") or string.find(profile, "watch")

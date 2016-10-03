@@ -9,6 +9,10 @@
 local monsters_too = false --Включить монстрам обход аномалий?
 local freq = 1000 --Как часто выполнять апдейт обхода аномалий (в мс)
 
+added_restrictions = {}
+last_position      = {}
+
+
 local excluded_npc = { --Запретные профили/имена/story_id
 	["bar_ecolog_professor"] = true,
 	["dik_the_drifter"] = true,
@@ -64,9 +68,6 @@ function can_evade(npc)
   end
   return true
 end
-
-local added_restrictions = {}
-local last_position      = {}
 
 function on_after_blowout()
   last_position = {}

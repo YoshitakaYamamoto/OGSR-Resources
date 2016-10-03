@@ -1380,8 +1380,6 @@ function action_companion_activity:initialize()
 	
 	if being_attacked == true then return false end	
 	
-	--log1("[XR COMPANION.INITIALIZE] REMOVING ALL RESTRICTIONS FOR "..self.object:name())
-	--self.object:remove_all_restrictions()
 	self.object:enable_talk()	
 	assist_point[self.object:id()] = nil
 
@@ -1683,8 +1681,6 @@ function enable_scheme(npc, ini)
 
 	if st then
 		if tostring(flag) == "1" then
-			--log1("[XR COMPANION.ENABLE_SCHEME] REMOVING ALL RESTRICTIONS FOR "..npc:name())
-			--npc:remove_all_restrictions()
 			companions[npc:id()] = true --"companion"
 			subscribe(npc:id())
 			--log3("--[%s.enable_scheme] subscribed: [%s]", script_name(), npc:name())
