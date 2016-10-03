@@ -7,8 +7,10 @@ function attach(sm)
 	sm:subscribe({ signal = "on_storyline_start", fun = this.spawn_black_dealer })
 	sm:subscribe({ signal = "on_storyline_start", fun = this.scape_doors_start })
 	sm:subscribe({ signal = "on_spawn",			fun = this.dar_stalker_explorer_spawn })
-	sm:subscribe({ signal = "on_update",		fun = this.check_gorkom_books, queued = true })
-	sm:subscribe({ signal = "on_update",		fun = this.play_digger_motor_sound, queued = true })
+------Квест с мотором в подземке Агропрома-----
+	sm:subscribe({ signal = "on_spawn",			fun = this.check_subscribe_motor_on_spawn })
+---------Квест с сейфом в горкоме в МГ---------
+	sm:subscribe({ signal = "on_first_update",	fun = this.check_gorkom_books_on_first_upd })
 -------------------Квест с БТР-----------------
 	sm:subscribe({ signal = "on_sit_down_in_btr", fun = this.set_btr_fuel_empty })
 	sm:subscribe({ signal = "on_sit_down_in_btr", fun = this.set_btr_nonworking })
@@ -683,22 +685,33 @@ function this_is_the_end()
 end
 
 function set_complete_tasks()
-	if not has_alife_info("freeplay") and level.name()=="l13_generators_ogse" then
-	
+	if not has_alife_info("freeplay") and level.name() == "l13_generators_ogse" then
+
 		ogse_quests.turn_pnv_off()
 		level.add_pp_effector("blink.ppe", 99, false)			
-	
+
 		local point = patrol("gen_actor_wakeup_walk")
 		local look = patrol("gen_actor_wakeup_look")
 		db.actor:set_actor_position(point:point(0))
 		local dir = look:point(0):sub(point:point(0))
 		db.actor:set_actor_direction(-dir:getH())	
-	
-		db.actor:iterate_inventory(del_q_items,db.actor)
+
+		local del_items_tbl = {
+			["gunslinger_flash"] = true,
+			["decoder"] = true,
+			["pri_decoder_documents"] = true,
+		}
+		db.actor:iterate_inventory(function(npc, item)
+			if del_items_tbl[item:section()] then
+				ogse.remove_item_from_inventory(item, npc)
+			end
+		end)
+
 		db.actor:give_info_portion("freeplay")
 		db.actor:disable_info_portion("game_end")
 		db.gameover_credits_started = false
-		
+
+--[=[ --KRodin: вот тут, мне кажется, надо проверять как минимум группировку, а не имя профиля + сносить все респавнеры монолитовцев. Или вообще не делать ничего.
 		for k, v in pairs(db.creature) do
 			local npc = level.object_by_id(k)
 			if v == true and npc and npc:alive() and IsStalker(npc) then
@@ -708,21 +721,8 @@ function set_complete_tasks()
 				end
 			end
 		end
-
+--]=]
 		ogse.start_timer("fpl", 1)
-	end
-end
-
-function del_q_items(npc, item)
-	if item==nil or alife():object(item:id())==nil then return end
-	local section = item:section()
-	if section=="gunslinger_flash" or 
-		section=="decoder" or
-		section=="pri_decoder_documents" then
-			local q_item = alife():object(item:id())
-			if q_item then
-				alife():release(q_item, true)
-			end
 	end
 end
 
@@ -843,8 +843,16 @@ local motor_pos = vector():set(-114.72, -14.46, -40.84) -- сюда позицию мотора
 local start_particle = "anomaly2\\emi_damage_big_electra"
 local dust_particle = "nc\\fog_base"
 
+function check_subscribe_motor_on_spawn()
+	if level.name() == "l03u_agr_underground" and has_alife_info("diggers_pda_info") then
+		--log3("--[%s] Motor subscribed!", script_name())
+		ogse_signals.get_mgr():subscribe({ signal = "on_update", fun = this.play_digger_motor_sound })
+	end
+end
+
 function play_digger_motor_sound()
-	if level.name() == "l03u_agr_underground" and db.actor:has_info("diggers_pda_info") then
+	--if level.name() == "l03u_agr_underground" and db.actor:has_info("diggers_pda_info") then
+		ogse_signals.get_mgr():reschedule( math.random(1000, 1500) )
 		local hasanom,anomid,pos,cls,dist,radius,sect = ogse_anomaly.get_nearest_anomaly_by_point(motor_pos)
 		if hasanom and dist < 2 and string.find(sect, "zone_witches_galantine") then
 			if not db.actor:has_info("diggers_motor") then 
@@ -864,7 +872,7 @@ function play_digger_motor_sound()
 				motor_idle:play_at_pos (db.actor, motor_pos, 0, sound_object.s3d + sound_object.looped)
 			end		
 		end
-	end
+	--end
 end
 
 function spawn_motor_reward()
@@ -926,8 +934,36 @@ local books = {
 	["lenin_book_5"] = 5,
 }
 
+
+---------------------------------------------------------------------------------------
+local gorkom_books_subscribed
+
+function gorkom_books_subscribe()
+	if not gorkom_books_subscribed then
+		gorkom_books_subscribed = {signal = "on_update", fun = this.check_gorkom_books}
+		ogse_signals.get_mgr():subscribe( gorkom_books_subscribed )
+		--log3("--[%s] gorkom_books subscribed!", script_name())
+	end
+end
+
+function gorkom_books_unsubscribe()
+	if gorkom_books_subscribed then
+		ogse_signals.get_mgr():unsubscribe( gorkom_books_subscribed )
+		gorkom_books_subscribed = nil
+		--log3("~~[%s] gorkom_books UNsubscribed!", script_name())
+	end
+end
+
+function check_gorkom_books_on_first_upd()
+	if level.name() ~= "l09_deadcity_ogse" then return end
+
+	if has_alife_info("kpss_quest_begin") and not has_alife_info("kpss_freetogo") then
+		gorkom_books_subscribe()
+	end
+end
+
 function check_gorkom_books()
-	if not db.actor:has_info("kpss_quest_begin") then return end
+	--if not db.actor:has_info("kpss_quest_begin") then return end
 
 	local safe = level_object_by_sid(story_ids.gorkom_safe)
 	local monster = level_object_by_sid(story_ids.gorkom_librarian)
@@ -944,7 +980,10 @@ function check_gorkom_books()
 		end
 		if weight_count == 15 and not db.actor:has_info("ui_car_body") then
 			local se_obj = alife():object(safe:id())
+
 			db.actor:give_info_portion("kpss_freetogo")
+			gorkom_books_unsubscribe()
+
 			local fx_particle = "anomaly2\\teleport_out"
 			local pos = safe:position()
 			local snd = xr_sound.get_safe_sound_object([[anomaly\teleport_work_2]])
@@ -959,8 +998,16 @@ function check_gorkom_books()
 				checker_minefield.add_to_delete(monster:id())
 			end			
 		end
+		local dist = safe:position():distance_to( db.actor:position() )
+		ogse_signals.get_mgr():reschedule(
+			( dist < 15 and math.random(900, 1100) )
+			or ( dist < 25 and math.random(2000, 3000) )
+			or math.random( 5000, 7000 )
+		)
 	end
 end
+------------------------------------------------------------------------------------------
+
 
 local needed_infos = nil
 local info_1_notice, info_2_notice = nil, nil
