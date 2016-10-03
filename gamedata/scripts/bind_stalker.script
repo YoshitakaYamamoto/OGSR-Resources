@@ -34,6 +34,10 @@ function actor_binder:net_spawn(data)
 	ogse_debug.process_actor("a_spw", 4)
 	db.add_actor(self.object)
 
+	if not db.storage[self.object:id()].pstor then	--KRodin: из xr_logic почему-то не срабатывает, поэтому создаём pstor здесь.
+		db.storage[self.object:id()].pstor = {}
+	end
+
 	ogse_debug.process_actor("a_spw", 5)
 	set_extensions_flags(15)
 
@@ -156,7 +160,7 @@ end
 
 function actor_binder:hud_animation_end(a1, blend_addr)
 	local addr = sum_args_ex(blend_addr, 56)
-	local value = db.actor:get_memory_int("", addr)
+	local value = self.object:get_memory_int("", addr)
 end
 
 function actor_binder:on_goodwill_change(from, to)
@@ -338,7 +342,7 @@ function actor_binder:on_item_take(obj)
 	local sobj = alife():object(obj:id())
 	if not sobj then
 		if obj:section() ~= "bolt" then
-			db.actor:drop_item(obj)
+			self.object:drop_item(obj)
 		end
 		ogse_debug.process_actor("itm_t", 0)
 		return
@@ -407,7 +411,6 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:task_callback(_task, _objective, _state)
 	self.am:call("on_task", _task, _objective, _state)
-	--ogse_debug.process_actor("tsk", 0)
 end
 ----------------------------------------------------------------------------------------------------------------------
 local update_was_never_called = true
