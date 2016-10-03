@@ -2,26 +2,29 @@
 -- 03.02.2012 --------------------------------------------------------------------------------------
 
 function attach(sm)
-	sm:subscribe({signal = "on_drop",		fun = this.check_generator})
-	sm:subscribe({signal = "on_update",		fun = this.check_bind_avail_six_anom_house_items, queued = true})
+	sm:subscribe({signal = "on_drop", fun = this.check_generator})
+	--
+	sm:subscribe({signal = "on_first_update", fun = this.check_subscribe_bind_avail_six_anom_house_items})
+	sm:subscribe({signal = "on_info", fun = this.info_check_subscribe_bind_avail_six_anom_house_items})
 end
 
 local spawn_db = ogse_spawn_db.script_spawn_registry.jekan_quests
 
+--[=[
 function cheat_start()
 	local items = { "grenade_light", "matras", "device_torch", "first_neutral_planshet",
 		--"af_resine", "af_sparks", "af_candle", "af_heart", "af_ray", "af_steam", "af_polter", "af_uley",
 		--"af_puzir", "af_doll", "af_jar", "af_bottle", "af_plate", "af_spoon", "afscanner", "af_mincer_meat",
 		--"af_cristall_flower",
 	}
-	local objs = { --"karlik", "vehicle_zaz968",
-	}
+	---local objs = { --"karlik", "vehicle_zaz968",
+	--}
 	for _, section in ipairs(items) do
 		ogse.spawn_item_in_inv(section, db.actor)
 	end
-	for _, section in ipairs(objs) do
-		alife():create(section, db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
-	end
+	--for _, section in ipairs(objs) do
+	--	alife():create(section, db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
+	--end
 -- jekan_work.spawn_human_pervert()
 -- jekan_work.spawn_catgirl()
 -- bind_statpkm.create_stat_pkm_on_actor()
@@ -32,10 +35,11 @@ function cheat_start()
 -- spawn_caravan_loader()
 -- spawn_caravan_guard()
 end
+--]=]
 
 -- То, что должно быть заспавнено в начале игры ----------------------------------------------------
 
-function spawn_on_start()
+function spawn_on_start() --Вызывается из конфигов
 	set_ds_hunter_invulnerable()
 	set_bratstvo_orujeinik_invulnerable()
 	set_bratstvo_vrach_invulnerable()
@@ -4755,51 +4759,43 @@ end
 
 -- 11.07.2014 stb
 function money_give_anom_bolts(first_speaker, second_speaker) 
-local n=check_anom_bolts()
-	dialogs.relocate_money(first_speaker, 1500*n, "in") 
+	dialogs.relocate_money(first_speaker, 1500 * check_anom_bolts(), "in") 
 	re_anom_bolts()
 	db.actor:give_info_portion("bar_anom_bolt_20")
 end
 
 function money_give_anom_bolt(first_speaker, second_speaker) 
-local n=check_anom_bolts()
-	dialogs.relocate_money(first_speaker,  1000*n, "in") 
+	dialogs.relocate_money(first_speaker, 1000 * check_anom_bolts(), "in") 
 	re_anom_bolts()
 	db.actor:disable_info_portion("bar_anom_bolt_over")
 end
 
 function check_20_anom_bolts()
-local n=check_anom_bolts()
-	return n > 19
+	return check_anom_bolts() > 19
 end
 
 function check_avail_anom_bolts()
-local n=check_anom_bolts()
-	return n > 0
+	return check_anom_bolts() > 0
 end
 
 function check_anom_bolts()
-local n = 0
-	if db.actor and (db.actor:object("af_bolt"))  then
-		db.actor:iterate_inventory(function (dummy,item) 
-		local id = item:id()
-		local sobj = alife():object( id )
-		if sobj and sobj:section_name()=="af_bolt" then
-			n= n+ 1
-		end
+	local n = 0
+	if db.actor:object("af_bolt") then
+		db.actor:iterate_inventory(function(dummy, item) 
+			if item:section() == "af_bolt" then
+				n = n + 1
+			end
 		end)
 	end
 	return n
 end
 
 function re_anom_bolts()
-	if db.actor and (db.actor:object("af_bolt")) then
-		db.actor:iterate_inventory(function (dummy,item) 
-		local id = item:id()
-		local sobj = alife():object( id )
-		if sobj and sobj:section_name() =="af_bolt" then
-			ogse.remove_item(item)
-		end
+	if db.actor:object("af_bolt") then
+		db.actor:iterate_inventory(function(dummy, item) 
+			if obj:section() == "af_bolt" then
+				ogse.remove_item(item)
+			end
 		end)
 	end
 end
@@ -4811,7 +4807,7 @@ function spawn_city_house_items()
 end
 
 -- 18.07.2014 stb
-local house_items ={"af_doll", "af_steam", "af_spoon", "af_plate", "af_bottle", "af_jar"}
+local house_items ={["af_doll"] = true, ["af_steam"] = true, ["af_spoon"] = true, ["af_plate"] = true, ["af_bottle"] = true, ["af_jar"] = true}
 
 function money_give_anom_house_items(first_speaker, second_speaker) 
 	dialogs.relocate_money(first_speaker, 30000, "in") 
@@ -4819,59 +4815,84 @@ function money_give_anom_house_items(first_speaker, second_speaker)
 	db.actor:give_info_portion("yan_anom_house_items_complete")
 end
 
+local house_items_subscribed
+
+function house_items_subscribe()
+	if not house_items_subscribed then
+		house_items_subscribed = {signal = "on_update", fun = this.check_bind_avail_six_anom_house_items, queued = true}
+		ogse_signals.get_mgr():subscribe( house_items_subscribed )
+		log3("--[%s] house_items subscribed!", script_name())
+	end
+end
+
+function house_items_unsubscribe()
+	if house_items_subscribed then
+		ogse_signals.get_mgr():unsubscribe( house_items_subscribed )
+		house_items_subscribed = nil
+		log3("~~[%s] house_items UNsubscribed!", script_name())
+	end
+end
+
+function check_subscribe_bind_avail_six_anom_house_items()
+	if has_alife_info("yan_anom_house_items_find") and not has_alife_info("yan_anom_house_items_continue") then
+		house_items_subscribe()
+	end
+end
+
+function info_check_subscribe_bind_avail_six_anom_house_items(npc, info_id)
+	if info_id == "yan_anom_house_items_find" then
+		house_items_subscribe()
+	end
+end
+
 function check_bind_avail_six_anom_house_items()
+	ogse_signals.get_mgr():reschedule(math.random(1500, 2000))
 	if db.actor:dont_has_info("yan_anom_house_items_continue") and check_avail_six_anom_house_items() == true then
 		db.actor:give_info_portion("yan_anom_house_items_continue")
+		house_items_unsubscribe()
 	end
 end
 
 function check_avail_anom_house_items()
-local n=check_anom_house_items()
-	return n > 0
+	return check_anom_house_items() > 0
 end
 
 function check_avail_1to6_anom_house_items()
-local n=check_anom_house_items()
+	local n = check_anom_house_items()
 	return n > 1 and n < 6
 end
 
 function check_avail_six_anom_house_items()
-local n=check_anom_house_items()
-	return n == 6
+	return check_anom_house_items() == 6
 end
 
 function check_anom_house_items()
-if db.actor:dont_has_info("deadcity_first_enter") then return 0 end --до первого входа в МГ проверка не имеет смысла
+	if db.actor:dont_has_info("deadcity_first_enter") then return 0 end --до первого входа в МГ проверка не имеет смысла
 
-local n = 0
-	if db.actor then	db.actor:iterate_inventory(function (dummy,item) 
-		for k, v in pairs(house_items) do
-			local id = item:id()
-			local sobj = alife():object( id )
-			if sobj and sobj:section_name() == v then
-				n= n+ 1
-			end
+	local n = 0
+	db.actor:iterate_inventory(function(dummy, item) 
+		if house_items[item:section()] then
+			n = n + 1
 		end
-		end)
-	end
+	end)
 	return n
 end
 
 function re_anom_house_items()
-	if db.actor then	db.actor:iterate_inventory(function (dummy,item) 
-		for k, v in pairs(house_items) do
-			local id = item:id()
-			local sobj = alife():object( id )		
-			if sobj and sobj:section_name() == v then
-				ogse.remove_item(item)
-			end
+	db.actor:iterate_inventory(function(dummy, item) 
+		if house_items[item:section()] then
+			ogse.remove_item(item)
 		end
-		end)
-	end
+	end)
 end
 
 -- 31.07.2014 stb
-local ammo_boxes ={"box_amm_1", "box_amm_2", "box_amm_3", "box_amm_4"}
+local ammo_boxes = {
+	["box_amm_1"] = "agr_help_krot_ammo_box_find_1",
+	["box_amm_2"] = "agr_help_krot_ammo_box_find_2",
+	["box_amm_3"] = "agr_help_krot_ammo_box_find_3",
+	["box_amm_4"] = "agr_help_krot_ammo_box_find_4"
+}
 
 function krot_ammo_box_st()
 local sobj = alife():story_object(story_ids.agr_krot)
@@ -4891,51 +4912,34 @@ function spawn_ammo_box()
 end
 
 function check_ammo_box()
-local n = 0
-	if db.actor then	db.actor:iterate_inventory(function (dummy,item) 
-		for k, v in pairs(ammo_boxes) do
-			local id = item:id()
-			local sobj = alife():object( id )
-			if sobj and sobj:section_name() == v then
-				n= n+ 1
-			end
+	local n = 0
+	db.actor:iterate_inventory(function(dummy, item) 
+		if ammo_boxes[item:section()] then
+			n = n + 1
 		end
-		end)
-	end
+	end)
 	return n
 end
 
 function check_avail_ammo_box()
-local n=check_ammo_box()
-	return n > 0
+	return check_ammo_box() > 0
 end
 
 function check_remove_ammo_box()
-	if db.actor then	db.actor:iterate_inventory(function (dummy,item) 
-		for k, v in pairs(ammo_boxes) do
-			local id = item:id()
-			local sobj = alife():object( id )		
-			if sobj and sobj:section_name() == v then
-				if v == "box_amm_1" then 
-					db.actor:give_info_portion("agr_help_krot_ammo_box_find_1") 
-				elseif v == "box_amm_2" then
-					db.actor:give_info_portion("agr_help_krot_ammo_box_find_2") 
-				elseif v == "box_amm_3" then
-					db.actor:give_info_portion("agr_help_krot_ammo_box_find_3") 
-				elseif v == "box_amm_4" then
-					db.actor:give_info_portion("agr_help_krot_ammo_box_find_4") 
-				end
-				ogse.remove_item(item)
-				if db.actor:has_info("agr_help_krot_ammo_box_find_1") and 
-					db.actor:has_info("agr_help_krot_ammo_box_find_2") and 
-					db.actor:has_info("agr_help_krot_ammo_box_find_3") and 
-					db.actor:has_info("agr_help_krot_ammo_box_find_4") then
-					db.actor:give_info_portion("agr_help_krot_ammo_box_complete")
-				end
+	db.actor:iterate_inventory(function(dummy, item) 
+		if ammo_boxes[item:section()] then
+			ogse.remove_item(item)
+			db.actor:give_info_portion(ammo_boxes[item:section()]) 
+			if
+				db.actor:has_info("agr_help_krot_ammo_box_find_1")
+				and db.actor:has_info("agr_help_krot_ammo_box_find_2")
+				and db.actor:has_info("agr_help_krot_ammo_box_find_3")
+				and db.actor:has_info("agr_help_krot_ammo_box_find_4")
+			then
+				db.actor:give_info_portion("agr_help_krot_ammo_box_complete")
 			end
 		end
-		end)
-	end
+	end)
 end
 
 function ammo_give_76239(first_speaker, second_speaker)
