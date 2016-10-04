@@ -384,12 +384,11 @@ function use_matras()
 end
 
 function is_af_mopheus_on_belt()
-	for i=0, db.actor:belt_count()-1 do
-		local item = db.actor:item_on_belt(i)
-		if item and item:section() == "af_mopheus" then
-			return true
-		end
+	local obj = db.actor:object("af_mopheus")
+	if obj then
+		return db.actor:is_on_belt(obj)
 	end
+
 	return false
 end
 
