@@ -184,15 +184,10 @@ end
 
 -- Проверка нахождения актора в особой зоне
 function actor_in_zone(pos_psy_x,pos_psy_y,size_psy_x,size_psy_y,z1,z2)
-local pos = db.actor:position()
-local x1 = pos_psy_x
-local x2 = pos_psy_y
-local y1 = size_psy_x
-local y2 = size_psy_y
-if (pos.x >= x1 and pos.x <= x2) and (pos.z >= y1 and pos.z <= y2) and (pos.y >= z1) and (pos.y <= z2) then
-	return 1
-end
-return 0
+	local pos = db.actor:position()
+	local x1, x2, y1, y2 = pos_psy_x, pos_psy_y, size_psy_x, size_psy_y
+
+	return ( (pos.x >= x1 and pos.x <= x2) and (pos.z >= y1 and pos.z <= y2) and (pos.y >= z1) and (pos.y <= z2) ) and 1 or 0
 end
 
 -- Проверка нахождения НПС в особой зоне
@@ -375,15 +370,13 @@ local quest_profiles = {
 function is_quest_npc(npc)
 	local story = 4294967296
 	if npc then
-		if npc.m_story_id ~= nil then
+		if npc.m_story_id then
 			story = npc.m_story_id
 		else
 			story = npc:story_id()
 		end
 		if story == 4294967296 then
-			local profile = npc:profile_name()
-			local name = npc:name()
-			if quest_profiles[profile] or quest_profiles[name] then
+			if quest_profiles[npc:profile_name()] or quest_profiles[npc:name()] then
 				return true
 			end
 		end
@@ -406,7 +399,7 @@ function go_offline_watch_timer:__init(npc_id, pos) super()
    self.pos    = pos -- запоминаем позицию, куда будем перемещать
 end
 function go_offline_watch_timer:condition()
-   return (not level.object_by_id(self.npc_id)) -- ждём исчезновения клиентского объекта
+   return not level.object_by_id(self.npc_id) -- ждём исчезновения клиентского объекта
 end
 function go_offline_watch_timer:action()
    local s_npc = alife():object(self.npc_id)
@@ -421,78 +414,70 @@ end
 --- Возвращает класс защиты надетой на ГГ брони от выброса. В obj передавать db:actor
 --- С неписями НЕ работает! Пользуйте armor_type(npc)
 function armor_class(obj)
-	if obj then
-		local armor = obj:get_current_outfit()
-		local armorname
-		if armor ~= nil then armorname = armor:section() else return 5 end
-		if armorname ~= nil then
-			if 	string.find(armorname, "scientific_outfit") or
-				string.find(armorname, "ecolog_outfit") or
-				string.find(armorname, "protection_outfit") or
-				string.find(armorname, "military_outfit") then
-				return 1
-	     elseif string.find(armorname, "exo") or
-				string.find(armorname, "monolit_exoskeleton") then
-				return 2
-	     elseif string.find(armorname, "outfit_specnaz_m1") or
-				string.find(armorname, "specops_outfit") or
-				string.find(armorname, "monolit_outfit_m1") or
-				string.find(armorname, "svoboda_heavy_outfit") then
-				return 3 else return 4
-			end
-		end
-	end
+	if not obj then return end
+
+	local armor = obj:get_current_outfit()
+	if not armor then return 5 end
+
+	local armorname = armor:section()
+	return (
+			   string.find(armorname, "scientific_outfit")
+			or string.find(armorname, "ecolog_outfit")
+			or string.find(armorname, "protection_outfit")
+			or string.find(armorname, "military_outfit")
+		) and 1
+		or (
+			   string.find(armorname, "exo")
+			or string.find(armorname, "monolit_exoskeleton")
+		) and 2
+		or (   string.find(armorname, "outfit_specnaz_m1")
+			or string.find(armorname, "specops_outfit")
+			or string.find(armorname, "monolit_outfit_m1")
+			or string.find(armorname, "svoboda_heavy_outfit")
+		) and 3
+		or 4
 end
 
 --- Возвращает величину урона ударной волной в зависимости от локации
-function level_blow_damage(level_name)
+function level_blow_damage()
+	local level_name = level.name()
 
-local level_name = level.name()
-
-	if level_name then
-		if level_name == "l01_escape" then
-			return 0.02
-		elseif level_name == "l03_agroprom" or level_name == "l02_garbage" or level_name == "l04_darkvalley" then
-			return 0.04
-		elseif level_name == "l05_bar" or level_name == "l06_rostok" then
-			return 0.06
-		elseif level_name == "l07_military" or level_name == "l08_yantar" or level_name == "l11_pripyat" then
-			return 0.08
-		else return 0.06 end
-	end
-	return 0.06
+	return
+		   ( level_name == "l01_escape" ) and 0.02
+		or ( level_name == "l03_agroprom" or level_name == "l02_garbage" or level_name == "l04_darkvalley" ) and 0.04
+		or ( level_name == "l05_bar" or level_name == "l06_rostok" ) and 0.06
+		or ( level_name == "l07_military" or level_name == "l08_yantar" or level_name == "l11_pripyat" ) and 0.08
+		or 0.06
 end
 
-local armor_type_npc = {["novice"]=4, ["experienced"]=3, ["veteran"]=2, ["master"]=1}
+local armor_type_npc = { ["novice"] = 4, ["experienced"] = 3, ["veteran"] = 2, ["master"] = 1 }
 --- Возвращает класс защиты непися
 function armor_type(npc)
-	if npc then
-		local npc_rank = ranks.get_obj_rank_name(npc)
-		if npc_rank ~= nil then
-			return (armor_type_npc[npc_rank] or 1)
-		end
+	if not npc then return end
+
+	local npc_rank = ranks.get_obj_rank_name(npc)
+	if npc_rank then
+		return armor_type_npc[npc_rank] or 1
 	end
 end
 
 -- Показ типса
 function send_tip(news_text, header, timeout, showtime, sender, sound)
-	if news_text==nil then return end
-	local header = (header or game.translate_string("st_tip"))
-	local timeout = (timeout or 0)
-	local showtime = (showtime or 5)
+	if not news_text then return end
 
-	local player = xr_sound.get_safe_sound_object((tips_variable[tostring(sound)] or  tips_variable["pda_tips"]))
-
-	--' Играем дефолтный звук
-	player:play(db.actor, timeout, sound_object.s2d)
-
-	local sender = (sender or "default")
-
+	local header = header or game.translate_string("st_tip")
+	local timeout = timeout or 0
+	local showtime = showtime or 5
+	local sender = sender or "default"
 	local x = tips_icons[sender][1]
 	local y = tips_icons[sender][2]
+	local player = xr_sound.get_safe_sound_object( tips_variable[sound] or tips_variable["pda_tips"] )
+
+	player:play(db.actor, timeout, sound_object.s2d) --Играем дефолтный звук
 
 	local news_text = "%c[255,160,160,160]"..header.."\\n".."%c[default]"..news_text
 	db.actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(x,y,83,47), timeout*1000, showtime*1000)
+
 	return true
 end
 
@@ -980,7 +965,7 @@ local selector = {
 
 function __do_timer_action(select_string, params_string)
 	local action = selector[select_string]
-	if action ~= nil then
+	if action then
 		action(params_string)
 	end
 end
@@ -988,7 +973,7 @@ end
 
 -----------------------------------------------------------------------------------------------------------
 function spawn_items_in_inv(section, npc, num) --Спавним несколько объектов в инвентарь
-	for i=1, num do
+	for i = 1, num do
 		spawn_item_in_inv(section, npc)
 	end
 end
@@ -1013,6 +998,7 @@ end
 -- Спавним патроны в инвентарь
 function spawn_ammo_in_inv(section, num, npc)
 	if num <= 0 then return end
+
 	local npc = npc or db.actor
 
 	local pos, lvi, gvi, pid
@@ -1091,8 +1077,8 @@ function remove_inv_items_by_section(sec, items_to_remove)
 end
 
 -- Выбрасываем объект из инвентаря, применимо к ГГ
-function drop_item(npc,item)
-	if item~=nil then
+function drop_item(npc, item)
+	if item then
 	    npc:mark_item_dropped(item)
 	end
 end
@@ -1105,8 +1091,10 @@ end
 -- Узнаем отношение одного непися к другому
 function get_npc_relation(obj,target)
 	local rel = obj:relation(target)
-	if rel ~= nil then
-		return (rel==game_object.neutral and "neutral" or rel==game_object.friend and "friend" or rel==game_object.enemy and "enemy")
+	if rel then
+		return rel == game_object.neutral and "neutral"
+			or rel == game_object.friend and "friend"
+			or rel == game_object.enemy and "enemy"
 	end
 end
 
@@ -1126,11 +1114,6 @@ function set_npc_relation(obj,target,relation)
 	return true
 end
 
--- Узнаем группировку непися, применимо к ГГ
-function get_npc_community(npc)
-	return npc:community()
-end
-
 -- Выставляем группировку непися, можно ГГ
 function set_npc_community(npc,community_string)
 	--значения для community_string можно узнать в config\creatures\game_relations.ltx
@@ -1141,41 +1124,38 @@ end
 function remove_item_from_inventory_by_name(remove_item_name,npc)
 	return remove_item_from_inventory(npc:object(remove_item_name),npc)
 end
-function remove_item_from_inventory(remove_item,npc)
-	if npc==nil then npc=db.actor end
-	if remove_item~=nil then
+function remove_item_from_inventory(remove_item, npc)
+	npc = npc or db.actor
+	if remove_item then
 	    npc:mark_item_dropped(remove_item)
 		local sobj = alife():object(remove_item:id())
 		if sobj then
 			alife():release(sobj, true)
 			return true
-		else
-			return false
 		end
 	end
 	return false
 end
 
--- Очищаем инвентарь непися, можно ГГ, использует следующую фунцию для удаления предмета
+-- Очищаем инвентарь непися, можно ГГ
 function clear_npc_inventory(npc)
-    npc:iterate_inventory(__del_item, npc)
-end
-function __del_item(npc, item)
-    local section = item:section()
+    npc:iterate_inventory(function(npc, item)
+		local section = item:section()
+		if section == "bolt" or section == "device_torch" then
+			return
+		end
 
-    if section == "bolt" or section == "device_torch" then
-        return
-    end
-    npc:mark_item_dropped(item)
-	local sobj = alife():object(item:id())
-	if sobj then
-		alife():release(sobj, true)
-	end
+		npc:mark_item_dropped(item)
+		local sobj = alife():object(item:id())
+		if sobj then
+			alife():release(sobj, true)
+		end
+	end)
 end
 
 -- Проверка, запущена ли игра
 function check_game()
-	return level.present() and (db.actor ~= nil) and db.actor:alive()
+	return level.present() and db.actor and db.actor:alive()
 end
 
 --**********************************************************************************************************
@@ -1215,10 +1195,6 @@ function is_point_inside_interval(x,p1,p2)
 	return x>p1 and x<p2
 end
 
--- Получаем инвентарное название объекта
-function get_inv_name(section)
-	return sys_ini:r_string(section,"inv_name")
-end
 
 -- Колбэк на появление предмета в инвентаре ГГ
 function on_item_take(obj)
@@ -1362,7 +1338,6 @@ end
 
 -- Загружаем все переменные, которые нужно, вызывается при загрузке игры автоматически
 function on_game_load()
-
 	cmd("unbind", "contacts") --Отключаем в PDA вкладку "Контакты"
 
 	ogse_debug.process_actor("a_spw", 117)
@@ -1422,36 +1397,37 @@ end
 
 
 function kill_offline_npc(obj)
-	if obj then
-		local pk = xs_netpk.monster(obj)
-		if not pk:isOk() then
-			pk = xs_netpk.stalker(obj)
-		end
-		local data = pk:get()
-		data.health = 0
-		data.updhealth = 0
-		pk:set(data)
-		obj.offline_dead = 1
-		smart_terrain.on_death( obj.id )
+	if not obj then return end
+
+	local pk = xs_netpk.monster(obj)
+	if not pk:isOk() then
+		pk = xs_netpk.stalker(obj)
 	end
+	local data = pk:get()
+	data.health = 0
+	data.updhealth = 0
+	pk:set(data)
+	obj.offline_dead = 1
+	smart_terrain.on_death( obj.id )
 end
 
 -- возвращает уровень здоровья НПС, для проверки в оффлайне жив/мёртв НПС
 function check_offline_npc(obj)
-	if obj then
-		local pk = xs_netpk.monster(obj)
-		if not pk:isOk() then
-			pk = xs_netpk.stalker(obj)
-		end
-		
-		local data = pk:get()
-		local health = data.health
-		return health > 0
+	if not obj then return end
+
+	local pk = xs_netpk.monster(obj)
+	if not pk:isOk() then
+		pk = xs_netpk.stalker(obj)
 	end
+	local data = pk:get()
+	local health = data.health
+
+	return health > 0
 end
 
+
 -------------------Выводим время на HUD-------------------
-function show_time( forced ) --forced должен быть true, если апдейт вызван не из менеджера сигналов (например, из ogse_sleep_mgr).
+function show_time( forced ) --forced должен быть true, если апдейт вызван НЕ из менеджера сигналов (например, из ogse_sleep_mgr).
 	if forced ~= true then
 		ogse_signals.get_mgr():reschedule( 60000 / game_time_factor )
 	end
@@ -1467,11 +1443,12 @@ function show_time( forced ) --forced должен быть true, если апдейт вызван не из
 end
 -----------------------------------------------------------
 
+
 -- Парсинг ини-файла в массив
 function parse_ini_section_to_array(ini,section)
 	local tmp={}
 	if ini:section_exist(section) then
-		local result, id, value = nil, nil, nil
+		local result, id, value
 		for a=0,ini:line_count(section)-1 do
 			result, id, value = ini:r_line(section,a,"","")
 			if id~=nil and string.trim(id)~="" and string.trim(id)~=nil then
@@ -1482,13 +1459,14 @@ function parse_ini_section_to_array(ini,section)
 	return tmp
 end
 
--- Туториал на пси-воздействие
+-- Туториал на пси-воздействие. Вызывается из конфигов.
 function on_my_psy()
 	if not has_alife_info("encyclopedy_tutorial_psy") then
 		game.start_tutorial("part_7_psy")
 		db.actor:give_info_portion("encyclopedy_tutorial_psy")
 	end
 end
+
 
 -- вспомогательная функция, создание одного или нескольких объектов в заданной точке
 -- назначение: убрать повторный код из функций далее по тексту
@@ -1722,7 +1700,7 @@ function visual_timer:init( action_name, ... )
 	ASSERT(
 		self.user_action,
 		"visual_timer:init: can not compile function with the name '%s'",
-		tostring( self.action_name )
+		self.action_name
 	)
 	self.fun_params = { ... }
 	return self
@@ -1741,7 +1719,7 @@ function visual_timer:load( packet )
   ASSERT(
     self.user_action,
     "visual_timer:load: can not compile function with the name '%s'",
-    tostring( self.action_name )
+    self.action_name
   )
   local array_item = ogse_unist.read_item_from_packet( packet )
   ASSERT(
@@ -1804,7 +1782,7 @@ end
 function conditional_visual_timer:init(cond_name, action_name, ...)
 	self.cond_name = cond_name
 	self.user_condition = loadstring("return "..self.cond_name.."(...)")
-	ASSERT(self.user_condition, "conditional_visual_timer:init: can not compile function with the name '"..tostring(self.cond_name).."'")
+	ASSERT(self.user_condition, "conditional_visual_timer:init: can not compile function with the name '"..self.cond_name.."'")
 
 	return visual_timer.init(self, action_name, ...)
 end
@@ -1816,7 +1794,7 @@ end
 function conditional_visual_timer:load(packet)
 	self.cond_name = packet:r_stringZ()
 	self.user_condition = loadstring("return "..self.cond_name.."(...)")
-	ASSERT(self.user_condition, "conditional_visual_timer:load: can not compile function with the name '"..tostring(self.cond_name).."'")
+	ASSERT(self.user_condition, "conditional_visual_timer:load: can not compile function with the name '"..self.cond_name.."'")
 
 	visual_timer.load(self, packet)
 end
@@ -1844,12 +1822,11 @@ end
 --****************************************************************************************************************************************
 
 function fix_restrictors(npc)
-
 	if not npc then return end
 
 	local t = parse_names(npc:in_restrictions())
 
-	local pk = nil
+	local pk
 	local sObj = alife():object(npc:id())
 	if sObj then
 		pk = xs_netpk.stalker(sObj)
@@ -1936,6 +1913,7 @@ end
 function transfer_items_from_box(box_sid, remove_quest_items, exclude_sections, exclude_clsids)
 	local box = level_object_by_sid(box_sid)
 	if not box then return end
+
 	local cnt = box:inv_box_count()
 	for i=0, cnt-1 do
 		local obj = box:object_from_inv_box(i)
