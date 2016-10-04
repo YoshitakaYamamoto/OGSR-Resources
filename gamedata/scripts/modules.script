@@ -84,14 +84,10 @@ load_scheme("ph_appforce",    "ph_force",    stype_item)
 load_scheme("ph_death",       "ph_on_death", stype_item)
 load_scheme("ph_oscillate",   "ph_oscillate",stype_item)  
 
-load_scheme("fx_sound",		  "fx_sound",    stype_item)
-
 ----------------------------------------------------------------------
 -- Загрузка модулей вертолёта:
 ----------------------------------------------------------------------
 load_scheme("heli_move",      "heli_move",   stype_heli)
---load_scheme("heli_attack",    "heli_attack", stype_heli)
-load_scheme("turret_firmware","turret",      stype_heli)
 
 ----------------------------------------------------------------------
 -- Загрузка модулей рестрикторов:
