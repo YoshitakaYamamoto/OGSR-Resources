@@ -3325,10 +3325,14 @@ function yan_sold_paralyze_actor()
 	db.actor:set_actor_direction(-dir:getH())
 	db.actor:set_actor_position(new_pos)
 	ogse.start_timer("yan_sold_actor_failed",10)
-	ogse.save_variable("inventory_key", bind_to_dik(key_bindings.kINVENTORY))
-	ogse.save_variable("grenade_key", bind_to_dik(key_bindings.kWPN_4))
+
+	ogse.save_var("inventory_key", bind_to_dik(key_bindings.kINVENTORY))
+	--log3("~~UNBind inventory: [%s]", bind_to_dik(key_bindings.kINVENTORY))
 	cmd("unbind", "inventory")
+	ogse.save_var("grenade_key", bind_to_dik(key_bindings.kWPN_4))
+	--log3("~~UNBind grenades: [%s]", bind_to_dik(key_bindings.kWPN_4))
 	cmd("unbind", "wpn_4")
+
 	bind_stalker.restore_weapon()
 	db.actor:activate_slot(0)
 	for i = 0,4 do
@@ -3339,10 +3343,16 @@ function yan_sold_paralyze_actor()
 end
 
 function restore_inventory()
-	local inv_key = ogse.load_variable("inventory_key", DIK_keys.DIK_I)
+	ASSERT( ogse.var_exists("inventory_key"), "can't load inventory key")
+	local inv_key = ogse.load_var("inventory_key")
+	--log3("~~Bind inventory: [%s]", inv_key)
 	cmd("bind", "inventory", ogse_rebind_key.dik_to_name(inv_key))
-	inv_key = ogse.load_variable("grenade_key", DIK_keys.DIK_4)
-	cmd("bind", "wpn_4", ogse_rebind_key.dik_to_name(inv_key))
+	ogse.delete_var("inventory_key")
+	ASSERT( ogse.var_exists("grenade_key"), "can't load grenade key") 
+	local gr_key = ogse.load_var("grenade_key")
+	--log3("~~Bind grenades: [%s]", gr_key)
+	cmd("bind", "wpn_4", ogse_rebind_key.dik_to_name(gr_key))
+	ogse.delete_var("grenade_key")
 end
 
 function blow_generator()
@@ -3414,7 +3424,7 @@ function delete_yan_party()
 			tasks_functor.delete_when_offline(sold2.id):start()
 		end
 		--
-		local yantar_strange_zone = alife():object("strange_zone5") --KRodin: пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+		local yantar_strange_zone = alife():object("strange_zone5") --KRodin: Удаляем странную аномалию с Янтаря
 		if yantar_strange_zone then
 			tasks_functor.delete_when_offline(yantar_strange_zone.id):start()
 		end

@@ -1844,22 +1844,27 @@ function tutor_zombied()
 	end
 end
 
-local use_keys_unbinded = false
+local use_keys_unbinded
 
 function block_use_hotkeys()
-	ogse.save_variable("close_dialog_key", bind_to_dik(key_bindings.kQUIT))
-	ogse.save_variable("use_key", bind_to_dik(key_bindings.kUSE))
+	ogse.save_var("close_dialog_key", bind_to_dik(key_bindings.kQUIT))
 	cmd("unbind", "quit")
+	ogse.save_var("use_key", bind_to_dik(key_bindings.kUSE))
 	cmd("unbind", "use")
+
 	use_keys_unbinded = true
 end
 
 function unblock_use_hotkeys()
 	if use_keys_unbinded then
-		local quit_key = ogse.load_variable("close_dialog_key", DIK_keys.kESCAPE)
-		local use_key = ogse.load_variable("use_key", DIK_keys.kF)
-		cmd("bind",  "quit", ogse_rebind_key.dik_to_name(quit_key))
-		cmd("bind",  "use", ogse_rebind_key.dik_to_name(use_key))
+		ASSERT( ogse.var_exists("close_dialog_key"), "can't load close_dialog_key" )
+		local quit_key = ogse.load_var("close_dialog_key")
+		cmd("bind", "quit", ogse_rebind_key.dik_to_name(quit_key))
+		ogse.delete_var("close_dialog_key")
+		ASSERT( ogse.var_exists("use_key"), "can't load use_key" )
+		local use_key = ogse.load_var("use_key")
+		cmd("bind", "use", ogse_rebind_key.dik_to_name(use_key))
+		ogse.delete_var("use_key")
 	end
 end
 
