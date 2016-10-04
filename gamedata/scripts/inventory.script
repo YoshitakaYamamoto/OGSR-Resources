@@ -45,7 +45,7 @@ function on_first_update()
 end
 
 
-belt = {}
+--belt = {}
 local belt_id  = {}
 local af_restore_speeds = {
   --[ "additional_inventory_weight"  ] = 0,
@@ -87,12 +87,12 @@ function rescan_belt()
   for k, _ in pairs( af_restore_speeds ) do
     af_restore_speeds[ k ] = 0
   end
-  belt     = {}
+  --belt     = {}
   belt_id  = {}
   for i = 0, db.actor:belt_count() - 1 do
     local item = db.actor:item_on_belt( i )
     local sect = item:section()
-    belt[ sect ] = ( belt[ sect ] or 0 ) + 1
+    --belt[ sect ] = ( belt[ sect ] or 0 ) + 1
     belt_id[ item:id() ] = true
     local props = get_af_props( sect )
     for k, total in pairs( af_restore_speeds ) do
