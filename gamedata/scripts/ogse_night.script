@@ -43,7 +43,7 @@ function on_hit( obj, amount, local_direction, who, bone_index )
 end
 
 function on_update( obj )
-  ogse_signals.get_mgr():reschedule( 12000 )
+  ogse_signals.get_mgr():reschedule( math.random(11500, 12500) )
   check_night( obj )
 end
 

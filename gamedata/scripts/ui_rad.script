@@ -22,7 +22,7 @@ end
 
 function update()
 	if not db.actor then return end
-	ogse_signals.get_mgr():reschedule(500)
+	ogse_signals.get_mgr():reschedule(math.random(450, 550))
 
 	local bDetected = false
 	if db.actor:item_in_slot(8) then

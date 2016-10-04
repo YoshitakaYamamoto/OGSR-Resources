@@ -128,7 +128,7 @@ function PsyAntenna:update_sound() --TODO: перенести в zone_enter/leav
 end
 
 function PsyAntenna:update()
-	self.sm:reschedule( 1000 ) --Раз в секунду достаточно
+	self.sm:reschedule( math.random(900, 1100) ) --Раз в секунду достаточно
 
 	self:generate_phantoms()
 

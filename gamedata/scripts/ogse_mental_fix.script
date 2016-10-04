@@ -35,7 +35,7 @@ end
 
 function check_mental( obj )
   --log3("~~[%s] Update check_mental for [%s]", script_name(), obj:name())
-  ogse_signals.get_mgr():reschedule( 5000 )
+  ogse_signals.get_mgr():reschedule( math.random(4500, 5500) )
   local storage = db.storage[ obj:id() ].state_mgr
   ASSERT( storage, "state_mgr not found in db.storage: %s", obj:name() )
   local binder  = obj:binded_object()
