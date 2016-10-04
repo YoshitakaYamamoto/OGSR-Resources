@@ -1,6 +1,6 @@
 
 function attach(sm)
-	sm:subscribe({ signal = "on_first_update",	fun = this.on_first_update })
+	sm:subscribe({ signal = "on_first_update", fun = this.on_first_update })
 end
 
 function on_first_update()
@@ -8,6 +8,24 @@ function on_first_update()
 	del_buggy_mapspots()
 
 	aem_fix() --Удалить по окончании игры нахер! С НИ ЭТО НЕ НУЖНО!
+	
+	lc_question_add()
+end
+
+
+function lc_question_add() --Переход "Припять - ЧАЭС" задаёт вопрос о смене уровня. Взято из аддона Naxac'а
+	local sobj = alife():object("exit_to_stancia_01")
+	if sobj then
+		local pk = xs_netpk.level_changer(sobj)
+		if pk:isOk() then
+			local data = pk:get()
+			if data.silent_mode ~= 0 then
+				data.silent_mode = 0
+				pk:set(data)
+				log3( "~~KRodin: fixed [exit_to_stancia_01]..." )
+			end
+		end
+	end
 end
 
 
