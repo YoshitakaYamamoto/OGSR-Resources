@@ -474,16 +474,29 @@ function evaluator_check_altcombat:evaluate()
 		check_for_grenades(self.object)
 	end
 
+--[=[ --KRodin: Зря я этот кусок добавил, из за него неписи перестали стрелять по вертолётам на Генераторах
 	local targ_id = primary_target[self.object:id()]
 	if targ_id ~= nil then
 		local targ_obj = level.object_by_id(targ_id)
-		if targ_obj and targ_obj:alive() then
-			--log3("~~[%s] Checking target for [%s]: [%s]", script_name(), self.object:name(), targ_obj:name() or "nil")
-			if not check_is_enemy(self.object, targ_obj) then
-				primary_target[self.object:id()] = nil
-				in_combat[self.object:id()] = nil
-				return false
-			end	
+		if targ_obj then
+			if is_armor(best_enemy) then
+				--if not armor_alive(best_enemy) then
+				--	primary_target[self.object:id()] = nil
+				--	in_combat[self.object:id()] = nil
+				--	return false
+				--end
+			elseif targ_obj:alive() then
+				--log3("~~[%s] Checking target for [%s]: [%s]", script_name(), self.object:name(), targ_obj:name() or "nil")
+				if not check_is_enemy(self.object, targ_obj) then
+					primary_target[self.object:id()] = nil
+					in_combat[self.object:id()] = nil
+					return false
+				end
+			--else
+			--	primary_target[self.object:id()] = nil
+			--	in_combat[self.object:id()] = nil
+			--	return false
+			end
 		else
 			primary_target[self.object:id()] = nil
 			in_combat[self.object:id()] = nil
@@ -493,6 +506,7 @@ function evaluator_check_altcombat:evaluate()
 		in_combat[self.object:id()] = nil
 		return false
 	end
+--]=]
 
 	local bw = nil
 	local wm = rx_wmgr and rx_wmgr.get_wm(self.object)
