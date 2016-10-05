@@ -1,55 +1,4 @@
-[mounted_weapon]:identity_immunities
-GroupControlSection		= spawn_group
-class				= W_MOUNTD
-$spawn				= "weapons\mounted_weapon"
-cform   	        = skeleton
-visual  	        = weapons\mounted_weapons\wpn_pkm_trenoga.ogf  
-
-;-----------------------------------------------------------------------------------
-
-;params of weapon recoil
-fire_dispersion_base = 1 	;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
-
-;отдача
-cam_relax_speed     = 5.0	;3; скорость возврата в исходное положение
-cam_dispersion      = 0.7	;увеличения угла (в градусах) с каждым выстрелом
-cam_max_angle		= 8	;максимальный угол отдачи
-cam_max_angle_horz	= 9.0  	;(degree) maximum shot horizontal degree 
-cam_step_angle_horz	= 1.8	;(degree) size of step camera moved in horizontal position while shooting
-
-
-fire_dispersion_condition_factor = 5	;увеличение дисперсии в процентах при максимальном износе 
-misfire_probability = 0.0001	;вероятность осечки при максимальном износе 
-condition_shot_dec 	= 0.00003	;увеличение износа при каждом выстреле
-;-----------------------------------------------------------------------------------
-
-; ttc
-hit_power			= 1.2
-hit_impulse			= 220
-hit_type 			= fire_wound 	
-
-fire_distance  		= 500
-bullet_speed		= 800	;начальная скорость пули
-rpm            		= 650
-
-light_color		 	= 0.9,0.9,0.5
-light_range		 	= 6
-light_var_color  	= 0.05
-light_var_range  	= 0.5
-light_time 		 	= 0.3
-
-ammo_class		 	= ammo_7.62x54_7h1
-
-flame_particles		= weapons\generic_weapon08
-smoke_particles		= weapons\generic_shoot_00
-
-shell_point		 	= 0.0, 0.0, 0.0
-shell_particles	 	= weapons\generic_shells00
-
-;------------------------------ O.G.S.E. sound remake -----------------------
-snd_shoot			= weapons\pkm\pkm_shoot
-;----------------------------------------------------------------------------
-
+//Пулемёт БТР'а
 [stationary_mgun]:identity_immunities
 GroupControlSection		= spawn_group
 class				= W_STMGUN
@@ -91,6 +40,7 @@ tracer_width		= 0.07
 inv_name	       	= Mounted Weapon								; name in inventory	
 inv_name_short		= Mounted Weapon
 
+//Ещё один пулемёт БТР'а
 [kpvt_mgun]:stationary_mgun
 $spawn				= "weapons\kpvt_mgun"
 hit_power			= 2.2
@@ -102,14 +52,17 @@ ammo_class			= ammo_12x76_zhekan_heli
 flame_particles		= weapons\heli_weapon
 shell_particles		= weapons\generic_shells
 
-[turret_mgun]
+
+//------------------------------------------------------------------------------
+// Сборная турель ПКМ
+[stationary_pkm]
 GroupControlSection	= spawn_group
 $spawn				= "weapons\turret_mgun"
 $prefetch			= 1
 cform				= skeleton
 class				= TURRETMG
-script_binding		= turret_mgun.bind
-visual				= weapons\mounted_weapons\wpn_pkm_trenoga.ogf
+visual = weapons\mounted_weapons\wpn_pkm_trenoga.ogf
+script_binding		= bind_statpkm.bind
 
 wallmarks			= explosion_marks
 
@@ -138,15 +91,15 @@ fire_trail_length		= 0
 death_angular_vel		= 0.1,6.0,0.2
 death_lin_vel_koeff		= 1
 
-immunities_sect			= turret_mgun_immunities
+immunities_sect			= turret_usable_immunities
 
 // CShootingObject::Load
 rpm				    = 650
 // CShootingObject::LoadFireParams
-fire_dispersion_base = 0.4
-hit_power			= 0.95
-hit_impulse			= 300
-fire_distance		= 500
+fire_dispersion_base = 0.22
+hit_power			= 1.23
+hit_impulse			= 30
+fire_distance		= 250
 bullet_speed		= 870
 use_aim_bullet		= false
 
@@ -162,8 +115,8 @@ shell_particles		= weapons\generic_shells00
 shell_point			= 0.0,0.0,0.0
 
 // CShootingObject::LoadFlameParticles
-flame_particles		= weapons\generic_weapon08
-smoke_particles		= weapons\generic_shoot_00
+flame_particles				= weapons\generic_weapon09
+smoke_particles				= weapons\generic_shoot_00
 ;shot_particles		=
 
 ;------------------------------ O.G.S.E. sound remake -----------------------
@@ -177,7 +130,7 @@ launch_speed			= 60
 // CHelicopter::UseFireTrail
 fire_dispersion_null		= 1.0
 
-ammo_class			= ammo_7.62x54_7h1 ;ammo_7.62x54_ap
+ammo_class			= ammo_7.62x54_ap
 rocket_class		= wpn_rpg7_missile
 use_rocket			= false
 use_mgun			= true
@@ -206,60 +159,6 @@ fire_trace_width		= 0.1
 // CHelicopter::DieHelicopter
 broken_snd			= $no_sound
 
-[turret_mgun_immunities]
-burn_immunity			= 0.2
-strike_immunity			= 0.05
-shock_immunity			= 0.8
-wound_immunity			= 0.01
-radiation_immunity		= 0.005
-telepatic_immunity		= 0.0
-chemical_burn_immunity	= 0.01
-fire_wound_immunity		= 0.15
-explosion_immunity		= 0.6
-
-[turret_army]:turret_mgun
-$spawn				= "weapons\turret_army"
-visual				= weapons\mounted_weapons\wpn_turret_pkm.ogf
-ammo_class			= ammo_5.45x39_fmj
-snd_shoot			= weapons\ak74\ak74_shoot
-rpm				    = 450
-fire_dispersion_base = 0.7
-hit_power			= 0.5
-hit_impulse			= 25
-fire_distance		= 100
-bullet_speed		= 870
-
-
-[turret_nato]:turret_mgun
-$spawn				= "weapons\turret_nato"
-visual				= weapons\mounted_weapons\wpn_turret_nato.ogf
-ammo_class			= ammo_5.56x45_ss190
-
-;------------------------------ O.G.S.E. sound remake -----------------------
-snd_shoot			= weapons\lr300\lr300_shoot2
-;-----------------------------------------------------------------------------
-rpm				    = 400
-fire_dispersion_base = 0.6
-hit_power			= 0.6
-hit_impulse			= 25
-fire_distance		= 100
-bullet_speed		= 970
-
-
-[turret_usable]:turret_mgun
-visual				= weapons\mounted_weapons\wpn_turret_pkm.ogf
-ammo_class			= ammo_7.62x54_ap
-snd_shoot			= weapons\pkm\pkm_shoot
-rpm				    = 650
-fire_dispersion_base = 0.22
-hit_power			= 1.23
-hit_impulse			= 30
-fire_distance		= 250
-bullet_speed		= 870
-flame_particles				= weapons\generic_weapon09
-smoke_particles				= weapons\generic_shoot_00
-immunities_sect			= turret_usable_immunities
-
 [turret_usable_immunities]
 burn_immunity			= 0.0
 strike_immunity			= 0.0
@@ -270,11 +169,3 @@ telepatic_immunity		= 0.0
 chemical_burn_immunity	= 0.0
 fire_wound_immunity		= 0.0
 explosion_immunity		= 0.0
-
-
-
-[stationary_pkm]:turret_usable
-visual = weapons\mounted_weapons\wpn_pkm_trenoga.ogf
-script_binding		= bind_statpkm.bind
-
-

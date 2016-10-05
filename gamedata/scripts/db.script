@@ -11,7 +11,6 @@ sound               = {}
 actor               = nil
 actor_proxy         = actor_proxy.actor_proxy()
 heli                = {}
-turret              = {}
 cars                = {}
 camp_storage        = {}
 story_by_id	        = {}
@@ -163,21 +162,7 @@ function del_heli(obj)
 	heli[obj:id()] = nil
 end	
 
---Туррели
-
-function add_turret(obj)
-	turret[obj:id()] = obj
-	-- нах не надо, но пусть будет.
-	add_obj(obj)
-end
-
-function del_turret(obj)
-	turret[obj:id()] = nil
-	del_obj(obj)
-end
-
 -- Транспорт
-
 function add_car(obj)
 	cars[obj:id()] = obj
 end

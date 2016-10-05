@@ -91,15 +91,6 @@ local pda =
 			soundtrack.kordon_samogon_drink()
 	end,
 
-	-- Сборная турель ПКМ:
-	--[[["turret_pkm"] 			= function () 
-		soundtrack.pkm_activate()
-		level.disable_input()
-		jekan_work.actor_disable_inventory()
-		jekan_devices.use_turret_interface_installing()
-		ogse.start_timer("pkm1",5)
-	end,]]
-
 	-- ПДА Диггера юры:
 	["diggers_pda"] 			= function () 
 			db.actor:give_info_portion("diggers_pda_info")

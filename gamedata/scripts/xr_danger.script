@@ -346,15 +346,21 @@ function evaluator_danger:evaluate()
 
 	write_log("!!XR_DANGER_17".." ["..self.object:name().."]")
 
-	-- Отсеиваем дружественные туррели.
-	if bd_type == danger_object.attack_sound and
-	   self.object:best_enemy() == nil and
-	   turret_mgun.is_friendly_turret(self.object, best_danger_object, best_danger:position()) then
-	   write_log("!!XR_DANGER_TURRET".." ["..self.object:name().."]")
-		-- printf("DANGER [%s] [FALSE] friendly turret", self.object:name())
+	--Отсеиваем туррели.
+	local turret_classes = {
+		[clsid.turret_mgun]   = true,
+		[clsid.wpn_mounted]   = true,
+		[clsid.wpn_stat_mgun] = true,
+	}
+	if
+		bd_type == danger_object.attack_sound
+		and not self.object:best_enemy()
+		and turret_classes[best_danger_object:clsid()]
+	then
+		write_log("!!XR_DANGER_TURRET".." ["..self.object:name().."]")
 		return false
 	end
-	
+
 	write_log("!!XR_DANGER_18".." ["..self.object:name().."]")
 
 			
