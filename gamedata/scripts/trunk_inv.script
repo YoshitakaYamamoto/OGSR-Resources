@@ -10,7 +10,44 @@ function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_body_hide",     fun = this.on_body_hide})
 	sm:subscribe({signal = "on_destroy",       fun = this.on_destroy})
 	sm:subscribe({signal = "on_take_from_box", fun = this.on_take_from_box})
+	sm:subscribe({signal = "on_car_spawn",		fun = this.init_trunk})
+	sm:subscribe({signal = "on_car_death",		fun = this.on_car_death})
 end
+
+
+function on_car_death(car)
+	-- выкидываем предметы из багажника
+	local trunk = get_trunk_for_car(car)
+	for i=0, trunk:inv_box_count()-1 do
+		local pos = vector():mad(car:position(), vector():setHP(math.random()*math.pi*2, 0), 1.0+math.random()*2)
+		local it = trunk:object_from_inv_box(i)
+		trunk:drop_item_and_teleport(it, pos)
+		alife():set_switch_online(it:id(), true)
+		alife():set_switch_offline(it:id(), false)
+		if it:is_explosive() then -- следим только за взрывающимися предметами
+			wait_independent(it, math.random(1000, 2000)):start()
+		end
+	end
+
+	remove_trunk(car) --Удаляем сам багажник
+end
+
+-- таймер ждёт, когда предмет окончательно переместится на уровень (не будет родительского объекта)
+-- и после этого пытается этот предмет взорвать
+-- надо для подрыва взрывоопасных предметов в инвентаре машины, поскольку сразу после телепорта
+-- предметы ещё находятся во владении онлайновой машины и взрываться не хотят
+class "wait_independent" (ogse_qt.quick_timer)
+function wait_independent:__init(item, dt) super()
+	self.kill_time = time_global() + dt
+	self.item = item
+end
+function wait_independent:condition()
+	return not self.item:parent() and time_global() > self.kill_time and self.item:get_physics_shell()
+end
+function wait_independent:action()
+	self.item:explode(0) -- взорвутся только те, которые могут взорваться
+end
+
 
 local sim
 

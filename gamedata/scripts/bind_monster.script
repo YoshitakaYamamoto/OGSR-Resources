@@ -43,6 +43,7 @@ log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name()
 end
 
 function generic_object_binder:net_spawn(sobject)
+--log3("~~[%s] Start net_spawn [%s]", script_name(), self.object and self.object:name() or "nil")
 	ogse_debug.process_monster(self.object, "m_spw", 1)
 	if not object_binder.net_spawn(self, sobject) then
 		ogse_debug.process_monster(self.object, "m_spw", 0)
@@ -112,9 +113,6 @@ function generic_object_binder:net_spawn(sobject)
 		ogse_debug.process_monster(self.object, "m_spw", 0)
 		return true
 	end
-
-	ogse_car_control.register_target(self.object)
-	ogse_scripted_btr.register_target(self.object)
 
 	ogse_debug.process_monster(self.object, "m_spw", 63)
 	self.am:call( "on_monster_spawn", self.object, self )
@@ -237,13 +235,9 @@ function generic_object_binder:death_callback(victim, who)
 	ogse_debug.process_monster(victim, "dth", 11)
 	smart_monster_parts.death_spawn(victim)
 
-	ogse_debug.process_monster(victim, "dth", 12)	
-	ogse_car_control.unregister_target(self.object)
-	ogse_scripted_btr.unregister_target(self.object)
-
 	ogse_debug.process_monster(victim, "dth", 13)	
 
-	self.am:call( "on_monster_death", victim, who )
+	self.am:call( "on_monster_death", self.object, who )
 
 	ogse_debug.process_monster(victim, "dth", 0)
 end
@@ -255,20 +249,20 @@ end
 
 function generic_object_binder:hit_callback(obj, amount, local_direction, who, bone_index)
 	ogse_debug.process_monster(self.object, "hit", 1)
-	if who and obj and string.find(who:name(), "vehicle_btr") then
+	if who and string.find(who:name(), "vehicle_btr") then
 		who = db.actor
 	end	
 
 	ogse_debug.process_monster(self.object, "hit", 2)
 	if self.st.hit then
-		xr_logic.issue_event(self.object, self.st.hit, "hit_callback", obj, amount, local_direction, who, bone_index)
+		xr_logic.issue_event(self.object, self.st.hit, "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end
 
 	ogse_debug.process_monster(self.object, "hit", 4)
-	smart_monster_parts.main_check(obj, amount, local_direction, who, bone_index)
+	smart_monster_parts.main_check(self.object, amount, local_direction, who, bone_index)
 
 	ogse_debug.process_monster(self.object, "hit", 7)
-	self.am:call( "on_monster_hit", obj, amount, local_direction, who, bone_index, self )
+	self.am:call( "on_monster_hit", self.object, amount, local_direction, who, bone_index, self )
 
 	ogse_debug.process_monster(self.object, "hit", 0)
 end
@@ -285,9 +279,6 @@ log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:nam
 
 	db.del_obj(self.object)
 	db.storage[self.object:id()] = nil
-
-	ogse_car_control.unregister_target(self.object)
-	ogse_scripted_btr.unregister_target(self.object)
 
 	self.am:call( "on_monster_net_destroy", self.object, self )
 	self.am:cleanup_signal_subs( "on_monster_update." .. self.object:id() )

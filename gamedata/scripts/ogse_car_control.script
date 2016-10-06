@@ -6,7 +6,6 @@
 --- version 2.0.00 (22/05/2014)
 -----------------------------------------------------------------------
 
-
 --local log_stream = io.open("..\\OGSE_LOGS\\ogse_car_control.txt", "a")
 --function log1(str)
 --	log_stream:write(str, '\n')
@@ -18,11 +17,27 @@ function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_finalize", fun = this.on_finalize})
 	sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
 	sm:subscribe({signal = "on_key_up",   fun = this.on_key_up})
-	--sm:subscribe({signal = "on_key_hold", fun = this.on_key_hold})
 	sm:subscribe({signal = "on_wheel",    fun = this.on_wheel})
 	sm:subscribe({signal = "on_update",   fun = this.on_update})
-	sm:subscribe({signal = "on_first_update",   fun = this.on_first_update})
+	sm:subscribe({signal = "on_first_update", fun = this.on_first_update})
 	sm:subscribe({signal = "on_info",     fun = this.on_info})
+	sm:subscribe({signal = "on_car_death", fun = this.on_car_death})
+	--
+	sm:subscribe({signal = "on_monster_spawn", fun = this.register_target})
+	sm:subscribe({signal = "on_monster_death", fun = this.unregister_target})
+	sm:subscribe({signal = "on_monster_net_destroy", fun = this.unregister_target})
+	--
+	sm:subscribe({signal = "on_npc_spawn", fun = this.register_target})
+	sm:subscribe({signal = "on_npc_death", fun = this.unregister_target})
+	sm:subscribe({signal = "on_npc_net_destroy", fun = this.unregister_target})
+	---- Изначально не работает, после некоторых манипуляций заработало, но криво. Поэтому отключено.
+	--sm:subscribe({signal = "on_heli_spawn", fun = this.register_target})
+	--sm:subscribe({signal = "on_heli_death", fun = this.unregister_target})
+	--sm:subscribe({signal = "on_heli_net_destroy", fun = this.unregister_target})
+	---- Машины вообще не регистрируются, хз почему. Да и нужно вообще их регистрировать?
+	--sm:subscribe({signal = "on_car_spawn", fun = this.register_target})
+	--sm:subscribe({signal = "on_car_death", fun = this.unregister_target})
+	--sm:subscribe({signal = "on_car_net_destroy", fun = this.unregister_target})
 end
 
 local sim
@@ -137,7 +152,8 @@ function register_target(obj)
 	t.obj = obj
 	t.desc = resolve_target(obj)
 	targets[t.obj_id] = t
-	return t
+
+	--log3("[register_target] - registered [%s]", obj:name() or "UKNOWN")
 end
 function unregister_target(obj)
 	targets[obj:id()] = nil
@@ -170,9 +186,7 @@ local last_reprioritize		= nil
 local primary_target = nil 			-- кого окучивать будем, id
 local need_issue_targeting_warning = false -- предупредить о пиздеце под колесами
 local need_warn_turret_failure = false
-local targets_list = {		-- список целей
-
-}
+local targets_list = {}		-- список целей
 local last_target = {}				-- последняя цель, [id] = last_time 
 ------- структура записи таблицы
 -- targets_list[npc_id] = {
@@ -281,7 +295,7 @@ function on_key_down(key, bind)
 	
 	if not in_btr then return end -- последующие действия имеют смысл только при нахождении внутри БТР
 	
-	if bind == key_bindings.kCAM_ZOOM_OUT then
+	--[[if bind == key_bindings.kCAM_ZOOM_OUT then
 		--if not level.main_input_receiver() then -- контроль худа
 		--	hud_disable = true
 		--end
@@ -289,7 +303,7 @@ function on_key_down(key, bind)
 		--if not level.main_input_receiver() then
 		--	hud_disable = false
 		--end
-	elseif bind == key_bindings.kL_LOOKOUT then -- управление распознаванием
+	else]]if bind == key_bindings.kL_LOOKOUT then -- управление распознаванием
 		if not recognition_target_operable then -- режим распознования сломался
 			play_error_sound()
 			return
@@ -432,10 +446,6 @@ function on_key_up(key, bind)
 	end
 end
 
--- Проверка удержания клавиш
-function on_key_hold(key, bind)
-end
-
 -- Проверка вращения колесика мыши
 function on_wheel(vol)
 	if level.main_input_receiver() then return end
@@ -452,7 +462,7 @@ function on_wheel(vol)
 	end
 end
 
-function on_update(delta) -- вызывается из менеджера 
+function on_update() -- вызывается из менеджера 
 	update_car_hud()
 end
 
@@ -742,6 +752,7 @@ function update_car_states(car)
 	else
 		auto_fire_operable          = car_health >= auto_fire_broken_limit          and not surge and actor_has_control_module()
 	end
+	
 	recognition_target_operable = car_health >= recognition_target_broken_limit and not surge and actor_has_control_module()
 	car_critically_damaged      = car_health < general_broken_limit
 end
@@ -900,33 +911,21 @@ function update_btr_hud(car)
 	
 end
 
-local turrets_sections = {turret_mgun == true, turret_army = true, turret_nato = true,}
-function is_enemy_turret(npc, turret)
-    -- сначала выясним, турель ли это вообще.
-    if not turrets_sections[turret:section()] then
-        return false
-    end
-    local community = db.storage[turret:id()].community
-    if community and utils2.community_relation(community, npc) <= -500 then
-        return true
-    end
-    return false
-end
-
 function is_enemy(object)
-	return object:relation(db.actor) == game_object.enemy or is_enemy_turret(db.actor, object) or object:is_monster()
-end
-
-function has_heavy_fire_power(object)
-	local name = object:name()
-	return string.find(name, "turret") ~= nil or string.find(name, "btr") ~= nil
+	--log3("[is_enemy] - start check [%s]", object:name() or "")
+	if object:relation(db.actor) == game_object.enemy or object:is_monster() then
+		--log3("[is_enemy] - [%s] IS ENEMY!!!", object:name() or "")
+		return true
+	end
 end
 
 function can_be_target(object)
+	--log3("[can_be_target] - start check [%s]", object:name() or "")
 	if object:id() == current_car:id() then return false end -- объект - наша сабственная машина
 	if is_recognition_target_active() and not is_enemy(object) then return false end -- если работает распознавание свой/чужой и цель нам не враг, то игнорируем
 	local obj_dist = object:position():distance_to(db.actor:position()) -- расстояние от актора до объекта
 	if obj_dist > target_detect_range or (obj_dist < target_min_range and not is_auto_fire_mode()) then return false end -- цель вне пределов досягаемости - игнорируем
+	--log3("[can_be_target] - [%s] CAN BE TARGET!", object:name() or "")
 	return true
 end
 
@@ -940,7 +939,7 @@ end
 
 function process_enemy(car, enemy)
 	if enemy and enemy:alive() and enemy:id() ~= db.actor:id() then
-		if (IsStalker(enemy) or IsMonster(enemy)) then
+		if IsStalker(enemy) or IsMonster(enemy) then
 			-- человек ты иль монструшка
 			register_as_target(car, enemy)
 		else
@@ -961,13 +960,14 @@ function register_as_target(car, enemy)
 		}
 		enemy_record.npc = IsStalker(enemy)
 		enemy_record.range = dist
-		enemy_record.vis = script_car:IsObjectVisible(enemy) or enemy:see(car) -- мы видим текущую цель или она видит нас
+		enemy_record.vis = script_car:IsObjectVisible(enemy) or enemy:see(car) or false -- мы видим текущую цель или она видит нас
 		enemy_record.weight = 1000
 		if enemy_record.vis == true and enemy_record.npc == true then
 			enemy_record.last_time_seen = time_global()
 			enemy_record.vertex = enemy:level_vertex_id()
 		end
 		targets_list[id] = enemy_record
+		--log3("[register_as_target] - registered [%s], vis = [%s], npc = [%s]", enemy:name() or "", enemy_record.vis or "", enemy_record.npc or "")
 	end
 end
 
@@ -1137,9 +1137,9 @@ function reprioritize_targets(car)
 	
 	if primary_target ~= nil then
 		last_reprioritize = time_global()
-		if debug_output then
-			log1("--BTR_SKYNET_COMBAT: Выбрана цель: "..tostring(primary_target))
-		end
+		
+		--local obj = level.object_by_id(primary_target)
+		--log3("--BTR_SKYNET_COMBAT: Выбрана цель: [%s]", obj and obj:name() or "UKNOWN")
 		return
 	else
 		last_target = {}
@@ -1229,7 +1229,6 @@ local objects_sec2desc = {
 	["tushkano"]    = game.translate_string("ogse_car_objects_sec2desc_17_text"),
 	--
 	["helicop"]     = game.translate_string("ogse_car_objects_sec2desc_18_text"),
-	["turret"]      = game.translate_string("ogse_car_objects_sec2desc_19_text"),
 	["btr"]         = game.translate_string("ogse_car_objects_sec2desc_20_text"),
 }
 local sec2desc_cache = {}
@@ -1300,9 +1299,9 @@ function update_target_marker()
 	local target = targets[current_target_id]
 	
 	local script_car = current_car:get_car()
-	local obj_vis = script_car:IsObjectVisible(target.obj)
+	local obj_vis = script_car:IsObjectVisible(target.obj) or false
 	local dist = target.obj:position():distance_to(db.actor:position())
-	local recognized_as_enemy = is_recognition_target_active() and is_enemy(target.obj)
+	local recognized_as_enemy = ( is_recognition_target_active() and is_enemy(target.obj) ) or false
 	local texture = target_textures[recognized_as_enemy][obj_vis]
 	btr_hud_wnd.hud_target:InitTexture(texture)
 	btr_hud_wnd.hud_target:SetColor(target_colors[recognized_as_enemy])
@@ -1315,9 +1314,6 @@ function update_target_marker()
 end
 
 local clsid2target_bone = {
-	[clsid.turret_mgun]   = "wpn_body1",
-	[clsid.wpn_mounted]   = "wpn_body1",
-	[clsid.wpn_stat_mgun] = "wpn_body1",
 	[clsid.script_heli]   = "pilot2", -- "root"
 	[clsid.helicopter]    = "pilot2",
 	[clsid.car_s]         = "root",

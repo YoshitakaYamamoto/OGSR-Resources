@@ -23,6 +23,7 @@ end
 
 class "car_binder" (object_binder)
 function car_binder:__init(obj) super(obj)
+	self.sm = ogse_signals.get_mgr()
 	self.info = false
 end
 
@@ -46,8 +47,8 @@ end
 function car_binder:net_spawn(server_object)
 	-- self.object:set_fuel_consumption(self.object:get_fuel_consumption()*100)
 	db.add_car(self.object)
-	trunk_inv.init_trunk(self.object)
-	ogse_car_control.register_target(self.object)
+
+	self.sm:call( "on_car_spawn", self.object, self )
 	return true
 end
 
@@ -97,11 +98,11 @@ function car_binder:update(delta)
 				close_door(self.engine_door_def)
 			end
 			-- подписываемся на сигнал открывания/закрывания дверей
-			self.sm = ogse_signals.get_mgr()
 			self._open_trunk_door_desc = {signal = "on_car_trunk_open", self = self, fun = self.on_trunk_open}
 			self.sm:subscribe(self._open_trunk_door_desc)
 			self._open_engine_door_desc = {signal = "on_car_engine_open", self = self, fun = self.on_engine_open}
 			self.sm:subscribe(self._open_engine_door_desc)
+			self.subscribed = true
 		end
 	end
 	if self.start_fuel then self.object:set_fuel(self.start_fuel) self.start_fuel = nil end
@@ -174,9 +175,9 @@ function wait_for_actor_move:condition()
 	return dist > 0.2
 end
 function wait_for_actor_move:action()
-	if self._on_key_desc then
+	--[[if self._on_key_desc then
 		self.sm:unsubscribe(self._on_key_desc)
-	end
+	end]]
 	close_door(self.car_binder.engine_door_def)
 end
 
@@ -217,59 +218,29 @@ function car_binder:save(packet)
 end
 
 function car_binder:death_callback(victim, who)
-	local car = self.object
-	db.del_car(car) -- удаляем машину из глобальной базы
-	ogse_car_control.unregister_target(car) -- разрегистрируем машину как цель
-	ogse_car_control.on_car_death(car) -- выполняем посмертные действия для водилы
-	-- выкидываем предметы из багажника
-	local trunk = trunk_inv.get_trunk_for_car(car)
-	for i=0,trunk:inv_box_count()-1 do
-		local pos = vector():mad(car:position(), vector():setHP(math.random()*math.pi*2, 0), 1.0+math.random()*2)
-		local it = trunk:object_from_inv_box(i)
-		trunk:drop_item_and_teleport(it, pos)
-		alife():set_switch_online(it:id(), true)
-		alife():set_switch_offline(it:id(), false)
-		if it:is_explosive() then -- следим только за взрывающимися предметами
-			wait_independent(it, math.random(1000, 2000)):start()
-		end
-	end
-	-- удаляем сам багажник
-	trunk_inv.remove_trunk(car)
-	-- удаляем машину
-	local s_car = alife():object(car:id())
-	if s_car then
-		alife():release(s_car, true)
-	end
-end
+	db.del_car(self.object) -- удаляем машину из глобальной базы
 
--- таймер ждёт, когда предмет окончательно переместится на уровень (не будет родительского объекта)
--- и после этого пытается этот предмет взорвать
--- надо для подрыва взрывоопасных предметов в инвентаре машины, поскольку сразу после телепорта
--- предметы ещё находятся во владении онлайновой машины и взрываться не хотят
-class "wait_independent" (ogse_qt.quick_timer)
-function wait_independent:__init(item, dt) super()
-	self.kill_time = time_global() + dt
-	self.item = item
-end
-function wait_independent:condition()
-	return not self.item:parent() and time_global() > self.kill_time and self.item:get_physics_shell()
-end
-function wait_independent:action()
-	self.item:explode(0) -- взорвутся только те, которые могут взорваться
+	self.sm:call( "on_car_death", self.object, who )
+
+	local s_car = alife():object(self.object:id())
+	if s_car then
+		alife():release(s_car, true) --Удаляем машину
+	end
 end
 
 function car_binder:net_destroy()
-	db.del_car(self.object)
 	self.object:set_callback(callback.death, nil)
-	ogse_car_control.unregister_target(self.object)
 
-	-- проверка, прошел ли хоть один апдейт и успели ли мы подписаться на сигналы
-	if self.sm then
+	if self.subscribed then --Проверка, прошел ли хоть один апдейт и успели ли мы подписаться на сигналы
 		self.sm:unsubscribe(self._open_trunk_door_desc)
 		self.sm:unsubscribe(self._open_engine_door_desc)
 	end
+
+	db.del_car(self.object)
+
+	self.sm:call( "on_car_net_destroy", self.object, self )
 end
 
 function car_binder:net_save_relevant()
-   return true
+	return true
 end

@@ -64,6 +64,7 @@ function heli_binder:__init( obj, ini ) super( obj )
 	self.ini         = ini
 	self.initialized = false
 	self.loaded      = false
+	self.sm = ogse_signals.get_mgr()
 end
 
 function heli_binder:reload( section )
@@ -143,7 +144,8 @@ function heli_binder:net_spawn( data )
 
 	db.add_obj( self.object )
 	db.add_heli( self.object )
-	ogse_car_control.register_target(self.object)
+
+	self.sm:call( "on_heli_spawn", self.object, self )
 
 	return true
 end
@@ -152,7 +154,7 @@ function heli_binder:net_destroy()
 	db.del_obj( self.object )
 	db.del_heli( self.object )
 
-	ogse_car_control.unregister_target(self.object)
+	self.sm:call( "on_heli_net_destroy", self.object, self )
 
 	object_binder.net_destroy( self )
 end
@@ -202,6 +204,8 @@ function heli_binder:check_health()
 			heli_die( self.object )
 
 			heli_snd.play_snd( self.st, "death", 4 )
+
+			self.sm:call( "on_heli_death", self.object, self )
 		end
 	end
 end

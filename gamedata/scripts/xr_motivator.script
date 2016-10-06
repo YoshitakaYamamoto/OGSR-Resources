@@ -297,6 +297,7 @@ log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name()
 end
 
 function motivator_binder:net_spawn(sobject)
+--log3("~~[%s] Start net_spawn [%s]", script_name(), self.object and self.object:name() or "nil")
 	ogse_debug.process_npc(self.object, "s_spw", 1)
 	ogse.fix_restrictors(self.object)
 
@@ -479,10 +480,6 @@ function motivator_binder:net_spawn(sobject)
 	end
 	--// xr_companion	
 
-	ogse_debug.process_npc(self.object, "s_spw", 13)
-	ogse_car_control.register_target(self.object)
-	ogse_scripted_btr.register_target(self.object)
-
 	self.am:call( "on_npc_spawn", self.object, self )
 
 	ogse_debug.process_npc(self.object, "s_spw", 0)
@@ -523,9 +520,6 @@ log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:nam
 
 	self:clear_callbacks()
 	self.object:set_callback(callback.use_object, nil)
-
-	ogse_car_control.unregister_target(self.object)
-	ogse_scripted_btr.unregister_target(self.object)
 
 	self.am:call( "on_npc_net_destroy", self.object, self )
 	self.am:cleanup_signal_subs( "on_npc_update." .. self.object:id() )
@@ -737,13 +731,9 @@ function motivator_binder:death_callback(victim, who)
 	ogse_debug.process_npc(victim, "dth", 18)
 	xr_effects.bar_territory_death(self.object, who)
 
-	ogse_debug.process_npc(victim, "dth", 19)
-	ogse_car_control.unregister_target(self.object)
-	ogse_scripted_btr.unregister_target(self.object)
-
 	ogse_debug.process_npc(victim, "dth", 21)
 
-	self.am:call("on_npc_death", victim, who)
+	self.am:call("on_npc_death", self.object, who)
 
 	ogse_debug.process_npc(victim, "dth", 0)
 end
