@@ -22,6 +22,8 @@ function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_first_update", fun = this.on_first_update})
 	sm:subscribe({signal = "on_info",     fun = this.on_info})
 	sm:subscribe({signal = "on_car_death", fun = this.on_car_death})
+	sm:subscribe({signal = "on_save", 	  fun = this.on_save})
+	sm:subscribe({signal = "on_load", 	  fun = this.on_load})
 	--
 	sm:subscribe({signal = "on_monster_spawn", fun = this.register_target})
 	sm:subscribe({signal = "on_monster_death", fun = this.unregister_target})
@@ -679,6 +681,22 @@ function on_first_update()
 	end
 end
 
+
+function on_save()
+	if in_btr then
+		ogse.save_var( "god_mode_in_btr", true, "bool" )
+	elseif ogse.var_exists( "god_mode_in_btr" ) then
+		ogse.delete_var( "god_mode_in_btr" )
+	end
+end
+
+function on_load()
+	if not ogse.var_exists( "god_mode_in_btr" ) then
+		cmd("g_god off")
+	end
+end
+
+
 function update_car_hud()
 	local car = get_actor_car() -- получаем машину, в которой сидит ГГ
 	-- обновляем состояние машины
@@ -704,7 +722,9 @@ function update_car_hud()
 		in_btr = string.find(car:section(), "btr") ~= nil
 		if in_btr then
 			enable_car_gun(car, true)
-			--set_actor_invincible(true)
+
+			--log3("~~[%s] god_mode is: [%s]", script_name(), get_con_bool("g_god"))
+			cmd("g_god on")
 		end
 		show_car_hud(car, in_btr)
 		ogse_signals.get_mgr():call("on_hud_show")
@@ -717,7 +737,8 @@ function update_car_hud()
 		hide_car_hud(in_btr)
 		if in_btr then
 			in_btr = false
-			--set_actor_invincible(false)
+
+			cmd("g_god off")
 		end
 	end
 	if car then
