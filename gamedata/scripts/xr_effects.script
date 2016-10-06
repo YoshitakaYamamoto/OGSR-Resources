@@ -2564,7 +2564,7 @@ function on_tutor_gameover_stop()
 end
 
 function actor_stop_sleeping()
-	ogse_signals.get_mgr():call("break_sleep")
+	--ogse_signals.get_mgr():call("break_sleep")
 end
 
 function esc_actor_is_enemy(actor, npc)			
