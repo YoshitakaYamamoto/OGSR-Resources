@@ -257,34 +257,40 @@ function invalidate_pp_accessibility()
 end
 
 function validate_accessibility(npc,ppname)
-	local pp=patrol(ppname)
-	local valid=false
+	local pp = patrol(ppname)
+	local valid = false
 	if pp_validated[ppname] then
-		return true,ppname
+		return true, ppname
 	end
-	pp_validated[ppname]=true
+	pp_validated [ppname] = true
 	if pp then
-		--log1("MOVE_MGR validating "..ppname.." for "..npc:name())
+		--log3("[%s] validating [%s] for [%s]", script_name(), ppname, npc:name())
 		for i=0,pp:count()-1 do
 			local nearest_anoms = ogse_anomaly.get_all_nearest_anomalies_by_point(pp:point(i))
-			-- local hasanom, anomid, pos, cls, dist, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(pp:point(i))
 			if nearest_anoms ~= {} then
 				for k, v in pairs(nearest_anoms) do
 					if ogse_anomaly.get_anomaly_mode(k) ~= "anom_off" and v.dist <= (v.radius+2) and not string.find(npc:name(), "dik_the_drifter") then -- для дика не производим валидацию
-						--log1("MOVE_MGR found anomaly "..v.sect.." on point "..ppname.." for "..npc:name())
+						--log3("~~[%s] found anomaly [%s] on point [%s] for [%s]", script_name(), v.sect, ppname, npc:name())
 						ogse_anomaly_evader.remove_restriction(npc, k)
-						--log1("MOVE_MGR removed anomaly "..v.sect.." on point "..ppname.." for "..npc:name())
+						--log3("--[%s] removed anomaly [%s] on point [%s] for [%s]", script_name(), v.sect, ppname, npc:name())
 					end					
 				end
 			end
 		end
+
+		local level_vertexes = ogse.level_vertexes[ level.name() ]
 		for i=0,pp:count()-1 do
-			--log1("MOVE_MGR verifying point ["..tostring(i).."] on path "..ppname.." VTX ["..tostring(pp:level_vertex_id(i)).."] for "..npc:name())
-			if npc:accessible(pp:level_vertex_id(i)) then
-				--log1("MOVE_MGR checked point")
-				return true,ppname
+			--log3("~~[%s] verifying point [%s] on path [%s] VTX [%s] for [%s]", script_name(), i, ppname, pp:level_vertex_id(i), npc:name())
+			if not npc:accessible(pp:level_vertex_id(i)) then
+				--log1("!!MOVE_MGR verifying point end")
+				return false, ppname
 			end
-			--log1("MOVE_MGR verifying point end")
+			if pp:level_vertex_id( i ) > level_vertexes then
+				log3( "!![%s]: wrong point [%s] on path [%s]: level_vertex_id = %s", script_name(), i, ppname, pp:level_vertex_id( i ) )
+				return false, ppname
+			end
+			--log1("--MOVE_MGR checked point")
+			return true, ppname
 		end
 	end
 	return false,ppname

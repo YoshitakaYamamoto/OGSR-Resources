@@ -122,6 +122,42 @@ tips_icons = {
 	uniq	= { 498, 47}
 }
 
+
+level_vertexes = {
+  ['l01_escape'] = 592836,
+  ['l02_garbage'] = 394972,
+  ['l03_agroprom'] = 438013,
+  ['l03u_agr_underground'] = 5170,
+  ['l04_darkvalley'] = 391084,
+  ['l04u_labx18'] = 8308,
+  ['l05_bar'] = 120422,
+  ['l06_rostok'] = 68382,
+  ['l08_yantar'] = 155448,
+  ['l08u_brainlab'] = 12614,
+  ['l07_military'] = 421596,
+  ['l10_radar'] = 227462,
+  ['l10u_bunker'] = 8817,
+  ['l11_pripyat'] = 262315,
+  ['l12_stancia'] = 481752,
+  ['l12_stancia_2'] = 609784,
+  ['l12u_sarcofag'] = 10685,
+  ['l12u_control_monolith'] = 4000,
+  ['k01_darkscape_ogse'] = 1094047,
+  ['l09_deadcity_ogse'] = 783951,
+  ['l13_generators_ogse'] = 427806,
+  ['l22_marsh'] = 91518,
+  ['l23_x9'] = 2859,
+}
+
+function check_lvids_for_all_levels()
+	local lv_new = {}
+	for lname, v in pairs(level_vertexes) do
+		lv_new[lname] = get_lvids_count(lname)
+	end
+	log4("Level_vertexes", "%s", lv_new)
+end
+
+
 function kill_living_npc(npc_id)
    local s_npc = alife():object(npc_id)
    s_npc.force_offline = true
@@ -1864,23 +1900,20 @@ function fix_restrictors(npc)
 	end	
 end
 
-local readers = {}
+
 function get_lvids_count(lname)
-	local level_ai_reader = readers[lname]
-	if not level_ai_reader then
-		local fs = getFS()
-		if not fs:exist("$game_levels$", lname.."\\level.ai") then
-			return 0
-		end
-		level_ai_reader = fs:r_open("$game_levels$", lname.."\\level.ai")
-		readers[lname] = level_ai_reader 
+	local fs = getFS()
+	if not fs:exist("$game_levels$", lname.."\\level.ai") then
+		return 0
 	end
-	
+	local level_ai_reader = fs:r_open("$game_levels$", lname.."\\level.ai")
+
 	level_ai_reader:r_seek(0)
 	local ver = level_ai_reader:r_u32() --4 -- версия файла
 	local v_number = level_ai_reader:r_u32() --4 -- количество вертексов
 	return v_number
 end
+
 
 function transfer_items_to_box(box_sid, remove_quest_items, exclude_sections, exclude_clsids)
 	local box = level_object_by_sid(box_sid)
