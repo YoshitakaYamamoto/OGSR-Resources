@@ -270,32 +270,6 @@ local postcombat_states_full_weapon = {
 	[2] = "threat",
 }
 
---[=[
-local shotguns = {
-
-["wpn_bm16"]			= true,
-["wpn_toz34_short"]		= true,
-["wpn_bm16_full"]		= true,
-["wpn_toz34"]			= true,
-["wpn_wincheaster1300"]	= true,
-["wpn_spas12"]			= true,
-["wpn_saiga12c"]		= true,
-["wpn_saiga12c_m1"]		= true,
-["wpn_flame"]			= true,
-["wpn_sayga12k_sk1"]	= true
-
-}
-
-local sniper_rifles = {
-
-["wpn_svu"]				= true,
-["wpn_swd"]				= true,
-["wpn_awm"]				= true,
-["wpn_gauss"]			= true
-
-}
---]=]
-
 local grenade_launchers = {
 
 ["wpn_rpg7"] = true,
@@ -303,8 +277,6 @@ local grenade_launchers = {
 }
 
 local short_weapons = {
-		--[clsid.wpn_binocular] 			= true,
-		--[clsid.wpn_binocular_s] 		= true,
 		[clsid.wpn_fort]				= true,
 		[clsid.wpn_grenade_f1] 			= true,
 		[clsid.wpn_grenade_fake] 		= true,
@@ -393,28 +365,6 @@ function check_is_enemy(npc, enemy)
 	return false
 end
 
---[=[ --KRodin: отключил и оторвал все вызовы. Теперь тоже самое делает enemy_callback в функции check_is_enemy
-function is_combat_ignore( npc, enemy )
-  st = db.storage[npc:id()].combat_ignore
-  if not st then return false end
-  if st.enabled then
-    local overrides = xr_logic.generic_scheme_overrides( npc )
-    db.storage[ npc:id() ].enemy = enemy
-    if
-      overrides
-      and overrides.combat_ignore
-      and db.actor
-      and xr_logic.pick_section_from_condlist(
-        db.actor, npc, overrides.combat_ignore.condlist
-      ) ~= nil
-    then
-      return true
-    end
-  end
-  return false
-end
-]=]
-
 
 local community_forbidden_locations = {
 	["monolith"] = {
@@ -473,40 +423,6 @@ function evaluator_check_altcombat:evaluate()
 		reprioritize_targets(self.object)
 		check_for_grenades(self.object)
 	end
-
---[=[ --KRodin: Зря я этот кусок добавил, из за него неписи перестали стрелять по вертолётам на Генераторах
-	local targ_id = primary_target[self.object:id()]
-	if targ_id ~= nil then
-		local targ_obj = level.object_by_id(targ_id)
-		if targ_obj then
-			if is_armor(best_enemy) then
-				--if not armor_alive(best_enemy) then
-				--	primary_target[self.object:id()] = nil
-				--	in_combat[self.object:id()] = nil
-				--	return false
-				--end
-			elseif targ_obj:alive() then
-				--log3("~~[%s] Checking target for [%s]: [%s]", script_name(), self.object:name(), targ_obj:name() or "nil")
-				if not check_is_enemy(self.object, targ_obj) then
-					primary_target[self.object:id()] = nil
-					in_combat[self.object:id()] = nil
-					return false
-				end
-			--else
-			--	primary_target[self.object:id()] = nil
-			--	in_combat[self.object:id()] = nil
-			--	return false
-			end
-		else
-			primary_target[self.object:id()] = nil
-			in_combat[self.object:id()] = nil
-			return false
-		end
-	else
-		in_combat[self.object:id()] = nil
-		return false
-	end
---]=]
 
 	local bw = nil
 	local wm = rx_wmgr and rx_wmgr.get_wm(self.object)
@@ -2808,13 +2724,6 @@ function IsShotgun(object)
 		return wpn_class and wpn_class == "shotgun"
 	end
 	return false
-	--[=[if object then
-		local id = object:section()
-		if shotguns[id] then
-			return true
-		end
-	end
-	return false]=]
 end
 
 function IsSniperRifle(object)
@@ -2825,17 +2734,6 @@ function IsSniperRifle(object)
 		return wpn_class and wpn_class == "sniper_rifle"
 	end
 	return false
-	--[=[if object then
-		local sect = object:section()
-		if sniper_rifles[sect] then return true end
-
-		for k, v in pairs(sniper_rifles) do --KRodin: Если по ключу в таблице секцию не нашли, значит перебираем всю таблицу в поисках вхождения ключа таблицы в секцию ствола. Это нужно для модульных стволов с кучей секций. Например, СВД (чтобы всю эту гору секций в таблицу не заносить).
-			if string.find(sect, k) then
-				return true
-			end
-		end
-	end
-	return false]=]
 end
 
 function IsRPG(object)
