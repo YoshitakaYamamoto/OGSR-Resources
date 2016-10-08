@@ -20,7 +20,7 @@ function recolor_slot_item(item)
 	if not recolor_items then return end
 	if db.actor:is_in_slot(item) or db.actor:is_on_belt(item) then
 		local _st = CUIFrameWindow():GetTitleStatic()
-		if _st then _st:SetColor(GetARGB(255,150,255,150)) end
+		if _st then _st:SetColor(GetARGB( 255, 0, 255, 0 )) end
 	end
 end
 
