@@ -1,14 +1,15 @@
 ------------------------------------------------------------
 class "timeout_timer" ( ogse_qt.quick_timer )
-function timeout_timer:__init( delay, fun) super( delay )
+function timeout_timer:__init( delay, fun, ... ) super( delay )
   self.fun = fun
+  self.args = { ... }
 end
 function timeout_timer:taction()
-  self.fun()
+  self.fun( unpack( self.args ) )
 end
 
-function timeout( delay, fun )
-  local tmout = timeout_timer( delay, fun )
+function timeout( delay, fun, ... )
+  local tmout = timeout_timer( delay, fun, ... )
   tmout:start()
   return tmout
 end
