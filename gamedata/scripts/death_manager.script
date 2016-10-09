@@ -7,12 +7,12 @@ end
 
 function on_first_update( obj )
   if not obj:alive() then
-    drop_manager( obj ):create_release_item()
+    create_release_item( obj )
   end
 end
 
 function on_death( obj )
-  drop_manager( obj ):create_release_item()
+  create_release_item( obj )
 end
 
 
@@ -260,54 +260,49 @@ function keep_offline_item(npc, item)
     end
 end
 
-class "drop_manager"
-function drop_manager:__init(npc)
-	self.npc = npc
-end
-
-function drop_manager:create_release_item()
-	--log3("~~Called drop_manager:create_release_item() for [%s]", self.npc:name())
+function create_release_item(npc)
+	--log3("~~Called create_release_item() for [%s]", npc:name())
 	--' Спрашиваем у серверного объекта генерились ли предметы
-	local se_obj = alife():object(self.npc:id())
+	local se_obj = alife():object(npc:id())
 	if not se_obj or se_obj.death_dropped > 0 then return end
 	se_obj.death_dropped = 1
-	--log3("--Creating release_items for [%s]", self.npc:name())
+	--log3("--Creating release_items for [%s]", npc:name())
 
 	--// xr_companion
-	if xr_companion.is_companion(self.npc:id()) then
-		self.npc:iterate_inventory(companion_item, self.npc)
+	if xr_companion.is_companion(npc:id()) then
+		npc:iterate_inventory(companion_item, npc)
 		return
 	end	
 	--// xr_companion
 
     --' Запускаем итератор на удаление предметов
-    self.npc:iterate_inventory(keep_item, self.npc)
+    npc:iterate_inventory(keep_item, npc)
 
     --' Проверка на отсутствие спауна лута
-    local ini = self.npc:spawn_ini()
+    local ini = npc:spawn_ini()
     if ini and ini:section_exist("dont_spawn_loot") then
         return
     end
 
     --' Доспавниваем необходимое количество итемов:
     --' Необходимо составить список объектов которые могут быть заспавнены для персонажа
-	local spawn_items = item_by_community[self.npc:character_community()]    
+	local spawn_items = item_by_community[npc:character_community()]    
 	for k,v in pairs(spawn_items) do
 		--' По каждому объекту необходимо получить количество
 		local number = math.ceil(math.random(count_by_level[k].min, count_by_level[k].max))
 		--' Необходимо заспавнить нужное количество.
-		create_items(self.npc, k, number, v)
+		create_items(npc, k, number, v)
 	end
 
-	local sect = ogse_real_armor.vis_to_armor(self.npc) --RealArmor by KamikaZze
+	local sect = ogse_real_armor.vis_to_armor(npc) --RealArmor by KamikaZze
 
 	if	sect
-		and not forbidden_npc_names[self.npc:name()]
-		and not string.find(self.npc:name(),"gar_dm_bandit")
+		and not forbidden_npc_names[npc:name()]
+		and not string.find(npc:name(),"gar_dm_bandit")
 	then
 		local rnd = suit_prob
 		if sect == "exo1" then rnd = exo_prob end
-		local otf = create_items(self.npc, sect, 1, rnd)
+		local otf = create_items(npc, sect, 1, rnd)
 		if otf then
 			dsh.timeout(300, function()
 				local a = level.object_by_id(otf.id)
@@ -317,14 +312,14 @@ function drop_manager:create_release_item()
 	end
 
 --[=[ --Вот здесь этому доспавниванию не место вообще. Отключено. Кажется мне, что это не используется, но если что - переделать.
-	if has_alife_info("pri_trader_arny_task") and string.find(self.npc:name(), "aem_arny") then 
-		ogse.spawn_item_in_inv("zapiska", self.npc) 
+	if has_alife_info("pri_trader_arny_task") and string.find(npc:name(), "aem_arny") then 
+		ogse.spawn_item_in_inv("zapiska", npc) 
 	end
-	if has_alife_info("pri_trader_dolg_task") and self.npc:name()=="bar_dolg_leader" then 
-		ogse.spawn_item_in_inv("zapiska_m1", self.npc) 
+	if has_alife_info("pri_trader_dolg_task") and npc:name()=="bar_dolg_leader" then 
+		ogse.spawn_item_in_inv("zapiska_m1", npc) 
 	end
-	if has_alife_info("pri_trader_freedom_task") and self.npc:name()=="mil_freedom_member0012" then 
-		ogse.spawn_item_in_inv("zapiska_m2", self.npc) 
+	if has_alife_info("pri_trader_freedom_task") and npc:name()=="mil_freedom_member0012" then 
+		ogse.spawn_item_in_inv("zapiska_m2", npc) 
 	end
 --]=]
 end
