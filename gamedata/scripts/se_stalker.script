@@ -1,9 +1,4 @@
---[[
-»зменени€ script_version:
-	3 - сохранение пол€ job_online
-	5 - сохранение пол€ was_in_smart_terrain
-	6 - сохранение пол€ death_dropped
-]]
+
 bar_exceptions = {
    [4294967296] = true,
    [story_ids.second_neutral] = true,
@@ -206,7 +201,6 @@ end
 function se_stalker:STATE_Read (packet, size)
 	cse_alife_human_stalker.STATE_Read (self, packet, size)
 
-	if self.script_version >= 3 then
 		local t = packet:r_u8()
 
 		if t == 0 then
@@ -220,12 +214,8 @@ function se_stalker:STATE_Read (packet, size)
 
 			self.job_online = xr_logic.parse_condlist(nil, "se_stalker:STATE_Read", "job_online", self.job_online_condlist)
 		end
-	end
 
-	if self.script_version >= 5 then
 		self.was_in_smart_terrain = packet:r_bool()
-	end
-	if self.script_version >= 6 then
 
 		self.death_dropped = packet:r_u8()
 
@@ -233,7 +223,6 @@ function se_stalker:STATE_Read (packet, size)
 			self.offline_dead = packet:r_u32()
 			self.s_storage = packet:r_stringZ() -- если есть, загрузим из сохранЄнной строки			
 		end
-	end
 end
 --------------------
 function se_stalker:on_before_register()
