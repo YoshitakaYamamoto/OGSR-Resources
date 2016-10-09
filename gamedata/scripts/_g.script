@@ -84,11 +84,14 @@ function sum_args_ex(base, offs)
 end
 
 --Некоторые недостающие DIK_keys:
-DIK_keys["MOUSE_4"] = 340
-DIK_keys["MOUSE_5"] = 341
-DIK_keys["MOUSE_6"] = 342
-DIK_keys["MOUSE_7"] = 343
-DIK_keys["MOUSE_8"] = 344
+DIK_keys["DIK_MOUSE1"] = 337
+DIK_keys["DIK_MOUSE2"] = 338
+DIK_keys["DIK_MOUSE3"] = 339
+DIK_keys["DIK_MOUSE4"] = 340
+DIK_keys["DIK_MOUSE5"] = 341
+DIK_keys["DIK_MOUSE6"] = 342
+DIK_keys["DIK_MOUSE7"] = 343
+DIK_keys["DIK_MOUSE8"] = 344
 
 --Некоторые недостающие key_bindings:
 key_bindings["kSPRINT_TOGGLE"] = 8

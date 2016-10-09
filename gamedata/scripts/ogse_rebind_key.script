@@ -3,160 +3,195 @@
 --/ OGS Evolution Team 2010 /--
 --/ version 1.4 (04/08/2013)/--
 
---/ Модуль перехвата функционала клавиш /--
--- назначение модуля: отвязка движкового назначения клавиш во время игры, чтобы ненужные движковые 
--- действия не конфликтовали со скриптовыми, забинденными на эти же клавиши. При этом на время
--- работы меню клавиши биндятся обратно, чтобы можно было назначать и менять их с помощью
--- стиандартного диалога настроек клавиатуры.
+--/ РњРѕРґСѓР»СЊ РїРµСЂРµС…РІР°С‚Р° С„СѓРЅРєС†РёРѕРЅР°Р»Р° РєР»Р°РІРёС€ /--
+-- РЅР°Р·РЅР°С‡РµРЅРёРµ РјРѕРґСѓР»СЏ: РѕС‚РІСЏР·РєР° РґРІРёР¶РєРѕРІРѕРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ РєР»Р°РІРёС€ РІРѕ РІСЂРµРјСЏ РёРіСЂС‹, С‡С‚РѕР±С‹ РЅРµРЅСѓР¶РЅС‹Рµ РґРІРёР¶РєРѕРІС‹Рµ 
+-- РґРµР№СЃС‚РІРёСЏ РЅРµ РєРѕРЅС„Р»РёРєС‚РѕРІР°Р»Рё СЃРѕ СЃРєСЂРёРїС‚РѕРІС‹РјРё, Р·Р°Р±РёРЅРґРµРЅРЅС‹РјРё РЅР° СЌС‚Рё Р¶Рµ РєР»Р°РІРёС€Рё. РџСЂРё СЌС‚РѕРј РЅР° РІСЂРµРјСЏ
+-- СЂР°Р±РѕС‚С‹ РјРµРЅСЋ РєР»Р°РІРёС€Рё Р±РёРЅРґСЏС‚СЃСЏ РѕР±СЂР°С‚РЅРѕ, С‡С‚РѕР±С‹ РјРѕР¶РЅРѕ Р±С‹Р»Рѕ РЅР°Р·РЅР°С‡Р°С‚СЊ Рё РјРµРЅСЏС‚СЊ РёС… СЃ РїРѕРјРѕС‰СЊСЋ
+-- СЃС‚РёР°РЅРґР°СЂС‚РЅРѕРіРѕ РґРёР°Р»РѕРіР° РЅР°СЃС‚СЂРѕРµРє РєР»Р°РІРёР°С‚СѓСЂС‹.
+
+function attach( sm )
+	sm:subscribe({ signal = "on_first_update", fun = this.unbind_key })
+end
+
+--********************************************************************************************************
+
+local dik_key_to_name = {
+	[ 11  ] = "k0",
+	[ 2   ] = "k1",
+	[ 3   ] = "k2",
+	[ 4   ] = "k3",
+	[ 5   ] = "k4",
+	[ 6   ] = "k5",
+	[ 7   ] = "k6",
+	[ 8   ] = "k7",
+	[ 9   ] = "k8",
+	[ 10  ] = "k9",
+	[ 30  ] = "kA",
+	[ 78  ] = "kADD",
+	[ 40  ] = "kAPOSTROPHE",
+	[ 221 ] = "kAPPS",
+	[ 145 ] = "kAT",
+	[ 150 ] = "kAX",
+	[ 48  ] = "kB",
+	[ 14  ] = "kBACK",
+	[ 43  ] = "kBACKSLASH",
+	[ 46  ] = "kC",
+	[ 58  ] = "kCAPITAL",
+	[ 144 ] = "kCIRCUMFLEX",
+	[ 146 ] = "kCOLON",
+	[ 51  ] = "kCOMMA",
+	[ 121 ] = "kCONVERT",
+	[ 32  ] = "kD",
+	[ 83  ] = "kDECIMAL",
+	[ 211 ] = "kDELETE",
+	[ 181 ] = "kDIVIDE",
+	[ 208 ] = "kDOWN",
+	[ 18  ] = "kE",
+	[ 207 ] = "kEND",
+	[ 13  ] = "kEQUALS",
+	[ 1   ] = "kESCAPE",
+	[ 33  ] = "kF",
+	[ 59  ] = "kF1",
+	[ 68  ] = "kF10",
+	[ 87  ] = "kF11",
+	[ 88  ] = "kF12",
+	[ 100 ] = "kF13",
+	[ 101 ] = "kF14",
+	[ 102 ] = "kF15",
+	[ 60  ] = "kF2",
+	[ 61  ] = "kF3",
+	[ 62  ] = "kF4",
+	[ 63  ] = "kF5",
+	[ 64  ] = "kF6",
+	[ 65  ] = "kF7",
+	[ 66  ] = "kF8",
+	[ 67  ] = "kF9",
+	[ 34  ] = "kG",
+	[ 41  ] = "kGRAVE",
+	[ 35  ] = "kH",
+	[ 199 ] = "kHOME",
+	[ 23  ] = "kI",
+	[ 210 ] = "kINSERT",
+	[ 36  ] = "kJ",
+	[ 37  ] = "kK",
+	[ 112 ] = "kKANA",
+	[ 148 ] = "kKANJI",
+	[ 38  ] = "kL",
+	[ 26  ] = "kLBRACKET",
+	[ 29  ] = "kLCONTROL",
+	[ 203 ] = "kLEFT",
+	[ 56  ] = "kLMENU",
+	[ 42  ] = "kLSHIFT",
+	[ 219 ] = "kLWIN",
+	[ 50  ] = "kM",
+	[ 12  ] = "kMINUS",
+	[ 55  ] = "kMULTIPLY",
+	[ 49  ] = "kN",
+	[ 209 ] = "kNEXT",
+	[ 123 ] = "kNOCONVERT",
+	[ 69  ] = "kNUMLOCK",
+	[ 82  ] = "kNUMPAD0",
+	[ 79  ] = "kNUMPAD1",
+	[ 80  ] = "kNUMPAD2",
+	[ 81  ] = "kNUMPAD3",
+	[ 75  ] = "kNUMPAD4",
+	[ 76  ] = "kNUMPAD5",
+	[ 77  ] = "kNUMPAD6",
+	[ 71  ] = "kNUMPAD7",
+	[ 72  ] = "kNUMPAD8",
+	[ 73  ] = "kNUMPAD9",
+	[ 179 ] = "kNUMPADCOMMA",
+	[ 156 ] = "kNUMPADENTER",
+	[ 141 ] = "kNUMPADEQUALS",
+	[ 24  ] = "kO",
+	[ 25  ] = "kP",
+	[ 197 ] = "kPAUSE",
+	[ 52  ] = "kPERIOD",
+	[ 201 ] = "kPRIOR",
+	[ 16  ] = "kQ",
+	[ 19  ] = "kR",
+	[ 27  ] = "kRBRACKET",
+	[ 157 ] = "kRCONTROL",
+	[ 28  ] = "kRETURN",
+	[ 205 ] = "kRIGHT",
+	[ 184 ] = "kRMENU",
+	[ 54  ] = "kRSHIFT",
+	[ 220 ] = "kRWIN",
+	[ 31  ] = "kS",
+	[ 70  ] = "kSCROLL",
+	[ 39  ] = "kSEMICOLON",
+	[ 53  ] = "kSLASH",
+	[ 57  ] = "kSPACE",
+	[ 149 ] = "kSTOP",
+	[ 74  ] = "kSUBTRACT",
+	[ 183 ] = "kSYSRQ",
+	[ 20  ] = "kT",
+	[ 15  ] = "kTAB",
+	[ 22  ] = "kU",
+	[ 147 ] = "kUNDERLINE",
+	[ 151 ] = "kUNLABELED",
+	[ 200 ] = "kUP",
+	[ 47  ] = "kV",
+	[ 17  ] = "kW",
+	[ 45  ] = "kX",
+	[ 21  ] = "kY",
+	[ 125 ] = "kYEN",
+	[ 44  ] = "kZ",
+	[ 337 ] = "MOUSE1", --Р›РљРњ
+	[ 338 ] = "MOUSE2", --РџРљРњ
+	[ 339 ] = "MOUSE3", --РЎРљРњ (РёРјРµРЅРЅРѕ РЅР°Р¶Р°С‚РёРµ, Р° РЅРµ РІСЂР°С‰РµРЅРёРµ!)
+	[ 340 ] = "MOUSE4",
+	[ 341 ] = "MOUSE5",
+	[ 342 ] = "MOUSE6",
+	[ 343 ] = "MOUSE7",
+	[ 344 ] = "MOUSE8",
+}
+
+function dik_to_name(dik)
+	local name = dik_key_to_name[dik]
+    ASSERT( name, "dik_to_name not found: %s", dik or "nil" )
+	return name
+end
+
+function bind_to_keys( bind, return_names ) --Р•СЃР»Рё РІС‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚ == true, С‚Рѕ С„СѓРЅРєС†РёСЏ РІРѕР·РІСЂР°С‚РёС‚ РёРјРµРЅР° РєР»Р°РІРёС€. Р’ РїСЂРѕС‚РёРІРЅРѕРј СЃР»СѓС‡Р°Рµ РІРѕР·РІСЂР°С‚РёС‚ РєРѕРґС‹.
+  local dik = bind_to_dik( bind )
+  ASSERT( dik, "bind_to_dik not found: %s", bind )
+  local t = return_names and { dik_to_name(dik) } or { dik }
+  for k, v in pairs( dik_key_to_name ) do
+    if ( return_names and v ~= t[ 1 ] ) or ( not return_names and k ~= t[ 1 ] ) then
+      local kbd = v:find( "^k" ) ~= nil and v:sub( 2 ) or v
+	  local key = DIK_keys[ "DIK_" .. kbd ]
+      if key and dik_to_bind( key ) == bind then 
+		table.insert( t, return_names and v or k )
+      end
+    end
+  end
+  return t
+end
+
+local name_to_dik_key = {}
+for dik, name in pairs(dik_key_to_name) do
+	name_to_dik_key[name] = dik
+end
+function keyname_to_dik( kname )
+	local dik = name_to_dik_key[kname]
+    ASSERT( dik, "keyname_to_dik not found: %s", kname or "nil" )
+	return dik
+end
+
+--********************************************************************************************************
 
 local intercept_key_table = {}
 
 function get_key_preset_value(key_name)
 	local key = intercept_key_table[key_name]
-	--log3("key=%d", key)
+	--log3("key= [%s]", key or "nil")
 	return key
 end
 
 function set_key_preset_value(key_name, value)
-	--log3("set_key_preset_value: %s = $d", key_name, value)
+	--log3("set_key_preset_value: [%s] = [%s]", key_name, value)
 	intercept_key_table[key_name] = value
-end
-local dik_key_to_name = {
---[0] = "",
---[100000] = "",
-[11] = "k0",
-[2] = "k1",
-[3] = "k2",
-[4] = "k3",
-[5] = "k4",
-[6] = "k5",
-[7] = "k6",
-[8] = "k7",
-[9] = "k8",
-[10] = "k9",
-[30] = "kA",
-[78] = "kADD",
-[40] = "kAPOSTROPHE",
-[221] = "kAPPS",
-[145] = "kAT",
-[150] = "kAX",
-[48] = "kB",
-[14] = "kBACK",
-[43] = "kBACKSLASH",
-[46] = "kC",
-[58] = "kCAPITAL",
-[144] = "kCIRCUMFLEX",
-[146] = "kCOLON",
-[51] = "kCOMMA",
-[121] = "kCONVERT",
-[32] = "kD",
-[83] = "kDECIMAL",
-[211] = "kDELETE",
-[181] = "kDIVIDE",
-[208] = "kDOWN",
-[18] = "kE",
-[207] = "kEND",
-[13] = "kEQUALS",
-[1] = "kESCAPE",
-[33] = "kF",
-[59] = "kF1",
-[68] = "kF10",
-[87] = "kF11",
-[88] = "kF12",
-[100] = "kF13",
-[101] = "kF14",
-[102] = "kF15",
-[60] = "kF2",
-[61] = "kF3",
-[62] = "kF4",
-[63] = "kF5",
-[64] = "kF6",
-[65] = "kF7",
-[66] = "kF8",
-[67] = "kF9",
-[34] = "kG",
-[41] = "kGRAVE",
-[35] = "kH",
-[199] = "kHOME",
-[23] = "kI",
-[210] = "kINSERT",
-[36] = "kJ",
-[37] = "kK",
-[112] = "kKANA",
-[148] = "kKANJI",
-[38] = "kL",
-[26] = "kLBRACKET",
-[29] = "kLCONTROL",
-[203] = "kLEFT",
-[56] = "kLMENU",
-[42] = "kLSHIFT",
-[219] = "kLWIN",
-[50] = "kM",
-[12] = "kMINUS",
-[55] = "kMULTIPLY",
-[49] = "kN",
-[209] = "kNEXT",
-[123] = "kNOCONVERT",
-[69] = "kNUMLOCK",
-[82] = "kNUMPAD0",
-[79] = "kNUMPAD1",
-[80] = "kNUMPAD2",
-[81] = "kNUMPAD3",
-[75] = "kNUMPAD4",
-[76] = "kNUMPAD5",
-[77] = "kNUMPAD6",
-[71] = "kNUMPAD7",
-[72] = "kNUMPAD8",
-[73] = "kNUMPAD9",
-[179] = "kNUMPADCOMMA",
-[156] = "kNUMPADENTER",
-[141] = "kNUMPADEQUALS",
-[24] = "kO",
-[25] = "kP",
-[197] = "kPAUSE",
-[52] = "kPERIOD",
-[201] = "kPRIOR",
-[16] = "kQ",
-[19] = "kR",
-[27] = "kRBRACKET",
-[157] = "kRCONTROL",
-[28] = "kRETURN",
-[205] = "kRIGHT",
-[184] = "kRMENU",
-[54] = "kRSHIFT",
-[220] = "kRWIN",
-[31] = "kS",
-[70] = "kSCROLL",
-[39] = "kSEMICOLON",
-[53] = "kSLASH",
-[57] = "kSPACE",
-[149] = "kSTOP",
-[74] = "kSUBTRACT",
-[183] = "kSYSRQ",
-[20] = "kT",
-[15] = "kTAB",
-[22] = "kU",
-[147] = "kUNDERLINE",
-[151] = "kUNLABELED",
-[200] = "kUP",
-[47] = "kV",
-[17] = "kW",
-[45] = "kX",
-[21] = "kY",
-[125] = "kYEN",
-[44] = "kZ",
-[337] = "MOUSE1", --ЛКМ, Она же DIK_keys.MOUSE_1 (есть в движке)
-[338] = "MOUSE2", --ПКМ, Она же DIK_keys.MOUSE_2 (есть в движке)
-[339] = "MOUSE3", --Она же DIK_keys.MOUSE_3 (есть в движке)
-[340] = "MOUSE4", --Она же DIK_keys.MOUSE_4 (в движке почему-то нет, добавил в _G)
-[341] = "MOUSE5", --Она же DIK_keys.MOUSE_5 (в движке почему-то нет, добавил в _G)
-[342] = "MOUSE6", --Она же DIK_keys.MOUSE_6 (в движке почему-то нет, добавил в _G)
-[343] = "MOUSE7", --Она же DIK_keys.MOUSE_7 (в движке почему-то нет, добавил в _G)
-[344] = "MOUSE8", --Она же DIK_keys.MOUSE_8 (в движке почему-то нет, добавил в _G)
-}
-
-function dik_to_name(dik)
-	return dik_key_to_name[dik] or ""
 end
 
 local keys_list = {
@@ -168,11 +203,11 @@ local keys_list = {
 	{ogse_name = "handradio_key",    stor_name = "ogse_handradio_bind",    real_bind_name = key_bindings.kDROP        , cmd_name = "drop"},
 	{ogse_name = "quicksave_key",    stor_name = "ogse_quicksave_bind",    real_bind_name = key_bindings.kBUY         , cmd_name = "buy_menu"},
 }
+
 function save_keys()
 	--log1("ogse_rebind_key.save_keys")
 	for _,key_data in ipairs(keys_list) do
 		local key = bind_to_dik(key_data.real_bind_name)
-		--log3("")
 		cmd(key_data.stor_name, key)
 		set_key_preset_value(key_data.ogse_name, key)
 	end
@@ -183,7 +218,7 @@ function rebind_key()
 	for _,key_data in ipairs(keys_list) do
 		local key = get_console():get_integer(key_data.stor_name)
 		local keyname = dik_key_to_name[key]
-		--log3("%s, %s, %s", key_data.stor_name, key, tostring(keyname))
+		--log3("%s, %s, %s", key_data.stor_name, key, keyname or "nil")
 		if keyname then
 			cmd("bind",  key_data.cmd_name, keyname)
 			set_key_preset_value(key_data.ogse_name, key)
@@ -193,11 +228,11 @@ function rebind_key()
 	end
 end
 
-rebind_key()
-
 function unbind_key()
 	--log1("ogse_rebind_key.unbind_key")
 	for _,key_data in ipairs(keys_list) do
 		cmd("unbind", key_data.cmd_name)
 	end
 end
+
+rebind_key()

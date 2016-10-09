@@ -138,7 +138,7 @@ end
 
 
 function on_key_down( key, bind )
-  if key == DIK_keys.MOUSE_1 then
+  if key == DIK_keys.DIK_MOUSE1 then
     local wnd = level.get_inventory_wnd()
     if wnd:IsShown() then
       local x, y = wnd:GetCursorX(), wnd:GetCursorY()
@@ -152,7 +152,7 @@ function on_key_up( key, bind )
   if not selected_item_id then return end
   local selected_item = level.object_by_id(selected_item_id)
   if not selected_item then return end
-  if key == DIK_keys.MOUSE_1 then
+  if key == DIK_keys.DIK_MOUSE1 then
     local wnd = level.get_inventory_wnd()
     if wnd:IsShown() then
       local x, y = wnd:GetCursorX(), wnd:GetCursorY()
@@ -229,5 +229,6 @@ function on_drop(obj) --Чтобы не было глюков при прода�
 	local slot_cfg = get_u32(obj:section(), "slot")
 	if slot_engine ~= slot_cfg then
 		set_inv_item_slot(obj, slot_cfg)
+		--log3("--Change clot for [%s]: [%s]", obj:name(), slot_cfg)
 	end
 end

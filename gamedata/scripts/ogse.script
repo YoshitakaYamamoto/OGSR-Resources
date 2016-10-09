@@ -1351,9 +1351,6 @@ function on_actor_first_update()
 	-- Установка FOV
 	db.actor:set_camera_fov(fov_vol)
 
-	-- Перехват хоткеев
-	ogse_rebind_key.unbind_key()
-
 	-- позволим актору выйти через тот же выход на Агро, что он пришел
 	agroprom_tasks.check_enter()
 

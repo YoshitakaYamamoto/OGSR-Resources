@@ -410,29 +410,60 @@ function set_btr_fuel_empty() --при влезании в квестовый БТР установим топливо в
 	end
 end
 
-function set_btr_nonworking() --при отсутствии у ГГ аккумулятора, при влезании в БТР, блокируем старт двигателя
-	if db.actor:has_info("btr_get_accum_set") then return end
 
-	local btr = level_object_by_sid(story_ids.dead_city_btr_real)
+function set_btr_nonworking() --при отсутствии у ГГ аккумулятора, при влезании в БТР, блокируем старт двигателя
+	if db.actor:has_info( "btr_get_accum_set" ) then return end
+
+	local btr = level_object_by_sid( story_ids.dead_city_btr_real )
 	if btr and btr:id() == ogse_car_control.current_car:id() then
-		local var = bind_to_dik(15) --клавиша запуска двигателя.
-		if var then
-			ogse.save_var("turn_engine_key", var) --сохраняем её в хранилище
-			cmd("unbind", "turn_engine") --и разбиндиваем, чтобы сидя в неисправном бтр нельзя было запустить движок
+		if not ogse.var_exists( "turn_engine_keys" ) then
+			ogse.save_var( "turn_engine_keys", ogse_rebind_key.bind_to_keys( key_bindings.kENGINE, true ), "array" ) --сохраняем в хранилище клавиши запуска двигателя
+			cmd( "unbind", "turn_engine" ) --и разбиндиваем их, чтобы сидя в неисправном бтр нельзя было запустить движок
+			cmd( "unbind_sec", "turn_engine" )
+		end
+		if not ogse.var_exists( "quit_keys" ) then
+			ogse.save_var( "quit_keys", ogse_rebind_key.bind_to_keys( key_bindings.kQUIT, true ), "array" )
+			cmd( "unbind", "quit" ) --Кнопку выхода в меню тоже разбиндиваем, чтобы актор сидя в БТР не мог загружаться или выходить из игры (после этого слетят настройки некоторых клавиш)
+			cmd( "unbind_sec", "quit" )
+		end
+		if not ogse.var_exists( "QUICK_LOAD_keys" ) then
+			ogse.save_var( "QUICK_LOAD_keys", ogse_rebind_key.bind_to_keys( key_bindings.kQUICK_LOAD, true ), "array" )
+			cmd( "unbind", "QUICK_LOAD" ) --Кнопку быстрой загрузки игры разбиндиваем по той же причине.
+			cmd( "unbind_sec", "QUICK_LOAD" )
 		end
 	end
 end
 
 function set_btr_working() --при вылезании из БТР, возвращаем все как было
-	if ogse.var_exists("turn_engine_key") and not db.actor:has_info("btr_get_accum_set") then
-		local eng_key = ogse.load_var("turn_engine_key") --грузим клавишу из хранилища
-		local dik_key = ogse_rebind_key.dik_to_name(eng_key) --конвертируем
-		cmd("bind", "turn_engine", dik_key) --биндим
+	if ogse.var_exists( "turn_engine_keys" ) then
+		local keys = ogse.load_var( "turn_engine_keys" )
+		--log3("--[%s.set_btr_working] Loaded turn_engine_keys: %s", script_name(), keys)
+		cmd( "bind", "turn_engine", keys[1] )
+		if keys[2] then
+			cmd( "bind_sec", "turn_engine", keys[2] )
+		end
+		ogse.delete_var( "turn_engine_keys" )
 	end
-	if db.actor:has_info("btr_get_accum_set") and ogse.var_exists("turn_engine_key") then --Если бтр уже исправен,
-		ogse.delete_var("turn_engine_key") --удаляем сохраненную клавишу из хранилища. Больше она не нужна.
+	if ogse.var_exists( "quit_keys" ) then
+		local quit_keys = ogse.load_var( "quit_keys" )
+		--log3("--[%s.set_btr_working] Loaded quit_keys: %s", script_name(), quit_keys)
+		cmd( "bind", "quit", quit_keys[1] )
+		if quit_keys[2] then
+			cmd( "bind_sec", "quit", quit_keys[2] )
+		end
+		ogse.delete_var( "quit_keys" )
+	end
+	if ogse.var_exists( "QUICK_LOAD_keys" ) then
+		local QUICK_LOAD_keys = ogse.load_var( "QUICK_LOAD_keys" )
+		--log3("--[%s.set_btr_working] Loaded QUICK_LOAD_keys: %s", script_name(), QUICK_LOAD_keys)
+		cmd( "bind", "QUICK_LOAD", QUICK_LOAD_keys[1] )
+		if QUICK_LOAD_keys[2] then
+			cmd( "bind_sec", "QUICK_LOAD", QUICK_LOAD_keys[2] )
+		end
+		ogse.delete_var( "QUICK_LOAD_keys" )
 	end
 end
+
 
 -- Кордон --
 -- Спавним артефакт для Сидоровича и ставим метку на его местоположение
@@ -1844,27 +1875,52 @@ function tutor_zombied()
 	end
 end
 
-local use_keys_unbinded
 
-function block_use_hotkeys()
-	ogse.save_var("close_dialog_key", bind_to_dik(key_bindings.kQUIT))
-	cmd("unbind", "quit")
-	ogse.save_var("use_key", bind_to_dik(key_bindings.kUSE))
-	cmd("unbind", "use")
-
-	use_keys_unbinded = true
+function block_use_hotkeys() --Вызывается из tasks_functor.actor_switch_to_trade (которая вызывается в нескольких местах из config\gameplay\dialogs_tasks.xml)
+	if not ogse.var_exists( "quit_keys" ) then
+		ogse.save_var( "quit_keys", ogse_rebind_key.bind_to_keys( key_bindings.kQUIT, true ), "array" )
+		cmd( "unbind", "quit" )
+		cmd( "unbind_sec", "quit" )
+	end
+	if not ogse.var_exists( "use_keys" ) then
+		ogse.save_var( "use_keys", ogse_rebind_key.bind_to_keys( key_bindings.kUSE, true ), "array" )
+		cmd( "unbind", "use" )
+		cmd( "unbind_sec", "use" )
+	end
+	if not ogse.var_exists( "QUICK_LOAD_keys" ) then
+		ogse.save_var( "QUICK_LOAD_keys", ogse_rebind_key.bind_to_keys( key_bindings.kQUICK_LOAD, true ), "array" )
+		cmd( "unbind", "QUICK_LOAD" )
+		cmd( "unbind_sec", "QUICK_LOAD" )
+	end
 end
 
-function unblock_use_hotkeys()
-	if use_keys_unbinded then
-		ASSERT( ogse.var_exists("close_dialog_key"), "can't load close_dialog_key" )
-		local quit_key = ogse.load_var("close_dialog_key")
-		cmd("bind", "quit", ogse_rebind_key.dik_to_name(quit_key))
-		ogse.delete_var("close_dialog_key")
-		ASSERT( ogse.var_exists("use_key"), "can't load use_key" )
-		local use_key = ogse.load_var("use_key")
-		cmd("bind", "use", ogse_rebind_key.dik_to_name(use_key))
-		ogse.delete_var("use_key")
+function unblock_use_hotkeys() --Вот это вызывается при КАЖДОЙ выдаче инфопорции ui_trade_hide.
+	if ogse.var_exists( "quit_keys" ) then
+		local quit_keys = ogse.load_var( "quit_keys" )
+		--log3("--[%s.unblock_use_hotkeys] Loaded quit_keys: %s", script_name(), quit_keys)
+		cmd( "bind", "quit", quit_keys[1] )
+		if quit_keys[2] then
+			cmd( "bind_sec", "quit", quit_keys[2] )
+		end
+		ogse.delete_var( "quit_keys" )
+	end
+	if ogse.var_exists( "use_keys" ) then
+		local use_keys = ogse.load_var( "use_keys" )
+		--log3("--[%s.unblock_use_hotkeys] Loaded use_keys: %s", script_name(), use_keys)
+		cmd( "bind", "use", use_keys[1] )
+		if use_keys[2] then
+			cmd( "bind_sec", "use", use_keys[2] )
+		end
+		ogse.delete_var("use_keys")
+	end
+	if ogse.var_exists( "QUICK_LOAD_keys" ) then
+		local QUICK_LOAD_keys = ogse.load_var( "QUICK_LOAD_keys" )
+		--log3("--[%s.unblock_use_hotkeys] Loaded QUICK_LOAD_keys: %s", script_name(), QUICK_LOAD_keys)
+		cmd( "bind", "QUICK_LOAD", QUICK_LOAD_keys[1] )
+		if QUICK_LOAD_keys[2] then
+			cmd( "bind_sec", "QUICK_LOAD", QUICK_LOAD_keys[2] )
+		end
+		ogse.delete_var( "QUICK_LOAD_keys" )
 	end
 end
 
