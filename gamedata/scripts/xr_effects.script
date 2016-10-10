@@ -1778,15 +1778,8 @@ end
 -- kill
 -------------------------------------------------------------------------------------
 function killactor (actor, npc)
-    npc:set_relation (game_object.enemy, actor)
-	local h = hit()
-	h.draftsman = actor
-	h.type = hit.fire_wound
-	h.direction = actor:position():sub(npc:position())
-	h:bone("bip01_spine")
-	h.power = 0.01
-	h.impulse = 1
-	npc:hit(h)	
+    npc:set_relation(game_object.enemy, db.actor)
+	npc:set_goodwill( -5000, db.actor )
 end
 
 function kill(actor, npc)
