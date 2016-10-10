@@ -51,23 +51,20 @@ function init()
 	gl_sets.inited = true
 end
 
+local forbidden_monster_clsids = {
+	[clsid.dog_s] = true,
+	[clsid.flesh_s] = true,
+	[clsid.pseudodog_s] = true,
+	[clsid.cat_s] = true,
+}
 function valid_target(obj)
-	if obj then
-		local section = obj:section()
-		if tostring(obj:name()) == "single_player" or obj:id() == db.actor:id() then return true end
-		if IsStalker(obj) then
-			if ogse.armor_type(obj) <= 3 then return true else return false end
-		elseif IsMonster(obj) then
-			local id = get_clsid (obj)
-			if id == clsid.dog_s or
-			   id == clsid.flesh_s or
-			   id == clsid.pseudodog_s or
-			   id == clsid.cat_s then
-			   return false else return true
-			end
-		end
+	if obj:id() == db.actor:id() then
+		return true
+	elseif IsStalker(obj) then
+		return not xr_wounded.is_wounded(obj) and ogse.armor_type(obj) <= 3
+	elseif IsMonster(obj) then
+		return not forbidden_monster_clsids[obj:clsid()]
 	end
-	return true
 end
 
 class "evaluator_launch_grenade" (property_evaluator)
@@ -121,7 +118,7 @@ function evaluator_launch_grenade:evaluate()
 			target = nil
 			for o in npc:memory_visible_objects() do
 				local obj = o:object()
-				if obj and obj.clsid and obj:alive() and o.visible and (IsStalker(obj) or IsMonster(obj) or obj:clsid() == clsid.actor) and npc:relation(obj) == game_object.enemy and npc:see(obj) and not xr_wounded.is_wounded(obj) and valid_target(obj) then
+				if obj and obj.clsid and obj:alive() and o.visible and npc:relation(obj) == game_object.enemy and valid_target(obj) then
 					target = obj
 --					printf("ev_reload_gl[%s]:set target[%s]",npc:character_name(),obj:name())
 					break
@@ -510,10 +507,20 @@ function launch(obj,target,typ)
 --	printf("launch!")
 end
 
-function launch2(npc,id,target,pos,radius,typ,test)
-	npc:drop_item_and_teleport(level.object_by_id(id),pos)
-	temp.fms[id] = {npc = npc,time = time_global()+6000,radius = radius,target = target,cnt = 0,vel = 0,launch = true,type = typ,test = test}
-	run_fms_timer()
+function launch2( npc, id, target, pos, radius, typ, test )
+  npc:drop_item_and_teleport( level.object_by_id( id ), pos )
+  temp.fms[ id ] = {
+    [ "cnt"    ] = 0,
+    [ "launch" ] = true,
+    [ "npc_id" ] = npc:id(),
+    [ "radius" ] = radius,
+    [ "target" ] = target,
+    [ "test"   ] = test,
+    [ "time"   ] = time_global() + 6000,
+    [ "type"   ] = typ,
+    [ "vel"    ] = 0,
+  }
+  run_fms_timer()
 end
 
 function gl_switch(npc)
@@ -666,11 +673,15 @@ function update()
               temp.fms[ k ].explode = true
               temp.rem[ k ] = true
             else
-              if check_victims( v.npc, pos, v.radius ) then
+              local npc = level.object_by_id( v.npc_id )
+              if npc and not npc:is_stalker() then npc = nil end
+              if npc and check_victims( npc, pos, v.radius ) then
                 obj:explode( 0 )
               else
                 temp.rem[ k ] = true
-                spawn_shell( v.npc )
+				if npc then
+                  spawn_shell( npc )
+				end
               end
               temp.fms[ k ] = nil
             end
