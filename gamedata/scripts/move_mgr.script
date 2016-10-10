@@ -15,8 +15,8 @@ local default_state_moving1 = "patrol"
 local default_state_moving2 = "rush"
 local default_state_moving3 = "sprint"
 
-arrival_before_rotation = 0
-arrival_after_rotation = 1
+local arrival_before_rotation = 0
+local arrival_after_rotation = 1
 
 local state_none = 0
 local state_moving = 1
@@ -257,12 +257,11 @@ function invalidate_pp_accessibility()
 end
 
 function validate_accessibility(npc,ppname)
-	local pp = patrol(ppname)
-	local valid = false
-	if pp_validated[ppname] then
-		return true, ppname
+	if pp_validated[ppname] ~= nil then
+		return pp_validated[ppname], ppname
 	end
-	pp_validated [ppname] = true
+	pp_validated[ppname] = false
+	local pp = patrol(ppname)
 	if pp then
 		--log3("[%s] validating [%s] for [%s]", script_name(), ppname, npc:name())
 		for i=0,pp:count()-1 do
@@ -283,17 +282,17 @@ function validate_accessibility(npc,ppname)
 			--log3("~~[%s] verifying point [%s] on path [%s] VTX [%s] for [%s]", script_name(), i, ppname, pp:level_vertex_id(i), npc:name())
 			if not npc:accessible(pp:level_vertex_id(i)) then
 				--log1("!!MOVE_MGR verifying point end")
-				return false, ppname
+				return pp_validated[ ppname ], ppname
 			end
 			if pp:level_vertex_id( i ) > level_vertexes then
 				log3( "!![%s]: wrong point [%s] on path [%s]: level_vertex_id = %s", script_name(), i, ppname, pp:level_vertex_id( i ) )
-				return false, ppname
+				return pp_validated[ ppname ], ppname
 			end
 			--log1("--MOVE_MGR checked point")
-			return true, ppname
+			pp_validated[ ppname ] = true
 		end
 	end
-	return false,ppname
+	return pp_validated[ ppname ], ppname
 end
 
 --' продолжить движение со следующей точки, а не с ближайшей.
@@ -539,7 +538,7 @@ function move_mgr:turn_end_callback()
 				self.object:name(), self.path_look)
 		end
 
-		if self.move_cb_info.func(self.move_cb_info.obj, this.arrival_after_rotation, self.retval_after_rotation, self.last_index)
+		if self.move_cb_info.func(self.move_cb_info.obj, arrival_after_rotation, self.retval_after_rotation, self.last_index)
 		then
 			--' Callback решил перехватить управление перемещением, не восстанавливаем таймер
 			return
@@ -601,7 +600,7 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 				"callback function wasn't registered in move_mgr:reset()",
 				self.object:name(), self.path_walk)
 		end
-		if self.move_cb_info.func(self.move_cb_info.obj, this.arrival_before_rotation, retv_num, index) then
+		if self.move_cb_info.func(self.move_cb_info.obj, arrival_before_rotation, retv_num, index) then
 			return
 		end
 	end
