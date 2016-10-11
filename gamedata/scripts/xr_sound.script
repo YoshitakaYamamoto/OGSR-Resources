@@ -244,7 +244,6 @@ function play_sound(npc, themes, timeout)
 			if db.sound[npc_id].last_snd[snd.into_id] == nil then db.sound[npc_id].last_snd[snd.into_id] = -1 end
 			
 			--printf("*SND* play seq [%s] for [%s]", db.sound[npc_id].last_snd[snd.into_id]+1, npc:name())
-			process_tutor_on_sound(snd.theme)
 			npc:play_sound(snd.into_id, 1, 0, 1, 0, db.sound[npc_id].last_snd[snd.into_id]+1)
 			db.sound[npc_id].last_snd[snd.into_id] = db.sound[npc_id].last_snd[snd.into_id] + 1
 			--printf("*SND* play seq [%s] for [%s]", db.sound[npc_id].last_snd[snd.into_id], npc:name())
@@ -273,7 +272,6 @@ function play_sound(npc, themes, timeout)
 				timeout = 0
 			end							
 			--printf("*SND* play rnd [%s] for [%s]", s, npc:name())
-			process_tutor_on_sound(snd.theme)
 			npc:play_sound(snd.rnd_id, timeout+1, timeout, 1, 0, s)
 			--db.sound[npc_id].last_snd[snd.rnd_id] = s
 			group_table.last_snd[snd.rnd_id] = s
@@ -289,14 +287,6 @@ function get_last_IDS(npc, theme)
 	end	
 	--printf("LAST INTO ID for [%s] = [%s], max [%s]", theme, last_table[snd_table.into_id], snd_table.into_max)
 	return last_table[snd_table.into_id], snd_table.into_max
-end
-
-
-function load_sound(npc)
-	sound_theme.load_sound(npc)
-end
-
-function process_tutor_on_sound(theme)
 end
 
 

@@ -332,21 +332,26 @@ function motivator_binder:net_spawn(sobject)
 ]=]
 	ogse_debug.process_npc(self.object, "s_spw", 4)
 
-	-- Все CALLBACK-и ставить здесь:
-	self.object:set_patrol_extrapolate_callback(motivator_binder.extrapolate_callback, self)
-	self.object:set_callback(callback.hit, motivator_binder.hit_callback, self)
-	self.object:set_callback(callback.death, motivator_binder.death_callback, self)
-	self.object:set_callback(callback.use_object, motivator_binder.use_callback, self)
+-------------------------------[Все CALLBACK-и ставить здесь]---------------------------------------
+	self.object:set_patrol_extrapolate_callback(self.extrapolate_callback, self)
+	self.object:set_callback(callback.hit, self.hit_callback, self)
+	self.object:set_callback(callback.death, self.death_callback, self)
+	self.object:set_callback(callback.use_object, self.use_callback, self)
 	self.object:set_callback(callback_ex.entity_alive_before_hit, self.before_hit_callback, self)
 	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)	
 	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
 	if not ogse.is_quest_npc(self.object) then
-		self.object:set_callback(callback.sound, motivator_binder.hear_callback, self)
+		self.object:set_callback(callback.sound, self.hear_callback, self)
 	end
 	self.object:set_enemy_callback( self.enemy_callback, self )
+----------------------------------------------------------------------------------------------------
 
 	ogse_debug.process_npc(self.object, "s_spw", 5111)
+	
+	self.am:call( "on_npc_before_spawn", self.object, self )
+
 	self:subscribe_updaters()
+
 
 	ogse_debug.process_npc(self.object, "s_spw", 6)
     --' Загрузка историй для лагеря.
@@ -454,11 +459,6 @@ function motivator_binder:net_spawn(sobject)
 		manager:add_evaluator(ogsm_hideout.property_inhide, property_evaluator_const(false))
 	end
 
-	ogse_debug.process_npc(self.object, "s_spw", 11)
-    -- загрузка озвучки
-    xr_sound.load_sound(self.object)
-
-	ogse_debug.process_npc(self.object, "s_spw", 12)
 	--// xr_companion
 	if xr_companion.is_companion(self.object:id()) then
 		local gulag = xr_gulag.get_npc_gulag(self.object)
@@ -479,6 +479,8 @@ function motivator_binder:net_spawn(sobject)
 		xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_stalker, self.loaded )
 	end
 	--// xr_companion	
+
+	ogse_debug.process_npc(self.object, "s_spw", 12)
 
 	self.am:call( "on_npc_spawn", self.object, self )
 

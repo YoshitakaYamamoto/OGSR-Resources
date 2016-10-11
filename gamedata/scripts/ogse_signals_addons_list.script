@@ -98,7 +98,8 @@ addons = {
 	"aem_manager",
 	"treasure_manager",
 	"task_manager",
-	"xr_sound", --должен быть перед инвентарём!
+	"sound_theme",
+	"xr_sound",
 	"inventory", --должен быть предпоследним!
 -----------------------------------------------
 	"dsh_memuse" --должен быть последним!
