@@ -50,25 +50,14 @@ function generic_object_binder:net_spawn(sobject)
 		return false
 	end
 
+	self:subscribe_updaters()
+
 	db.add_obj(self.object)
 
 	self.object:set_enemy_callback( self.enemy_callback, self )
 
 	ogse_debug.process_monster(self.object, "m_spw", 3)
 	xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_mobile, self.loaded )
-
-	ogse_debug.process_monster(self.object, "m_spw", 4)
-	local particle_param = get_string( self.object:section(), "bones_particles" )
-	if particle_param and sys_ini:section_exist(particle_param) then
-		local tmp = ogse.parse_ini_section_to_array(sys_ini,particle_param)
-		for k,v in pairs(tmp) do
-			local t = ogse.parse_ini_section_to_array(sys_ini, v)
-			t.obj = self.object
-			if not t.stop_on_death or self.object:alive() then
-				dsh_particles.play_particle(self.object, t)
-			end
-		end
-	end
 
 	ogse_debug.process_monster(self.object, "m_spw", 6)
 	if not self.object:alive() then
@@ -121,6 +110,25 @@ function generic_object_binder:net_spawn(sobject)
 	return true
 end
 
+function generic_object_binder:subscribe_updaters()
+  local s_name = "on_monster_update." .. self.object:id()
+  if self.object:alive() then
+    self.updaters = {
+      {
+        [ "signal" ] = s_name,
+        [ "self"   ] = self,
+        [ "fun"    ] = self.update_tip_text,
+        [ "queued" ] = true,
+      },
+    }
+  else
+    self.updaters = {}
+  end
+  for _, s in ipairs( self.updaters ) do
+    self.am:subscribe( s )
+  end
+end
+
 function generic_object_binder:update(delta)
 	ogse_debug.check_npc()
 	ogse_debug.check_actor()
@@ -133,27 +141,23 @@ function generic_object_binder:update(delta)
 
 	object_binder.update(self, delta)
 
-	ogse_debug.process_monster(self.object, "upd", 8)
-	if self.object:alive() then
-		if self.object:is_talk_enabled() then
-			self.object:set_tip_text("character_use")
-		else
-			self.object:set_tip_text("")
-		end
-	else
-		self.object:set_tip_text_default()
-	end
-
 	ogse_debug.process_monster(self.object, "upd", 11)
 	if self.st.active_section ~= nil then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
 	end
 
 	ogse_debug.process_monster(self.object, "upd", 12)
-	--self.am:call( "on_monster_update", self.object, delta )
 	self.am:call( "on_monster_update." .. self.object:id(), self.object, delta )
 
 	ogse_debug.process_monster(self.object, "upd", 0)
+end
+
+function generic_object_binder:update_tip_text()
+	if self.object:is_talk_enabled() then
+		self.object:set_tip_text("character_use")
+	else
+		self.object:set_tip_text("")
+	end
 end
 
 --function generic_object_binder:use_callback(obj, who)
@@ -172,74 +176,74 @@ end
 
 function generic_object_binder:waypoint_callback(obj, action_type, index)
 	if self.st.active_section ~= nil then
-		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "waypoint_callback", obj, action_type, index)
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "waypoint_callback", self.object, action_type, index)
 	end
 end
 
 function generic_object_binder:death_callback(victim, who)
-	ogse_debug.process_monster(victim, "dth", 1)
+	for _, s in ipairs( self.updaters ) do
+		self.am:unsubscribe( s )
+	end
+	self.updaters = {}
+	self.object:set_tip_text_default()
+
+	self:clear_callbacks()
+
+	ogse_debug.process_monster(self.object, "dth", 1)
 	if who and string.find(who:name(), "vehicle_btr") then
 		who = db.actor
 	end
 
-	local name = tostring(victim:name())
-
-	if not self.object then
-		self.object = victim
-	end
-
-	if name == "secret_villager" then
+	if self.object:name() == "secret_villager" then
 		db.actor:give_info_portion("secret_villager_dead")
 	end
 
-	self:clear_callbacks()
-
-	ogse_debug.process_monster(victim, "dth", 2)
-	if db.actor then -- добавлено KamikaZze  с целью отладки 25/02/2009
+	ogse_debug.process_monster(self.object, "dth", 2)
+	--if db.actor then -- добавлено KamikaZze  с целью отладки 25/02/2009
 	--	if who:id() == db.actor:id() then
 	-- добавление опыта за убийство
 			xr_statistic.addKillCount(who, self.object)
 	--	end
-	end
+	--end
 
-	ogse_debug.process_monster(victim, "dth", 3)
+	ogse_debug.process_monster(self.object, "dth", 3)
 	if self.st and self.st.mob_death then
-		xr_logic.issue_event(self.object, self.st.mob_death, "death_callback", victim, who)
+		xr_logic.issue_event(self.object, self.st.mob_death, "death_callback", self.object, who)
 	end
 
-	ogse_debug.process_monster(victim, "dth", 4)
+	ogse_debug.process_monster(self.object, "dth", 4)
 	if self.st and self.st.active_section then
-		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", victim, who)
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", self.object, who)
 	end
 
-	ogse_debug.process_monster(victim, "dth", 5)
+	ogse_debug.process_monster(self.object, "dth", 5)
 	smart_terrain.on_death( self.object:id() )
 
-	ogse_debug.process_monster(victim, "dth", 6)
+	ogse_debug.process_monster(self.object, "dth", 6)
 	--проверка на аномалии  
-	ogse_death_artefact.on_death(victim, who)
+	ogse_death_artefact.on_death(self.object, who)
 
-	ogse_debug.process_monster(victim, "dth", 8)
+	ogse_debug.process_monster(self.object, "dth", 8)
 	--' Наносим небольшой импульс вперед.
 	local h = hit()
 	h.draftsman = self.object
 	h.type = hit.fire_wound
-	if db.actor ~= nil then -- добавлено KamikaZze  с целью отладки 25/02/2009
+	--if db.actor ~= nil then -- добавлено KamikaZze  с целью отладки 25/02/2009
 		h.direction = db.actor:position():sub(self.object:position())
-	end
+	--end
 	h:bone("pelvis")
 	h.power = 1
 	h.impulse = 10
 	self.object:hit(h)
 
-	ogse_debug.process_monster(victim, "dth", 11)
-	smart_monster_parts.death_spawn(victim)
+	ogse_debug.process_monster(self.object, "dth", 11)
+	smart_monster_parts.death_spawn(self.object)
 
-	ogse_debug.process_monster(victim, "dth", 13)	
+	ogse_debug.process_monster(self.object, "dth", 13)	
 
 	self.am:call( "on_monster_death", self.object, who )
 
-	ogse_debug.process_monster(victim, "dth", 0)
+	ogse_debug.process_monster(self.object, "dth", 0)
 end
 
 function generic_object_binder:before_hit_callback(p_s_hit, p_ignore_flags)
@@ -392,7 +396,7 @@ function generic_object_binder:enemy_callback( obj, enemy_st )
   end
   if res == nil or ttl < time_global() then
     local result = {}
-    self.am:call( "on_monster_enemy_callback", obj, enemy, result )
+    self.am:call( "on_monster_enemy_callback", self.object, enemy, result )
     res = result[1] ~= false
     if cached then
       cached[ enemy:id() ] = { res, time_global() + enemy_callback_freq }

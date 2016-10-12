@@ -1,15 +1,31 @@
 
 function attach( sm )
-  sm:subscribe({ signal = "on_monster_death",  fun = this.on_death })
   sm:subscribe({ signal = "on_monster_init",   fun = this.on_init })
+  sm:subscribe({ signal = "on_monster_spawn",  fun = this.on_monster_spawn })
+  sm:subscribe({ signal = "on_monster_death",  fun = this.on_death })
   sm:subscribe({ signal = "on_monster_net_destroy", fun = this.on_net_destroy })
-  sm:subscribe({ signal = "on_npc_death",      fun = this.on_death })
   sm:subscribe({ signal = "on_npc_init",       fun = this.on_init })
+  sm:subscribe({ signal = "on_npc_death",      fun = this.on_death })
   sm:subscribe({ signal = "on_npc_net_destroy", fun = this.on_net_destroy })
 end
 
+
 function on_init( obj, binder )
   binder.particles = {}
+end
+
+function on_monster_spawn( obj )
+	local particle_param = get_string( obj:section(), "bones_particles" )
+	if particle_param and sys_ini:section_exist(particle_param) then
+		local tmp = ogse.parse_ini_section_to_array(sys_ini,particle_param)
+		for k,v in pairs(tmp) do
+			local t = ogse.parse_ini_section_to_array(sys_ini, v)
+			t.obj = obj
+			if not t.stop_on_death or obj:alive() then
+				play_particle(obj, t)
+			end
+		end
+	end
 end
 
 function on_update( obj, delta )

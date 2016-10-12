@@ -319,17 +319,6 @@ function motivator_binder:net_spawn(sobject)
 		st.loaded_gulag_name = st.gulag_name
 	end
 
---[=[
-	if has_alife_info("bar_heli_scene_stay_online") then
-		if string.find(self.object:name(), "bar_ecolog_professor") then
-			local gulag = xr_gulag.get_npc_gulag(self.object)
-			if gulag and gulag.name ~= "bar_ecolog_crush" then
-				log1("Найден Круглов, его гулаг "..gulag.name)
-				gulag:free_obj(self.object:id())
-			end		
-		end		
-	end
-]=]
 	ogse_debug.process_npc(self.object, "s_spw", 4)
 
 -------------------------------[Все CALLBACK-и ставить здесь]---------------------------------------
@@ -498,6 +487,12 @@ function motivator_binder:subscribe_updaters()
         [ "fun"    ] = self.check_art_weapon,
         [ "queued" ] = true,
       },
+      {
+        [ "signal" ] = s_name,
+        [ "self"   ] = self,
+        [ "fun"    ] = self.update_tip_text,
+        [ "queued" ] = true,
+      },
     }
   else
     self.updaters = {}
@@ -568,11 +563,7 @@ end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
 	if not amount or amount < 0.05 then return end --Выстрелы в воздух и хиты непонятного происхождения не учитывать!
---log3("!!Called hit callback: obj: [%s], amount: [%s], local_direction: [%s], who: [%s], bone_index: [%s]", obj:name() or "nil", amount or "nil", local_direction or "nil", who:name() or "nil", bone_index or "nil")
-
-	if not self.object then
-		self.object = obj
-	end
+--log3("!!Called hit callback: obj: [%s], amount: [%s], local_direction: [%s], who: [%s], bone_index: [%s]", self.object:name() or "nil", amount or "nil", local_direction or "nil", who:name() or "nil", bone_index or "nil")
 
 	ogse_debug.process_npc(self.object, "hit", 1)
 	if amount < 0.3 and xr_companion.is_companion(self.object:id()) then --Зачем оно нужно? Типа напарник прекращает говорить когда слышит выстрелы где-то?
@@ -598,63 +589,45 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	-- FIXME: коллбеки неплохо было бы регистрировать в общем storage, а не посхемно...
 	-- просто всегда ставить их при включении схемы и снимать при отключении.
 	if self.st.active_section then
-		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "hit_callback", obj, amount, local_direction, who, bone_index)
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 4)
 	if self.st.combat_ignore then
-		xr_logic.issue_event(self.object, self.st.combat_ignore, "hit_callback", obj, amount, local_direction, who, bone_index)
+		xr_logic.issue_event(self.object, self.st.combat_ignore, "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 5)
 	if self.st.combat then
-		xr_logic.issue_event(self.object, self.st.combat, "hit_callback", obj, amount, local_direction, who, bone_index)
+		xr_logic.issue_event(self.object, self.st.combat, "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 6)
 	if self.st.hit then
-		xr_logic.issue_event(self.object, self.st.hit, "hit_callback", obj, amount, local_direction, who, bone_index)
+		xr_logic.issue_event(self.object, self.st.hit, "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 7)
-	--if amount > 0 then
-		sr_territory.issue_event(self.object, "hit_callback", obj, amount, local_direction, who, bone_index)
-		if self.object then
-			local drop, err_msg = pcall(xr_wounded.hit_callback,self.object:id())
-			if not drop then
-				log1("ERROR: XR_M xr_wounded.hit_call_back pcall 1 FAIL "..self.object:id().." reason: "..tostring(err_msg))
-				db.actor:give_game_news(game.translate_string("xr_motivator_debug2"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
-			end				
-		else
-			local drop, err_msg = pcall(xr_wounded.hit_callback,obj:id())
-			if not drop then
-				log1("ERROR: XR_M xr_wounded.hit_call_back pcall 2 FAIL "..obj:id().." reason: "..tostring(err_msg))
-				db.actor:give_game_news(game.translate_string("xr_motivator_debug2"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
-			end				
-		end
-	--end
+
+	sr_territory.issue_event(self.object, "hit_callback", self.object, amount, local_direction, who, bone_index)
+
+	xr_wounded.hit_callback(self.object:id())
 
 	ogse_debug.process_npc(self.object, "hit", 12)
 	local warn_timer = time_global()
-	if not ogse.is_quest_npc(obj) and not xr_companion.is_companion(obj:id()) then
-		if not warn_check_timer[obj:id()] then
-			warn_check_timer[obj:id()] = warn_timer + math.random(1000, 2000) 
+	if not ogse.is_quest_npc(self.object) and not xr_companion.is_companion(self.object:id()) then
+		if not warn_check_timer[self.object:id()] then
+			warn_check_timer[self.object:id()] = warn_timer + math.random(1000, 2000) 
 		else
-			if warn_check_timer[obj:id()] < warn_timer then
-				drop, err_msg = pcall(look_to_shot,obj,who)
-				if not drop then
-					log1("ERROR: XR_M look_to_shot pcall FAIL "..obj:id().." reason: "..tostring(err_msg))
-					db.actor:give_game_news(game.translate_string("xr_motivator_debug3"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
-				end	
-				warn_check_timer[obj:id()] = warn_timer + math.random(1000, 2000)
+			if warn_check_timer[self.object:id()] < warn_timer then
+				look_to_shot(self.object, who)
+				warn_check_timer[self.object:id()] = warn_timer + math.random(1000, 2000)
 			end
 		end
 	end
 
 	ogse_debug.process_npc(self.object, "hit", 13)
-	--if amount > 0.05 then
-		xr_effects.bar_territory_hit(self.object, who)
-	--end
+	xr_effects.bar_territory_hit(self.object, who)
 
 	ogse_debug.process_npc(self.object, "hit", 16)
 
@@ -668,96 +641,75 @@ function motivator_binder:death_callback(victim, who)
 		self.am:unsubscribe( s )
 	end
 	self.updaters = {}
+	self.object:set_tip_text_default()
 
-	ogse_debug.process_npc(victim, "dth", 1)
-	if who and victim and string.find(who:name(), "vehicle_btr") and ogse_car_control.current_car and who:id() == ogse_car_control.current_car:id() then
+	ogse_debug.process_npc(self.object, "dth", 1)
+	if ogse_car_control.current_car and who:id() == ogse_car_control.current_car:id() then
 		who = db.actor
-		local drop, err_msg = pcall(ogse_car_control.btr_kill,victim)
-		if not drop then
-			log1("ERROR: XR_M ogse_car_control.btr_kill pcall FAIL "..victim:id().." reason: "..tostring(err_msg))
-			db.actor:give_game_news(game.translate_string("xr_motivator_debug4"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
-		end
+		ogse_car_control.btr_kill(self.object)
 	end
 
-	ogse_debug.process_npc(victim, "dth", 21)	
-	ogse_hitfx.npc_on_death(victim, who)
+	ogse_debug.process_npc(self.object, "dth", 21)	
+	ogse_hitfx.npc_on_death(self.object, who)
 
-	ogse_debug.process_npc(victim, "dth", 3)
+	ogse_debug.process_npc(self.object, "dth", 3)
 	if self.st.death then
-		xr_logic.issue_event(self.object, self.st.death, "death_callback", victim, who)
+		xr_logic.issue_event(self.object, self.st.death, "death_callback", self.object, who)
 	end
 
-	ogse_debug.process_npc(victim, "dth", 4)	
+	ogse_debug.process_npc(self.object, "dth", 4)	
 	if self.st.active_section then
-		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", victim, who)
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", self.object, who)
 	end
 
-	ogse_debug.process_npc(victim, "dth", 5)	
-	sr_territory.issue_event(self.object, "death_callback", victim, who)
+	ogse_debug.process_npc(self.object, "dth", 5)	
+	sr_territory.issue_event(self.object, "death_callback", self.object, who)
 
-	ogse_debug.process_npc(victim, "dth", 6)	
-	if self.object then
-		smart_terrain.on_death(self.object:id())
-	elseif victim then
-		smart_terrain.on_death(victim:id())
-		self.object = victim
-	end
+	ogse_debug.process_npc(self.object, "dth", 6)	
+	smart_terrain.on_death(self.object:id())
 
-	ogse_debug.process_npc(victim, "dth", 9)
+	ogse_debug.process_npc(self.object, "dth", 9)
 	self:clear_callbacks()
 
-	ogse_debug.process_npc(victim, "dth", 11)
+	ogse_debug.process_npc(self.object, "dth", 11)
 	-- добавление опыта за убийство
 	xr_statistic.addKillCount(who, self.object)
 
-	ogse_debug.process_npc(victim, "dth", 13)
+	ogse_debug.process_npc(self.object, "dth", 13)
 	--проверка на аномалии  
-	ogse_death_artefact.on_death(victim, who)
+	ogse_death_artefact.on_death(self.object, who)
 
-	ogse_debug.process_npc(victim, "dth", 16)
+	ogse_debug.process_npc(self.object, "dth", 16)
 	local community = self.object:character_community()
-	if	community == "zombied" or
-		community == "monolith" or
-		community == "arena_enemy" or
-		string.find(self.object:name(), "aem_")
+	if not (
+		community == "zombied"
+		or community == "monolith"
+		or community == "arena_enemy"
+		or string.find(self.object:name(), "aem_")
+	)
 	then
-		-- did nothing
-	else
-		local drop, err_msg = pcall(actor_stats.remove_from_ranking,self.object:id())
-		if not drop then
-			log1("ERROR: XR_DEATH remove_from_ranking pcall FAIL "..victim:id().." reason: "..tostring(err_msg))
-			db.actor:give_game_news(game.translate_string("xr_motivator_debug6"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
-		end		
+		actor_stats.remove_from_ranking(self.object:id())
 	end
 
-	ogse_debug.process_npc(victim, "dth", 18)
+	ogse_debug.process_npc(self.object, "dth", 18)
 	xr_effects.bar_territory_death(self.object, who)
 
-	ogse_debug.process_npc(victim, "dth", 21)
+	ogse_debug.process_npc(self.object, "dth", 21)
 
 	self.am:call("on_npc_death", self.object, who)
 
-	ogse_debug.process_npc(victim, "dth", 0)
+	ogse_debug.process_npc(self.object, "dth", 0)
 end
 
 function motivator_binder:use_callback(obj, who)
 	ogse_debug.process_npc(self.object, "use", 1)
-    if not self.object then 
-		if obj then
-			self.object = obj
-		else	
-			ogse_debug.process_npc(self.object, "use", 0)
-			return
-		end
-	end
 
-	ogse_debug.process_npc(self.object, "use", 2)
 	if self.object:alive() then
 		ogse_debug.process_npc(self.object, "use", 3)
-		xr_use.notify_on_use(obj, who)
+		xr_use.notify_on_use(self.object, who)
 
 		if self.st.active_section then
-			xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "use_callback", obj, who)
+			xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "use_callback", self.object, who)
 		end
 	else
 		ogse_debug.process_npc(self.object, "use", 4)
@@ -778,42 +730,19 @@ function motivator_binder:update(delta)
 	ogse_debug.check_monsters()
 	ogse_debug.check_actor()
 
-	ogse_debug.process_npc(self.object, "upd", 2)
-	if self.object:alive() then
-		if self.object:is_talk_enabled() then
-			self.object:set_tip_text("character_use")
-		else
-			self.object:set_tip_text("")
-		end
-	else
-		self.object:set_tip_text_default()
-	end
-
---[=[
-	ogse_debug.process_npc(self.object, "upd", 6)
-	self.object:info_clear()
-	local best_enemy = self.object:best_enemy()
-	if best_enemy then
-		self.object:info_add('enemy -- ' .. best_enemy:name())
-	end
-	ogse_debug.process_npc(self.object, "upd", 7)
-	local active_section = db.storage[self.object:id()].active_section
-	if active_section then
-		self.object:info_add('section -- ' .. active_section)
-	end
-	self.object:info_add('name -- ' .. self.object:name())
---]=]
-
-	ogse_debug.process_npc(self.object, "upd", 87)
-
 	if not self.first_update then
 		self.first_update = true
 		self.am:call( "on_npc_first_update", self.object, delta )
 	end
-	--self.am:call( "on_npc_update", self.object, delta )
 	self.am:call( "on_npc_update." .. self.object:id(), self.object, delta )
+end
 
-	ogse_debug.process_npc(self.object, "upd", 0)
+function motivator_binder:update_tip_text()
+	if self.object:is_talk_enabled() then
+		self.object:set_tip_text("character_use")
+	else
+		self.object:set_tip_text("")
+	end
 end
 
 function motivator_binder:check_art_weapon()
@@ -925,11 +854,11 @@ log3("~~[%s] Start loading [%s]", script_name(), self.object and self.object:nam
 log3("--[%s] End loading [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
-function motivator_binder:hear_callback(self, who, sound_type, sound_position, sound_power)
-	ogse_debug.process_npc(self, "hr", 1)
+function motivator_binder:hear_callback(obj, who, sound_type, sound_position, sound_power)
+	ogse_debug.process_npc(self.object, "hr", 1)
 	--// xr_companion
-	if xr_companion.is_companion(self:id()) then
-		ogse_debug.process_npc(self, "hr", 0)
+	if xr_companion.is_companion(self.object:id()) then
+		ogse_debug.process_npc(self.object, "hr", 0)
 		return
 	end	
 
@@ -937,22 +866,22 @@ function motivator_binder:hear_callback(self, who, sound_type, sound_position, s
 		who = db.actor
 	end		
 
-	ogse_debug.process_npc(self, "hr", 2)	
+	ogse_debug.process_npc(self.object, "hr", 2)	
 	local snd_timer = time_global()
-	if not snd_check_timer[self:id()] then
-		snd_check_timer[self:id()] = snd_timer + math.random(1000, 2000) 
+	if not snd_check_timer[self.object:id()] then
+		snd_check_timer[self.object:id()] = snd_timer + math.random(1000, 2000) 
 	else
-		if snd_check_timer[self:id()] < snd_timer then
-			local result, err = pcall(check_sound, self, who, sound_type, sound_position, sound_power)
+		if snd_check_timer[self.object:id()] < snd_timer then
+			local result, err = pcall(check_sound, self.object, who, sound_type, sound_position, sound_power)
 			if not result then
-				log1("ERROR: XR_M hear_callback pcall FAIL "..self:id().." reason: "..tostring(err))
+				log1("ERROR: XR_M hear_callback pcall FAIL "..self.object:id().." reason: "..tostring(err))
 				db.actor:give_game_news(game.translate_string("xr_motivator_debug11"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
 			end
-			snd_check_timer[self:id()] = snd_timer + math.random(1000, 2000)
+			snd_check_timer[self.object:id()] = snd_timer + math.random(1000, 2000)
 		end
 	end
 
-	ogse_debug.process_npc(self, "hr", 0)
+	ogse_debug.process_npc(self.object, "hr", 0)
 end
 
 class "timer_drop_weapon" (ogse_qt.quick_timer)
@@ -981,34 +910,21 @@ function timer_drop_weapon:action()
 end
 
 function motivator_binder:on_item_drop(obj)
-	if not obj then 
-		return 
-	else	
-		local id = obj:id()
-		local sobj = alife():object(id)
-		if not sobj then
-			return
-		end
-	end
+	if not obj then return end
+	local sobj = alife():object(obj:id())
+	if not sobj then return end
+
 	if obj:is_weapon() then
 		timer_drop_weapon(obj, obj:parent()):start()
 	end
 end
 
 function motivator_binder:on_item_take(obj)
-	local sobj
-	if not obj then 
-		return 
-	else	
-		local id = obj:id()
-		sobj = alife():object(id)
-		if not sobj then
-			return
-		end
-	end
+	if not obj then return end
+	local sobj = alife():object(obj:id())
+	if not sobj then return end
 
-	local section = sobj:section_name()
-	if section == "device_torch" then
+	if sobj:section_name() == "device_torch" then
 		if not obj:attachable_item_enabled() then
 			obj:switch_torch(false)
 		end
@@ -1034,9 +950,9 @@ function motivator_binder:enemy_callback( obj, enemy_st )
     res, ttl = unpack( cached[ enemy:id() ] )
   end
   if res == nil or ttl < time_global() then
-    --log3("~~Called add_cache_rec for [%s], [%s]", obj:name(), enemy:name())
+    --log3("~~Called add_cache_rec for [%s], [%s]", self.object:name(), enemy:name())
     local result = {}
-    self.am:call( "on_npc_enemy_callback", obj, enemy, result )
+    self.am:call( "on_npc_enemy_callback", self.object, enemy, result )
     res = result[1] ~= false
     if cached then
       cached[ enemy:id() ] = { res, time_global() + enemy_callback_freq }
