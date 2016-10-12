@@ -1179,7 +1179,7 @@ function get_section_keys(section, ini_file)
 	ASSERT(ini:section_exist(section), "get_section_keys: section '"..section.."' doesn't exist")
 	local t = {}
 	for i=0,ini:line_count(section)-1 do
-		local v1,key = ini:r_line(section, i)
+		local _, key, v = ini:r_line(section, i)
 		t[i+1] = key
 	end
 	return t
@@ -1314,8 +1314,6 @@ function log3(fmt, ...)
 	local res, msg = pcall(string.format, fmt, unpack(args))
 	if not res then --Если произошла ошибка
 		msg = "!!log3 failed: "..msg
-		log1(msg) --Вылетать не будем, напишем об ошибке в лог
-		return msg
 	end
 	if msg:find('[\n]') then --Если нашли в тексте хоть один перенос строки
 		local subs = msg:sub(1, 2) --Читаем два символа из самого начала текста
@@ -1331,19 +1329,17 @@ function log3(fmt, ...)
 		for s=1, #ret do
 			log1(ret[s]) --Выводим в лог каждую подстроку отдельно. Это позволяет избежать ограничения в 1024 символа, после которых текст просто обрезается.
 		end
-		return ret --Нужно для log4
 	else --Если подстрок нет
 		log1(msg) --Выводим текст в лог без дополнительных манипуляций.
-		return msg --Нужно для log4
 	end
 end
 -----------------------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------------------
 local logs_cach = {}
---Дополнительная обёртка для log3. Создаёт новый лог-файл и выводит текст в него.
+--Функция создаёт новый лог-файл и выводит текст в него.
 --fname - название лог-файла, например "Anomaly_Evader". Он будет создан в папке logs, к названию добавится дата и время создания.
---fmt, ... - строка формата с параметрами. См. функцию log3.
+--fmt, ... - строка формата с параметрами как и в функции log3
 function log4(fname, fmt, ...)
 	local f = logs_cach[fname]
 	if not f then
@@ -1352,14 +1348,15 @@ function log4(fname, fmt, ...)
 		f = io.open(fpath, "w")
 		logs_cach[fname] = f
 	end
-	local msg = log3(fmt, ...)
-	if type(msg) == "string" then
-		f:write(msg..'\n')
-	elseif type(msg) == "table" then
-		for s=1, #msg do
-			f:write(msg[s]..'\n')
-		end
+	local args = {...}
+	for i=1, #args do
+		args[i] = tostring_all(args[i])
 	end
+	local res, msg = pcall(string.format, fmt, unpack(args))
+	if not res then
+		msg = "!!log4 failed: "..msg
+	end
+	f:write(msg..'\n')
 	f:flush()
 end
 -----------------------------------------------------------------------------------------
