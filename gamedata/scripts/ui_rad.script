@@ -21,14 +21,9 @@ function attach(sm)
 end
 
 function update()
-	if not db.actor then return end
 	ogse_signals.get_mgr():reschedule(math.random(450, 550))
 
-	local bDetected = false
-	if db.actor:item_in_slot(8) then
-		bDetected = true
-	end		
-	update_hud( "ui_rad", cfg.ui_rad, bDetected, db.actor.radiation )
+	update_hud( "ui_rad", cfg.ui_rad, db.actor:item_in_slot(8), db.actor.radiation )
 end
 
 function update_hud( sect_name, params, bDetected, val )
@@ -51,7 +46,7 @@ function update_hud( sect_name, params, bDetected, val )
 			custom_static_rad_back = nil
 			custom_static_rad      = nil
 		end
-		if bDetected == false then
+		if not bDetected then
 			if custom_static_rad_back then
 				hud:RemoveCustomStatic( params.hud_back  )
 			end
