@@ -3023,7 +3023,7 @@ function set_transfer_state(npc, enemy)
 end
 
 function add_deviation( npc, position )
-do return position end --пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+do return position end --Неадекватно работает, подожду, пока исправят
   local npc_rank   = ranks.get_obj_rank_name( npc )
   local npc_comm   = npc:character_community()
   local deviations = deviation_table[ npc_rank ]
@@ -3682,7 +3682,7 @@ function check_for_grenades(npc)
 					if best_danger_object and not grenka_already_blow[best_danger_object:id()] and npc:position():distance_to(best_danger_object:position()) < distant_combat_distance then
 						local id = best_danger_object:id()
 						active_grenades[npc:id()] = {grenade = id, timeout = time_global()+inertion_time_grenade, parent = best_danger:object():id()}
-						if ogse.get_npc_relation(npc,best_danger:object())=="enemy" then
+						if npc:relation(best_danger:object()) == game_object.enemy then
 							enable_object(npc, best_danger:object())
 							process_enemy(npc, best_danger:object())
 							--npc:make_object_visible_somewhen(best_danger:object())

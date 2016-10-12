@@ -65,6 +65,7 @@ function valid_target(obj)
 	elseif IsMonster(obj) then
 		return not forbidden_monster_clsids[obj:clsid()]
 	end
+	return false
 end
 
 class "evaluator_launch_grenade" (property_evaluator)
