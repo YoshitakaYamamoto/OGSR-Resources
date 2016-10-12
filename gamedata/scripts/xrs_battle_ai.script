@@ -3023,6 +3023,7 @@ function set_transfer_state(npc, enemy)
 end
 
 function add_deviation( npc, position )
+do return position end --����������� ��������, �������, ���� ��������
   local npc_rank   = ranks.get_obj_rank_name( npc )
   local npc_comm   = npc:character_community()
   local deviations = deviation_table[ npc_rank ]
