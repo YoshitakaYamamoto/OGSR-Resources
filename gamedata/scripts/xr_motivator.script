@@ -298,16 +298,10 @@ end
 
 function motivator_binder:net_spawn(sobject)
 --log3("~~[%s] Start net_spawn [%s]", script_name(), self.object and self.object:name() or "nil")
-	ogse_debug.process_npc(self.object, "s_spw", 1)
 	ogse.fix_restrictors(self.object)
 
-	ogse_debug.process_npc(self.object, "s_spw", 2)
-	if not object_binder.net_spawn(self, sobject) then
-		ogse_debug.process_npc(self.object, "s_spw", 0)
-		return false
-	end
+	if not object_binder.net_spawn(self, sobject) then return false end
 
-	ogse_debug.process_npc(self.object, "s_spw", 3)
 	db.add_obj(self.object)
 
 	if not self.loaded then
@@ -318,8 +312,6 @@ function motivator_binder:net_spawn(sobject)
 		st.loaded_active_section = st.active_section
 		st.loaded_gulag_name = st.gulag_name
 	end
-
-	ogse_debug.process_npc(self.object, "s_spw", 4)
 
 -------------------------------[Все CALLBACK-и ставить здесь]---------------------------------------
 	self.object:set_patrol_extrapolate_callback(self.extrapolate_callback, self)
@@ -334,22 +326,17 @@ function motivator_binder:net_spawn(sobject)
 	end
 	self.object:set_enemy_callback( self.enemy_callback, self )
 ----------------------------------------------------------------------------------------------------
-
-	ogse_debug.process_npc(self.object, "s_spw", 5111)
 	
 	self.am:call( "on_npc_before_spawn", self.object, self )
 
 	self:subscribe_updaters()
 
-
-	ogse_debug.process_npc(self.object, "s_spw", 6)
-    --' Загрузка историй для лагеря.
+    --Загрузка историй для лагеря.
 	if self.loaded == false then
 		local char_ini = self.object:spawn_ini() or dsh.cached_ini_file("scripts\\dummy.ltx")
 		xr_info.loadInfo(self.object, char_ini)
 	end
 
-	ogse_debug.process_npc(self.object, "s_spw", 7)
 	if not self.object:alive() then
 		if xr_companion.is_companion(self.object:id()) then
 			xr_companion.save_var_companion(self.object:id(), "is_companion", 0)
@@ -367,7 +354,6 @@ function motivator_binder:net_spawn(sobject)
 		local s_obj = alife():object(self.object:id())
 
 		if s_obj.offline_dead == 1 then
-			ogse_debug.process_npc(self.object, "s_spw", 71)
 			if debug_flag then
 				log1("--ВНИМАНИЕ! Обнаружен погибший в оффлайне! Объект: ИД: "..self.object:id().." ИМЯ:"..self.object:name().." Будет произведена обработка лута и постановка объекта на удаление!")					
 				db.actor:give_game_news(game.translate_string("bind_monster_debug1")..self.object:id()..game.translate_string("bind_monster_debug2")..self.object:name()..game.translate_string("bind_monster_debug3"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
@@ -377,28 +363,19 @@ function motivator_binder:net_spawn(sobject)
 				xr_logic.issue_event(self.object, self.st.death, "death_callback", self.object, self.object)
 			end
 
-			ogse_debug.process_npc(self.object, "s_spw", 72)	
 			if self.st.active_section then
 				xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", self.object, self.object)
 			end
 
-			ogse_debug.process_npc(self.object, "s_spw", 73)	
 			sr_territory.issue_event(self.object, "death_callback", self.object, self.object)
 
-			ogse_debug.process_npc(self.object, "s_spw", 75)
 			self:clear_callbacks()
 
 			self.object:iterate_inventory(death_manager.keep_item)
 
-			ogse_debug.process_npc(self.object, "s_spw", 77)
 			s_obj.offline_dead = game.time()+(1*24*60*60*1000)
-
 		elseif s_obj.offline_dead > 1 and s_obj.offline_dead <= game.time() then
-
-			ogse_debug.process_npc(self.object, "s_spw", 77)
-			if death_manager.offline_dead_quest_check(self.object) then
-				-- имеет квестовую вещь, не трогаем
-			else
+			if not death_manager.offline_dead_quest_check(self.object) then
 				if debug_flag then
 					log1("--ВНИМАНИЕ! Обнаружен уже обработанный погибший в оффлайне! Объект: ИД: "..self.object:id().." ИМЯ:"..self.object:name().." Будет произведено удаление объекта!")
 					db.actor:give_game_news(game.translate_string("bind_monster_debug21")..self.object:id()..game.translate_string("bind_monster_debug2")..self.object:name()..game.translate_string("bind_monster_debug22"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
@@ -407,21 +384,17 @@ function motivator_binder:net_spawn(sobject)
 			end
 
 			--self.am:call( "on_npc_spawn", self.object, self )
-			--ogse_debug.process_npc(self.object, "s_spw", 0)
 			--return true
 		end
 
 		--self.am:call( "on_npc_spawn", self.object, self )
-		ogse_debug.process_npc(self.object, "s_spw", 0)
 		return true
 	end
 
-	ogse_debug.process_npc(self.object, "s_spw", 8)
 	local manager = self.object:motivation_action_manager()
 	manager:remove_evaluator(stalker_ids.property_anomaly)
 	manager:add_evaluator(stalker_ids.property_anomaly, property_evaluator_const(false))
 
-	ogse_debug.process_npc(self.object, "s_spw", 9)
 	if xr_combat_companion then
 		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(xr_combat_companion.prop_combat, property_evaluator_const(false))
@@ -440,7 +413,6 @@ function motivator_binder:net_spawn(sobject)
 		manager:add_evaluator(xrs_grenade.prop_grenade, property_evaluator_const(false))
 	end
 
-	ogse_debug.process_npc(self.object, "s_spw", 10)
 	if ogsm_hideout then
 		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(ogsm_hideout.property_blowout, property_evaluator_const(false))
@@ -469,11 +441,7 @@ function motivator_binder:net_spawn(sobject)
 	end
 	--// xr_companion	
 
-	ogse_debug.process_npc(self.object, "s_spw", 12)
-
 	self.am:call( "on_npc_spawn", self.object, self )
-
-	ogse_debug.process_npc(self.object, "s_spw", 0)
 	return true
 end
 
@@ -565,14 +533,12 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	if not amount or amount < 0.05 then return end --Выстрелы в воздух и хиты непонятного происхождения не учитывать!
 --log3("!!Called hit callback: obj: [%s], amount: [%s], local_direction: [%s], who: [%s], bone_index: [%s]", self.object:name() or "nil", amount or "nil", local_direction or "nil", who:name() or "nil", bone_index or "nil")
 
-	ogse_debug.process_npc(self.object, "hit", 1)
 	if amount < 0.3 and xr_companion.is_companion(self.object:id()) then --Зачем оно нужно? Типа напарник прекращает говорить когда слышит выстрелы где-то?
 		xr_sound.set_sound(self.object, nil)
 		stop_play_sound(self.object)
 	end
 
-	ogse_debug.process_npc(self.object, "hit", 2)
-	if who and victim and string.find(who:name(), "vehicle_btr") then
+	if who and string.find(who:name(), "vehicle_btr") then
 		who = db.actor
 	end	
 
@@ -585,35 +551,28 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 --		self.object:make_object_visible_somewhen(who:cast_game_object())	-- в движке баг в этой функции, поэтому надо кастить к "движковому" клиентскому объекту
 	end
 
-	ogse_debug.process_npc(self.object, "hit", 3) 
 	-- FIXME: коллбеки неплохо было бы регистрировать в общем storage, а не посхемно...
 	-- просто всегда ставить их при включении схемы и снимать при отключении.
 	if self.st.active_section then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end
 
-	ogse_debug.process_npc(self.object, "hit", 4)
 	if self.st.combat_ignore then
 		xr_logic.issue_event(self.object, self.st.combat_ignore, "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end
 
-	ogse_debug.process_npc(self.object, "hit", 5)
 	if self.st.combat then
 		xr_logic.issue_event(self.object, self.st.combat, "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end
 
-	ogse_debug.process_npc(self.object, "hit", 6)
 	if self.st.hit then
 		xr_logic.issue_event(self.object, self.st.hit, "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end
-
-	ogse_debug.process_npc(self.object, "hit", 7)
 
 	sr_territory.issue_event(self.object, "hit_callback", self.object, amount, local_direction, who, bone_index)
 
 	xr_wounded.hit_callback(self.object:id())
 
-	ogse_debug.process_npc(self.object, "hit", 12)
 	local warn_timer = time_global()
 	if not ogse.is_quest_npc(self.object) and not xr_companion.is_companion(self.object:id()) then
 		if not warn_check_timer[self.object:id()] then
@@ -626,14 +585,9 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 		end
 	end
 
-	ogse_debug.process_npc(self.object, "hit", 13)
 	xr_effects.bar_territory_hit(self.object, who)
 
-	ogse_debug.process_npc(self.object, "hit", 16)
-
 	self.am:call( "on_npc_hit", self.object, amount, local_direction, who, bone_index )
-
-	ogse_debug.process_npc(self.object, "hit", 0)
 end
 
 function motivator_binder:death_callback(victim, who)
@@ -643,43 +597,31 @@ function motivator_binder:death_callback(victim, who)
 	self.updaters = {}
 	self.object:set_tip_text_default()
 
-	ogse_debug.process_npc(self.object, "dth", 1)
 	if ogse_car_control.current_car and who:id() == ogse_car_control.current_car:id() then
 		who = db.actor
 		ogse_car_control.btr_kill(self.object)
 	end
 
-	ogse_debug.process_npc(self.object, "dth", 21)	
 	ogse_hitfx.npc_on_death(self.object, who)
 
-	ogse_debug.process_npc(self.object, "dth", 3)
 	if self.st.death then
 		xr_logic.issue_event(self.object, self.st.death, "death_callback", self.object, who)
 	end
 
-	ogse_debug.process_npc(self.object, "dth", 4)	
 	if self.st.active_section then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", self.object, who)
 	end
 
-	ogse_debug.process_npc(self.object, "dth", 5)	
 	sr_territory.issue_event(self.object, "death_callback", self.object, who)
 
-	ogse_debug.process_npc(self.object, "dth", 6)	
 	smart_terrain.on_death(self.object:id())
 
-	ogse_debug.process_npc(self.object, "dth", 9)
 	self:clear_callbacks()
 
-	ogse_debug.process_npc(self.object, "dth", 11)
-	-- добавление опыта за убийство
-	xr_statistic.addKillCount(who, self.object)
+	xr_statistic.addKillCount(who, self.object) --Добавление опыта за убийство
 
-	ogse_debug.process_npc(self.object, "dth", 13)
-	--проверка на аномалии  
-	ogse_death_artefact.on_death(self.object, who)
+	ogse_death_artefact.on_death(self.object, who) --Проверка на аномалии
 
-	ogse_debug.process_npc(self.object, "dth", 16)
 	local community = self.object:character_community()
 	if not (
 		community == "zombied"
@@ -691,28 +633,19 @@ function motivator_binder:death_callback(victim, who)
 		actor_stats.remove_from_ranking(self.object:id())
 	end
 
-	ogse_debug.process_npc(self.object, "dth", 18)
 	xr_effects.bar_territory_death(self.object, who)
 
-	ogse_debug.process_npc(self.object, "dth", 21)
-
 	self.am:call("on_npc_death", self.object, who)
-
-	ogse_debug.process_npc(self.object, "dth", 0)
 end
 
 function motivator_binder:use_callback(obj, who)
-	ogse_debug.process_npc(self.object, "use", 1)
-
 	if self.object:alive() then
-		ogse_debug.process_npc(self.object, "use", 3)
 		xr_use.notify_on_use(self.object, who)
 
 		if self.st.active_section then
 			xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "use_callback", self.object, who)
 		end
 	else
-		ogse_debug.process_npc(self.object, "use", 4)
 		if self.treasure_processed == false then
 			treasure_manager:get_treasure_manager():use(self.object)
 			self.treasure_processed = true
@@ -720,15 +653,10 @@ function motivator_binder:use_callback(obj, who)
 	end
 
 	self.am:call("on_npc_use", self.object, who)
-
-	ogse_debug.process_npc(self.object, "use", 0)
 end
 
 function motivator_binder:update(delta)
 	object_binder.update(self, delta)
-
-	ogse_debug.check_monsters()
-	ogse_debug.check_actor()
 
 	if not self.first_update then
 		self.first_update = true
@@ -797,28 +725,19 @@ function motivator_binder:net_save_relevant()
 end
 
 function motivator_binder:save(packet)
-	ogse_debug.process_npc(self.object, "npc_sv", 1)
 	xr_logic.pstor_store(self.object, "anom_invis", get_anomaly_invisibility(self.object))
 
-	ogse_debug.process_npc(self.object, "npc_sv", 2)
 	xr_logic.pstor_store(self.object, "is_invulnerable", self.object:invulnerable())
 
-	ogse_debug.process_npc(self.object, "npc_sv", 5)
 	object_binder.save(self, packet)
 
-	ogse_debug.process_npc(self.object, "npc_sv", 6)
 	packet:w_bool(self.treasure_processed)
 
-	ogse_debug.process_npc(self.object, "npc_sv", 7)
 	xr_logic.save_obj(self.object, packet)
 
-	ogse_debug.process_npc(self.object, "npc_sv", 9)
 	dialog_manager.save(self.object, packet)
 
-	ogse_debug.process_npc(self.object, "npc_sv", 10)
 	trade_manager.save(self.object, packet)
-
-	ogse_debug.process_npc(self.object, "npc_sv", 0)
 end
 
 function motivator_binder:load(reader)
@@ -855,33 +774,21 @@ log3("--[%s] End loading [%s]", script_name(), self.object and self.object:name(
 end
 
 function motivator_binder:hear_callback(obj, who, sound_type, sound_position, sound_power)
-	ogse_debug.process_npc(self.object, "hr", 1)
-	--// xr_companion
-	if xr_companion.is_companion(self.object:id()) then
-		ogse_debug.process_npc(self.object, "hr", 0)
-		return
-	end	
+	if xr_companion.is_companion(self.object:id()) then return end	
 
 	if who and string.find(who:name(), "vehicle_btr") then
 		who = db.actor
 	end		
 
-	ogse_debug.process_npc(self.object, "hr", 2)	
 	local snd_timer = time_global()
 	if not snd_check_timer[self.object:id()] then
 		snd_check_timer[self.object:id()] = snd_timer + math.random(1000, 2000) 
 	else
 		if snd_check_timer[self.object:id()] < snd_timer then
-			local result, err = pcall(check_sound, self.object, who, sound_type, sound_position, sound_power)
-			if not result then
-				log1("ERROR: XR_M hear_callback pcall FAIL "..self.object:id().." reason: "..tostring(err))
-				db.actor:give_game_news(game.translate_string("xr_motivator_debug11"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
-			end
+			check_sound(self.object, who, sound_type, sound_position, sound_power)
 			snd_check_timer[self.object:id()] = snd_timer + math.random(1000, 2000)
 		end
 	end
-
-	ogse_debug.process_npc(self.object, "hr", 0)
 end
 
 class "timer_drop_weapon" (ogse_qt.quick_timer)
@@ -892,9 +799,9 @@ end
 function timer_drop_weapon:condition()
 	local item = level.object_by_id(self.item_id)
 	local sobj = alife():object( self.item_id )
-	if item == nil or sobj == nil then
+	if not item or not sobj then
 		self:stop()
-	elseif item:parent() == nil or sobj.parent_id == 65535 then
+	elseif not item:parent() or sobj.parent_id == 65535 then
 		return true
 	elseif item:parent():id() ~= self.parent_id or sobj.parent_id ~= self.parent_id then
 		self:stop()
@@ -904,7 +811,7 @@ end
 function timer_drop_weapon:action()
 	local parent = level.object_by_id(self.parent_id)
 	local item = level.object_by_id(self.item_id)
-	if item ~= nil then
+	if item then
 		death_manager.set_weapon_drop_condition(item, parent)
 	end
 end

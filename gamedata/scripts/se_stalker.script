@@ -155,12 +155,7 @@ function se_stalker:can_switch_online ()
 end
 --------------------
 function se_stalker:STATE_Write (packet)
-
-	ogse_debug.process_npc(self, "npc_sv", 11)
-
 	cse_alife_human_stalker.STATE_Write (self, packet)
-	
-	ogse_debug.process_npc(self, "npc_sv", 12)
 
 	if self.job_online == true then
 		packet:w_u8(0)
@@ -172,29 +167,15 @@ function se_stalker:STATE_Write (packet)
 		packet:w_u8(3)
 		packet:w_stringZ(self.job_online_condlist)
 	end
-	
-	ogse_debug.process_npc(self, "npc_sv", 13)
 
 	packet:w_bool(self.was_in_smart_terrain)
-	
-	ogse_debug.process_npc(self, "npc_sv", 14)
 
 	packet:w_u8(self.death_dropped)
 
-	ogse_debug.process_npc(self, "npc_sv", 15)
-
 	if self.id ~= 65535 then
 		packet:w_u32(self.offline_dead)
-		
-		ogse_debug.process_npc(self, "npc_sv", 16)
-		
 		packet:w_stringZ(self.s_storage) -- допишем его к пакету
-		
-		ogse_debug.process_npc(self, "npc_sv", 17)
 	end
-	
-	ogse_debug.process_npc(self, "npc_sv", 0)
-
 end
 --------------------
 

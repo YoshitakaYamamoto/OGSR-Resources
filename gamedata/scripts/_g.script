@@ -663,11 +663,7 @@ function abort(fmt, ...)
 		log1(msg_crash[i])
 	end
 
-	ogse_debug.dump_actor_codes()
-
 	log3(debug.traceback())
-	--log1("йпюрйне нохяюмхе ньхайх: "..fmt)
-	log1("онкмне нохяюмхе ньхайх:")
 	log3(fmt, ...)
 	cmd("flush")
 

@@ -51,7 +51,6 @@ end
 --[[
 --Вызывалось из апдейта ogse.script:
 function()
-	ogse_debug.process_actor("upd_a", 41)
 -- Обновление баг-таймера
 	if time_global() > buggy_timer then
 		for k, v in pairs(db.creature) do

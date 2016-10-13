@@ -1373,10 +1373,7 @@ end
 function on_game_load()
 	cmd("unbind", "contacts") --Отключаем в PDA вкладку "Контакты"
 
-	ogse_debug.process_actor("a_spw", 117)
 	id_cleaner.check_ids() --проверка количества идентификаторов
-
-	ogse_debug.process_actor("a_spw", 119)
 
 	-- Первый запуск мода
 	if db.actor:dont_has_info("storyline_actor_start") then
@@ -1424,7 +1421,6 @@ function on_game_load()
 	cmd("cam_inert 0") --KRodin: сбрасываем инерцию камеры в 0
 -----------------------KD: end-------------------------
 
-	ogse_debug.process_actor("a_spw", 1110)
 	db.register_all_quest_zones()
 end
 

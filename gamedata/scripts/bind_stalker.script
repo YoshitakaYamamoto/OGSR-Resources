@@ -22,33 +22,26 @@ function actor_binder:__finalize()
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:net_spawn(data)
-
-	ogse_debug.process_actor("a_spw", 1)
 	cmd("r2_dof_control", "off")
 
 	level.show_indicators()
 
-	ogse_debug.process_actor("a_spw", 2)
 	xr_gulag.make_restrictors_registry()
 
-	ogse_debug.process_actor("a_spw", 4)
 	db.add_actor(self.object)
 
 	if not db.storage[self.object:id()].pstor then	--KRodin: из xr_logic почему-то не срабатывает, поэтому создаём pstor здесь.
 		db.storage[self.object:id()].pstor = {}
 	end
 
-	ogse_debug.process_actor("a_spw", 5)
 	set_extensions_flags(15)
 
 	level.enable_input()
 
-	ogse_debug.process_actor("a_spw", 7)
-	if(actor_stats.add_to_ranking~=nil)then
+	if actor_stats.add_to_ranking~=nil then
 		actor_stats.add_to_ranking(self.object:id())
 	end
 
-	ogse_debug.process_actor("a_spw", 14)
 -------- пауза при загрузке --------
 	ui_main_menu.start()
 ------------------------------------
@@ -59,8 +52,6 @@ function actor_binder:net_spawn(data)
 	self.am:subscribe({ signal = "on_trade_hide", fun = this.restore_weapon })
 
 	self.am:call("on_spawn", data)
-
-	ogse_debug.process_actor("a_spw", 0)
 	return true
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -247,14 +238,9 @@ local info2call = {
 	ui_car_body_hide         = "on_body_hide",
 }
 function actor_binder:info_callback(npc, info_id)
-
-	ogse_debug.process_actor("inf", 1)
 	level_tasks.proceed() --Сюжет
 
-	ogse_debug.process_actor("inf", 2)
 	level_tasks.process_info_portion(info_id) --Отметки на карте
-
-	ogse_debug.process_actor("inf", 4)
 
 	self.am:call("on_info", npc, info_id)
 
@@ -262,8 +248,6 @@ function actor_binder:info_callback(npc, info_id)
 	if sc then
 		self.am:call(sc, npc)
 	end
-
-	ogse_debug.process_actor("inf", 0)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_trade(item, sell_bye, money)
@@ -336,46 +320,30 @@ function check_pickup_fake_gren(obj, srv_obj)
 end
 
 function actor_binder:on_item_take(obj)
-
-	ogse_debug.process_actor("itm_t", 1)
-	if not obj then ogse_debug.process_actor("itm_t", 0) return end
+	if not obj then return end
 	local sobj = alife():object(obj:id())
 	if not sobj then
 		if obj:section() ~= "bolt" then
 			self.object:drop_item(obj)
 		end
-		ogse_debug.process_actor("itm_t", 0)
 		return
 	end
 
-	ogse_debug.process_actor("itm_t", 2)
-	if check_pickup_fake_gren(obj, sobj) then
-		ogse_debug.process_actor("itm_t", 0)
-		return
-	end
+	if check_pickup_fake_gren(obj, sobj) then return end
 
-	ogse_debug.process_actor("itm_t", 4)
     level_tasks.proceed()
 
-	ogse_debug.process_actor("itm_t", 7)
-
 	self.am:call("on_take", obj, sobj)
-
-	ogse_debug.process_actor("itm_t", 0)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_item_drop(obj)
-	if not obj then ogse_debug.process_actor("itm_d", 0) return end
+	if not obj then return end
 	local sobj = alife():object(obj:id())
-	if not sobj then ogse_debug.process_actor("itm_d", 0) return end
-
-	ogse_debug.process_actor("itm_d", 1)
+	if not sobj then return end
 
     level_tasks.proceed()
 
 	self.am:call("on_drop", obj, sobj)
-
-	ogse_debug.process_actor("itm_d", 0)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:before_use(item)
@@ -387,14 +355,11 @@ function actor_binder:before_use(item)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:use_inventory_item(obj)
-	if not obj then ogse_debug.process_actor("itm_u", 0) return end
+	if not obj then return end
 	local sobj = alife():object(obj:id())
-	if not sobj then ogse_debug.process_actor("itm_u", 0) return end
+	if not sobj then return end
 
-	ogse_debug.process_actor("itm_u", 1)
 	self.am:call("on_use", obj, sobj)
-
-	ogse_debug.process_actor("itm_u", 0)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:before_hit_callback(p_s_hit, p_ignore_flags)
@@ -415,38 +380,22 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 local update_was_never_called = true
 function actor_binder:update(delta)
-	ogse_debug.check_npc()
-	ogse_debug.check_monsters()	
-	ogse_debug.check_gulag()	
-
-	ogse_debug.process_actor("upd", 15)
 	self.am:call("on_update", delta)	
 
---=====================================================================================================
 	if update_was_never_called then
-----------------------------------------------------------------------------------------------
+-------------------------------------------------------------------
 		if not has_alife_info("storyline_actor_start") then
-
 			self.am:call("on_storyline_start")
-
 			self.object:give_info_portion("storyline_actor_start")
 		end
-----------------------------------------------------------------------------------------------
+-------------------------------------------------------------------
 		if not has_alife_info("global_dialogs") then
 			self.object:give_info_portion("global_dialogs")
 		end
-		--if not has_alife_info("level_changer_icons") then
-		--	self.object:give_info_portion("level_changer_icons")
-		--end
-
-		ogse_debug.process_actor("upd", 16)
 
 		self.am:call("on_first_update")
 		update_was_never_called = false
 	end
---=====================================================================================================
-
-	ogse_debug.process_actor("upd", 0)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_key(key)

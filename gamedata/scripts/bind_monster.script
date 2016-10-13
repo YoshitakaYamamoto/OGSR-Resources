@@ -44,11 +44,7 @@ end
 
 function generic_object_binder:net_spawn(sobject)
 --log3("~~[%s] Start net_spawn [%s]", script_name(), self.object and self.object:name() or "nil")
-	ogse_debug.process_monster(self.object, "m_spw", 1)
-	if not object_binder.net_spawn(self, sobject) then
-		ogse_debug.process_monster(self.object, "m_spw", 0)
-		return false
-	end
+	if not object_binder.net_spawn(self, sobject) then return false end
 
 	self:subscribe_updaters()
 
@@ -56,10 +52,8 @@ function generic_object_binder:net_spawn(sobject)
 
 	self.object:set_enemy_callback( self.enemy_callback, self )
 
-	ogse_debug.process_monster(self.object, "m_spw", 3)
 	xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_mobile, self.loaded )
 
-	ogse_debug.process_monster(self.object, "m_spw", 6)
 	if not self.object:alive() then
 		--' Наносим небольшой импульс вперед.
 		local h = hit()
@@ -71,7 +65,6 @@ function generic_object_binder:net_spawn(sobject)
 		h.impulse = 1
 		self.object:hit(h)	
 
-		ogse_debug.process_monster(self.object, "m_spw", 61)
 		local s_obj = alife():object(self.object:id())
 		if s_obj.offline_dead == 1 then
 			if debug_flag then
@@ -91,7 +84,6 @@ function generic_object_binder:net_spawn(sobject)
 
 			s_obj.offline_dead = game.time()+(1*24*60*60*1000)
 		elseif s_obj.offline_dead > 1 and s_obj.offline_dead <= game.time() then
-			ogse_debug.process_monster(self.object, "m_spw", 62)
 			if debug_flag then
 				log1("--ВНИМАНИЕ! Обнаружен уже обработанный погибший в оффлайне! Объект: ИД: "..self.object:id().." ИМЯ:"..self.object:name().." Будет произведено удаление объекта!")			
 				db.actor:give_game_news(game.translate_string("bind_monster_debug21")..self.object:id()..game.translate_string("bind_monster_debug2")..self.object:name()..game.translate_string("bind_monster_debug22"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
@@ -99,14 +91,11 @@ function generic_object_binder:net_spawn(sobject)
 
 			checker_minefield.add_to_delete(self.object:id())
 		end
-		ogse_debug.process_monster(self.object, "m_spw", 0)
+
 		return true
 	end
 
-	ogse_debug.process_monster(self.object, "m_spw", 63)
 	self.am:call( "on_monster_spawn", self.object, self )
-
-	ogse_debug.process_monster(self.object, "m_spw", 0)
 	return true
 end
 
@@ -129,27 +118,16 @@ function generic_object_binder:subscribe_updaters()
   end
 end
 
-function generic_object_binder:update(delta)
-	ogse_debug.check_npc()
-	ogse_debug.check_actor()
-	
-	ogse_debug.process_monster(self.object, "upd", 1)
-	if string.find(self.object:name(), "crow_") then
-		ogse_debug.process_monster(self.object, "upd", 0)
-		return false
-	end
+function generic_object_binder:update(delta)	
+	if string.find(self.object:name(), "crow_") then return false end
 
 	object_binder.update(self, delta)
 
-	ogse_debug.process_monster(self.object, "upd", 11)
 	if self.st.active_section ~= nil then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
 	end
 
-	ogse_debug.process_monster(self.object, "upd", 12)
 	self.am:call( "on_monster_update." .. self.object:id(), self.object, delta )
-
-	ogse_debug.process_monster(self.object, "upd", 0)
 end
 
 function generic_object_binder:update_tip_text()
@@ -189,7 +167,6 @@ function generic_object_binder:death_callback(victim, who)
 
 	self:clear_callbacks()
 
-	ogse_debug.process_monster(self.object, "dth", 1)
 	if who and string.find(who:name(), "vehicle_btr") then
 		who = db.actor
 	end
@@ -198,7 +175,6 @@ function generic_object_binder:death_callback(victim, who)
 		db.actor:give_info_portion("secret_villager_dead")
 	end
 
-	ogse_debug.process_monster(self.object, "dth", 2)
 	--if db.actor then -- добавлено KamikaZze  с целью отладки 25/02/2009
 	--	if who:id() == db.actor:id() then
 	-- добавление опыта за убийство
@@ -206,24 +182,19 @@ function generic_object_binder:death_callback(victim, who)
 	--	end
 	--end
 
-	ogse_debug.process_monster(self.object, "dth", 3)
 	if self.st and self.st.mob_death then
 		xr_logic.issue_event(self.object, self.st.mob_death, "death_callback", self.object, who)
 	end
 
-	ogse_debug.process_monster(self.object, "dth", 4)
 	if self.st and self.st.active_section then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", self.object, who)
 	end
 
-	ogse_debug.process_monster(self.object, "dth", 5)
 	smart_terrain.on_death( self.object:id() )
 
-	ogse_debug.process_monster(self.object, "dth", 6)
 	--проверка на аномалии  
 	ogse_death_artefact.on_death(self.object, who)
 
-	ogse_debug.process_monster(self.object, "dth", 8)
 	--' Наносим небольшой импульс вперед.
 	local h = hit()
 	h.draftsman = self.object
@@ -236,14 +207,9 @@ function generic_object_binder:death_callback(victim, who)
 	h.impulse = 10
 	self.object:hit(h)
 
-	ogse_debug.process_monster(self.object, "dth", 11)
 	smart_monster_parts.death_spawn(self.object)
 
-	ogse_debug.process_monster(self.object, "dth", 13)	
-
 	self.am:call( "on_monster_death", self.object, who )
-
-	ogse_debug.process_monster(self.object, "dth", 0)
 end
 
 function generic_object_binder:before_hit_callback(p_s_hit, p_ignore_flags)
@@ -252,23 +218,17 @@ function generic_object_binder:before_hit_callback(p_s_hit, p_ignore_flags)
 end
 
 function generic_object_binder:hit_callback(obj, amount, local_direction, who, bone_index)
-	ogse_debug.process_monster(self.object, "hit", 1)
 	if who and string.find(who:name(), "vehicle_btr") then
 		who = db.actor
 	end	
 
-	ogse_debug.process_monster(self.object, "hit", 2)
 	if self.st.hit then
 		xr_logic.issue_event(self.object, self.st.hit, "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end
 
-	ogse_debug.process_monster(self.object, "hit", 4)
 	smart_monster_parts.main_check(self.object, amount, local_direction, who, bone_index)
 
-	ogse_debug.process_monster(self.object, "hit", 7)
 	self.am:call( "on_monster_hit", self.object, amount, local_direction, who, bone_index, self )
-
-	ogse_debug.process_monster(self.object, "hit", 0)
 end
 
 function generic_object_binder:net_destroy()

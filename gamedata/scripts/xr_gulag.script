@@ -129,38 +129,23 @@ end
 
 -- подготовка гулага к работе
 function gulag:initialize()
-
-	ogse_debug.process_gulag(self, "gul_i", 1)
-
 	self.ObjectJobPathName = {} --' по id. имя патрульного пути места работы персонажа
 	self.restrictors       = {} --' по id. назначенные гулагом рестрикторы для каждого персонажа
 	
-	ogse_debug.process_gulag(self, "gul_i", 2)
-	
 	self:prepare_jobs()
-	
-	ogse_debug.process_gulag(self, "gul_i", 33)
 
 	self.calculateStates = gulag_tasks.loadStates( self.name, self.type )
-	
-	ogse_debug.process_gulag(self, "gul_i", 4)
 
 	local ini = self.smrttrn:spawn_ini()
 	local sect = "smart_terrain"
 	if not ini:section_exist( sect ) then
 		sect = "gulag1"
 	end
-	
-	ogse_debug.process_gulag(self, "gul_i", 5)
 
 	self.state_switch_0 = xr_logic.parse_condlist( self.smrttrn, "gulag1", "switch_0", utils.cfg_get_string(ini, sect, "switch_0", self.smrttrn, false, "", "") )
 	self.state_switch_1 = xr_logic.parse_condlist( self.smrttrn, "gulag1", "switch_1", utils.cfg_get_string(ini, sect, "switch_1", self.smrttrn, false, "", "") )
 
-	ogse_debug.process_gulag(self, "gul_i", 6)
-	
 	self.JobLoaded = nil
-	
-	ogse_debug.process_gulag(self, "gul_i", 0)
 end
 
 -- подготовить работы.

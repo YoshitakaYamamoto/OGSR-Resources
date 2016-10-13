@@ -291,95 +291,68 @@ function act_state_mgr_end:execute()
 	self:weapon_update()
 end	
 function act_state_mgr_end:weapon_update()
-
-	ogse_debug.process_npc(self.object, "smgr_uw", 1)
 --	if not self.st.planner:evaluator(self.st.properties["movement_stand_now"]):evaluate() then		
 --		state_mgr_direction.update_movement_direction(self.object, self.st)
 --	end
 	local t = state_lib.states[self.st.target_state].weapon
-	ogse_debug.process_npc(self.object, "smgr_uw", 2)
 	local wm = rx_wmgr and rx_wmgr.get_wm(self.object)
-	ogse_debug.process_npc(self.object, "smgr_uw", 4)
 	local wpn = (wm and wm:get_weapon()) or self.object:best_weapon()
-	ogse_debug.process_npc(self.object, "smgr_uw", 5)
-	if not wpn then
-		ogse_debug.process_npc(self.object, "smgr_uw", 0)
-		return
-	end
-	ogse_debug.process_npc(self.object, "smgr_uw", 6)
+	if not wpn then return end
+
 	if t == "fire" or t == "sniper_fire" then
 		--log3("[%s] shooting", self.object:name())
 		local sniper_aim = 3000
 		if self.st.look_object ~= nil then
-			ogse_debug.process_npc(self.object, "smgr_uw", 61)
 			local look_object = level.object_by_id(self.st.look_object)
 			if look_object == nil then
 				self.st.look_object = nil
-				ogse_debug.process_npc(self.object, "smgr_uw", 0)
 				return
 			end
-			ogse_debug.process_npc(self.object, "smgr_uw", 62)
 			if self.object:see(look_object) and
 				(not IsStalker(look_object) or				
 				self.object:relation(look_object) == game_object.enemy) and
 				look_object:alive() == true
 			then
-				ogse_debug.process_npc(self.object, "smgr_uw", 63)
 				if t == "sniper_fire" then
 					sniper_aim = self.object:position():distance_to(look_object:position())*aim_ratio
 					if sniper_aim <= min_ratio then
 						self.object:set_item(object.fire1, wpn, 1, min_ratio)
-						ogse_debug.process_npc(self.object, "smgr_uw", 0)
 						return
 					end					
 					self.object:set_item(object.fire1, wpn, 1, sniper_aim)
 				else
 					self.object:set_item(object.fire1, wpn, state_mgr_weapon.get_queue_params(self.object, look_object))
 				end
-				ogse_debug.process_npc(self.object, "smgr_uw", 0)
 				return
 			else
 				self.object:set_item(object.idle, wpn)
-				ogse_debug.process_npc(self.object, "smgr_uw", 0)
 				return
 			end
 		end
-		
-		ogse_debug.process_npc(self.object, "smgr_uw", 7)
 			
-		if self.st.look_position ~= nil and 
-			self.st.look_object == nil
-		then
-			ogse_debug.process_npc(self.object, "smgr_uw", 71)
+		if self.st.look_position ~= nil and self.st.look_object == nil then
 			if t == "sniper_fire" then
 				self.object:set_item(object.fire1, wpn, 1, sniper_aim)
 			else
 				self.object:set_item(object.fire1, wpn, state_mgr_weapon.get_queue_params(self.object, nil))
 			end
-			ogse_debug.process_npc(self.object, "smgr_uw", 0)
 			return
 		else
-			ogse_debug.process_npc(self.object, "smgr_uw", 72)
 			if self.st.target_state == "psy_shoot" then
 				self.object:set_item(object.fire1, wpn)
-				ogse_debug.process_npc(self.object, "smgr_uw", 0)
 				return
 			end
 			self.object:set_item(object.idle, wpn)
-			ogse_debug.process_npc(self.object, "smgr_uw", 0)
 			return				
 		end
-		ogse_debug.process_npc(self.object, "smgr_uw", 8)
 		self.object:set_item(object.fire1, wpn, state_mgr_weapon.get_queue_params(self.object, nil, state_lib.states[self.st.target_state]))
-		ogse_debug.process_npc(self.object, "smgr_uw", 0)
 		return
 	elseif t == "unstrapped" then
-		ogse_debug.process_npc(self.object, "smgr_uw", 9)
 		--log3("[%s] not shooting", self.object:name())
 		self.object:set_item(state_mgr_weapon.get_idle_state(self.st.target_state), wpn)
 	end	
-	ogse_debug.process_npc(self.object, "smgr_uw", 0)
 end
+
 function act_state_mgr_end:finalize()
 	action_base.finalize(self)
 end
@@ -447,8 +420,6 @@ end
 function state_manager:set_state(caller, state_name, callback, timeout, target, emerg, synsound, extrakeys)
 	--log3("Set State called: for %s State: %s", self.npc:name(), state_name)
 	
-	ogse_debug.process_npc(self.npc, "smgr_s", 1)
-	
 	if state_lib.states[state_name] == nil then
 		log1("DEBUG_STATEMGR: Script "..tostring(caller).." called illegal state ["..tostring(state_name).."] for NPC "..tostring(self.npc:name()))
 		abort("ERROR: ILLEGAL SET STATE CALLED!!! %s fo %s", tostring(state_name), self.npc:name())
@@ -469,8 +440,6 @@ function state_manager:set_state(caller, state_name, callback, timeout, target, 
 	else
 		log3("look target NIL")
 	end]]
-	
-	ogse_debug.process_npc(self.npc, "smgr_s", 3)
 
 	--сперва устанавливаем цели
 	if target ~= nil then
@@ -484,24 +453,20 @@ function state_manager:set_state(caller, state_name, callback, timeout, target, 
 		self.look_position = nil
 		self.look_object = nil
 	end
-	ogse_debug.process_npc(self.npc, "smgr_s", 4)	
-	
+
 	-- меняем угол точности.
 	if extrakeys and extrakeys.yaw_delta ~= nil then
 		self.yaw_delta = extrakeys.yaw_delta
 	else
 		self.yaw_delta = 5
 	end
-	
-	ogse_debug.process_npc(self.npc, "smgr_s", 5)	
+
 	-- меняем глубину рекурсивности анимации.
 	if extrakeys and extrakeys.subanim ~= nil then
 		self.subanim = extrakeys.subanim
 	else
 		self.subanim = 0
 	end
-	
-	ogse_debug.process_npc(self.npc, "smgr_s", 6)	
 
 	local switched = false
 	local last_state = self.target_state
@@ -530,17 +495,13 @@ function state_manager:set_state(caller, state_name, callback, timeout, target, 
 
 		switched = true
 	end
-	
-	ogse_debug.process_npc(self.npc, "smgr_s", 7)	
 
 	if state_lib.states[state_name].reset == true then
 		self.reset_state = true
 	else
 		self.reset_state = false
 	end
-	
-	ogse_debug.process_npc(self.npc, "smgr_s", 8)
-	
+
 	if switched and emerg ~= nil then
 		if animation_reset_denied[last_state] ~= true  then
 			self.emerg.animation = emerg.animation
@@ -548,7 +509,6 @@ function state_manager:set_state(caller, state_name, callback, timeout, target, 
 		end
 	end
 
-	ogse_debug.process_npc(self.npc, "smgr_s", 9)	
 	self.synsound = synsound
 	
 	self.callback = callback
@@ -563,9 +523,7 @@ function state_manager:set_state(caller, state_name, callback, timeout, target, 
 			self.callback.timeout = nil
 		end
 	end
-	
-	ogse_debug.process_npc(self.npc, "smgr_s", 10)
-	
+
 	-- if switched == true then
 		-- if self.npc:best_enemy() then
 			-- if last_state == nil or last_state == "idle" then
@@ -581,40 +539,29 @@ function state_manager:set_state(caller, state_name, callback, timeout, target, 
 --	if switched == true then
 --		self:update()
 --	end
-
-	ogse_debug.process_npc(self.npc, "smgr_s", 0)
 end
+
 function state_manager:get_state()
 	return self.target_state
 end
+
 function state_manager:update()
 	--log1("Update called")
-	ogse_debug.process_npc(self.npc, "smgr_u", 1)
 	self.animstate:update()	
-	ogse_debug.process_npc(self.npc, "smgr_u", 2)
 	self.animation:update()	
-	ogse_debug.process_npc(self.npc, "smgr_u", 3)
 	local last_pl_id = nil	
 	self.planner:update()
-	ogse_debug.process_npc(self.npc, "smgr_u", 4)
-	if not self.planner:initialized() then 
-		ogse_debug.process_npc(self.npc, "smgr_u", 0)
-		return 
-	end
-	ogse_debug.process_npc(self.npc, "smgr_u", 5)
+	if not self.planner:initialized() then return end
+
 	local pl_id = self.planner:current_action_id()
-	ogse_debug.process_npc(self.npc, "smgr_u", 6)
 	while pl_id ~= last_pl_id and
 	   pl_id ~= self.operators["end"] and
 	   pl_id ~= self.operators["locked"]
 	do
 		last_pl_id = pl_id
-		ogse_debug.process_npc(self.npc, "smgr_u", 7)
 		self.planner:update()
-		ogse_debug.process_npc(self.npc, "smgr_u", 8)
 		pl_id = self.planner:current_action_id()
 	end	
-	ogse_debug.process_npc(self.npc, "smgr_u", 0)
 	--self.planner:show("")
 end
 
