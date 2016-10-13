@@ -614,23 +614,6 @@ function shustriy_atp_relations()			-- не пашет, но оставим на всякий пожарный
 	end
 end
 
-----------------------------------------------------------------------------------------------------
-
-function clear_npc_inventory()
-	local objt = level_object_by_sid(6) --тута обьект запросить.. 
-	if objt and objt ~= nil then
-		objt:set_callback(callback.use_object, non_item_take, self)
-	end
-end
-
-function non_item_take(obj, who)
-	if obj ~= nil then
-		if obj:is_weapon() or obj:is_weapon_magazined() or obj:is_weapon_gl() then 
-			who:drop_item(obj)
-		end
-	end
-end
-
 -- Артефакт Погодник -------------------------------------------------------------------------------
 local thunderbird_subscribed
 
