@@ -83,19 +83,15 @@ local explode_power_5 = 1.2
 -- Параметры
 
 function update()
-	if not get_hud():GetCustomStatic("gun_jammed") or not db.actor:alive() then return end
+	if not get_hud():GetCustomStatic("gun_jammed") then return end
 
 	local active_item = db.actor:active_item()
 	if not active_item then return end
 	local s_wpn = alife():object(active_item:id())
 	if s_wpn then
 		if active_item:condition() <= current_blow_limit then
+			db.actor:drop_item(active_item)
 			make_boom(active_item)
-			if bad_weapons_in_slots[active_item:id()] then
-				bad_weapons_in_slots[active_item:id()] = nil
-				--log3("~~[%s] Removing from table: [%s]", script_name(), active_item:name())
-				unsubscribe()
-			end
 		end
 	end
 end
