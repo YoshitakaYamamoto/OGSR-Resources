@@ -458,7 +458,7 @@ end
 
 -- 
 function action_gate:hit_callback(obj, amount, local_direction, who, bone_index)
-    printf("gate <hit>: action_gate:hit_callback()")
+--log3("--[%s] Called hit_callback for [%s]. Who: [%s], amount: [%s]", script_name(), self.object:name(), who:name(), amount)
 	if self.locking == state_lock_hard then
 		if self.st.snd_open_start then
 			self:gate_play_snd_from_set(self.st.snd_open_start)

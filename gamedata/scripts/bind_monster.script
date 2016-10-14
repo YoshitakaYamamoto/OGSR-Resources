@@ -213,11 +213,13 @@ function generic_object_binder:death_callback(victim, who)
 end
 
 function generic_object_binder:before_hit_callback(p_s_hit, p_ignore_flags)
-	self.last_hit_data = read_hit_data( p_s_hit )
-	self.am:call( "on_monster_before_hit", self.object, self.last_hit_data, p_s_hit, p_ignore_flags, self )
+	local last_hit_data = read_hit_data( p_s_hit )
+--log3("--[%s] Called before_hit_callback for [%s]: %s, %s, %s", script_name(), self.object:name(), last_hit_data, p_s_hit, p_ignore_flags)
+	self.am:call( "on_monster_before_hit", self.object, last_hit_data, p_s_hit, p_ignore_flags, self )
 end
 
 function generic_object_binder:hit_callback(obj, amount, local_direction, who, bone_index)
+--log3("--[%s] Called hit_callback for [%s]. Who: [%s], amount: [%s]", script_name(), self.object:name(), who:name(), amount)
 	if who and string.find(who:name(), "vehicle_btr") then
 		who = db.actor
 	end	

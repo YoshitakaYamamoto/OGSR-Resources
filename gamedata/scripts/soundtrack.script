@@ -76,10 +76,10 @@ function ti_zombie() 				s_play([[characters_voice\scenario\trader\trader_tutori
 function trader_kakogo() 			s_play([[soundtrack\trader_kakogo]]) end
 
 local function play_random_from_tbl(sounds_tbl)
-	s_play(sounds_tbl[math.random(1, #sounds_tbl)])
+	s_play(sounds_tbl[math.random(#sounds_tbl)])
 end
 local function surge_play_random_from_tbl(sounds_tbl)
-	surge_play(sounds_tbl[math.random(1, #sounds_tbl)])
+	surge_play(sounds_tbl[math.random(#sounds_tbl)])
 end
 
 local otchajanie_snds = {
@@ -183,24 +183,6 @@ function heli_let_it_be() 	   s_play([[characters_voice\scenario\escape\heli_rad
 function wolf_to_dialog() 	   s_play([[characters_voice\scenario\escape\wolf_to_dialog]]) end
 ------Лис просит о помощи-------
 function dogs_fox() 		   s_play([[soundtrack\dogs_fox]]) end
-------Horror time-------
-local rnd_moan_snds = {
-	[[characters_voice\scenario\esc\esc_music_horror_3]],
-	[[ambient\random\rnd_moan1]],
-	[[ambient\random\rnd_moan2]],
-	[[ambient\random\rnd_moan3]],
-	[[ambient\random\rnd_moan4]],
-	[[ambient\random\rnd_moan5]],
-	[[ambient\random\rnd_ratchant]],
-	[[ambient\random\rnd_respawn]],
-	[[characters_voice\scenario\esc\esc_music_horror_4]],
-}
-for i=1,121 do
-	table.insert(rnd_moan_snds, [[soundtrack\horror_time\]]..i)
-end
-function rnd_moan()
-	play_random_from_tbl(rnd_moan_snds)
-end
 ------Звуки в подземных локациях, в основном при открывании дверей и при включении (выключении механизмов)-------
 local underground_snds = {
 	[[soundtrack\underground\underground_1]],

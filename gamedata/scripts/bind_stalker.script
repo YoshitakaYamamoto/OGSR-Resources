@@ -364,11 +364,12 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:before_hit_callback(p_s_hit, p_ignore_flags)
 	local hit_data = read_hit_data(p_s_hit)
+--log3("--[%s] Called before_hit_callback for [%s]: %s, %s, %s", script_name(), self.object:name(), hit_data, p_s_hit, p_ignore_flags)
 	self.am:call("on_actor_before_hit", hit_data, p_s_hit, p_ignore_flags)
 end
 
 function actor_binder:actor_hit_callback(obj, amount, local_direction, who, bone_index)
-
+--log3("--[%s] Called hit_callback for [%s]. Who: [%s], amount: [%s]", script_name(), self.object:name(), who:name(), amount)
 	ogse_critical_hit.check_critical(amount, bone_index, who)
 
 	self.am:call("on_hit", obj, amount, local_direction, who, bone_index)

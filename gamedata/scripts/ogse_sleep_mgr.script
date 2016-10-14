@@ -111,14 +111,7 @@ function begin_sleep(desired_sleep_time)
 			urgent_awakening = true
 			break
 		end
-		-- начался пси-выброс
-		if has_alife_info("horror_time") then
-			ogse.autohiding_msg("ogse_sleep_mgr_warn_2_text", 1500)
-			--log1("psy")
-			urgent_awakening = true
-			break
-		end
-		
+
 		-- начинается выброс
 		if ogse_weather_mgr.get_weather_mgr():is_surge_in_process() then
 			ogse.autohiding_msg("ogse_sleep_mgr_warn_3_text", 1500)
@@ -354,8 +347,6 @@ function use_matras()
 	end end
 	if has_alife_info("pre_blowout") then 
 		ogse.autohiding_msg("ogse_sleep_mgr_warn_1_text", 1500)
-	elseif has_alife_info("horror_time") then
-		ogse.autohiding_msg("ogse_sleep_mgr_warn_2_text", 1500)
 	elseif is_enemy_around then
 		ogse.autohiding_msg("ogse_sleep_mgr_warn_5_text", 1500)
 	elseif (ogse_car_control.current_car and not ogse_car_control.in_btr) and not db.actor:has_info("blessing_of_old_man") then

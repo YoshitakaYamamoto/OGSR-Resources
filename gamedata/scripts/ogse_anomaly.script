@@ -1253,8 +1253,7 @@ end
 
 -- Обновляем менеджер аномалий при загрузке
 function anom_update()
-
-	if has_alife_info("blowout") --[[or has_alife_info("horror_time")]] then return end
+	if has_alife_info("blowout") then return end
 
 	local lname = level.name()
 	if chek_blow_flags() then

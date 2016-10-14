@@ -784,7 +784,7 @@ function CKampManager:updateNpc(npc)
 	local state, sound = self:proceedRole(npc, director)
 	
 	local substate = nil
-	if state == "wait_harmonica" and not has_alife_info("horror_time") then
+	if state == "wait_harmonica" then
 		if sound == "pre_harmonica" and self.npc[npc_id].new == true then
 			xr_sound.set_sound_play(npc, "intro_music", math.random(2000,3000))
 			self.npc[npc_id].new = false
@@ -795,55 +795,30 @@ function CKampManager:updateNpc(npc)
 		state = "harmonica"
 		substate = 1
 		xr_kamp.kamp_stalkers[npc_id] = false
-	elseif state == "wait_harmonica" and has_alife_info("horror_time") then
-		local t = math.mod(npc_id, 2)
-		if t == 0 then
-			state = "trans_0"
-		else
-			state = "trans_1"
-		end
-		xr_kamp.kamp_stalkers[npc_id] = false
-	elseif state == "wait_guitar" and not has_alife_info("horror_time") then
+	elseif state == "wait_guitar" then
 		if sound == "pre_guitar" and self.npc[npc_id].new == true then
 			xr_sound.set_sound_play(npc, "intro_music", math.random(2000,3000))
 			self.npc[npc_id].new = false
 		end
 		state = "guitar"
 		xr_kamp.kamp_stalkers[npc_id] = false
-	elseif state == "wait_guitar" and has_alife_info("horror_time") then
-		local t = math.mod(npc_id, 2)
-		if t == 0 then
-			state = "trans_0"
-		else
-			state = "trans_1"
-		end
-		xr_kamp.kamp_stalkers[npc_id] = false
-	elseif state == "play_guitar" and not has_alife_info("horror_time") then
+	elseif state == "play_guitar" then
 		state = "guitar"
 		substate = 1
 		xr_kamp.kamp_stalkers[npc_id] = false
-	elseif state == "play_guitar" and has_alife_info("horror_time") then
-		local t = math.mod(npc_id, 2)
-		if t == 0 then
-			state = "trans_0"
-		else
-			state = "trans_1"
-		end
 	elseif state == "declarate" then
 		if self.npc[npc_id].new == true then
 			if sound == "pre_joke" then
 				xr_sound.set_sound_play(npc, "intro_joke", math.random(2000,3000))
-			elseif sound == "play_joke" and not has_alife_info("horror_time") then
+			elseif sound == "play_joke" then
 				xr_sound.set_sound_play(npc, "joke", math.random(2000,3000))
-			elseif sound == "play_story" and not has_alife_info("horror_time") then
+			elseif sound == "play_story" then
 				xr_sound.set_sound_play(npc, self.selected_story)
 				self.story_last, self.story_max = xr_sound.get_last_IDS(npc, self.selected_story)
 				if self.story_last==nil then
 					self.story_last=0
 					self.story_max=1
-					if not has_alife_info("horror_time") then
 					xr_sound.set_sound_play(npc, "threat_back", math.random(1000,2000))
-					end
 					--- dirty hack
 					self.kamp_state="idle"
 					self.forbiddendirector=self.director
@@ -873,14 +848,6 @@ function CKampManager:updateNpc(npc)
 		end
 		xr_kamp.kamp_stalkers[npc_id] = false
 	elseif state == "trans" then
-		if has_alife_info("horror_time") then
-			local t = math.mod(npc_id, 2)
-			if t == 0 then
-				state = "trans_0"
-			else
-				state = "trans_1"
-			end
-			end
 		if npc:character_community() == "monolith" then
 			local t = math.mod(npc_id, 2)
 			if t == 0 then
@@ -948,12 +915,8 @@ function CKampManager:checkNpcAbility(npc)
 		
 		local can_eat = ogse_kamp_eating.can_eat(npc)
 		
+		self.npc[npc_id].states["trans"] = false
 		-- есть колбасу
-		if has_alife_info("horror_time") then
-			self.npc[npc_id].states["trans"] = true
-		else
-			self.npc[npc_id].states["trans"] = false
-		end
 		if npc:object("kolbasa_a") and can_eat and math.random(99) > 20 then		-- вероятность 80%
 			self.npc[npc_id].states["eat_kolbasa"] = true
 		else
@@ -1048,18 +1011,10 @@ function CKampManager:addNpc(npc, bind)
 		return
 	end
 	
-	if npc:character_community() == "monolith" or
-	   npc:character_community() == "zombied"
-	then
+	if npc:character_community() == "monolith" or npc:character_community() == "zombied" then
 		self.npc[npc:id()] = {name = npc:name(), position = nil, current = nil, speak = 0, states = {
 								stand_wait = false, sit = false, sit_ass = false, sit_knee = false, declarate = true,
 								use_pda = false, eat_kolbasa = false, eat_vodka = false, eat_energy = false, eat_bread = false, kurit = false, trans = true,
-								play_harmonica = false, play_guitar = false, play_joke = false, play_story = false}}
-	
-	elseif has_alife_info("horror_time") then
-		self.npc[npc:id()] = {name = npc:name(), position = nil, current = nil, speak = 0, states = {
-								stand_wait = true, sit = true, sit_ass = true, sit_knee = true, declarate = true,
-								use_pda = false, eat_kolbasa = false, eat_vodka = true, eat_energy = false, eat_bread = false, kurit = false, trans = true,
 								play_harmonica = false, play_guitar = false, play_joke = false, play_story = false}}
 	else
 		self.npc[npc:id()] = {name = npc:name(), position = nil, current = nil, speak = 0, states = {

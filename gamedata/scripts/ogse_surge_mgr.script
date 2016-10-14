@@ -33,12 +33,6 @@ local first_surge_time_disp = 2  -- разброс времени первого выброса, час.
 local base_surge_wait_time  = sys_ini:r_s32("options","t_surge") --36 --get_float("options", "t_surge") -- среднее время между выбросами, час.
 local surge_wait_time_disp  = 4  -- разброс времени ожидания, час.
 local surge_postpone_time   = 10 -- [час.], время откладывания выброса в случае невозможности его начать по сюжетным ограничениям
-local horror_flag           = sys_ini:r_s32("options","horror_flag")
-local horror_time_proshow   = sys_ini:r_s32("options","horror_time_proshow")
-
-local sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
-local sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
-
 
 local military_phantom_types = {
 	"phantom_krovosos_1",
@@ -229,8 +223,7 @@ function surge_db_init()
 	surge_db.surge_process_stage_05 = { --3. Проигрываем промежуточные эффекты
 		on_info = {
 			call1 = news_main_data.on_disconnect_vbs, -- выдаем сообщение о дисконнекте
-			call2 = this.f_vibros_meter, -- счётчик выбросов - нужен чтобы гарантировано игроку показать пси-выброс, но не слишком рано
-			call3 = this.set_no_net_signal,
+			call2 = this.set_no_net_signal,
 			if_surface = {Flag2 = 1,},
 			if_underground = {Flag2 = 0,},
 		},
@@ -455,10 +448,6 @@ function surge_db_init()
 end
 
 function on_surge_end()
-	local blowout_count = ogse.load_variable("blowout_count",0)
-	blowout_count = blowout_count + 1
-	ogse.save_variable("blowout_count",blowout_count)
-
 	ogse_anomaly.add_anom(level.name(), true)
 	ogse_anomaly.need_disable_anomaly = true
 
@@ -608,7 +597,7 @@ function on_actor_update()
 			db.FlagEsc = 0
 		end	
 		if db.Dead2 == 1 and db.FlagEsc == 0 then
-			g_R_Vibros:Run()
+			run_vibros_effects()
 			hit_actor()
 			soundtrack.strange_sounds()
 			level.add_pp_effector("dead_zone.ppe", 1003, true)
@@ -616,13 +605,13 @@ function on_actor_update()
 			level.set_pp_effector_factor(1003, 0.5)
 		end
 		if db.FlagEsc == 1 then
-			g_R_Vibros:Stop()
+			stop_vibros_effects()
 		end
 	else
 		if db.FlagEsc == 1 then
 			db.FlagEsc = 0
 			db.Dead2 = 0
-			g_R_Vibros:Stop()
+			stop_vibros_effects()
 		end
 	end
 end
@@ -774,33 +763,21 @@ end
 
 local horror_objects_db = {
 	l01_escape = {
-		horror = {prob = 0.25, use_surge_count = true, 
-			spawn_items = {["phantom_zombi_3"] = 2,},
-		},
 		spawn = {prob = 0.1,
 			items = {["af_medusa"] = 1, ["af_vyvert"] = 1, ["af_blood"] = 1, ["af_electra_sparkler"] = 1,}
 		},
 	},
 	l02_garbage = {
-		horror = {prob = 0.3, use_surge_count = true, 
-			spawn_items = escape_phantom_types,
-		},
 		spawn = {prob = 0.1,
 			items = { ["af_cristall_flower"] = 1, ["af_gravi"] = 1, ["af_rusty_thorn"] = 1,},
 		},
 	},
 	l03_agroprom = {
-		horror = {prob = 0.3, use_surge_count = true, 
-			spawn_items = escape_phantom_types,
-		},
 		spawn = {prob = 0.1,
 			items = {["af_cristall_flower"] = 1, ["af_gravi"] = 1, ["af_rusty_thorn"] = 1, ["af_mincer_meat"] = 1, },
 		},
 	},
 	l04_darkvalley = {
-		horror = {prob = 0.4, use_surge_count = true, 
-			spawn_items = escape_phantom_types,
-		},
 		spawn = {prob = 0.1,
 			items = {["af_dummy_glassbeads"] = 1, ["af_electra_flash"] = 1, ["af_fuzz_kolobok"] = 1, ["af_fireball"] = 1, },
 		},
@@ -811,41 +788,26 @@ local horror_objects_db = {
 		},
 	},
 	l06_rostok = {
-		horror = {prob = 0.6, use_surge_count = false,
-			spawn_items = {["phantom_snork_1"] = 2},
-		},
 		spawn = {prob = 0.1,
 			items = {["af_dummy_pellicle"] = 1, ["af_ameba_slime"] = 1, ["af_soul"] = 1, ["af_rusty_kristall"] = 1, },
 		},
 	},
 	l07_military = {
-		horror = {prob = 0.6, use_surge_count = false,
-			spawn_items = military_phantom_types,
-		},
 		spawn = {prob = 0.1,
 			items = {["af_dummy_battery"] = 1, ["af_rusty_sea-urchin"] = 1, ["af_electra_moonlight"] = 1, ["af_ameba_slug"] = 1, ["af_electra_sparkler"] = 1, },
 		},
 	},
 	l08_yantar = {
-		horror = {prob = 0.6, use_surge_count = false,
-			spawn_items = {["phantom_snork_1"] = 1},
-		},
 		spawn = {prob = 0.1,
 			items = {["af_dummy_battery"] = 1, ["af_dummy_dummy"] = 1, ["af_night_star"] = 1, ["af_gold_fish"] = 1, },
 		},
 	},
 	l10_radar = {
-		horror = {prob = 0.7, use_surge_count = false,
-			spawn_items = military_phantom_types,
-		},
 		spawn = {prob = 0.1,
 			items = {["af_dummy_spring"] = 1, ["af_rusty_sea-urchin"] = 1, ["af_electra_moonlight"] = 1, ["af_ameba_mica"] = 1,	},
 		},
 	},
 	l11_pripyat = {
-		horror = {prob = 0.8, use_surge_count = false,
-			spawn_items = military_phantom_types,
-		},
 		spawn = {prob = 0.1,
 			items = {["af_dummy_spring"] = 1, ["af_night_star"] = 1, ["af_dummy_glassbeads"] = 1, ["af_fuzz_kolobok"] = 1, },
 		},
@@ -875,18 +837,10 @@ end
 
 -- Вызов спавна артефактов и хоррор-тайма
 function horror_and_arts()
-	---- обнуление переменной 
-	
-	lname = level.name()
 	actor_was_hit = false -- TODO: перенести это в другое место
+
 	local actions = horror_objects_db[lname]
-	
 	if actions then
-		local blowout_count = ogse.load_variable("blowout_count",0)
-		if horror_flag == 1 and actions.horror and ((math.random() < actions.horror.prob) or (actions.horror.use_surge_count and blowout_count ==  horror_time_proshow)) then
-			horror_time.horror_begin()
-			process_spawn_items(actions.horror.spawn_items)
-		end
 		if actions.spawn and math.random() < actions.spawn.prob then
 			process_spawn_items(actions.spawn.items)
 		end
@@ -894,49 +848,23 @@ function horror_and_arts()
 end
 
 
-class "R_Vibros"
-function R_Vibros:__init()
-	self.work = 0
-end
-
-g_R_Vibros = R_Vibros()
-
-function R_Vibros:construct()
-end
-
-function R_Vibros:Run()
-	if self.work == 0 then
+local effects_playing
+function run_vibros_effects()
+	if not effects_playing then
 		xr_sound.set_actor_sound("level_border_detector")
 		xr_sound.set_actor_sound_factor(0.01)
 		level.add_cam_effector("camera_effects\\fatigue.anm", 2004, true, "")
 		level.add_pp_effector("yantar_underground_psi.ppe", 299, true)
 		level.set_pp_effector_factor(299, 1.0)
-		self.work = 1
+		effects_playing = true
 	end
 end
-
-function R_Vibros:Stop()
-	if self.work == 1 then
+function stop_vibros_effects()
+	if effects_playing then
 		level.remove_pp_effector(1003)
 		level.remove_cam_effector(2004)
 		level.remove_pp_effector(299)
 		xr_sound.set_actor_sound("")
-		self.work = 0
-	end
-end
-
-
- -- счётчик выбросов
-function f_vibros_meter()
-	if has_alife_info("vibros_meter_done") then return end
-	local vibros_meter_limit = 10 -- предел работы счётчика
-	local vibros_meter = tonumber(ogse.load_variable("vmr",0))
-	vibros_meter = vibros_meter + 1
-	if vibros_meter < vibros_meter_limit then
-		ogse.del_variable("vmr")
-		ogse.save_variable("vmr",vibros_meter) -- счётчик выбросов
-	else
-		ogse.del_variable("vmr")
-		db.actor:give_info_portion("vibros_meter_done") -- завершаем работу счетчика
+		effects_playing = nil
 	end
 end

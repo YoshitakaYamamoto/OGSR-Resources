@@ -42,10 +42,6 @@ function show_news_main()
 		t_duwn = t_duwn*t_koef_glob*t_koef_blow -- диапазон времени выдачи сообщений при начале Выброса
 		t_up = t_up*t_koef_glob*t_koef_blow
 	end
-	if has_alife_info("horror_time") then
-		t_duwn = t_duwn*t_koef_glob*t_koef_horr -- диапазон времени выдачи сообщений во время Ужаса
-		t_up = t_up*t_koef_glob*t_koef_horr
-	end
 	local uptime = time_global()
 	local meter = meter_time + math.random(t_duwn, t_up)
 	if uptime < meter then return end
@@ -79,15 +75,6 @@ function show_news_main()
 		prob7,
 		prob12,
 		prob7
-		}
-	elseif has_alife_info("horror_time") then
-		ft = { 
-		prob3,
-		prob4,
-		prob6,
-		prob7,
-		prob8,
-		prob10
 		}
 	else
 		ft = { 

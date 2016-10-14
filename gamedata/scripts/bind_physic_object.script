@@ -152,6 +152,7 @@ function generic_physics_binder:use_callback(obj, who)
 end
 -- MARKER: hit_callback
 function generic_physics_binder:hit_callback(obj, amount, local_direction, who, bone_index)
+--log3("--[%s] Called hit_callback for [%s]. Who: [%s], amount: [%s]", script_name(), self.object:name(), who:name(), amount)
 	if self.st.ph_on_hit then
 		xr_logic.issue_event(self.object, self.st.ph_on_hit, "hit_callback", obj, amount, local_direction, who, bone_index)
 	end
