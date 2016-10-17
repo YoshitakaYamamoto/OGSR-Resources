@@ -158,36 +158,18 @@ function actor_binder:on_goodwill_change(from, to)
 	self.am:call("on_goodwill_change", from, to)
 end
 
-controllerSoundPresentOnDeath = false
 function actor_binder:actor_death_callback(victim, who)
-	controllerSoundPresentOnDeath = false
-	local actorPosition = self.object:position()
-	local kontrikSoundAuraDistance = get_float("m_controller_e", "PsyAura_Fake_MaxAddDist", 90.0)
-	kontrikSoundAuraDistance = kontrikSoundAuraDistance*kontrikSoundAuraDistance
-	for k,v in pairs(db.creature) do
-		if v == false then		-- монстры
-			local obj = level.object_by_id(k)
-			if obj and obj:clsid() == clsid.controller_s and obj:position():distance_to_sqr(actorPosition) <= kontrikSoundAuraDistance then
-				controllerSoundPresentOnDeath = true
-				cmd("cfg_save", "user.ltx")
-				cmd("unbind", "quick_load")
-				cmd("unbind_sec", "quick_load")
-				break
-			end
-		end
-	end
-
 	self.am:call("on_actor_death", victim, who)
 end
 
 function actor_binder:debug_monster_follow_path(id, params)
 	local g0 = bit_and(params, 65535)
 	local g1 = bit.rshift(params, 16)
-	
-	log3("id = %d, g0 = %d, g1 = %d", id, g0, g1)
+
+	log3("id = [%s], g0 = [%s], g1 = [%s]", id, g0, g1)
 	local obj = alife():object(id)
 	if obj then
-		log3("actor_binder:debug_monster_follow_path: %s", obj:name())
+		log3("actor_binder:debug_monster_follow_path: [%s]", obj:name())
 	end
 end
 ----------------------------------------------------------------------------------------------------------------------

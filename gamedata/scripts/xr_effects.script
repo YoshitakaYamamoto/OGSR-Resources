@@ -2485,33 +2485,19 @@ function game_over(actor, npc)
 	if db.gameover_credits_started ~= true then
 		return
 	end
-	local c = get_console()
-	if bind_stalker.controllerSoundPresentOnDeath then
-		c:execute("disconnect")
-		c:execute("cfg_load user.ltx")
-		bind_stalker.controllerSoundPresentOnDeath = false
-	end
-	printf("main_menu on console command is executed")
-	c:execute("main_menu on")
+	cmd("main_menu on")
 end
 
 function after_credits(actor, npc)
 	if db.gameover_credits_started ~= true then
 		return
 	end
-	local c = get_console()
-	c:execute("disconnect")
+	cmd("disconnect")
 end
 
 
 function pri_game_over(actor, npc)
-	if bind_stalker.controllerSoundPresentOnDeath then
-		c:execute("disconnect")
-		c:execute("cfg_load user.ltx")
-		bind_stalker.controllerSoundPresentOnDeath = false
-	end
-	printf("main_menu on console command is executed")
-	get_console():execute("main_menu on")
+	cmd("main_menu on")
 end
 
 function esc_init_dialod ()
@@ -2546,14 +2532,7 @@ function change_leader(actor, npc)
 end
 
 function on_tutor_gameover_stop()
-	local c = get_console()
-	if bind_stalker.controllerSoundPresentOnDeath then
-		c:execute("disconnect")
-		c:execute("cfg_load user.ltx")
-		bind_stalker.controllerSoundPresentOnDeath = false
-	end
-	printf("main_menu on console command is executed")
-	c:execute("main_menu on")
+	cmd("main_menu on")
 end
 
 function actor_stop_sleeping()
