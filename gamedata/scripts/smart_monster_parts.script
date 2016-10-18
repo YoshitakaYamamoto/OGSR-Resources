@@ -178,7 +178,7 @@ function spawn_parts(obj,number)
 					num_of_parts = num_of_parts - 1
 				end
 				if num_of_parts > 0 then
-					ogse.spawn_items_in_inv(mob["spawn_part"], obj, num_of_parts)
+					ogse.spawn_item_in_inv(mob["spawn_part"], obj, num_of_parts)
 				end
 			end
 		break

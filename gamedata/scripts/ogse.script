@@ -1008,32 +1008,35 @@ end
 --****************************************ТАЙМЕРЫ - КОНЕЦ.*************************************************
 
 -----------------------------------------------------------------------------------------------------------
-function spawn_items_in_inv(section, npc, num) --Спавним несколько объектов в инвентарь
-	for i = 1, num do
-		spawn_item_in_inv(section, npc)
-	end
-end
-
-function spawn_item_in_inv(section, npc) --Спавним объекты в инвентарь
+--Спавним предметы в инвентарь актора, НПС, монстров, ящиков (поддерживаются и клиентские, и серверные объекты)
+--ДЛЯ СПАВНА ПАТРОНОВ ИСПОЛЬЗОВАТЬ ОТДЕЛЬНУЮ ФУНКЦИЮ!!!
+function spawn_item_in_inv(section, npc, num)
 	local npc = npc or db.actor
-	local sobj_abstr, id
+	local num = num or 1
+
+	local pos, lvi, gvi, pid, sobj
 	if type(npc.id) == "function" then
-		id = npc:id()
-		sobj_abstr = alife():create(section, npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), id)
+		pos, lvi, gvi, pid = npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id()
 	else
-		id = npc.id
-		sobj_abstr = alife():create(section, npc.position, npc.level_vertex_id, npc.game_vertex_id, id)
+		pos, lvi, gvi, pid = npc.position, npc.m_level_vertex_id, npc.m_game_vertex_id, npc.id
 	end
-	ASSERT(sobj_abstr, "[ogse.spawn_item_in_inv] Can't create object with section [%s] in inv [%s]", section or "nil", npc:name() or "nil")
-	if id ~= db.actor:id() then
-		level.client_spawn_manager():add(sobj_abstr.id, -1, fix_spawn_item_in_inv, npc) --Фикс пропадания доспавненного предмета при сейв/лоаде
+
+	local is_actor = pid == db.actor:id()
+	local game_obj = level.object_by_id(pid)
+	for i = 1, num do
+		sobj = alife():create(section, pos, lvi, gvi, pid)
+		if not is_actor and game_obj then
+			level.client_spawn_manager():add(sobj.id, -1, fix_spawn_item_in_inv, game_obj) --Фикс пропадания доспавненного предмета при сейв/лоаде
+		end
 	end
-	return alife():object(sobj_abstr.id)
+	if num == 1 then
+		return alife():object(sobj.id)
+	end
 end
 
--- Спавним патроны в инвентарь
+--Спавним патроны в инвентарь актора, НПС, монстров, ящиков (поддерживаются и клиентские, и серверные объекты)
 function spawn_ammo_in_inv(section, num, npc)
-	if num <= 0 then return end
+	if num < 1 then return end
 
 	local npc = npc or db.actor
 
@@ -1041,30 +1044,23 @@ function spawn_ammo_in_inv(section, num, npc)
 	if type(npc.id) == "function" then
 		pos, lvi, gvi, pid = npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id()
 	else
-		pos, lvi, gvi, pid = npc.position, npc.level_vertex_id, npc.game_vertex_id, npc.id
+		pos, lvi, gvi, pid = npc.position, npc.m_level_vertex_id, npc.m_game_vertex_id, npc.id
 	end
 
 	local is_actor = pid == db.actor:id()
+	local game_obj = level.object_by_id(pid)
 	local num_in_box = get_u32(section, "box_size")
-	while num > num_in_box do
+	while num > num_in_box or num > 0 do
 		local sitem = alife():create_ammo(section, pos, lvi, gvi, pid, num_in_box)
-		local sammo = alife():object(sitem.id)
-		sammo:use_ai_locations(false)
-		if not is_actor then
-			level.client_spawn_manager():add(sammo.id, -1, fix_spawn_item_in_inv, npc) --Фикс пропадания доспавненного предмета при сейв/лоаде
+		if not is_actor and game_obj then
+			level.client_spawn_manager():add(sitem.id, -1, fix_spawn_item_in_inv, game_obj) --Фикс пропадания доспавненного предмета при сейв/лоаде
 		end
 		num = num - num_in_box
 	end
-	local sitem = alife():create_ammo(section, pos, lvi, gvi, pid, num)
-	local sammo = alife():object(sitem.id)
-	sammo:use_ai_locations(false)
-	if not is_actor then
-		level.client_spawn_manager():add(sammo.id, -1, fix_spawn_item_in_inv, npc) --Фикс пропадания доспавненного предмета при сейв/лоаде
-	end
 end
 
-function fix_spawn_item_in_inv(npc, id, sobj_abstr) --Фикс пропадания доспавненного предмета при сейв/лоаде
-    npc:transfer_item(sobj_abstr, npc)
+function fix_spawn_item_in_inv(obj, item_id, item_obj) --Фикс пропадания доспавненного предмета при сейв/лоаде
+    obj:transfer_item(item_obj, obj)
 end
 -----------------------------------------------------------------------------------------------------------
 
@@ -1341,7 +1337,7 @@ function on_actor_first_update()
 			if af_kolya then
 				alife():release(af_kolya, true)
 				if db.actor:has_info("cheb_found_kolya") and not db.actor:object("cheb") then
-					ogse.spawn_item_in_inv("af_kolya", alife():story_object(story_ids.stalker_kolya))
+					spawn_item_in_inv("af_kolya", alife():story_object(story_ids.stalker_kolya))
 				end
 			end
 			db.actor:give_info_portion("OGSE_PATCH_10_1_FIX")

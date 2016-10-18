@@ -2111,8 +2111,8 @@ function on_death_figa(actor, figa)
 	StalkerZombFiga = figa
 end
 function death_figa()
-	--ogse.spawn_items_in_inv("medkit", nil, 16)
-	--ogse.spawn_items_in_inv("bandage", nil, 16)
+	--ogse.spawn_item_in_inv("medkit", nil, 16)
+	--ogse.spawn_item_in_inv("bandage", nil, 16)
 	ogse_st_mgr.start_timer("death_figa_timer", 1.0, "tasks_functor.death_figa_2")
 end
 function death_figa_2()
