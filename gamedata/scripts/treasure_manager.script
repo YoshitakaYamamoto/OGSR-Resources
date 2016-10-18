@@ -97,9 +97,8 @@ function CTreasure:__init()
 	for k,v in pairs(self.treasure_info) do
 		self.treasure_by_target[v.target] = k	
 	end
-
-	self.loss_workaround_queue = {}
 end
+
 --' Юзание инициатора (возможность выдать тайник)
 function CTreasure:use(npc)	
 	--' Нужно рандомно выбрать один из тайников.
@@ -145,138 +144,45 @@ function CTreasure:check()
 	end
 end
 
---' Выдача тайника
+--Выдача тайника
 function CTreasure:give_treasure(k)
 	local v = self.treasure_info[k]
-	local sim = alife()
-	local obj = sim:story_object(v.target)
-	if not obj then return end
-	local item_ids = {}
-	local pos, lvid, gvid, pid, new_obj
-
+	local sobj = alife():story_object(v.target)
+	ASSERT(sobj, "!!Can't find treasure_box with story_id: [%s]", v.target)
 	local text = opt.need_text == 0
-		and "%c[255,238,155,23]"..game.translate_string(v.name).."\\n".."%c[default]"..game.translate_string(v.description) 
-		or  "%c[255,238,155,23]"..game.translate_string(v.name).."\\n".."%c[default]"..game.translate_string(v.description).."\\n".."%c[255,225,0,0]"..game.translate_string("stash_manager_string").."\\n"		
-	--' Сгенерить вещи
-	--'
-	--' Из-за какого-то дефекта в xrGame.dll тайник потеряет
-	--' сгенерированное содержимое в следующей ситуации:
-	--'  1) получена ссылка на тайник, который находится в online;
-	--'  2) игрок сохраняется и загружается;
-	--'  3) между 1 и 2 не было переводов тайника в offline хотя бы раз.
-	--' Для предотвращения этого создаём вещи у актёра, запоминаем
-	--' идентификаторы, а в вызове actor_binder:update() переносим их
-	--' в нужный ящик.
-	local need_workaround = level.object_by_id(obj.id)
-	if need_workaround then
-		pos = db.actor:position()
-		lvid = db.actor:level_vertex_id()
-		gvid = db.actor:game_vertex_id()
-		pid = db.actor:id()
-	else
-		pos = obj.position
-		lvid = obj.m_level_vertex_id
-		gvid = obj.m_game_vertex_id
-		pid = obj.id
+		and "%c[255,238,155,23]"..game.translate_string(v.name).."\\n".."%c[default]"..game.translate_string(v.description)
+		or  "%c[255,238,155,23]"..game.translate_string(v.name).."\\n".."%c[default]"..game.translate_string(v.description).."\\n".."%c[255,225,0,0]"..game.translate_string("stash_manager_string").."\\n"
+
+-------Рандомные награды-------
+	local new_treasure = ogse_random_treasure.random_treasure(v.name, v.target)
+	local new_items = new_treasure:set_random_reward()
+	if new_items then 
+		v.items = new_items
 	end
+	new_treasure = nil --Чистим неиспользуемое
+-------------------------------
 
--- Рандомные награды
-	--if v.name then
-		local new_treasure = ogse_random_treasure.random_treasure(v.name, v.target)
-		local new_items = new_treasure:set_random_reward()
-		if new_items then 
-			v.items = new_items
-		end
-		new_treasure = nil -- чистим неиспользуемое
-	--end
--- Рандомные награды	
-
-	for kk,vv in pairs(v.items) do
-		if ammo_section[vv.section] == true then
-			local left, box_size = vv.prob, sys_ini:r_u32(vv.section, "box_size")
-			while left > box_size do
-				if vv.section ~= nil then
-					new_obj = sim:create_ammo(vv.section, pos, lvid, gvid, pid, box_size)
-					local sammo = alife():object(new_obj.id)
-					sammo:use_ai_locations(false)
-					table.insert(item_ids, new_obj.id)
-					left = left - box_size
-				end
-			end
-			if left > 0 then
-				if vv.section ~= nil then
-					new_obj = sim:create_ammo(vv.section, pos, lvid, gvid, pid, left)
-					local sammo = alife():object(new_obj.id)
-					sammo:use_ai_locations(false)
-					table.insert(item_ids, new_obj.id)
-				end	
-			end
+	for k,t in pairs(v.items) do
+		if ammo_section[t.section] then
+			ogse.spawn_ammo_in_inv(t.section, t.prob, sobj)
 		else
-			if vv.section ~= nil then
-				for i=1,vv.prob do
-					new_obj = sim:create(vv.section, pos, lvid, gvid, pid)
-					table.insert(item_ids, new_obj.id)
-				end
-			end	
+			ogse.spawn_item_in_inv(t.section, sobj, t.prob)
 		end
 
-		local tmp_str = kk > 1 and ", " or ""
 		if opt.need_text == 1 then
-			if not string.find(text, treasure_find.get_treasure_name(vv.section)) then
-				text = text.."%c[255,155,238,23]"..tmp_str..treasure_find.get_treasure_name(vv.section)
+			local tmp_str = k > 1 and ", " or ""
+			if not string.find(text, treasure_find.get_treasure_name(t.section)) then
+				text = text.."%c[255,155,238,23]"..tmp_str..treasure_find.get_treasure_name(t.section)
 			end
 		end
-	end
-
-	if need_workaround then
-		self.loss_workaround_queue[v.target] = item_ids
-		dsh.exec_on_update(function() get_treasure_manager():loss_workaround() end)
 	end
 
 	news_manager.send_treasure(v.name)
+	level_tasks.add_location_by_id(sobj.id, "treasure", text)
 
-	level_tasks.add_location_by_id(obj.id, "treasure", text)
-
-	--' Пометим тайник как выданный
+	--Пометим тайник как выданный
 	self.treasure_info[k].active = true
 	self.treasure_info[k].done = true
-end
-
-
---' Перенос содержимого для предотвращения возможной потери
-function CTreasure:loss_workaround()
---	log1("Вызов функции CTreasure:loss_workaround с параметром ")
-	local pos, gv, lv = nil, nil, nil
-	local fault_use_teleport = false
-
-	for k,v in pairs(self.loss_workaround_queue) do
-		--type_info(self.loss_workaround_queue)
-		box = level_object_by_sid(k)
-		if box == nil then
-			-- смысла вылетать тут нет, спавнить вещи прямо Меченом в рюкзак фигня.
-			-- хер с ними, рассыплем вокруг тайника если он вообще есть такой
-			local sobj_box = alife():story_object(k)
-			if sobj_box then
-				local pos = sobj_box.position
-				local gv = sobj_box.m_game_vertex_id
-				local lv = sobj_box.m_level_vertex_id
-				pos.y = pos.y + 0.3
-				fault_use_teleport = true
-			else
-				abort("ERROR! Can't find treasure box with sid ["..tostring(k).."]")
-			end
-		end
-		for kk,vv in ipairs(v) do
-			if vv ~= nil then
-				if fault_use_teleport == true and pos and gv and lv then
-					alife():teleport_object("_", pos, lv, gv, vv)
-				else
-					db.actor:transfer_item(level.object_by_id(vv), box)
-				end
-			end
-		end
-	end
-	self.loss_workaround_queue = {}
 end
 
 --' Снимаем отметку с тайника
