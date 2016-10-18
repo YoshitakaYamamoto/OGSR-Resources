@@ -304,10 +304,9 @@ function create_release_item(npc)
 		if sect == "exo1" then rnd = exo_prob end
 		local otf = create_items(npc, sect, 1, rnd)
 		if otf then
-			dsh.timeout(300, function()
-				local a = level.object_by_id(otf.id)
-				if a then a:set_condition( (10+math.random(6,65))/100 ) end
-			end)
+			level.client_spawn_manager():add( otf.id, -1, function(id, obj)
+				obj:set_condition( (10+math.random(6,65))/100 )
+			end )
 		end
 	end
 

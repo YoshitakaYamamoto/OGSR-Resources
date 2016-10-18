@@ -334,40 +334,22 @@ function get_wpn_parameters(wpn, swpn_, sec_)
 	return rif, shg
 end
 
-
--- служебный таймер, ждущий выход объекта в онлайн
-class "go_online_watch_timer" (ogse_qt.quick_timer)
-function go_online_watch_timer:__init(npc_id, fun) super()
-	self.npc_id = npc_id
-	self.fun = fun
-end
-function go_online_watch_timer:condition()
-	return level.object_by_id(self.npc_id)
-end
-function go_online_watch_timer:action()
-	self.fun()
-end
-function start_go_online_watch_timer(id, fun)
-	go_online_watch_timer(id, fun):start()
-end
-
 local function move_weapon_to_slot(sobj, slot, is_slot_active) --KRodin: Сделано для поддержки равнозначных слотов
-	start_go_online_watch_timer(sobj.id, function() --Ждём появление клиентского объекта
-		local obj = level.object_by_id(sobj.id)
+  level.client_spawn_manager():add(
+    sobj.id, -1, function( tbl, id, obj )
 		if db.actor:is_in_slot( obj ) then
 			db.actor:move_to_ruck( obj ) --Необходимо, иначе будут глюки и непонятные вылеты
 		end
-		set_inv_item_slot( obj, slot )
+		set_inv_item_slot( obj, tbl[1] )
 		db.actor:move_to_slot(obj)
-		if is_slot_active then
-			db.actor:activate_slot( slot )
+		if tbl[2] then
+			db.actor:activate_slot( tbl[1] )
 		end
-
 		db.actor:invalidate_inventory()
 		update_inventory_window()
-	end)
+    end, {slot, is_slot_active}
+  )
 end
-
 
 -- назначение функции - по факту снятия аддона-дробовика сконвертировать ствол
 -- в версию без дробовика (фактически, с одним из стандартных подствольных гранатомётов, но снятым)
