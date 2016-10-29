@@ -10,7 +10,6 @@ local function gg_backward_scan(gg, lid, gvid)
 		end
 	end
 	abort("gg_backward_scan")
-	return nil
 end
 
 local function fill_top_game_vertex_ids(gg)
@@ -33,6 +32,7 @@ function get_top_graph_ids(level_name)
 			fill_top_game_vertex_ids(gg)
 		end
 		local gvid = top_game_vertex_ids[level_name]
+--log3("[get_top_graph_ids] top_game_vertex_ids = %s", top_game_vertex_ids)
 		return gg:vertex(gvid):level_vertex_id(), gvid
 	end
 	if top_gvid == nil then
@@ -44,23 +44,16 @@ function get_top_graph_ids(level_name)
 	return top_lvid, top_gvid
 end
 
-local communities_relations
-local index_for_community
-local community_for_index
 
+local index_for_community = {}
+local communities_relations = {}
+local community_for_index = {}
 local function load_communities_relations()
 	local index = 1
-	local comm,id,rel
 
-	index_for_community = {}
-	communities_relations = {}
-	community_for_index = {}
-
-	local communities = sys_ini:r_string("game_relations", "communities")
-	for comm,id in string.gfind(communities, "([%w_]+)%s*,%s*([%d%.%-]+)%,*") do
+	for comm, id in string.gmatch(get_string("game_relations", "communities"), "([%w_]+)%s*,%s*([%d%.%-]+)%,*") do
 		local t = {}
-		local relations = sys_ini:r_string("communities_relations", comm)
-		for rel in string.gfind(relations, "([%d%.%-]+)%,*") do
+		for rel in string.gmatch(get_string("communities_relations", comm), "([%d%.%-]+)%,*") do
 			table.insert(t, tonumber(rel))
 		end
 		communities_relations[comm] = t
@@ -69,70 +62,35 @@ local function load_communities_relations()
 		index = index + 1
 	end
 end
+load_communities_relations() --Построение таблиц делаем при первом запуске скрипта
+
 function comm2idx(comm)
-	if not index_for_community then
-		load_communities_relations()
-	end
 	return index_for_community[comm]
 end
+
 function idx2comm(id)
-	if not index_for_community then
-		load_communities_relations()
-	end
 	return community_for_index[id]
 end
 
 function comm2comm_relation(community_from, community_to)
-	if index_for_community == nil then
-		load_communities_relations()
-	end
 	local relations = communities_relations[community_from]
 	ASSERT(relations, "")
 	return relations[index_for_community[community_to]]
 end
 
-function community_relation(community, npc)
-	if index_for_community == nil then
-		load_communities_relations()
-	end
-	local relations = communities_relations[community]
-	if relations == nil then
-		return -5000
-	end
-	return relations[index_for_community[npc:character_community()]] +
-			relation_registry.community_goodwill(community, npc:id())
-end
-
 function community_relation_safe(community, npc_id, char_comm)
-	if index_for_community == nil then
-		load_communities_relations()
-	end
 	local relations = communities_relations[community]
-	if relations == nil then
-		return -5000
-	end
+	ASSERT(relations, "Can't find relation for community: [%s]", community or "nil")
 	return relations[index_for_community[char_comm]] +
 			relation_registry.community_goodwill(community, npc_id)
 end
 
+
 function show_coordinates()
-	local hud = get_hud()
-	local cs = hud:GetCustomStatic("cs_debug")
-	if cs == nil then
-		hud:AddCustomStatic("cs_debug", true)
-		cs = hud:GetCustomStatic("cs_debug")
-	end
 	local lvid, gvid = db.actor:level_vertex_id(), db.actor:game_vertex_id()
 	local pos, dir = db.actor:position(), db.actor:direction()
-	local pos2 = level.vertex_position(lvid)
-	local d = vector():sub(pos, pos2)
-	local valid = (math.abs(d.x) <= 0.35 and math.abs(d.y) < 1.0 and math.abs(d.z) <= 0.35)
-	local msg = string.format("lvid: %d\\n", lvid) ..
-				string.format("gvid: %d\\n", gvid) ..
-				string.format("pos: %f,%f,%f\\n", pos.x, pos.y, pos.z) ..
-				string.format("dir: %f,%f,%f\\n", dir.x, dir.y, dir.z) ..
-				"valid: " .. tostring(valid)
-	if cs ~= nil then
-		cs:wnd():SetText(msg)
-	end
+	db.actor:set_vector_global_arg_1( pos )
+	local valid = level.vertex_id( pos ) ~= -1
+
+	log3( "- lvid: [%s]\ngvid: [%s]\npos: [%s, %s, %s]\ndir: [%s, %s, %s]\nvalid: [%s]", lvid, gvid, pos.x, pos.y, pos.z, dir.x, dir.y, dir.z, valid )
 end

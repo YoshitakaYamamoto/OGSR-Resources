@@ -135,10 +135,12 @@ end
 
 --->> nice one, taken from Monnoroch AI
 
+local hostile_treshold = get_float("game_relations", "attitude_neutal_threshold")
 function is_hostile(comm,target)
 	if IsMonster(target) then
 		return true
 	end
+
 	local t_comm_number = 1
 	local t_comm = "actor"
 	if IsStalker(target) then
@@ -152,17 +154,8 @@ function is_hostile(comm,target)
 	elseif string.find(target:name(),"btr") then
 		t_comm = "military"
 	end
-	local hostile_treshold = tonumber(sys_ini:r_string("game_relations", "attitude_neutal_threshold"))
-	local comm_attitude = parse_data(sys_ini:r_string("communities_relations", comm))
-	local comm_list = parse_data(sys_ini:r_string("game_relations", "communities"))
-	for k,v in pairs (comm_list) do
-		if t_comm == tostring(v) then
-			t_comm_number = (k+1)/2
-			break
-		end
-	end
-	attitude = tonumber(comm_attitude[t_comm_number]) or -5000
-	return attitude < hostile_treshold
+
+	return utils2.community_relation_safe(comm, target:id(), t_comm) < hostile_treshold
 end
 
 ---<< from Monnoroch AI

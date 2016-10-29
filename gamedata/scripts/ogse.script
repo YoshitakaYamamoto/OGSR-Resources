@@ -1469,21 +1469,6 @@ end
 -----------------------------------------------------------
 
 
--- Парсинг ини-файла в массив
-function parse_ini_section_to_array(ini,section)
-	local tmp={}
-	if ini:section_exist(section) then
-		local result, id, value
-		for a=0,ini:line_count(section)-1 do
-			result, id, value = ini:r_line(section,a,"","")
-			if id~=nil and string.trim(id)~="" and string.trim(id)~=nil then
-				tmp[string.trim(id)] = string.trim(value)
-			end
-		end
-	end
-	return tmp
-end
-
 -- Туториал на пси-воздействие. Вызывается из конфигов.
 function on_my_psy()
 	if not has_alife_info("encyclopedy_tutorial_psy") then

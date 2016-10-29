@@ -343,30 +343,7 @@ local point_count = 0
 
 function main_menu:main_cheat_f3()
 	-- Выдадим сообщение о нашем местоположении
-	local text
-	local vid
-	local gvid
-	local a = vector() -- Тип переменной
-	local text
-	local actor_vid = game_graph():vertex(alife():actor().m_game_vertex_id):level_id()
-	local valid_level = isRegisteredLevel(gvid)
-
-	a    = db.actor:position()        -- Наше положение в координатах
-	vid  = db.actor:level_vertex_id() -- секция уровня
-	gvid = db.actor:game_vertex_id()  -- секция карты
-	text = "Позиция:\\nX= "..a.x.."\\nY= "..a.y.."\\nZ= "..a.z.."\\nV= "..vid.."\\nG= "..gvid.."\\nLEVEL= "..actor_vid.."\\nVALID_LEVEL = "..tostring(valid_level)
-	log1("############################################")
-	log1("##[waypoint"..tostring(point_count).."]")
-	log1("##points = p0")
-	log1("##p0:name = wp00")
-	log1("##p0:flags = 0x1")
-	log1("##p0:position = "..a.x..","..a.y..","..a.z)
-	log1("##p0:game_vertex_id = "..gvid)
-	log1("##p0:level_vertex_id = "..vid)
-	log1("############################################")
-	point_count = point_count + 1
-	flush_log()
-	news_manager.send_tip(db.actor, text, nil, nil, 30000)
+	utils2.show_coordinates()
 end
 
 --// Метод описан и открыт Malandrinus'om. 

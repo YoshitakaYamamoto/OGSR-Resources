@@ -174,6 +174,53 @@ end
 function heli_combat:read_pair_data()
 	self.status = 0 -- обновл€ем его статус
 end
+------------------------------------------------------------------------
+--[=[
+KRodin: три функции ниже конвертируют строку вида: "area(-215,170,55,stalker), area(-117,170,55,stalker), ..."
+¬ массив вида: { "area(-215,170,55,stalker)", "area(-117,170,55,stalker)", ... }
+—юда перенесено из _G, т.к. кроме как здесь, нигде не нужно.
+ѕеределать бы этот ужас, но лень...
+--]=]
+local function find_split_pos(str)
+	local split_pos = string.find(str,",")
+	if split_pos == nil then
+		return nil
+	end
+	local br1_pos = string.find(str,"(",1,true)
+	local br2_pos = string.find(str,")",1,true)
+	if br1_pos ~= nil and br2_pos ~= nil and br1_pos < br2_pos and split_pos > br1_pos then
+		local str_end1 = string.sub(str,(br2_pos +1),string.len(str))
+		if string.find(str_end1,",") ~= nil then
+			split_pos = br2_pos + string.find(str_end1,",")
+		else
+			split_pos = nil
+		end
+	end
+	return split_pos
+end
+local function split_string(str,split_pos)
+	local str_beg = (string.sub(str,1,split_pos-1))
+	local str_end = string.sub(str,(split_pos+1),string.len(str))
+	return str_beg,str_end
+end
+local function parse_data(str)
+	local string_parts = {}
+	if str == nil then
+		string_parts[1] = nil
+		return string_parts
+	end
+	local str_beg,str_end
+	str_end = str
+	local split_pos = find_split_pos(str_end)
+	while split_pos ~= nil do
+		str_beg, str_end = split_string(str_end,split_pos)
+		table.insert(string_parts,str_beg)
+		split_pos = find_split_pos(str_end)
+	end
+	table.insert(string_parts,str_end)
+	return string_parts
+end
+------------------------------------------------------------------------
 function heli_combat:get_target()
 	local temp_trg = {} -- все возможные цели
 	local pr_1 = {} -- видимые цели 1 приоритета: мутанты
@@ -185,7 +232,8 @@ function heli_combat:get_target()
 	local pr_7 = {} -- видимые цели 7 приоритета: вертолеты
 	local vis_trg = {} -- видимые цели
 	local targets = parse_data(self.combat_enemy)
-	for k,v in pairs (targets) do
+--log3("[%s] self.combat_enemy = %s, parsed: %s", script_name(), self.combat_enemy, targets)
+	for k,v in pairs(targets) do
 		if v == "actor" then -- 
 			if db.actor then
 				table.insert(temp_trg, db.actor:id())
@@ -262,11 +310,12 @@ function heli_combat:get_target()
 	return nil,nil
 end
 
+local hostile_treshold = get_float("game_relations", "attitude_neutal_threshold")
 function is_hostile(comm,target)
-
 	if IsMonster(target) then -- мутанты враги всем
 		return true
 	end
+
 	local t_comm_number = 1
 	local t_comm = "actor"
 	if IsStalker(target) then
@@ -281,17 +330,6 @@ function is_hostile(comm,target)
 		t_comm = "military"
 	end
 
-	local hostile_treshold = tonumber(sys_ini:r_string("game_relations", "attitude_neutal_threshold"))
---[[	local comm_attitude = parse_data(sys_ini:r_string("communities_relations", comm))
-	local comm_list = parse_data(sys_ini:r_string("game_relations", "communities"))
-	for k,v in pairs (comm_list) do
-		if t_comm == tostring(v) then
-			t_comm_number = (k+1)/2
-			break
-		end
-	end
-	attitude = tonumber(comm_attitude[t_comm_number]) or -5000
-	return attitude < hostile_treshold]]
 	return utils2.community_relation_safe(comm, target:id(), t_comm) < hostile_treshold
 end
 

@@ -17,9 +17,9 @@ end
 function on_monster_spawn( obj )
 	local particle_param = get_string( obj:section(), "bones_particles" )
 	if particle_param and sys_ini:section_exist(particle_param) then
-		local tmp = ogse.parse_ini_section_to_array(sys_ini,particle_param)
+		local tmp = get_section_keys_and_values(particle_param)
 		for k,v in pairs(tmp) do
-			local t = ogse.parse_ini_section_to_array(sys_ini, v)
+			local t = get_section_keys_and_values(v)
 			t.obj = obj
 			if not t.stop_on_death or obj:alive() then
 				play_particle(obj, t)

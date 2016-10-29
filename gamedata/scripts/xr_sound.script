@@ -106,7 +106,7 @@ function set_sound(npc, sound, now, into_timeout)
 		if sound == nil then sound = "" end
 		if db.sound[npc_id] == nil then db.sound[npc_id] = {} end
 		db.sound[npc_id].theme = sound
-		db.sound[npc_id].snd = parse_names(sound)
+		db.sound[npc_id].snd = sound == "" and {} or parse_names(sound)
 		if db.sound[npc_id].last_snd == nil then
 			db.sound[npc_id].last_snd = {}
 		else	

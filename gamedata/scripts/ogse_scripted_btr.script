@@ -405,7 +405,7 @@ function is_enemy(car, object)
 	if not comm then
 		comm = "military"
 	end
-	return (IsStalker(object) and utils2.community_relation(comm, object) <= -400) or object:is_monster()
+	return (IsStalker(object) and utils2.community_relation_safe(comm, object:id(), object:character_community()) <= -400) or object:is_monster()
 end
 
 function can_be_target(car, object)
@@ -426,7 +426,7 @@ function check_single_object(car, obj)
 			if not comm then
 				comm = "military"
 			end
-			local relation = utils2.community_relation(comm, obj)
+			local relation = utils2.community_relation_safe(comm, obj:id(), obj:character_community())
 			if relation <= -150 then
 				objects[game_object.enemy][obj:id()] = obj
 			elseif relation > -150 and relation < 500 then	

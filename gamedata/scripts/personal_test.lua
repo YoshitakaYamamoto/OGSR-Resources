@@ -31,6 +31,3 @@ end
 
 dsh_respawn.cleanup_respawners()
 ]]-----------------------------------------------------------
-
---ogse.spawn_item_in_inv("exo1", level.object_by_id(1288))
---ogse.spawn_item_in_inv("exo2", level.object_by_id(1268))

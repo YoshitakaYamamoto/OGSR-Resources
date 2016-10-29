@@ -42,7 +42,7 @@ function get_target_area(area_data)
 	local br1_pos = string.find(area_data,"(",1,true) + 1
 	local br2_pos = string.find(area_data,")",1,true) - 1
 	local area_string = string.sub(area_data,br1_pos,br2_pos)
-	local area = parse_data(area_string)
+	local area = split_comma_separated_list(area_string)
 	local area_x = tonumber(area[1]) --координаты центра зоны
 	local area_z = tonumber(area[2])
 	local area_r = tonumber(area[3]) or 150 -- радиус зоны, 150 м по умолчанию.

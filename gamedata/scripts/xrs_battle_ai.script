@@ -2163,6 +2163,7 @@ function register_as_target_armor(npc, enemy)
 	end
 end
 
+local hostile_treshold = get_float("game_relations", "attitude_neutal_threshold")
 function is_hostile_armor(comm,target)
 	local t_comm_number = 1
 	local t_comm = "actor"
@@ -2182,27 +2183,15 @@ function is_hostile_armor(comm,target)
 			t_comm = "military"
 		end
 	end
-	local hostile_treshold = tonumber(sys_ini:r_string("game_relations", "attitude_neutal_threshold"))
-	local comm_attitude = parse_data(sys_ini:r_string("communities_relations", comm))
-	local comm_list = parse_data(sys_ini:r_string("game_relations", "communities"))
-	for k,v in pairs (comm_list) do
-		if t_comm == tostring(v) then
-			t_comm_number = (k+1)/2
-			break
-		end
-	end
-	attitude = tonumber(comm_attitude[t_comm_number]) or -5000
-	
+
 	-- квестовая врезка начало
-	
 	if level.name() == "l13_generators_ogse" and (string.find(target:section(),"helicopter") 
 	or string.find(target:section(),"mi24")) and (comm == "freedom" or comm == "dolg") then
 		return false
 	end
-	
 	-- квестовая врезка конец
-	
-	return attitude < hostile_treshold
+
+	return utils2.community_relation_safe(comm, target:id(), t_comm) < hostile_treshold
 end
 
 function check_helicopter(npc)

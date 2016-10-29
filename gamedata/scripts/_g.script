@@ -76,7 +76,7 @@ function sum_args_ex(base, offs)
 	--log1(b2_s)
 	local b1 = tonumber(b1_s, 16)
 	local b2 = tonumber(b2_s, 16)
-	local res = sum_args(bit.lshift(b1, 16), sum_args(b2, offs))
+	local res = sum_args(bit.lshift(b1, 16), sum_args(b2, offs)) --KRodin: думал, что res = первое значение, а второе вообще не используется. Но как оказалось, res = сумма этих двух значений. Я и не знал, что так можно делать.
 	--log2("sum_args_ex: %s, %x, %x", base_s, offs, res)
 	return res
 end
@@ -247,48 +247,6 @@ function validate_enemy_object( enemy )
 end
 
 
-function parse_data(str)
-	local string_parts = {}
-	if str == nil then
-		string_parts[1] = nil
-		return string_parts
-	end
-	local str_beg,str_end
-	str_end = str
-	local split_pos = find_split_pos(str_end)
-	while split_pos ~= nil do
-		str_beg, str_end = split_string(str_end,split_pos)
-		table.insert(string_parts,str_beg)
-		split_pos = find_split_pos(str_end)
-	end
-	table.insert(string_parts,str_end)
-	return string_parts
-end
-
-function find_split_pos(str)
-	local split_pos = string.find(str,",")
-	if split_pos == nil then
-		return nil
-	end
-	local br1_pos = string.find(str,"(",1,true)
-	local br2_pos = string.find(str,")",1,true)
-	if br1_pos ~= nil and br2_pos ~= nil and br1_pos < br2_pos and split_pos > br1_pos then
-		local str_end1 = string.sub(str,(br2_pos +1),string.len(str))
-		if string.find(str_end1,",") ~= nil then
-			split_pos = br2_pos + string.find(str_end1,",")
-		else
-			split_pos = nil
-		end
-	end
-	return split_pos
-end
-
-function split_string(str,split_pos)
-	local str_beg = (string.sub(str,1,split_pos-1))
-	local str_end = string.sub(str,(split_pos+1),string.len(str))
-	return str_beg,str_end
-end
-
 ----------------------------------------------------------------------
 if nil == time_global then
 	time_global = function () return device():time_global() end
@@ -417,8 +375,8 @@ function update_action (npc, script, ...)
     npc:command (act, false)
 end
 
-
---/ парсит строку вида "ааа, ббб, ввв ..." в таблицу { "ааа", "ббб", "ввв", ... }
+-------------------------------------------------------------------------------------------------------
+--Отличается от split_comma_separated_list тем, что кроме запятых обрабатывает ещё и пробелы.
 function parse_names( s )
 	local t = {}
 	for name in s:gmatch("[^,%s]+" ) do
@@ -427,36 +385,32 @@ function parse_names( s )
     return t
 end
 
+--Конвертирует строку вида "actor, 0, actor_dolg, 1, actor_freedom, 2, ..."
+--В таблицу вида { ["actor"] = "0", ["actor_dolg"] = "1", ["actor_freedom"] = "2", ... }
 function parse_key_value( s )
-	if s == nil then
-		return nil
-	end
+	if s == nil then return nil end --бывает и такое
+
     local t = {}
 	local t0 = parse_names( s )
-    for i=1,#t0,2 do
+    for i=1, #t0, 2 do
 		local key, nam = t0[i], t0[i+1]
-		ASSERT(nam, "parse_key_value: %s, stopped at %d: '%s' - '%s'", s or "nil", i or "nil", tostring(key) or "nil", tostring(nam) or "nil")
+		ASSERT(nam, "parse_key_value: stopped at %s: [%s] - [%s]", i, key or "nil", nam or "nil")
 		t[key] = nam
     end
     return t
 end
 
---/ парсит строку вида "n1, n2, n3..." в таблицу { n1, n2, n3, ... } где n1, n2, n3... - дробные числа
+--Парсит строку вида "n1, n2, n3..." в таблицу { n1, n2, n3, ... } где n1, n2, n3... - числа
 function parse_nums( s )
     local t = {}
     for i,entry in ipairs(parse_names( s )) do
 		local v = tonumber( entry )
-		ASSERT(v, "parse_nums: '%s', stopped at %d:'%s'", tostring(s) or "nil", i or "nil", tostring(entry) or "nil")
+		ASSERT(v, "parse_nums: [%s], stopped at [%s]: [%s]", s, i, entry)
 		table.insert(t,  v)
     end
     return t
 end
-
-
---/ проверяет, есть ли объект в онлайне
-function is_object_online(obj_id)
-	return level.object_by_id(obj_id) ~= nil
-end
+-------------------------------------------------------------------------------------------------------
 
 function get_clsid(npc)
     if not npc then return nil end
@@ -1067,7 +1021,6 @@ sys_ini = system_ini() --Из скриптов вызывать только sys_ini!!!!
 -- служебные функции для чтения параметров из секций объектов
 
 function get_string(section, param, def_val, ini_file)
-	ASSERT(section, "get_string: section not defined, param="..param)
 	local ini = ini_file or sys_ini
 	ASSERT(ini:section_exist(section), "get_string: section '"..section.."' doesn't exist")
 	if ini:line_exist(section, param) then
@@ -1076,8 +1029,8 @@ function get_string(section, param, def_val, ini_file)
 		return def_val
 	end
 end
+
 function get_string_wq(section, param, def_val, ini_file)
-	ASSERT(section, "get_string: section not defined, param="..param)
 	local ini = ini_file or sys_ini
 	ASSERT(ini:section_exist(section), "get_string: section '"..section.."' doesn't exist")
 	if ini:line_exist(section, param) then
@@ -1086,8 +1039,8 @@ function get_string_wq(section, param, def_val, ini_file)
 		return def_val
 	end
 end
+
 function get_u32(section, param, def_val, ini_file)
-	ASSERT(section, "get_u32: section not defined, param="..tostring(param))
 	local ini = ini_file or sys_ini
 	ASSERT(ini:section_exist(section), "get_u32: section '"..section.."' doesn't exist")
 	if ini:line_exist(section, param) then
@@ -1096,8 +1049,8 @@ function get_u32(section, param, def_val, ini_file)
 		return def_val
 	end
 end
+
 function get_bool(section, param, def_val, ini_file)
-	ASSERT(section, "get_bool: section not defined, param="..param)
 	local ini = ini_file or sys_ini
 	ASSERT(ini:section_exist(section), "get_bool: section '"..section.."' doesn't exist")
 	if ini:line_exist(section, param) then
@@ -1106,8 +1059,8 @@ function get_bool(section, param, def_val, ini_file)
 		return not (not def_val)
 	end
 end
+
 function get_float(section, param, def_val, ini_file)
-	ASSERT(section, "get_float: section not defined, param="..param)
 	local ini = ini_file or sys_ini
 	ASSERT(ini:section_exist(section), "get_float: section '"..section.."' doesn't exist")
 	if ini:line_exist(section, param) then
@@ -1116,27 +1069,30 @@ function get_float(section, param, def_val, ini_file)
 		return def_val
 	end
 end
+
 -- получить класс из секции, полезно в том случае, если нет объекта (и недоступен метод clsid), а есть только имя секции
 function get_class(section)
-	ASSERT(section, "get_class: section parameter is not defined")
 	ASSERT(sys_ini:section_exist(section), "get_class: section '"..section.."' doesn't exist")
 	ASSERT(sys_ini:line_exist(section, "class"), "get_class: there is no 'class' parameter in the section '"..section.."'")
 	return sys_ini:r_clsid(section, "class")
 end
+
 -- делит строку в виде "aaa,bbb,ccc" на строки "aaa", "bbb", "ccc" и возвращает их в виде массива
 function split_comma_separated_list(s)
 	local res = {}
 	for v in string.gmatch(s, "[^,]+") do
 		table.insert(res, v)
 	end
+	--log3("split_comma_separated_list called: [%s], res: %s", s, res)
 	return res
 end
+
 -- читает время, сохранённое в виде строки со значениями, разделёнными запятой, и конвертирует в значение класса CTime
 function unpack_time_from_string(str_time)
 	local time_values = {}
 	for i,s in ipairs(split_comma_separated_list(str_time)) do
 		local value = tonumber(s)
-		ASSERT(value, "unpack_time_from_string: problem with unpacking saved time '%s', value #%d (%s)", str_time, i, tostring(s))
+		ASSERT(value, "unpack_time_from_string: problem with unpacking saved time '%s', value #%d (%s)", str_time, i, s)
 		table.insert(time_values, value)
 	end
 	ASSERT(#time_values == 7, "unpack_time_from_string: packed time '%s' has wrong number of components. Must be equal to seven.")
@@ -1144,25 +1100,27 @@ function unpack_time_from_string(str_time)
 	res:set(unpack(time_values))
 	return res
 end
+
 -- упаковать время в виде объекта CTime в строку значений, разделённых запятой
 function pack_time_to_string(t)
 	ASSERT(t, "pack_time_to_string: t is a nil reference")
 	return table.concat({t:get()}, ',')
 end
+
 -- читает строку вида "s1,s2,s3" и парсит на строковые значения, разделённые запятой, в таблицу вида {s1, s2, s3}
 function get_names(section, param, ini_file)
-	ASSERT(section, "get_names: section not defined, param="..param)
 	local ini = ini_file or sys_ini
 	ASSERT(ini:section_exist(section), "get_names: section '"..section.."' doesn't exist")
 	local s = ini:r_string(section, param)
 	return split_comma_separated_list(s)
 end
+
 -- читает строку вида "s1,s2,s3" и парсит на численные значения, разделённые запятой, в таблицу вида {n1, n2, n3}
 function get_numbers(section, param, ini_file)
 	local t = {}
 	for i,sv in ipairs(get_names(section, param, ini_file)) do
 		local v = tonumber(sv)
-		ASSERT(v, "get_numbers: can not convert to number item ["..i.."]: "..tostring(sv))
+		ASSERT(v, "get_numbers: can not convert to number item ["..i.."]: "..sv)
 		table.insert(t, v)
 	end
 	return t
@@ -1191,7 +1149,6 @@ function get_section_keys_and_values( section, ini_file )
 end
 
 function get_vector(section, param, def_val, ini_file)
-	ASSERT(section, "get_vector: section not defined, param="..param)
 	local ini = ini_file or sys_ini
 	ASSERT(ini:section_exist(section), "get_vector: section '"..section.."' doesn't exist")
 	if ini:line_exist(section, param) then
@@ -1208,7 +1165,6 @@ end
 
 -- значение по умолчанию должно задаваться таблицей {num1, num2}
 function get_vector2(section, param, def_val, ini_file)
-	ASSERT(section, "get_vector2: section not defined, param=%s", param)
 	local ini = ini_file or sys_ini
 	ASSERT(ini:section_exist(section), "get_vector2: section '"..section.."' doesn't exist")
 	if ini:line_exist(section, param) then
