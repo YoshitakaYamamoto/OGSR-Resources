@@ -7,9 +7,9 @@ function attach(sm)
 	sm:subscribe({ signal = "on_key_down",		fun = this.chek_keys })
 	sm:subscribe({ signal = "on_key_up",		fun = this.chek_keys_free })
 	sm:subscribe({ signal = "on_key_hold",		fun = this.chek_keys_hold })
-	sm:subscribe({ signal = "on_item_to_slot",	fun = this.remove_m134 }) --Перенос М134 в слот.
-	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.remove_m134 }) --Ситуация, когда снимаем надетый костюм в инвентарь, при находящемся м134 во втором слоте.
-	sm:subscribe({ signal = "on_drop",			fun = this.remove_m134 }) --Ситуация, когда выбрасываем надетый костюм прямо из слота, при находящемся м134 во втором слоте.
+	--sm:subscribe({ signal = "on_item_to_slot",	fun = this.remove_m134 }) --Перенос М134 в слот.
+	--sm:subscribe({ signal = "on_item_to_ruck",	fun = this.remove_m134 }) --Ситуация, когда снимаем надетый костюм в инвентарь, при находящемся м134 во втором слоте.
+	--sm:subscribe({ signal = "on_drop",			fun = this.remove_m134 }) --Ситуация, когда выбрасываем надетый костюм прямо из слота, при находящемся м134 во втором слоте.
 end
 
 local on_sound = xr_sound.get_safe_sound_object([[weapons\m134\m134_on]])
