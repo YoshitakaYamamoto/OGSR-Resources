@@ -122,10 +122,10 @@ function make_euler_xzy(ax, az, ay)
 	return mul_43(matrix(), mul_43(matrix(), ymat, zmat), xmat)
 end
 
-function mul_43(res, m1, m2)
+function mul_43(res, m1, m2) --умножает две матрицы без последнего столбца и записывает результат в матрицу для которой вызывался метод.
 	if res.mul_43 then
 		res:mul_43(m1, m2)
-	else
+	else --Видимо, оставлено для совместимости с обычным движком.
 		local res_00 = m1.j.x * m2.i.y + m1.k.x * m2.i.z + m1.i.x * m2.i.x;
 		local res_01 = m1.j.y * m2.i.y + m1.k.y * m2.i.z + m1.i.y * m2.i.x;
 		local res_02 = m1.j.z * m2.i.y + m1.k.z * m2.i.z + m1.i.z * m2.i.x;
@@ -249,7 +249,7 @@ end
 -- получение world-трансформации объекта
 function get_xform(cobj)
 	local xform = matrix()
-	if type(cobj.get_go_float) == "function" then
+	if cobj.get_go_float then
 		local a = {}
 		for i=0,15 do
 			a[i] = cobj:get_go_float(80 + i*4)
@@ -260,7 +260,7 @@ function get_xform(cobj)
 			vector():set(a[8], a[9], a[10]),
 			vector():set(a[12], a[13], a[14])
 		)
-	else
+	else --Видимо, оставлено для совместимости с обычным движком.
 		xform:set(
 			vector():set(1, 0, 0),
 			vector():set(0, 1, 0),
@@ -327,7 +327,8 @@ function distance_from_zone_boundary(zone_data, point)
 			dist = d
 		end
 	end
-	return dist
+	return dist > 0 and -dist or math.abs( dist ) --KRodin: почему-то при нахождении за пределами зоны функция возвращала отрицательные значения, а внутри зоны - положительные. По идее, должно же быть наоборот. Здесь я это исправил.
+	--return dist
 end
 local base_box_vertices = {
 	vector():set(-.5, -.5, -.5),
