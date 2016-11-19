@@ -134,7 +134,7 @@ end
 local saved_aspect = 0
 local static_name
 function update_shelter_icon()
-	ogse_signals.get_mgr():reschedule(500)
+	ogse_signals.get_mgr():reschedule(math.random(450, 550))
 	local hud = get_hud()
 	local aspect = device().width / device().height
 	if saved_aspect ~= aspect then
@@ -167,7 +167,6 @@ function check_not_need_hide(obj)
 				end
 			end
 		end
-		return false
 	end
 	return false
 end
@@ -175,11 +174,11 @@ end
 -- Проверка нахождения непися в безопасной зоне
 function npc_inside_safe_zone(obj)
 	local location = level.name()
-	
+
 	if isIndoor(location) then
 		return true
 	end
-	
+
 	if obj and obj:alive() then	
 		if ogse_car_control.in_btr and obj:id() == db.actor:id() then
 			return true
@@ -191,8 +190,6 @@ function npc_inside_safe_zone(obj)
 				return true
 			end
 		end
-	else
-		return false
 	end
 	return false
 end

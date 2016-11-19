@@ -325,15 +325,9 @@ function action_gate:gate_play_snd_from_set(sndset)
 end
 
 function action_gate:update(delta)
-	--printf("_bp: action_gate:update()", delta)
+	ASSERT(self.initialized, "object '%s': gate failed to initialize", self.object:name())
 
-	if not self.initialized then
-		abort("object '%s': gate failed to initialize", self.object:name())
-	end
-
-	local actor = db.actor
-
-	if xr_logic.try_switch_to_another_section(self.object, self.st, actor) then
+	if xr_logic.try_switch_to_another_section(self.object, self.st, db.actor) then
 		return
 	end
 end

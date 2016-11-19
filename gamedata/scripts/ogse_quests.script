@@ -885,8 +885,8 @@ function play_digger_motor_sound()
 	--if level.name() == "l03u_agr_underground" and db.actor:has_info("diggers_pda_info") then
 		ogse_signals.get_mgr():reschedule( math.random(1000, 1500) )
 		local hasanom,anomid,pos,cls,dist,radius,sect = ogse_anomaly.get_nearest_anomaly_by_point(motor_pos)
-		if hasanom and dist < 2 and string.find(sect, "zone_witches_galantine") then
-			if not db.actor:has_info("diggers_motor") then 
+		if hasanom then
+			if dist < 2 and string.find(sect, "zone_witches_galantine") and not db.actor:has_info("diggers_motor") then
 				motor_start:play_at_pos(db.actor, motor_pos)
 				local part = particles_object(start_particle)
 				part:play_at_pos(motor_pos)

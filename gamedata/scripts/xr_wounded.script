@@ -290,9 +290,7 @@ function Cwound_manager:update()
 	if comm ~= "ecolog" and sobj.wounded and (not self.a.regen) and (not self.medkit_eaten) then
 		hp=1 -- симулируем раненость
 	end
-	
-	
-  
+
 	if db.actor and comm ~= "ecolog" and comm ~= "trader" and comm ~= "zombied" and isWeapon(db.actor:active_item()) and
 		self.npc:relation(db.actor) == game_object.enemy and 
 		self.npc.health < 0.35 and 
@@ -305,23 +303,23 @@ function Cwound_manager:update()
 				-- играем звук
 				local snd_name = nil
 				if comm == "bandit" then
-					snd_name = dont_shoot["bandit_"..tostring(math.random(1,5))]
+					snd_name = dont_shoot["bandit_"..math.random(5)]
 				elseif comm == "csky" then
-					snd_name = dont_shoot["csky_"..tostring(math.random(1,4))]
+					snd_name = dont_shoot["csky_"..math.random(4)]
 				elseif comm == "freedom" then
-					snd_name = dont_shoot["freedom_"..tostring(math.random(1,4))]
+					snd_name = dont_shoot["freedom_"..math.random(4)]
 				elseif comm == "killer" then
-					snd_name = dont_shoot["killer_"..tostring(math.random(1,3))]
+					snd_name = dont_shoot["killer_"..math.random(3)]
 				elseif comm == "military" then
-					snd_name = dont_shoot["military_"..tostring(math.random(1,4))]
+					snd_name = dont_shoot["military_"..math.random(4)]
 				elseif comm == "monolith" then
-					snd_name = dont_shoot["monolith_"..tostring(math.random(1,3))]
+					snd_name = dont_shoot["monolith_"..math.random(3)]
 				elseif comm == "stalker" then
 					local rank = ogse.armor_type(self.npc)
 					if rank and rank > 3 then
-						snd_name = dont_shoot["newbie_"..tostring(math.random(1,4))]
+						snd_name = dont_shoot["newbie_"..math.random(4)]
 					else
-						snd_name = dont_shoot["stalker_"..tostring(math.random(1,3))]
+						snd_name = dont_shoot["stalker_"..math.random(3)]
 					end				
 				end		
 				if snd_name then
@@ -745,12 +743,7 @@ function is_wounded(npc)
 		return false
 	end
 
-	if tostring(xr_logic.pstor_retrieve(npc, "wounded_state")) ~= "nil" then
-		return true
-	else
-		return false
-	end
-	
+	return tostring(xr_logic.pstor_retrieve(npc, "wounded_state")) ~= "nil"
 end
 
 function hit_callback(npc_id)

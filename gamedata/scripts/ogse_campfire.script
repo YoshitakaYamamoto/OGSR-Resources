@@ -8,10 +8,10 @@ function attach(sm)
 end
 
 local start_stand_time  = time_global()
-local prev_actor_pos = nil
+local prev_actor_pos
 function on_actor_update()
 	ogse_signals.get_mgr():reschedule(math.random(1000, 1500))
-	if prev_actor_pos == nil then prev_actor_pos = db.actor:position() end
+	if not prev_actor_pos then prev_actor_pos = db.actor:position() end
 	if prev_actor_pos:distance_to(db.actor:position()) > 0.1 then
 		start_stand_time = time_global()
 	end

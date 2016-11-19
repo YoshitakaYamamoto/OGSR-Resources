@@ -57,14 +57,6 @@ function evaluator_bandage:evaluate()
 		self.hitt = time_global()+2000
 		return false
 	end
-	local hasanom, anomid, pos, cls, dist, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(npc:position())	
-	if hasanom and ogse_anomaly.get_anomaly_mode(anomid) ~= "anom_off" then
-		if dist <= 3 then
-			self.st.action = nil
-			self.hitt = time_global()+2000	
-			return false -- если непись слишком близко к аномалии
-		end
-	end	
 	if medkit and self.st.action then
 --		printf("eva[%s]: true(act)",npc:character_name())
 		ogse_debug.add_active_eval( self.object, script_name(), "bandage" )

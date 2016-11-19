@@ -19,7 +19,7 @@ function configure()
 		    local n = sys_ini:line_count(v)
 		    local id, value = "", ""
 		    for i=0,n-1 do
-			    result, id, value	= sys_ini:r_line(v,i,"","")
+			    result, id, value = sys_ini:r_line(v,i,"","")
                 item_by_community[v][id] = tonumber(value)
 		    end
         end
@@ -126,7 +126,6 @@ function create_items(obj, section, number, rnd)
 			while number > num_in_box or number > 0 do
 				local sammo = alife():create_ammo(section, position, obj:level_vertex_id(), obj:game_vertex_id(), 65535, num_in_box)
 				local _sammo = alife():object(sammo.id)
-log1("!!Called use ai locations for xr_box (ammo)")
 				_sammo:use_ai_locations(false)
 				number = number - num_in_box
 			end
@@ -137,7 +136,6 @@ log1("!!Called use ai locations for xr_box (ammo)")
             if math.random() <= rnd then
 				local sitem = alife():create(section, position, obj:level_vertex_id(), obj:game_vertex_id())
 				local _sitem = alife():object(sitem.id)
-log1("!!Called use ai locations for xr_box")
 				_sitem:use_ai_locations(false)
 			end
         end

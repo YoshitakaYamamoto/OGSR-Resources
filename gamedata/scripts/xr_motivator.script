@@ -8,18 +8,15 @@ load
 net_spawn
 -------------------------------]]
 
-local debug_flag = false
-
 --*****************************************************************************************************
 local warn_check_timer = {}
 local snd_check_timer = {}
 
 function look_to_shot(object, who)
 	if object and who then
-		if IsStalker(object) and 
-		(object:alive() and who:alive()) and
-		not xr_wounded.is_wounded(object) and
-		((IsStalker(who) and object:relation(who) ~= game_object.friend) or IsMonster(who)) then
+		if  IsStalker(object) and object:alive() and not xr_wounded.is_wounded(object)
+			and who:alive() and ((IsStalker(who) and object:relation(who) ~= game_object.friend) or IsMonster(who))
+		then
 			if object:best_enemy() then
 				local be = object:best_enemy()
 				local enemy_dist = object:position():distance_to_sqr(be:position())
@@ -105,25 +102,15 @@ function silent_level()
 end
 
 function check_sound(self, who, sound_type, sound_position, sound_power)
-	-- secure and optimize
-	if
-		( not self )
-		or ( not who )
-		or ( not sound_type )
-		or ( not sound_position )
-		or ( not sound_power )
-	then
+	if not self or not who or not sound_type or not sound_position or not sound_power then
 		return
 	end
 
 	local actsch
-
 	if db.storage[self:id()] and db.storage[self:id()].active_scheme then
 		actsch = db.storage[self:id()].active_scheme
 	end
-
-	if actsch and (actsch == "remark" or actsch == "wounded" or actsch == "actor_dialogs")
-	then 
+	if actsch and (actsch == "remark" or actsch == "wounded" or actsch == "actor_dialogs") then 
 		return 
 	end
 
@@ -296,6 +283,7 @@ log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name
 log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
+local debug_flag = false
 function motivator_binder:net_spawn(sobject)
 --log3("~~[%s] Start net_spawn [%s]", script_name(), self.object and self.object:name() or "nil")
 	ogse.fix_restrictors(self.object)
