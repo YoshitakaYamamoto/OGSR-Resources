@@ -16,8 +16,8 @@ function attach(sm)
 end
 
 
-local exo_condition = 1.0
-local outfit_condition = 1.0
+local exo_condition
+local outfit_condition
 
 -- Функции
 function use_exo(use_object)
@@ -42,13 +42,10 @@ function use_exo(use_object)
 			end
 		end
 		-- а если не получается сконвертировать, то вертаем броньку взад
-		ogse.spawn_item_in_inv(use_obj_section, db.actor)
+		ogse.spawn_item_in_inv(use_obj_section)
 		return true
 	end
 end
-
-exo_to_rust = nil
-exo_to_rust_condition = nil
 
 function detach_exo()
 	local outfit_item = db.actor:item_in_slot(6)
@@ -58,15 +55,11 @@ function detach_exo()
 			local outfit_without_exo_section = sys_ini:r_string(outfit_sec, "without_exoskeleton")
 			local exo_section = sys_ini:r_string(outfit_sec, "exo_section")
 			if outfit_without_exo_section and exo_section and can_detach_exo(outfit_sec) then
-				local s_exo = ogse.spawn_item_in_inv(exo_section, db.actor)
-				local c_exo = level.object_by_id(s_exo.id)
+				local s_exo = ogse.spawn_item_in_inv(exo_section)
 				local exo_rusting = outfit_item:condition() / outfit_condition
-				if c_exo then
-					-- c_exo:set_condition(exo_condition * exo_rusting)	-- учтем, что состояние броньки уже было не идеальное, да еще мы попортили
-					exo_to_rust = s_exo.id
-					exo_to_rust_condition = exo_condition * exo_rusting
-					ogse.start_timer("ex1",1) 
-				end
+				level.client_spawn_manager():add( s_exo.id, -1, function(cond, id, obj)
+					obj:set_condition( cond ) --Учтем, что состояние броньки уже было не идеальное, да ещё мы попортили
+				end, exo_condition * exo_rusting )
 				convert_outfit(outfit_item, outfit_without_exo_section)
 			end
 		end
@@ -76,36 +69,24 @@ end
 function convert_outfit(outfit, new_outfit_section)
 	local sobj = alife():object(outfit:id())
 	if sobj then
-		local outfit_condition = outfit:condition()
+		local cond = outfit:condition()
 		db.actor:move_to_ruck(outfit)
 		alife():release(sobj, true)
-		local s_new_outfit = ogse.spawn_item_in_inv(new_outfit_section, db.actor)
-		outfit_spawn_watcher(s_new_outfit.id, outfit_condition):start()
+		local s_new_outfit = ogse.spawn_item_in_inv(new_outfit_section)
+		level.client_spawn_manager():add( s_new_outfit.id, -1, function(cond, id, obj)
+			obj:set_condition( cond )
+		end, cond )
 	end
 end
 
-class "outfit_spawn_watcher" (ogse_qt.quick_timer)
-
-function outfit_spawn_watcher:__init(id, condition_to_set) super()
-	self.id = id
-	self.cond = condition_to_set
-end
-function outfit_spawn_watcher:condition()
-	self.obj = level.object_by_id(self.id)
-	return (self.obj ~= nil)
-end
-function outfit_spawn_watcher:action()
-	self.obj:set_condition(self.cond)
-end
-
 function save()
-	ogse.save_variable("exo_condition", exo_condition)
-	ogse.save_variable("outfit_condition", outfit_condition)
+	ogse.save_var(script_name()..".exo_cond", exo_condition, "float")
+	ogse.save_var(script_name()..".outfit_cond", outfit_condition, "float")
 end
 
 function load()
-	exo_condition = tonumber(ogse.load_variable("exo_condition", 1.0))
-	outfit_condition = tonumber(ogse.load_variable("outfit_condition", 1.0))
+	exo_condition		= ogse.load_var_safe(script_name()..".exo_cond") or 1.0
+	outfit_condition	= ogse.load_var_safe(script_name()..".outfit_cond") or 1.0
 end
 
 class "exo_control" (CUIScriptWnd)

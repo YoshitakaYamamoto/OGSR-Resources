@@ -10,7 +10,21 @@ Feedback   : email - nazgool@ukr.net
 function attach(sm)
     sm:subscribe({signal = "on_save",         fun = this.on_save})
     sm:subscribe({signal = "on_first_update", fun = this.on_load})
+    sm:subscribe({signal = "on_storyline_start", fun = this.on_storyline_start})
 end
+
+function on_storyline_start() --Спавн пластинок
+	ogse.spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_1)
+	ogse.spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_2)
+	ogse.spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_3)	
+	ogse.spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_5)
+	ogse.spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_6)
+	ogse.spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_8)
+	ogse.spawn_object(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_9)	
+	ogse.spawn_object_rand(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_4)
+	ogse.spawn_object_rand(ogse_spawn_db.script_spawn_registry.spawn_plastinki.plastinka_7)
+end
+
 
 musicbox_mem = {}
 music_dir    = 'characters_voice\\scenario\\mbox\\'

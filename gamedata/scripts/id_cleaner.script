@@ -1,8 +1,10 @@
----------------------------------------------------------
----------------------------------------------------------
--- чистильщик ID дл€ OGSE
--- авторы: Stalbar, KamikaZze
----------------------------------------------------------
+--Чистильщик ID для OGSE
+--Авторы: Stalbar, KamikaZze
+
+function attach(sm)
+	sm:subscribe({signal = "on_spawn", fun = this.check_ids})
+end
+
 
 local duplicates = {}
 
@@ -30,7 +32,7 @@ function check_inv()
 			if IsStalker(obj) and obj.id ~= 0 then
 				local obj_sect = obj:section_name()
 				local obj_name = obj:name()
-				local posobj = obj.position  --- получим позицию непис€
+				local posobj = obj.position  --- получим позицию непися
 				local actorpos = db.actor:position()  --- получим позицию актора
 				if not ogse.is_quest_npc(obj) and obj.online then
 					if posobj:distance_to(actorpos) > 5 then
@@ -54,7 +56,7 @@ function check_inv()
 	end
 end
 
--- ƒобавление в таблицу
+-- Добавление в таблицу
 function insert_to_table(tbl, section)
 	if tbl[section] == nil then
 		tbl[section] = 1

@@ -23,6 +23,7 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:net_spawn(data)
 	cmd("r2_dof_control", "off")
+	cmd("unbind", "contacts") --Отключаем в PDA вкладку "Контакты"
 
 	level.show_indicators()
 
@@ -34,13 +35,33 @@ function actor_binder:net_spawn(data)
 		db.storage[self.object:id()].pstor = {}
 	end
 
+	level.disable_input() --Где-то читал, что при вызове set_extensions_flags возможны ложные вызовы калбеков нажатия клавиш. Поэтому надо типа делать так.
 	set_extensions_flags(15)
-
 	level.enable_input()
 
-	if actor_stats.add_to_ranking~=nil then
+	if actor_stats.add_to_ranking ~= nil then
 		actor_stats.add_to_ranking(self.object:id())
 	end
+
+------------KD: установка настроек графики------------
+	-- шмапы
+	cmd("r2_ls_depth_bias -0.00005")
+	cmd("r2_ls_depth_scale 1.00001")
+	cmd("r2_sun_depth_far_bias -0.00001")
+	cmd("r2_sun_depth_far_scale 1.0")
+	cmd("r2_sun_depth_near_bias -0.0001")
+	cmd("r2_sun_depth_near_scale 1.00004")
+	cmd("r2_sun_focus on")
+	cmd("r2_sun_near_border 1.")
+	-- избавляемся от пересвета поверхностей
+	cmd("r2_ls_bloom_threshold 1.") --блум
+	cmd("r2_sun_lumscale 1.") --мультипликатор цвета солнца (идиотская настройка)
+	cmd("r2_rain_drops_control on") --капли на стекле
+	cmd("r2_lens_dirt_control on") --грязь на линзе
+	cmd("cam_inert 0") --KRodin: сбрасываем инерцию камеры в 0
+----------------------KD: end-------------------------
+
+	db.register_all_quest_zones()
 
 -------- пауза при загрузке --------
 	ui_main_menu.start()
@@ -368,14 +389,12 @@ function actor_binder:update(delta)
 	if update_was_never_called then
 -------------------------------------------------------------------
 		if not has_alife_info("storyline_actor_start") then
+			self.object:give_info_portion("global_dialogs") --KRodin: не совсем понял для чего это нужно, но пусть будет.
+
 			self.am:call("on_storyline_start")
 			self.object:give_info_portion("storyline_actor_start")
 		end
 -------------------------------------------------------------------
-		if not has_alife_info("global_dialogs") then
-			self.object:give_info_portion("global_dialogs")
-		end
-
 		self.am:call("on_first_update")
 		update_was_never_called = false
 	end
