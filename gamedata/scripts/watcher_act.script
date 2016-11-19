@@ -163,72 +163,41 @@ local bad_items = {
 	["plastinka_8"] = true,
 	["plastinka_9"] = true,
 	["yan_sold_generator"] = true,
-
+	["amk_metka"] = true,
+	["bolt"] = true,
 }
 
 function do_not_touch(item)
-	local section = nil
-	local quest_itm = false	
 	if ogse_anomaly.dangerous_acivated_arts[item:id()] then
 		if ogse_anomaly.dangerous_acivated_arts[item:id()] > time_global() then
 			return true
-		end	
-	end	
-	if item then
-		section = item:section()
-		if sys_ini:line_exist(section, "quest_item") then
-			quest_itm = sys_ini:r_bool(section,"quest_item")
 		end
-	else
-		return false
 	end
-	if item and (bad_items[item:section()] or quest_itm == true) then
- 		return true
-	else
-		return false
-	end	
-end
 
-function cannot_take_that(npc)
-	if not npc then return false end
-
-	return ogse.is_quest_npc( npc ) or
-		   npc:character_community()=="zombied" or
-		   npc:character_community()=="trader" or 
-		   npc:character_community()=="arena_enemy" or 
-		   npc:character_community()=="quest_stalker" or 
-		   string.find(npc:name(), "doctor") or 
-		   string.find(npc:name(), "doktor") or		   
-		   string.find(npc:name(), "mil_stalker") or 
-		   string.find(npc:name(), "ecolog") or 
-		   string.find(npc:name(), "specnaz") or 
-		   string.find(npc:name(), "scientist") or
-		   string.find(npc:name(), "mil_freedom_member0021") or
-		   string.find(npc:name(), "pri_followers")
+	local section = item:section()
+	return bad_items[section] or get_bool(section, "quest_item", false)
 end
 
 function max_weight(npc)
 	local total_weight = 0.0
 	if npc then
-		npc:iterate_inventory(function (dummy, item)
+		npc:iterate_inventory(function(dummy, item)
 			if item then
-				local section = item:section()
-				local item_wt = sys_ini:r_float(section,"inv_weight")
-				total_weight = total_weight + item_wt
+				total_weight = total_weight + get_float(item:section(), "inv_weight", 0)
 			end
 		end, nil)
 	end
 	return total_weight
 end
 
-local bad_dangers={
+local bad_dangers = {
   [danger_object.hit]=true,
   [danger_object.attacked]=true,
   [danger_object.attack_sound]=true,
   [danger_object.bullet_ricochet]=true,
   [danger_object.grenade]=true,
   [danger_object.enemy_sound]=true
-  }
+}
   
 local inertion_time = 30000
 
@@ -240,67 +209,72 @@ function bad_danger(npc)
   return false
 end
 
----' 
----' Тут мы проверяем нельзя ли нам лутать
+local forbidden_schemes = {
+	--["test"] = true, -- если посланы игрой бежать куда-то
+	--["walker"] = true, -- если посланы игрой бежать куда-то
+	["remark"] = true, -- если играем в скриптовой сценке
+	["combat"] = true, -- если сражаемся
+	["wounded"] = true, -- если отыгрываем тяжелораненного
+	["actor_dialogs"] = true, -- если говорим с актором
+}
+local forbidden_comms = {
+	["zombied"] = true,
+	["trader"] = true,
+	["arena_enemy"] = true,
+	["quest_stalker"] = true,
+}
+
+function cannot_take_that(npc)
+	if ogse.is_quest_npc( npc ) or forbidden_comms[npc:character_community()] then return true end
+	
+	local name = npc:name()
+	return
+		name:find("doctor") or 
+		name:find("doktor") or		   
+		name:find("mil_stalker") or 
+		name:find("ecolog") or 
+		name:find("specnaz") or 
+		name:find("scientist") or
+		name:find("mil_freedom_member0021") or
+		name:find("pri_followers")
+end
+
+--Тут мы проверяем нельзя ли нам лутать
 --------------------------
 function bad_situation(npc)
+	if
+		   has_alife_info("pre_blowout") --начинается выброс
+		or not npc:alive() -- если мы трупик
+		or cannot_take_that(npc) --Запрещённые профили и имена
+		or xr_companion.is_companion(npc:id())
+		or npc:best_enemy() -- если рядом враг
+		or bad_danger(npc) -- если мы в опасности
+	then
+		return true
+	end
 
-	if npc then
-	
-		local actsch = db.storage[npc:id()].active_scheme  --- получим активную схему
-		local posobj = npc:position()  --- получим позицию непися
-		local actorpos
-		
-		--// xr_companion
-		if xr_companion.is_companion(npc:id()) then
-			return true
-		end	
-		
-		if db.actor then
-			actorpos = db.actor:position()  --- получим позицию актора		
-		end
-		
-		if actsch then
-			if db.storage[npc:id()][actsch].no_loot then return true end  --- если активная схема запрещает лут, возвращаем низзя
-		end
-		
-		
-		local lname = level.name()
-		
-		if has_alife_info("agr_krot_go_to_well") and not has_alife_info("agr_find_gunslinger_cache_found") and lname == "l03_agroprom" then
-			return true -- чтобы не лезли под пули сталкеры Крота
-		end		
-		
-		-- if db.storage[npc:id()].active_scheme == "test" then return true end --- если посланы игрой бежать куда-то
-		-- if db.storage[npc:id()].active_scheme == "walker" then return true end --- если посланы игрой бежать куда-то
-		if db.storage[npc:id()].active_scheme == "remark" then return true end --- если играем в скриптовой сценке
-		if db.storage[npc:id()].active_scheme == "combat" then return true end --- если сражаемся
-		if db.storage[npc:id()].active_scheme == "wounded" then return true end --- если отыгрываем тяжелораненного
-		if db.storage[npc:id()].active_scheme == "actor_dialogs" then return true end --- если говорим с актором
-		
-		local hasanom, anomid, pos, cls, dist, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(npc:position())	
-		if hasanom and ogse_anomaly.get_anomaly_mode(anomid) ~= "anom_off" then
-			if dist <= 3 then
-				return true -- если непись слишком близко к аномалии
-			end
-		end
-		
-		if xrs_battle_ai.cooldown[npc:id()] and xrs_battle_ai.cooldown[npc:id()] > time_global() then
-			return true 	-- ещё не успокоились после боя
-		end
-		
-		if max_weight(npc) > 100.0 then return true end --- если непись и так уже нагрёб дохренища вещей
-		if bad_danger(npc) then return true end --- если мы в опасности
-		if not npc:alive() then return true end --- если мы трупик
-		if cannot_take_that(npc) then return true end --- если мы не той фракции
-		if actorpos and posobj:distance_to(actorpos) < 3 then return true end --- если актор ближе 3 метров, пытается пообщаццо (так же запрещает лут трупа актора, этого делать нельзя, будет вылет)
-		if npc:best_enemy() then return true end --- если рядом враг
-		if xr_wounded.is_wounded(npc) then return true end  --- если мы ранены и просим помощи
-		
-		if xrs_battle_ai.actor_see(npc) and npc:relation(db.actor) == game_object.enemy and db.actor:alive() then return true end
-		
-  	end
-	
+	local actsch = db.storage[npc:id()].active_scheme  -- получим активную схему
+	if actsch then
+		if forbidden_schemes[actsch] or db.storage[npc:id()][actsch].no_loot then return true end  --если активная схема запрещает лут, возвращаем низзя
+	end
+
+	if xrs_battle_ai.cooldown[npc:id()] and xrs_battle_ai.cooldown[npc:id()] > time_global() then
+		return true -- ещё не успокоились после боя
+	end
+
+	if
+		   npc:position():distance_to(db.actor:position()) < 3 -- если актор ближе 3 метров, пытается пообщаццо (так же запрещает лут трупа актора, этого делать нельзя, будет вылет)
+		or xr_wounded.is_wounded(npc)  -- если мы ранены и просим помощи
+		or max_weight(npc) > 50.0 -- если непись и так уже нагрёб дохренища вещей
+	then
+		return true
+	end
+
+	--if has_alife_info("agr_krot_go_to_well") and not has_alife_info("agr_find_gunslinger_cache_found") and level.name() == "l03_agroprom" then
+	--	return true -- чтобы не лезли под пули сталкеры Крота
+	--end
+
+	--if xrs_battle_ai.actor_see(npc) and npc:relation(db.actor) == game_object.enemy and db.actor:alive() then return true end
 	return false   
 end
 
@@ -308,7 +282,7 @@ function item_inside_anomaly(item, storage)
 	if item then
 		local item_pos = item:position()
 		local hasanom, anomid, pos, cls, dist, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(item_pos)	
-		if hasanom and radius and ogse_anomaly.get_anomaly_mode(anomid) ~= "anom_off" then
+		if hasanom then
 			if dist <= 5 then
 				--- log1("BAD IDEA 1")
 				storage.disabled_objects[item:id()] = true
@@ -344,16 +318,17 @@ local disabled_objects = {}
 local corpse_checked = {} -- true - has loot, false - hasn't loot, nil - not checked
 
 function checkCorpse(obj)
-	if (IsStalker(obj) or IsMonster(obj)) and obj:alive() == false then
+	if (IsStalker(obj) or IsMonster(obj)) and not obj:alive() then
 		if corpse_checked[obj:id()]~=nil then
 			return corpse_checked[obj:id()]
 		end
 		local cnt = 0
 		obj:iterate_inventory(function (dummy, item)
-        if item:section()~="bolt" then
-          cnt = cnt+1
-        end
-			end, nil)
+			local section = item:section()
+			if bad_items[section] or get_bool(section, "quest_item", false) then
+				cnt = cnt + 1
+			end
+		end, nil)
 		corpse_checked[obj:id()] = cnt > 0
 		return corpse_checked[obj:id()]
 	end
@@ -500,36 +475,22 @@ function postmortem_sound(npc, body)
 	end
 end
 
-function bgwith(str,ptr)
-	local ps=string.find(str,ptr)
-	return ps~=nil and ps==1
-end
-
 function isValuable(obj)
-	local sec=  obj:section()
-	if sec == "amk_metka" then
-		return false,false
-	end
 	if valuable_clsid[obj:clsid()] then
 		return true, false
 	end
-	return bgwith(sec,"af_") or bgwith(sec,"ammo_") or bgwith(sec,"wpn_") or bgwith(sec,"energy_") or checkCorpse(obj), IsStalker(obj) or IsMonster(obj)
+	return obj:is_artefact() or obj:is_ammo() or obj:is_weapon(), checkCorpse(obj)
 end
 
 function objValue(obj)
-	local sec=  obj:section()
 	local multiplier = 1
-	if bgwith(sec,"ammo_") then
+	if obj:is_ammo() then
 		multiplier = 30
-	elseif sec == "af_" then
+	elseif obj:is_artefact() then
 		multiplier = 50		
-	elseif sec == "vodka" then
-		multiplier = 20
 	end
-	if sys_ini:section_exist(sec) and sys_ini:line_exist(sec,"cost") then
-		return sys_ini:r_float(sec,"cost")*multiplier
-	end
-	return 0
+
+	return get_float(obj:section(), "cost", 0) * multiplier
 end
 
 function claimGObject(npc,st,obj)
@@ -556,7 +517,7 @@ function getGObject(st)
 	if st.grabitemid then
 		local ret = level.object_by_id(st.grabitemid)
 		if ret and item_inside_anomaly(ret, st) then return nil end
-		if ret == nil then
+		if not ret then
 			st.grabitemid = nil
 		end
 		return ret
@@ -576,10 +537,9 @@ function correct_position(gi,npc)
 			local test_lvid = npc:vertex_in_direction(gi,diff,lengt)
 			if not npc:accessible(test_lvid) then
 				return npc:accessible_nearest(level.vertex_position(test_lvid), vector():set(0,0,0))
-			else	
+			else
 				return test_lvid
-			end			
-			
+			end
 		end
 	else
 		return gi:level_vertex_id()
@@ -594,11 +554,8 @@ function ev_see_stuff:__init(st,name) super(nil, name)
 end
  
 function ev_see_stuff:evaluate()
-	if not self.object:alive() or xr_wounded.is_wounded(self.object) or has_alife_info("pre_blowout") or self.object:best_enemy() then
-		return false
-	end
-	local res = getGObject(self.st) ~= nil
 	local npc = self.object
+	local res = getGObject(self.st) ~= nil
 --[=[-- Krodin: отключено по совету Naxac'a:
 		По зависающим неписям - я тут методом тыка выявил, что очень часто в этом виноват вызов
 		xr_logic.try_switch_to_another_section из watcher_act - некоторые неписи при переключении логики через неё виснут наглухо,
@@ -611,7 +568,6 @@ function ev_see_stuff:evaluate()
 		xr_logic.try_switch_to_another_section(npc, db.storage[npc:id()][actsch], db.actor)
 	end
 --]=]
-	local act_sec = db.storage[npc:id()].active_section or ""
 	if bad_situation(npc) then
 		if res then
 			local g_obj = getGObject(self.st)
@@ -619,23 +575,22 @@ function ev_see_stuff:evaluate()
 			freeGObject(self.st)
 		end
 		return false
-	end	
-	local dist_limit = 1000
-	if bgwith(act_sec,"camper") then
-		dist_limit = 5
 	end
-	local busy = bgwith(act_sec,"walker") or bgwith(act_sec,"combat") or bgwith(act_sec,"danger") -- or npc:best_danger()
-	if res then
-	  -- NPC собрался взять вещь. Временно прекратим поиск.
+
+	local act_sec = db.storage[npc:id()].active_section or ""
+	local dist_limit = act_sec:find("camper") and 5 or 1000
+	local busy = act_sec:find("walker") or act_sec:find("danger")
+	if res then --NPC собрался взять вещь. Временно прекратим поиск.
 		ogse_debug.add_active_eval( self.object, script_name(), "ev_see_stuff" )
 		return true
 	end
+
 	timed(self.st,"tm1",5000+math.random()*10000,
 		function ()
 			if not self.st.block_search then
 				-- непись намерен поискать вещь
 				local min_dist = 100000
-				
+
 				---->>> local function check_item(o)
 				local function check_item(o)
 					local obj = o:object()
@@ -644,20 +599,20 @@ function ev_see_stuff:evaluate()
 
 					if obj_owner[obj:id()] and 
 						(level.object_by_id(obj_owner[obj:id()])==nil 
-						or level.object_by_id(obj_owner[obj:id()]):alive()==false) then
+						or not level.object_by_id(obj_owner[obj:id()]):alive()) then
 							obj_owner[obj:id()]=nil
 					end
-					
+
 					if (not self.st.disabled_objects[obj:id()]) 
-					and (obj:parent()==nil or not IsStalker(obj:parent())) 
+					and (not obj:parent() or not IsStalker(obj:parent())) 
 					and (obj_owner[obj:id()]==nil or obj_owner[obj:id()]==npc:id()) 
 					and npc:accessible(obj:level_vertex_id()) 
 					and not (claimed_pos[obj:level_vertex_id()] and claimed_pos[obj:level_vertex_id()] ~= npc:id())
 					and not item_inside_anomaly(obj, self.st)
 					and not do_not_touch(obj)
-					and (db.actor == nil or db.actor:alive() == false or db.actor:position():distance_to_sqr(obj:position())>6) then
+					and db.actor:position():distance_to_sqr(obj:position())>6 then
 						local valuable,corpse = isValuable(obj)
-						if valuable then 
+						if valuable or corpse then
 							local value = 3000
 							if not corpse then
 								value = objValue(obj)
@@ -679,16 +634,16 @@ function ev_see_stuff:evaluate()
 					end
 				end
 				----<<< local function check_item(o)			
-				
+
 				for o in npc:memory_visible_objects() do
 					check_item(o)
 				end
 				for o in npc:memory_sound_objects() do
 					check_item(o)
 				end
-				if res then 
+				--if res then 
 					-- ogse.log1(npc:character_name() .. " хочет забрать "..getGObject(self.st):name().." - действие "..tostring(npc:motivation_action_manager():current_action_id()))
-				end
+				--end
 			end
 		end
 	)
@@ -853,7 +808,7 @@ function act_grab_item:execute()
 		if gi and gi:parent() == nil and not do_not_touch(gi) then
 			if IsStalker(gi) or IsMonster(gi) then
 				gi:iterate_inventory(function (d,item)
-				if item:section() ~= "bolt" and not do_not_touch(item) then 
+				if not do_not_touch(item) then 
 					gi:transfer_item(item,npc)
 				end end, nil)
 				corpse_checked[gi:id()] = false -- нет больше лута тут
@@ -888,7 +843,6 @@ actid_reach_item 	= evid_see_stuff + 2
 actid_grab_item 	= evid_see_stuff + 3
 
 function add_to_binder(object, char_ini, scheme, section, st)
-
 	local npc = object
 	st.disabled_objects={}
 	
