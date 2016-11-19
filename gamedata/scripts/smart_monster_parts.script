@@ -9,6 +9,12 @@
 -|Резрешил спавнить глаз полтергейста через конфиг (m_poltergeist.ltx) и убрал его из таблицы.
 --------------------------------------------------------------------------------------------]]
 
+function attach( sm )
+	sm:subscribe({ signal = "on_monster_hit", fun = this.main_check })
+	sm:subscribe({ signal = "on_monster_death", fun = this.death_spawn })
+end
+
+
 local table_mobs = {
   {
 	[ "type"		] = "fracture", --Умное выпадение теперь работает и для излома. В оригинале не работало.

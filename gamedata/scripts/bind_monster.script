@@ -207,8 +207,6 @@ function generic_object_binder:death_callback(victim, who)
 	h.impulse = 10
 	self.object:hit(h)
 
-	smart_monster_parts.death_spawn(self.object)
-
 	self.am:call( "on_monster_death", self.object, who )
 end
 
@@ -227,8 +225,6 @@ function generic_object_binder:hit_callback(obj, amount, local_direction, who, b
 	if self.st.hit then
 		xr_logic.issue_event(self.object, self.st.hit, "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end
-
-	smart_monster_parts.main_check(self.object, amount, local_direction, who, bone_index)
 
 	self.am:call( "on_monster_hit", self.object, amount, local_direction, who, bone_index, self )
 end
