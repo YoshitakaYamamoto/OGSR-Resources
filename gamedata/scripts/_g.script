@@ -1,66 +1,47 @@
 --************************************************* Инициализация расширений движка ************************************************
-log1("--...Инициализация расширений движка...")
+log1("--LUA version: ["..(jit.version or _VERSION).."]")
+log1("~~...Инициализация расширений движка...")
 
-RvP()
+if RvP then RvP() end
 
---[[
-pairs_old = pairs
-pairs = function(t)
-     if not t or type(t)~="table" then
-          log1("!! error, try to call 'pairs' with " .. tostring(t) .. " param")
-          log3(debug.traceback())
-          return
-     end
-     return pairs_old(t)
-end
-]]
+if SetLog then SetLog(getFS():update_path("$logs$", "_ogse.log")) end
 
+if init_external_libs then init_external_libs() end
 
-if type(SetLog) == "function" and os and os.clock() < 30 then
-	local name = getFS():update_path("$logs$", "_ogse.log")
-	SetLog(name)
-	log1("--SetLogCallback to file: ["..name.."]")
+package.cpath = package.cpath..";"..getFS():update_path("$fs_root$", "bin\\extensions").."\\?.dll"
+local rez, msg = pcall(require, "ogse")
+if not not rez then
+	log1("--Loaded: [ogse.dll]")
+else
+	log1("!!Error: "..msg)
 end
 
-local dir 		= "$fs_root$"
-local ext_path 	= "bin\\extensions"
-local path  	= getFS():update_path(dir, ext_path)
+if set_static_rescale_factor then set_static_rescale_factor(device().height / device().width / 0.75) end
 
-package.cpath = package.cpath..";"..path.."\\?.dll"
+math.randomseed(os.time())
 
-local function IsDll(fname)
-	return fname:sub(-4) == ".dll"
-end
+--===================[string.upper и string.lower с поддержкой русских букв]====================
+if not jit.version_num or jit.version_num < 20004 then --В ТЧ 1.0006 c lua-фиксом работает такой вариант:
+	os.setlocale("Russian_Russia.1251", "ctype")
+else --В новом LuaJIT работает только такой вариант:
+	local _lower = string.lower
+	string.lower = function(s)
+		return _lower(s:gsub("([А-Я])",function(c) return string.char(c:byte()+32) end):gsub("Ё", "ё"))
+	end
 
-if type(init_external_libs) == "function" then
-	init_external_libs()
-end
-
---лучше наверное оставить в главном модуле lfs и грузить им.
-if not lfs then
-	fail("check lfs namespace")
-end
-for file in lfs.dir(path) do
-	if file ~= "." and file ~= ".." then
-		if IsDll(file) then
-			local mod = file:sub(1, -5)
-			log1("~~Try to load: ["..file.."]")
-			local rez, msg = pcall(require, mod)
-			if (not(not rez)) then
-				log1("--Loaded: ["..file.."]")
-			else
-				log1("!!Error: "..msg)
-			end
-		end
+	local _upper = string.upper
+	string.upper = function(s)
+		return _upper(s:gsub("([а-я])",function(c) return string.char(c:byte()-32) end):gsub("ё", "Ё"))
 	end
 end
+--==============================================================================================
 
-if os and os.clock() < 30 then
-	--log1("~~        _G : os.clock() = " .. tostring(os.clock()) .. "    math.randomseed()")
-	math.randomseed(os.time())
+if not luaXML_loaded then
+	dofile(getFS():update_path("$game_data$","scripts\\_luaxml.script"))
+	--log1("--luaXML loaded!")
 end
 
-set_static_rescale_factor(device().height / device().width / 0.75)
+if not jit.version_num or jit.version_num < 20004 then --KRodin: Может, в новом JIT это исправлено?
 
 -- жуткая затычка для проблемы с большими целыми числами при сложении в Lua
 -- родное сложение начинает округлять и терять часть суммы, а функция sum_args
@@ -77,8 +58,18 @@ function sum_args_ex(base, offs)
 	local b1 = tonumber(b1_s, 16)
 	local b2 = tonumber(b2_s, 16)
 	local res = sum_args(bit.lshift(b1, 16), sum_args(b2, offs)) --KRodin: думал, что res = первое значение, а второе вообще не используется. Но как оказалось, res = сумма этих двух значений. Я и не знал, что так можно делать.
-	--log2("sum_args_ex: %s, %x, %x", base_s, offs, res)
+	log2("~~sum_args_ex: %s, %x, %x", base_s, offs, res)
+	log2("~~lua + : %x", base + offs)
 	return res
+end
+
+else
+
+function sum_args_ex(base, offs)
+	log2("~~lua + : %x", base + offs)
+	return base + offs
+end
+
 end
 
 --Некоторые недостающие DIK_keys:
@@ -113,16 +104,26 @@ key_bindings["kUSE_MEDKIT"] = 74
 key_bindings["kQUICK_SAVE"] = 75
 key_bindings["kQUICK_LOAD"] = 76
 
-if not SString_loaded then
-	dofile(getFS():update_path("$game_data$","scripts\\_s.script"))
-	log1("--SString loaded!")
-end
-if not luaXML_loaded then
-	dofile(getFS():update_path("$game_data$","scripts\\_luaxml.script"))
-	log1("--luaXML loaded!")
+-- Взято из аддона Naxac'a
+local to_ptrn = {
+	[' '] = '%s',
+	['.'] = '%.',
+	['%'] = '%%',
+	['*'] = '%*',
+	['-'] = '%-'
+}
+string.explode = function ( div,		-- разделитель
+							str,		-- строка
+							clear )		-- обрезать ли пробелы по краям строк (false/true)
+	local ret = {}
+	div = to_ptrn[div] or div
+	for s in str:gmatch("([^"..div.."]+)") do
+		ret[#ret+1] = (clear and s:trim() or s)
+	end
+	return ret
 end
 
-log1("--Инициализация расширений движка закончена!")
+log1("~~Инициализация расширений движка закончена!")
 --******************************************** Инициализация расширений движка закончена ********************************************
 
 -- FIX Nazgool ------------------------------------------------------------------
@@ -202,7 +203,6 @@ excluded_restrictors = {
 	}
 
 ----------------------------------------------------------------------
-
 schemes = {} -- соответствие схем модулям
 stypes = {} -- типы схем
 
@@ -248,44 +248,8 @@ end
 
 
 ----------------------------------------------------------------------
-if nil == time_global then
-	time_global = function () return device():time_global() end
-end
-
-function action(obj,...)
-    local arg = {...}
-    local act = entity_action()
-    local i = 1
-    while true do
-        if (arg[i] ~= nil) then
-            act:set_action(arg[i])
-        else
-            break
-        end
-        i = i + 1
-    end
-    if (obj ~= nil) then
-        obj:command(act,false)
-    end
-    return  entity_action(act)
-end
-
-function action_first(obj,...)
-    local arg = {...}
-    local act = entity_action()
-    local i = 1
-    while true do
-        if (arg[i] ~= nil) then
-            act:set_action(arg[i])
-        else
-            break
-        end
-        i = i + 1
-    end
-    if (obj ~= nil) then
-        obj:command(act,true)
-    end
-    return  entity_action(act)
+if not time_global then
+	time_global = function() return device():time_global() end
 end
 
 function distance_between(obj1, obj2)
@@ -298,91 +262,26 @@ function distance_between_safe(obj1, obj2)
 	return obj1:position():distance_to(obj2:position())
 end
 
-
 --/ Проверка на инфопоршны, даже если игрока не существует
 function has_alife_info(info_id)
 	return alife():has_info(0, info_id)
 end
 
-function reset_action (npc, script_name)
-    if npc:get_script () then
-       npc:script (false, script_name)
-    end
-    npc:script (true, script_name)
-end
-
---------------------------------------------------
---/ Functions and variables added by Zmey
---------------------------------------------------
-
---/ константа, которую использовать в местах, где нужно задать неограниченное время действия
-time_infinite = 100000000
-
---/ если в данный момент выполняется какое-то действие, прерывает его и отключает скриптовый режим
-function interrupt_action(who, script_name)
-  if who:get_script() then
-    who:script(false, script_name)
-  end
-end
-
-function random_choice(...)
-    local arg = {...}
-    local r = math.random(1, table.getn(arg))
-    return arg[r]
-end
-
-function new_action(...)
-    local arg = {...}
-    local act = entity_action()
-    for i = 1, table.getn(arg) do
-        act:set_action(arg[i])
-    end
-    return act;
-end
-
-obj_last_actions = {};
-
-function perform_action(obj, action_name, action)
-    if (obj ~= nil) then
-        obj_last_actions[obj] = action_name
-        obj:command(act, false)
-    end
-end
-
-function last_action(obj)
-  return obj_last_actions[obj]
-end
-
 function if_then_else(cond, if_true, if_false)
-    if cond then
-        return if_true
-    end
-    return if_false
-end
-
-function update_action (npc, script, ...)
-    local arg = {...}
-    if npc == nil then return end
-    local act = npc:action ()
-    if arg.n == 0 then return end
-
-    if act == nil then act = entity_action () end
-
-    for a = 1, arg.n, 1 do
-        if arg[a] ~= nil then act:set_action (arg[a]) end
-    end
-    reset_action (npc, script)
-    npc:command (act, false)
+	return cond and if_true or if_false
 end
 
 -------------------------------------------------------------------------------------------------------
 --Отличается от split_comma_separated_list тем, что кроме запятых обрабатывает ещё и пробелы.
 function parse_names( s )
+--[=[
 	local t = {}
 	for name in s:gmatch("[^,%s]+" ) do
 		table.insert( t, name )
 	end
     return t
+--]=]
+	return string.explode(",", s, true)
 end
 
 --Конвертирует строку вида "actor, 0, actor_dolg, 1, actor_freedom, 2, ..."
@@ -497,21 +396,13 @@ end
 
 -------------------------------------------------------------------------------------------
 function switch_online(id)
-    if id == -1 then return end
-    local sim = alife ()
-    if sim ~= nil then
-       sim:set_switch_online  (id, true)
-       sim:set_switch_offline (id, false)
-    end
+	alife():set_switch_online (id, true)
+	alife():set_switch_offline(id, false)
 end
 -------------------------------------------------------------------------------------------
-function switch_offline(npc)
-    if npc == nil or npc:alive () == false then return end
-    local sim = alife ()
-    if sim ~= nil then
-       sim:set_switch_online  (npc:id (), false)
-       sim:set_switch_offline (npc:id (), true)
-    end
+function switch_offline(id)
+	alife():set_switch_online (id, false)
+	alife():set_switch_offline(id, true)
 end
 -------------------------------------------------------------------------------------------
 local monster_classes = {}
@@ -559,20 +450,23 @@ function isOutfit(object, class_id)
 	return id and outfit_classes[id]
 end
 -------------------------------------------------------------------------------------------
+function isLc(object, class_id)
+	local id = class_id or get_clsid(object)
+	return id == clsid.level_changer
+end
+-------------------------------------------------------------------------------------------
 function isKnife(object, class_id)
 	local id = class_id or get_clsid(object)
 	return id and (id == clsid.wpn_knife or id == clsid.wpn_knife_s)
 end
 -------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------
 function isIndoor(level_name)
 	return indoor_levels[level_name]
 end
 -------------------------------------------------------------------------------------------
-function isRegisteredLevel(game_vertex_id)
-	local level_id = game_graph():vertex(game_vertex_id):level_id()
-	return (level_id > 0 and level_id < 24) -- при добавлении новых локаций увеличить счетчик
-end
--------------------------------------------------------------------------------------------
+
 function id_by_sid( sid )
 	local sim = alife()
 
@@ -1079,12 +973,15 @@ end
 
 -- делит строку в виде "aaa,bbb,ccc" на строки "aaa", "bbb", "ccc" и возвращает их в виде массива
 function split_comma_separated_list(s)
+--[=[
 	local res = {}
 	for v in string.gmatch(s, "[^,]+") do
 		table.insert(res, v)
 	end
 	--log3("split_comma_separated_list called: [%s], res: %s", s, res)
 	return res
+--]=]
+	return string.explode(",", s)
 end
 
 -- читает время, сохранённое в виде строки со значениями, разделёнными запятой, и конвертирует в значение класса CTime
@@ -1264,7 +1161,7 @@ function log3(fmt, ...)
 	end
 	local res, msg = pcall(string.format, fmt, unpack(args))
 	if not res then --Если произошла ошибка
-		msg = "!!log3 failed: "..msg
+		msg = "!!log3 failed: "..msg.."\n"..debug.traceback()
 	end
 	local subs = msg:sub(1, 1)
 	local color = subs_tbl[subs] and subs.." " or false

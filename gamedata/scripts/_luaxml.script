@@ -67,12 +67,16 @@ local symbols = {
 
 }
 
-function xml.encode(str) --KRodin: сталкерский lua не переваривает таблицу как аргумент в gsub. Переделал в функцию.
-    if type(str)~="string" then return end
-
-    return str:gsub('.', function(x)
-        return symbols[x] or x
-    end)
+if not jit.version_num or jit.version_num < 20004 then
+	function xml.encode(str) --KRodin: сталкерский lua не переваривает таблицу как аргумент в gsub. Переделал в функцию.
+		return str:gsub('.', function(x)
+			return symbols[x] or x
+		end)
+	end
+else
+	function xml.encode(str)
+		return str:gsub('.', symbols)
+	end
 end
 
 function xml.eval(str)
@@ -211,7 +215,7 @@ function xml.save(var, filename)
             file:write(xml.str(var))
             file:close()
             return true
-        else
+        --[=[else --KRodin: выключено, т.к. lfs больше не будет. Да и вообще, мне не понятно, как эта функция работает.
             filename = filename:gsub('\\', '/')
             local dir, path, name = string.match(filename, '^([^/]+)(.-)([^/]+)$')
             local cur_dir = lfs.currentdir()
@@ -224,7 +228,7 @@ function xml.save(var, filename)
             end
         
             lfs.chdir(cur_dir)
-            xml.save(var, filename)
+            xml.save(var, filename)]=]
         end
     end
     return false

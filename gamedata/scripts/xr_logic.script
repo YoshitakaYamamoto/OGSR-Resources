@@ -1105,7 +1105,10 @@ function mob_capture(mob, reset_actions)
 	end
 
 	if reset_actions then
-		reset_action(mob, script_name())
+		if mob:get_script() then
+			mob:script(false, script_name())
+		end
+		mob:script(true, script_name())
 	else
 		if not mob:get_script() then
 			mob:script(true, script_name())

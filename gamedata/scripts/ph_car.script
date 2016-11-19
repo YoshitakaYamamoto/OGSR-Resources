@@ -73,9 +73,9 @@ function action_car:reset_scheme(loading)
 	end
 	printf("car <state>: headlights %s", self.st.headlights)
 	xr_logic.mob_capture(self.object, true)
-	action(self.object, object("left_light",  self.headlights), cond(cond.time_end, time_infinite))
+	action(self.object, object("left_light",  self.headlights), cond(cond.time_end, 100000000))
 	xr_logic.mob_capture(self.object, true)
-	action(self.object, object("right_light", self.headlights), cond(cond.time_end, time_infinite))
+	action(self.object, object("right_light", self.headlights), cond(cond.time_end, 100000000))
 
     self.usable = self.st.usable
     
@@ -471,7 +471,7 @@ function action_car:go_to_walkpoint(pt)
 				move(accel, self.speed), --move.on + 
 				--object("right_light", self.headlights),
 				--object("left_light", self.headlights),
-				cond(cond.time_end, time_infinite)) --self.fc_upd_avg))
+				cond(cond.time_end, 100000000)) --self.fc_upd_avg))
 			self.state_moving = state_moving_fwd
 		end
 	else
@@ -487,7 +487,7 @@ function action_car:go_to_walkpoint(pt)
 					move(accel + move.left, self.speed), --move.on + 
 					--object("right_light", self.headlights),
 					--object("left_light", self.headlights),
-					cond(cond.time_end, time_infinite)) --self.fc_upd_avg))
+					cond(cond.time_end, 100000000)) --self.fc_upd_avg))
 				self.state_moving = state_moving_rot_left
 			end
 		else
@@ -497,7 +497,7 @@ function action_car:go_to_walkpoint(pt)
 					move(accel + move.right, self.speed), --move.on + 
 					--object("right_light", self.headlights),
 					--object("left_light", self.headlights),
-					cond(cond.time_end, time_infinite)) --self.fc_upd_avg))
+					cond(cond.time_end, 100000000)) --self.fc_upd_avg))
 				self.state_moving = state_moving_rot_right
 			end
 		end
@@ -951,9 +951,9 @@ function action_car:destroy_car()
 
     -- turn off lights
 	xr_logic.mob_capture(self.object, true)
-	action(self.object, object("left_light",  object.deactivate), cond(cond.time_end, time_infinite))
+	action(self.object, object("left_light",  object.deactivate), cond(cond.time_end, 100000000))
 	xr_logic.mob_capture(self.object, true)
-	action(self.object, object("right_light", object.deactivate), cond(cond.time_end, time_infinite))
+	action(self.object, object("right_light", object.deactivate), cond(cond.time_end, 100000000))
 
 	xr_logic.mob_release(self.object)
 	if self.st.on_death_info ~= nil then

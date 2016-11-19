@@ -697,7 +697,7 @@ function heli_combat:round_initialize()
 	self.change_dir_time            = 0
 	self.change_pos_time            = 0
 	self.center_pos                 = self.enemy_last_seen_pos
-	self.flight_direction           = random_choice( true, false )
+	self.flight_direction           = math.random() > 0.5
 	self.change_combat_type_allowed = true
 	self.round_begin_shoot_time    = 0
 
@@ -797,7 +797,7 @@ function heli_combat:search_initialize()
 	self.change_pos_time            = 0
 	self.center_pos                 = self.enemy_last_seen_pos
 
-	self.flight_direction           = random_choice( true, false )
+	self.flight_direction           = math.random() > 0.5
 	self.change_combat_type_allowed = true
 	self.search_begin_shoot_time    = 0
 

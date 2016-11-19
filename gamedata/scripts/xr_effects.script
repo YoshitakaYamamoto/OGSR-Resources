@@ -3277,7 +3277,7 @@ function suicide(actor, npc)
 		npc,
 --		particle("hit_fx\\hit_flesh_headshot","bip01_head",particle_params(vector():set(0,0,0.3),vector():set(0,0,0),vector():set(1,0,0)),false),
 		particle("hit_fx\\hit_flesh_headshot","bip01_head"),
-		cond	(cond.time_end, time_infinite)
+		cond	(cond.time_end, 100000000)
 	)
 	printf("_bp: val_suicide_kill_self: npc='%s'", npc:name())
 	local h = hit()

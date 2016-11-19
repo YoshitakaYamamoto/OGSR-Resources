@@ -173,7 +173,7 @@ function mob_walker:waypoint_callback(obj, action_type, index)
 		else
 			local patrol_walk_count = self.patrol_walk:count()
 			if patrol_walk_count == 1 and utils.stalker_at_waypoint(self.object, self.patrol_walk, 0) then
-				self.pt_wait_time = time_infinite
+				self.pt_wait_time = 100000000
 			else
 				self.pt_wait_time = default_wait_time
 			end
