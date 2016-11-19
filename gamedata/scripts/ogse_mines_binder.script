@@ -1,66 +1,74 @@
------------------------------------------------------------------------
---- ogse_mines_binder.script
---- Биндер мин OGSE 0.6.9.3
---- 2014 (c) KamikaZze, OGS Evolution Team
------------------------------------------------------------------------
+-------------------------------------------
+-- ogse_mines_binder.script
+-- Биндер мин OGSE 0.6.9.3
+-- 2014 (c) KamikaZze, OGS Evolution Team
+-------------------------------------------
+
+function attach(sm)
+	sm:subscribe({ signal = "on_storyline_start",	fun = this.set_gsc_mine })
+	sm:subscribe({ signal = "on_hit",				fun = this.mine_remove })
+	sm:subscribe({ signal = "on_npc_hit",			fun = this.mine_remove })
+	sm:subscribe({ signal = "on_npc_death",			fun = this.mine_remove })
+	sm:subscribe({ signal = "on_monster_hit",		fun = this.mine_remove })
+	sm:subscribe({ signal = "on_monster_death",		fun = this.mine_remove })
+end
+
+local minefield_table = {} -- таблица для мин
+
+--Вот это походу надо для того, чтобы в скрипте не учитывались никакие мины, кроме тех которые устанавливает актор.
+--Походу из за бага со свечением после взрыва. Если когда-то этот движковый баг исправят, можно будет это убрать.
+--Ну тогда и оптимизировать функцию mine_remove, т.к. из за большого кол-ва мин на локации она будет тормозить довольно сильно.
+function set_gsc_mine()
+	for i=1, 65534 do
+		local sobj = alife():object(i)
+		if sobj and sobj:section_name() == "zone_mine_field" then
+			data = m_net_utils.get_anomaly_data(sobj)
+			data.custom = "gsc_mine"			
+			m_net_utils.set_anomaly_data(data,sobj)			
+		end
+	end
+end
+
+function mine_remove(victim)
+	local radius = 2
+	local vic_pos = victim:position()
+	for k,v in pairs(minefield_table) do
+		local mine = level.object_by_id(v)
+		if mine then
+			local mine_pos = mine:position()
+			if vic_pos:distance_to(mine_pos) <= radius then
+				minefield_table[v] = nil
+				ogse_anomaly.set_anomaly_mode(v, "anom_off") --Взорванная мина удалится в менеджере аномалий
+				break
+			end
+		end
+	end
+end
+
 
 function init(obj)
 	local new_binder = mines_binder(obj)
 	obj:bind_object(new_binder)
 end
 
----------------------------------------------------------------------------------------------
 class "mines_binder" (object_binder)
 function mines_binder:__init(obj) super(obj)
 end 
 
-function mines_binder:reload(section)
-
-end
-
-function mines_binder:reinit()
-
-end
-
 function mines_binder:net_spawn(data)
-
 	local id = self.object:id()
 	local s_obj = alife():object(id)
-	if s_obj then
-		local data = m_net_utils.get_anomaly_data(s_obj)
-		if data.custom ~= "gsc_mine" and not checker_minefield.minefield_table[id] then
-			checker_minefield.minefield_table[id] = id
-		end	
-	end
+	--local status = ogse_anomaly.get_anomaly_mode(s_obj)
+	--if status == "anom_off" then --При отключении мин на их месте появляется свечение. Поэтому закомментировал.
+	--	log3("~~[%s] Disabling mine: [%s], IsAnomaly: [%s]", script_name(), self.object:name(), IsAnomaly(self.object))
+	--	self.object:disable_anomaly()
+	--	return true --думаю, больше тут делать нечего.
+	--end
+
+	local data = m_net_utils.get_anomaly_data(s_obj)
+	if data.custom ~= "gsc_mine" then
+		--log3("!![%s] Adding in minefield table: [%s], IsAnomaly: [%s]", script_name(), s_obj:name(), IsAnomaly(s_obj))
+		minefield_table[id] = id
+	end	
 	return true
 end
-
-local update_times = {}
-local update_interval = 1000
-
-function mines_binder:update(delta)
-		
-	if not update_times[self.object:id()] then
-		update_times[self.object:id()] = time_global()
-	else	
-		if (update_times[self.object:id()] + update_interval) > time_global() then
-			return
-		else	
-			update_times[self.object:id()] = time_global()
-		end		
-	end
-	
-	local id = self.object:id()
-	
-	--- встраиваем выключение
-	local status = ogse_anomaly.get_anomaly_mode(id)
-	if status == "anom_off" then
-		self.object:disable_anomaly()
-	end
-
-end
-
-function mines_binder:net_destroy()
---	log3("[mines_binder:net_destroy] name=%s, id=%d", self.object:name(), self.object:id())
-end
-

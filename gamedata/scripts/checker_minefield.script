@@ -1,143 +1,12 @@
--- Скрипт работы с минным полем. OGSE team.
--- Авторы: Mixser, Stalbar, KamikaZze.
+--KRodin: теперь этот скрипт не имеет к минам никакого отношения.
+--Теперь скрипт нужен только для отложенного удаления всяких объектов
 
-function attach(sm)
-	sm:subscribe({ signal = "on_spawn",				fun = this.startup })
-	sm:subscribe({ signal = "on_storyline_start",	fun = this.set_gsc_mine })
-	sm:subscribe({ signal = "on_hit",				fun = this.on_act_hit })
-	sm:subscribe({ signal = "on_npc_hit",			fun = this.mine_hit })
-	sm:subscribe({ signal = "on_npc_death",			fun = this.mine_hit })
-	sm:subscribe({ signal = "on_monster_hit",		fun = this.mine_hit })
-	sm:subscribe({ signal = "on_monster_death",		fun = this.mine_hit })
-end
-
-----------------
-local to_delete = {} -- таблица для кандидатов для удаления (турели, глючные трупы). Когда то тут удалялись мины, но теперь они удаляются другим методом.
-minefield_table = {} -- таблица для мин
-local data = {}
-local act_hlth = 1
-----------------
+local to_delete = {}
 
 function add_to_delete(id)
 	if not to_delete[id] then
 		to_delete[id] = id
 		run_del_mines_timer()
-	end
-end
-
-function isGameObject(obj)
-	local bResult = false
-	if (obj and obj.fov) then
-		bResult = true
-	end
-	return bResult
-end
-
-function get_obj(id)
-	local m_obj = nil
-	if (id) then
-		m_obj = level.object_by_id(id)
-	end
-	return m_obj
-end
-
-function set_gsc_mine()
-	for i=1,65534 do
-		local obj = alife():object(i)
-		if obj and obj:section_name() == "zone_mine_field" then -- обьект существует и так же найдена секция.
-			data = m_net_utils.get_anomaly_data(obj)
-			data.custom = "gsc_mine"			
-			m_net_utils.set_anomaly_data(data,obj)			
-		end
-	end
-end
-
-function reset_restrictors(anom_id)
-	for i=1,65534 do
-		local sobj = alife():object(i)
-		if sobj and (IsStalker(sobj) or IsMonster(sobj)) then -- обьект существует и так же найдена секция.
-			if IsStalker(sobj) then
-				local tbl = m_net_utils.get_stalker_data(sobj)
-				local current_restriction = tbl.crvu32u16u2	
-				for r_num,r_id in pairs(current_restriction) do
-					if anom_id == r_id then
-						alife():remove_in_restriction(sobj, anom_id)
-						log1("!!DEBUG: removed restr mine from "..i)
-					end
-				end
-			else
-				local tbl = m_net_utils.get_monster_data(sobj)
-				local current_restriction = tbl.crvu32u16u2
-				for r_num,r_id in pairs(current_restriction) do
-					if anom_id == r_id then
-						alife():remove_in_restriction(sobj, anom_id)
-						log1("!!DEBUG: removed restr mine from "..i)
-					end
-				end
-			end
-		end
-	end
-end
-
-function startup()
-	for i=1,65534 do
-		local obj = alife():object(i)
-		if obj and obj:section_name() == "zone_mine_field" then -- обьект существует и так же найдена секция.
-			local status = ogse_anomaly.get_anomaly_mode(i)
-			if status == "anom_off" then
-				local m_obj = level.object_by_id(i)
-				if not m_obj then
-					local actor_vid = game_graph():vertex(alife():actor().m_game_vertex_id):level_id()
-					local npc_vid 	= game_graph():vertex(obj.m_game_vertex_id):level_id()
-					if actor_vid ~= npc_vid then
-						log1("!!DEBUG: trying to remove mine "..i)
-						reset_restrictors(i)
-						log1("!!DEBUG: going to remove mine "..i)
-						alife():release(obj, true)
-					end
-				end
-			end		
-		end
-	end
-end
-
-function on_act_hit()
-	if db.actor then
-		mine_remove(db.actor)	
-	end
-end
-
-function mine_hit(victim)
-	if victim then
-		local m_obj
-		if (isGameObject(victim)) then
-			m_obj = victim
-		else
-			m_obj = get_obj(victim.id)	
-		end
-		if (m_obj) then
-			mine_remove(victim)
-		end
-	end
-end
-
-function mine_remove(victim)
-	local radius = 2
-	if victim then
-		local vic_pos = level.object_by_id(victim:id()):position()
-		for k,v in pairs(minefield_table) do
-			local mine = level.object_by_id(v)
-			if mine then
-				local mine_pos = mine:position()
-				if vic_pos:distance_to(mine_pos) <= radius then
-					minefield_table[v] = nil
---					mine:disable_anomaly()
-					ogse_anomaly.set_anomaly_mode(v, "anom_off")
-					-- -- log1("Добавили в табличку на удаление под номером "..tostring(table.getn(to_delete)).." объект "..tostring(v))
-					break
-				end
-			end
-		end
 	end
 end
 
@@ -152,7 +21,6 @@ function delete_mines()
 		end
 	end
 end
-
 
 local del_mines_t
 function run_del_mines_timer()
