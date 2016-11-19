@@ -555,30 +555,20 @@ function generic_rukzak_binder:__init( obj ) super( obj )
   self.object:set_nonscript_usable( true )
 end
 
-
 function generic_rukzak_binder:net_spawn( data )
   if not object_binder.net_spawn( self, data ) then
     return false
   end
 
   self.object:set_tip_text( "st_search_treasure" )
+  self.object:set_callback( callback.use_object, self.use_callback, self )
   return true
 end
-
-
-function generic_rukzak_binder:update( delta )
-  object_binder.update( self, delta )
-  self.object:set_callback(
-    callback.use_object, generic_rukzak_binder.use_callback, self
-  )
-end
-
 
 function generic_rukzak_binder:net_destroy()
   self.object:set_callback( callback.use_object, nil )
   object_binder.net_destroy( self )
 end
-
 
 function generic_rukzak_binder:use_callback( obj, who )
   self.am:call( "on_rukzak_use", self.object )
