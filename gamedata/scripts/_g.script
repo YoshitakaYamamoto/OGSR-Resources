@@ -21,9 +21,9 @@ if set_static_rescale_factor then set_static_rescale_factor(device().height / de
 math.randomseed(os.time())
 
 --===================[string.upper и string.lower с поддержкой русских букв]====================
-if not jit.version_num or jit.version_num < 20004 then --В ТЧ 1.0006 c lua-фиксом работает такой вариант:
-	os.setlocale("Russian_Russia.1251", "ctype")
-else --В новом LuaJIT работает только такой вариант:
+--if not jit.version_num or jit.version_num < 20004 then --В ТЧ 1.0006 c lua-фиксом работает такой вариант:
+--	os.setlocale("Russian_Russia.1251", "ctype")
+--else --В новом LuaJIT работает только такой вариант:
 	local _lower = string.lower
 	string.lower = function(s)
 		return _lower(s:gsub("([А-Я])",function(c) return string.char(c:byte()+32) end):gsub("Ё", "ё"))
@@ -33,7 +33,7 @@ else --В новом LuaJIT работает только такой вариант:
 	string.upper = function(s)
 		return _upper(s:gsub("([а-я])",function(c) return string.char(c:byte()-32) end):gsub("ё", "Ё"))
 	end
-end
+--end
 --==============================================================================================
 
 if not luaXML_loaded then
