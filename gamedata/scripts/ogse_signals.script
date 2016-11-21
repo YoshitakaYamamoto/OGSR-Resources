@@ -109,7 +109,7 @@ function signals_mgr:__init( name, modules_list, scan_for_autoattaching_modules 
         local file  = flist:GetAt( i )
         local fname = file:NameFull()
         prefetch( fname )
-        local module = _g[ fname ]
+        local module = _G[ fname ]
         if
           module and type( module ) == "table"
           and type( module.attach ) == "function" and module.auto_attach == true
@@ -131,13 +131,12 @@ function signals_mgr:__init( name, modules_list, scan_for_autoattaching_modules 
     local function hanged_calls_check()
       for mgr_name, count in pairs( unfinished_count ) do
         if count > 0 then       -- если есть незавершённые вызовы
-          log3( debug.traceback() )
-          local n = #self.slots_in_process
-          if n > 0 then
-            local slot = self.slots_in_process[ n ]
-            log3( "[%s]: signal on top: [%s], script_name = [%s]", script_name(), slot.signal, slot.script_name )
-          end
-          abort( "Signal manager '"..mgr_name.."' crushed:\nOne of the calls hung! See stack dump for details." ) -- RIP
+          --log3( debug.traceback() )
+		  for i=1, #self.slots_in_process do
+            local slot = self.slots_in_process[ i ]
+            log3( "[%s]: signal on top №%s: [%s], script_name = [%s]", script_name(), i, slot.signal, slot.script_name )
+		  end
+          abort( "Signal manager [%s] crushed:\nOne of the calls hung! See stack dump for details.", mgr_name ) -- RIP
         end
       end
     end
@@ -164,7 +163,7 @@ function signals_mgr:is_already_subscribed( slot_in_question, skip_unsub )
     for _, slot in ipairs( cur ) do
       if
         slots_equal( slot, slot_in_question )
-        and ( ( not skip_unsub ) or ( not slot.unsubscribed ) )
+        --and ( ( not skip_unsub ) or ( not slot.unsubscribed ) ) --На время выключил "Не нужно проверять уже отписанные, но не удаленные обработчики". Оно мне и не нужно пока.
       then
         return true
       end
@@ -211,8 +210,7 @@ function signals_mgr:make_empty_signal( signal )
     [ "next_in_scheduled" ] = 1,
   }
   if
-    string.find( signal, "update" )
-	and not string.find( signal, "first_update" )
+    ( string.find( signal, "update" ) and not string.find( signal, "first_update" ) )
   then
     t.time_limited = true
   else
@@ -278,7 +276,7 @@ end
 function signals_mgr:subscribe_module( module_name )
   prefetch( module_name )
   local res, msg = check_module( module_name )
-  local module = _g[ module_name ]
+  local module = _G[ module_name ]
   ASSERT(
     module,
     "signals_mgr:subscribe_module: Failed to subscribe module '"..module_name.."'"
@@ -300,6 +298,22 @@ end
 function signals_mgr:call( signal_name, ... )
   local slots = self.signals[ signal_name ]
   if slots then
+
+    --Пример: Откуда-то выдается инфопоршень "info1". Срабатывает инфокаллбек в биндере актора и соответственно вызывается сигнал "on_info".
+	--В процессе вызова сигнала, внутри одного из слотов происходит вызов actor:give_info_portion("info2")
+	--В этом случае, из инфокаллбека сработает вызов сигнала "on_info" "внутри" этого же сигнала вызванного ранее.
+	--Из-за этого нарушается очерёдность слотов сигнала "on_info" с непредсказуемыми последствиями.
+	--KRodin: cделал так, что при обнаружении такой ситуации, проблемный вызов переносится на ближайший апдейт актора.
+	for i=1, #self.slots_in_process do --Перебираем незавершенные вызовы, если они есть
+		local slot = self.slots_in_process[i]
+		if slot.signal == signal_name then --Если название текущего сигнала совпадает с сименем сигнала одного из незавершенных слотов
+			log3("~~[%s] Found unfinished slots for signal [%s]. Slots_in_process: %s %s", script_name(), signal_name, self.slots_in_process, debug.traceback())
+			local args = {...} --Без этого не получилось сделать
+			level.add_call( function() return true end, function() self:call(signal_name, unpack(args)) end ) --Вызов произойдёт на ближайшем апдейте актора.
+			return --Выходим.
+		end
+	end
+
     unfinished_count[ self.mgr_name ] = unfinished_count[ self.mgr_name ] + 1
     self:process_call( signal_name, slots, ... )
     unfinished_count[ self.mgr_name ] = unfinished_count[ self.mgr_name ] - 1
@@ -348,14 +362,27 @@ function signals_mgr:process_call( signal_name, slots, ... )
       local pt = profile_timer()
       pt:start()
       if slot.self then --Запуск слота
+--[=[
+		if signal_name == "on_info" then
+		  local args = {...}
+		  log3("!![signals_mgr:slots.normal] Call: [%s], [%s(%s, %s)], slots.next_in_normal = [%s], slots.normal tbl: %s", slot.script_name, signal_name, args[1] or "", args[2] or "", slots.next_in_normal, slots.normal) --KRodin: Debug
+		end
+--]=]
         result = slot.fun( slot.self, ... )
       else
+--[=[
+		if signal_name == "on_info" then
+		  local args = {...}
+		  log3("!![signals_mgr:slots.normal] Call: [%s], [%s(%s, %s)], slots.next_in_normal = [%s], slots.normal tbl: %s", slot.script_name, signal_name, args[1] or "", args[2] or "", slots.next_in_normal, slots.normal) --KRodin: Debug
+		end
+--]=]
         result = slot.fun( ... )
       end
       pt:stop()
       work_time = work_time + pt:time()
       table.remove( self.slots_in_process )
-      if slot.timeout then --Если время выполнения слота, ему задали таймаут для следующего запуска
+      if slot.timeout then --Если надо, задаем слоту таймаут для следующего запуска
+		--ASSERT(slots.time_limited, "!!Found not time_limited slot with timeout: [%s], [%s]", signal_name, slot.script_name) --KRodin: надо перенести это в другое место. Подумать.
         slots.reschedule_scheduled = true --Нужно пересортировать scheduled очередь
         slot.scheduled = true --Помечаем, что слот теперь в scheduled очереди
         table.insert( slots.scheduled, slot ) --Добавляем его в scheduled очередь
@@ -392,8 +419,12 @@ function signals_mgr:process_call( signal_name, slots, ... )
       local pt = profile_timer()
       pt:start()
       if slot.self then --Запуск слота
+		 -- local args = {...}
+		 -- log3("!![signals_mgr:slots.scheduled] Call: [%s], [%s(%s, %s)]", slot.script_name, signal_name, args[1] or "", args[2] or "") --KRodin: Debug
         slot.fun( slot.self, ... )
       else
+		 -- local args = {...}
+		 -- log3("!![signals_mgr:slots.scheduled] Call: [%s], [%s(%s, %s)]", slot.script_name, signal_name, args[1] or "", args[2] or "") --KRodin: Debug
         slot.fun( ... )
       end
       --Думаю, в этой очереди не нужно прерывать цикл после слота, вернувшего true, т.к последовательность вызовов постоянно меняется при пересортировке.
@@ -450,8 +481,12 @@ function signals_mgr:try_call_queued( signal_name, slots, ... )
         slot.timeout = 0 --обнуляем таймаут
         table.insert( self.slots_in_process, slot )
         if slot.self then --Запуск слота
+		 -- local args = {...}
+		 -- log3("!![signals_mgr:try_call_queued] Call: [%s], [%s(%s, %s)]", slot.script_name, signal_name, args[1] or "", args[2] or "") --KRodin: Debug
           slot.fun( slot.self, ... )
         else
+		 -- local args = {...}
+		 -- log3("!![signals_mgr:try_call_queued] Call: [%s], [%s(%s, %s)]", slot.script_name, signal_name, args[1] or "", args[2] or "") --KRodin: Debug
           slot.fun( ... )
         end
         table.remove( self.slots_in_process )
