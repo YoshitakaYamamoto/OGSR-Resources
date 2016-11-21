@@ -1335,12 +1335,12 @@ end
 
 --Функция рассчитывает и устанавливает в менеджере сигналов таймаут для следующего обновления погоды.
 local function change_new_update_time( current_time, next_update, forced, upd_slot, sm )
-	local cur_game_time = time2string(current_time, "%04d/%02d/%02d %02d:%02d:%02d.%03d", {'y','m','d','h','min','s','ms'})
-	local next_upd_game_time = time2string(next_update, "%04d/%02d/%02d %02d:%02d:%02d.%03d", {'y','m','d','h','min','s','ms'})
+	--local cur_game_time = time2string(current_time, "%04d/%02d/%02d %02d:%02d:%02d.%03d", {'y','m','d','h','min','s','ms'})
+	--local next_upd_game_time = time2string(next_update, "%04d/%02d/%02d %02d:%02d:%02d.%03d", {'y','m','d','h','min','s','ms'})
 	local game_time_delta = next_update:diffSec(current_time) --Посчитаем, через сколько игровых секунд нужно обновить погоду
 	local game_time_delta_ms = game_time_delta * 1000 --Переводим в игровые миллисекунды
 	local REAL_time_delta_ms = game_time_delta_ms / normal_time_factor --Конвертируем в РЕАЛЬНОЕ время
-	log3("##[%s] Current game time: %s, \nNext update game time: %s, \nDelta in game seconds: [%s], \nDelta in game ms: [%s] \nTime Factor: [%s] \nDelta in REAL ms: [%s] \nCurrent global time: [%s] \nNext update global time: [%s]", script_name(), cur_game_time, next_upd_game_time, game_time_delta, game_time_delta_ms, normal_time_factor, REAL_time_delta_ms, time_global(), time_global() + REAL_time_delta_ms)
+	--log3("##[%s] Current game time: %s, \nNext update game time: %s, \nDelta in game seconds: [%s], \nDelta in game ms: [%s] \nTime Factor: [%s] \nDelta in REAL ms: [%s] \nCurrent global time: [%s] \nNext update global time: [%s]", script_name(), cur_game_time, next_upd_game_time, game_time_delta, game_time_delta_ms, normal_time_factor, REAL_time_delta_ms, time_global(), time_global() + REAL_time_delta_ms)
 	if not forced then --Если это обычный апдейт, вызванный менеджером сигналов
 		sm:reschedule( REAL_time_delta_ms ) --Устанавливаем таймаут для текущего слота
 	else --Если это вынужденный апдейт, вызванный НЕ из менеджера сигналов
@@ -1357,13 +1357,13 @@ monitoring_weather_sect = nil
 function WeatherManager:update( forced ) --forced должен быть == true, если апдейт вызывается НЕ из менеджера сигналов (например, из ogse_sleep_mgr).
 	if not enabled then return end
 	--
-	log3("##[%s] Called %s update! Time_global: [%s]", script_name(), forced == true and "forced" or "normal", time_global())
+	--log3("##[%s] Called %s update! Time_global: [%s]", script_name(), forced == true and "forced" or "normal", time_global())
 	--
 	local current_time = game.get_game_time()
 	if self.next_update and current_time < self.next_update then -- Обновлять погоду ещё рано
 		if forced == true then --Апдейт вызван вынужденно, т.е после изменения игрового времени (например во время сна)
 			change_new_update_time( current_time, self.next_update, true, self.upd_ev_desc, self.sm ) --Пересчитываем и переустанавливаем таймаут в менеджере сигналов с учётом изменившегося времени.
-			log3("##[%s] Timeout rechanged. Update not needed!", script_name())
+			--log3("##[%s] Timeout rechanged. Update not needed!", script_name())
 			return
 		else
 			return
@@ -1417,6 +1417,6 @@ function WeatherManager:update( forced ) --forced должен быть == true, если апде
 	--end
 	--self:check_and_fail()
 	--
-	log3("##[%s] Weather %s updated!", script_name(), forced == true and "forced" or "normal")
+	--log3("##[%s] Weather %s updated!", script_name(), forced == true and "forced" or "normal")
 	--
 end

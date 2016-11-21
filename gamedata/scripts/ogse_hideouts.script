@@ -116,10 +116,10 @@ function on_info(npc, info)
 				local cd = data.custom_data:getTable()
 				if cd.sr_mapspot then
 					if info == "pre_blowout" then
-						log3("~~[%s] Adding mapspots on hideouts!", script_name())
+						--log3("~~[%s] Adding mapspots on hideouts!", script_name())
 						level_tasks.add_location_by_id(id, cd.sr_mapspot.location, cd.sr_mapspot.hint)
 					else
-						log3("~~[%s] Removing mapspots from hideouts!", script_name())
+						--log3("~~[%s] Removing mapspots from hideouts!", script_name())
 						if level.map_has_object_spot(id, cd.sr_mapspot.location) ~= 0 then
 							level_tasks.remove_location_by_id(id, cd.sr_mapspot.location)
 						end
