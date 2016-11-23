@@ -27,7 +27,7 @@ function actor_binder:net_spawn(data)
 
 	level.show_indicators()
 
-	xr_gulag.make_restrictors_registry()
+	--xr_gulag.make_restrictors_registry() --KRodin: убрал эти манипул€ции с рестрикшенами.
 
 	db.add_actor(self.object)
 

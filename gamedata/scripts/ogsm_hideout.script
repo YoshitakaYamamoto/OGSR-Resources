@@ -224,7 +224,7 @@ function restore_restrictions(npc)
 		backup_restrictions_out[npc:id()] = nil
 		backup_restrictions_in[npc:id()] = nil
 		
-		ogse.fix_restrictors(npc)
+		--ogse.fix_restrictors(npc)
 	end
 end
 

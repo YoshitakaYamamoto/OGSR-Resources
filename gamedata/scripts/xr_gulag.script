@@ -130,7 +130,7 @@ end
 -- подготовка гулага к работе
 function gulag:initialize()
 	self.ObjectJobPathName = {} --' по id. имя патрульного пути места работы персонажа
-	self.restrictors       = {} --' по id. назначенные гулагом рестрикторы для каждого персонажа
+	--self.restrictors       = {} --' по id. назначенные гулагом рестрикторы для каждого персонажа
 	
 	self:prepare_jobs()
 
@@ -409,7 +409,7 @@ function gulag:object_setup_offline( obj_id, was_online )
 
 	self.Object[obj_id] = true
 
-	self:clear_restrictors_info( obj_id )
+	--self:clear_restrictors_info( obj_id )
 
 	if not was_online then
 		local obj = level.object_by_id( obj_id )
@@ -423,7 +423,7 @@ end
 -- вызывается у персонажей из net_spawn() и из gulag:object_setup_offline()
 -- если он уже пришёл на работу, настроить ему логику и рестрикторы (при необходимости).
 -- obj=game_object
-function gulag:object_setup_online( obj_id, obj, need_setup_logic, need_setup_restrictors )
+function gulag:object_setup_online( obj_id, obj, need_setup_logic--[[, need_setup_restrictors]] )
 --	log3( "[smart_terrain %s] gulag: object_setup_online: obj=%s need_setup_logic=%s need_setup_restrictors=%s", self.name, obj:name(), tostring(need_setup_logic), tostring(need_setup_restrictors) )
 
 	self.Object[obj_id] = obj
@@ -442,9 +442,9 @@ function gulag:object_setup_online( obj_id, obj, need_setup_logic, need_setup_re
 			self:setup_logic( obj, job.section )
 		end
 
-		if need_setup_restrictors then
-			self:set_restrictions( obj, job.out_rest, job.in_rest, job.info_rest )
-		end
+		--if need_setup_restrictors then
+		--	self:set_restrictions( obj, job.out_rest, job.in_rest, job.info_rest )
+		--end
 	end
 end
 
@@ -454,7 +454,7 @@ end
 function gulag:removeObject( obj_id )
 	self:free_obj_and_reinit( obj_id )
 	self.Object[obj_id] = nil
-	self:clear_restrictors_info( obj_id )
+	--self:clear_restrictors_info( obj_id )
 	self.population = self.population - 1
 	if not self.npc_info[obj_id].exclusive then
 		self.population_non_exclusive = self.population_non_exclusive - 1
@@ -993,7 +993,7 @@ function gulag:beginJob( obj_id )
 	if self.Object[obj_id] ~= true then
 		local obj = self.Object[obj_id]
 
-		self:set_restrictions( obj, job.out_rest, job.in_rest, job.info_rest )
+		--self:set_restrictions( obj, job.out_rest, job.in_rest, job.info_rest )
 		self:setup_logic( obj, job.section )
 	end
 
@@ -1017,6 +1017,7 @@ function gulag:setup_job_online( se_obj, job )
 	end
 end
 
+--[=[ --KRodin: обойдёмся без этих манипуляций с рестрикторами.
 valid_restrictors = {}
 
 function make_restrictors_registry()
@@ -1030,9 +1031,11 @@ function make_restrictors_registry()
 		end
 	end
 end
+--]=]
 
 -- установить объекту рестрикторы в онлайне.
 -- obj - game_object
+--[=[
 function gulag:set_restrictions(obj, r_out, r_in, r_info)
 --	log3( "RESTR [%s] HAVE (IN)  : %s", obj:name(), obj:in_restrictions() )
 --	log3( "RESTR [%s] HAVE (OUT) : %s", obj:name(), obj:out_restrictions() )
@@ -1097,14 +1100,16 @@ function gulag:set_restrictions(obj, r_out, r_in, r_info)
 
 --	log3( "INFO [%s] RESTR      : %s", obj:name(), utils.to_str( r_info ) )
 end
-
+--]=]
 -- убрать записи о том, что смарт устанавливал объекту рестрикторы.
 -- obj - game_object
+--[=[
 function gulag:clear_restrictors_info( obj_id )
 	self.restrictors[obj_id] = nil
 
 	db.info_restr[obj_id] = nil
 end
+]=]
 
 -- получить работу, которую занимает объект
 function gulag:getJob(obj_id)
@@ -1139,12 +1144,12 @@ function gulag:free_obj( obj_id )
 			npc:smart_terrain_task_deactivate()
 		end
 
-		if self.Object[obj_id] ~= true
+		--[=[if self.Object[obj_id] ~= true
 		   and self.Object_begin_job[obj_id] == true
 		   and level.object_by_id( obj_id )
 		then
 			self:set_restrictions( self.Object[obj_id], "", "", nil )
-		end
+		end]=]
 
 		if self.Object_begin_job[obj_id] == true then
 			self.population_comed = self.population_comed - 1
@@ -1463,11 +1468,11 @@ function setup_gulag_and_logic_on_spawn( obj, st, sobject, stype, loaded )
 		if strn_id ~= 65535 then
 
 			local need_setup_logic       = strn.gulag.Object_begin_job[obj:id()] and not loaded
-			local need_setup_restrictors = strn.gulag.Object_begin_job[obj:id()]
+			--local need_setup_restrictors = strn.gulag.Object_begin_job[obj:id()]
 
 			strn:initialize_if_needed()
 
-			strn.gulag:object_setup_online( obj:id(), obj, need_setup_logic, need_setup_restrictors )
+			strn.gulag:object_setup_online( obj:id(), obj, need_setup_logic--[[, need_setup_restrictors]] )
 			
 			if xr_companion.is_companion(obj:id()) then
 				need_setup_logic = false
@@ -1703,6 +1708,7 @@ function getCasualities( name_or_sid )
 	return ( gulag and gulag:getCasualities() ) or 0
 end
 
+--[=[ --KRodin: хрень какая-то
 -- не находится ли источник информации вне информационного рестриктора?
 -- если вне, то информация будет запрещена
 -- функция кеширует game_object рестриктора
@@ -1725,7 +1731,7 @@ function is_info_restricted( obj_id, info_pos )
 
 	return not r:inside( info_pos )
 end
-
+--]=]
 -----------------------------------------------------------------------------------------------------------------
 --Тестовые типы гулагов???
 local test_gulag_types = {

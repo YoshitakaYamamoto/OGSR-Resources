@@ -286,7 +286,7 @@ end
 local debug_flag = false
 function motivator_binder:net_spawn(sobject)
 --log3("~~[%s] Start net_spawn [%s]", script_name(), self.object and self.object:name() or "nil")
-	ogse.fix_restrictors(self.object)
+	--ogse.fix_restrictors(self.object)
 
 	if not object_binder.net_spawn(self, sobject) then return false end
 
