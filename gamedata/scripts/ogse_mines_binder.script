@@ -32,13 +32,13 @@ end
 function mine_remove(victim)
 	local radius = 2
 	local vic_pos = victim:position()
-	for k,v in pairs(minefield_table) do
-		local mine = level.object_by_id(v)
+	for _ ,id in pairs(minefield_table) do
+		local mine = level.object_by_id(id)
 		if mine then
 			local mine_pos = mine:position()
 			if vic_pos:distance_to(mine_pos) <= radius then
-				minefield_table[v] = nil
-				ogse_anomaly.set_anomaly_mode(v, "anom_off") --Взорванная мина удалится в менеджере аномалий
+				checker_minefield.release_restrictor(id)
+				minefield_table[id] = nil
 				break
 			end
 		end
@@ -58,12 +58,6 @@ end
 function mines_binder:net_spawn(data)
 	local id = self.object:id()
 	local s_obj = alife():object(id)
-	--local status = ogse_anomaly.get_anomaly_mode(s_obj)
-	--if status == "anom_off" then --При отключении мин на их месте появляется свечение. Поэтому закомментировал.
-	--	log3("~~[%s] Disabling mine: [%s], IsAnomaly: [%s]", script_name(), self.object:name(), IsAnomaly(self.object))
-	--	self.object:disable_anomaly()
-	--	return true --думаю, больше тут делать нечего.
-	--end
 
 	local data = m_net_utils.get_anomaly_data(s_obj)
 	if data.custom ~= "gsc_mine" then

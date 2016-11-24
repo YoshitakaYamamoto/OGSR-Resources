@@ -32,24 +32,12 @@ end
 
 local teleport_binders = {}	-- Список телепортов, нужнен для функции delete_teleports_with_section()
 function delete_teleports_with_section(section)
-	ogse_anomaly.get_lists()
-	if ogse_anomaly.list_del_anom_id == nil then
-		ogse_anomaly.list_del_anom_id = {}
-	end
-	for _, i in ipairs(teleport_binders) do
-		local obj = alife():object(i)
-		if string.find(obj:section_name(), section) then
-			ogse_anomaly.list_del_anom_id[i] = i
+	for _, id in ipairs(teleport_binders) do
+		local sobj = alife():object(id)
+		if string.find(sobj:section_name(), section) then
+			checker_minefield.release_restrictor(id)
 		end
 	end
-	ogse_anomaly.soft_restr_reset()	
-	for _, i in ipairs(teleport_binders) do
-		local obj = alife():object(i)
-		if string.find(obj:section_name(), section) then
-			alife():release(obj, true)
-		end
-	end
-	ogse_anomaly.emergency_restr_reset()
 end
 
 function bind( obj )
@@ -71,29 +59,29 @@ function restrictor_teleport:net_spawn(data)
 		-- Заполним таблицу параметров
 		self["parametrs"] = {}
 		if sys_ini:line_exist(self.section, "radius") then
-			self.parametrs["radius"] = tonumber(sys_ini:r_string(self.section, "radius"))
+			self.parametrs["radius"] = get_float(self.section, "radius")
 		else
 			self.parametrs["radius"] = 2 -- Дефолтный радиус по xy
 		end
 		if sys_ini:line_exist(self.section, "z_radius") then
-			self.parametrs["z_radius"] = tonumber(sys_ini:r_string(self.section, "z_radius"))
+			self.parametrs["z_radius"] = get_float(self.section, "z_radius")
 		else
 			self.parametrs["z_radius"] = self.parametrs["radius"] -- если радиус высоты не задан то задаем равным радиусу xy
 		end
 
 		-- Запомним позицию что-бы каждый раз не считать
 		local s_obj = alife():object(self.object:id())
-		self.parametrs["x"] = tonumber(s_obj.position.x);
-		self.parametrs["y"] = tonumber(s_obj.position.y);
-		self.parametrs["z"] = tonumber(s_obj.position.z);
+		self.parametrs["x"] = s_obj.position.x
+		self.parametrs["y"] = s_obj.position.y
+		self.parametrs["z"] = s_obj.position.z
 
 		-- Запомним координаты куда телепортимся
-		self.parametrs["poz_x"] = tonumber(sys_ini:r_string(self.section, "poz_x"))
-		self.parametrs["poz_y"] = tonumber(sys_ini:r_string(self.section, "poz_y"))
-		self.parametrs["poz_z"] = tonumber(sys_ini:r_string(self.section, "poz_z"))
+		self.parametrs["poz_x"] = get_float(self.section, "poz_x")
+		self.parametrs["poz_y"] = get_float(self.section, "poz_y")
+		self.parametrs["poz_z"] = get_float(self.section, "poz_z")
 
 		if sys_ini:line_exist(self.section, "rotate") then
-			self.parametrs["rotate"] = tonumber(sys_ini:r_string(self.section, "rotate"))
+			self.parametrs["rotate"] = get_float(self.section, "rotate")
 		end
 
 		self.subscribed = {

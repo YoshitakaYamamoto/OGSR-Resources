@@ -2448,15 +2448,9 @@ function jeka_bunker_teleport()
 end
 
 function release_zapravka_port()
-	local obj = alife():object( "ds_zapravka_port" )
-	if obj then
-		if ogse_anomaly.list_del_anom_id == nil then
-			ogse_anomaly.list_del_anom_id = {}
-		end	
-		ogse_anomaly.list_del_anom_id[obj.id] = obj.id
-		ogse_anomaly.soft_restr_reset()	
-		alife():release(obj , true)
-		ogse_anomaly.emergency_restr_reset()
+	local sobj = alife():object( "ds_zapravka_port" )
+	if sobj then
+		checker_minefield.release_restrictor(sobj.id)
 	end
 end
 
@@ -3094,13 +3088,7 @@ end
 function release_cheb_birthplace()
     local sobj = alife():story_object(story_ids.cheb_birth_restrictor)
     if sobj then
-		if ogse_anomaly.list_del_anom_id == nil then
-			ogse_anomaly.list_del_anom_id = {}
-		end	
-		ogse_anomaly.list_del_anom_id[sobj.id] = sobj.id
-		ogse_anomaly.soft_restr_reset()	
-		alife():release(sobj , true)
-		ogse_anomaly.emergency_restr_reset()
+		checker_minefield.release_restrictor(sobj.id)
     end
 end
 
@@ -3506,15 +3494,9 @@ function strange_zone1particle_spawn()
 end
 
 function strange_zone1particle_delete()
-    local obj = alife():story_object(story_ids.strange_zone_1_particle)
-    if obj then
-		if ogse_anomaly.list_del_anom_id == nil then
-			ogse_anomaly.list_del_anom_id = {}
-		end	
-		ogse_anomaly.list_del_anom_id[obj.id] = obj.id
-		ogse_anomaly.soft_restr_reset()	
-		alife():release(obj)
-		ogse_anomaly.emergency_restr_reset()
+    local sobj = alife():story_object(story_ids.strange_zone_1_particle)
+    if sobj then
+		checker_minefield.release_restrictor(sobj.id)
     end
 end
 

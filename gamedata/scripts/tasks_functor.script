@@ -3279,20 +3279,14 @@ function delete_when_offline:save(packet)
 end
 
 function delete_when_offline:action()
-	local s_npc = alife():object(self.npc_id)
-	if s_npc then 
-		local sect = s_npc:section_name()
+	local sobj = alife():object(self.npc_id)
+	if sobj then 
+		local sect = sobj:section_name()
 		if string.find(sect, "restrictor") or string.find(sect, "zone") then
-			if ogse_anomaly.list_del_anom_id == nil then
-				ogse_anomaly.list_del_anom_id = {}
-			end
-			ogse_anomaly.list_del_anom_id[s_npc.id] = s_npc.id
-			ogse_anomaly.soft_restr_reset()
-			alife():release(s_npc, true)	
-			ogse_anomaly.emergency_restr_reset()
+			checker_minefield.release_restrictor(sobj.id)
 		else
-			alife():release(s_npc, true) 
-		end		
+			alife():release(sobj, true) 
+		end
 	end
 end
 
@@ -3729,8 +3723,6 @@ end
 function question_of_immortality_fisrt_part_delete_firefly_trash()
 	local enquee_anom_to_delete = function(anom_id)
 		ogse_anomaly.set_anomaly_mode(anom_id, "anom_off")
-		ogse_anomaly.remove_anomaly(anom_id)
-		ogse_anomaly.delete_anom(level.name(), anom_id)
 	end
 
 	local green_id = xs_stor.get("green_anomaly_id", -1)

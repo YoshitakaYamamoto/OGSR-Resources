@@ -1,5 +1,5 @@
---KRodin: ������ ���� ������ �� ����� � ����� �������� ���������.
---������ ������ ����� ������ ��� ����������� �������� ������ ��������
+--KRodin: теперь этот скрипт не имеет к минам никакого отношения.
+--Теперь скрипт нужен только для безопасного удаления всяких объектов
 
 local to_delete = {}
 
@@ -43,4 +43,104 @@ end
 
 function check_del_mines_timer:update()
   delete_mines()
+end
+
+--*****************************************************************************************
+--KRodin: средство безопасного удаления всяких рестрикторов, в т.ч. подходит для аномалий.
+local SomeRestrictions_tbl = {
+	[clsid.level_changer] = true,
+	[clsid.smart_terrain] = true,
+	[clsid.space_restrictor] = true,
+	[clsid.script_zone] = true,
+	[clsid.smart_zone] = true,
+	[clsid.respawn] = true,
+	[clsid.zone] = true,
+	[clsid.script_restr] = true,
+	[clsid.obj_climable] = true,
+}
+
+local to_delete_restrs = {}
+function release_restrictor(id)
+	local sobj = alife():object(id)
+	if not sobj then return end
+
+	if IsAnomaly(sobj) and not ogse_anomaly.not_anomal_zones[sobj:section_name()] then --С аномалиями разберется менеджер аномалий.
+		ogse_anomaly.set_anomaly_mode(id, "anom_off")
+	elseif not IsAnomaly(sobj) and not SomeRestrictions_tbl[sobj:clsid()] then --И такое бывает
+		alife():release(sobj, true)
+	elseif not to_delete_restrs[id] then
+		to_delete_restrs[id] = id
+		run_del_restrs_timer()
+	end
+end
+
+function delete_restrs()
+	local sim = alife()
+	--
+	for i=1, 65534 do
+		local sobj = sim:object(i)
+		if sobj then
+			local pk
+			if IsStalker(sobj) then
+				pk = xs_netpk.stalker(sobj)
+			elseif IsMonster(sobj) then
+				pk = xs_netpk.monster(sobj)
+			end
+			if pk then
+				ASSERT(pk:isOk(), "It is not stalker and not monster: [%s]", sobj:name())
+				local data = pk:get()
+				for _, anom_id in pairs(data.dynamic_in_restrictions) do
+					if to_delete_restrs[anom_id] then
+						log3("~~[%s] Removing in restriction [%s] from [%s]", script_name(), anom_id, sobj:name())
+						sim:remove_in_restriction(sobj, anom_id)
+						log3("~~[%s] Removed in restriction [%s] from [%s]", script_name(), anom_id, sobj:name())
+					end
+				end
+--[=[ --KRodin: Вроде бы это не нужно.
+				for _, anom_id in pairs(data.dynamic_out_restrictions) do --Может это и не нужно, но пусть на всякий случай будет.
+					if to_delete_restrs[anom_id] then
+						log3("~~[%s.get_lists] Removing out restriction [%s] from [%s]", script_name(), anom_id, sobj:name())
+						sim:remove_out_restriction(sobj, anom_id)
+						log3("~~[%s.get_lists] Removed out restriction [%s] from [%s]", script_name(), anom_id, sobj:name())
+					end
+				end
+--]=]
+			end
+		end
+	end
+	--
+	for k, v in pairs(to_delete_restrs) do 
+		local restr_sobj = sim:object(v)
+		if not restr_sobj then
+			log3("!!RESTRICTOR WITH ID [%s] NOT FOUND!", v)
+		else
+			log3("~~[%s] Releasing restrictor [%s]", script_name(), restr_sobj:name())
+			sim:release(restr_sobj, true)
+			to_delete_restrs[k] = nil
+			log3("--[%s] Restrictor released!", script_name())
+		end
+	end
+end
+
+local del_restrs_t
+function run_del_restrs_timer()
+  if not del_restrs_t then
+    del_restrs_t = check_del_restrs_timer():start()
+  end
+end
+
+class "check_del_restrs_timer" ( ogse_qt.quick_timer )
+function check_del_restrs_timer:__init() super()
+end
+
+function check_del_restrs_timer:condition()
+  return next(to_delete_restrs) == nil
+end
+
+function check_del_restrs_timer:action()
+  del_restrs_t = nil
+end
+
+function check_del_restrs_timer:update()
+  delete_restrs()
 end

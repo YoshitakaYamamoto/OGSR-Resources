@@ -478,27 +478,10 @@ function delete_dead_zone()
 	level.add_pp_effector ("teleport.ppe", 2006, false)
 	local dead_zone_id = xs_stor.get("dead_zone_id", nil)
 	if dead_zone_id then
-		for k,v in pairs(dead_zone_id) do
-			local obj = alife():object(v)
-			if obj then
-				if ogse_anomaly.list_del_anom_id == nil then
-					ogse_anomaly.list_del_anom_id = {}
-				end
-				ogse_anomaly.list_del_anom_id[v] = v
-			end
-		end		
-	end
-	ogse_anomaly.soft_restr_reset()	
-	if dead_zone_id then
-		for k,v in pairs(dead_zone_id) do
-			local obj = alife():object(v)
-			if obj then
-				alife():release(obj, true) 
-			end
+		for _, id in pairs(dead_zone_id) do
+			checker_minefield.release_restrictor(id)
 		end
-		-- проверка валидности удаления телепортов
 	end
-	ogse_anomaly.emergency_restr_reset()
 	xs_stor.set("dead_zone_id", nil)
 end
 
@@ -554,21 +537,9 @@ function spawn_case_with_art()
 	-- Удаляем арт, зону, кейс, спавним кейс с артефактом
 	local table_id = xs_stor.get("ogse_teleport_art_id", nil)
 	if table_id then
-		if table_id.sr then
-			if ogse_anomaly.list_del_anom_id == nil then
-				ogse_anomaly.list_del_anom_id = {}
-			end
-			ogse_anomaly.list_del_anom_id[table_id.sr] = table_id.sr 
+		for _, id in pairs(table_id) do
+			checker_minefield.release_restrictor(id)
 		end
-		ogse_anomaly.soft_restr_reset()	
-		for k,v in pairs(table_id) do
-			write_log(v)
-			local obj = alife():object(v)
-			if obj then	
-				alife():release(obj, true) 	
-			end
-		end
-		ogse_anomaly.emergency_restr_reset()
 	else write_log("table_id not found!")
 	end
 	xs_stor.set("ogse_teleport_art_id", nil)
