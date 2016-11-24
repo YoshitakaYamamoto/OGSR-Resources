@@ -130,7 +130,7 @@ function signals_mgr:__init( name, modules_list, scan_for_autoattaching_modules 
         local slot = self.slots_in_process[ i ]
         log3( "[%s]: signal on top №%s: [%s], script_name = [%s]", script_name(), i, slot.signal, slot.script_name )
       end
-      abort( "Signal manager [%s] crushed:\nOne of the calls hung! See stack dump for details.", mgr_name ) -- RIP
+      abort( "Signal manager [%s] crushed:\nOne of the calls hung! See stack dump for details.", self.mgr_name ) -- RIP
     end
   end
   level.add_call( hanged_calls_check, function() end ) -- сторожевой таймер
