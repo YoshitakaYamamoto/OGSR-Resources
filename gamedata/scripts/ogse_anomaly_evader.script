@@ -9,8 +9,8 @@
 local monsters_too = false --Включить монстрам обход аномалий?
 local freq = 1000 --Как часто выполнять апдейт обхода аномалий (в мс)
 
-added_restrictions = {}
-last_position      = {}
+local added_restrictions = {}
+last_position = {}
 
 
 local excluded_npc = { --Запретные профили/имена/story_id
@@ -39,13 +39,12 @@ local excluded_locations = { --Запретные локации
 
 
 function attach( sm )
-	sm:subscribe({ signal = "on_after_blowout",		fun = this.on_after_blowout })
 	sm:subscribe({ signal = "on_npc_death",			fun = this.on_death })
-	sm:subscribe({ signal = "on_npc_net_destroy",	fun = this.on_destroy })
+	sm:subscribe({ signal = "on_npc_net_destroy",	fun = this.cleanup })
 	sm:subscribe({ signal = "on_npc_spawn",			fun = this.on_npc_spawn })
 	if monsters_too then
 		sm:subscribe({ signal = "on_monster_death",			fun = this.on_death })
-		sm:subscribe({ signal = "on_monster_net_destroy",	fun = this.on_destroy })
+		sm:subscribe({ signal = "on_monster_net_destroy",	fun = this.cleanup })
 		sm:subscribe({ signal = "on_monster_spawn",			fun = this.on_monster_spawn })
 	end
 end
@@ -69,13 +68,8 @@ function can_evade(npc)
   return true
 end
 
-function on_after_blowout()
-  last_position = {}
-end
-
 function on_monster_spawn( obj, binder )
-  added_restrictions[ obj:id() ] = nil
-  last_position[ obj:id()      ] = nil
+  added_restrictions[ obj:id() ] = {}
 
   if not can_evade(obj) then return end
   local s = {
@@ -88,8 +82,7 @@ function on_monster_spawn( obj, binder )
 end
 
 function on_npc_spawn( obj, binder )
-  added_restrictions[ obj:id() ] = nil
-  last_position[ obj:id()      ] = nil
+  added_restrictions[ obj:id() ] = {}
 
   if not can_evade(obj) then return end
   local s = {
@@ -111,50 +104,10 @@ function on_death( obj )
   cleanup( obj )
 end
 
-function on_destroy( obj )
-  cleanup( obj )
-end
-
-function remove_restriction(npc, anomid)
-	if
-	  not npc
-	  or not anomid
-	  or isIndoor(level.name())
-	then
-	  return
-	end
-
-	local obj = level.object_by_id(anomid)
-	local anom_sect = ""
-	if obj then
-		anom_sect = obj:section()
-		if ogse_anomaly.chek_exclusion_anomaly(anomid) and not string.find(anom_sect, "handmade_") then
-			obj:disable_anomaly()
-		end
-	else
-		obj = alife():object(anomid)
-		if obj then
-			anom_sect = obj:section_name()
-		end
-	end
-	if anom_sect == "" then return end -- вообще нет объекта аномалии - ничего не поделать. Рестрикторы такого непися будут очищены на первом апдейте актора.
-	local npc_id = npc:id()
-	if ogse_anomaly.chek_exclusion_anomaly(anomid) and not string.find(anom_sect, "handmade_") then
-		ogse_anomaly.set_anomaly_mode(anomid, "anom_off")
-		ogse_anomaly.remove_anomaly(anomid)	
-		ogse_anomaly.delete_anom(level.name(), anomid)
-	end
-	if added_restrictions[npc_id] and added_restrictions[npc_id][anomid] then
-		added_restrictions[npc_id][anomid] = nil
-		log3("[ANOMALY EVADER] REMOVING IN RESTRICTION FOR [%s]: [%s]", npc:name(), obj:name())
-		npc:remove_restrictions("", obj:name())
-	end
-end
-
 function cleanup( obj )
 	local nid   = obj:id()
 	local anoms = added_restrictions[nid]
-	if anoms then
+	if anoms and next(anoms) then
 		local restrs = {}
 		for k, v in pairs(anoms) do
 			local sobj = alife():object(k)
@@ -168,9 +121,9 @@ function cleanup( obj )
 			ASSERT( s:len() < 4096, "too long: %s", s:len() )
 			obj:remove_restrictions( "", s )
 		end
-		added_restrictions[nid] = nil
-		last_position[nid]      = nil
 	end
+	added_restrictions[nid] = nil
+	last_position[nid]      = nil
 end
 
 function update_norm(npc)
@@ -188,14 +141,11 @@ function update_norm(npc)
     last_position[ npc:id() ] = curr_pos
   end
 
-  if not added_restrictions[ npc:id() ] then
-    added_restrictions[ npc:id() ] = {}
-  end
   local restr = {}
   for a, b in pairs(ogse_anomaly.get_all_nearest_anomalies_by_point_in_radius( npc:position(), 30 )) do
     local obj = level.object_by_id( a )
-    if obj and ogse_anomaly.get_anomaly_mode( a ) ~= "anom_off" then
-      local ignore    = false
+    if obj then
+      local ignore = false
       for k, v in pairs( excluded_sect ) do
         if string.find( b.sect, k ) then
           ignore = true

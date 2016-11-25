@@ -101,20 +101,20 @@ function move_mgr:initialize(npc)
 	self.object:set_callback(callback.patrol_path_in_point, self.waypoint_callback, self)
 end
 --' Удостоверяется, что пути и флажки на них проставлены корректно
-function move_mgr:validate_paths()
-	if self.no_validation then
-		return
-	end
-	local patrol_walk_count = self.patrol_walk:count()
-	if patrol_walk_count == 1 then
-		if self.path_walk_info[0].flags:get() == 0 then
+--function move_mgr:validate_paths()
+	--if self.no_validation then
+	--	return
+	--end
+	--local patrol_walk_count = self.patrol_walk:count()
+	--if patrol_walk_count == 1 then
+		--if self.path_walk_info[0].flags:get() == 0 then
 			--' Временно затыкаем, чтобы не срабатывало для пути атаки
 			--' наёмников на сталкеров возле армейских складов.
 --			abort("object '%s': path_walk '%s' has 1 waypoint, but has no flags",
 --				self.object:name(), self.path_walk)
-		end
-	end
-end
+		--end
+	--end
+--end
 
 function move_mgr:extrapolate_callback(npc)
 	self.can_use_get_current_point_index = true
@@ -220,7 +220,7 @@ function move_mgr:reset(path_walk, path_walk_info, path_look, path_look_info, te
 		self.path_look = path_look
 		self.path_look_info = path_look_info
 
-		self:validate_paths()
+		--self:validate_paths()
 
 		self.at_terminal_waypoint_flag = false
 
@@ -263,22 +263,24 @@ function validate_accessibility(npc,ppname)
 	pp_validated[ppname] = false
 	local pp = patrol(ppname)
 	if pp then
-		--log3("[%s] validating [%s] for [%s]", script_name(), ppname, npc:name())
-		for i=0,pp:count()-1 do
-			local nearest_anoms = ogse_anomaly.get_all_nearest_anomalies_by_point(pp:point(i))
-			if nearest_anoms ~= {} then
-				for k, v in pairs(nearest_anoms) do
-					if ogse_anomaly.get_anomaly_mode(k) ~= "anom_off" and v.dist <= (v.radius+2) and not string.find(npc:name(), "dik_the_drifter") then -- для дика не производим валидацию
-						--log3("~~[%s] found anomaly [%s] on point [%s] for [%s]", script_name(), v.sect, ppname, npc:name())
-						ogse_anomaly_evader.remove_restriction(npc, k)
-						--log3("--[%s] removed anomaly [%s] on point [%s] for [%s]", script_name(), v.sect, ppname, npc:name())
-					end					
+		if not isIndoor(level.name()) then
+			log3("[%s] validating [%s] for [%s]. Count: [%s]", script_name(), ppname, npc:name(), pp:count())
+			for i=0, pp:count()-1 do
+				local nearest_anoms = ogse_anomaly.get_all_nearest_anomalies_by_point_in_radius(pp:point(i), 2)
+				for id, anom in pairs(nearest_anoms) do
+					log3("~~[%s] found anomaly [%s] on point [%s] for [%s]", script_name(), anom.sect, ppname, npc:name())
+					local sobj = alife():object(id)
+					--ASSERT(sobj, "Can't find object with id [%s]", id)
+					if not ogse_anomaly.is_exclusion_anomaly(sobj) and not string.find(sobj:section_name(), "handmade_") then
+						ogse_anomaly.set_anomaly_mode(id, "anom_off")
+					end
+					log3("--[%s] removed anomaly [%s] on point [%s] for [%s]", script_name(), anom.sect, ppname, npc:name())
 				end
 			end
 		end
 
 		local level_vertexes = ogse.level_vertexes[ level.name() ]
-		for i=0,pp:count()-1 do
+		for i=0, pp:count()-1 do
 			--log3("~~[%s] verifying point [%s] on path [%s] VTX [%s] for [%s]", script_name(), i, ppname, pp:level_vertex_id(i), npc:name())
 			if not npc:accessible(pp:level_vertex_id(i)) then
 				--log1("!!MOVE_MGR verifying point end")

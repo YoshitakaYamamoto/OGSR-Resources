@@ -803,8 +803,7 @@ function companion_start_following(npc, actor)
 		xr_companion.subscribe(npc:id())
 		
 		npc:remove_all_restrictions() --Удалять все рестрикшены необходимо именно здесь!
-		ogse_anomaly_evader.added_restrictions[ npc:id() ] = nil --Сразу же переустанавливаем рестрикшены обхода аномалий
-		ogse_anomaly_evader.last_position[ npc:id() ] = nil --Тоже самое
+		ogse_anomaly_evader.last_position[ npc:id() ] = nil --Сразу же переустанавливаем рестрикшены обхода аномалий
 	end	
 end
 
