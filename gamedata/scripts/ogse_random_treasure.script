@@ -279,17 +279,6 @@ function random_treasure:get_mas(sec1, sec2)
 	return tbl	
 end
 
--- Функция получения массива из string'а из system_ini()
-function random_treasure:get_mas_ini(sec1, sec2)
-	local tbl = {}
-	local list = sys_ini:r_string(sec1, sec2) -- где,что
-	local num = nil
-	
-	if sys_ini:r_string(sec1,sec2) then for num in string.gfind(list,"([%w_%-.\\]+)%p*") do table.insert(tbl, num) end end 
-	
-	return tbl
-end
-
 -- Функция получения предмета для тайника
 function random_treasure:get_item(item)
 	local time_array = {}
@@ -347,9 +336,7 @@ function random_treasure:get_addon_to_weapon()
 end
 
 function random_treasure:get_ammo_to_weapon()
-	local weapon = self.current_reward[1].section
-	local ammo_list = self:get_mas_ini(weapon, "ammo_class")
-
+	local ammo_list = get_names(self.current_reward[1].section, "ammo_class")
 	return ammo_list[math.random(#ammo_list)]
 end
 
