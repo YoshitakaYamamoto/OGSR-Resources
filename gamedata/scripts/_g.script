@@ -246,8 +246,24 @@ function validate_enemy_object( enemy )
   end
 end
 
-
 ----------------------------------------------------------------------
+function action(obj, ...) --Как выяснилось, оно таки используется. По крайней мере, в mob_walker.script
+	local args = {...}
+	local act = entity_action()
+	for i=1, #args do
+		if args[i] ~= nil then
+			act:set_action(args[i])
+		--else
+		--	break
+		end
+    end
+    if obj ~= nil then
+        obj:command(act, false)
+    end
+    return entity_action(act)
+end
+----------------------------------------------------------------------
+
 if not time_global then
 	time_global = function() return device():time_global() end
 end
