@@ -218,7 +218,7 @@ end
 function additional_spawn:proceed_npc_spawn(section, count)
 for ind = 1, count do
 
-	local pos, new_lv, new_gv = ogse_anomaly.anomaly_position_choice(level.name(), false)
+	local pos, new_lv, new_gv = ogse_anomaly.anomaly_position_choice(level.name(), false) --KRodin!!! ‚от это теперь может здесь работать не так, как задумывали.
 
     local community = get_string(section, "community", "nil")
     local rank = get_string(section, "spec_rank", "nil")

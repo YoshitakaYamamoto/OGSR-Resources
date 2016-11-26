@@ -609,8 +609,6 @@ function motivator_binder:death_callback(victim, who)
 
 	xr_statistic.addKillCount(who, self.object) --Добавление опыта за убийство
 
-	ogse_death_artefact.on_death(self.object, who) --Проверка на аномалии
-
 	local community = self.object:character_community()
 	if not (
 		community == "zombied"

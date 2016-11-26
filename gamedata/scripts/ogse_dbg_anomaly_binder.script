@@ -52,11 +52,16 @@ function anomaly_binder:subscribe()
 end
 
 function anomaly_binder:net_spawn(data)
+	if not object_binder.net_spawn( self, data ) then
+		return false
+	end
+
 	local id = self.object:id()
-	local srv_obj = alife():object(id)
-	if srv_obj then
-		ogse_anomaly.get_anom(srv_obj)
-		--log3("anomaly_binder:net_spawn_register [%s]", self.object:name())
+	local status = ogse_anomaly.get_anomaly_mode( alife():object(id) )
+	if status == "anom_off" then
+		--log3("~~[%s] Disabling anomaly: [%s]", script_name(), self.object:name())
+		self.object:disable_anomaly()
+		return true --думаю, больше тут делать нечего.
 	end
 
 	if radzone_sect[self.object:section()] then
@@ -66,6 +71,8 @@ function anomaly_binder:net_spawn(data)
 			subscribed_anoms[id] = false
 		end
 	end
+
+	self.sm:call( "on_anomaly_spawn", self.object, self )
 	return true
 end
 
@@ -144,12 +151,13 @@ function get_max_radlevel()
 	return radlevel
 end
 
---function anomaly_binder:update()
---end
-
 function anomaly_binder:net_destroy()
 	if radzone_sect[self.object:section()] then
 		self:unsubscribe()
 		subscribed_anoms[self.object:id()] = nil
 	end
+
+	self.sm:call( "on_anomaly_net_destroy", self.object, self )
+
+	object_binder.net_destroy( self )
 end

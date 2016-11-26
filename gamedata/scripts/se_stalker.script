@@ -212,12 +212,6 @@ function se_stalker:on_before_register()
 end
 --------------------
 function se_stalker:on_register()
-
-	-- К менеджеру аномалий не подключать!!! Оставлено для дальнейших разработок (Dusty79)
---	if ogse_anomaly then
---		ogse_anomaly.get_stalker(self.id)
---	end
-
 	--if debug_flag then
 		-- log1("se_stalker register start "..self:name())
 	--end

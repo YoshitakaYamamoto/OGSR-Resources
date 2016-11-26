@@ -411,8 +411,9 @@ end
 local last_beep = 0
 local function update_detector_sound(act_pos)
 	local hasanom, anomid, pos, cls, distance, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(act_pos)
+	if not hasanom then return end
 	local obj = level.object_by_id(anomid)
-	if hasanom and obj and ogse_anomaly.get_anomaly_mode(anomid) ~= "anom_off" and ogse_detectors_data.detectors_presets[last_detector_sect][sect_anom] then
+	if obj and ogse_detectors_data.detectors_presets[last_detector_sect][sect_anom] then
 		if distance <= detect_radius then
 			local tg = time_global()
 			if last_beep == 0 then
@@ -507,7 +508,7 @@ function on_update()
 		--
 		for id, anm in pairs(anm_table) do
 			local obj = level.object_by_id(id)
-			if obj and ogse_anomaly.get_anomaly_mode(id) ~= "anom_off" and not string.find(anm.sect, "nodetect") then
+			if obj and not string.find(anm.sect, "nodetect") then
 				--
 				if not anoms_to_show[id] then
 					add_mark_on_minimap(id, anm.sect) --Установили метку на миникарте

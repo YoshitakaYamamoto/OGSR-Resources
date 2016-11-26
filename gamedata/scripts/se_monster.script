@@ -176,12 +176,6 @@ function se_monster:on_before_register()
 end
 --------------------
 function se_monster:on_register()
-
--- К менеджеру аномалий не подключать!!! Оставлено для дальнейших разработок (Dusty79)
---	if ogse_anomaly then
---		ogse_anomaly.get_mob(self.id)
---	end
-
 	cse_alife_monster_base.on_register( self )
 
 	--'self:fill_exclusives()

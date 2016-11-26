@@ -1,5 +1,14 @@
-------- Рождение артефактов при смерти монстров/неписей в аномалиях ------------
+------- Р РѕР¶РґРµРЅРёРµ Р°СЂС‚РµС„Р°РєС‚РѕРІ РїСЂРё СЃРјРµСЂС‚Рё РјРѕРЅСЃС‚СЂРѕРІ/РЅРµРїРёСЃРµР№ РІ Р°РЅРѕРјР°Р»РёСЏС… ------------
 -------------------- Copyright 2009-2014 KamikaZze, Dusty79 --------------------
+
+function attach( sm )
+	sm:subscribe({ signal = "on_monster_death", fun = this.on_death })
+	sm:subscribe({ signal = "on_npc_death", fun = this.on_death })
+end
+
+function on_death(victim)
+	spawn_art(victim:position())
+end
 
 
 local sect_particles = {
@@ -15,168 +24,37 @@ local sect_particles = {
 	["zone_zharka_static"]		= "ogse\\zharka_art",
 }
 
-function isGameObject(obj)
-	local bResult = false
-	if (obj and obj.fov) then
-		bResult = true
-	end
-	return bResult
-end
-
-function get_obj(id)
-	local m_obj = nil
-	if (id) then
-		m_obj = level.object_by_id(id)
-	end
-	return m_obj
-end
-
-local victim_pos = nil
---------------------------------
---' Основной обработчик
---------------------------------
-function on_death(victim, killer)
-	if victim then
-		local m_obj
-		if (isGameObject(victim)) then
-			m_obj = victim
-			--log1("ARTF_D A")
-			victim_pos = level.object_by_id(victim:id()):position()
-		else
-			m_obj = get_obj(victim.id)	
-			--log1("ARTF_D B")
-			victim_pos = level.object_by_id(victim.id):position()		
-		end
-		if (m_obj) then
-			spawn_art(victim)
-		end
-	end
-end
---------------------------------------------------
---' Рожание артефактов
---------------------------------------------------
-local basic_offset = 3
-local hvatalka_offset = 5
-
-function spawn_art(killer_)
-	local killer
-	if (killer_) then
-		if (isGameObject(killer_)) then
-			killer = killer_
-		else
-			killer = get_obj(killer_.id)
-		end
-		if killer then
-			local hasanom,anomid,pos,cls,dist,radius=ogse_anomaly.get_nearest_anomaly_by_point(killer:position())
-			if hasanom then
-				--log1("ARTF_D 0")
-				local obj = alife():object(anomid)
-				if obj then
-					local anom_sect = obj:section_name()
-					if string.find(anom_sect, "handmade_") then return end
-					local status = ogse_anomaly.get_anomaly_mode(anomid)
-					if status == "anom_off" then return end
-					local noart_chk = string.find(anom_sect, "noartf_", 1, true)
-					if noart_chk then
-						anom_sect = string.sub(anom_sect,(noart_chk +7),string.len(anom_sect))
-						anom_sect = "zone_"..anom_sect
-						-- log1("Секция аномалии "..anom_sect)
-						-- log1("Обнаружена динамическая аномалия - восстанавливаем родной класс: "..tostring(anom_sect))
-					end
-					local offset = basic_offset
-					if string.find(anom_sect, "hvatalka") then
-						offset = hvatalka_offset
-					end					
-					if victim_pos and victim_pos:distance_to(pos) <= radius+offset then
-						-- log1("Обнаружена смерть существа в аномалии, будет произведен спавн если успешно выбросим рандом.")
-						local rand_chk = utils.cfg_get_number(sys_ini, anom_sect, "artefact_spawn_rnd", obj, false, 40)
-						local rnd_1 = math.random(70)
-						-- log1("Извлекаем из конфига аномалии контроль. Рандом должен быть меньше или равен: "..tostring(rand_chk))
-						-- log1("Выбрасываем рандом. Получено значение: "..tostring(rnd_1))
-						if rand_chk >= rnd_1 then
-							-- log1("Проверка прошла успешно. Обрабатываем список артефактов.")
-							local art_section = parse_string_arts(anom_sect)
-							if art_section then
-								local lv, gv = obj.m_level_vertex_id, obj.m_game_vertex_id
-								if lv then
-									local spawn_pos = level.vertex_position(lv)
-									spawn_pos.y = spawn_pos.y + 3
-									spawn_obj = alife():create(tostring(art_section), spawn_pos, lv, gv)
-									local particle_fx = nil
-									for k, v in pairs(sect_particles) do
-										if string.find(anom_sect, k) then
-											particle_fx = v
-											break
-										end									
-									end	
-									if particle_fx ~= nil then
-										local part_pos = level.vertex_position(lv)
-										local particle_obj = particles_object(particle_fx)
-										particle_obj:play_at_pos(part_pos)										
-									end
-									-- log1("Создан артефакт: "..tostring(art_section))
-								end
-							end
-							victim_pos = nil
+function spawn_art(position)
+	local hasanom, anomid, pos, cls, dist, radius, anom_sect = ogse_anomaly.get_nearest_anomaly_by_point(position)
+	if hasanom then
+		local obj = level.object_by_id(anomid)
+		if obj then
+			if obj:inside(position) then --РўСЂСѓРї Р»РµР¶РёС‚ РІРЅСѓС‚СЂРё Р°РЅРѕРјР°Р»РёРё
+				--log3("--[%s] object [%s] inside position!", script_name(), obj:name())
+				--if get_u32(anom_sect, "artefact_spawn_rnd", 40) >= math.random(70) then --Р’РѕС‚ СЌС‚Рѕ, РјРЅРµ РєР°Р¶РµС‚СЃСЏ, Р»РёС€РЅРµРµ. Р’ Р°РЅРѕРјР°Р»РёРё Рё С‚Р°Рє СЂРµРґРєРѕ РєС‚Рѕ РїРѕРїР°РґР°РµС‚.
+					local art_section = ogse_anomaly.parse_string_arts(anom_sect)
+					if art_section then
+						local lv, gv = obj:level_vertex_id(), obj:game_vertex_id()
+						local spawn_pos = level.vertex_position(lv)
+						spawn_pos.y = spawn_pos.y + 3
+						local art_sobj = alife():create(art_section, spawn_pos, lv, gv)
+						--log3("--[%s] art [%s] spawned in death in anomaly!!!", script_name(), art_section)
+						--level_tasks.add_location_by_id(art_sobj.id, "red_location", "Art spawned in death in anomaly: ["..art_section.."]") --DEBUG!!!
+						--
+						local particle_fx
+						for k, v in pairs(sect_particles) do
+							if string.find(anom_sect, k) then
+								particle_fx = v
+								break
+							end									
+						end	
+						if particle_fx then
+							local particle_obj = particles_object(particle_fx)
+							particle_obj:play_at_pos(spawn_pos)										
 						end
 					end
-				end
+				--end
 			end
 		end
 	end
 end
---------------------------------------------------
---' Эта функция парсит строку из конфига артов
---' аномалии и выбирает какой арт спавнить
---------------------------------------------------
-function parse_string_arts(obj_sect)
--- arts_table
-local arts_table = {}
-if not sys_ini:section_exist(obj_sect) then 
-	log1("АНОМАЛИЯ С ТАКОЙ СЕКЦИЕЙ НЕ ОБНАРУЖЕНА "..tostring(obj_sect)) 
-return nil end
-local line = sys_ini:r_string(obj_sect,"artefacts")
-
-	if line then
-		for key, value, dec in string.gfind( line, "%s*([%w_%-.\\]+)%s*,%s*(%d).(%d)%s*" ) do
-			local artefact = {art = key, val = tonumber(tostring(value).."."..tostring(dec)) }
-			table.insert(arts_table, artefact)
-		end
-	end
-	
-	local spawn_choose = math.random()
-	-- log1("Выбрасываем значение рандома для спавна артефактов: "..tostring(spawn_choose))
-	local low_level = 0.0
-	local art_to_spawn = nil
-	
-	table.sort(arts_table,function(a,b) return a.val < b.val end)
-	
-	-- -- for debug only
-		-- log1("Список артефактов с пороговыми величинами: ")
-		-- for key, value in pairs(arts_table) do
-			-- log1(tostring(value.art).."="..tostring(value.val))
-		-- end	
-	-- -- for debug only	
-	
-	for key, value in pairs(arts_table) do
-		if spawn_choose < value.val and spawn_choose >= low_level then
-			art_to_spawn = value.art
-		end
-		low_level = value.val
-	end		
-	
-	if art_to_spawn == nil then
-		-- log1("Выброшенное значение за порогом величин списка. Артефакт не спавнится.")
-	else
-		-- log1("Будем спавнить артефакт "..tostring(art_to_spawn))
-	end
-	return art_to_spawn
-end
-
-
---([%w_%-.\\]+)%p*
---string.gfind( s, "%s*(%a+)%s*,%s*(%a+)%s*" )
---artefacts		= af_vyvert,0.7, af_gravi, 0.4, af_gold_fish, 0.2
-
-------- Рождение артефактов при смерти монстров/неписей в аномалиях ------------
--------------------- Copyright 2009 KamikaZze, Dusty79 -------------------------

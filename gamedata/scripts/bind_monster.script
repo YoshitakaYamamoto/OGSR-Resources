@@ -1,8 +1,6 @@
------------------------------------------------------------------------------------
--- Monster binding
------------------------------------------------------------------------------------
-local debug_flag = false
-
+--------------------
+--Monster binding
+--------------------
 function bind(obj)
 	local new_binder = generic_object_binder(obj)
 	obj:bind_object(new_binder)
@@ -42,6 +40,7 @@ log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name
 log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
+local debug_flag = false
 function generic_object_binder:net_spawn(sobject)
 --log3("~~[%s] Start net_spawn [%s]", script_name(), self.object and self.object:name() or "nil")
 	if not object_binder.net_spawn(self, sobject) then return false end
@@ -191,9 +190,6 @@ function generic_object_binder:death_callback(victim, who)
 	end
 
 	smart_terrain.on_death( self.object:id() )
-
-	--проверка на аномалии  
-	ogse_death_artefact.on_death(self.object, who)
 
 	--' Наносим небольшой импульс вперед.
 	local h = hit()

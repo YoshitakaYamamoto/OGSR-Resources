@@ -64,7 +64,7 @@ function release_restrictor(id)
 	local sobj = alife():object(id)
 	if not sobj then return end
 
-	if IsAnomaly(sobj) and not ogse_anomaly.not_anomal_zones[sobj:section_name()] then --С аномалиями разберется менеджер аномалий.
+	if IsAnomaly(sobj) and not ogse_anomaly.is_not_anomaly(sobj) then --С аномалиями разберется менеджер аномалий.
 		ogse_anomaly.set_anomaly_mode(id, "anom_off")
 	elseif not IsAnomaly(sobj) and not SomeRestrictions_tbl[sobj:clsid()] then --И такое бывает
 		alife():release(sobj, true)
