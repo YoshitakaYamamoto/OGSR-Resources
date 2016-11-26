@@ -1,14 +1,13 @@
 
 function attach(sm)
-	sm:subscribe({ signal = "on_first_update", fun = this.on_first_update })
+	sm:subscribe({ signal = "on_spawn", fun = this.on_spawn })
+	sm:subscribe({ signal = "on_first_update", fun = this.aem_fix }) --Удалить по окончании игры нахер! С НИ ЭТО НЕ НУЖНО!
 end
 
-function on_first_update()
+function on_spawn()
 	del_buggy_objects()
 	del_buggy_mapspots()
 
-	aem_fix() --Удалить по окончании игры нахер! С НИ ЭТО НЕ НУЖНО!
-	
 	lc_question_add()
 end
 
@@ -29,7 +28,7 @@ function lc_question_add() --Переход "Припять - ЧАЭС" зада
 end
 
 
-function aem_fix() --Удалить по окончании игры нахер! С НИ ЭТО НЕ НУЖНО!
+function aem_fix()
 	if not ogse.var_exists("AEM_FIX") then
 		for k, v in pairs( db.storage[db.actor:id()].pstor ) do
 			if string.find(k, "aem") then
@@ -87,7 +86,7 @@ function del_buggy_objects() --Удаление из игры глючных о�
 	end
 end
 
-function del_buggy_mapspots() --Удаление глючных меток с карты, и не только...
+function del_buggy_mapspots() --Удаление глючных меток с карты.
 	if has_alife_info("agr_find_gunslinger_cache_final")
 	and level_tasks.is_map_spot_present(story_ids.agr_zaz, "green_location") then
 		level_tasks.remove_location_by_sid(story_ids.agr_zaz, "green_location") --Глючная метка "Выбраться из подземелья" на Агро.
@@ -107,10 +106,6 @@ function del_buggy_mapspots() --Удаление глючных меток с к
 	if has_alife_info("mil_max_job_complete")
 	and level_tasks.is_map_spot_present(story_ids.Mil_Master_Max, "blue_location") then
 		level_tasks.remove_location_by_sid(story_ids.Mil_Master_Max, "blue_location") --Вечная метка "Отдать флэшку Максу" на АС
-	end
-	if has_alife_info("btr_own_freedom")
-	and db.actor:object("quest_btr_keys") then
-		ogse.remove_inv_items_by_section("quest_btr_keys", 1) --удаляем ключ от БТРа из инвентаря актора (который почему-то вовремя не удалился)
 	end
 	if has_alife_info("pri_stadium_reached")
 	and level_tasks.is_map_spot_present(story_ids.pri_stadium_entrance, "green_location") then
