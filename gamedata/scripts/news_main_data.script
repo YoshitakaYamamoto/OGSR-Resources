@@ -57,7 +57,7 @@ function show_news_main()
 		prob7,
 		prob10
 		}
-	elseif db.FlagEsc == 1 then
+	elseif ogse_surge_mgr.actor_in_hideout then
 		ft = { 
 		prob1,
 		prob7,

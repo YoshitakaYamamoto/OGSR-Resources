@@ -1583,10 +1583,7 @@ function aem_extro(actor, npc, p)
 end
 
 function aem_check_blow()
-	if db.Flag2==1 then
-		return true
-	end
-	return false
+	return ogse_surge_mgr.is_surge_started
 end
 
 function aem_evil()

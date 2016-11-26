@@ -253,8 +253,7 @@ function evaluator_blowout:evaluate()
 	end
 		
 	if not self.object:best_enemy() and 
-	   (db.Flag2==1 or scared[self.object:id()] == true) and db.Dead2==0 and 
---	   db.Flag2==1 and db.Dead2==0 and 
+	   (ogse_surge_mgr.is_surge_started or scared[self.object:id()] == true) and not ogse_surge_mgr.is_surge_raskolbas and 
 	   not (level.name()=="l11_pripyat" and self.object:character_community() == "monolith") and
 	   not ogse_hideouts.npc_inside_safe_zone(self.object) then
 		if debug_flag then log1("!!BLOW_UNSAFE "..self.object:name()) end
@@ -307,7 +306,7 @@ function evaluator_hideout:evaluate()
 		return false
 	end
 
-	if db.Dead2==1 and not ogse_hideouts.npc_inside_safe_zone(self.object) then
+	if ogse_surge_mgr.is_surge_raskolbas and not ogse_hideouts.npc_inside_safe_zone(self.object) then
 		if debug_flag then log1("!!BLOW_HIDEOUT_LOST "..self.object:name()) end
 		self.st.hideout_lost = true
 	else
@@ -345,8 +344,7 @@ function evaluator_inhide:evaluate()
 			return false
 		end
 	end
-	if (db.Flag2==1 or scared[self.object:id()] == true) and ogse_hideouts.npc_inside_safe_zone(self.object) then
---	if db.Flag2==1 and ogse_hideouts.npc_inside_safe_zone(self.object) then
+	if (ogse_surge_mgr.is_surge_started or scared[self.object:id()] == true) and ogse_hideouts.npc_inside_safe_zone(self.object) then
 		if debug_flag then log1("--BLOW_IN_HIDE "..self.object:name()) end
 		self.st.inhide = true
 	else

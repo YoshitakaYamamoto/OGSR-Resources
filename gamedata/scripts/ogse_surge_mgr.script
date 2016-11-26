@@ -1,14 +1,18 @@
--------------------------------------------------------------------------------
+----------------------------------
 --- ogse_surge_mgr.script
 --- Модуль выброса для OGSE
 --- (c) OGS Evolution Team, 2014
--------------------------------------------------------------------------------
+----------------------------------
 
 function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_first_update",    fun = this.on_first_update})
 	sm:subscribe({signal = "on_info",            fun = this.on_get_info})
 	sm:subscribe({signal = "on_spawn",           fun = this.on_actor_spawn})
 end
+
+actor_in_hideout = false --Находится ли актор в укрытии
+is_surge_started = false --Начался ли выброс
+is_surge_raskolbas = false --Находится ли выброс в смертельной стадии
 
 local debug_logging = get_console():get_bool("write_debug_log")
 local fsurgelog = nil
@@ -34,34 +38,9 @@ local base_surge_wait_time  = sys_ini:r_s32("options","t_surge") --36 --get_floa
 local surge_wait_time_disp  = 4  -- разброс времени ожидания, час.
 local surge_postpone_time   = 10 -- [час.], время откладывания выброса в случае невозможности его начать по сюжетным ограничениям
 
-local military_phantom_types = {
-	"phantom_krovosos_1",
-	"phantom_kontroler_1", 
-	"phantom_pseudodog_1", 
-	"phantom_psevdogigant_1", 
-	"phantom_chimera_1", 
-	"phantom_zombi_3", 
-	"boar_phantom_2", 
-	"zombie_phantom_2", 
-	"dog_phantom_2", 
-	"flesh_phantom_2"
-}
-	
-local escape_phantom_types = {
-	"phantom_flesh_1",
-	"phantom_mutant_boar_1", 
-	"phantom_dog_1", 
-	"phantom_cat_1", 
-	"phantom_tushkano_1", 
-	"phantom_zombi_3", 
-	"boar_phantom_2", 
-	"zombie_phantom_2", 
-	"dog_phantom_2", 
-	"flesh_phantom_2"
-}
-
 local lname
 local is_indoor = false
+local actor_was_hit = false
 
 function on_actor_spawn()
 	this.surge_db_init()
@@ -200,7 +179,7 @@ function surge_db_init()
 	}
 	surge_db.surge_process_stage_04 = {-- первые визуальные признаки выброса
 		on_info = {
-			call1 = ogse_anomaly.blow_flags, -- нужно делать без вариантов незаависимо от подземки
+			call1 = ogse_anomaly.blow_flags, -- нужно делать без вариантов независимо от подземки
 			if_surface = {Flag2 = 1,},
 			if_underground = {Flag2 = 0,},
 		},
@@ -448,14 +427,11 @@ function surge_db_init()
 end
 
 function on_surge_end()
-	ogse_anomaly.add_anom(level.name(), true)
-	ogse_anomaly.need_disable_anomaly = true
-
-	this.horror_and_arts()
-	move_mgr.invalidate_pp_accessibility()
+	actor_was_hit = false
 	db.actor:disable_info_portion("blowout")
 	db.actor:disable_info_portion("pre_blowout2")
-	db.actor:give_info_portion("net_signal") -- связь восстановлена	
+	db.actor:give_info_portion("net_signal") -- связь восстановлена
+
 	ogse_yan_random_quest.reinit_item_list() -- получаем новый список предметов у Сахарова (Mixser)
 
 	ogse_signals.get_mgr():call( "on_after_blowout" )
@@ -505,9 +481,9 @@ function parse_and_process_action_item(key, item)
 		local snd_obj = xr_sound.get_safe_sound_object(item)
 		snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
 	elseif key == "Dead2" then
-		db.Dead2 = item
+		is_surge_raskolbas = item > 0
 	elseif key == "Flag2" then
-		db.Flag2 = item
+		is_surge_started = item > 0
 	else
 		abort("[ogse_surge_mgr.parse_and_process_action_item] unknown action '%s'", key)
 	end
@@ -529,7 +505,7 @@ local function parse_and_process_surge_stage(stage_info)
 			end
 		elseif key == "rnd" then
 			local stage = item
-			stage = item[math.random(1,#item)]
+			stage = item[math.random(#item)]
 			parse_and_process_surge_stage(stage)
 		else
 			parse_and_process_action_item(key, item) -- TODO: проверить алгоритм, мог накосяяить
@@ -578,11 +554,8 @@ function check_blowout_timer:action()
 end
 
 function check_blowout_timer:update()
-  ogse_signals.get_mgr():reschedule( 1000 )
-  on_actor_update()
-end
+	ogse_signals.get_mgr():reschedule( 1000 )
 
-function on_actor_update()
 	if deferred_actions then
 		local info_action = deferred_actions.on_info_deferred
 		if info_action then
@@ -590,31 +563,23 @@ function on_actor_update()
 		end
 		deferred_actions = nil
 	end
-	if db.actor:has_info("blowout") then
-		if ogse_hideouts.npc_inside_safe_zone(db.actor) then
-			db.FlagEsc = 1
-		else	
-			db.FlagEsc = 0
-		end	
-		if db.Dead2 == 1 and db.FlagEsc == 0 then
+	if is_surge_raskolbas then
+		actor_in_hideout = ogse_hideouts.npc_inside_safe_zone(db.actor)
+		if not actor_in_hideout then
 			run_vibros_effects()
 			hit_actor()
-			soundtrack.strange_sounds()
-			level.add_pp_effector("dead_zone.ppe", 1003, true)
-			-- level.add_pp_effector("radiation.ppe", 1003, true)
-			level.set_pp_effector_factor(1003, 0.5)
-		end
-		if db.FlagEsc == 1 then
+		else
 			stop_vibros_effects()
 		end
 	else
-		if db.FlagEsc == 1 then
-			db.FlagEsc = 0
-			db.Dead2 = 0
+		if not actor_in_hideout then
+			actor_in_hideout = true
+			is_surge_raskolbas = false
 			stop_vibros_effects()
 		end
 	end
 end
+
 -- выполняем реинициализацию фазы выброса при перезагрузке
 function on_first_update() -- выполняем восстановление временных эффектов, флагов и т.п.
 	if db.actor:has_info("pre_blowout") then
@@ -635,7 +600,6 @@ function on_first_update() -- выполняем восстановление временных эффектов, флаго
 end
 -- выполняем действия, которые должны выполниться строго один раз в момент наступления фазы выброса
 function on_get_info(npc, info_id)
-	
 	local action_item = surge_db[info_id]
 	if action_item then
 		surge_log("surge stage: %s", tostring(info_id))
@@ -643,38 +607,11 @@ function on_get_info(npc, info_id)
 		run_blowout_timer()
 		local info_action = action_item.on_info
 		if info_action then
-			log1("!!SURGE_DEBUG: info["..tostring(info_id).."]")
+			--log1("!!SURGE_DEBUG: info["..tostring(info_id).."]")
 			parse_and_process_surge_stage(info_action)
 		end
 	end
 end
-
--- Служебные функции выброса --
-
-local monster_kill_exclusion = {
-	[clsid.snork_s]       = true,
-	[clsid.bloodsucker_s] = true,
-	[clsid.burer_s]       = true,
-	[clsid.gigant_s]      = true,
-	[clsid.chimera_s]     = true,
-	[clsid.controller_s]  = true,
-	[clsid.zombie_s]      = true,
-}
--- Очистка гулагов монстров после выброса
-function kill_monsters(gulag1)
-	if not gulag1 then return end
-	
-	for k, v in pairs(gulag1.Object) do 	
-		if level.object_by_id(k) ~= nil then
-			obj = level.object_by_id(k)
-			if obj:is_monster() and not monster_kill_exclusion[get_clsid(obj)] then
-				obj:kill(obj)
-			end
-		end	
-	end
-end
-
-local actor_was_hit = false
 
 -- Deadly Blowout by KamikaZze - Нанесение актору удара волной в смертельной стадии выброса, если он не спрятался
 function deadly_blowout()
@@ -751,103 +688,6 @@ function hit_actor()
 	end
 end
 
--- Обобщенная процедура спавна артефактов
-function proceed_art_spawn(section, count)
-	for ind = 1, count do
-		local pos, new_lv, new_gv = ogse_anomaly.anomaly_position_choice(lname, false)
-		if pos and new_lv and new_gv then
-			alife():create(section, pos, new_lv, new_gv)
-		end
-	end
-end
-
-local horror_objects_db = {
-	l01_escape = {
-		spawn = {prob = 0.1,
-			items = {["af_medusa"] = 1, ["af_vyvert"] = 1, ["af_blood"] = 1, ["af_electra_sparkler"] = 1,}
-		},
-	},
-	l02_garbage = {
-		spawn = {prob = 0.1,
-			items = { ["af_cristall_flower"] = 1, ["af_gravi"] = 1, ["af_rusty_thorn"] = 1,},
-		},
-	},
-	l03_agroprom = {
-		spawn = {prob = 0.1,
-			items = {["af_cristall_flower"] = 1, ["af_gravi"] = 1, ["af_rusty_thorn"] = 1, ["af_mincer_meat"] = 1, },
-		},
-	},
-	l04_darkvalley = {
-		spawn = {prob = 0.1,
-			items = {["af_dummy_glassbeads"] = 1, ["af_electra_flash"] = 1, ["af_fuzz_kolobok"] = 1, ["af_fireball"] = 1, },
-		},
-	},
-	l05_bar = {
-		spawn = {prob = 0.1,
-			items = {["af_dummy_pellicle"] = 1, ["af_ameba_slime"] = 1, ["af_soul"] = 1, ["af_rusty_kristall"] = 1, },
-		},
-	},
-	l06_rostok = {
-		spawn = {prob = 0.1,
-			items = {["af_dummy_pellicle"] = 1, ["af_ameba_slime"] = 1, ["af_soul"] = 1, ["af_rusty_kristall"] = 1, },
-		},
-	},
-	l07_military = {
-		spawn = {prob = 0.1,
-			items = {["af_dummy_battery"] = 1, ["af_rusty_sea-urchin"] = 1, ["af_electra_moonlight"] = 1, ["af_ameba_slug"] = 1, ["af_electra_sparkler"] = 1, },
-		},
-	},
-	l08_yantar = {
-		spawn = {prob = 0.1,
-			items = {["af_dummy_battery"] = 1, ["af_dummy_dummy"] = 1, ["af_night_star"] = 1, ["af_gold_fish"] = 1, },
-		},
-	},
-	l10_radar = {
-		spawn = {prob = 0.1,
-			items = {["af_dummy_spring"] = 1, ["af_rusty_sea-urchin"] = 1, ["af_electra_moonlight"] = 1, ["af_ameba_mica"] = 1,	},
-		},
-	},
-	l11_pripyat = {
-		spawn = {prob = 0.1,
-			items = {["af_dummy_spring"] = 1, ["af_night_star"] = 1, ["af_dummy_glassbeads"] = 1, ["af_fuzz_kolobok"] = 1, },
-		},
-	},
-}
-
-function process_spawn_items(items)
-
-	local num = 1
-	local sect = nil
-	for k,v in pairs(items) do
-		
-		if type(k) == "string" then -- прямое указание секции
-			sect = k
-			num = v
-		elseif type(k) == "number" then -- случайный выбор из таблицы
-			sect = items[math.random(#items)]
-			num = 1
-		else
-			abort("ogse_surge_mgr.process_spawn_items "..tostring(k).." type "..type(k))
-		end
-		if sect then
-			proceed_art_spawn(sect, num)
-		end
-	end
-end
-
--- Вызов спавна артефактов и хоррор-тайма
-function horror_and_arts()
-	actor_was_hit = false -- TODO: перенести это в другое место
-
-	local actions = horror_objects_db[lname]
-	if actions then
-		if actions.spawn and math.random() < actions.spawn.prob then
-			process_spawn_items(actions.spawn.items)
-		end
-	end
-end
-
-
 local effects_playing
 function run_vibros_effects()
 	if not effects_playing then
@@ -856,6 +696,9 @@ function run_vibros_effects()
 		level.add_cam_effector("camera_effects\\fatigue.anm", 2004, true, "")
 		level.add_pp_effector("yantar_underground_psi.ppe", 299, true)
 		level.set_pp_effector_factor(299, 1.0)
+		soundtrack.strange_sounds()
+		level.add_pp_effector("dead_zone.ppe", 1003, true)
+		level.set_pp_effector_factor(1003, 0.5)
 		effects_playing = true
 	end
 end
