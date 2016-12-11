@@ -157,6 +157,7 @@ function del_heli(obj)
 	heli[obj:id()] = nil
 end	
 
+
 -- Транспорт
 function add_car(obj)
 	cars[obj:id()] = obj
@@ -166,17 +167,6 @@ function del_car(obj)
 	cars[obj:id()] = nil
 end
 
--- Регистрация всех квестовых зон на локации
-function register_all_quest_zones()
-	for id=1,65535 do
-		local obj = alife():object(id)
-		if obj then
-			if obj:section_name() == "smart_terrain" then
-				add_quest_zone( obj )
-			end
-		end
-	end
-end
 
 function add_smart_terrain( obj )
 	smart_terrain_by_id[obj.id] = obj
@@ -184,12 +174,4 @@ end
 
 function del_smart_terrain( obj )
 	smart_terrain_by_id[obj.id] = nil
-end
-
-function add_quest_zone( obj )
-	quest_zones[obj:name()] = obj.id
-end
-
-function del_quest_zone( obj )
-	quest_zones[obj:name()] = nil
 end

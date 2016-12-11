@@ -2255,7 +2255,10 @@ function start_kvest_yan_search_case()
 	local obj_2 = ogse.spawn_object(spawn_db.case_use_rub)
 	add_map_spot(obj_2.id, "get_your_case", game.translate_string("dobrozhelatel_string1"))
 	spawn_mines_near_yan_search_case()
-	delete_jail_restr()
+	local sobj = alife():object("val_prisoner_jail_restr")
+	if sobj then
+		alife():release(sobj, true)
+	end
 end
 
 function spawn_mines_near_yan_search_case()
@@ -2270,17 +2273,6 @@ function spawn_mines_near_yan_search_case()
 			my_table.max_power = 35
 			pk:set(my_table)
 		else ogse.send_tip(game.translate_string("fail"))
-		end
-	end
-end
-
--- Ќе пугаемс€, сделано специально, чтобы не было бы вылета, когда спауним ћинора
-function delete_jail_restr()
-	for i = 1 , 65536 do
-	local obj = alife():object(i)
-		if obj and obj:name() == "val_prisoner_jail_restr" then
-			alife():release(obj, true)
-			break
 		end
 	end
 end

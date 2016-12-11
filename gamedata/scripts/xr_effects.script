@@ -3168,18 +3168,13 @@ end
 -----------------------------------------------------------------------------------------
 
 local function find_sidor_door()
-	local door
-	for id = 1,65535 do
-		local cobj = level.object_by_id(id)
-		if cobj then
-			local sobj = alife():object(id)
-			if sobj and cobj:name() == "trader_door" then
-				door = cobj
-				break
-			end
+	local sobj = alife():object("trader_door")
+	if sobj then
+		local obj = level.object_by_id(sobj.id)
+		if obj then
+			return obj
 		end
 	end
-	return door
 end
 
 local trader_door

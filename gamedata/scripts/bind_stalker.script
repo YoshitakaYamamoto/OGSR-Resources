@@ -61,8 +61,6 @@ function actor_binder:net_spawn(data)
 	cmd("cam_inert 0") --KRodin: сбрасываем инерцию камеры в 0
 ----------------------KD: end-------------------------
 
-	db.register_all_quest_zones()
-
 -------- пауза при загрузке --------
 	ui_main_menu.start()
 ------------------------------------

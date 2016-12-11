@@ -1500,21 +1500,18 @@ end
 -- получить гулаг по имени смарта.
 -- работает только для смартов, которые в онлайне.
 function get_gulag_by_name( name )
+	if name and type(name) == "string" then
+		local strn = alife():object( name )
 
-	local go_strn = db.quest_zones[name]
-
-	if go_strn then
-		local strn = alife():object( go_strn )
-		
 		if not strn then
-			abort("get_gulag_by_name failed - no zone "..tostring(name))
+			abort("get_gulag_by_name failed - no zone [%s]", name)
 		end
 
 		strn:initialize_if_needed()
 
 		return strn.gulag
 	else
-		write_log("!!NO_GULAG "..tostring(name).." IN quest_zones")
+		log3("!![%s] NO_GULAG [%s] IN quest_zones!", script_name(), name)
 		return nil
 	end
 end
