@@ -4,27 +4,18 @@
 --------------------------------------------------------------------------------------------------]]
 
 zone_by_name        = {}
-quest_zones         = {}
-sl_by_name          = {}
 storage             = {}
-sound               = {}
+sound               = {} --TODO: Вынести отсюда в xr_sound.
 actor               = nil
 actor_proxy         = actor_proxy.actor_proxy()
 heli                = {}
 cars                = {}
-camp_storage        = {}
+camp_storage        = {} --TODO: вынести в mob_camp.
 story_by_id	        = {}
-smart_terrain_by_id = {}
-trader              = nil
---info_restr          = {}
-delayed             = {}
-strn_by_respawn     = {}
-dead_bodies         = {}
+trader              = nil --TODO: Вынести в mob_trader
+--info_restr          = {} --После тестов надо удалить
 creature            = {} -- true - человек, false - животное (исключая торговца)
-doors               = {}
-last_deadman        = nil
-
-artefacts			= {}
+artefacts			= {} --TODO: вынести в bind_artefact.
 
 
 function add_obj( obj )
@@ -46,6 +37,7 @@ end
 
 --[[
 --Вызывалось из апдейта ogse.script:
+delayed = {}
 function()
 -- Обновление баг-таймера
 	if time_global() > buggy_timer then
@@ -55,7 +47,7 @@ function()
 			if obj and not obj:alive() and v and obj:name() ~= "single_player" and sobj.offline_dead == 0 then
 				log1("!!UNREGISTERED BODY FOUND - TO DELAYED "..obj:id().." "..obj:name())
 				db.actor:give_game_news("ВНИМАНИЕ! Обнаружен потенциально повреждённый неразрегистрированный труп! Объект: "..obj:character_name().." ИД: "..obj:id().." Профиль: "..obj:profile_name().." Будет произведена попытка разрегистрации и удаления объекта!", "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
-				if not db.delayed[obj:id()] then db.delayed[obj:id()] = obj:id() end
+				if not delayed[obj:id()] then delayed[obj:id()] = obj:id() end
 			end
 		end
 		buggy_timer = buggy_timer + math.random(20000,25000)
@@ -126,17 +118,6 @@ function del_zone( zone )
 end
 
 
-function add_sl( sl )
-	sl_by_name[sl:name()] = sl
-	add_obj( sl )
-end
-
-function del_sl( sl )
-	sl_by_name[sl:name()] = nil
-	del_obj( sl )
-end
-
-
 function add_actor( obj )
 	actor = obj
 	actor_proxy:net_spawn( obj )
@@ -165,13 +146,4 @@ end
 
 function del_car(obj)
 	cars[obj:id()] = nil
-end
-
-
-function add_smart_terrain( obj )
-	smart_terrain_by_id[obj.id] = obj
-end
-
-function del_smart_terrain( obj )
-	smart_terrain_by_id[obj.id] = nil
 end

@@ -903,10 +903,6 @@ function se_smart_terrain:register_if_needed()
 
 	smart_terrains[level_name][self.id] = self
 
-	if self.gparams.respawn then
-		db.strn_by_respawn[self.gparams.respawn] = self
-	end
-
 	self.gulag:load_jobs()
 
 	if self.gulag_working then
@@ -932,10 +928,6 @@ function se_smart_terrain:on_unregister()
 
 	if lvl_smarts then
 		lvl_smarts[self.id] = nil
-	end
-
-	if self.gparams and self.gparams.respawn then
-		db.strn_by_respawn[self.gparams.respawn] = nil
 	end
 
 	db.actor_proxy:deinit() -- ?? вызывается из каждого такого метода

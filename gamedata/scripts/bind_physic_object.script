@@ -97,10 +97,6 @@ function generic_physics_binder:net_spawn(data)
 		return false
 	end
 
-	if self.object:clsid() == clsid.projector then
-		db.add_sl(self.object)
-	end
-
 	if self.object:spawn_ini() ~= nil and self.object:spawn_ini():section_exist("drop_box") == true then
 		self.box_items = xr_box.ph_item_box(self.object)
 	end
@@ -117,8 +113,6 @@ function generic_physics_binder:net_destroy()
     if self.particle ~= nil then
         self.particle:stop()
     end
-
-	db.del_sl(self.object)
 
 	db.storage[self.object:id()] = nil
 
