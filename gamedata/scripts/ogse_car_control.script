@@ -18,12 +18,14 @@ function attach(sm) -- дл€ менеджера сигналов
 	sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
 	sm:subscribe({signal = "on_key_up",   fun = this.on_key_up})
 	sm:subscribe({signal = "on_wheel",    fun = this.on_wheel})
-	sm:subscribe({signal = "on_update",   fun = this.on_update})
 	sm:subscribe({signal = "on_first_update", fun = this.on_first_update})
 	sm:subscribe({signal = "on_info",     fun = this.on_info})
 	sm:subscribe({signal = "on_car_death", fun = this.on_car_death})
 	sm:subscribe({signal = "on_save", 	  fun = this.on_save})
 	sm:subscribe({signal = "on_load", 	  fun = this.on_load})
+	sm:subscribe({signal = "on_attach_vehicle", fun = this.on_attach_vehicle})
+	sm:subscribe({signal = "on_use_vehicle", fun = this.on_use_vehicle})
+	sm:subscribe({signal = "on_detach_vehicle", fun = this.on_detach_vehicle})
 	--
 	sm:subscribe({signal = "on_monster_spawn", fun = this.register_target})
 	sm:subscribe({signal = "on_monster_death", fun = this.unregister_target})
@@ -60,6 +62,100 @@ local function dbg_log(s)
 		car_log:flush()
 	end
 end
+
+
+local article_by_car_section = {
+	vehicle_zaz			 = "vehicles_zaporozh_gorb_article",
+	vehicle_zaz968		 = "vehicles_zaporozh_ush_article",	
+	vehicle_kamaz		 = "vehicles_kamaz_article",			
+	vehicle_btr			 = "vehicles_btr-70_article",			
+	vehicle_niva		 = "vehicles_niva_article",			
+	vehicle_niva2		 = "vehicles_niva_article",			
+	vehicle_tr13		 = "vehicles_traktor_article",			
+	vehicle_uaz			 = "vehicles_uaz_article",				
+	vehicle_uaz2		 = "vehicles_uaz_article",				
+	vehicle_uazbuhanka	 = "vehicles_uaz_buh_article",			
+	vehicle_moskvich	 = "vehicles_moskvich_article",		
+	vehicle_moskvich2	 = "vehicles_moskvich_article",		
+	vehicle_baggi		 = "vehicles_baggi_article",			
+	vehicle_zil_mmz		 = "vehicles_zil_mmz_article",			
+	vehicle_gaz66		 = "vehicles_gaz66_article",			
+	vehicle_avtobuszil	 = "vehicles_gaz53_article",			
+}
+
+local subscribed
+function subscribe()
+	if not subscribed then
+		subscribed = {signal = "on_update", fun = this.update_car_hud}
+		ogse_signals.get_mgr():subscribe( subscribed )
+		--log3("--[%s] subscribed!", script_name())
+	end
+end
+
+function unsubscribe()
+	if subscribed then
+		ogse_signals.get_mgr():unsubscribe( subscribed )
+		subscribed = nil
+		--log3("~~[%s] UNsubscribed!", script_name())
+	end
+end
+
+function on_attach_vehicle(obj) --“олько что залезли в машину
+	local info = article_by_car_section[obj:section()] -- усок перенесен из биндера авто.
+	if info then
+		if db.actor:dont_has_info(info) then
+			db.actor:give_info_portion(info) --ƒадим инфу дл€ энциклопедии
+		end
+	end
+	--
+	SetDetailsMinRadius(2.0) -- убираем траву из под ног
+	setup_car_camera(obj)
+	bind_stalker.hide_weapon()
+	db.actor:set_actor_int(1432, 0)
+	db.actor:set_actor_int(1428, 0)
+	current_car = obj
+	in_btr = string.find(obj:section(), "btr") ~= nil
+	if in_btr then
+		enable_car_gun(obj, true)
+		--log3("~~[%s] god_mode is: [%s]", script_name(), get_con_bool("g_god"))
+		cmd("g_god on")
+	end
+	show_car_hud(obj, in_btr)
+
+	subscribe()
+end
+
+function on_detach_vehicle(obj) --“олько что вылезли из машины
+	SetDetailsMinRadius(0.0) -- вертаем траву обратно
+	fix_camera_limits = false --ќно тут зачем?
+	bind_stalker.restore_weapon()
+	switch_firing(current_car, false)
+	current_car = nil
+	hide_car_hud(in_btr)
+	if in_btr then
+		in_btr = false
+		cmd("g_god off")
+	end
+
+	unsubscribe()
+end
+
+
+function on_use_vehicle(obj)
+	if not current_car then -- действи€, имеющие смысл только при нахождении снаружи машины
+		local car = car_which_trunk_we_looking_at()
+		if car then
+			trunk_inv.open_trunk_dialog(car)
+			ogse_signals.get_mgr():call("on_car_trunk_open", car)
+		else
+			local car = car_which_engine_door_we_looking_at()
+			if car then
+				ogse_signals.get_mgr():call("on_car_engine_open", car)
+			end
+		end
+	end
+end
+
 
 function on_spawn(sactor)
 	sim = alife()
@@ -274,19 +370,7 @@ function on_key_down(key, bind)
 	if not db.actor or not db.actor:alive() then return end -- нет актора - нечего делать
 	if level.main_input_receiver() then return end
 	if not current_car then -- действи€, имеющие смысл только при нахождении снаружи машины
-		if bind == 15 then -- лезем в багажник
-			local car = car_which_trunk_we_looking_at()
-			if car then
-				trunk_inv.open_trunk_dialog(car)
-				ogse_signals.get_mgr():call("on_car_trunk_open", car)
-			else
-				local car = car_which_engine_door_we_looking_at()
-				if car then
-					ogse_signals.get_mgr():call("on_car_engine_open", car)
-				end
-			end
-			return
-		elseif bind == 56 then -- «аправка транспорта
+		if bind == 56 then -- «аправка транспорта
 			local car = car_which_gastank_we_looking_at()
 			if car then
 				refuel(car)
@@ -464,17 +548,13 @@ function on_wheel(vol)
 	end
 end
 
-function on_update() -- вызываетс€ из менеджера 
-	update_car_hud()
-end
-
 function on_info(npc, info_id)
 	if info_id == "no_net_signal" then
 		surge = true
 	elseif info_id == "net_signal" then
 		surge = false
 	end
-	update_car_hud()
+
 	if in_btr then
 		if info_id == "ui_pda" or info_id == "ui_inventory" then
 			transfer_btr_hud_to_alt()
@@ -509,6 +589,14 @@ function refuel(car)
 	car:set_fuel(fuel)
 	ogse_screen_msg.show_message_use_item(item:section())
 	alife():release(alife():object(item:id()), true)
+
+--KRodin:  вестова€ врезка перенесена сюда из апдейта биндера авто.
+	if string.find(car:name(), "esc_vehicle_zaz_in_novice_lager") then
+		-- условие завершени€ подзадачи на заправку запора
+		if db.actor:has_info("esc_kvest_sdelka_with_mils_start") and db.actor:dont_has_info("escape_kvest_with_military_zaz_fueled") then
+			db.actor:give_info_portion("escape_kvest_with_military_zaz_fueled")
+		end
+	end
 end
 
 class "car_hud" (CUIScriptWnd)
@@ -699,8 +787,7 @@ end
 
 function update_car_hud()
 	local car = get_actor_car() -- получаем машину, в которой сидит √√
-	-- обновл€ем состо€ние машины
-	if car then
+	if car then -- обновл€ем состо€ние машины
 		update_car_states(car)
 		if fix_camera_limits then
 			local cam_cur_addr = car:get_car_int(nil, 1320)
@@ -710,38 +797,7 @@ function update_car_hud()
 				car:set_memory_float(nil, ang2, sum_args_ex(cam_cur_addr, 20))
 			end
 		end
-	end
-	-- что-то делаем по факту смены состо€ни€ внутри/снаружи
-	if car and not current_car then -- только что залезли в машину
-		SetDetailsMinRadius(2.0) -- убираем траву из под ног
-		setup_car_camera(car)
-		bind_stalker.hide_weapon()
-		db.actor:set_actor_int(1432, 0)
-		db.actor:set_actor_int(1428, 0)
-		current_car = car
-		in_btr = string.find(car:section(), "btr") ~= nil
-		if in_btr then
-			enable_car_gun(car, true)
-
-			--log3("~~[%s] god_mode is: [%s]", script_name(), get_con_bool("g_god"))
-			cmd("g_god on")
-		end
-		show_car_hud(car, in_btr)
-		ogse_signals.get_mgr():call("on_hud_show")
-	elseif not car and current_car then -- только что вылезли из машины
-		SetDetailsMinRadius(0.0) -- вертаем траву обратно
-		fix_camera_limits = false
-		bind_stalker.restore_weapon()
-		switch_firing(current_car, false)
-		current_car = nil
-		hide_car_hud(in_btr)
-		if in_btr then
-			in_btr = false
-
-			cmd("g_god off")
-		end
-	end
-	if car then
+		--
 		local new_width = (car:get_fuel() / car:get_fuel_tank()) * car_hud_wnd.max_width
 		car_hud_wnd.fuel_level:SetWidth(new_width)
 	end
@@ -752,12 +808,14 @@ function update_car_hud()
 		update_fire_status(car)
 	end
 end
+
+
 function on_car_death(car)
 	if current_car and car:id() == current_car:id() then
 		db.actor:kill(db.actor)
 	end
-	update_car_hud()
 end
+
 
 function update_car_states(car)
 	local script_car = car:get_car()
@@ -786,6 +844,7 @@ function show_car_hud(car, btr)
 		current_target_id = nil
 
 		ogse_signals.get_mgr():call("on_sit_down_in_btr")
+		ogse_signals.get_mgr():call("on_hud_show")
 	end
 	bg:AttachChild(car_hud_wnd) -- поместить окно на подложку
 end

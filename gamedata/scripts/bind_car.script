@@ -1,22 +1,3 @@
-local article_by_car_section = {
-	vehicle_zaz			 = "vehicles_zaporozh_gorb_article",
-	vehicle_zaz968		 = "vehicles_zaporozh_ush_article",	
-	vehicle_kamaz		 = "vehicles_kamaz_article",			
-	vehicle_btr			 = "vehicles_btr-70_article",			
-	vehicle_niva		 = "vehicles_niva_article",			
-	vehicle_niva2		 = "vehicles_niva_article",			
-	vehicle_tr13		 = "vehicles_traktor_article",			
-	vehicle_uaz			 = "vehicles_uaz_article",				
-	vehicle_uaz2		 = "vehicles_uaz_article",				
-	vehicle_uazbuhanka	 = "vehicles_uaz_buh_article",			
-	vehicle_moskvich	 = "vehicles_moskvich_article",		
-	vehicle_moskvich2	 = "vehicles_moskvich_article",		
-	vehicle_baggi		 = "vehicles_baggi_article",			
-	vehicle_zil_mmz		 = "vehicles_zil_mmz_article",			
-	vehicle_gaz66		 = "vehicles_gaz66_article",			
-	vehicle_avtobuszil	 = "vehicles_gaz53_article",			
-}
-
 function init(obj)
    obj:bind_object(car_binder(obj))
 end
@@ -24,11 +5,10 @@ end
 class "car_binder" (object_binder)
 function car_binder:__init(obj) super(obj)
 	self.sm = ogse_signals.get_mgr()
-	self.info = false
 end
 
-function car_binder:reload(section)
-end
+--function car_binder:reload(section)
+--end
 
 function car_binder:reinit()
 	self.object:set_callback(callback.death, self.death_callback, self)
@@ -44,7 +24,7 @@ function car_binder:load(reader)
 	end
 end
 
-function car_binder:net_spawn(server_object)
+function car_binder:net_spawn()
 	-- self.object:set_fuel_consumption(self.object:get_fuel_consumption()*100)
 	db.add_car(self.object)
 
@@ -82,8 +62,8 @@ function read_door_definition(obj, line)
 	return nil
 end
 
-function car_binder:update(delta)
-	if not self.ph_shell then
+function car_binder:update()
+	if not self.ph_shell then --Надо делать именно на апдейте. При спавне - рано.
 		self.ph_shell = self.object:get_physics_shell()
 		if self.ph_shell then
 			-- даём пинок, чтобы опустить на землю
@@ -104,43 +84,16 @@ function car_binder:update(delta)
 			self.sm:subscribe(self._open_engine_door_desc)
 			self.subscribed = true
 		end
+		if self.start_fuel then self.object:set_fuel(self.start_fuel); self.start_fuel = nil end
 	end
-	if self.start_fuel then self.object:set_fuel(self.start_fuel) self.start_fuel = nil end
-	
-	-- дадим инфу для энциклопедии
-	if not self.info and db.actor then
-		local actor_car = ogse_car_control.get_actor_car()
-		if actor_car and actor_car:id() == self.object:id() then
-			local sect = self.object:section()
-			local info = nil
-			for k,v in pairs(article_by_car_section) do
-				if k == self.object:section() then
-					info = v
-					break
-				end
-			end
-			if info then
-				--log1(self.object:section()..": "..info)
-				if db.actor:dont_has_info(info) then
-					db.actor:give_info_portion(info)
-				end
-			end
-			self.info = true
-		end
-	end
-	
-	-- обработки туториального запора в деревне новичков
+
+--[=[ --KRodin: выключил, не вижу в этом нужды.
+	--Обработки туториального запора в деревне новичков
 	if string.find(self.object:name(), "esc_vehicle_zaz_in_novice_lager") then
 		-- сделаем запор неубиваемым, пока игрок не закончит квест с военными
 		if db.actor:dont_has_info("esc_kvest_sdelka_with_mils_complete") and db.actor:dont_has_info("esc_kvest_sdelka_with_mils_fail") then
 			local car = self.object:get_car()
 			car:SetfHealth(1.0)
-		end
-		-- условие завершения подзадачи на заправку запора
-		if db.actor:has_info("esc_kvest_sdelka_with_mils_start") and db.actor:dont_has_info("escape_kvest_with_military_zaz_fueled") then
-			if self.object:get_fuel() > 0.01 then
-				db.actor:give_info_portion("escape_kvest_with_military_zaz_fueled")
-			end
 		end
 	end
 	if string.find(self.object:name(), "vehicle_esc_last_request_gaz66") then
@@ -149,6 +102,7 @@ function car_binder:update(delta)
 			car:SetfHealth(1.0)
 		end
 	end
+--]=]
 end
 
 class "wait_for_actor_move" (ogse_qt.quick_timer)

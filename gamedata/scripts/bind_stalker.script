@@ -105,7 +105,11 @@ log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:nam
 	self.object:set_callback(callback_ex.on_slot, nil)
 	self.object:set_callback(callback_ex.on_select_item, nil)
 	self.object:set_callback(callback_ex.on_create_cell_item, nil)
-	
+
+	self.object:set_callback(callback_ex.attach_vehicle, nil)
+	self.object:set_callback(callback_ex.use_vehicle, nil)
+	self.object:set_callback(callback_ex.detach_vehicle, nil)
+
 	self.object:set_callback(callback_ex.on_hud_animation_end, nil)
 	self.object:set_callback(callback.hit, nil)
 	
@@ -156,6 +160,10 @@ log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name
 	self.object:set_callback(callback_ex.on_slot, self.item_to_slot, self)		-- перемещение предмета в слот
 	self.object:set_callback(callback_ex.on_select_item, self.on_select_item, self)
 	self.object:set_callback(callback_ex.on_create_cell_item, self.on_create_cell_item, self)
+
+	self.object:set_callback(callback_ex.attach_vehicle, self.attach_vehicle, self) --Посадка в машину
+	self.object:set_callback(callback_ex.use_vehicle, self.use_vehicle, self) --Юз машины (без посадки)
+	self.object:set_callback(callback_ex.detach_vehicle, self.detach_vehicle, self) --Высадка из машины
 
 	self.object:set_callback(callback_ex.on_hud_animation_end, self.hud_animation_end, self) -- вызывается в конце проигрывания анимации худа (только если используем play_hud_animation)
 	self.object:set_callback(callback_ex.on_goodwill_change, self.on_goodwill_change, self)		-- изменение отношений
@@ -481,6 +489,30 @@ log3("~~[%s] Start load [%s]", script_name(), self.object and self.object:name()
 
 	self.am:call("on_load", reader)
 log3("--[%s] End load [%s]", script_name(), self.object and self.object:name() or "nil")
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:attach_vehicle(obj)
+	if not obj then return end
+	local sobj = alife():object( obj:id() )
+	if not sobj then return end
+
+	self.am:call("on_attach_vehicle", obj, sobj)
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:use_vehicle(obj)
+	if not obj then return end
+	local sobj = alife():object( obj:id() )
+	if not sobj then return end
+
+	self.am:call("on_use_vehicle", obj, sobj)
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:detach_vehicle(obj)
+	if not obj then return end
+	local sobj = alife():object( obj:id() )
+	if not sobj then return end
+
+	self.am:call("on_detach_vehicle", obj, sobj)
 end
 ----------------------------------------------------------------------------------------------------------------------
 

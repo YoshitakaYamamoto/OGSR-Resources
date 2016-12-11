@@ -1,4 +1,11 @@
 --************************************************* Инициализация расширений движка ************************************************
+
+-- https://github.com/OpenXRay/xray-16/commit/9cd4bab9d0a31b9b808834601da366c8c1d9da5c
+-- XXX nitrocaster: with vanilla scripts, '-nojit' option requires script profiler to be disabled. The reason
+-- is that lua hooks somehow make 'super' global unavailable (is's used all over the vanilla scripts).
+-- You can disable script profiler by commenting out the following lines in the beginning of _g.script:
+if not jit then profiler.setup_hook() end --KRodin: в оригинальном огсе этого нет, но может поможет от странного вылета при загрузке сейвов.
+
 log1("--LUA version: ["..(jit.version or _VERSION).."]")
 log1("~~...Инициализация расширений движка...")
 
@@ -35,6 +42,20 @@ else --В новом LuaJIT работает только такой вариант:
 	end
 end
 --==============================================================================================
+--=================================[Функции из xrLuaFix]========================================
+--Срезать пробелы слева
+if not string.trim_l then
+	string.trim_l = function(s) return s:gsub("^%s+",'') end
+end
+--Срезать пробелы справа
+if not string.trim_r then
+	string.trim_r = function(s) return s:gsub("%s*$",'') end
+end
+--Срезать все пробелы слева и справа
+if not string.trim then
+	string.trim = function(s) return s:gsub('^%s*(.-)%s*$', '%1') end
+end
+--==============================================================================================
 
 if not luaXML_loaded then
 	dofile(getFS():update_path("$game_data$","scripts\\_luaxml.script"))
@@ -58,8 +79,8 @@ function sum_args_ex(base, offs)
 	local b1 = tonumber(b1_s, 16)
 	local b2 = tonumber(b2_s, 16)
 	local res = sum_args(bit.lshift(b1, 16), sum_args(b2, offs)) --KRodin: думал, что res = первое значение, а второе вообще не используется. Но как оказалось, res = сумма этих двух значений. Я и не знал, что так можно делать.
-	log2("~~sum_args_ex: %s, %x, %x", base_s, offs, res)
-	log2("~~lua + : %x", base + offs)
+	--log2("~~sum_args_ex: %s, %x, %x", base_s, offs, res) --Действительно, этот результат
+	--log2("~~lua + : %x", base + offs) --и этот результат - отличаются. При переезде на исходники надо будет городить функцию в движке, или попробовать использовать ffi
 	return res
 end
 
@@ -247,7 +268,8 @@ function validate_enemy_object( enemy )
 end
 
 ----------------------------------------------------------------------
-function action(obj, ...) --Как выяснилось, оно таки используется. По крайней мере, в mob_walker.script
+function action(obj, ...) --Как выяснилось, оно таки используется. По крайней мере, в mob_walker.script и mob_camp.script
+	--log3("!!Called action() from: %s", debug.traceback())
 	local args = {...}
 	local act = entity_action()
 	for i=1, #args do
@@ -1588,43 +1610,47 @@ hit_offset = {
 
 -- коды дополнительных колбеков
 callback_ex = {
-	["on_key_press"]                 = 123,
-	["on_key_release"]               = 124,
-	["on_key_hold"]                  = 125,
-	["on_mouse_wheel"]               = 126,
-	["on_mouse_move"]                = 127,
+	["on_key_press"]				= 123,
+	["on_key_release"]				= 124,
+	["on_key_hold"]					= 125,
+	["on_mouse_wheel"]				= 126,
+	["on_mouse_move"]				= 127,
 
-	["on_belt"]                      = 130,
-	["on_ruck"]                      = 131,
-	["on_slot"]                      = 132,
-	["on_select_item"]               = 133,
-	["on_create_cell_item"]          = 136,
+	["on_belt"]						= 130,
+	["on_ruck"]						= 131,
+	["on_slot"]						= 132,
+	["on_select_item"]				= 133,
+	["on_create_cell_item"]			= 136,
 
-	["on_after_save"]				 = 140,
+	["attach_vehicle"]				= 137,
+	["use_vehicle"]					= 138,
+	["detach_vehicle"]				= 139,
 
-	["on_goodwill_change"]           = 145,
-	["on_release_npc"]               = 146,
+	["on_after_save"]				= 140,
 
-	["on_inv_box_put_item"]          = 151,
-	["entity_alive_before_hit"]      = 152,
-	["dbg_gg_distance_failed"]       = 153,
-	["update_addons_visibility"]     = 154,
-	["update_hud_addons_visibility"] = 155,
-	["on_before_use_item"]           = 156;
-	["on_hud_animation_end"]         = 157,
+	["on_goodwill_change"]			= 145,
+	["on_release_npc"]				= 146,
 
-	["pda_contact"]                  = 180,
+	["on_inv_box_put_item"]			= 151,
+	["entity_alive_before_hit"]		= 152,
+	["dbg_gg_distance_failed"]		= 153,
+	["update_addons_visibility"]	= 154,
+	["update_hud_addons_visibility"]= 155,
+	["on_before_use_item"]			= 156;
+	["on_hud_animation_end"]		= 157,
+
+	["pda_contact"]					= 180,
 }
+
 inventory_item_offsets = {
-	["health_influence"]    = 220,
-	["power_influence"]     = 224,
-	["satiety_influence"]   = 228,
-	["radiation_influence"] = 232,
-	["power_max_influence"] = 236,
-	["wound_heal"]          = 240,
-	["alcohol_influence"]   = 688,
+	["health_influence"]	= 220,
+	["power_influence"]		= 224,
+	["satiety_influence"]	= 228,
+	["radiation_influence"]	= 232,
+	["power_max_influence"]	= 236,
+	["wound_heal"]			= 240,
+	["alcohol_influence"]	= 688,
 }
-
 -- обнуление всех эффектов съедаемого предмета
 -- изменённые значения в сейве не сохраняются
 -- функция предназначена в основном для использования в событии предиспользования,
