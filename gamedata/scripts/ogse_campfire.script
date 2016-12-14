@@ -1,7 +1,7 @@
 
 local DIST_TO_FLAME = 1
-local DIST_TO_NPC = 5
-local DIST_TO_ACTOR = 2
+local DIST_TO_NPC = 25 --5^2
+local DIST_TO_ACTOR = 4 --2^2
 
 function attach(sm)
 	sm:subscribe({signal = "on_update", fun = this.on_actor_update, queued = true})
@@ -12,7 +12,7 @@ local prev_actor_pos
 function on_actor_update()
 	ogse_signals.get_mgr():reschedule(math.random(1000, 1500))
 	if not prev_actor_pos then prev_actor_pos = db.actor:position() end
-	if prev_actor_pos:distance_to(db.actor:position()) > 0.1 then
+	if prev_actor_pos:distance_to_sqr(db.actor:position()) > 0.01 then -- 0.1^2
 		start_stand_time = time_global()
 	end
 	prev_actor_pos = db.actor:position()
@@ -53,7 +53,7 @@ end
 
 function check_shedule(flame)
 	for k, t in pairs(sheduled_flames) do
-		if t.pos:distance_to(flame:position()) < DIST_TO_FLAME then
+		if t.pos:distance_to_sqr(flame:position()) < DIST_TO_FLAME then
 			switch_flame(flame, ena)
 			sheduled_flames[k] = nil
 			return
@@ -63,7 +63,7 @@ end
 
 function switch_flame_near_light(light, ena)
 	for id, pos in pairs(flames) do
-		if pos:distance_to(light:position()) < DIST_TO_FLAME then
+		if pos:distance_to_sqr(light:position()) < DIST_TO_FLAME then
 			local flame = level.object_by_id(id)
 			switch_flame(flame, ena)
 			return
@@ -81,7 +81,7 @@ end
 
 function play_particle_near_light(light, particle)
 	for id, pos in pairs(flames) do
-		if pos:distance_to(light:position()) < DIST_TO_FLAME then
+		if pos:distance_to_sqr(light:position()) < DIST_TO_FLAME then
 			local flame = level.object_by_id(id)
 			particle:play_at_pos(flame:position())
 			return
@@ -187,7 +187,7 @@ function campfire_binder:check_npc(npc)
 	if not npc then return false end
 	if not npc:alive() then return false end
 	local dists = {[false] = DIST_TO_NPC, [true] = DIST_TO_ACTOR }
-	if self.object:position():distance_to(npc:position()) > dists[npc:id() == 0] then return false end
+	if self.object:position():distance_to_sqr(npc:position()) > dists[npc:id() == 0] then return false end
 	if npc:id() == 0 then
 		if stand_time() < 3000 then return false end
 	else
