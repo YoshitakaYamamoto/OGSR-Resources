@@ -66,7 +66,7 @@ _SIGNALS_MGR = nil
 function get_mgr()
   if not _SIGNALS_MGR then
     -- _SIGNALS_MGR инициализируется внутри конструтора. См. комментарии там.
-    signals_mgr( "global", ogse_signals_addons_list.addons, true )
+    signals_mgr( "global", ogse_signals_addons_list.addons, false )
   end
   return _SIGNALS_MGR
 end
@@ -266,7 +266,11 @@ end
 
 function signals_mgr:subscribe_module( module_name )
   prefetch( module_name )
-  local res, msg = check_module( module_name )
+  --
+  local name = getFS():update_path("$game_scripts$", module_name..".script")
+  local res, err = loadfile(name)
+  ASSERT(res, "[%s] module: [%s]\nerror: %s", script_name(), name, err)
+  --
   local module = _G[ module_name ]
   ASSERT(
     module,

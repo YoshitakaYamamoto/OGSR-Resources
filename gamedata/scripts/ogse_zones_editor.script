@@ -5,7 +5,6 @@ function attach(sm)
 	sm:subscribe({signal = "on_destroy",  fun = this.on_destroy})
 	sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
 end
-auto_attach = false
 
 local translation_matrix      = _geom_helpers.translation_matrix
 local combine_transformations = _geom_helpers.combine_transformations

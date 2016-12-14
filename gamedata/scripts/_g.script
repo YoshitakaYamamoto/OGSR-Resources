@@ -1288,17 +1288,7 @@ end
 function print_time(title, time)
 	log1(title..": "..time2string(time))
 end
-local fs = getFS()
-function check_module(module_name)
-	local script_name = fs:update_path("$game_scripts$", module_name..".script")
-	local res, err = loadfile(script_name)
---[[	if res then
-		log1("module: '"..script_name.."' is correct")
-	else
-		log1("module: "..script_name.."\nerror: "..err)
-	end]]
-	return res, err
-end
+
 
 function hit_object(obj, dir, imp, dr, pow, t)
 	local h = hit()
@@ -1337,6 +1327,7 @@ function hit_obj_by_id_simple(ObjId, Pwr, iImpulse)
 	}
 	hit_object_ex(hit_params)
 end
+
 
 function seconds2ctime(time_sec)
 	local s,ms = math.modf(time_sec)
