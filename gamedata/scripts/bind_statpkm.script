@@ -85,22 +85,22 @@ local activation_cmds = {
 	[key_bindings.kWPN_5] = 4,
 	[key_bindings.kWPN_6] = 5,
 }
--- таймер, который ждёт активации оружия, чтобы переключить активный слот на заданный
+-- таймер, который ждЮт активации оружиЯ, чтобы переключить активный слот на заданный
 class "activate_slot_after_wpn_restore" (ogse_qt.quick_timer)
 function activate_slot_after_wpn_restore:__init(slot_num)
 	self.slot_num = slot_num
 end
 function activate_slot_after_wpn_restore:condition()
-	-- Lua неправильно обрабатывает возвращаемое значение, приходится изворачиваться с проверкой строки
+	-- Lua неправильно обрабатывает возвращаемое значение, приходитсЯ изворачиватьсЯ с проверкой строки
 	if bit.tohex(db.actor:active_slot()) == "80000000" then
 		return false
 	end
 	db.actor:activate_slot(self.slot_num)
 	return true
 end
--- специальный управляющий таймер. Активируется при использовании пулемёта,
--- после чего подписывается на события нажатия клавиш, что использует для включени/выключения огня
--- событие проверки выхода также использует для контроля направления ствола
+-- специальный управлЯющий таймер. ЂктивируетсЯ при использовании пулемЮта,
+-- после чего подписываетсЯ на событиЯ нажатиЯ клавиш, что использует длЯ включени/выключениЯ огнЯ
+-- событие проверки выхода также использует для контролЯ направлениЯ ствола
 class "turret_control" (ogse_qt.quick_timer)
 function turret_control:__init(turret_binder)
 	self.binder = turret_binder
@@ -116,19 +116,19 @@ function turret_control:__init(turret_binder)
 	self.key_up_desc = {signal = "on_key_up", self = self, fun = self.on_key_up}
 	ogse_signals.get_mgr():subscribe(self.key_up_desc)
 end
--- проверка условия окончания использования
+-- проверка условиЯ окончаниЯ использованиЯ
 function turret_control:condition()
-	-- если актор сошёл с места, где стоял
+	-- если актор сошЮл с места, где стоЯл
 	if db.actor:position():distance_to(self.initial_actor_pos) > 0.1 then
 		return true
-	elseif self.stop_using then -- если нажал клавишу переключения слотов
+	elseif self.stop_using then -- если нажал клавишу переключениЯ слотов
 		return true
 	elseif not self.binder.alive then -- если турель загнулась
 		return true
 	elseif not db.actor:alive() then -- если сам актор помре
 		return true
 	end
-	-- продолжаем использовать, синхронизируем направление ствола и взгляда актора
+	-- продолжаем использовать, синхронизируем направление ствола и взглЯда актора
 	local dev = device()
 	local dist = math.min(math.max(3, level.get_target_dist()), 50)
 	local target_pos = dev.cam_pos:mad(dev.cam_dir,dist)
@@ -146,7 +146,7 @@ function turret_control:on_key_down(key, bind)
 	if level.main_input_receiver() then return end
 	if bind == key_bindings.kWPN_FIRE then -- начинаем стрельбу
 		self:start_fire()
-	elseif activation_cmds[bind] then -- переключаемся на своё оружие
+	elseif activation_cmds[bind] then -- переключаемсЯ на своЮ оружие
 		activate_slot_after_wpn_restore(activation_cmds[bind]):start()
 		self.stop_using = true
 	end
@@ -157,16 +157,16 @@ function turret_control:on_key_up(key, bind)
 		self:stop_fire()
 	end
 end
--- обработка действий окончания использования пулемёта
+-- обработка действий окончаниЯ использованиЯ пулемЮта
 function turret_control:action()
 	-- заканчиваем стрельбу
 	self:stop_fire()
-	-- отписываемся от сигналов клавиш
+	-- отписываемсЯ от сигналов клавиш
 	ogse_signals.get_mgr():unsubscribe(self.key_down_desc)
 	ogse_signals.get_mgr():unsubscribe(self.key_up_desc)
-	-- возвращаем актора в исходное состояние
+	-- возвращаем актора в исходное состоЯние
 	bind_stalker.restore_weapon()
-	-- возвращаем турель в исходное состояние
+	-- возвращаем турель в исходное состоЯние
 	pkm_captured = nil
 	self.turret:set_tip_text("tip_pkm_use")
 end
@@ -194,17 +194,16 @@ function pkm_binder:net_spawn(data)
 	self.se_obj = alife():object(self.object:id())
 	self.heli:SetfHealth(self.se_obj.health)
 	--self.alive = self.se_obj.health > 0.005
-	if self.se_obj.setup_direction then
-		log1("setup_direction")
-
-	end
+	--if self.se_obj.setup_direction then
+		--log1("setup_direction")
+	--end
 	return true
 end
 
 function pkm_binder:update(delta)
 	self:check_health()
 end
--- событие использования
+-- событие использованиЯ
 function pkm_binder:on_use(obj,who)
 	if pkm_captured then -- если используем сейчас, 
 		return -- то ничего не делаем
@@ -216,7 +215,7 @@ function pkm_binder:on_use(obj,who)
 		turret_mount_delay(5000):start()
 		--
 	else -- стандартный случай, просто нажали 'F'
-		turret_control(self):start() -- переключаемся в режим использования
+		turret_control(self):start() -- переключаемсЯ в режим использованиЯ
 	end
 end
 
@@ -229,7 +228,7 @@ function pkm_binder:check_health()
 	end
 end
 
-function create_stat_pkm_on_actor()   ----  это для переносной турели
+function create_stat_pkm_on_actor()   ----  это длЯ переносной турели
 	local level_vertex_id = db.actor:level_vertex_id()
 	local game_vertex_id = db.actor:game_vertex_id()
 	local position = db.actor:position()

@@ -109,19 +109,8 @@ class "wait_for_actor_move" (ogse_qt.quick_timer)
 function wait_for_actor_move:__init(binder) super()
 	self.initial_actor_pos = db.actor:position()
 	self.car_binder = binder
-	--self.sm = ogse_signals.get_mgr()
-end
-function wait_for_actor_move:on_key_down(key, bind)
-	if bind == 15 then
-		log1("wait_for_actor_move:on_key_down")
-		self.closed_by_key = true
-	end
 end
 function wait_for_actor_move:condition()
-	--[[if not self._on_key_desc then
-		self._on_key_desc = {signal = "on_key_down", self = self, fun = self.on_key_down}
-		self.sm:subscribe(self._on_key_desc)
-	end]]
 	if self.closed_by_key then
 		return true
 	end
@@ -129,9 +118,6 @@ function wait_for_actor_move:condition()
 	return dist > 0.2
 end
 function wait_for_actor_move:action()
-	--[[if self._on_key_desc then
-		self.sm:unsubscribe(self._on_key_desc)
-	end]]
 	close_door(self.car_binder.engine_door_def)
 end
 

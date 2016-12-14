@@ -1,15 +1,17 @@
 --KRodin: теперь этот скрипт не имеет к минам никакого отношения.
 --Теперь скрипт нужен только для безопасного удаления всяких объектов
 
-local to_delete = {}
+--local to_delete = {}
 
 function add_to_delete(id)
-	if not to_delete[id] then
-		to_delete[id] = id
-		run_del_mines_timer()
-	end
+	--if not to_delete[id] then
+	--	to_delete[id] = id
+	--	run_del_mines_timer()
+	--end
+	alife():release( alife():object(id) )
 end
 
+--[=[ --KRodin: по-моему, для удаления всего того, что здесь удаляется, таймер не нужен.
 function delete_mines()
 	for k, v in pairs(to_delete) do
 		local sobj = alife():object(v)
@@ -44,6 +46,7 @@ end
 function check_del_mines_timer:update()
   delete_mines()
 end
+--]=]
 
 --*****************************************************************************************
 --KRodin: средство безопасного удаления всяких рестрикторов, в т.ч. подходит для аномалий.

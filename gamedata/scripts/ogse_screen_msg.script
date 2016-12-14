@@ -44,16 +44,12 @@ function remove_use_item_message()
 end
 
 -- Конструктор таймера сообщений об использовании предметов
-class "use_item_show_timer" (ogse_qt.quick_timer)
-
+class "use_item_show_timer"(ogse_qt.quick_timer)
 function use_item_show_timer:__init() super()
 	self.limit = time_global()+3000
 end
 function use_item_show_timer:condition()
-	if time_global() >= self.limit then
-		return true
-	end
-	return ogse_qt.quick_timer.condition(self)
+	return time_global() >= self.limit
 end
 function use_item_show_timer:action()
 	remove_use_item_message()

@@ -1614,10 +1614,13 @@ function captive_on_agr_mill_base_spawn_specnaz_on_nii()
 	local respawns = {"val_soldier_respawn_1", "rad_specnaz_respawn_specnaz", "esc_soldier_respawn_specnaz", "agr_soldier_veteran"}
 	for k,v in pairs(spawn_db.captive_on_agr_mill_base_spawn_specnaz_on_nii) do
 		for i = 1, 2 do
-			local obj = respawns[math.random(#respawns)]
-			--local sobj = alife():create(obj, v.pos, v.lvid, v.gvid)
-			local sobj = alife():create(obj, vector():set(unpack(v.pos)), v.lvid, v.gvid)
-			captive_on_agr_mill_base_wait_for_spawn_specnaz(sobj.id):start()
+			local sect = respawns[math.random(#respawns)]
+			local sobj = alife():create(sect, vector():set(unpack(v.pos)), v.lvid, v.gvid)
+			level.client_spawn_manager():add( sobj.id, -1,
+				function( id, obj )
+					obj:set_relation(game_object.enemy, db.actor)
+					obj:set_goodwill(-5000, db.actor)
+				end)
 		end
 	end
 end
@@ -3379,50 +3382,8 @@ function ogse_military_psycho_surprise:taction()
 	db.actor:give_info_portion("military_psycho_spawn_note_when_sleeping")
 end
 
--- Таймер, следящий за удалением объекта после того, как он уйдет в оффлайн
--- Работает только в пределе одной игровой сессии (то есть до перехода на новый уровень или сохранения/загрузки игры)!!!
-
-class "go_offline_release_timer" (ogse_qt.quick_timer)
-function go_offline_release_timer:__init(obj_id) super()
-   self.obj_id = obj_id -- запоминаем в таймере id непися
-end
-
-function go_offline_release_timer:condition()
-   return (not level.object_by_id(self.obj_id)) -- ждём исчезновения клиентского объекта
-end
-
-function go_offline_release_timer:action()
-   local s_npc = alife():object(self.obj_id)
-   if s_npc then
-      alife():release(s_npc, true)
-   else
-	  log1("----Something wrong with object! ID = "..tostring(self.obj_id))
-   end
-end
-
--- Таймер, дающий маленький хит спецназу на Агропроме
-
-class "captive_on_agr_mill_base_wait_for_spawn_specnaz" (ogse_qt.quick_timer)
-function captive_on_agr_mill_base_wait_for_spawn_specnaz:__init(npc_id) super()
-	self.npc_id = npc_id -- запоминаем в таймере id непися
-end
-
-function captive_on_agr_mill_base_wait_for_spawn_specnaz:condition()
-	return level.object_by_id(self.npc_id)
-end
-
-function captive_on_agr_mill_base_wait_for_spawn_specnaz:action()
-	local my_hit = hit()
-	my_hit.direction = vector():set(0,0,0)
-	my_hit.impulse = 0.01
-	my_hit.draftsman = db.actor
-	my_hit.power = 0.01
-	my_hit.type = hit.strike
-	level.object_by_id(self.npc_id):hit(my_hit)
-end
 
 -- Включение сталкеровской сети через сутки
-
 class "captive_on_agr_mill_base_shutdown_news_timer" (ogse_st_mgr.savable_timer)
 function captive_on_agr_mill_base_shutdown_news_timer:__init() super()
 	-- обязательная строка с именем класса таймера
@@ -3435,7 +3396,6 @@ end
 
 
 -- Функции для работы с дезертиром на Агропроме
-
 function agr_swamp_ratcatcher_actor_has_stalker_outfit()
 	return db.actor:has_info("agr_swamp_ratcatcher_go_to_novice_outfit") and (db.actor:object("novice_outfit") or db.actor:object("stalker_outfit"))
 end

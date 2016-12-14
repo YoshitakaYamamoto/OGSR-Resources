@@ -462,8 +462,8 @@ end
 -- level.add_cam_effector("camera_effects\\prison_1.anm", 100, false, "") - взгл€д в небо, плавное восстановление с раскачиванием
 -- level.add_cam_effector("camera_effects\\drunk.anm", 100, false, "") - сильное раскачивание слева направо
 
--- —павним клона(спасибо Mixser) -------------------------------------------------------------------
-
+--[=[
+--—павним клона(спасибо Mixser) -------------------------------------------------------------------
 class "go_online_watch_timer" (ogse_qt.quick_timer)
 function go_online_watch_timer:__init(npc_id) super()
    self.npc_id = npc_id -- запоминаем в таймере id непис€
@@ -535,6 +535,7 @@ function spawn_gg_clone()
 		end
 	end
 end
+--]=]
 
 -- Ёффекты от артефакта "”лей" ---------------------------------------------------------------------
 function uley_timer_1()

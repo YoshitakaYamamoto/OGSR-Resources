@@ -152,18 +152,6 @@ function on_use(obj, sobj)
 	end
 end
 
-
--- таймер отсчёта тактов лечения кровотечения автодоком
-class "heal_wounds_timer" (ogse_qt.quick_timer)
-
-function heal_wounds_timer:__init(timeout) super(timeout)
-end
-
-function heal_wounds_timer:taction()
-	heal_wounds_per_turn()
-end
--- конец таймера
-
 -- Действия при помещении автодока на пояс
 function start_up()
 
@@ -244,17 +232,18 @@ function autohealing()
 	local cas = db.actor.power		-- current actor stamina
 	local car = db.actor.radiation	-- current actor radiation
 	local cab = db.actor:get_bleeding()	-- current actor bleeding
- 	if( switch_on["h"] and cah < threshold_h and charges["h"] > 0 )
-	then 
+ 	if switch_on["h"] and cah < threshold_h and charges["h"] > 0 then 
 		snd_obj = xr_sound.get_safe_sound_object( [[HEV\administering-anti-rad]] )
 		if snd_obj then snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0) end
 		db.actor:give_game_news(ad_healing_msg, "ui\\ui_iconsTotal", Frect():set(0,188,83,47), 0, 3000)
 		db.actor.health = health_dlt
-		if( cab > 0 )	-- есть кровотечение
-		then
-			if( bleeding_on_begin < cab ) then bleeding_on_begin = cab end
-			db.actor:heal_wounds(bleeding_on_begin/10)
-			if( not is_bleeding ) then heal_wounds_timer(300):start(); is_bleeding = true end
+		if cab > 0 then -- есть кровотечение
+			if bleeding_on_begin < cab then bleeding_on_begin = cab end
+			db.actor:heal_wounds(bleeding_on_begin / 10)
+			if not is_bleeding then
+				dsh.timeout(300, heal_wounds_per_turn)
+				is_bleeding = true
+			end
 		else
 			bleeding_on_begin = 0
 		end
@@ -363,13 +352,15 @@ function autohealing()
 end
 
 function heal_wounds_per_turn()
-
-	db.actor:heal_wounds(bleeding_on_begin/10)
-	if( db.actor:get_bleeding()>0 ) then heal_wounds_timer(300):start()
-	else bleeding_on_begin = 0; is_bleeding = false
+	db.actor:heal_wounds( bleeding_on_begin / 10 )
+	if db.actor:get_bleeding() > 0 then
+		dsh.timeout(300, heal_wounds_per_turn)
+	else
+		bleeding_on_begin = 0
+		is_bleeding = false
 	end
-
 end
+
 -- Перезарядка подсистем автодока с помощью картриджей
 function ad_recharge(subsys)
 
