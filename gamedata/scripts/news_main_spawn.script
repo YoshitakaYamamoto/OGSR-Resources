@@ -141,7 +141,7 @@ function on_spawn(obj)
 		
 		local mob_u = {}
 		mob_u.spawn_time = news_main_data.game_minutes()
-		mob_u.level = object_level_name(obj)
+		mob_u.level = object_level_name(obj) or ""
 		mob_u.name = get_clsid(obj) or ""
 		
 		if s_mob_u == 0 or s_mob_meter == 0 then

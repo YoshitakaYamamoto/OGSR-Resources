@@ -136,7 +136,7 @@ function on_stalker_death(victim_, killer_)
 	
 	local m_name  = get_npc_name(victim)
 	if total_debug == true then printf("Сообщения о смерти. Имя покойного - " .. m_name) end
-	local m_level = get_level_name(get_object_levelname(victim), 1)
+	local m_level = get_level_name(object_level_name(victim) or "", 1)
 	if total_debug == true then printf("Сообщения о смерти. Локация покойного - " .. m_level) end
 	local m_comm  = get_npc_community(victim)
 	if total_debug == true then printf("Сообщения о смерти. Группировка покойного - " .. m_comm) end
@@ -225,32 +225,6 @@ function get_level_name(level_, value_id)
 				end
 			end
 		return m_tmp_str
-end
-
--- Расположение игрового объекта
-function get_object_levelname(obj)
-	local mlevel = "null"	
-	if (obj) then
-		local m_game_vertex
-		local nm = "nil"
-		if (obj.name) then nm = obj:name() end
-		if (isGameObject(obj)) then
-			m_game_vertex = obj:game_vertex_id()
-		else
-			m_game_vertex = obj.m_game_vertex_id
-		end
-		if (m_game_vertex) then
-			local lvert = game_graph():vertex(m_game_vertex)
-			if (lvert ~= nil and lvert.level_id) then
-				local lid = lvert:level_id()
-				if (lid ~= nil) then
-					mlevel = alife():level_name(lid)
-				end
-			end
-			if mlevel == nil then mlevel = "nil" end
-		end
-	end
-	return mlevel
 end
 
 function get_npc_community(obj)
