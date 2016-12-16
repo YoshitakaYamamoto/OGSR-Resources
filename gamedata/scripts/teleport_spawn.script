@@ -1,127 +1,43 @@
-local spawn_db = ogse_spawn_db.script_spawn_registry.teleport_spawn
 
-function teleport()
-	-- Создаем  телепорт за базой военных у ворот
---SPAWN_V1
-	--alife():create("m_teleport_2",vector():set(-38.0,-14.5,-197),319032,207)
---SPAWN_V2
-	ogse.spawn_object(spawn_db.m_teleport_2)
-	-- Создаем  телепорт возле низкого валуна
---SPAWN_V1
-	--alife():create("m_teleport_3",vector():set(-128.06,-23.46,-478.5),12829,8)
---SPAWN_V2
-	ogse.spawn_object(spawn_db.m_teleport_3)
-	-- БТР перед чемоданом Лиса
---SPAWN_V1
-	--alife():create("esc_vehicle_btr",vector():set(-125.37,-28.38,-526.76),126642,11)
---SPAWN_V2
-	--ogse.spawn_object(spawn_db.esc_vehicle_btr)
-end
+function barman_pivo_timer_action()
+	ogse_st_mgr.delayed_fun_start("barman_pivo_timer")
+	:set_gdelayDHMS(0, math.random(12, 36), 0, 0)
+	:init(script_name()..".barman_pivo_timer_action")
+	:start()
 
-function on_timer_random_spawn()
-	random_timer_spawn.random_timer_spawn(actor, npc)
-	local time_in_sec = 0 * 24 * 3600 + vars.get_surge_time() * 3600 + 0
-	ogse.start_gtmr("random_spawn", time_in_sec, script_name()..".on_timer_random_spawn")
 	if has_alife_info("barman_pivo") then
 		db.actor:disable_info_portion("barman_pivo")
 	end
 end
-	
-function teleport1(actor,npc)
-	-- Телепорт на Янтаре для входа в лабиринт на трубе возле здания с входом в Х16 
---SPAWN_V1
-	--alife():create("m_teleport_4",vector():set(-5.498,7.1,-28.34),36999,1444)
---SPAWN_V2
-	ogse.spawn_object(spawn_db.m_teleport_4)
-	-- Телепорт на Янтаре для перехода на другую сторону лабиринта
---SPAWN_V1
-	--alife():create("m_teleport_14",vector():set(-19,-0.188,-140.45),38540,1446)
---SPAWN_V2
-	ogse.spawn_object(spawn_db.m_teleport_14)
-	-- Телепорт на Янтаре в узкожопом месте для выхода из лабиринта
---SPAWN_V1
-	--alife():create("m_teleport_5",vector():set(-67.09,1.24,-153.26),38540,1446)
---SPAWN_V2
-	ogse.spawn_object(spawn_db.m_teleport_5)
-	-- Телепорт затычка 1 на Янтаре
---SPAWN_V1
-	--alife():create("m_teleport_17",vector():set(76.05,-0.0,-79.17),71294,1468)
---SPAWN_V2
-	ogse.spawn_object(spawn_db.m_teleport_17)
-	-- Телепорт затычка 2 на Янтаре
---SPAWN_V1
-	--alife():create("m_teleport_18",vector():set(-12.72,0.0,-84.62),40708,1446)
---SPAWN_V2
-	ogse.spawn_object(spawn_db.m_teleport_18)
-	-- Телепорт на Дикой территории для подъёма на обочину дороги возле тоннеля с жарками
---SPAWN_V1
-	-- alife():create("m_teleport_6",vector():set(-217.9,2.73,-62.16),45279,1311)
---SPAWN_V2
-	--ogse.spawn_object(spawn_db.m_teleport_6)
-	-- Телепорт на Дикой территории для спрыгивания на левую часть дороги возле тоннеля с жарками
---SPAWN_V1
-	-- alife():create("m_teleport_7",vector():set(-213.1,1.83,-50.3),45279,1311)
---SPAWN_V2
-	--ogse.spawn_object(spawn_db.m_teleport_7)
-	-- Телепорт на Янтаре на бульдозере
---SPAWN_V1
-	-- alife():create("m_teleport_8",vector():set(-25.8,6.13,2.18),53717,1446)
---SPAWN_V2
-	--ogse.spawn_object(spawn_db.m_teleport_8)
-	-- Телепорт для перехода в Бар на Свалке возле бензовоза на радиоактивной возвышенности 
---SPAWN_V1
-	--alife():create("m_teleport_9",vector():set(-61.35,28.5,260.56),178215,355)
---SPAWN_V2
-	ogse.spawn_object(spawn_db.m_teleport_9)
-	-- Телепорт для перехода из Бара на Свалке возле кучи мусора 
---SPAWN_V1
-	--alife():create("m_teleport_10",vector():set(0,7.3,201.3),178215,355)
---SPAWN_V2
-	ogse.spawn_object(spawn_db.m_teleport_10)
-	-- Телепорт на Дикой территории для спрыгивания с тоннеля слева от дороги  
---SPAWN_V1
-	-- alife():create("m_teleport_11",vector():set(-136.86,5.4,-95.66),45279,1311)
---SPAWN_V2
-	--ogse.spawn_object(spawn_db.m_teleport_11)
-	-- Телепорт на Дикой территории для спрыгивания с тоннеля справа от дороги  
---SPAWN_V1
-	-- alife():create("m_teleport_12",vector():set(-141.7,2.5,-104.16),45279,1311)
---SPAWN_V2
-	--ogse.spawn_object(spawn_db.m_teleport_12)
-	-- Артефакт Душа на Дикой территории на мосту над туннелем с жарками  
---SPAWN_V1
-	-- alife():create("af_soul",vector():set(-170.31,1.8,-132),45279,1311)
---SPAWN_V2
-	--ogse.spawn_object(spawn_db.af_soul_1)
-	-- Артефакт Лунный свет на Янтаре возле доктора Томпсона
---SPAWN_V1
-	-- alife():create("af_soul",vector():set(23.4, 2.8, -74),43996,1315)
---SPAWN_V2
-	--ogse.spawn_object(spawn_db.af_soul_2)
-	-- Зомби в лабиринте Янтаря
---SPAWN_V1
-	--alife():create("rad_zombied_respawn_2",vector():set(23.35, 2.8, -79.29),53336,1446)
---SPAWN_V2
-	ogse.spawn_object(spawn_db.rad_zombied_respawn_2)
-	-- Одиночки в одежде из Чистого неба на расширенном участке локации Бар
---SPAWN_V1
-	-- alife():create("clear_cky",vector():set(-101.57, 1.7, 146.38),30954 ,1224)
---SPAWN_V2
-	--ogse.spawn_object(spawn_db.clear_cky)
---SPAWN_V1
-	-- alife():create("clear_cky1",vector():set(-42.3, 1.7, 131.35),30954 ,1224)
---SPAWN_V2
-	--ogse.spawn_object(spawn_db.clear_cky1)
---SPAWN_V1
-	--alife():create("stalker_monolith",vector():set(-60.3, 1.7, 131.35),30954 ,1224)
---SPAWN_V2
-	ogse.spawn_object(spawn_db.stalker_monolith)
---SPAWN_V1
-	--alife():create("tompson",vector():set(104.91,-0.0,93.285),95605,1520)
---SPAWN_V2
-	ogse.spawn_object(spawn_db.tompson)
-	
-	dialogs.actor_clear_community(actor,npc)
-	ogse.start_gtmr("random_spawn", 0 * 24 * 3600 + math.random(12,36) * 3600 + 0, script_name()..".on_timer_random_spawn")
-end
 
+function teleport1() --Р’С‹Р·С‹РІР°РµС‚СЃСЏ РёРЅС„РѕРїРѕСЂС€РЅРµРј РїРѕСЃР»Рµ РїРµСЂРІРѕРіРѕ СЂР°Р·РіРѕРІРѕСЂР° СЃ СЃРёРґРѕСЂРѕРј. TODO: Р’С‹РЅРµСЃС‚Рё СЌС‚Рѕ РѕС‚СЃСЋРґР°, Рё СЃРєСЂРёРїС‚ СѓРґР°Р»РёС‚СЊ.
+	local spawn_db = ogse_spawn_db.script_spawn_registry.teleport_spawn
+
+	-- РўРµР»РµРїРѕСЂС‚ РЅР° РЇРЅС‚Р°СЂРµ РґР»СЏ РІС…РѕРґР° РІ Р»Р°Р±РёСЂРёРЅС‚ РЅР° С‚СЂСѓР±Рµ РІРѕР·Р»Рµ Р·РґР°РЅРёСЏ СЃ РІС…РѕРґРѕРј РІ РҐ16 
+	ogse.spawn_object(spawn_db.m_teleport_4)
+	-- РўРµР»РµРїРѕСЂС‚ РЅР° РЇРЅС‚Р°СЂРµ РґР»СЏ РїРµСЂРµС…РѕРґР° РЅР° РґСЂСѓРіСѓСЋ СЃС‚РѕСЂРѕРЅСѓ Р»Р°Р±РёСЂРёРЅС‚Р°
+	ogse.spawn_object(spawn_db.m_teleport_14)
+	-- РўРµР»РµРїРѕСЂС‚ РЅР° РЇРЅС‚Р°СЂРµ РІ СѓР·РєРѕР¶РѕРїРѕРј РјРµСЃС‚Рµ РґР»СЏ РІС‹С…РѕРґР° РёР· Р»Р°Р±РёСЂРёРЅС‚Р°
+	ogse.spawn_object(spawn_db.m_teleport_5)
+	-- РўРµР»РµРїРѕСЂС‚ Р·Р°С‚С‹С‡РєР° 1 РЅР° РЇРЅС‚Р°СЂРµ
+	ogse.spawn_object(spawn_db.m_teleport_17)
+	-- РўРµР»РµРїРѕСЂС‚ Р·Р°С‚С‹С‡РєР° 2 РЅР° РЇРЅС‚Р°СЂРµ
+	ogse.spawn_object(spawn_db.m_teleport_18)
+	-- РўРµР»РµРїРѕСЂС‚ РґР»СЏ РїРµСЂРµС…РѕРґР° РІ Р‘Р°СЂ РЅР° РЎРІР°Р»РєРµ РІРѕР·Р»Рµ Р±РµРЅР·РѕРІРѕР·Р° РЅР° СЂР°РґРёРѕР°РєС‚РёРІРЅРѕР№ РІРѕР·РІС‹С€РµРЅРЅРѕСЃС‚Рё 
+	--ogse.spawn_object(spawn_db.m_teleport_9) --KRodin: РѕРЅРё Р·Р°С‡РµРј РЅСѓР¶РЅС‹? РўР°Рј Р¶Рµ С‡РµСЂРµР· РґС‹СЂСѓ РІ Р·Р°Р±РѕСЂРµ РїРµСЂРµС…РѕРґ.
+	-- РўРµР»РµРїРѕСЂС‚ РґР»СЏ РїРµСЂРµС…РѕРґР° РёР· Р‘Р°СЂР° РЅР° РЎРІР°Р»РєРµ РІРѕР·Р»Рµ РєСѓС‡Рё РјСѓСЃРѕСЂР° 
+	--ogse.spawn_object(spawn_db.m_teleport_10)
+	-- Р—РѕРјР±Рё РІ Р»Р°Р±РёСЂРёРЅС‚Рµ РЇРЅС‚Р°СЂСЏ
+	ogse.spawn_object(spawn_db.rad_zombied_respawn_2)
+	--
+	ogse.spawn_object(spawn_db.stalker_monolith)
+	--
+	ogse.spawn_object(spawn_db.tompson)
+	--
+	--dialogs.actor_clear_community() --Рђ СЌС‚Рѕ Р·Р°С‡РµРј?
+
+	ogse_st_mgr.delayed_fun_start("barman_pivo_timer")
+	:set_gdelayDHMS(0, math.random(12, 36), 0, 0)
+	:init(script_name()..".barman_pivo_timer_action")
+	:start()
+end

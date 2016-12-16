@@ -1,9 +1,4 @@
 script_spawn_registry = {
-	military_spawn = {
-		zomb1              = {pos = {-356.8, -23, 4.22}, y_offs =  1, lvid = 3907, gvid = 1610},
-		military_monolith1 = {pos = {-135.2, 0, 49.4}, y_offs =  1, lvid = 184394, gvid = 1694},
-		military_monolith2 = {pos = {-5.3, -7.8, 113.1}, y_offs =  1, lvid = 303497, gvid = 1710},
-	},
 	dark_valley_u_spawn = {
 		rat_entry          = {pos = {0.806, 9.408, -4.068}, y_offs = 10, lvid = 3082, gvid = 1136},
 		key1               = {pos = {-9.515, 3.187, -8.75}, y_offs = 11, lvid = 1793, gvid = 1122},
@@ -268,8 +263,8 @@ script_spawn_registry = {
 		af_soul_1             = {sec = "af_soul"              ,pos = {-170.31, 1.8, -132}, lvid = 38383,  gvid = 1426},
 		af_soul_2             = {sec = "af_soul"              ,pos = {23.4, 2.8, -74}, lvid = 58964,  gvid = 1447},
 		rad_zombied_respawn_2 = {sec = "rad_zombied_respawn_2",pos = {23.35, 2.8, -79.29}, lvid = 61200,  gvid = 1470},
-		clear_cky             = {sec = "clear_cky"            ,pos = {-101.57, 1.7, 146.38}, lvid = 13322,  gvid = 1316},
-		clear_cky1            = {sec = "clear_cky1"           ,pos = {-42.3, 1.7, 131.35}, lvid = 15815,  gvid = 1316},
+		--clear_cky             = {sec = "clear_cky"            ,pos = {-101.57, 1.7, 146.38}, lvid = 13322,  gvid = 1316},
+		--clear_cky1            = {sec = "clear_cky1"           ,pos = {-42.3, 1.7, 131.35}, lvid = 15815,  gvid = 1316},
 		stalker_monolith      = {sec = "stalker_monolith"     ,pos = {-60.3, 1.7, 131.35}, lvid = 15094,  gvid = 1316},
 		tompson               = {sec = "tompson"              ,pos = {104.91, 0, 93.285}, lvid = 109642,  gvid = 1545},
 	},

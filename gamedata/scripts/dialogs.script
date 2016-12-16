@@ -389,7 +389,7 @@ function end_bandits_neutral_by_lab_end()
 	end
 end
 
-function actor_clear_community(actor, npc)
+function actor_clear_community()
 	log1("ACTOR NOW IN [NEUTRAL] COMMUNITY")
 	clear_all_actor_community_info()
 	if db.actor and db.actor:alive() then
