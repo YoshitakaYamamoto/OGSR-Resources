@@ -395,17 +395,6 @@ function spawn_dead_zone()
 	xs_stor.set("dead_zone_id", dead_zone_id)	
 end
 
--- Таймер для телепортирования игрока
-class "ogse_teleport_trap_journey" (ogse_st_mgr.savable_timer)
-function ogse_teleport_trap_journey:__init() super()
-	-- обязательная строка с именем класса таймера
-	self._class = script_name()..".ogse_teleport_trap_journey"
-end
-
-function ogse_teleport_trap_journey:taction()
-	journey_step()
-end
-
 function journey_step()
 	write_log("journey_step")
 --	local teleport_position = xs_stor.get("teleport_position", nil)
@@ -418,9 +407,7 @@ function journey_step()
 			table.remove(teleport_position, index)
 			--xs_stor.set("teleport_position", teleport_position)
 
-			local my_timer = ogse_teleport_trap_journey()
-			my_timer:set_delay(5)
-			my_timer:start(true)
+			ogse_st_mgr.delayed_fun_start("ogse_teleport_trap_journey"):set_delay(5):init(script_name()..".journey_step"):start(true)
 
 			teleport_actor(step.position)
 		else
@@ -462,14 +449,7 @@ function saharov_tell_about_complete_timer()
 	ogse.start_visual_timer(nil, 15, script_name() .. ".saharov_tell_about_complete")
 end
 
--- Таймер для выдачи инофопоршня
-class "ogse_teleport_trap_art_destiny" (ogse_st_mgr.savable_timer)
-function ogse_teleport_trap_art_destiny:__init() super()
-	-- обязательная строка с именем класса таймера
-	self._class = script_name()..".ogse_teleport_trap_art_destiny"
-end
-
-function ogse_teleport_trap_art_destiny:taction()
+function ogse_teleport_trap_art_destiny_taction()
 	db.actor:give_info_portion("ogse_teleport_trap_art_destiny")
 end
 
@@ -524,10 +504,11 @@ function give_reward_and_pick_up_items(first_speaker, second_speaker)
 	dialogs.relocate_money(second_speaker, 20000, "in")
 	dialogs.relocate_item_section(second_speaker, "af_transmut_7", "in")
 	dialogs.relocate_item_section(first_speaker, "telekill_case_with_art", "out")
-	
-	local p = ogse_teleport_trap_art_destiny()
-	p:set_gdelayDHMS(math.random(2,3), 0, 0, 0) -- 2-3 игровых дня
-	p:start()
+
+	ogse_st_mgr.delayed_fun_start("ogse_teleport_trap_art_destiny")
+	:set_gdelayDHMS(math.random(2,3), 0, 0, 0)
+	:init(script_name()..".ogse_teleport_trap_art_destiny_taction")
+	:start()
 end
 
 function spawn_case_with_art()

@@ -871,7 +871,7 @@ function delete_mils_near_anoms()
 				if level.object_by_id(i)==nil then
 					alife():release(obj, true)
 				else
-					ogse.start_tmr("del_anom_mils", 10, "tasks_functor.delete_mils_near_anoms")
+					ogse_st_mgr.start_timer("del_anom_mils", 10, "tasks_functor.delete_mils_near_anoms")
 				end
 			end
         end
@@ -929,14 +929,10 @@ end
 function spawn_bomba()
 	local sbomb = ogse.spawn_object_rand(spawn_db.PosesBomb)
 	ogse.save_var("BombID", sbomb.id, "u16")
-	ogse.start_tmr(nil, 5, script_name() .. ".SetBombTip")
+	level.client_spawn_manager():add( sbomb.id, -1, function(id, obj)
+		obj:set_tip_text("spawn_bomba_text")
+	end )
 	ogse.start_conditional_visual_timer(nil, 180, script_name() .. ".DetonateBombCond", script_name() .. ".DetonateBomb")
-end
-
-function SetBombTip()
-	local id = ogse.load_var("BombID", -1, "u16")
-	ASSERT(id ~= -1, "cannot get id")
-	level.object_by_id(id):set_tip_text("spawn_bomba_text")
 end
 
 function DetonateBombCond()
@@ -1070,6 +1066,9 @@ function ui_neutralize_bomb:OnKeyboard(dik, key_act)
         if dik == DIK_keys.DIK_ESCAPE then 
 			this.ReleaseBomb()
 			local sbomb = alife():create("bomba", db.actor:position():add(db.actor:direction()), db.actor:level_vertex_id(), db.actor:game_vertex_id())
+			level.client_spawn_manager():add( sbomb.id, -1, function(id, obj)
+				obj:set_tip_text("spawn_bomba_text")
+			end )
 			ogse.save_var("BombID", sbomb.id, "u16")
 			self:quit()
 		end
@@ -1273,8 +1272,8 @@ function bar_kvest_friend_of_barman_check_status_of_bomb()
 		end
 	end
 	if is_all_dead == true then
-		if ogse.tmr_exists("bar_kvest_friend_of_barman_bomb_explose") then
-			local bomb_timer = ogse.get_tmr("bar_kvest_friend_of_barman_bomb_explose")
+		if ogse_st_mgr.timer_exists("bar_kvest_friend_of_barman_bomb_explose") then
+			local bomb_timer = ogse_st_mgr.get_timer("bar_kvest_friend_of_barman_bomb_explose")
 			bomb_timer:stop()
 			db.actor:give_info_portion("bar_kvest_friend_of_barman_val_freedom_all_dead")
 		end
@@ -1283,8 +1282,8 @@ end
 
 function bar_kvest_friend_of_barman_id_dead()
 	-- Отключаем таймер
-	if ogse.tmr_exists("bar_kvest_friend_of_barman_bomb_explose") then
-		local bomb_timer = ogse.get_tmr("bar_kvest_friend_of_barman_bomb_explose")
+	if ogse_st_mgr.timer_exists("bar_kvest_friend_of_barman_bomb_explose") then
+		local bomb_timer = ogse_st_mgr.get_timer("bar_kvest_friend_of_barman_bomb_explose")
 		bomb_timer:stop()
 	end
 
@@ -1494,7 +1493,7 @@ function captive_on_agr_mill_base_send_tip_about_heli()
 	local timeout = 15
 	local showtime = 20
 	ogse.send_tip(game.translate_string("captive_save_sos_msg"), game.translate_string("bar_barmen_name"), timeout, showtime, "barman", "pda_sos")
-	ogse.start_tmr(nil, timeout + 1, script_name()..".captive_on_agr_mill_base_start_heli_timer")
+	ogse_st_mgr.start_timer(nil, timeout + 1, script_name()..".captive_on_agr_mill_base_start_heli_timer")
 	captive_on_agr_mill_base_spawn_guard_restr()
 end
 
@@ -1510,8 +1509,8 @@ end
 
 -- Вертолет летит высаживать спецназ
 function captive_on_agr_mill_base_actor_inside_building()
-	if ogse.tmr_exists("captive_on_agr_mill_base_start_heli") then
-		local timer = ogse.get_tmr("captive_on_agr_mill_base_start_heli")
+	if ogse_st_mgr.timer_exists("captive_on_agr_mill_base_start_heli") then
+		local timer = ogse_st_mgr.get_timer("captive_on_agr_mill_base_start_heli")
 		timer:stop()
 		--ogse.send_tip("Вылет вертолёта для высадки десанта!")
 		db.actor:give_info_portion("captive_on_agr_mill_base_spawn_specnaz")
@@ -1705,9 +1704,11 @@ function captive_on_agr_mill_base_shutdown_news()
 	xs_stor.set("need_shutdown_stalker_news", true)
 	local text = game.translate_string("captive_on_agr_mill_base_shutdown_news_text")
 	ogse.send_tip(text, game.translate_string("bar_barmen_name"), 5, 10, "barman", "pda_news")
-	local timer = captive_on_agr_mill_base_shutdown_news_timer()
-	timer:set_gdelayDHMS(2, 0, 0, 0)
-	timer:start()
+
+	ogse_st_mgr.delayed_fun_start("captive_on_agr_mill_base_shutdown_news_timer")
+	:set_gdelayDHMS(2, 0, 0, 0)
+	:init(script_name()..".captive_on_agr_mill_base_shutdown_news_timer_taction")
+	:start()
 end
 
 -- Награда за фиговую концовку
@@ -1736,7 +1737,7 @@ function delete_starik()
 	if starik and level_object_by_sid(story_ids.esc_starik_searcing_doch) == nil then
 		alife():release(starik, true)
 	else
-		ogse.start_tmr("delete_starik", 120, "tasks_functor.delete_starik")
+		ogse_st_mgr.start_timer("delete_starik", 120, "tasks_functor.delete_starik")
 	end
 	--obj:on_death()
 end
@@ -1776,7 +1777,7 @@ local Snd_Horr = {
 function af_of_doch_starik_effects()
     if Actor_Has_Items("af_of_doch_starik") and not has_alife_info("pri_kvest_search_doch_of_starik_complete") and not has_alife_info("pri_kvest_search_doch_of_starik_fail") then
 		level.add_pp_effector(tPpe[math.random(1, #tPpe)], 1971, false)
-		ogse.start_tmr("af_of_doch_starik_effects", math.random(20, 50), "tasks_functor.af_of_doch_starik_effects")
+		ogse_st_mgr.start_timer("af_of_doch_starik_effects", math.random(20, 50), "tasks_functor.af_of_doch_starik_effects")
 		local snd_name = Snd_Horr[math.random(1,6)]
 		local snd_obj = xr_sound.get_safe_sound_object(snd_name)
 		snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)		
@@ -2558,7 +2559,7 @@ end
 function bun_spawn_bomba()
 	local pos = db.actor:position()
     local bomba = alife():create("bomba", vector():set(pos.x+1, pos.y, pos.z+1), db.actor:level_vertex_id(), db.actor:game_vertex_id())
-	ogse.start_tmr("bun_babah_bomba", 2, "tasks_functor.bun_babah_bomba", bomba.id)
+	ogse_st_mgr.start_timer("bun_babah_bomba", 2, "tasks_functor.bun_babah_bomba", bomba.id)
 end
 
 function bun_babah_bomba(bomb_id)
@@ -2647,7 +2648,7 @@ function death_esc_scoryi()
 end
 
 function death_esc_scoryi_by_dialog(actor,npc)
-	ogse.start_tmr("scoryi_talk_with_sidor", 30, "tasks_functor.kvest_scoryi_talk_with_sidor")
+	ogse_st_mgr.start_timer("scoryi_talk_with_sidor", 30, "tasks_functor.kvest_scoryi_talk_with_sidor")
 	npc:kill(npc)
 	ogse.del_variable("ScoryiID")
 end
@@ -2922,9 +2923,9 @@ function hit_cars_in_online_visitors()
 	for i,obj in ipairs(killers) do
 		ogse.save_variable("last_request_esc_killer_"..tostring(i), obj.id)
 	end
-	ogse.start_tmr("esc_visitors_hit_btr_01", 2, "tasks_functor.hit_btr_01")
-	ogse.start_tmr("esc_visitors_hit_btr_02", 3, "tasks_functor.hit_btr_02")
-	ogse.start_tmr("esc_visitors_hit_kamaz", 10, "tasks_functor.hit_kamaz")
+	ogse_st_mgr.start_timer("esc_visitors_hit_btr_01", 2, "tasks_functor.hit_btr_01")
+	ogse_st_mgr.start_timer("esc_visitors_hit_btr_02", 3, "tasks_functor.hit_btr_02")
+	ogse_st_mgr.start_timer("esc_visitors_hit_kamaz", 10, "tasks_functor.hit_kamaz")
 	local objects = ogse.spawn_objects(spawn_db.hit_cars_in_online_visitors_3)
 	for _,obj in ipairs(objects) do ogse.kill_offline_npc(obj) obj:on_death() end
 end
@@ -2981,7 +2982,7 @@ function add_tip_about_pass_from_kuzn()
 end
 
 function return_old_comm_to_actor()
-	ogse.start_tmr("make_actor_himself_again", 2, "tasks_functor.return_old_comm_to_actor_impl")
+	ogse_st_mgr.start_timer("make_actor_himself_again", 2, "tasks_functor.return_old_comm_to_actor_impl")
 end
 
 function return_old_comm_to_actor_impl()
@@ -2991,7 +2992,7 @@ function return_old_comm_to_actor_impl()
 end
 
 function esc_last_request_load_mils_in_gaz66()
-	ogse.start_tmr("tip_about_pass_from_kuzn", 3, "tasks_functor.add_tip_about_pass_from_kuzn")
+	ogse_st_mgr.start_timer("tip_about_pass_from_kuzn", 3, "tasks_functor.add_tip_about_pass_from_kuzn")
 	local mils = xr_gulag.get_gulag_by_name("esc_visitors_in_car_last_request")
 	if mils then
 		for k,v in pairs(mils.Object) do
@@ -3071,7 +3072,7 @@ function search_preobr_complete()
 	if db.actor:object("pda_preobr") and not has_alife_info("esc_kvest_iscelenie_snd_kill_preobr_1")  then
 		local Trup1 = ogse.spawn_object(spawn_db.Trup1)
 		ogse.kill_offline_npc(Trup1)
-		ogse.start_tmr("snd_kill_preobr", 10, "tasks_functor.snd_kill_preobr_play")
+		ogse_st_mgr.start_timer("snd_kill_preobr", 10, "tasks_functor.snd_kill_preobr_play")
 		db.actor:give_info_portion("esc_kvest_iscelenie_snd_kill_preobr_1")
 	end
 
@@ -3084,11 +3085,11 @@ end
 function snd_kill_preobr_play()
 	if NumSndKillPreobr == 0 then
 		soundtrack.s_play_no_feedback([[ambient\random\rnd_ak47_1]], 1.0)
-		ogse.start_tmr("snd_kill_preobr", 2, "tasks_functor.snd_kill_preobr_play")
+		ogse_st_mgr.start_timer("snd_kill_preobr", 2, "tasks_functor.snd_kill_preobr_play")
 		NumSndKillPreobr = NumSndKillPreobr + 1
 	elseif NumSndKillPreobr == 1 then
 		soundtrack.s_play_no_feedback([[ambient\random\rnd_ak47_2]], 1.0)
-		ogse.start_tmr("snd_kill_preobr", 2, "tasks_functor.snd_kill_preobr_play")
+		ogse_st_mgr.start_timer("snd_kill_preobr", 2, "tasks_functor.snd_kill_preobr_play")
 		NumSndKillPreobr = NumSndKillPreobr + 1
 	else
 		soundtrack.s_play_no_feedback([[ambient\battle_2]], 1.0)
@@ -3106,7 +3107,7 @@ function guid_preobr_to_yan()
 			if db.actor:position():distance_to_sqr(vector():set(-44.56,0.43,-528.89),122632,815) < 4^2 and Preobr:position():distance_to_sqr(vector():set(-44.56,0.43,-528.89),122632,815) < 4^2 then
 				dialogs.companion_stop_following(Preobr, db.actor)
 				db.actor:give_info_portion("esc_kvest_iscelenie_guid_preobr")
-				ogse.start_tmr("del_preobr", 7, "tasks_functor.del_preobr")
+				ogse_st_mgr.start_timer("del_preobr", 7, "tasks_functor.del_preobr")
 				return true
 			end
 		end
@@ -3142,7 +3143,7 @@ function on_timer_wait_stebel_ri()
 end
 
 function start_wait_stebel_ri()
-	ogse.start_tmr("wait_stebel_ri", 9*60, script_name()..".on_timer_wait_stebel_ri")
+	ogse_st_mgr.start_timer("wait_stebel_ri", 9*60, script_name()..".on_timer_wait_stebel_ri")
 end
 
 function on_timer_wait_lechenie_sidor()
@@ -3150,7 +3151,7 @@ function on_timer_wait_lechenie_sidor()
 end
 
 function start_wait_lechenie_sidor()
-	ogse.start_tmr("wait_lechenie_sidor", 60*60, script_name()..".on_timer_wait_lechenie_sidor")
+	ogse_st_mgr.start_timer("wait_lechenie_sidor", 60*60, script_name()..".on_timer_wait_lechenie_sidor")
 end
 
 function give_lekar_for_sidor_to_actor(first_speaker, second_speaker)
@@ -3370,27 +3371,14 @@ function clothes_changing_actor_dont_see:action()
 	dialogs.companion_start_following(level.object_by_id(self.npc_id), db.actor)
 end
 
+
 -- Таймер, выдающий через определенное время ССИ, дающий возможность получить записку от Психа
-
-class "ogse_military_psycho_surprise" (ogse_st_mgr.savable_timer)
-function ogse_military_psycho_surprise:__init() super()
-	-- обязательная строка с именем класса таймера
-	self._class = script_name()..".ogse_military_psycho_surprise"
-end
-
-function ogse_military_psycho_surprise:taction()
+function ogse_military_psycho_surprise_taction()
 	db.actor:give_info_portion("military_psycho_spawn_note_when_sleeping")
 end
 
-
 -- Включение сталкеровской сети через сутки
-class "captive_on_agr_mill_base_shutdown_news_timer" (ogse_st_mgr.savable_timer)
-function captive_on_agr_mill_base_shutdown_news_timer:__init() super()
-	-- обязательная строка с именем класса таймера
-	self._class = script_name()..".captive_on_agr_mill_base_shutdown_news_timer"
-end
-
-function captive_on_agr_mill_base_shutdown_news_timer:taction()
+function captive_on_agr_mill_base_shutdown_news_timer_taction()
 	xs_stor.set("need_shutdown_stalker_news", false)
 end
 
@@ -3490,9 +3478,10 @@ end
 
 function military_psycho_delete_body()
 	-- Через 6 часов во время сна нам может придти записка
-	local timer = ogse_military_psycho_surprise()
-	timer:set_gdelayDHMS(0, 6, 0, 0)
-	timer:start()
+	ogse_st_mgr.delayed_fun_start("ogse_military_psycho_surprise")
+	:set_gdelayDHMS(0, 6, 0, 0)
+	:init(script_name()..".ogse_military_psycho_surprise_taction")
+	:start()
 end
 
 -- Цена бессмертия

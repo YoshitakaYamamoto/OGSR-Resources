@@ -841,7 +841,7 @@ end
 function esc_millitary_near_anomaly_start_timer_delete(actor,npc)
 	npc:can_switch_online(false)
 	delete_when_offline(npc:id()):start()
---	ogse.start_tmr("del_anom_mils", 10, "tasks_functor.delete_mils_near_anoms")
+--	ogse_st_mgr.start_timer("del_anom_mils", 10, "tasks_functor.delete_mils_near_anoms")
 end
 
 function messege_help_to_scoryi()
@@ -850,7 +850,7 @@ function messege_help_to_scoryi()
 	--local Scoryi = alife():create("esc_scoryi", vector():set(119.39, 2.05, 463.33), 423399, 222)
 --SPAWN_V2
 --	local Scoryi = ogse.spawn_object(spawn_db.esc_scoryi)
-	--ogse.start_gtmr("death_esc_scoryi", 5 * 24 * 3600, "tasks_functor.death_esc_scoryi")
+	--ogse_st_mgr.start_gtimer("death_esc_scoryi", 5 * 24 * 3600, "tasks_functor.death_esc_scoryi")
 --	ogse.save_variable("ScoryiID",Scoryi.id)
 end
 
@@ -1646,7 +1646,7 @@ end
 	
 --Призрак Quest's
 function val_last_request_start_timer()
-	ogse.start_tmr("orlov_go_to_fab", 60, script_name()..".on_timer_orlov_go_to_fab")
+	ogse_st_mgr.start_timer("orlov_go_to_fab", 60, script_name()..".on_timer_orlov_go_to_fab")
 end
 
 function on_orlov_use(actor,npc)
@@ -1691,7 +1691,7 @@ end
 	
 function show_messeges_shpion_to_orlov4()
 	news_manager.send_tip(db.actor, "Время не изменилось.", 0, "stalker", 5000)
-	ogse.start_tmr("scene_hit_actor_to_prison2", 3, script_name()..".on_timer_scene_hit_actor_to_prison2")
+	ogse_st_mgr.start_timer("scene_hit_actor_to_prison2", 3, script_name()..".on_timer_scene_hit_actor_to_prison2")
 end
 
 function going_to_orlov(actor,npc)
@@ -2850,22 +2850,22 @@ end
 
 function human_pervert_dead()
 	jekan_work.respawn_izlom_pervert()
-	ogse.start_tmr("prvrt1", 0.5, "jekan_work.release_human_pervert")
+	ogse_st_mgr.start_timer("prvrt1", 0.5, "jekan_work.release_human_pervert")
 end
 
 function izlom_pervert_dead()
 	jekan_work.respawn_human_pervert()
-	ogse.start_tmr("prvrt2", 0.5, "jekan_work.release_izlom_pervert")
+	ogse_st_mgr.start_timer("prvrt2", 0.5, "jekan_work.release_izlom_pervert")
 end
 
 function girl_pervert_dead()
 	jekan_work.respawn_cat_queen()
-	ogse.start_tmr("catgl1", 0.5, "jekan_work.release_girl_pervert")
+	ogse_st_mgr.start_timer("catgl1", 0.5, "jekan_work.release_girl_pervert")
 end
 
 function cat_queen_dead()
 	jekan_work.respawn_girl_pervert()
-	ogse.start_tmr("catgl2", 0.5, "jekan_work.release_cat_queen")
+	ogse_st_mgr.start_timer("catgl2", 0.5, "jekan_work.release_cat_queen")
 end
 -------------------------------------------------------------------------------------------------------------------------------
 
@@ -3125,7 +3125,7 @@ function release_krovos_unic(actor,npc)
 end
 
 function spawn_krovos_unic_body()
-	--ogse.start_tmr("unicsos1", 0, 1, "xr_effects.release_krovos_unic")
+	--ogse_st_mgr.start_timer("unicsos1", 0, 1, "xr_effects.release_krovos_unic")
 	jekan_work.spawn_krovos_unic_body()
 end
 
@@ -3150,7 +3150,7 @@ function release_pseudodog_unic()
 end
 
 function spawn_pseudodog_unic_body()
-	--ogse.start_tmr("psdog1", 0, 1, "xr_effects.release_pseudodog_unic")
+	--ogse_st_mgr.start_timer("psdog1", 0, 1, "xr_effects.release_pseudodog_unic")
 	jekan_work.spawn_pseudodog_unic_body()
 end
 

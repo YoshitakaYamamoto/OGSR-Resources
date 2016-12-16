@@ -252,12 +252,12 @@ function on_timer_hel()
 	switch_online(spawn_obj.id)
 	deadman[spawn_obj.id] = spawn_obj.id
 	ogse.save_variable("heli_quest_3", spawn_obj.id)
-	ogse.start_tmr("hel1", 10, script_name()..".on_timer_hel1")
+	ogse_st_mgr.start_timer("hel1", 10, script_name()..".on_timer_hel1")
 end
 
 -- Запуск по сигналу esc_heli_direct из логики вертолета	
 function esc_heli_combat()
-	ogse.start_tmr("hel", 5, script_name()..".on_timer_hel")
+	ogse_st_mgr.start_timer("hel", 5, script_name()..".on_timer_hel")
 end
 
 function esc_heli_cancel()
@@ -311,7 +311,7 @@ function on_timer_hel0()
 		snd_obj = xr_sound.get_safe_sound_object( [[helicopter\hit_4]] )
 		snd_obj:play( db.actor, 0, sound_object.s2d )
 	end
-	ogse.start_tmr("hel_fire", 10, script_name()..".esc_heli_cancel")
+	ogse_st_mgr.start_timer("hel_fire", 10, script_name()..".esc_heli_cancel")
 end
 
 function esc_hit_heli()
@@ -330,7 +330,7 @@ function esc_hit_heli()
 			st.combat.enemy_id = spawn_obj.id			
 		end
 	end
-	ogse.start_tmr("hel0", 10, script_name()..".on_timer_hel0")
+	ogse_st_mgr.start_timer("hel0", 10, script_name()..".on_timer_hel0")
 end
 
 --' спавн вертолёта и Толика

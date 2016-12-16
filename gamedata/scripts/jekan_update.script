@@ -264,20 +264,20 @@ end
 function on_timer_cheb2(params_string)
 	if db.actor:dont_has_info("cheb_hello") then
 		jekan_work.send_cheb_hello_tip2()
-		ogse.start_tmr("cheb1", 7, script_name()..".on_timer_cheb1")
+		ogse_st_mgr.start_timer("cheb1", 7, script_name()..".on_timer_cheb1")
 	end
 end
 	
 function on_timer_cheb1(params_string)
 	if db.actor:dont_has_info("cheb_hello") then
 		jekan_work.send_cheb_hello_tip1()
-		ogse.start_tmr("cheb2", 7, script_name()..".on_timer_cheb2")
+		ogse_st_mgr.start_timer("cheb2", 7, script_name()..".on_timer_cheb2")
 	end
 end
 
 function cheburashka_greeting(obj)
 	if obj:section() == "cheb" and db.actor:dont_has_info("cheb_greeting") then
-		ogse.start_tmr("cheb1", 7, script_name()..".on_timer_cheb1")
+		ogse_st_mgr.start_timer("cheb1", 7, script_name()..".on_timer_cheb1")
 		db.actor:give_info_portion ("cheb_greeting")
 		return true
 	end

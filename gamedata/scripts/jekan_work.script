@@ -437,7 +437,7 @@ function set_mark_smert_zone()
 end
 
 function mark_smert_zone()
-	ogse.start_tmr("smert_zone_spot", 5, script_name()..".set_mark_smert_zone")
+	ogse_st_mgr.start_timer("smert_zone_spot", 5, script_name()..".set_mark_smert_zone")
 end
 
 function unmark_smert_zone()
@@ -1791,7 +1791,7 @@ function on_izgoy_timer()
 end
 
 function start_izgoy_timer()
-	ogse.start_tmr("izgoy", 2 * 24 * 3600, script_name()..".on_izgoy_timer")
+	ogse_st_mgr.start_timer("izgoy", 2 * 24 * 3600, script_name()..".on_izgoy_timer")
 end
 
 function spawn_gorbovsky_dead()
@@ -3058,7 +3058,7 @@ function on_timer_cheb4(params_string)
 end
 
 function spawn_cheb_timer()
-	ogse.start_tmr("cheb4", 1, script_name()..".on_timer_cheb4")
+	ogse_st_mgr.start_timer("cheb4", 1, script_name()..".on_timer_cheb4")
 end
 
 function cheb_birthplace_spawn()
@@ -3111,7 +3111,7 @@ end
 
 function cheb_guidance()
 	jekan_devices2.cheb_guidance(math.random(1, 5))
-	ogse.start_tmr("cheb_guidance", 300, script_name()..".on_timer_cheb_guidance")
+	ogse_st_mgr.start_timer("cheb_guidance", 300, script_name()..".on_timer_cheb_guidance")
 	db.actor:give_info_portion ("cheb_busy_guidance")
 end
 
@@ -3125,7 +3125,7 @@ end
 
 function cheb_guidance_story()
 	jekan_devices2.cheb_story(math.random(1, 6))
-	ogse.start_tmr("cheb_story", 300, script_name()..".on_timer_cheb_story")
+	ogse_st_mgr.start_timer("cheb_story", 300, script_name()..".on_timer_cheb_story")
 	db.actor:give_info_portion ("cheb_busy_story")
 end
 

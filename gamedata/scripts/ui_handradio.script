@@ -160,7 +160,7 @@ function handradio:listen()
 	elseif level.name() == "l10_radar" and has_alife_info("bun_antenna_off") and not has_alife_info("secret_talk") then
 		snd = sound_object("script_replics\\radio\\message\\radio_voice_secret")
 		length = snd:length()
-		ogse.start_tmr("scr", length/1000, script_name()..".on_timer_scr")
+		ogse_st_mgr.start_timer("scr", length/1000, script_name()..".on_timer_scr")
 	else
 		if math.random()<0.65 then
 			i = math.random(1,13)

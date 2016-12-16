@@ -306,7 +306,7 @@ local function get_combined_radiation_protection()
 	for _,v in pairs(timers_immunities.rad_immunity) do
 		total_rad_immunity = total_rad_immunity * v
 	end
-	--local now_using_B190 = ogse.tmr_exists("using_B190")
+	--local now_using_B190 = ogse_st_mgr.timer_exists("using_B190")
 	--local B190_effect = now_using_B190 and 0.1 or 1.0
 	local alcohol_effect = 1.0 - 0.2 * db.actor.alcohol -- минимально 0.8 при максимальном опъ€нении
 	return total_rad_immunity * alcohol_effect
@@ -316,7 +316,7 @@ local function get_combined_food_radiation_protection()
 	for _,v in pairs(timers_immunities.rad_food_immunity) do
 		total_rad_food_immunity = total_rad_food_immunity * v
 	end
-	--local now_using_B190 = ogse.tmr_exists("using_B190")
+	--local now_using_B190 = ogse_st_mgr.timer_exists("using_B190")
 	--local B190_effect = now_using_B190 and 0.1 or 1.0
 	local alcohol_effect = 1.0 - 0.1 * db.actor.alcohol -- минимально 0.9 при максимальном опъ€нении
 	return total_rad_food_immunity * alcohol_effect
@@ -440,7 +440,7 @@ end
 
 local function use_B190(item, section)
 	zero_all_item_effects(item)
-	if ogse.tmr_exists("using_B190") then
+	if ogse_st_mgr.timer_exists("using_B190") then
 		ogse_screen_msg.show_message_trouble(text_yod_using_error)
 		return post_use_action.create_new_item
 	end
@@ -454,7 +454,7 @@ end
 
 local function use_dix(item, section)
 	zero_all_item_effects(item)
-	if ogse.tmr_exists("using_dix") then
+	if ogse_st_mgr.timer_exists("using_dix") then
 		ogse_screen_msg.show_message_trouble(text_dix_using_error)
 		return post_use_action.create_new_item
 	end
@@ -465,7 +465,7 @@ end
 
 local function use_bipsizon(item, section)
 	zero_all_item_effects(item)
-	if ogse.tmr_exists("using_bipsizon") then
+	if ogse_st_mgr.timer_exists("using_bipsizon") then
 		ogse_screen_msg.show_message_trouble(text_bipsizon_using_error)
 		return post_use_action.create_new_item
 	end
