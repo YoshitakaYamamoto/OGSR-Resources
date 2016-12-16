@@ -507,7 +507,7 @@ function get_nearest_anomaly_by_point(position)
 	end
 
 	if anomid then
-		--log3("[get_nearest_anomaly_by_point] dist from [%s] to [%s] = %s, OLD dist: [%s]", level.object_by_id(anomid):name(), position, mindist, (level.object_by_id(anomid):position()):distance_to(position))
+		--log3("[get_nearest_anomaly_by_point] dist from [%s] to [%s, %s, %s] = %s, OLD dist: [%s]", level.object_by_id(anomid):name(), position.x, position.y, position.z, mindist, (level.object_by_id(anomid):position()):distance_to(position))
 		--log3("%s", debug.traceback())
 		local anom_desc = anom_list[anomid]
 		return true, anomid, anom_desc.pos, anom_desc.clsid, mindist, anom_desc.radius, anom_desc.section
@@ -750,14 +750,22 @@ function generate_anoms(lname)
 		local section, shape = anomaly_section_choice(lname)
 		local sobj = alife():create(section, pos, new_lv, new_gv)
 		ASSERT(sobj, "Can't generate_anomaly [%s], [%s], [%s], [%s]", section or "nil", pos or "nil", new_lv or "nil", new_gv or "nil")
-		--local pk = xs_netpk.anomaly(sobj)
-		--ASSERT(pk:isOk(), "pk is not OK in anom: [%s]", section or "nil")
-		--local data = pk:get()
-		--data.shapes = shape
-		--pk:set(data)
-		local tbl = m_net_utils.get_anomaly_data(sobj) --TODO: Переделать на современную систему.
-		tbl.shapes = shape
-		m_net_utils.set_anomaly_data(tbl, sobj)
+		local pk = xs_netpk.anomaly(sobj)
+		ASSERT(pk:isOk(), "pk is not OK in anom: [%s]", section or "nil")
+		local data = pk:get()
+		if shape.shtype == 0 then --/ sphere
+			data.shapes:addSphere(shape.radius * get_float(section, "effective_radius", 1), vector():set(unpack(shape.center)))
+		else --/ box
+			data.shapes:addBox(
+				matrix():set(
+					vector():set(unpack(shape.v1)), 
+					vector():set(unpack(shape.v2)), 
+					vector():set(unpack(shape.v3)), 
+					vector():set(unpack(shape.offset))
+				)
+			)
+		end
+		pk:set(data)
 		--log3("--[%s] Generated anomaly [%s] on level [%s]", script_name(), section, lname)
 
 		lvids_forbidden[new_lv] = true
@@ -1033,7 +1041,6 @@ local anoms_sections = {
 	zharka_static     = {"zharka_static",     {shtype=1, v1={1,0,0}, v2={0,5,0}, v3={0,0,1}, offset={0,0,0}}}
 }
 
-
 local anom_prefix = "noartf_" --KRodin: Префикс не влияет на спавн артов, нужен только для того чтобы отличить аномалии созданные выбросом от всех остальных аномалий.
 function anomaly_section_choice(levelname)
 	local anom_to_spawn, name_anom_to_spawn, postfix_anom_to_spawn, anom_table_name
@@ -1066,20 +1073,5 @@ function anomaly_section_choice(levelname)
 		anom_to_spawn = anom_prefix .. name_anom_to_spawn .. postfix_anom_to_spawn
 	end
 
-	local coef_effective_radius = get_float(anom_to_spawn, "effective_radius", 1)
-	local section = anoms_sections[name_anom_to_spawn]
-	local shape1 = section[2]
-	local shapes = {}
-	shapes[1] = {}
-	shapes[1].shtype = shape1.shtype
-	if shape1.shtype == 0 then
-		shapes[1].radius = shape1.radius * coef_effective_radius
-		shapes[1].center = vector():set(unpack(shape1.center))
-	else
-		shapes[1].v1 = vector():set(unpack(shape1.v1))
-		shapes[1].v2 = vector():set(unpack(shape1.v2))
-		shapes[1].v3 = vector():set(unpack(shape1.v3))
-		shapes[1].offset = vector():set(unpack(shape1.offset))
-	end
-	return anom_to_spawn, shapes
+	return anom_to_spawn, anoms_sections[name_anom_to_spawn][2]
 end
