@@ -89,10 +89,6 @@ end
 
 ---------------------------------------------------------------------------------------------------------------------
 function check_light(stalker)
-    if not stalker then 
-       return 
-    end
-
     local torch = stalker:object("device_torch")
     if not torch then
        return
@@ -109,7 +105,11 @@ function check_light(stalker)
 	end
 
 	if xr_companion.is_companion(stalker:id()) then
-		if xr_combat_companion.in_ambush(stalker) or ogse_night_vision.is_nv_working() then
+		local actor_torch = db.actor:item_in_slot(9)
+		if
+			xr_combat_companion.in_ambush(stalker)
+			or not (actor_torch and actor_torch:is_torch() and actor_torch:is_torch_enabled())
+		then
 			if torch then
 				torch:enable_attachable_item(false)	
 			end
