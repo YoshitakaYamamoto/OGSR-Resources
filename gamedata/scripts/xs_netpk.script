@@ -390,59 +390,57 @@ end
 -- end helpers --
 
 -- _global_ constants/flags can be used with packets --
--- alife_object
-_G.alife_object_flag = {}
-_G.alife_object_flag.UseSwitches		= 1
-_G.alife_object_flag.SwitchOnline		= 2
-_G.alife_object_flag.SwitchOffline		= 4
-_G.alife_object_flag.Interactive		= 8
-_G.alife_object_flag.VisibleForAI		= 16
-_G.alife_object_flag.UsefulForAI		= 32
-_G.alife_object_flag.OfflineNoMove		= 64
-_G.alife_object_flag.UsedAI_Locations	= 128
-_G.alife_object_flag.UseGroupBehaviour	= 256
-_G.alife_object_flag.CanSave			= 512
-_G.alife_object_flag.VisibleForMap		= 1024
-_G.alife_object_flag.UseSmartTerrains	= 2048
-_G.alife_object_flag.CheckForSeparator	= 4096
-_G.alife_object_flag.CorpseRemoval		= 8192
---visual
-_G.visual_flag = {}
-_G.visual_flag.Obstacle					= 1
---weapon
-_G.weapon_addons = {}
-_G.weapon_addons.scope					= 1
-_G.weapon_addons.launcher				= 2
-_G.weapon_addons.silencer				= 4
---shape
-_G.shape_type = {}
-_G.shape_type.sphere 					= 0
-_G.shape_type.box 						= 1
---hanging lamp
-_G.hanging_lamp = {}
-_G.hanging_lamp.Physic					= 1
-_G.hanging_lamp.CastShadow				= 2
-_G.hanging_lamp.R1						= 4
-_G.hanging_lamp.R2						= 8
-_G.hanging_lamp.TypeSpot				= 16
-_G.hanging_lamp.PointAmbient			= 32
---trader 
-_G.trader_flags = {}
-_G.trader_flags.InfiniteAmmo			= 1
-_G.trader_flags.Dummy					= 0
---restrictor
-_G.restrictor_flags = {}
-_G.restrictor_flags.DefaultRestrictorTypeNone	= 0
-_G.restrictor_flags.DefaultRestrictorTypeOut	= 1
-_G.restrictor_flags.DefaultRestrictorTypeIn		= 2
-_G.restrictor_flags.RestrictorTypeNone			= 3
-_G.restrictor_flags.RestrictorTypeIn			= 4
-_G.restrictor_flags.RestrictorTypeOut			= 5
---torch
-_G.torch_flags = {}
-_G.torch_flags.Active							= 1
-_G.torch_flags.NightVisionActive				= 2
-_G.torch_flags.Unknown							= 4
+_G.alife_object_flag = { -- alife_object
+	UseSwitches			= 1,
+	SwitchOnline		= 2,
+	SwitchOffline		= 4,
+	Interactive			= 8,
+	VisibleForAI		= 16,
+	UsefulForAI			= 32,
+	OfflineNoMove		= 64,
+	UsedAI_Locations	= 128,
+	UseGroupBehaviour	= 256,
+	CanSave				= 512,
+	VisibleForMap		= 1024,
+	UseSmartTerrains	= 2048,
+	CheckForSeparator	= 4096,
+	CorpseRemoval		= 8192,
+}
+_G.visual_flag = { Obstacle = 1 } --visual
+_G.weapon_addons = { --weapon
+	scope				= 1,
+	launcher			= 2,
+	silencer			= 4,
+}
+_G.shape_type = { --shape
+	sphere 				= 0,
+	box 				= 1,
+}
+_G.hanging_lamp = { --hanging lamp
+	Physic				= 1,
+	CastShadow			= 2,
+	R1					= 4,
+	R2					= 8,
+	TypeSpot			= 16,
+	PointAmbient		= 32,
+}
+_G.trader_flags = { --trader
+	InfiniteAmmo		= 1,
+	Dummy				= 0,
+}
+_G.restrictor_flags = { --restrictor
+	DefaultRestrictorTypeNone	= 0,
+	DefaultRestrictorTypeOut	= 1,
+	DefaultRestrictorTypeIn		= 2,
+	RestrictorTypeNone			= 3,
+	RestrictorTypeIn			= 4,
+	RestrictorTypeOut			= 5,
+}
+_G.torch_flags = { --torch
+	Active						= 1,
+	NightVisionActive			= 2,
+	Unknown						= 4,
+}
 -- end constants --
 
 --shape type classes for use in scripts

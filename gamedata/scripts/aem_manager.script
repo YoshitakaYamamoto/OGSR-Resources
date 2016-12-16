@@ -1477,7 +1477,7 @@ end
 -- Проверяем версию игры и подставляем нужный тип данных
 -------
 function chk_ver(pid)
-	if tonumber(_G.main_menu.get_main_menu():GetGSVer()) <= 1.0004 then
+	if tonumber(main_menu.get_main_menu():GetGSVer()) <= 1.0004 then
 		return pid
 	else
 		if pid == -1 then
@@ -1489,7 +1489,7 @@ function chk_ver(pid)
 end
 
 function chk_ver_back(ph_curr)
-	if tonumber(_G.main_menu.get_main_menu():GetGSVer()) <= 1.0004 then
+	if tonumber(main_menu.get_main_menu():GetGSVer()) <= 1.0004 then
 		return ph_curr
 	else
 		return tonumber(ph_curr)

@@ -135,13 +135,13 @@ local see_word_text={
 }
 
 function on_spawn(obj)
-if isIndoor(level.name()) or isIndoor(get_object_levelname(obj)) or news_main_data.chk_Vibros() then return end
-	if (obj) then
-		if (_g.IsMonster(obj)) then
+	if isIndoor(level.name()) or isIndoor(object_level_name(obj) or "") or news_main_data.chk_Vibros() then return end
+	if obj then
+		if IsMonster(obj) then
 		
 		local mob_u = {}
 		mob_u.spawn_time = news_main_data.game_minutes()
-		mob_u.level = get_object_levelname(obj)
+		mob_u.level = object_level_name(obj)
 		mob_u.name = get_clsid(obj) or ""
 		
 		if s_mob_u == 0 or s_mob_meter == 0 then
@@ -270,31 +270,6 @@ function get_level_name(level_, index)
 		end
 	end
 	return m_tmp_str
-end
-
-function get_object_levelname(obj)
-	local mlevel = "null"	
-	if (obj) then
-		local m_game_vertex
-		local nm = "nil"
-		if (obj.name) then nm = obj:name() end
-		if (isGameObject(obj)) then
-			m_game_vertex = obj:game_vertex_id()
-		else
-			m_game_vertex = obj.m_game_vertex_id
-		end
-		if (m_game_vertex) then
-			local lvert = game_graph():vertex(m_game_vertex)
-			if (lvert ~= nil and lvert.level_id) then
-				local lid = lvert:level_id()
-				if (lid ~= nil) then
-					mlevel = alife():level_name(lid)
-				end
-			end
-			if mlevel == nil then mlevel = "nil" end
-		end
-	end
-	return mlevel
 end
 
 function get_monster_name(gm_mob_name, index)
