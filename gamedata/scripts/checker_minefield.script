@@ -8,7 +8,10 @@ function add_to_delete(id)
 	--	to_delete[id] = id
 	--	run_del_mines_timer()
 	--end
-	alife():release( alife():object(id) )
+	local sobj = alife():object(id)
+	if sobj then
+		alife():release(sobj)
+	end
 end
 
 --[=[ --KRodin: по-моему, для удаления всего того, что здесь удаляется, таймер не нужен.
