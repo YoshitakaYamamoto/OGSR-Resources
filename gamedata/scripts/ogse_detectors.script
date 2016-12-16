@@ -412,8 +412,7 @@ local last_beep = 0
 local function update_detector_sound(act_pos)
 	local hasanom, anomid, pos, cls, distance, radius, sect_anom = ogse_anomaly.get_nearest_anomaly_by_point(act_pos)
 	if not hasanom then return end
-	local obj = level.object_by_id(anomid)
-	if obj and ogse_detectors_data.detectors_presets[last_detector_sect][sect_anom] then
+	if ogse_detectors_data.detectors_presets[last_detector_sect][sect_anom] then
 		if distance <= detect_radius then
 			local tg = time_global()
 			if last_beep == 0 then
@@ -500,7 +499,7 @@ function on_update()
 	if last_detector_sect == "interactive_detector_elite" then
 		local anm_table = ogse_anomaly.get_all_nearest_anomalies_by_point_in_radius(act_pos, det_radius)
 		-- пересчитаем радиус без учета вертикальной координаты
-		local act_pos_no_y = act_pos
+		local act_pos_no_y = db.actor:position() --KRodin: act_pos здесь использовать нельзя!!! Иначе будут баги в функции update_detector_sound()
 		act_pos_no_y.y = 0
 		local pair = 0
 		--
