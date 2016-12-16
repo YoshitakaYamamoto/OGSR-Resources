@@ -405,30 +405,8 @@ function spawn_item_in_trunk(car, obj_section, count)
 	ASSERT(car, "spawn_item_in_trunk: nil car parameter")
 	local trunk = get_trunk_for_car(car)
 	ASSERT(trunk, "spawn_item_in_trunk: car has no trunk")
-	local act = db.actor
-	local lvid, gvid, id = act:level_vertex_id(), act:game_vertex_id(), act:id()
-	local item
-	for i = 1, count do
-		item = sim:create(obj_section, vector(), lvid, gvid, id)
-		ogse_st_mgr.start_timer("TransferItemFromActorToTrunk"..i, 1, "trunk_inv.transfer_from_actor_to_trunk", item.id, trunk)
-	end
+	ogse.spawn_item_in_inv(obj_section, trunk, count)
 end
-
-function transfer_from_actor_to_trunk(id, trunk)
-	local act = db.actor
-	local item = level.object_by_id(id)
-	act:transfer_item(item, trunk)
-end
-
---[=[
-function spawn_ammo_in_trunk(car, obj_section, count)
-	ASSERT(car, "spawn_item_in_trunk: nil car parameter")
-	local trunk = get_trunk_for_car(car)
-	ASSERT(trunk, "spawn_item_in_trunk: car has no trunk")
-	local lvid, gvid, id = trunk:level_vertex_id(), trunk:game_vertex_id(), trunk:id()
-	ogse.spawn_ammo_in_inv(obj_section, count, trunk)
-end
---]=]
 
 function remove_item_from_trunk_by_section(car, obj_section)
 	local item = get_item_from_trunk_by_section(car, obj_section)
