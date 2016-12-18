@@ -70,11 +70,10 @@ local actor_need_surprise = false -- подляночка
 local break_sleep_request = false -- флажок запроса на прерывание сна
 function begin_sleep(desired_sleep_time)
 	break_sleep_request = false -- если кто-то запрашивал прерывание сна во время бодрствования, то сбрасываем это
-	
+	--
 	db.actor:stop_talk()
 	bind_stalker.hide_weapon()
 	--
-
 	sleeping_now = true
 	local urgent_awakening = false
 	local start_sleep_time = game.get_game_time()
@@ -87,23 +86,13 @@ function begin_sleep(desired_sleep_time)
 		-- переводим стрелки
 		level.advance_game_time(dt_ms)
 
-		ogse_weather_mgr.get_weather_mgr():update(true) --KRodin: ОБНОВЛЕНИЕ ПОГОДЫ НЕОБХОДИМО ВЫЗЫВАТЬ ПОСЛЕ КАЖДОГО ВЫЗОВА level.advance_game_time !!!
-
-		-- обновляем движковые эффекты здоровья
-		db.actor:update_condition()
-		-- учитываем все возможные скриптовые эффекты
-		--actor_binder:update(0) -- бесполезно делать из-за работающей системы распределения нагрузки
-		-- приходится явно обновлять каждую подсистему, требующую обновления
-		-- при необходимости расширить список!
-		ogse_signals.get_mgr():call("on_update", 0)
-
 		-- проверяем останов по разным событиям
 		if break_sleep_request then -- кто-то запросил останов сна
 			--log1("break_sleep_request")
 			urgent_awakening = true
 			break
 		end
-		
+
 		-- начался выброс
 		if has_alife_info("pre_blowout") then 
 			ogse.autohiding_msg("ogse_sleep_mgr_warn_1_text", 1500)
@@ -118,7 +107,7 @@ function begin_sleep(desired_sleep_time)
 			urgent_awakening = true
 			break		
 		end
-		
+
 		-- проверяем условие останова сна по состоянию здоровья
 		local cur_health = db.actor.health
 		local dh = cur_health - prev_health
@@ -131,10 +120,7 @@ function begin_sleep(desired_sleep_time)
 		end
 		prev_health = cur_health
 	end
-	db.actor:update_condition()
 	db.actor.power = 1
-	ogse.show_time(true) --После сна принудительно обновляем время на худе
-	set_ignore_game_state_update()
 	sleeping_now = false
 	break_sleep_request = false
 	-- сколько реально спали

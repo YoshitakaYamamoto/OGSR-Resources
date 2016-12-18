@@ -1,11 +1,4 @@
 --************************************************* Инициализация расширений движка ************************************************
-
--- https://github.com/OpenXRay/xray-16/commit/9cd4bab9d0a31b9b808834601da366c8c1d9da5c
--- XXX nitrocaster: with vanilla scripts, '-nojit' option requires script profiler to be disabled. The reason
--- is that lua hooks somehow make 'super' global unavailable (is's used all over the vanilla scripts).
--- You can disable script profiler by commenting out the following lines in the beginning of _g.script:
-if not jit then profiler.setup_hook() end --KRodin: в оригинальном огсе этого нет, но может поможет от странного вылета при загрузке сейвов.
-
 log1("--LUA version: ["..(jit.version or _VERSION).."]")
 log1("~~...Инициализация расширений движка...")
 
@@ -31,14 +24,14 @@ math.randomseed(os.time())
 if not jit.version_num or jit.version_num < 20004 then --В ТЧ 1.0006 c lua-фиксом работает такой вариант:
 	os.setlocale("Russian_Russia.1251", "ctype")
 else --В новом LuaJIT работает только такой вариант:
-	local _lower = string.lower
+	local lower = string.lower
 	string.lower = function(s)
-		return _lower(s:gsub("([А-Я])",function(c) return string.char(c:byte()+32) end):gsub("Ё", "ё"))
+		return lower(s:gsub("([А-Я])",function(c) return string.char(c:byte()+32) end):gsub("Ё", "ё"))
 	end
 
-	local _upper = string.upper
+	local upper = string.upper
 	string.upper = function(s)
-		return _upper(s:gsub("([а-я])",function(c) return string.char(c:byte()-32) end):gsub("ё", "Ё"))
+		return upper(s:gsub("([а-я])",function(c) return string.char(c:byte()-32) end):gsub("ё", "Ё"))
 	end
 end
 --==============================================================================================
@@ -142,6 +135,25 @@ string.explode = function ( div,		-- разделитель
 		ret[#ret+1] = (clear and s:trim() or s)
 	end
 	return ret
+end
+
+local _advance_game_time = level.advance_game_time
+level.advance_game_time = function(game_ms) --KRodin: универсальная функция для перевода часов. Вынесена из менеджера сна.
+	_advance_game_time(game_ms) --Прокручивает игровое время вперед на заданное кол-во ИГРОВЫХ миллисекунд.
+	--
+	db.actor:update_condition() --Обновляем движковые эффекты здоровья
+	--
+	ogse_signals.get_mgr():call("after_time_change") --KRodin: Добавил специальный сигнал для обновления погодного менеджера, таймеров и прочих систем, зависящих от игрового времени.
+	--
+	ogse_signals.get_mgr():call("on_update", 0) --Учитываем все возможные скриптовые эффекты
+	--
+	--Malandrinus: Эта функция идёт как затычка к механизму прокрутки времени, который в ОГСЕ используется для сна.
+	--Я обнаружил, что после прокрутки времени происходят косяки с пересчётом состояний актора.
+	--Подробностей уже не помню, но лечилось это разовым игнорированием соответствующего обновления сразу после приращения времени.
+	--Для установки этого разового игнора и предназначена эта функция.
+	--Вполне допускаю, хотя уже и не помню точно, что вместе с актором пропускается обновление чего-то ещё.
+	-- http://www.amk-team.ru/forum/topic/10538-x-ray-extensions/page-50#entry975972
+	set_ignore_game_state_update()
 end
 
 log1("~~Инициализация расширений движка закончена!")
@@ -1210,7 +1222,7 @@ function log3(fmt, ...)
 	end
 end
 -----------------------------------------------------------------------------------------
-
+log3("%s", debug.traceback()) --Помогает определить, из за чего в некоторых случаях перезагружается _G
 -----------------------------------------------------------------------------------------
 local logs_cach = {}
 --Функция создаёт новый лог-файл и выводит текст в него.
@@ -1230,13 +1242,13 @@ function log4(fname, fmt, ...)
 	end
 	local res, msg = pcall(string.format, fmt, unpack(args))
 	if not res then
-		msg = "!!log4 failed: "..msg
+		msg = "!!log4 failed: "..msg.."\n"..debug.traceback()
 	end
 	f:write(msg..'\n')
 	f:flush()
 end
 -----------------------------------------------------------------------------------------
-log3("%s", debug.traceback()) --пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ _G
+
 -----------------------------------------------------------------------------------------
 function log2(fmt, ...) --Простая обёртка для log1.
 	log1(fmt:format(...))

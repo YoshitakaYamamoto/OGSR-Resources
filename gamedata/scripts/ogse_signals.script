@@ -62,7 +62,7 @@ ogse_signals.get_mgr():unsubscribe(slot_desc) -- отписали
 --]=]
 
 
-_SIGNALS_MGR = nil
+local _SIGNALS_MGR = nil
 function get_mgr()
   if not _SIGNALS_MGR then
     -- _SIGNALS_MGR инициализируется внутри конструтора. См. комментарии там.
@@ -88,7 +88,7 @@ function signals_mgr:__init( name, modules_list, scan_for_autoattaching_modules 
   -- Теоретически это не приводит к проблемам, поскольку экземпляров
   -- менеджера сигналов может быть несколько, но лучше от такого
   -- застраховаться.
-  _SIGNALS_MGR      = self -- а так ссылку прописываем ещё до завершения конструктора
+  _SIGNALS_MGR  = self -- а так ссылку прописываем ещё до завершения конструктора
   self.mgr_name = name
   self.signals  = {}
   self.slots_in_process = {}
@@ -520,12 +520,14 @@ function signals_mgr:rechange_scheduled_time( slot_in_question, new_timeout )
   ASSERT(slots, "")
   local check_slots = slot_in_question.queued
     and { slots.queue }
-    or  { slots.normal, slots.scheduled }
+    or  { slots.scheduled, slots.normal }
   for _, cur in ipairs( check_slots ) do
     for _, slot in ipairs( cur ) do
       if slots_equal( slot, slot_in_question ) then
 		--log3("~~[%s] Changing new timeout: [%s], old timeout: [%s]", script_name(), time_global() + new_timeout, slot.timeout)
 		slot.timeout = time_global() + new_timeout
+		slots.reschedule_scheduled = true --На всякий случай сразу пометим что нужна пересортировка.
+		slots.reschedule_queue = true --и тут тоже.
         return
       end
     end

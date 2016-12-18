@@ -79,58 +79,6 @@
 
 
 function attach(sm)
-  sm:subscribe( {signal = "on_update", fun = this.on_update })
-end
-
-
-local rh_queue = {}
-local rl_queue = {}
-
-function on_update()
-  process_r_queue( rh_queue    )
-  process_r_queue( rl_queue, 1 )
-end
-
-function sort_any_timers( q )
-  table.sort( q, function( a, b ) return a.sort_by < b.sort_by end )
-end
-
-function register_any_timer( t, low )
-  local q = low and rl_queue or rh_queue
-  table.insert( q, {
-    [ "sort_by" ] = t.termination_time,
-    [ "timer"   ] = t,
-  })
-  t._queue = q
-  sort_any_timers( q )
-end
-
-function unregister_any_timer( t )
-  local q = t._queue
-  local found = false
-  for i = 1, table.getn( q ) do
-    if rawequal( t, q[ i ].timer ) then
-      table.remove( q, i )
-      found = true
-      break
-    end
-  end
-  ASSERT( found, "can't find requested timer" )
-end
-
-function process_r_queue( q, n )
-  local cnt = 0
-  while table.getn( q ) > 0 do
-    local t = q[ 1 ].timer
-    if time_global() >= t.termination_time then
-      table.remove( q, 1 )
-      t:taction()               -- выполняем действие по таймауту
-      cnt = cnt + 1
-      if n and cnt == n then break end
-    else
-      break
-    end
-  end
 end
 
 
@@ -140,26 +88,30 @@ function quick_timer:__init( timeout )
   self.timeout = timeout
 end
 
-
--- Запуск таймера, аргумент задаёт использование проверки с низким
--- приоритетом
+-- Запуск таймера, аргумент задаёт использование проверки с низким приоритетом
 function quick_timer:start( low_priority )
   self.start_time = time_global()
-  if self.timeout then          -- если при создании задавали таймаут
+  if self.timeout then -- если при создании задавали таймаут
     -- то запоминаем время останова
     self.termination_time = self.start_time + self.timeout
-    register_any_timer( self, low_priority )
-  else
-    self.slot_desc = {
-      signal = "on_update",
-      self   = self, fun = self.aux_cond,
-      queued = low_priority
-    }
-    ogse_signals.get_mgr():subscribe( self.slot_desc )
   end
+  if not self.script_name then
+    local d = debug.getinfo( 2, "S" )
+    if d then
+      self.script_name = d.source
+    end
+  end
+  self.slot_desc = {
+    signal = "on_update",
+    self   = self,
+	fun    = self.aux_cond,
+    queued = (not self.timeout and low_priority),
+	script_name = self.script_name
+  }
+  self.sm = ogse_signals.get_mgr()
+  self.sm:subscribe( self.slot_desc )
   return self
 end
-
 
 -- времени прошло с момента запуска.
 -- возвращает два числа: в миллисекундах и относительное от 0 до 1
@@ -172,49 +124,44 @@ function quick_timer:elapsed()
   return elapsed, fe
 end
 
-
 -- функция принудительного останова, никаких действий при этом не
 -- выполняется
 function quick_timer:stop()
-  if self.timeout then          -- если при создании задавали таймаут
-    unregister_any_timer( self )
-  else
-    ogse_signals.get_mgr():unsubscribe( self.slot_desc )
-  end
+    self.sm:unsubscribe( self.slot_desc )
 end
-
 
 -- проверка в базовом классе таймера обеспечивает сервис остановки по
 -- таймауту и возможность принудительной остановки
 function quick_timer:aux_cond()
   self:update()
-  -- если сработал таймаут
-  if self.termination_time and time_global() > self.termination_time then
-    self:taction()              -- выполняем действие по таймауту
-    self:stop()                 -- останавливаем проверки
+
+  if self.termination_time then -- если имеется таймаут
+    -- и он сработал на первом апдейте
+    if self.termination_time <= time_global() then
+      self:taction()            -- выполняем действие по таймауту
+      self:stop()               -- останавливаем проверки
+    else                        -- засыпаем до срабатывания
+      self.sm:reschedule( self.termination_time - time_global() )
+    end
   elseif self:condition() then  -- если сработало условие
     self:action()               -- выполняем действие по условия
     self:stop()
   end
 end
 
-
 -- условие-заглушка на случай использования только с таймаутом
 function quick_timer:condition()
   return false
 end
-
 
 -- пустое действие в базовом классе. Нужно для того случая, когда по
 -- каким-то причинам не задаём действие в унаследованном классе
 function quick_timer:action()
 end
 
-
 -- аналогичная заглушка для действия по таймауту
 function quick_timer:taction()
 end
-
 
 -- заглушка для периодического действия
 function quick_timer:update()

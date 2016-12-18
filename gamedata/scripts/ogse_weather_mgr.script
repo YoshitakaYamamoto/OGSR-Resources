@@ -1049,6 +1049,8 @@ function WeatherManager:__init()
 	self.sm:subscribe(self.spwn_ev_desc)
 	self.destr_ev_desc = {signal = "on_destroy",self = self, fun = self.on_destroy}
 	self.sm:subscribe(self.destr_ev_desc)
+	self.after_time_change_ev_desc = {signal = "after_time_change",self = self, fun = self.after_time_change}
+	self.sm:subscribe(self.after_time_change_ev_desc)
 	--
 	ogse_surge_mgr.surge_log("WeatherManager:__init - END")
 end
@@ -1073,6 +1075,8 @@ function WeatherManager:on_destroy()
 	self.spwn_ev_desc = nil
 	self.sm:unsubscribe(self.destr_ev_desc)
 	self.destr_ev_desc = nil
+	self.sm:unsubscribe(self.after_time_change_ev_desc)
+	self.after_time_change_ev_desc = nil
 end
 -- начальная инициализация при начале игры (когда не выполняется on_load)
 function WeatherManager:on_actor_spawn()
@@ -1345,6 +1349,7 @@ local function setup_frame(p1, p2)
 	ogse_surge_mgr.surge_log("setup_frame - END")
 end
 
+
 --Функция рассчитывает и устанавливает в менеджере сигналов таймаут для следующего обновления погоды.
 local function change_new_update_time( current_time, next_update, forced, upd_slot, sm )
 	--local cur_game_time = time2string(current_time, "%04d/%02d/%02d %02d:%02d:%02d.%03d", {'y','m','d','h','min','s','ms'})
@@ -1360,13 +1365,17 @@ local function change_new_update_time( current_time, next_update, forced, upd_sl
 	end
 end
 
+function WeatherManager:after_time_change() --Вынужденное обновление погоды после перевода часов.
+	self:update(true)
+end
+
 -- функция вставляет за первым кадром последовательность кадров выброса
 -- при необходимости часть точек, перекрываемая выбросом, удаляется и также
 -- формируется дополнительная точка в конце для плавного перехода от окончания выброса к обычной погоде
 
 monitoring_weather_sect = nil
 
-function WeatherManager:update( forced ) --forced должен быть == true, если апдейт вызывается НЕ из менеджера сигналов (например, из ogse_sleep_mgr).
+function WeatherManager:update( forced )
 	if not enabled then return end
 	--
 	--log3("##[%s] Called %s update! Time_global: [%s]", script_name(), forced == true and "forced" or "normal", time_global())
@@ -1376,10 +1385,8 @@ function WeatherManager:update( forced ) --forced должен быть == true, если апде
 		if forced == true then --Апдейт вызван вынужденно, т.е после изменения игрового времени (например во время сна)
 			change_new_update_time( current_time, self.next_update, true, self.upd_ev_desc, self.sm ) --Пересчитываем и переустанавливаем таймаут в менеджере сигналов с учётом изменившегося времени.
 			--log3("##[%s] Timeout rechanged. Update not needed!", script_name())
-			return
-		else
-			return
 		end
+		return
 	end
 	--
 	ogse_surge_mgr.surge_log("WeatherManager:update - new point")

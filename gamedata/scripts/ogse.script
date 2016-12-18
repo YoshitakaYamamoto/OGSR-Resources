@@ -10,6 +10,7 @@ function attach(sm)
 	sm:subscribe({signal = "on_first_update",	fun = this.on_actor_first_update})
 	sm:subscribe({signal = "on_update",			fun = this.show_time})
 	sm:subscribe({signal = "on_take",			fun = this.on_item_take})
+	sm:subscribe({signal = "after_time_change",	fun = this.after_time_change})
 end
 
 game_time_factor = get_float("alife", "time_factor")
@@ -30,12 +31,6 @@ load_var_safe = ogse_unist.get_value_safe
 var_exists = ogse_unist.value_exist
 delete_var = ogse_unist.remove_value
 save_or_delete_var = ogse_unist.set_or_remove_value
-----------------------------------------------------
-start_tmr = ogse_st_mgr.start_timer
-start_gtmr = ogse_st_mgr.start_gtimer
-get_tmr = ogse_st_mgr.get_timer
-tmr_exists = ogse_st_mgr.timer_exists
---Таймеры с визуальным счётчиком на худе вызываются прямо отсюда. См. внизу скрипта.
 ----------------------------------------------------
 
 art_levels = {
@@ -1401,7 +1396,11 @@ end
 
 
 -------------------Выводим время на HUD-------------------
-function show_time( forced ) --forced должен быть true, если апдейт вызван НЕ из менеджера сигналов (например, из ogse_sleep_mgr).
+function after_time_change() --Принудительное обновление времени после перевода стрелок.
+	show_time(true)
+end
+
+function show_time( forced )
 	if forced ~= true then
 		ogse_signals.get_mgr():reschedule( 60000 / game_time_factor )
 	end
@@ -1516,7 +1515,7 @@ function kill_crow()
 				hit.type = hit.strike
 			crow:hit(hit)
 
-			ogse.start_gtmr(nil, math.random(150, 300), "checker_minefield.add_to_delete", k)
+			ogse_st_mgr.start_gtimer(nil, math.random(150, 300), "checker_minefield.add_to_delete", k)
 		end
 	end
 end
@@ -1750,7 +1749,7 @@ end
 function conditional_visual_timer:condition()
 	visual_timer.condition(self) -- всегда возвращает false
 
-	return self.user_condition(unpack(self.fun_params))
+	self.user_condition(unpack(self.fun_params))
 end
 function conditional_visual_timer:load(packet)
 	self.cond_name = packet:r_stringZ()
