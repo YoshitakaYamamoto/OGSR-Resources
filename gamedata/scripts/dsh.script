@@ -10,6 +10,10 @@ end
 
 function timeout( delay, fun, ... )
   local tmout = timeout_timer( delay, fun, ... )
+  local d     = debug.getinfo( 2, "S" )
+  if d then
+    tmout.script_name = d.source
+  end
   tmout:start()
   return tmout
 end
@@ -33,6 +37,10 @@ end
 
 function wait_condition( ... )
   local tmout = condition_timer( ... )
+  local d     = debug.getinfo( 2, "S" )
+  if d then
+    tmout.script_name = d.source
+  end
   tmout:start()
   return tmout
 end
@@ -52,6 +60,10 @@ end
 
 function exec_on_update( ... )
   local tmout = exec_on_update_timer( ... )
+  local d     = debug.getinfo( 2, "S" )
+  if d then
+    tmout.script_name = d.source
+  end
   tmout:start()
   return tmout
 end
