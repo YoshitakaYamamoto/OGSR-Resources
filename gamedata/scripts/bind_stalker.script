@@ -26,6 +26,7 @@ function actor_binder:net_spawn(data)
 	cmd("unbind", "contacts") --Отключаем в PDA вкладку "Контакты"
 
 	level.show_indicators()
+	level.set_snd_volume( 1 )
 
 	--xr_gulag.make_restrictors_registry() --KRodin: убрал эти манипуляции с рестрикшенами.
 
@@ -186,6 +187,8 @@ function actor_binder:on_goodwill_change(from, to)
 end
 
 function actor_binder:actor_death_callback(victim, who)
+	level.set_snd_volume( 1 )
+
 	self.am:call("on_actor_death", victim, who)
 end
 
@@ -294,6 +297,7 @@ function actor_binder:article_callback(npc, group, name, article_type)
 end
 ----------------------------------------------------------------------------------------------------------------------
 
+--[=[
 local remove_this_shit_immediately = {
 	["fake_grenades_base"] = true,
 	["grenade_f1_fake"] = true,
@@ -327,6 +331,7 @@ function check_pickup_fake_gren(obj, srv_obj)
 	end	
 	return false
 end
+--]=]
 
 function actor_binder:on_item_take(obj)
 	if not obj then return end
@@ -338,7 +343,7 @@ function actor_binder:on_item_take(obj)
 		return
 	end
 
-	if check_pickup_fake_gren(obj, sobj) then return end
+	--if check_pickup_fake_gren(obj, sobj) then return end --KRodin: Этим предметам установлен запрет на подбирание актором, они сюда попасть вообще не могут.
 
     level_tasks.proceed()
 
