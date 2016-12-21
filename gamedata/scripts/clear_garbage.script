@@ -80,6 +80,29 @@ local protected_sections = { --Секции объектов, которые з�
 	[ "wpn_m_134" ] = true, --Миниган в комнате за кодовой дверью на Радаре
 }
 
+local musor_sections = { --Секции всякого мусора, который надо удалять.
+	["fake_grenades_base"] = true,
+	["grenade_f1_fake"] = true,
+	["grenade_rgd5_fake"] = true,
+	["grenade_gd-05_fake"] = true,
+	["grenade_light_fake"] = true,
+	["grenade_f1_test"] = true,
+	["grenade_rgd5_test"] = true,
+	["grenade_gd-05_test"] = true,
+	["grenade_light_test"] = true,
+	["gl_test_shell"] = true,
+	["wpn_fake_missile"] = true,
+	["gl_test_shell_ammo_vog-25"] = true,
+	["gl_test_shell_ammo_vog-25p"] = true,
+	["gl_test_shell_ammo_m209"] = true,
+	["gl_test_shell_ammo_m208a"] = true,
+	["gl_fake_missile"] = true,
+	["gl_fake_missile_ammo_vog-25"] = true,
+	["gl_fake_missile_ammo_vog-25p"] = true,
+	["gl_fake_missile_ammo_m209"] = true,
+	["gl_fake_missile_ammo_m208a"] = true,
+}
+
 function remove_guns()
 local actor_level = level.name()
 	for a = 1, 65534 do
@@ -88,12 +111,12 @@ local actor_level = level.name()
 			local wpn_name = obj:name()
 			local wpn_sect = obj:section_name()
 			if	obj.parent_id == 65535
-				and isWeapon(obj)
 				and not protected_objects[wpn_name]
 				and not protected_sections[wpn_sect]
+				and ( isWeapon(obj) or musor_sections[wpn_sect] )
 			then
 				local wpn_level = object_level_name(obj)
-				if wpn_level ~= actor_level then
+				if wpn_level ~= actor_level or musor_sections[wpn_sect] then
 					--log3("!!!Clear_garbage!!! Deleting wpn: %s , Section: %s , level: %s", wpn_name, wpn_sect, wpn_level)
 					alife():release(obj,true)
 				end
