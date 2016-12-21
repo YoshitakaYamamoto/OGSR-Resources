@@ -1670,6 +1670,7 @@ end
 -- сделать указанного персонажа врагом всех персонажей смарта, которые в онлайне
 function setGulagNeutral( name_or_sid, target_obj )
 	setGulagRelation( name_or_sid, game_object.neutral, target_obj )
+	setGulagGoodwill( name_or_sid, -5000, target_obj )
 end
 
 -- получить номер состояния смарта по имени
