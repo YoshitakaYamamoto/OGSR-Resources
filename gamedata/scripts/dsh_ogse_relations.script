@@ -202,6 +202,8 @@ local fix_rel_exceptions = {
   [ "mil_Dolg_specnaz_cherep" ] = true, -- Череп
   [ "mil_Dolg_specnaz_silence" ] = true, -- группа Черепа
   [ "bar_arena_kaligula" ] = true,
+  [ "mil_freedom_member0001" ] = true, -- Павлик на АС
+  [ "mil_stalker0012" ] = true, -- Псих на АС
 }
 
 function on_npc_spawn( npc, binder )
