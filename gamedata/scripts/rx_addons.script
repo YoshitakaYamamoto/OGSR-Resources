@@ -4,6 +4,8 @@
 --	rx_ai.printf("ads:"..s,...)
 --end
 
+--KRodin: пока выключаю, потом надо будет это переделать на систему ogse_addons.
+
 function printw(s, ...)
 	rx_ai.printf("ads:"..s.."!!!",...)
 end
@@ -380,10 +382,13 @@ function get_addon_section(sec,c)
 end
 
 function attach( sm )
+  if not addons_sets.enabled then return end
+
+  init()
+
   sm:subscribe({ signal = "on_npc_death", fun = this.on_death })
   sm:subscribe({ signal = "on_npc_net_destroy", fun = this.npc_switch_offline }) -- не вызывалось в огсе.
   sm:subscribe({ signal = "on_npc_spawn", fun = this.on_npc_spawn })
-  sm:subscribe({ signal = "on_spawn", fun = this.on_actor_spawn })
   sm:subscribe({ signal = "on_save", fun = this.actor_save })
 end
 
@@ -420,13 +425,6 @@ function on_death( obj )
   if subscribed then
     ogse_signals.get_mgr():unsubscribe( subscribed )
     binder[ script_name() .. ".subscribed" ] = nil
-  end
-end
-
-
-function on_actor_spawn()
-  if addons_sets.enabled then
-    init()
   end
 end
 
