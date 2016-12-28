@@ -809,6 +809,8 @@ function motivator_binder:on_item_drop(obj)
 	if not sobj then return end
 
 	if obj:is_weapon() then
+		ogse_wpn_utils.set_condition_shot_dec( obj, get_float( obj:section(), "condition_shot_dec" ) )
+
 		timer_drop_weapon(obj, obj:parent()):start()
 	end
 
@@ -820,10 +822,12 @@ function motivator_binder:on_item_take(obj)
 	local sobj = alife():object(obj:id())
 	if not sobj then return end
 
-	if sobj:section_name() == "device_torch" then
-		if not obj:attachable_item_enabled() then
+	if obj:is_torch() then
+		if obj:is_torch_enabled() then
 			obj:switch_torch(false)
 		end
+	elseif obj:is_weapon() then
+		ogse_wpn_utils.set_condition_shot_dec( obj, 0 ) --Для неписей износ оружия отключаем.
 	end
 
 	self.am:call( "on_npc_item_take", self.object, obj, sobj )
