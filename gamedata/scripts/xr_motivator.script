@@ -681,7 +681,7 @@ function motivator_binder:check_art_weapon()
 			--' его убирать, а лучшее оружие получить не удаётся, придётся арт выбросить, отрелизить и вернуть ему в рюкзак.
 			-- log1("WARNING! Engine error - art in NPC weapon slot! "..tostring(item_in_slot_sec).." ID "..tostring(item_in_slot_id))
 			-- local s_obj = alife():object(item_in_slot_id)
-			local bw = self.object:best_weapon()
+			local bw = rx_utils.get_weapon(self.object)
 			local be = self.object:best_enemy()
 			local rem_id = self.object:active_item():id()
 			self.object:drop_item(self.object:active_item())
@@ -811,6 +811,8 @@ function motivator_binder:on_item_drop(obj)
 	if obj:is_weapon() then
 		timer_drop_weapon(obj, obj:parent()):start()
 	end
+
+	self.am:call( "on_npc_item_drop", self.object, obj, sobj )
 end
 
 function motivator_binder:on_item_take(obj)
@@ -823,6 +825,8 @@ function motivator_binder:on_item_take(obj)
 			obj:switch_torch(false)
 		end
 	end
+
+	self.am:call( "on_npc_item_take", self.object, obj, sobj )
 end
 
 --Функция проверяет, может ли объект вступать в бой с предполагаемым противником (enemy_st).

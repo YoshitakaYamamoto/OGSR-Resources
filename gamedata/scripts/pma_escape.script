@@ -385,7 +385,7 @@ function show_heli_scene()
 								return
 							end
 							
-							local bw = npc:best_weapon()	
+							local bw = rx_utils.get_weapon(npc)
 							
 							if timeout > time_global() then
 								state_mgr.set_state( script_name(),  npc, "threat_fire", nil, nil, nil )

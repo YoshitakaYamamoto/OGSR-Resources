@@ -87,7 +87,7 @@ function action_position:execute ()
     else 
        if self.set == false then 
           xr_state.change_state (self.object, 3)
-          --printf ("Change state at %d", device ():time_global ())
+          --printf ("Change state at %d", time_global())
           self.set = true
           return
        end   
@@ -96,7 +96,7 @@ function action_position:execute ()
 	if xr_state.finish_state (self.object) ~= true then 
 	   return 
 	end
-	--printf ("End of change state at %d", device ():time_global ())
+	--printf ("End of change state at %d", time_global())
 	self.st.on_position = true    
 	self.st.standing = false
 end
@@ -220,20 +220,20 @@ function action_rest:execute ()
     if self.eat_enable == true then
        if self.stage == 0 then  
          if hand_object ~= nil and hand_object:id () == self.eat_object:id () then
-            self.time_to_eat = device ():time_global () + 30000
+            self.time_to_eat = time_global() + 30000
             self.object:clear_animations () 
             self.stage = 1
           end   
           --printf ("ENABLE BREAD 1")
           self.object:set_item (object.use, self.eat_object)
-          self.time_to_eat = device ():time_global () + 30000
+          self.time_to_eat = time_global() + 30000
           return
        end   
        --printf ("ENABLE BREAD 2")
-       if device ():time_global () - self.time_to_eat > 0 then
+       if time_global() - self.time_to_eat > 0 then
           self.eat_enable = false
           self.stage = 0
-          self.time_to_eat = device ():time_global () + 20000
+          self.time_to_eat = time_global() + 20000
        end
        return
     end   
@@ -246,11 +246,11 @@ function action_rest:execute ()
           end   
           --printf ("ENABLE VODKA 1")
           self.object:set_item (object.use, self.drink_object)
-          self.time_to_eat = device ():time_global () + 20000
+          self.time_to_eat = time_global() + 20000
           return
        end   
        --printf ("ENABLE VODKA 2")
-       if device ():time_global () - self.time_to_eat > 0 then
+       if time_global() - self.time_to_eat > 0 then
           self.object:set_item (object.deactivate, self.drink_object)
           self.drink_enable = false
           self.state = 2
@@ -267,23 +267,20 @@ function action_rest:execute ()
        self.rest_end_signalled = true
     end   
 
-    local actor = level.actor()
-    if actor then
-       if xr_logic.try_switch_to_another_section (self.object, self.st, actor) then
-          return
-       end
-    end
-    self.object:set_item (object.activate, self.object:best_weapon ())
+	if xr_logic.try_switch_to_another_section(self.object, self.st, db.actor) then
+		return
+	end
+    self.object:set_item(object.activate, rx_utils.get_weapon(self.object))
 end
 ----------------------
-function  action_rest:finalize ()
-//    if self.object:best_enemy () ~= nil then
-//       printf ("ANIMATIONS CLEARED") 
-//       self.object:clear_animations ()
-//       self.object:set_item (object.deactivate, self.object:active_item ())
-//    end    
-    action_base.finalize (self)
-end    
+--function  action_rest:finalize ()
+--    if self.object:best_enemy () ~= nil then
+--       printf ("ANIMATIONS CLEARED") 
+--       self.object:clear_animations ()
+--       self.object:set_item (object.deactivate, self.object:active_item ())
+--    end    
+--    action_base.finalize (self)
+--end    
 ----------------------
 
 

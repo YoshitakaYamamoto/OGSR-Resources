@@ -1443,7 +1443,7 @@ end
 function rasstrel_start1()
 	if db.actor:alive() and has_alife_info("rasstrel_start") then
 		local npc = level_object_by_sid(story_ids.dolg_palach1)
-		local bw = (wm and wm:get_weapon()) or npc:best_weapon()
+		local bw = rx_utils.get_weapon(npc)
 		npc:set_sight(look.fire_point, db.actor:position())
 		npc:set_item(object.fire1, bw, 1, 5000)
 		fx_particle = particles_object("weapons\\generic_weapon01")
@@ -1458,7 +1458,7 @@ end
 function rasstrel_start2()
 	if db.actor:alive() and has_alife_info("rasstrel_start") then
 		local npc = level_object_by_sid(story_ids.dolg_palach2)
-		local bw = (wm and wm:get_weapon()) or npc:best_weapon()
+		local bw = rx_utils.get_weapon(npc)
 		npc:set_sight(look.fire_point, db.actor:position())
 		npc:set_item(object.fire1, bw, 1, 5000)
 		fx_particle = particles_object("weapons\\generic_weapon01")
@@ -3780,9 +3780,8 @@ function yan_sold_sniper_cover()
 	if db.actor:alive() and has_alife_info("spawn_yan_zombsoldier") then
 		local npc = level_object_by_sid(story_ids.yan_soldier)
 		local enemy = level_object_by_sid(story_ids.yan_zombsoldier)
-		local bw = (wm and wm:get_weapon()) or npc:best_weapon()
 		npc:set_sight(look.fire_point, enemy:bone_position("bip01_spine2"))
-		npc:set_item(object.fire1, bw, 1, 3000)
+		npc:set_item(object.fire1, rx_utils.get_weapon(npc), 1, 3000)
 	end
 end
 
