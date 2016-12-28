@@ -412,7 +412,7 @@ function repair_dialog:FillList()
 	item_table = 0
 	item_table = {}
 	item_table_index = 0
-	db.actor:iterate_inventory(item_for_repair, db.actor) --перебираем инвентарь в поиске совместимых стволов для ремонта
+	db.actor:inventory_for_each(item_for_repair) --перебираем инвентарь в поиске совместимых стволов для ремонта
 
 	local i = 1
 	while (item_table[i]) do
@@ -444,9 +444,8 @@ function repair_dialog:FillList()
 	end
 end
 
-function item_for_repair(npc, item) --Сравниваем предмет с ремонтируемым
-	if item == nil or alife():object(item:id()) == nil then return end
-	if item:id() == repaired_item:id() then return end
+function item_for_repair(item, npc) --Сравниваем предмет с ремонтируемым
+	if not npc:is_in_ruck( item ) then return end
 
 	if item:section() == repaired_item:section() then --если секции предмета совпадают, то доп. проверка не нужна.
 		item_table_index = item_table_index + 1
