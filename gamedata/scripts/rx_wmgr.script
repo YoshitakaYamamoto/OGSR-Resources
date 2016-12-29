@@ -7,6 +7,10 @@
 ------------------------------------------------------------------------------------------------
 --- убраны оружейные ящики - не нужны если выставить can_select_items для сталкеров в off
 ------------------------------------------------------------------------------------------------
+
+--TODO: Вынести из итератора проверку на безопасную стрельбу из РПГ. Оно должно проверяться на каждом обновлении оружейного менеджера.
+--Пока проверку просто выключил, и запретил вообще использовать РПГ (в конфиге rx_weapon_mgr)
+
 local total_debug = ogse_debug.verbose_debug
 
 --function printf(s,...)
@@ -30,9 +34,9 @@ end
 local weapon_params = {} -- параметры оружия будем хранить здесь
 local update_time = time_global()
 local wms = {} -- запоминаем id
-local item_parents = {}
 local defsec = "default"
-local clslist = {actor = rx_utils.actor_clsid,
+local clslist = {
+	actor = rx_utils.actor_clsid,
 	stalker = clsid.script_stalker,
 	dog = clsid.dog_s,
 	boar = clsid.boar_s,
@@ -50,27 +54,32 @@ local clslist = {actor = rx_utils.actor_clsid,
 	fracture = clsid.fracture_s,
 	cat = clsid.cat_s,
 	psy_dog = clsid.psy_dog_s,
-	psy_dog_phantom = clsid.psy_dog_phantom_s}
+	psy_dog_phantom = clsid.psy_dog_phantom_s
+}
 
-wm_modes = {sect = {custom = {}, default = {}}, -- данные из конфигов
+wm_modes = {
+		sect = {custom = {}, default = {}}, -- данные из конфигов
 		koeffs = {},
 		priors = {},
-		types = {list = {},
+		types = {
+				list = {},
 				rsec = {},
 				maxr = {},
 				minr = {},
 				enem = {},
-				line = read_from_ini(sys_ini,"rx_wmgr_types","line","ef_weapon_type",1)},
+				line = read_from_ini(sys_ini,"rx_wmgr_types","line","ef_weapon_type",1)
+		},
 		forbiddens = {},
 		enabled = read_from_ini(sys_ini,"rx_wmgr_main","enabled",false,0),
-		enabled_ext = read_from_ini(sys_ini,"rx_wmgr_main","enabled",false,0) or read_from_ini(sys_ini,"rx_wmgr_main","enabled_ext",false,0),
+		enabled_ext = read_from_ini(sys_ini,"rx_wmgr_main","enabled",false,0), --or read_from_ini(sys_ini,"rx_wmgr_main","enabled_ext",false,0),
 		update_prd = read_from_ini(sys_ini,"rx_wmgr_main","update_period",2000),
 		combat_prd = read_from_ini(sys_ini,"rx_wmgr_main","combat_period",400),
 		reload_prd = read_from_ini(sys_ini,"rx_wmgr_main","reload_period",2500),
 		idle_prd = read_from_ini(sys_ini,"rx_wmgr_main","idle_period",10000),
 		return_prd = read_from_ini(sys_ini,"rx_wmgr_main","return_period",200000),
 		min_cond = read_from_ini(sys_ini,"rx_wmgr_main","min_condition",0.2),
-		wpn_minmax = read_from_ini(sys_ini,"rx_wmgr_main","weapon_minmaxr",false,0)}
+		wpn_minmax = read_from_ini(sys_ini,"rx_wmgr_main","weapon_minmaxr",false,0)
+}
 		
 function init()
 	wm_modes.types.list = rx_utils.parse_list(sys_ini,"rx_wmgr_types","list")
@@ -101,7 +110,6 @@ function init()
 	wm_modes.forbiddens = rx_utils.parse_list(sys_ini,"rx_wmgr_main","forbidden_weapons",true)
 	wm_modes.inited = true
 	read_wm_modes(nil,nil,defsec,nil)
---	printf("init %s",tostring(wm_modes.enabled))
 end
 
 class "weapon_manager"
@@ -112,19 +120,14 @@ function weapon_manager:__init(npc)
 	self:initialize()
 	self.wpns_prstor = {}
 	self.priors_mem = {}
---	rx_ai.subscribe_for_events(npc,self)
-end
-
-function weapon_manager:__finalize()
-	printf("__finalize[%s]",self.name)
+	self.refresh_weapon_list = true
 end
 
 function weapon_manager:initialize()
-	if rx_utils.IsTrader(self.npc) then
-		self.disabled = true
---		printf(":initialize[%s]: disabled(trader)", self.npc:character_name())
-		return
-	end
+	--if rx_utils.IsTrader(self.npc) then
+	--	self.disabled = true
+	--	return
+	--end
 	self.modes = read_wm_modes(self.npc:character_community(),ranks.get_obj_rank_name(self.npc),self.npc:section(),self.npc)
 	if self.modes.disabled == true then
 		self.disabled = true
@@ -133,24 +136,18 @@ function weapon_manager:initialize()
 	end
 	self.modes.max_pr_weapons = tonumber(self.modes.max_pr_weapons)
 	self.period = time_global()
---	printf("initialize[%s] comm[%s], rank[%s]",self.name,self.npc:character_community(),ranks.get_obj_rank_name(self.npc))
 end
 
 function weapon_manager:update()
 	write_log("~~RX_WMGR_update_1")
-	if not wm_modes.inited then
-		init()
-	end
-	write_log("~~RX_WMGR_update_2")
 	local tg = time_global()
 	if self.disabled or (self.disabled_temp and self.disabled_temp > tg) then
 		write_log("~~RX_WMGR_update_end_1")
 		return
-	elseif rx_utils.IsTrader(self.npc) then
-		self.disabled = true
---		printf(":update[%s]: disabled(trader)", self.npc:character_name())
-		write_log("~~RX_WMGR_update_end_2")
-		return
+	--elseif rx_utils.IsTrader(self.npc) then
+	--	self.disabled = true
+	--	write_log("~~RX_WMGR_update_end_2")
+	--	return
 	end
 	write_log("~~RX_WMGR_update_3")
 	if self.last_return == nil then
@@ -183,11 +180,8 @@ function weapon_manager:get_weapon()
 	write_log("~~RX_WMGR_get_weapon_1")	
 	if db.storage[self.npc:id()] and db.storage[self.npc:id()].active_scheme == "remark" then return self.npc:best_weapon() end
 	write_log("~~RX_WMGR_get_weapon_2")	
---	self:update() not needed
-	write_log("~~RX_WMGR_get_weapon_3")	
 	local wpn = (self.weapon_id and level.object_by_id(self.weapon_id)) or self.npc:best_weapon()
 	write_log("~~RX_WMGR_get_weapon_4")	
---	self:output(wpn)
 	return wpn
 end
 
@@ -207,14 +201,15 @@ function weapon_manager:output(wpn)
 				local cost = params.cst
 				local eff
 				local kf = wm_modes.koeffs[self.modes.koeffs] or wm_modes.koeffs["koefs_def"]
-				if kf == nil then
+				if not kf then
 					eff = "NOT READED"
 				else
-					eff = (params.dmg*kf.dmg)+(params.rpm*kf.rpm)+(params.dst*kf.dst)+((100/params.dsp)*kf.dsp)
+					local dst = params.bullet_speed -- params.dst
+					eff = (params.dmg*kf.dmg)+(params.rpm*kf.rpm)+(dst*kf.dst)+((50/params.dsp)*kf.dsp)
 				end
-				local prior = nil
+				local prior
 				local pr = wm_modes.priors[self.modes.priors] or wm_modes.priors["priors_def"]
-				if pr == nil then
+				if not pr then
 					prior = "NOT READED"
 				else
 					prior = pr[wpn_section]
@@ -231,7 +226,7 @@ function weapon_manager:output(wpn)
 				end
 				local res = self:get_weapon_prior(wpn)
 				--rx_utils.give_game_news(name..": "..string.format("wpn: %s[%s] aminmag %s(%s), reload is %s, cost[%s], eff[%s], prior[%s], res[%s]",wpn_section,wpn_id,wpn:get_ammo_in_magazine(),read_wpn_params(wpn_section).mag,reload,cost,eff,prior,res),1000)
-			else
+			--else
 				--rx_utils.give_game_news(name..": "..string.format("wpn: %s reload is %s",tostring(wpn),reload),1000)
 			end
 			self.outtime = time_global() + 1000
@@ -242,10 +237,73 @@ end
 function weapon_manager:set_weapon(wpn)
 	if wpn then
 		self.weapon_id = wpn:id()
-	else
-		printw("set_wpn:weapon not exist")
 	end
-	self.weapons = nil
+	--self.weapons = nil
+end
+
+
+function becls_to_pr( sect, cls, be )
+  local enl = weapon_params[ sect ].enm
+    or wm_modes.types.enem[ weapon_params[ sect ].typ ]
+  if enl then
+    for k, v in pairs( enl ) do
+      if
+        ( k == "monster" and IsMonster( be, cls ) )
+        or ( clslist[ k ] and clslist[ k ] == cls )
+      then
+        return v
+      end
+    end
+  end
+  return 0
+end
+
+function bedist_to_pr( sect, dist )
+  local typ = weapon_params[ sect ].typ
+  local fr  = weapon_params[ sect ].dtn
+  if dist >= fr then return -80 end
+  local mn  = wm_modes.types.minr[ typ ] or weapon_params[sect].mnr
+  local mx  = wm_modes.types.maxr[ typ ] or weapon_params[sect].mxr
+  local ts  = weapon_params[ sect ].rsc or wm_modes.types.rsec[ typ ]
+  if not ts then return 0 end
+  local sn  = #ts
+  local df  = ( mx - mn ) / ( sn - 2 )
+  if dist < mn then
+    return ts[ 1 ]
+  elseif dist > mx then
+    return ts[ sn ]
+  end
+  for i = 2, sn - 1 do
+    if dist < mn + df * i then
+      return ts[ i ]
+    end
+  end
+end
+
+function blastwpn_condition( sect, dist, be, me )
+  local radius = weapon_params[ sect ].bls ^ 2
+  if dist <= radius then return false end
+  local bepos  = be:position()
+  if
+    me:relation( db.actor ) ~= game_object.enemy
+    and db.actor:position():distance_to_sqr( bepos ) < radius
+  then
+    return false
+  end
+  for k, is_npc in pairs( db.creature ) do
+    local npc = level.object_by_id( k )
+    if
+      npc and is_npc
+      and (
+        npc:character_community() == me:character_community()
+        or me:relation( npc ) ~= game_object.enemy
+      )
+      and npc:position():distance_to_sqr( bepos ) < radius
+    then
+      return false
+    end
+  end
+  return true
 end
 
 function weapon_manager:update_weapon()
@@ -256,10 +314,11 @@ function weapon_manager:update_weapon()
 		write_log("~~RX_WMGR_update_wpn_2A")
 		for k,v in pairs(self.weapons) do
 			if v[1] and v[1].sec then
-				if not level.object_by_id(v[1].id) then
+				local obj = level.object_by_id(v[1].id)
+				if not obj then
 					write_log("update_weapon(cnt == 1):weapon not exist!,sec "..v[1].sec)
 				end
-				self:set_weapon(level.object_by_id(v[1].id))
+				self:set_weapon(obj)
 				write_log("~~RX_WMGR_update_wpn_2AEXIT")
 				return
 			end
@@ -291,9 +350,6 @@ function weapon_manager:update_weapon()
 			elseif self.modes.mode2_idle == "2" then
 				for k,t in ipairs(self.modes.types) do
 					if types[t.t] then
-						if not level.object_by_id(self.weapons[t.t][1].id) then
---							printw("update_weapon(cnt > 1,not enemy):weapon not exist!,id[%s]",self.weapons[t.t][1].id)
-						end
 						self:set_weapon(level.object_by_id(self.weapons[t.t][1].id))
 						return
 					end
@@ -328,7 +384,6 @@ function weapon_manager:update_weapon()
 				end
 			elseif (self.modes.mode2 == "1" or self.modes.mode2 == "3" or xr_companion.is_companion(self.npc:id())) then
 				if self.last_change and curwpn and curwpn:get_ammo_in_magazine() ~= 0 and self.last_change+self.modes.change_rest_time > time_global() then
---					printf("update_wpn[%s]:change_rest_time[%s]",self.npc:character_name(),curwpn:section())
 					return
 				end
 				local weapons = {}
@@ -339,91 +394,23 @@ function weapon_manager:update_weapon()
 				end
 				if (self.modes.mode2 == "1" and not xr_companion.is_companion(self.npc:id())) then
 					table.sort(weapons,function(a,b) return a.prm > b.prm end)
---					printf("npc[%s]:set_weapon[%s]",self.npc:character_name(),level.object_by_id(weapons[1].id):section())
 					self:set_weapon(level.object_by_id(weapons[1].id))
 					return
-				end
-				local function becls_to_pr(sect,cls)
-					local enl = weapon_params[sect].enm or wm_modes.types.enem[weapon_params[sect].typ]
-					if enl then
-						for k,v in pairs(enl) do
-							if clslist[k] and clslist[k] == cls then
--- 								printf("becls_to_pr[%s]:return[%s](%s)", self.npc:character_name(),v,k)
-								return v
-							end
-						end
-					end
-					return 0
-				end
-				local function bedist_to_pr(sect,dist)
-					local typ = weapon_params[sect].typ
-					local fr = weapon_params[sect].dtn
-					if dist >= fr then
--- 						printf("bedist_to_pr[%s]:dist >= fr - return 0", self.npc:character_name())
-						return -80
-					end
-					local mn = wm_modes.types.minr[typ] or weapon_params[sect].mnr
-					local mx = wm_modes.types.maxr[typ] or weapon_params[sect].mxr
-					local ts = weapon_params[sect].rsc or wm_modes.types.rsec[typ]
-					if not ts then
-						return 0
-					end
-					local sn = #ts
--- 					printf("bedist_to_pr[%s]:mn=[%s],mx=[%s],dist=[%s]", self.npc:character_name(),mn,mx,dist)
-					local df = (mx-mn)/(sn-2)
-					if dist < mn then
--- 						printf("bedist_to_pr[%s]:return[%s]", self.npc:character_name(),ts[1])
-						return ts[1]
-					elseif dist > mx then
--- 						printf("bedist_to_pr[%s]:return[%s]", self.npc:character_name(),ts[sn])
-						return ts[sn]
-					end
-					for i=2,sn-1 do
-						if dist < mn+df*i then
--- 							printf("bedist_to_pr[%s]:return[%s]", self.npc:character_name(),ts[i])
-							return ts[i]
-						end
-					end
-				end
-				local function blastwpn_condition(sect,dist)
-					local radius = weapon_params[sect].bls^2
-					if dist <= radius then
-						return false
-					end
-					local bepos = be:position()
-					if self.npc:relation(db.actor) ~= game_object.enemy and db.actor:position():distance_to_sqr(bepos) < radius then
-						return false
-					end
-					for k,v in pairs(db.creature) do
-						local npc = level.object_by_id(k)
-						if npc and IsStalker(npc) and npc:character_community() == self.npc:character_community() and npc:position():distance_to_sqr(bepos) < radius then
-							return false
-						end
-					end
-					return true
 				end
 				local bedist = self.npc:position():distance_to(be:position())
 				local becls = be:clsid()
 				local wpnp = {}
 				mprm = mprm/cnt
---				printf("update_weapon_new[%s]:start cnt=[%s]", self.npc:character_name(),#weapons)
---				printf("update_weapon_new:bedist=[%s],becls=[%s]",bedist,becls)
 				for i,w in pairs(weapons) do
---					printf("update_weapon:[%s]:prm=%s", w.sec,w.prm)
 					local pr = 0
--->> returned to test
 					for k,v in ipairs(self.modes.types) do
 						if v.t == weapon_params[w.sec].typ then
 							pr = pr + mprm*v.p/100
---							printf("update_weapon_new:proc type: add %s o/o pr=%s",v.p,pr)
 							break
 						end
 					end
---<< returned to test
 					pr = pr + mprm*bedist_to_pr(w.sec,bedist)/100
---					printf("update_weapon_new:proc dist: pr=%s",pr)
-					pr = pr + mprm*becls_to_pr(w.sec,becls)/100
---					printf("update_weapon_new:proc class: pr=%s",pr)
+					pr = pr + mprm*becls_to_pr(w.sec, becls, be)/100
 					if curwpn and curwpn:id() == w.id then
 						pr = pr + w.prm*self.modes.active_add/100
 					end
@@ -445,21 +432,16 @@ function weapon_manager:update_weapon()
 							local bebe = be:best_enemy()
 							if be:see(self.npc) and ((bebe and bebe:id() == self.npc_id) or (db.actor and db.actor:id() == be:id())) and self.last_change+self.modes.tchange_time_fc > tg then
 								local add = (self.last_change+self.modes.tchange_time_fc-tg)/40
---								printf("update_weapon_new:proc last_change[%s]!!: pr=%s,add=%s",w.sec,pr,w.prm*add/100)
 								pr = pr + mprm*add/100
 							elseif self.last_change+self.modes.tchange_time > tg then
 								local add = (self.last_change+self.modes.tchange_time-tg)/50
---								printf("update_weapon_new:proc last_change[%s]: pr=%s,add=%s",w.sec,pr,w.prm*add/100)
 								pr = pr + mprm*add/100
 							end
 						end
 					end
---					printf("update_weapon:proc ammo: pr=%s",pr)
-					if weapon_params[w.sec].bls and not blastwpn_condition(w.sec,bedist) then
---						printf("update_weapon_new:not blastwpn_condition()[%s]",w.sec)
+					if weapon_params[w.sec].bls and not blastwpn_condition( w.sec, bedist, be, self.npc ) then
 						pr = pr - w.prm*0.6
 					end
---					printf("update_weapon:wpn[%s]=%s",w.sec,tostring(w.prm+pr))
 					table.insert(wpnp,{id = w.id,p = w.prm+pr})
 				end
 				table.sort(wpnp,function(a,b) return a.p > b.p end)
@@ -474,7 +456,7 @@ function weapon_manager:update_weapon()
 	end
 	write_log("~~RX_WMGR_update_wpn_3")
 	self.weapon_id = nil
-	self.weapons = nil
+	--self.weapons = nil
 end
 
 function weapon_manager:check_conditions(nam)
@@ -516,22 +498,23 @@ local iterate_opts = {
 	cut = false,
 }
 
-local function weapon_iterator(npc, item)
+local function weapon_iterator( mgr, cut, npc, item )
 	write_log("~~RX_WMGR_ITERATE_1")
-	if item == nil --[[or alife():object(item:id()) == nil]] then 
+	if item == nil then 
 		log1("!!RX_WMGR Weapon manager lost weapon in iteration of inventory of "..npc:name())
-	return end
+		return
+	end
+
 	write_log("~~RX_WMGR_ITERATE_3")
 	local id = item:id()
 	local npc_id = npc:id()
 	local srv_item = alife():object(id)
 	write_log("~~RX_WMGR_ITERATE_4")
---	if srv_item and rx_utils.item_is_fa(srv_item) then
 	if rx_utils.item_is_fa(item) then
 		write_log("~~RX_WMGR_ITERATE_5")
 		local sec = item:section()
 		local cnd = item:condition()
-		if na or (wm_modes.forbiddens[sec] ~= true and cnd >= wm_modes.min_cond and iterate_opts.mgr:have_ammo(item)) then
+		if na or (wm_modes.forbiddens[sec] ~= true and cnd >= wm_modes.min_cond and mgr:have_ammo(item)) then
 			write_log("~~RX_WMGR_ITERATE_6")
 			local check_companion = false
 			local check_companion_inv = true
@@ -539,19 +522,16 @@ local function weapon_iterator(npc, item)
 				if xr_companion.check_weapon(sec, npc_id) then
 					check_companion = true
 					check_companion_inv = false
-				end						
+				end
 			else
 				check_companion = true
 			end
 			write_log("~~RX_WMGR_ITERATE_7")
 			local params = read_wpn_params(sec)
 			local typ = params.typ
-			if not iterate_opts.mgr.weapons[typ] then
-				write_log("~~RX_WMGR_ITERATE_ABORT")
-			abort("weapon_manager: not registered weapon type "..tostring(sec))
-			end
+			ASSERT( mgr.weapons[ typ ], "[%s]: not registered weapon type: %s", sec, typ )
 			write_log("~~RX_WMGR_ITERATE_8")
-			local prm = iterate_opts.mgr:get_weapon_prior(item)
+			local prm = mgr:get_weapon_prior(item)
 			if not wm_modes.enabled then
 				local bwpn = npc:best_weapon()
 				if bwpn and id == bwpn:id() then
@@ -559,21 +539,21 @@ local function weapon_iterator(npc, item)
 				end
 			end
 			write_log("~~RX_WMGR_ITERATE_9")
-			if not iterate_opts.cut then
+			if not cut then
 				write_log("~~RX_WMGR_ITERATE_10")
 				if check_companion then
-					table.insert(iterate_opts.mgr.weapons[typ],{sec = sec,id = id,prm = prm})
+					table.insert(mgr.weapons[typ],{sec = sec,id = id,prm = prm})
 				end
 			else
 				write_log("~~RX_WMGR_ITERATE_10A")
 				if not tslist[sec] or tslist[sec].prm < prm then
 					write_log("~~RX_WMGR_ITERATE_11")
 					if tslist[sec] then
-						-- printf("weapon_iterator:reins [%s](%s > %s), rem %s",sec,prm,tslist[sec].prm,tslist[sec].pos)
 						if check_companion_inv then
 							table.remove(twlist,tslist[sec].pos)
 						end
 					end
+					--[=[ --KRodin: Нафиг надо, РПГ вообще очень глючная вещь.
 					write_log("~~RX_WMGR_ITERATE_12")
 						--' Проверка на РПГ-7 '--
 					if sec == "wpn_rpg7" then
@@ -581,21 +561,21 @@ local function weapon_iterator(npc, item)
 					--' Если РПГ-7 тогда проверяем безопасность ведения огня
 						if check_if_safe_rpg7(npc) == true then
 							if check_companion then
-							table.insert(twlist,{sec = sec,id = id,prm = prm,typ = typ})
+								table.insert(twlist,{sec = sec,id = id,prm = prm,typ = typ})
 								tslist[sec] = {prm = prm,pos = #twlist}
 							end
 						else	
 							table.remove(twlist,tslist[sec].pos)
 						end
 						write_log("~~RX_WMGR_ITERATE_13END")
-					else
+					else--]=]
 						write_log("~~RX_WMGR_ITERATE_13A")
 						if check_companion then
 							table.insert(twlist,{sec = sec,id = id,prm = prm,typ = typ})
 							tslist[sec] = {prm = prm,pos = #twlist}									
 						end
 						write_log("~~RX_WMGR_ITERATE_13AEND")
-					end				
+					--end				
 				end
 			end
 		end
@@ -603,6 +583,7 @@ local function weapon_iterator(npc, item)
 end
 
 function weapon_manager:update_weapon_list(na,cut,max)
+if self.refresh_weapon_list then
 	write_log("~~RX_WMGR_update_wpn_list_1")
 	local tslist,twlist = {},{}
 	write_log("~~RX_WMGR_update_wpn_list_2")
@@ -612,17 +593,22 @@ function weapon_manager:update_weapon_list(na,cut,max)
 	for z,i in ipairs(self.modes.types) do
 		self.weapons[i.t] = {}
 	end
-	write_log("~~RX_WMGR_update_wpn_list_3A")
-	iterate_opts.mgr = self
-	iterate_opts.cut = cut
 	write_log("~~RX_WMGR_update_wpn_list_4")
-	self.npc:iterate_inventory(weapon_iterator, self.npc)
+	self.npc:iterate_inventory(
+      function( npc, item )
+        weapon_iterator( self, cut, npc, item )
+      end,
+      self.npc
+    )
 	write_log("~~RX_WMGR_update_wpn_list_5")
 	for k,v in pairs(self.wpns_prstor) do
 		if v then
-			weapon_iterator(self.npc, k)
+			weapon_iterator( self, cut, self.npc, k )
 		end
 	end
+	self.refresh_weapon_list = false
+end
+
 	write_log("~~RX_WMGR_update_wpn_list_6")
 	local cnt,sprm = 0,0
 	if not cut then
@@ -643,13 +629,11 @@ function weapon_manager:update_weapon_list(na,cut,max)
 				cnt = cnt+1
 				sprm = sprm+v.prm
 			else
---				printf("update_weapon_list:wpn count(%s) > max_pr_weapons(%s) -> break",#twlist,(max or self.modes.max_pr_weapons))
 				break
 			end
 		end
 	end
 	write_log("~~RX_WMGR_update_wpn_list_end")
---	printf("update_weapon[%s]:cnt:[%s]", self.npc:character_name(), cnt)
 	return cnt,sprm
 end
 
@@ -657,7 +641,6 @@ function weapon_manager:get_weapon_prior(wpn,addonf)
 	local id,tg = wpn:id(),time_global()
 --	log1("[RX_WMGR] get prior for wpn "..wpn:name())
 	if tg > (self.priors_mem.tg or 0) then
---		rx_ai.printf("get_weapon_prior[%s]:clear mem on %s",self.npc:character_name(),tg)
 		self.priors_mem = {tg = tg+math.random(6000,8000)}
 	end
 	if self.priors_mem[id] and not addonf then
@@ -666,12 +649,13 @@ function weapon_manager:get_weapon_prior(wpn,addonf)
 		local prm,pr = 0,0
 		local sec = wpn:section()
 		local params = read_wpn_params(sec)
-		if (self.modes.mode1 == "1" and not xr_companion.is_companion(self.npc:id())) then
+		if self.modes.mode1 == "1" and not xr_companion.is_companion(self.npc:id()) then
 			prm = params.cst+self.modes.addcost
-		elseif (self.modes.mode1 == "2" or xr_companion.is_companion(self.npc:id())) then
+		elseif self.modes.mode1 == "2" or xr_companion.is_companion(self.npc:id()) then
+			local dst = params.bullet_speed -- params.dst
 			local kf = wm_modes.koeffs[self.modes.koeffs]
-			prm = (params.dmg*kf.dmg)+(params.rpm*kf.rpm)+(params.dst*kf.dst)+((100/params.dsp)*kf.dsp)
-		elseif (self.modes.mode1 == "3" and not xr_companion.is_companion(self.npc:id())) then
+			prm = (params.dmg*kf.dmg)+(params.rpm*kf.rpm)+(dst*kf.dst)+((50/params.dsp)*kf.dsp)
+		elseif self.modes.mode1 == "3" and not xr_companion.is_companion(self.npc:id()) then
 			prm = wm_modes.priors[self.modes.priors][sec] or 0
 			if prm == 0 then
 				for k,v in pairs(wm_modes.priors[self.modes.priors]) do
@@ -738,8 +722,36 @@ function weapon_manager:disable(end_time)
 end
 
 function weapon_manager:enable()
---	self.disabled = nil
 	self.disabled_temp = nil
+end
+
+
+class "fake_weapon_manager"
+function fake_weapon_manager:__init()
+	self.disabled = true
+end
+function fake_weapon_manager:initialize()
+end
+function fake_weapon_manager:update()
+end
+function fake_weapon_manager:get_weapon()
+end
+function fake_weapon_manager:output()
+end
+function fake_weapon_manager:set_weapon()
+end
+function fake_weapon_manager:update_weapon()
+end
+function fake_weapon_manager:check_conditions()
+end
+function fake_weapon_manager:update_weapon_list()
+	return 0,0
+end
+function fake_weapon_manager:have_ammo()
+end
+function fake_weapon_manager:disable()
+end
+function fake_weapon_manager:enable()
 end
 
 function get_wm(obj)
@@ -749,7 +761,7 @@ function get_wm(obj)
 		local id = obj:id()
 		local st = rx_ai.get_storage(id)
 		write_log("~~RX_WMGR_3")	
-		if st.wm == nil then
+		if not st.wm then
 			write_log("~~RX_WMGR_4")	
 			st.wm = weapon_manager(obj)
 			wms[id] = true
@@ -759,33 +771,6 @@ function get_wm(obj)
 		return st.wm
 	else
 		write_log("~~RX_WMGR_END")	
-		class "fake_weapon_manager"
-		function fake_weapon_manager:__init()
-			self.disabled = true
-		end
-		function fake_weapon_manager:initialize()
-		end
-		function fake_weapon_manager:update()
-		end
-		function fake_weapon_manager:get_weapon()
-		end
-		function fake_weapon_manager:output()
-		end
-		function fake_weapon_manager:set_weapon()
-		end
-		function fake_weapon_manager:update_weapon()
-		end
-		function fake_weapon_manager:check_conditions()
-		end
-		function fake_weapon_manager:update_weapon_list()
-			return 0,0
-		end
-		function fake_weapon_manager:have_ammo()
-		end
-		function fake_weapon_manager:disable()
-		end
-		function fake_weapon_manager:enable()
-		end
 		return fake_weapon_manager()
 	end
 end
@@ -813,30 +798,28 @@ function kill_wm( obj, death )
   if not obj then return end
   local id = obj:id()
   local st = rx_ai.get_storage( id )
-  if st and st.wm ~= nil then
+  if st and st.wm then
     clear_wms( id )
   end
 end
 
 
+--[=[ --Видимо это более не нужно.
 function global_update()
   ogse_signals.get_mgr():reschedule( wm_modes.update_prd )
-  if not wm_modes.inited then
-    init()
-  end
   for k, v in pairs( wms ) do
     if not db.storage[ k ] then
       clear_wms(k)
     end
   end
 end
-
+--]=]
 
 function npc_update( npc, st )
-  ogse_signals.get_mgr():reschedule( math.random(1500, 3000) )
+  ogse_signals.get_mgr():reschedule( math.random(3000, 5000) )
   if st and st.wm then
     if npc:best_enemy() then
-      ogse_signals.get_mgr():reschedule( 1000 )
+      ogse_signals.get_mgr():reschedule( math.random(900, 1100) )
     end
     st.wm:update()
   end
@@ -844,9 +827,6 @@ end
 
 
 function read_wm_modes(comm,rank,sect,npc)
-	if not wm_modes.inited then
-		init()
-	end
 	if sect and wm_modes.sect.custom[sect] then
 		return wm_modes.sect.custom[sect]
 	end
@@ -867,38 +847,35 @@ function read_wm_modes(comm,rank,sect,npc)
 	else
 		cm,rp = rx_utils.collect_sections(sys_ini,{"rx_wmgr_"..defsec})
 	end
---	printf("read_wm_modes: cm.mode1=[%s]",cm.mode1)
 	cm.disabled = (cm.disabled == "true" or cm.disabled == "1")
 	if cm.disabled or cm.mode2 == "0" then
 		cm.process_mode = "0"
 	end
 
-		local kf = {}
-		if not sys_ini:section_exist("rx_wmgr_"..cm.koeffs) then
-			abort("weapon_mgr: can`t find koeffs section [%s]",cm.koeffs)
-		end
---		printf("read_wm_modes: read koeffs from [%s]",cm.koeffs)
-		kf.dmg = sys_ini:r_float("rx_wmgr_"..cm.koeffs,"damage")
-		kf.rpm = sys_ini:r_float("rx_wmgr_"..cm.koeffs,"rpm")
-		kf.dst = sys_ini:r_float("rx_wmgr_"..cm.koeffs,"distance")
-		kf.dsp = sys_ini:r_float("rx_wmgr_"..cm.koeffs,"dispersion")
-		wm_modes.koeffs[cm.koeffs] = kf
+	local kf = {}
+	if not sys_ini:section_exist("rx_wmgr_"..cm.koeffs) then
+		abort("weapon_mgr: can`t find koeffs section [%s]",cm.koeffs)
+	end
+	kf.dmg = sys_ini:r_float("rx_wmgr_"..cm.koeffs,"damage")
+	kf.rpm = sys_ini:r_float("rx_wmgr_"..cm.koeffs,"rpm")
+	kf.dst = sys_ini:r_float("rx_wmgr_"..cm.koeffs,"distance")
+	kf.dsp = sys_ini:r_float("rx_wmgr_"..cm.koeffs,"dispersion")
+	wm_modes.koeffs[cm.koeffs] = kf
 
-		local pr = {}
-		if not sys_ini:section_exist("rx_wmgr_"..cm.priors) then
-			abort("weapon_mgr: can`t find priors section [%s]",cm.priors)
-		end
---		printf("read_wm_modes: read priors from [%s]",cm.priors)
-		local n = sys_ini:line_count("rx_wmgr_"..cm.priors)
-		if n > 0 then
-			for i = 0,n-1 do
-				local r, id, value = sys_ini:r_line("rx_wmgr_"..cm.priors,i,"","")
-				if pr[id] == nil then
-					pr[id] = tonumber(value)
-				end
+	local pr = {}
+	if not sys_ini:section_exist("rx_wmgr_"..cm.priors) then
+		abort("weapon_mgr: can`t find priors section [%s]",cm.priors)
+	end
+	local n = sys_ini:line_count("rx_wmgr_"..cm.priors)
+	if n > 0 then
+		for i = 0,n-1 do
+			local r, id, value = sys_ini:r_line("rx_wmgr_"..cm.priors,i,"","")
+			if not pr[id] then
+				pr[id] = tonumber(value)
 			end
 		end
-		wm_modes.priors[cm.priors] = pr
+	end
+	wm_modes.priors[cm.priors] = pr
 
 	local tps = string.explode(",",cm.types,true)
 	cm.types = {}
@@ -915,14 +892,12 @@ function read_wm_modes(comm,rank,sect,npc)
 			wm_modes.sect.custom[sect] = cm
 		else
 			wm_modes.sect.custom[sect] = wm_modes.sect.default
-			printf("read_wm_modes[%s]: set default",sect)
 		end
 		return wm_modes.sect.custom[sect]
 	else
 		if  rp[1] > 0 or rp[2] > 0 or rp[3] > 0 then
 			wm_modes.sect[comm][rank] = cm
 		else
-			printf("read_wm_modes[%s][%s]: set default",comm,rank)
 			wm_modes.sect[comm][rank] = wm_modes.sect.default
 		end
 		return wm_modes.sect[comm][rank]
@@ -930,11 +905,7 @@ function read_wm_modes(comm,rank,sect,npc)
 end
 
 function read_wpn_params(sect)
-	if not wm_modes.inited then
-		init()
-	end
-	if weapon_params[sect] == nil then
-		weapon_params[sect] = {}
+	if not weapon_params[sect] then
 		local ammos = get_ammo_section(sect)
 		local dmg, blast = get_dmg(sect,ammos)
 		local rpm = get_rpm(sect)
@@ -946,7 +917,7 @@ function read_wpn_params(sect)
 		local minr, maxr = get_radius(sect)
 		local enemyt = get_enemyt(sect)
 		local rsec = get_rsect(sect)
-		weapon_params[sect] = {cst = cost,typ = typ,dmg = dmg,rpm = rpm,dsp = disp,dst = dist,dtn = distr,mag = magsize,mnr = minr,mxr = maxr,bls = blast,ams = ammos,enm = enemyt,rsc = rsec}
+		weapon_params[sect] = {bullet_speed = get_bullet_speed_as_dist( sect ),cst = cost,typ = typ,dmg = dmg,rpm = rpm,dsp = disp,dst = dist,dtn = distr,mag = magsize,mnr = minr,mxr = maxr,bls = blast,ams = ammos,enm = enemyt,rsc = rsec}
 	end
 	return weapon_params[sect]
 end
@@ -996,14 +967,12 @@ function get_dmg(section,ammo_list)
 			k_hit = k_hit+hit
 		end
 	end
---	printf("[%s]:dmg=%s (%s)",section,((hit_power*k_hit/#ammo_list*25)*1.7)^0.9,#ammo_list)
 	return ((hit_power*k_hit/#ammo_list*25)*1.7)^0.9
 end
 
 function get_rpm(section)
 	local mag_size = read_if_exist_float(section,"ammo_mag_size",2)
 	if mag_size < 4 then
---		printf("[%s]:rpm=%s",section,(mag_size^0.4)*5)
 		return (mag_size^0.4)*5
 	end
 	local rpm = read_if_exist_float(section,"rpm",10)
@@ -1012,7 +981,6 @@ function get_rpm(section)
 	if string.find(f_modes,"-1") or (tonumber(f_modes) and tonumber(f_modes) > 4) then
 		rpm = rpm*1.3
 	end
---	printf("[%s]:rpm=%s",section,rpm+(mag_size/3))
 	return rpm+(mag_size/3)
 end
 
@@ -1022,17 +990,17 @@ function get_disp(section,ammo_list)
 	for i,s in ipairs(ammo_list) do
 		k_disp = k_disp+read_if_exist_float(s,"k_disp",1)
 	end
-	if disp_base < 0.2 then
-		disp_base = 0.2
-	end
---	printf("[%s]:disp=%s (%s)",section,disp_base*k_disp/#ammo_list*10,#ammo_list)
+	if disp_base < 0.1 then disp_base = 0.1 end
 	return disp_base*k_disp/#ammo_list*10
 end
 
 function get_dist(section)
 	local dist = read_if_exist_float(section,"fire_distance",50)
---	printf("[%s]:dist=%s",section,(dist/2)^0.7)
 	return (dist/2)^0.7,dist
+end
+
+function get_bullet_speed_as_dist( sect )
+	return ( get_float( sect, "bullet_speed", 0 ) / 2 ) ^ 0.7
 end
 
 function get_radius(section)
@@ -1082,10 +1050,6 @@ function get_rsect(section)
 end
 
 
-function net_spawn()
-
-end
-
 -- определение валидности цели для РПГ-7 или РГ-6
 function valid_target(obj)
 	if obj then
@@ -1122,14 +1086,10 @@ end
 --' собакам, кошкам и плотям. По псевдопсам - будет, они расцениваются как опасная цель. Аналогично тушканы и крысы,
 --' так как бегают стаями.
 ----------------------------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------------------------
+--[=[--------------------------------------------------------------------------------------------------------------------
 function check_if_safe_rpg7(npc)
-
-local shooting_are_safe = true
-local be = npc:best_enemy()
-local friends = {}
-
---' -- write_log("WPN_MGR Check RPG7_SAFE start")
+	local be = npc:best_enemy()
+	local friends = {}
 
 	local function check_object(obj)
 		if obj and obj.clsid and obj:alive() and npc:id() ~= obj:id() then
@@ -1153,65 +1113,55 @@ local friends = {}
 		local be_pos = be:bone_position("bip01_spine")
 		local be_dist = npc_pos:distance_to(be_pos)		
 
-		--' -- write_log("WPN_MGR Check RPG7_SAFE: be_dist: "..tostring(be_dist))
-
 		local check_dist = 20
 		local friendly_fire_dist = 20
 
-		if #friends ~= 0 then
+		if #friends > 0 then
 
 		for i,friend in ipairs(friends) do
 			local friend_pos = friend:bone_position("bip01_spine")
 			local friend_dist = npc_pos:distance_to(friend_pos)
 			local ff_dist = friend_pos:distance_to(be_pos)
-				if friend_dist < check_dist then check_dist = friend_dist end
-				if ff_dist < friendly_fire_dist then friendly_fire_dist = ff_dist end
-					--' -- write_log("WPN_MGR Check RPG7_SAFE: friend_dist: "..tostring(friend_dist).." ff_dist: "..tostring(ff_dist))
-				if check_dist <= 15 or ff_dist <= 15 then 
-					--' -- write_log("WPN_MGR Check RPG7_SAFE UNSAFE SITUATION BREAK SHOOTING")
-					shooting_are_safe = false 
-					return shooting_are_safe
-				end
+			if friend_dist < check_dist then check_dist = friend_dist end
+			if ff_dist < friendly_fire_dist then friendly_fire_dist = ff_dist end
+			if check_dist <= 15 or ff_dist <= 15 then 
+				return false
 			end
 		end
-				
-		--' -- write_log("WPN_MGR Check RPG7_SAFE SITUATION OK CONTINUE SHOOTING")
-				
-		if (be_dist > 25) and (check_dist > 15) and (friendly_fire_dist > 15) and valid_target(be) then
-			shooting_are_safe = true 
-			--' -- write_log("WPN_MGR Check RPG7_SAFE ENDED OK") 
-			return shooting_are_safe
-		else 
-			shooting_are_safe = false 
-			--' -- write_log("WPN_MGR Check RPG7_SAFE ENDED BAD") 
-			return shooting_are_safe
-		end
-	end
-	return shooting_are_safe
-end
 
+		end
+
+		return be_dist > 25 and check_dist > 15 and friendly_fire_dist > 15 and valid_target(be)
+	end
+	return true --?
+end
+--]=]
 
 function attach( sm )
+  if not wm_modes.enabled then return end
+
+  init() --Делаем здесь и только один раз.
+
   sm:subscribe({ signal = "on_save", fun = this.return_all })
   sm:subscribe({ signal = "on_npc_death", fun = this.on_death })
-  sm:subscribe({ signal = "on_npc_net_destroy", fun = this.kill_wm }) -- не вызывалось в огсе.
+  sm:subscribe({ signal = "on_npc_item_drop", fun = this.on_take })
+  sm:subscribe({ signal = "on_npc_item_take", fun = this.on_take })
+  sm:subscribe({ signal = "on_npc_net_destroy", fun = this.kill_wm })
   sm:subscribe({ signal = "on_npc_spawn", fun = this.on_npc_spawn })
-  if wm_modes.enabled then
-    sm:subscribe({
-      signal = "on_update", fun = this.global_update, queued = true
-    })
-  end
+  --sm:subscribe({ --Видимо это более не нужно.
+  --  signal = "on_update", fun = this.global_update, queued = true
+  --})
 end
 
 
 function on_npc_spawn( obj, binder )
   if not obj:alive()          then return end
   if not wm_modes.enabled     then return end
-  if rx_utils.IsTrader( obj ) then return end
+  --if rx_utils.IsTrader( obj ) then return end
   local s = {
     [ "signal" ] = "on_npc_update." .. obj:id(),
     [ "fun"    ] = this.on_npc_update,
-    --[ "queued" ] = true,
+    [ "queued" ] = true,
   }
   binder[ script_name() .. ".subscribed" ] = s
   ogse_signals.get_mgr():subscribe( s )
@@ -1232,4 +1182,14 @@ function on_death( obj )
     binder[ script_name() .. ".subscribed" ] = nil
   end
   kill_wm( obj, true )
+end
+
+
+function on_take( npc, obj )
+  if obj:is_weapon() or obj:is_ammo() then
+    local st = rx_ai.get_storage( npc:id() )
+    if st and st.wm then
+      st.wm.refresh_weapon_list = true
+    end
+  end
 end

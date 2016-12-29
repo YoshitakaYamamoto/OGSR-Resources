@@ -273,7 +273,7 @@ end
 -- в этой табличке хранитс€ выбранный тип оружи€ дл€ напарника в виде companion_weapon[npc:id()] = "выбранный_тип"
 -- разрешение использовать любое оружие == "anything"
 -----------------------------------------------------
-companion_weapon = {}
+local companion_weapon = {}
 -----------------------------------------------------
 -- в этой табличке хранитс€ список типов оружи€ которые есть у напарника
 -- структура:
@@ -435,7 +435,7 @@ function search_weapon(npc, item)
 			end
 			w_cl = tonumber(tostring(ammo)..tostring(mode))
 		end
-		log1("FOUND "..weapon_section.." CLASS "..w_cl)
+		--log1("FOUND "..weapon_section.." CLASS "..w_cl)
 		if weapon_class[w_cl] then
 			if not companion_has[npc:id()] then
 				companion_has[npc:id()] = {
@@ -480,70 +480,89 @@ end
 -----------------------------------------------------
 -- ѕриказы на смену оружи€
 -----------------------------------------------------
+----------------------------------
+local function update_wmgr(npc) --ѕринудительное обновление оружейного менеджера
+	local st = rx_ai.get_storage( npc:id() )
+	if st and st.wm then
+		st.wm.refresh_weapon_list = true
+	end
+end
+----------------------------------
 function set_weapon_anyting(actor, npc)
 	if npc then
 		companion_weapon[npc:id()] = "anything"
 		save_var_companion(npc:id(),"weapon_behavior",companion_weapon[npc:id()])
+		update_wmgr(npc)
 	end
 end
 function set_weapon_pistol(actor, npc)
 	if npc then
 		companion_weapon[npc:id()] = "pistol"
 		save_var_companion(npc:id(),"weapon_behavior",companion_weapon[npc:id()])
+		update_wmgr(npc)
 	end
 end
 function set_weapon_submashinegun(actor, npc)
 	if npc then
 		companion_weapon[npc:id()] = "submashinegun"
 		save_var_companion(npc:id(),"weapon_behavior",companion_weapon[npc:id()])
+		update_wmgr(npc)
 	end
 end
 function set_weapon_shotgun(actor, npc)
 	if npc then
 		companion_weapon[npc:id()] = "shotgun"
 		save_var_companion(npc:id(),"weapon_behavior",companion_weapon[npc:id()])
+		update_wmgr(npc)
 	end
 end
 function set_weapon_assault_shotgun(actor, npc)
 	if npc then
 		companion_weapon[npc:id()] = "assault_shotgun"
 		save_var_companion(npc:id(),"weapon_behavior",companion_weapon[npc:id()])
+		update_wmgr(npc)
 	end
 end
 function set_weapon_carbine(actor, npc)
 	if npc then
 		companion_weapon[npc:id()] = "carbine"
 		save_var_companion(npc:id(),"weapon_behavior",companion_weapon[npc:id()])
+		update_wmgr(npc)
 	end
 end
 function set_weapon_assault_rifle(actor, npc)
 	if npc then
 		companion_weapon[npc:id()] = "assault_rifle"
 		save_var_companion(npc:id(),"weapon_behavior",companion_weapon[npc:id()])
+		update_wmgr(npc)
 	end
 end
 function set_weapon_sniper_rifle(actor, npc)
 	if npc then
 		companion_weapon[npc:id()] = "sniper_rifle"
 		save_var_companion(npc:id(),"weapon_behavior",companion_weapon[npc:id()])
+		update_wmgr(npc)
 	end
 end
 function set_weapon_mashinegun(actor, npc)
 	if npc then
 		companion_weapon[npc:id()] = "mashinegun"
 		save_var_companion(npc:id(),"weapon_behavior",companion_weapon[npc:id()])
+		update_wmgr(npc)
 	end
 end
 function set_weapon_grenade_launcher(actor, npc)
 	if npc then
 		companion_weapon[npc:id()] = "grenade_launcher"
 		save_var_companion(npc:id(),"weapon_behavior",companion_weapon[npc:id()])
+		update_wmgr(npc)
 	end
 end
 function set_weapon_flamethrower(actor, npc)
 	if npc then
 		companion_weapon[npc:id()] = "flamethrower"
 		save_var_companion(npc:id(),"weapon_behavior",companion_weapon[npc:id()])
+		update_wmgr(npc)
 	end
 end
 -----------------------------------------------------
@@ -555,7 +574,7 @@ function has_pistol(actor, npc)
 	elseif companion_has[npc:id()].pistol == false then
 		return false
 	else
-		log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
+		--log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
 		return false
 	end
 end
@@ -565,7 +584,7 @@ function has_submashinegun(actor, npc)
 	elseif companion_has[npc:id()].submashinegun == false then
 		return false
 	else
-		log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
+		--log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
 		return false
 	end
 end
@@ -575,7 +594,7 @@ function has_shotgun(actor, npc)
 	elseif companion_has[npc:id()].shotgun == false then
 		return false
 	else
-		log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
+		--log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
 		return false
 	end
 end
@@ -585,7 +604,7 @@ function has_assault_shotgun(actor, npc)
 	elseif companion_has[npc:id()].assault_shotgun == false then
 		return false
 	else
-		log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
+		--log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
 		return false
 	end
 end
@@ -595,7 +614,7 @@ function has_carbine(actor, npc)
 	elseif companion_has[npc:id()].carbine == false then
 		return false
 	else
-		log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
+		--log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
 		return false
 	end
 end
@@ -605,7 +624,7 @@ function has_assault_rifle(actor, npc)
 	elseif companion_has[npc:id()].assault_rifle == false then
 		return false
 	else
-		log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
+		--log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
 		return false
 	end
 end
@@ -615,7 +634,7 @@ function has_sniper_rifle(actor, npc)
 	elseif companion_has[npc:id()].sniper_rifle == false then
 		return false
 	else
-		log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
+		--log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
 		return false
 	end
 end
@@ -625,7 +644,7 @@ function has_mashinegun(actor, npc)
 	elseif companion_has[npc:id()].mashinegun == false then
 		return false
 	else
-		log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
+		--log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
 		return false
 	end
 end
@@ -635,7 +654,7 @@ function has_grenade_launcher(actor, npc)
 	elseif companion_has[npc:id()].grenade_launcher == false then
 		return false
 	else
-		log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
+		--log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
 		return false
 	end
 end
@@ -645,7 +664,7 @@ function has_flamethrower(actor, npc)
 	elseif companion_has[npc:id()].flamethrower == false then
 		return false
 	else
-		log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
+		--log1("!!!ERROR - Companion weapon selector wasn't fill table companion_has !!!")
 		return false
 	end
 end
@@ -839,50 +858,12 @@ function community_by_actor(actor_comm)
 	return return_community
 end
 
-
-class "change_community_by_actor" (ogse_st_mgr.savable_timer)
-function change_community_by_actor:__init(npc_id) super()
-	-- об€зательна€ строка с именем класса таймера
-	self._class = script_name()..".change_community_by_actor"
-	self.npc_id = npc_id
-end
-
-function change_community_by_actor:condition()
-	return level.object_by_id(self.npc_id)
-end
-
-function change_community_by_actor:load(packet)
-	self.npc_id = packet:r_u16()
-end
-
-function change_community_by_actor:save(packet)
-	packet:w_u16(self.npc_id)
-end
-
-function change_community_by_actor:action()
-	if companions[self.npc_id] then
-		local obj = level.object_by_id(self.npc_id)
-		if obj:alive() then
-			local actor_comm = db.actor:character_community()
-			local new_comm = community_by_actor(actor_comm)
-			obj:set_character_community(new_comm, 0, 0)	
---			relation_registry.set_community_goodwill (new_comm, obj:id(), 0)
-		end		
-	end	
-end
-
 function set_community_by_actor()
-	local actor_comm = db.actor:character_community()
-	local new_comm = community_by_actor(actor_comm)
 	for id, _ in pairs(companions) do
-		local obj = level.object_by_id(id)
-		local s_npc = alife():object(id)
-		if s_npc and obj and obj:alive() then
-			obj:set_character_community(new_comm, 0, 0)	
---			relation_registry.set_community_goodwill (new_comm, obj:id(), 0)
-		elseif not obj and s_npc then
-			change_community_by_actor(id):start()
-		end			
+		ASSERT(alife():object(id), "") --“акого быть не должно
+		level.client_spawn_manager():add( id, -1, function(id, obj) --¬место сохран€емого таймера лучше сделать так, если даже не сработает - вроде как не страшно. Ќапарник даже если враг - атаковать актора всЄ равно не должен.
+			obj:set_character_community(community_by_actor(db.actor:character_community()), 0, 0)
+		end )
 	end
 end
 
@@ -1684,7 +1665,8 @@ function enable_scheme(npc, ini)
 			companions[npc:id()] = true --"companion"
 			subscribe(npc:id())
 			--log3("--[%s.enable_scheme] subscribed: [%s]", script_name(), npc:name())
-			companion_weapon[npc:id()] = load_var_companion(npc:id(), "weapon_behavior", "anything")			
+			companion_weapon[npc:id()] = load_var_companion(npc:id(), "weapon_behavior", "anything")	
+			update_wmgr(npc)
 			local behavior = load_var_companion(npc:id(), "companion_behavior", beh_walk_simple)
 			init_danger_settings(npc)
 			st.enabled = true		
