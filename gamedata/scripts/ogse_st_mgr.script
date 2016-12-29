@@ -355,14 +355,14 @@ end
 
 -- запустить таймер с указанием, в какую очередь поместить проверку
 -- в отличие от "быстрых" таймеров приоритет по умолчанию - низкий
-function savable_timer:start( --[[high_priority]] )
+function savable_timer:start( high_priority )
   self._start_time     = self._start_time or game.get_game_time()
-  self._high_priority  = true --high_priority --TODO: с НИ удалить это вообще.
+  self._high_priority  = high_priority
   self._cond_slot_desc = {
     signal = "on_update",
     self   = self,
     fun    = self._aux_cond,
-    --queued = not high_priority, --Больше не нужно, из за использования reschedule()
+    queued = (not self._residual_time and not self._game_termination_time and not high_priority), --Низкий приоритет может быть только у таймеров БЕЗ любого таймаута (т.е у таймеров, которые срабатывают по условию)
 	script_name = self._class
   }
   self.sm:subscribe( self._cond_slot_desc )
