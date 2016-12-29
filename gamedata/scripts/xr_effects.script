@@ -3443,7 +3443,7 @@ function launch_klondike_ending()
 	for i = 1, num_arts_to_spawn do
 		local art_idx = 0
 		while art_idx == 0 or (art_idx > 10 and art_idx < 18) or spawned_idxs[art_idx] == true do
-			art_idx = math.random(1,22)
+			art_idx = math.random(22)
 		end
 		alife():create("af_klondike_"..tostring(art_idx), vector():set(41.942,-1,78.993), 543615, 3616)
 		spawned_idxs[art_idx] = true
@@ -3467,4 +3467,9 @@ end
 
 function start_sleep_timer()
 	ogse.start_timer("synak_sleeped", 240)
+end
+
+--Эта функция используется в логике esc_anomaly_tips_zone
+--В этом рестрикторе, похоже, логика никогда не срабатывает.
+function esc_wolf_thanks()
 end
