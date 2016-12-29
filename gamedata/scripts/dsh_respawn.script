@@ -129,6 +129,31 @@ local function r_spawns( spawn_ini, section, line, sectSpawnProps)
 end
 
 
+--Служебный таймер. Использовать только здесь и больше нигде.
+class "swith_online_cond_timer" (ogse_st_mgr.savable_timer)
+function swith_online_cond_timer:__init(timer_id) super(timer_id)
+	self._class = script_name()..".swith_online_cond_timer"
+end
+function swith_online_cond_timer:init(npc_id)
+	self.npc_id = npc_id
+	return self
+end
+function swith_online_cond_timer:load(packet)
+	self.npc_id = packet:r_u16()
+end
+function swith_online_cond_timer:save(packet)
+	packet:w_u16(self.npc_id)
+end
+function swith_online_cond_timer:condition()
+	self.npc_sobj = alife():object(self.npc_id)
+	return self.npc_sobj.position:distance_to(db.actor:position()) > alife():switch_distance()
+end
+function swith_online_cond_timer:action()
+	log3("--[%s] Switching online: [%s]", script_name(), self.npc_sobj:name())
+	switch_online(self.npc_sobj.id)
+end
+
+
 class "dsh_respawner"
 function dsh_respawner:__init( name )
   self.name = name
@@ -336,12 +361,17 @@ function dsh_respawner:create( prob )
 	if not self.parent then
       if tt.check == true then
         sobj:brain():update()
-        if
-          sobj:smart_terrain_id() == 65535
-        then
+        if sobj:smart_terrain_id() == 65535 then
 		  --log3("!!SPAWNING [%s] -> [%s], NO SMART_TERRAIN AVAILABLE!!!", self.name, spawn_section)
           alife():release( sobj, true )
           return false
+		else
+		  --Чтобы неписи и монстры не спавнились в присутствии актора.
+          if object_level_name(sobj) == level.name() and sobj.position:distance_to(db.actor:position()) <= alife():switch_distance() then
+            log3("--[%s] Switching offline: [%s] on level: [%s]", script_name(), sobj:name(), object_level_name(sobj))
+			switch_offline(sobj.id)
+            swith_online_cond_timer(sobj:name()):init(sobj.id):start()
+          end
         end
       end
 	end
