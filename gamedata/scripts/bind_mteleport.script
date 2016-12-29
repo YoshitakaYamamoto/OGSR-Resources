@@ -4,13 +4,8 @@
 -- ** Поддерживает работу самопальных телепортов **
 -- ************************************************
 
-function abs_comp(a,b)
-	-- Служебная функция вычисления разности
-	if( a < b) then
-		return (b - a)
-	else
-		return (a - b)
-	end
+function abs_comp(a, b) --Служебная функция вычисления разности
+	return a < b and (b - a) or (a - b)
 end
 
 function teleportate(x,y,z)
@@ -133,7 +128,8 @@ function restrictor_teleport:actor_update()
 			s.teleporte = false
 			local dist = self.object:position():distance_to( db.actor:position() )
 			self.sm:reschedule(
-				( dist < 25 and 200 ) or ( dist < 100 and 1000 )
+				( dist < 15 and 200 )
+				or ( dist < 30 and math.random( 1000, 2000 ) )
 				or math.random( 5000, 6000 )
 			)
 		end

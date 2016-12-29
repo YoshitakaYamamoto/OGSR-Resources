@@ -34,9 +34,12 @@ end
 
 
 function restrictor_binder:net_spawn( data )
+  if not alife():object(self.object:id()) then return true end --KRodin: я был удивлён, но, оказалось, бывает и такое.
+
   if not object_binder.net_spawn( self, data ) then
     return false
   end
+
   db.add_zone( self.object )
   -- Не регистрироваться на апдейты, если у объекта в customdata
   -- нет секции logic вообще.
@@ -66,6 +69,9 @@ function restrictor_binder:net_spawn( data )
       [ "self"   ] = self,
     }
     self.sm:subscribe( self.subscribed )
+    --log3("--Before shapes data for [%s]", self.object:name())
+    self.shapes_data = _geom_helpers.get_all_shapes_data( self.object ) --Для точного рассчёта расстояния до рестрикторов.
+    --log3("- [%s] Shapes data for [%s]: %s", script_name(), self.object:name(), self.shapes_data)
   --else
 	--log3("!!Restrictor NOT subscribed to update: [%s], logic is empty!", self.object:name())    
   end
@@ -117,9 +123,10 @@ function restrictor_binder:actor_update( delta )
     end
   end
 
-  local dist = self.object:position():distance_to( db.actor:position() )
+  local dist = _geom_helpers.distance_from_zone_boundary( self.shapes_data, db.actor:position() ) --Точный рассчёт расстояния от актора до рестриктора
   self.sm:reschedule(
-    ( dist < 25 and 200 ) or ( dist < 100 and 1000 )
+    ( dist < 15 and 200 )
+	or ( dist < 30 and math.random(1000, 2000) )
     or math.random( 5000, 6000 )
   )
 end
