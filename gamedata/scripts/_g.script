@@ -1414,6 +1414,8 @@ function set_disp_base(v)          db.actor:set_actor_float(nil, v, 1484) end --
 
 function set_jump_power( v ) db.actor:set_actor_condition_float( nil, v, 276 ) end
 
+function set_stand_power( v ) db.actor:set_actor_condition_float( nil, v, 280 ) end -- скорость восстановления выносливости
+
 local body_states = { -- флажки состояния тела актора
 [1]		= "fwd",
 [2]		= "back",
@@ -1769,8 +1771,6 @@ end
 
 function mark_grenade_non_pickable(id, item)
 	set_item_forbidden_to_actor(item)
-	log1("!!DEBUG_GRENKA_NONPICKABLE "..tostring(id))
-	--level.client_spawn_manager():remove(id, 0)
 end
 
 -- вспомогательная функция для установки флагов в классе CInventoryItem
