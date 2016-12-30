@@ -2749,29 +2749,35 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 	if enemy and (enemy:alive() or (is_armor(enemy) and armor_alive(enemy))) and weapon and not (IsStalker(enemy) and xr_wounded.is_wounded(enemy)) then
 		local time_aim = time_to_aim[npc_rank]
 		local type_of_fire = object.aim1
-		
+
 		write_log("--XRS_BATTLE_AI: RAYTRACE PREPARE "..npc:name().." : "..tostring(enemy:id()))
-		
-		local be_pos = enemy:position()
-		local npc_pos = weapon:position()
-		local distance = npc_pos:distance_to(be_pos)
-		
-		write_log("--XRS_BATTLE_AI: WPNS_FIRE_1 "..npc:name().." : "..tostring(enemy:id()))
-		
+
 		if use_raytrace then
-		
+
+			local be_pos = enemy:position()
+			local npc_pos = weapon:position()
+
 			write_log("--XRS_BATTLE_AI: WPNS_FIRE_2_RTC_1 "..npc:name().." : "..tostring(enemy:id()))
-			
-			if is_armor(enemy) then
-				if string.find(enemy:name(),"btr") then
-					be_pos = enemy:bone_position("mashine_gun_tower")
-				else
-					be_pos = enemy:bone_position("korpus1")
-				end			
+
+			local sight_type = npc:sight_params()
+			if
+				sight_type.m_sight_type == look.fire_point
+				and sight_type.m_vector
+			then
+				be_pos = sight_type.m_vector
 			else
-				be_pos = enemy:bone_position("bip01_head")
+				if is_armor( enemy ) then
+					if string.find( enemy:name(), "btr" ) then
+						be_pos = enemy:bone_position( "mashine_gun_tower" )
+					else
+						be_pos = enemy:bone_position( "korpus1" )
+					end
+				else
+					be_pos = enemy:bone_position("bip01_head")
+				end
 			end
-			
+			local distance = npc_pos:distance_to( be_pos )
+
 			write_log("--XRS_BATTLE_AI: WPNS_FIRE_2_RTC_2 "..npc:name().." : "..tostring(enemy:id()))
 			
 			local dir_enemy = utils.vector_copy_by_val(be_pos):sub(npc_pos)
