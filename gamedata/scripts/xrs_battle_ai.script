@@ -356,11 +356,11 @@ function write_log(str)
 	end
 end
 
-function check_is_enemy(npc, enemy)
+function check_is_enemy(npc, enemy, fast)
 	if not npc or not enemy then return false end
 	local is_engine_enemy = npc:relation(enemy) == game_object.enemy
 	if is_engine_enemy then
-		return npc:binded_object():enemy_callback( npc, enemy )
+		return fast and true or npc:binded_object():enemy_callback( npc, enemy )
 	end
 	return false
 end
@@ -2800,7 +2800,7 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 				write_log("--XRS_BATTLE_AI: RAYTRACE PHASE_2 "..npc:name().." : "..tostring(enemy:id()))
 				
 				local is_alive_mob = obj and ( IsStalker( obj ) or IsMonster( obj ) ) and obj:alive()
-				if obj and ( obj:id() == enemy:id() or ( is_alive_mob and check_is_enemy( npc, obj ) ) ) then
+				if obj and ( obj:id() == enemy:id() or ( is_alive_mob and check_is_enemy( npc, obj, true ) ) ) then
 					type_of_fire = object.fire1
 				else
 					if is_alive_mob then
@@ -2818,10 +2818,10 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 					end
 				end
 			else	
-				log2(
-					"dsh: XRS_BATTLE_AI: RAYTRACE CHECK DOESN RETURN RESULT: %s -> %s, distance = %s",
-					npc:name(), enemy:name(), distance
-				)
+				--log2(
+				--	"dsh: XRS_BATTLE_AI: RAYTRACE CHECK DOESN RETURN RESULT: %s -> %s, distance = %s",
+				--	npc:name(), enemy:name(), distance
+				--)
 				type_of_fire = object.fire1
 			end
 		else	
