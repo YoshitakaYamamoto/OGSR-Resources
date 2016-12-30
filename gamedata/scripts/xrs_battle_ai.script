@@ -3034,51 +3034,62 @@ function set_escape_sight(npc, vertex)
 end
 
 function set_combat_sight(npc, enemy, weapon)
-
 	if hit_timeout[npc:id()] and hit_timeout[npc:id()] > time_global() then
 		return
 	elseif hit_timeout[npc:id()] then	
 		hit_timeout[npc:id()] = nil
 	end	
 	
-	local look_pos = nil
 	local enemy_pos = enemy:position()
 	local npc_pos = npc:position()
 	local direction = npc_pos:sub(enemy_pos)
 	local distance = npc_pos:distance_to(enemy_pos)
 
+	local bone, use_deviation
 	if IsStalker(enemy) then
-		if distance < 25 then
+		if distance < 10 then
+			use_deviation = true
 			if enemy:body_state() == move.crouch then
-				look_pos = add_deviation(npc, enemy:bone_position("bip01_pelvis"))
+				bone = "bip01_pelvis"
 			else
-				look_pos = add_deviation(npc, enemy:bone_position("bip01_spine"))
+				bone = "bip01_spine"
 			end
 		else
 			if IsSniperRifle( weapon ) then
-				look_pos = enemy:bone_position( "bip01_head" )
+				bone = "bip01_head"
+				use_deviation = false
 			else
-				look_pos = add_deviation(npc, enemy:bone_position("bip01_spine"))
+				bone = "bip01_spine"
+				use_deviation = true
 			end
 		end
 	elseif is_armor(enemy) then
+		use_deviation = true
 		if string.find(enemy:name(),"btr") then
-			look_pos = add_deviation(npc, enemy:bone_position("seat_left"))
+			bone = "seat_left"
 		else
-			look_pos = add_deviation(npc, enemy:bone_position("pilot1"))
+			bone = "pilot1"
 		end
 	else
-		if distance < 25 then
-			look_pos = add_deviation(npc, enemy:bone_position( "bip01_spine" ))
+		if distance < 10 then
+			bone = "bip01_spine"
+			use_deviation = true
 		else
 			if IsSniperRifle(weapon) then
-				look_pos = enemy:bone_position( "bip01_head" )
+				bone = "bip01_head"
+				use_deviation = false
 			else
-				look_pos = add_deviation(npc, enemy:bone_position("bip01_spine"))
+				bone = "bip01_spine"
+				use_deviation = true
 			end
 		end
 	end
-	
+
+	local look_pos = enemy:bone_position( bone )
+	if use_deviation then
+		look_pos = add_deviation( npc, look_pos )
+	end
+
 	if (npc:see(enemy) and enemy:alive()) or (is_armor(enemy) and armor_alive(enemy))
 	or knife_scheme[npc:id()]
 	then
