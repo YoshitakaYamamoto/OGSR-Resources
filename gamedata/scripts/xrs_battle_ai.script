@@ -3071,16 +3071,14 @@ function set_combat_sight(npc, enemy, weapon)
 			bone = "pilot1"
 		end
 	else
+		use_deviation = false
 		if distance < 10 then
 			bone = "bip01_spine"
-			use_deviation = true
 		else
 			if IsSniperRifle(weapon) then
 				bone = "bip01_head"
-				use_deviation = false
 			else
 				bone = "bip01_spine"
-				use_deviation = true
 			end
 		end
 	end
