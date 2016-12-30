@@ -264,7 +264,7 @@ end
 
 function motivator_binder:reinit()
     if not self.object then return end
-log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name() or "nil")
+--log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 
     object_binder.reinit(self)
 
@@ -280,7 +280,7 @@ log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name
 		self.st.move_mgr = move_mgr.move_mgr(self.object)
 		self.st.move_mgr:initialize()
 	end
-log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name() or "nil")
+--log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
 local debug_flag = false
@@ -459,7 +459,7 @@ function motivator_binder:subscribe_updaters()
 end
 
 function motivator_binder:net_destroy()
-log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:name() or "nil")
+--log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 	xr_logic.save_logic_online(self.object)
 
 	local st = db.storage[self.object:id()]
@@ -478,7 +478,7 @@ log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:nam
 	self.am:cleanup_signal_subs( "on_npc_update." .. self.object:id() )
 
 	object_binder.net_destroy(self)
-log3("--[%s] End destroy [%s]", script_name(), self.object and self.object:name() or "nil")
+--log3("--[%s] End destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
 function motivator_binder:clear_callbacks()
@@ -728,7 +728,7 @@ function motivator_binder:save(packet)
 end
 
 function motivator_binder:load(reader)
-log3("~~[%s] Start loading [%s]", script_name(), self.object and self.object:name() or "nil")
+--log3("~~[%s] Start loading [%s]", script_name(), self.object and self.object:name() or "nil")
 	self.loaded = true
 
 	object_binder.load(self, reader)
@@ -757,7 +757,7 @@ log3("~~[%s] Start loading [%s]", script_name(), self.object and self.object:nam
 
 	local is_invulnerable = xr_logic.pstor_retrieve(self.object, "is_invulnerable", false)
 	self.object:invulnerable(is_invulnerable)
-log3("--[%s] End loading [%s]", script_name(), self.object and self.object:name() or "nil")
+--log3("--[%s] End loading [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
 function motivator_binder:hear_callback(obj, who, sound_type, sound_position, sound_power)

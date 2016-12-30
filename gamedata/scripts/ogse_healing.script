@@ -9,7 +9,6 @@ function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_update", fun = this.on_update_lp, queued = true})
 	sm:subscribe({signal = "on_update", fun = this.on_actor_update})
 	sm:subscribe({signal = "on_spawn", fun = this.on_actor_spawn})
-	--sm:subscribe({signal = "on_spawn", fun = this.on_actor_spawn})
 	sm:subscribe({signal = "on_save", fun = this.on_save})
 	sm:subscribe({signal = "on_actor_before_hit", fun = this.on_actor_before_hit})
 	sm:subscribe({signal = "on_actor_before_use", fun = this.on_before_use_item})

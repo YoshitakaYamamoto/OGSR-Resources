@@ -76,7 +76,7 @@ function actor_binder:net_spawn(data)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:net_destroy()
-log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:name() or "nil")
+--log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 
 	if(actor_stats.remove_from_ranking~=nil)then
 		actor_stats.remove_from_ranking(self.object:id())
@@ -125,11 +125,11 @@ log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:nam
 	self.object:set_callback(callback_ex.on_before_use_item, nil)
 
 	self.am:call("on_destroy")
-log3("--[%s] End destroy [%s]", script_name(), self.object and self.object:name() or "nil")
+--log3("--[%s] End destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:reinit()
-log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name() or "nil")
+--log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 	local npc_id = self.object:id()
 
 	db.storage[npc_id] = { }
@@ -174,7 +174,7 @@ log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name
 	self.object:set_callback(callback_ex.on_after_save, self.after_save, self)
 
 	self.am:call("on_reinit")
-log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name() or "nil")
+--log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
 function actor_binder:hud_animation_end(a1, blend_addr)
@@ -486,14 +486,14 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 local game_difficulty_by_num = {"gd_novice", "gd_stalker", "gd_veteran", "gd_master"}
 function actor_binder:load(reader)
-log3("~~[%s] Start load [%s]", script_name(), self.object and self.object:name() or "nil")
+--log3("~~[%s] Start load [%s]", script_name(), self.object and self.object:name() or "nil")
 	local game_difficulty = ogse.load_var("game_difficulty", 3) --«агружаем уровень сложности
 	cmd("g_game_difficulty", game_difficulty_by_num[game_difficulty + 1]) --и устанавливаем его.
 
 	xr_logic.pstor_load_all(self.object, reader)
 
 	self.am:call("on_load", reader)
-log3("--[%s] End load [%s]", script_name(), self.object and self.object:name() or "nil")
+--log3("--[%s] End load [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:attach_vehicle(obj)

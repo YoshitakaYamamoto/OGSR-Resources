@@ -116,7 +116,7 @@ function cleanup( obj )
 			end
 		end
 		if table.getn(restrs) > 0 then
-			log3("[ANOMALY EVADER] REMOVING IN RESTRICTIONS FOR [%s]: %s", obj:name(), restrs)
+			--log3("[ANOMALY EVADER] REMOVING IN RESTRICTIONS FOR [%s]: %s", obj:name(), restrs)
 			local s = table.concat( restrs, "," )
 			ASSERT( s:len() < 4096, "too long: %s", s:len() )
 			obj:remove_restrictions( "", s )
@@ -170,7 +170,7 @@ function update_norm(npc)
     for _, k in ipairs( del ) do
       added_restrictions[ npc:id() ][ k ] = nil
     end
-    log3("[ANOMALY EVADER] REMOVING IN RESTRICTIONS FOR [%s]: %s", npc:name(), del)
+    --log3("[ANOMALY EVADER] REMOVING IN RESTRICTIONS FOR [%s]: %s", npc:name(), del)
     local s = table.concat( del, "," )
     ASSERT( s:len() < 4096, "too long: %s", s:len() )
     npc:remove_restrictions( "", s )
@@ -182,7 +182,7 @@ function update_norm(npc)
     added_restrictions[ npc:id() ][ k ] = true
   end
   if table.getn( add ) > 0 then
-    log3("[ANOMALY EVADER] ADDING IN RESTRICTIONS FOR [%s]: %s", npc:name(), add)
+    --log3("[ANOMALY EVADER] ADDING IN RESTRICTIONS FOR [%s]: %s", npc:name(), add)
     local s = table.concat( add, "," )
     ASSERT( s:len() < 4096, "too long: %s", s:len() )
     npc:add_restrictions( "", s )
