@@ -87,21 +87,20 @@ function get_community_hide(obj) --Считываем параметры укр�
 		return hideouts_data[id]()
 	end
 
-	local pk = xs_netpk.space_restrictor( obj )
-	if pk:isOk() then
-		local data = pk:get()
-		local cd = data.custom_data:getTable()
-		if
-			not cd.parameters
-			or not cd.parameters.community
-			or not cd.parameters.radius
-		then
-			hideouts_data[id] = function() return "none" end
-			return "none"
-		end
-		hideouts_data[id] = function() return cd.parameters.community, cd.parameters.radius end
-		return cd.parameters.community, cd.parameters.radius
+	local ini = obj:spawn_ini()
+	if not ini or not ini:section_exist( "parameters" ) then
+		hideouts_data[id] = function() return "none" end
+		return "none"
 	end
+	local community = get_string("parameters", "community", nil, ini)
+	local radius = get_float("parameters", "radius", nil, ini)
+	if not community or not radius then
+		hideouts_data[id] = function() return "none" end
+		return "none"
+	end
+
+	hideouts_data[id] = function() return community, radius end
+	return community, radius
 end
 
 
@@ -110,19 +109,16 @@ function on_info(npc, info)
 	if info == "pre_blowout" or info == "net_signal" then
 		for _, id in pairs(restr_list_on_curr_level) do
 			local sobj = alife():object(id)
-			local pk = xs_netpk.space_restrictor( sobj )
-			if pk:isOk() then
-				local data = pk:get()
-				local cd = data.custom_data:getTable()
-				if cd.sr_mapspot then
-					if info == "pre_blowout" then
-						--log3("~~[%s] Adding mapspots on hideouts!", script_name())
-						level_tasks.add_location_by_id(id, cd.sr_mapspot.location, cd.sr_mapspot.hint)
-					else
-						--log3("~~[%s] Removing mapspots from hideouts!", script_name())
-						if level.map_has_object_spot(id, cd.sr_mapspot.location) ~= 0 then
-							level_tasks.remove_location_by_id(id, cd.sr_mapspot.location)
-						end
+			local ini = sobj:spawn_ini()
+			if ini and ini:section_exist( "sr_mapspot" ) then
+				local location = get_string("sr_mapspot", "location", nil, ini)
+				if info == "pre_blowout" then
+					--log3("~~[%s] Adding mapspots on hideouts!", script_name())
+					level_tasks.add_location_by_id(id, location, get_string("sr_mapspot", "hint", nil, ini))
+				else
+					--log3("~~[%s] Removing mapspots from hideouts!", script_name())
+					if level.map_has_object_spot(id, location) ~= 0 then
+						level_tasks.remove_location_by_id(id, location)
 					end
 				end
 			end
