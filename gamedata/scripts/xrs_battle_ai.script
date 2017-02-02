@@ -113,6 +113,14 @@ local forbidden_profiles = {		-- запретные профили и имена
 	["esc_guns_remontnik"]			=	true,
 }
 
+local headshot_prob = {
+  [ "novice"      ] = 0.1,
+  [ "experienced" ] = 0.2,
+  [ "veteran"     ] = 0.3,
+  [ "master"      ] = 0.4,
+}
+
+
 function attach( sm )
   sm:subscribe({ signal = "on_npc_death", fun = this.death_place  })
   sm:subscribe({ signal = "on_npc_hit",   fun = this.hit_callback })
@@ -2871,7 +2879,8 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 		elseif IsRPG(weapon) then
 			npc:set_item(type_of_fire, weapon, 1, time_aim.rpg)			
 		else
-			npc:set_item( type_of_fire, weapon, 5, time_aim.other )
+			local qs = get_u32( weapon:section(), script_name() .. ".preffered_fire_mode", math.random( 2, 5 ) )
+			npc:set_item( type_of_fire, weapon, qs, time_aim.other )
 		end
 		
 		write_log("--XRS_BATTLE_AI: WPNS_FIRE_END "..npc:name().." : "..tostring(enemy:id()))
@@ -3065,7 +3074,25 @@ function set_combat_sight(npc, enemy, weapon)
 				bone = "bip01_head"
 				use_deviation = false
 			else
-				bone = "bip01_spine"
+				local binder  = npc:binded_object()
+				local st_name = script_name() .. ".set_combat_sight"
+				local st      = binder[ st_name ]
+				if not st then
+					st = {}
+					binder[ st_name ] = st
+				end
+				if st.time and st.time > time_global() then
+					bone          = st.bone
+				else
+					local rank = ranks.get_obj_rank_name( npc )
+					if math.random() < headshot_prob[ rank ] then
+						bone      = "bip01_head"
+					else
+						bone      = "bip01_spine"
+					end
+					st.bone = bone
+					st.time = time_global() + 10000
+				end
 				use_deviation = true
 			end
 		end
