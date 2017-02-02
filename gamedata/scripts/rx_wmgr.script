@@ -154,7 +154,7 @@ function weapon_manager:update()
 		self.last_return = tg
 	end
 	write_log("~~RX_WMGR_update_4")
-	local enemy,cwpn = self.npc:best_enemy()
+	local enemy,cwpn = get_best_enemy( self.npc )
 	if self.weapon_id then
 		cwpn = level.object_by_id(self.weapon_id)
 	end
@@ -332,7 +332,7 @@ function weapon_manager:update_weapon()
 			end
 		end
 		write_log("~~RX_WMGR_update_wpn_2C")
-		local be = self.npc:best_enemy()
+		local be = get_best_enemy(self.npc)
 		local curwpn = level.object_by_id(self.weapon_id)
 		write_log("~~RX_WMGR_update_wpn_2D")
 		if not be then
@@ -417,7 +417,7 @@ function weapon_manager:update_weapon()
 					local wpn = level.object_by_id(w.id)
 					local amm1,amm2 = wpn:get_ammo_in_magazine(),weapon_params[w.sec].mag
 					if amm1 ~= amm2 and amm1 == 0 then
-						local bebe = be:best_enemy()
+						local bebe = get_best_enemy(be)
 						if be:see(self.npc) and ((bebe and bebe:id() == self.npc_id) or (db.actor and db.actor:id() == be:id())) then
 							pr = pr - w.prm*self.modes.mag_lowering_fc/100
 						else
@@ -429,7 +429,7 @@ function weapon_manager:update_weapon()
 						end
 						if curwpn and curwpn:id() == w.id and self.last_change and (wm_modes.types.line ~= "ef_weapon_type" or weapon_params[curwpn:section()].typ ~= "8") then
 							local tg = time_global()
-							local bebe = be:best_enemy()
+							local bebe = get_best_enemy(be)
 							if be:see(self.npc) and ((bebe and bebe:id() == self.npc_id) or (db.actor and db.actor:id() == be:id())) and self.last_change+self.modes.tchange_time_fc > tg then
 								local add = (self.last_change+self.modes.tchange_time_fc-tg)/40
 								pr = pr + mprm*add/100
@@ -461,7 +461,7 @@ end
 
 function weapon_manager:check_conditions(nam)
 	local tg = time_global()
-	local be = self.npc:best_enemy()
+	local be = get_best_enemy(self.npc)
 	local me_see_be
 	if self.last_me_see_be and self.last_me_see_be + 2000 > tg then
 		me_see_be = true
@@ -818,7 +818,7 @@ end
 function npc_update( npc, st )
   ogse_signals.get_mgr():reschedule( math.random(3000, 5000) )
   if st and st.wm then
-    if npc:best_enemy() then
+    if get_best_enemy(npc) then
       ogse_signals.get_mgr():reschedule( math.random(900, 1100) )
     end
     st.wm:update()
@@ -1088,7 +1088,7 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 --[=[--------------------------------------------------------------------------------------------------------------------
 function check_if_safe_rpg7(npc)
-	local be = npc:best_enemy()
+	local be = get_best_enemy(npc)
 	local friends = {}
 
 	local function check_object(obj)
@@ -1192,4 +1192,9 @@ function on_take( npc, obj )
       st.wm.refresh_weapon_list = true
     end
   end
+end
+
+
+function get_best_enemy( npc )
+	return xrs_battle_ai.get_target( npc ) or npc:best_enemy()
 end
