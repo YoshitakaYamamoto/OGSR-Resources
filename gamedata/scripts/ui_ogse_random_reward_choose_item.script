@@ -193,7 +193,6 @@ end
 function choose_item:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 end
 
 function choose_item:OnKeyboard(dik, keyboard_action)

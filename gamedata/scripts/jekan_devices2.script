@@ -84,7 +84,6 @@ end
 function cheb_1_1:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -165,7 +164,6 @@ end
 function cheb_1_2:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -234,7 +232,6 @@ end
 function cheb_1_3:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -304,7 +301,6 @@ end
 function cheb_1_4:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -373,7 +369,6 @@ end
 function cheb_1_5:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -442,7 +437,6 @@ end
 function cheb_1_6:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -512,7 +506,6 @@ end
 function cheb_1_7:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -679,7 +672,6 @@ end
 function cheb_2_1:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -752,7 +744,6 @@ end
 function cheb_2_2:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -829,7 +820,6 @@ end
 function cheb_2_3_1:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -902,7 +892,6 @@ end
 function cheb_2_3_2:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -975,7 +964,6 @@ end
 function cheb_2_3_3:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -1048,7 +1036,6 @@ end
 function cheb_2_3_4:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -1121,7 +1108,6 @@ end
 function cheb_2_3_5:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -1194,7 +1180,6 @@ end
 function cheb_2_3_6:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -1267,7 +1252,6 @@ end
 function cheb_2_3_7:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -1340,7 +1324,6 @@ end
 function cheb_2_3_8:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -1408,7 +1391,6 @@ end
 function cheb_2_4:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -1545,7 +1527,6 @@ end
 function cheb_2_4a:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -1614,7 +1595,6 @@ end
 function cheb_ui_guidance:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 
@@ -1683,7 +1663,6 @@ end
 function cheb_2_4_11:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -1760,7 +1739,6 @@ end
 function cheb_ui_story:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 
@@ -1983,7 +1961,6 @@ end
 function cheb_2_5:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 
@@ -2053,7 +2030,6 @@ end
 function cheb_quest_tip:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 
@@ -2133,7 +2109,6 @@ end
 function cheb_2_6:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -2206,7 +2181,6 @@ end
 function cheb_2_7:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -2280,7 +2254,6 @@ end
 function cheb_help_1:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -2353,7 +2326,6 @@ end
 function cheb_help_2:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 	soundtrack.cheb_talking()
 end
 -----------------------------------------------------------------------------------------------
@@ -2673,7 +2645,6 @@ end
 function city_tower_box_1:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 end
 -----------------------------------------------------------------------------------------------
 

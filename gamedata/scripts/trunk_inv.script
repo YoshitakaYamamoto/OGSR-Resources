@@ -189,7 +189,6 @@ end
 function on_destroy()
 	get_hud():RemoveDialogToRender(car_info_wnd)
 	car_info_wnd = nil
-	collectgarbage("collect")
 end
 
 -- получение параметров из секции машины: 

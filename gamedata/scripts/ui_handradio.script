@@ -197,7 +197,6 @@ function handradio:listen()
 	spawn_radio_if_used()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 end
 
 function handradio:call_friend()
@@ -215,7 +214,6 @@ function handradio:call_friend()
 	spawn_radio_if_used()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 end
 
 function handradio:stay_friend()
@@ -233,7 +231,6 @@ function handradio:stay_friend()
 	spawn_radio_if_used()	
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 end
 
 function handradio:hide_friend()
@@ -251,14 +248,12 @@ function handradio:hide_friend()
 	spawn_radio_if_used()	
 	self:GetHolder():start_stop_menu(self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 end
 
 function handradio:on_quit()
 	spawn_radio_if_used()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 end
 
 function start_muten_radio_effect(sound_length, delay)

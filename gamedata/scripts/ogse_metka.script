@@ -147,6 +147,5 @@ end
 function setup_gps_beacon:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	setup_gps_beacon_wnd = nil
-	collectgarbage("collect")	
 end
 

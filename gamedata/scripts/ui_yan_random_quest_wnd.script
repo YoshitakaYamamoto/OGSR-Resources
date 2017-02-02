@@ -168,7 +168,6 @@ end
 function yan_random_quest_wnd:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	self.dlg = nil
-	collectgarbage("collect")	
 end
 
 --[[

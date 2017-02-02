@@ -273,14 +273,12 @@ function remkit:rep_trans()
 	end
 	self:GetHolder():start_stop_menu(self,true)
 	self.dlg = nil
-	collectgarbage("collect")
 end
 --------------------------------------------------------------------
 function remkit:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	create_repair_kit() 
 	self.dlg = nil
-	collectgarbage("collect")	
 end
 
 function remkit:OnMsgYes()
@@ -534,7 +532,6 @@ function repair_dialog:on_quit()
 		create_repair_kit() 
 	end
 	self.dlg = nil
-	collectgarbage("collect")	
 end
 
 function repair_dialog:OnMsgYes()

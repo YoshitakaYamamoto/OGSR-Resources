@@ -1016,7 +1016,6 @@ function ui_rukzak:on_quit()
   end
   if self.weight_timer then self.weight_timer:stop() end
   self:GetHolder():start_stop_menu( self, true )
-  collectgarbage( "collect" )
 end
 
 

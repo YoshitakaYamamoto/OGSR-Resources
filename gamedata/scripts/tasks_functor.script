@@ -1089,7 +1089,6 @@ end
 function ui_neutralize_bomb:quit()
 	level.start_stop_menu(self, true)
 	self.dlg = nil
-	collectgarbage("collect")
 end
 
 function messege_of_sidor_a_kill_mercs()
@@ -2461,7 +2460,6 @@ function case_use_rub:quit()
 	end
 	self:GetHolder():start_stop_menu(self, true)
 	self.dlg = nil
-	collectgarbage("collect")
 end
 
 function case_use_rub:OnKeyboard(dik, keyboard_action)
@@ -2614,7 +2612,6 @@ end
 function ui_bun_comp:quit_ui_bun_comp()
 	self:GetHolder():start_stop_menu(self, true)
 	self.dlg = nil
-	collectgarbage("collect")
 end
 
 function ui_bun_comp_show()

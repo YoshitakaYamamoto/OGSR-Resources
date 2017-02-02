@@ -865,7 +865,6 @@ end
 function on_destroy()
 	dlg = nil
 	vis_shapes = nil
-	collectgarbage("collect")
 end
 
 local actor_pos
