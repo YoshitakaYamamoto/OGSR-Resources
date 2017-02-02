@@ -173,6 +173,9 @@ end
 function se_monster:on_before_register()
 	ogse_signals.get_mgr():call( "se_monster_on_before_register", self )
 	self:fill_exclusives()
+	if self.has_none_true then
+		self:brain():can_choose_alife_tasks( false )
+	end
 end
 --------------------
 function se_monster:on_register()
@@ -221,7 +224,7 @@ end
 --------------------
 function se_monster:fill_exclusives()
 	self:get_ini()
-	self.smart_terrain_conditions             = smart_terrain.read_smart_terrain_conditions( self )
+	self.smart_terrain_conditions, self.has_none_true = smart_terrain.read_smart_terrain_conditions( self )
 
 	if self.smart_terrain_conditions then
 		for name, condlist in pairs(self.smart_terrain_conditions) do
