@@ -3,7 +3,6 @@ function attach( sm )
   sm:subscribe({ signal = "on_monster_spawn",  fun = this.on_monster_spawn })
   sm:subscribe({ signal = "on_monster_death",  fun = this.on_death })
   sm:subscribe({ signal = "on_monster_before_hit", fun = this.on_monster_before_hit })
-  sm:subscribe({ signal = "on_monster_hit",    fun = this.on_hit })
 end
 
 function on_monster_spawn( obj, binder )
@@ -198,27 +197,19 @@ end
 
 
 --Аномальный щит бюрера
-function on_monster_before_hit(obj, last_hit_data, p_s_hit, p_ignore_flags, binder )
-	if obj:alive() and obj:clsid() == clsid.burer_s then	
-		binder[ script_name() .. ".health_before_hit" ] = obj.health
-	end
-end
-
---Аномальный шит бюрера
-function on_hit( obj, amount, local_direction, who, bone_index, binder )
-  if obj:alive() and obj:clsid() == clsid.burer_s then	
-	local v1 = obj:direction()
-	local v2 = who:direction()
-	if v1:dotproduct(v2) < -0.6 then
+function on_monster_before_hit(obj, hit_data, p_s_hit, p_ignore_flags, binder )
+  if obj:clsid() ~= clsid.burer_s then return end
+  if hit_data.hit_type == hit.fire_wound or hit_data.hit_type == hit.explosion then --Учитываем только хиты от стрелкового оружия и взрывов
+	if not hit_data.dir_x or not hit_data.dir_y or not hit_data.dir_z then return end --Оно почему-то есть не всегда. Ну и ладно, пусть будет типа рандомно. То работает, то нет.
+	local obj_dir = obj:direction()
+	local hit_dir = vector():set(hit_data.dir_x, hit_data.dir_y, hit_data.dir_z) --Точное направление хита.
+	if obj_dir:dotproduct(hit_dir) < -0.6 then
 		local particle_start = particles_object("anomaly2\\burer_shield_01")
 		local pos = obj:bone_position("bip01_head")
-		local dir = obj:direction()
-		pos:add(dir:mul(1.0))
+		pos:add(obj_dir:mul(1.0))
 		particle_start:play_at_pos(pos)
 
-		if binder[ script_name() .. ".health_before_hit" ] then
-			obj.health = binder[ script_name() .. ".health_before_hit" ] --[[ - obj.health ]]
-		end
+		write_memory_float( 0, p_s_hit, hit_offset.power ) --Обнуляем силу хита
 	end
   end
 end
