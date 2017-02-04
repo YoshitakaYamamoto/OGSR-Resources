@@ -1,8 +1,8 @@
 [logic]
 active = ph_sound@idle
 
-[ph_sound@shut_up_bitch]
-snd = mbox_quiet
+;[ph_sound@shut_up_bitch]
+;snd = mbox_quiet
  
 [ph_sound@idle]
 snd = dolg_speech
@@ -10,7 +10,7 @@ min_idle = 20000
 max_idle = 50000
 on_info = {+bar_arena_start} ph_idle@idle, {+bar_territory_nodolg_1_hit -bar_dolg_territory_1_hit_notify} ph_sound@1_hit, {+bar_territory_nodolg_2_hit -bar_dolg_territory_2_hit_notify} ph_sound@2_hit, {+bar_territory_nodolg_kill -bar_dolg_territory_kill_notify} ph_sound@kill, {=bar_dolg_alarm} ph_sound@alarm
 on_info2 = {+bar_start_megafon} ph_sound@start_megafon
-on_info3 = {+voronin_tower_task} ph_sound@ph_sound@shut_up_bitch, {+tower_box_off} ph_sound@start_megafon
+;on_info3 = {+voronin_tower_task} ph_sound@shut_up_bitch, {+tower_box_off} ph_sound@start_megafon
  
 [ph_sound@start_megafon]
 snd = bar_start_megafon
