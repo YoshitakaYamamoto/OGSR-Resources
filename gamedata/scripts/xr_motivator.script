@@ -573,8 +573,6 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 		end
 	end
 
-	xr_effects.bar_territory_hit(self.object, who)
-
 	self.am:call( "on_npc_hit", self.object, amount, local_direction, who, bone_index )
 end
 
@@ -618,8 +616,6 @@ function motivator_binder:death_callback(victim, who)
 	then
 		actor_stats.remove_from_ranking(self.object:id())
 	end
-
-	xr_effects.bar_territory_death(self.object, who)
 
 	self.am:call("on_npc_death", self.object, who)
 end

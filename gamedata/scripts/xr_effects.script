@@ -1161,151 +1161,17 @@ function esc_hit_from_fox(actor, npc)
 	npc:hit(h)
 end
 
-function bar_territory_logic(actor, npc)
-	local level = level.name()
-	if 	level == "l05_bar" then
-		if dialogs.actor_in_dolg(actor,npc) then
-			if has_alife_info("bar_dolg_territory_kill") then
-				news_manager.send_tip(actor, "bar_territory_dolg_kill", nil, "dolg", nil, 507)
-				xr_gulag.setGulagEnemy("bar_dolg_general", db.actor)
-				xr_gulag.setGulagEnemy("bar_dolg_veterans", db.actor)
-				xr_gulag.setGulagEnemy("bar_dolg_bunker", db.actor)
-				xr_gulag.setGulagEnemy("bar_zastava", db.actor)
-				xr_gulag.setGulagEnemy("bar_zastava_2", db.actor)
-				xr_gulag.setGulagEnemy("bar_visitors", db.actor)
-				return
-			end
-			if has_alife_info("bar_dolg_territory_3_hit") then
-				news_manager.send_tip(actor, "bar_territory_dolg_3_hit", nil, "dolg", nil, 507)
-				xr_gulag.setGulagEnemy("bar_dolg_general", db.actor)
-				xr_gulag.setGulagEnemy("bar_dolg_veterans", db.actor)
-				xr_gulag.setGulagEnemy("bar_dolg_bunker", db.actor)
-				xr_gulag.setGulagEnemy("bar_zastava", db.actor)
-				xr_gulag.setGulagEnemy("bar_zastava_2", db.actor)
-				return
-			end
-			if has_alife_info("bar_dolg_territory_2_hit") then
-				news_manager.send_tip(actor, "bar_territory_dolg_2_hit", nil, "dolg", nil, 507)
-				return
-			end
-			if has_alife_info("bar_dolg_territory_1_hit") then
-				news_manager.send_tip(actor, "bar_territory_dolg_1_hit", nil, "dolg", nil, 507)
-				return
-			end
-		else
-			if has_alife_info("bar_dolg_territory_kill") then
-				db.actor:give_info_portion("bar_territory_nodolg_kill")
-				news_manager.send_tip(actor, "bar_territory_nodolg_kill", nil, "dolg", nil, 507)
-				xr_gulag.setGulagEnemy("bar_dolg_general", db.actor)
-				xr_gulag.setGulagEnemy("bar_dolg_veterans", db.actor)
-				xr_gulag.setGulagEnemy("bar_dolg_bunker", db.actor)
-				xr_gulag.setGulagEnemy("bar_zastava", db.actor)
-				xr_gulag.setGulagEnemy("bar_zastava_2", db.actor)
-				xr_gulag.setGulagEnemy("bar_visitors", db.actor)
-				return
-			end
-			if has_alife_info("bar_dolg_territory_2_hit") then
-				db.actor:give_info_portion("bar_territory_nodolg_2_hit")
-				news_manager.send_tip(actor, "bar_territory_nodolg_2_hit", nil, "dolg", nil, 507)
-				xr_gulag.setGulagEnemy("bar_dolg_general", db.actor)
-				xr_gulag.setGulagEnemy("bar_dolg_veterans", db.actor)
-				xr_gulag.setGulagEnemy("bar_dolg_bunker", db.actor)
-				xr_gulag.setGulagEnemy("bar_zastava", db.actor)
-				xr_gulag.setGulagEnemy("bar_zastava_2", db.actor)
-				xr_gulag.setGulagEnemy("bar_visitors", db.actor)
-				return
-			end
-			if has_alife_info("bar_dolg_territory_1_hit") then
-				db.actor:give_info_portion("bar_territory_nodolg_1_hit")
-				news_manager.send_tip(actor, "bar_territory_nodolg_1_hit", nil, "dolg", nil, 507)
-				return
-			end	
-		end
-	end
-	return
-end
-
-function bar_territory_hit(victim, who)
-	local lname = level.name()
-	if lname == "l05_bar" and who and who:id() == db.actor:id() then
-		-- log1("hit1")
-		relation_registry.set_community_goodwill(victim:character_community(), db.actor:id(), -25)
-		if victim:relation(db.actor) == game_object.neutral then
-			db.actor:change_character_reputation(-25)
-			ogse.set_npc_relation(victim, who, "enemy")
-		elseif victim:relation(db.actor) == game_object.friend then
-			db.actor:change_character_reputation(-50)
-			ogse.set_npc_relation(victim, who, "neutral")
-		end
-		-- log1("hit2")
-	end
-end
-
-function bar_territory_death(victim, who)
-	local lname = level.name()
-	if lname == "l05_bar" and who and who:id() == db.actor:id() then
-		-- log1("death1")
-		relation_registry.set_community_goodwill(victim:character_community(), db.actor:id(), -100)
-		-- log1("death11")	
-		if victim:relation(db.actor) == game_object.neutral then
-			db.actor:change_character_reputation(-50)
-			-- log1("death12")	
-		elseif victim:relation(db.actor) == game_object.friend then
-			db.actor:change_character_reputation(-100)
-			-- log1("death13")	
-		end
-		-- log1("death14")	
-		if victim:character_community() == "stalker" or victim:character_community() == "dolg" then
-			-- log1("death15")	
-			for k, v in pairs(db.creature) do
-				local npc = level.object_by_id(k)
-				if v == true and npc and npc:alive() and (npc:character_community() == "stalker" or npc:character_community() == "dolg") then
-					-- log1("death16")	
-					ogse.set_npc_relation(npc, who, "enemy")
-				end
-			end
-		end	
-		-- log1("death2")		
-	end
-end
-
 function bar_psih_come(actor, npc)
 	news_manager.send_tip(actor, "bar_psih_come", nil, "barman")
 end
 
 function bar_actor_is_enemy(actor, npc)
-			xr_gulag.setGulagEnemy("bar_dolg_general", db.actor)
-			xr_gulag.setGulagEnemy("bar_dolg_veterans", db.actor)
-			xr_gulag.setGulagEnemy("bar_dolg_bunker", db.actor)
-			xr_gulag.setGulagEnemy("bar_visitors", db.actor)
+	xr_gulag.setGulagEnemy("bar_dolg_general", actor)
+	xr_gulag.setGulagEnemy("bar_dolg_veterans", actor)
+	xr_gulag.setGulagEnemy("bar_dolg_bunker", actor)
+	xr_gulag.setGulagEnemy("bar_visitors", actor)
 end
 
-function bar_actor_enemy_set (actor, npc)          
-    local dog = level_object_by_sid (story_ids.bar_freedom_volkodav)
-    if dog ~= nil then
-       dog:set_relation (game_object.enemy, db.actor) 
-    end   
-end
-
-function bar_arena_weapon_spawn ()
---TODO: прописать читаемый sid вместо константы
-	local obj = level_object_by_sid (story_ids.pl_weapon_spawn)
-	local spawn_items = {}
-	
-	for i = 1,100 do
-		table.insert( spawn_items, "novice_outfit")
---		table.insert( spawn_items, "bandit_outfit")
-	end
-	
-	local k,v = 0,0
-	
-	for k,v in pairs(spawn_items) do
-		alife():create(v,	
-						obj:position(),
-						obj:level_vertex_id(),	
-						obj:game_vertex_id())
-	end	
-end
 local items_no_transfer = {
 	["device_pda"] = true,
 	["device_torch"] = true,
