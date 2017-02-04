@@ -1247,7 +1247,7 @@ relation_registry.change_goodwill(who_id, to_whom_id, goodwill_change)
 function gulag:set_goodwill( relation, target_obj )
 	for obj_id, obj in pairs( self.Object ) do
 		if obj ~= true and level.object_by_id( obj_id ) ~= nil then
-			obj:set_community_goodwill( goodwill, target_obj )
+			obj:set_goodwill( goodwill, target_obj )
 		end
 	end
 end
@@ -1665,12 +1665,12 @@ end
 -- сделать указанного персонажа врагом всех персонажей смарта
 function setGulagEnemy( name_or_sid, target_obj )
 	setGulagRelation( name_or_sid, game_object.enemy, target_obj )
+	setGulagGoodwill( name_or_sid, -5000, target_obj )
 end
 
--- сделать указанного персонажа врагом всех персонажей смарта, которые в онлайне
 function setGulagNeutral( name_or_sid, target_obj )
 	setGulagRelation( name_or_sid, game_object.neutral, target_obj )
-	setGulagGoodwill( name_or_sid, -5000, target_obj )
+	setGulagGoodwill( name_or_sid, 0, target_obj )
 end
 
 -- получить номер состояния смарта по имени
