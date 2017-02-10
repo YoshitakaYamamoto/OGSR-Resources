@@ -1,3 +1,4 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
 --************************************************* Инициализация расширений движка ************************************************
 log1("--LUA version: ["..(jit.version or _VERSION).."]")
 log1("~~...Инициализация расширений движка...")
@@ -154,6 +155,31 @@ level.advance_game_time = function(game_ms) --KRodin: универсальная функция для 
 	--Вполне допускаю, хотя уже и не помню точно, что вместе с актором пропускается обновление чего-то ещё.
 	-- http://www.amk-team.ru/forum/topic/10538-x-ray-extensions/page-50#entry975972
 	set_ignore_game_state_update()
+end
+
+net_packet.w_CTime_ex = function( p, t ) --Запись CTime в пакет.
+	ASSERT(t, "[w_CTime_ex] time is nil")
+	local Y, M, D, h, m, s, ms = -1, 0, 0, 0, 0, 0, 0
+	if t and t ~= game.CTime() then
+		Y, M, D, h, m, s, ms = t:get()
+		Y = Y - 2000
+	end
+	p:w_u8 ( Y )
+	p:w_u8 ( M )
+	p:w_u8 ( D )
+	p:w_u8 ( h )
+	p:w_u8 ( m )
+	p:w_u8 ( s )
+	p:w_u16( ms )
+end
+
+net_packet.r_CTime_ex = function( p ) --Чтение CTime из пакета
+	local Y, M, D, h, m, s, ms = p:r_s8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u16()
+	local t = game.CTime()
+	if Y ~= -1 then
+		t:set( Y + 2000,  M, D, h, m, s, ms)
+	end
+	return t
 end
 
 log1("~~Инициализация расширений движка закончена!")
@@ -1828,8 +1854,6 @@ function reset_actor_items_tradability()
 		set_item_default_tradability(db.actor:object(i)) 
 	end
 end
-
-get_game_id = ogse_unist.get_game_id
 
 
 --Задать кол-во патронов в пачке

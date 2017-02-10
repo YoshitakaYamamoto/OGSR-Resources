@@ -311,32 +311,6 @@ function r_CTime( p )
 		return CTime_0
 	end
 end
--- запись CTime в пакет. 
-function w_CTime_ex( p, t )
-	ASSERT(t, "[w_CTime_ex] time is nil")
-	local Y, M, D, h, m, s, ms = -1, 0, 0, 0, 0, 0, 0
-	if t and t ~= game.CTime() then
-		Y, M, D, h, m, s, ms = t:get()
-		Y = Y - 2000
-	end
-	p:w_u8 ( Y )
-	p:w_u8 ( M )
-	p:w_u8 ( D )
-	p:w_u8 ( h )
-	p:w_u8 ( m )
-	p:w_u8 ( s )
-	p:w_u16( ms )
-end
-
--- чтение CTime из пакета
-function r_CTime_ex( p )
-	local Y, M, D, h, m, s, ms = p:r_s8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u16()
-	local t = game.CTime()
-	if Y ~= -1 then
-		t:set( Y + 2000,  M, D, h, m, s, ms)
-	end
-	return t
-end
 ---------------------------------------------------------------------------
 
 -- отослать в ближайшую разрешённую ноду по направлению к заданной.

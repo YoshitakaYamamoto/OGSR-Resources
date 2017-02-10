@@ -117,9 +117,7 @@ end
 
 function get_timer( id )
   local timer = registry[ id ]
-  ASSERT(
-    timer, "ogse_st_mgr.get_timer: timer with id'" .. id .. "' doesn't exist"
-  )
+  ASSERT( timer, "ogse_st_mgr.get_timer: timer with id [%s] doesn't exist", id )
   return timer
 end
 
@@ -155,7 +153,7 @@ function on_load()
 
 	end
   end
-  log2( "--[%s]: %s timers loaded", script_name(), table.getn( chunks ) )
+  log2( "--[%s]: %s timers loaded", script_name(), #chunks )
 end
 
 
@@ -185,7 +183,7 @@ function on_load_old()
 	end
   end
   ogse.delete_var( root_guid )
-  log2( "~~[%s]: %s old timers loaded", script_name(), table.getn( timers_list ) )
+  log2( "~~[%s]: %s old timers loaded", script_name(), #timers_list )
 end
 
 
@@ -201,7 +199,7 @@ function on_save()
     timer:_aux_save( pk )
   end
   ogse.save_var( script_name() .. ".chunks", chunks, "array", "chunk" )
-  log2( "--[%s]: %s timers saved", script_name(), table.getn( chunks ) )
+  log2( "--[%s]: %s timers saved", script_name(), #chunks )
 end
 
 
@@ -218,7 +216,7 @@ function savable_timer:__init( timer_id )
     )
     ASSERT(
       not timer_exists( timer_id ),
-      "savable_timer:__init: timer with the id '" .. timer_id .. "' already exists!"
+      "savable_timer:__init: timer with the id [%s] already exists!", timer_id
     )
     self._id = tostring( timer_id )
   else
@@ -237,12 +235,12 @@ function savable_timer:_aux_load( packet )
     self:set_delay( res_time )
   end
   -- загружаем игровое время срабатывания
-  local end_t = utils.r_CTime_ex( packet )
+  local end_t = packet:r_CTime_ex()
   if end_t ~= game.CTime() then
     self:set_gtime( end_t )
   end
   -- загружаем игровое время запуска
-  self._start_time = utils.r_CTime_ex( packet )
+  self._start_time = packet:r_CTime_ex()
   -- загружаем данные пользователя, если есть
   if not packet:r_eof() then
     self:load( packet )
@@ -277,12 +275,12 @@ function savable_timer:_aux_save( timer_chunk )
   end
   -- сохраняем игровое время срабатывания
   if self._game_termination_time then
-    utils.w_CTime_ex( timer_chunk, self._game_termination_time )
+    timer_chunk:w_CTime_ex( self._game_termination_time )
   else
-    utils.w_CTime_ex( timer_chunk, game.CTime() )
+    timer_chunk:w_CTime_ex( game.CTime() )
   end
   -- сохраняем время запуска
-  utils.w_CTime_ex( timer_chunk, self._start_time )
+  timer_chunk:w_CTime_ex( self._start_time )
   -- теперь сохраняем данные пользователя, если есть
   self:save( timer_chunk )
 end
@@ -451,8 +449,8 @@ function delayed_fun_start:init( action_name, ... )
   self.user_action = loadstring( "return " .. self.action_name .. "( ... )" )
   ASSERT(
     self.user_action,
-    "delayed_fun_start:init: can not compile function with the name '%s'",
-    tostring( self.action_name )
+    "delayed_fun_start:init: can not compile function with the name [%s]",
+    self.action_name or ""
   )
   self.fun_params = { ... }
   return self
@@ -463,8 +461,8 @@ function delayed_fun_start:load( packet )
   self.user_action = loadstring( "return " .. self.action_name .. "( ... )" )
   ASSERT(
     self.user_action,
-    "delayed_fun_start:load: can not compile function with the name '%s'",
-    tostring( self.action_name )
+    "delayed_fun_start:load: can not compile function with the name [%s]",
+    self.action_name or ""
   )
   local array_item = ogse_unist.read_item_from_packet( packet )
   ASSERT(

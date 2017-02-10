@@ -1,17 +1,20 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
 -----------------------------------------------------------
 --| ogse_unist.script
 --| Универсальная система хранения пользовательских данных
 --| Malandrinus, OGS Evolution Team, 2011
 --| version 1.0
+--| https://github.com/dsh2dsh/op2ogse/blob/master/gamedata/scripts/ogse_unist.script
 -----------------------------------------------------------
 -- Использование:
--- ogse.save_var(name, value [,type]) -- сохранить переменную
--- ogse.load_var(name [,default_value [,type]]) -- прочитать переменную
+-- ogse.save_var(name, value [,type [,subtype]]) -- сохранить переменную
+-- ogse.load_var(name [,default_value [,type [,subtype]]]) -- прочитать переменную
 -- ogse.var_exists(name) -- проверить существование переменной
 -- ogse.delete_var(name) -- удалить переменную, чтобы освободить место
 -- name - строка с уникальным именем переменной
 -- value - значение
 -- type - строка с типом. Это в ряде случаев необязательный параметр. 
+--
 -- Возможные варианты:
 -- "string" - строка, занимает количество символов + 1
 -- "bool" - логическое значение, 1 байт
@@ -30,8 +33,13 @@
 --           сохраняемого модуля можно конечно выделить отдельный объект хранения (из тех, что 
 --           лежат в основе всего универсального хранилища), но это в общем случае слишком 
 --           расточительно. Используя эти сохраняемые пакеты можно упаковывать данные более экономно.
--- "array" - тип массива. Значение - таблица вида {v1, v2, v3}, где тип значений массива ограничен
---           автораспознаваемыми типами: строки, логические значения и числа. 
+-- "array" - тип массива. Значение - таблица вида {v1, v2, v3}.
+--           --
+--           При сохранении массивов можно указывать тип их элементов. Вот так:
+--           ogse.save_var( script_name() .. ".chunks", chunks, "array", "chunk" )
+--           Здесь сохраняется список, каждый элемент которого сохраняется, как
+--           chunk. Это вместо автоугадава, который все сохраняет, как строки.
+--           --
 -- параметр type не является обязательным в случае типа значения строка, логическое значение и 
 -- число. В случае числа при неуказании точного типа числа оно просто сохраняется в строковом виде. 
 -- Поэтому желательно его указывать. Для чисел с плавающей запятой это существенно уменьшит размер 
@@ -40,18 +48,28 @@
 -- Во всех остальных случаях, вектор, объект CTime, chunk, array, параметр надо указывать
 -- обязательно, так как в этом случае нет возможности тривиально определить природу вргумента. 
 -- Если в этом случае не указать тип, то будет вылет с соответствующим сообщением.
-
+--
 -- при чтении переменной минимально достаточно указать её имя
--- local value = ogse.load_variable(name)
+-- local value = ogse.load_var(name)
 -- Однако, переменная должна существовать. Если такой ранее не было сохранено, то будет 
 -- вылет (намеренно). Чтобы этого избежать, надо указывать значение по умолчанию.
--- local value = ogse.load_variable(name, default_value [,type])
+-- local value = ogse.load_var(name, default_value [,type [,subtype]])
 -- тип, как необязательный параметр, указывается по тем же правилам, что и при сохранении.
 
 
 function attach(sm)
   sm:subscribe({signal = "on_load_before_all", fun = this.on_load})
   sm:subscribe({signal = "on_save_after_all", fun = this.on_save})
+-----------Псевдонимы для удобства вызова-----------
+  if not _G.ogse then _G.ogse = {} end --на всякий случай
+  _G.ogse.save_var           = this.set_value
+  _G.ogse.load_var           = this.get_value
+  _G.ogse.load_var_safe      = this.get_value_safe
+  _G.ogse.var_exists         = this.value_exist
+  _G.ogse.delete_var         = this.remove_value
+  _G.ogse.save_or_delete_var = this.set_or_remove_value
+  _G.get_game_id             = this.get_game_id
+----------------------------------------------------
 end
 
 
@@ -142,7 +160,7 @@ function create_item( name, value, typ, subtype )
     local constructor = item_types_registry[ typ ]
     ASSERT(
       constructor,
-      "ogse_unist.create_item: cant find type [" .. typ .. "] in types registry"
+      "ogse_unist.create_item: cant find type [%s] in types registry", typ
     )
     return constructor( name, value, subtype )
   else
@@ -164,9 +182,9 @@ function create_item( name, value, typ, subtype )
       return table_element( name, value )
     elseif lua_type == "nil" then
       -- надо подумать, что делать, вылетать или сохранять nil
-      abort("ogse_unist.create_item: trying set nil value for variable with name %s", name )
+      abort("ogse_unist.create_item: trying set nil value for variable with name [%s]", name )
 	else
-	  abort("ogse_unist.create_item: trying set %s value for variable with name %s", lua_type, name)
+	  abort("ogse_unist.create_item: trying set [%s] value for variable with name [%s]", lua_type, name)
     end
   end
 end
@@ -179,7 +197,7 @@ function read_item_from_packet( r_packet )
   local constructor = item_types_registry[ typ ]
   ASSERT(
     constructor,
-    "ogse_unist.read_item_from_packet: cant find type [" .. typ .. "] in types registry"
+    "ogse_unist.read_item_from_packet: cant find type [%s] in types registry", typ
   )
   local name = r_packet:r_stringZ()
   local item = constructor( name )
@@ -187,9 +205,8 @@ function read_item_from_packet( r_packet )
   local pos2 = r_packet:r_tell()
   ASSERT(
     pos2 - pos1 == item.size,
-	"read_item_from_packet: item reported size is different from actually readed data: name_len = ["
-      .. item.name:len() .. "], value = [" .. item:get_string()
-      .. "], item.size = [" .. item.size .. "], written = [" .. ( pos2 - pos1 ) .."]"
+	"read_item_from_packet: item reported size is different from actually readed data: name_len = [%s], value = [%s], item.size = [%s], written = [%s]",
+	item.name:len(), item:get_string(), item.size, pos2 - pos1
   )
   return item
 end
@@ -204,9 +221,8 @@ function write_item_to_packet( w_packet, item )
   local pos2 = w_packet:w_tell()
   ASSERT(
     pos2 - pos1 == item.size,
-	"write_item_to_packet: item reported size is different from actually written data: name_len = ["
-      .. item.name:len() .. "], value = [" .. item:get_string()
-      .. "], item.size = [" .. item.size .. "], written = [" .. ( pos2 - pos1 ) .."]"
+	"write_item_to_packet: item reported size is different from actually written data: name_len = [%s], value = [%s], item.size = [%s], written = [%s]",
+	item.name:len(), item:get_string(), item.size, pos2 - pos1
   )
 end
 
@@ -215,7 +231,7 @@ local function add_storage()
   local st_count = st_count_item.value + 1
   local st = base_single_storage( st_count )
   ASSERT(
-    st, "ogse_unist.add_storage: can't create new storage. count = " .. st_count
+    st, "ogse_unist.add_storage: can't create new storage. count = [%s]", st_count
   )
   st_objects[ st_count ] = st
   st_count_item.value = st_count -- грязный трюк, не поступаем так
@@ -224,13 +240,9 @@ local function add_storage()
 end
 
 
-local game_id = nil
+local game_id
 function get_game_id()
-  ASSERT(
-    this.game_id,
-    "[ogse_unist.get_game_id] value of this.game_id is not yet defined. Do not use it before actor's loaded"
-  )
-  return this.game_id
+  return game_id or abort("[ogse_unist.get_game_id] value of game_id is not yet defined. Do not use it before actor's loaded")
 end
 
 
@@ -257,10 +269,10 @@ function on_load()
   -- ключ, чтобы с меньшей вероятностью затереть
   local game_id_key = "GAME_ID_" .. storage_guid
   if not value_exist( game_id_key ) then
-    this.game_id = math.random( 1000000, 9999999 )
-    set_value( game_id_key, this.game_id, "u32" )
+    game_id = math.random( 1000000, 9999999 )
+    set_value( game_id_key, game_id, "u32" )
   else
-    this.game_id = get_value( game_id_key )
+    game_id = get_value( game_id_key )
     ASSERT(
       ready, "[ogse_unist.on_load] cannot load game_id. Check the logic!"
     )
@@ -297,12 +309,12 @@ function on_save()
         -- добавляем элемент в хранилище
         st_objects[ i ]:add_item( frags[ 1 ] )
         table.remove( frags, 1 )
-        if table.getn( frags ) == 0 then break end
+        if #frags == 0 then break end
       end
     end
-    if table.getn( frags ) > 0 then
+    if #frags > 0 then
       -- если не найдено, то добавляем новые хранилища
-      for i = 1, table.getn( frags ) do
+      for i = 1, #frags do
         local st = add_storage()
         -- добавляем элемент в хранилище
         st:add_item( frags[ i ] )
@@ -393,7 +405,7 @@ end
 function base_single_storage:add_item( item )
   ASSERT(
     self.data_size + item.size <= self.total_space,
-    "base_single_storage:add_item: dude, you can't save it here. No space for the element:\nname: %s\ntype: %d\nsize: %s\nin the storage:\nnumber: %dtotal space: %d\nfree space: %d",
+    "base_single_storage:add_item: dude, you can't save it here. No space for the element:\nname: %s\ntype: %s\nsize: %s\nin the storage:\nnumber: %s\ntotal space: %s\nfree space: %s",
     item.name, item.type, item.size, self.st_num, self.total_space, self:free_space()
   )
   -- добавить элемент в локальную таблицу
@@ -563,7 +575,7 @@ function string_element:fragment_value( max_size )
   end
   ASSERT(
     sum_len == self.value:len(),
-    "sum_len != self.value:len(): %s != %s", sum_len, self.value:len()
+    "sum_len != self.value:len(): [%s] != [%s]", sum_len, self.value:len()
   )
   return fragments
 end
@@ -616,7 +628,7 @@ function vector_element:get_value()
 end
 
 function vector_element:get_string()
-  return string.format("%9.3f, %9.3f, %9.3f", self.value.x, self.value.y, self.value.z)
+  return ("%9.3f, %9.3f, %9.3f"):format(self.value.x, self.value.y, self.value.z)
 end
 
 function vector_element:read_value( data )
@@ -650,13 +662,13 @@ function time_element:get_string()
 end
 
 function time_element:read_value( data )
-  self.value = utils.r_CTime_ex( data )
+  self.value = data:r_CTime_ex()
   self:update_size()
   return self.value
 end
 
 function time_element:write_value( data )
-  utils.w_CTime_ex( data, self.value )
+  data:w_CTime_ex( self.value )
 end
 
 function time_element:get_value()
@@ -701,7 +713,7 @@ function array_element:read_value( data )
 end
 
 function array_element:write_value( data )
-  data:w_u16( table.getn( self.value ) )
+  data:w_u16( #self.value )
   for _, v in ipairs( self.value ) do
     write_item_to_packet( data, v )
   end
@@ -742,7 +754,7 @@ function array_element:fragment_value( max_size )
       sz = sz + v.size
     end
   end
-  if table.getn( tmp ) > 0 then
+  if #tmp > 0 then
     local t = {}
     for _, v2 in ipairs( tmp ) do
       table.insert( t, v2:get_value() )
@@ -752,7 +764,7 @@ function array_element:fragment_value( max_size )
   end
   ASSERT(
     check_sz + 2 == self:data_size(),
-    "check_sz + 2 != self:data_size(): %s, %s", check_sz, self:data_size()
+    "check_sz + 2 != self:data_size(): [%s], [%s]", check_sz, self:data_size()
   )
   return fragments
 end
@@ -800,7 +812,7 @@ function table_element:read_value( data )
 end
 
 function table_element:write_value( data )
-  data:w_u16( table.getn( self.value ) )
+  data:w_u16( #self.value )
   for _, v in ipairs( self.value ) do
     write_item_to_packet( data, v[ 1 ] )
     write_item_to_packet( data, v[ 2 ] )
@@ -871,7 +883,7 @@ function chunk_element:get_string()
   local buf  = get_row_data( self.value )
   local sbuf = {}
   for _, byte in ipairs( buf ) do
-    table.insert( sbuf, string.format( "%0x", byte ) )
+    table.insert( sbuf, ("%0x"):format(byte) )
   end
   return table.concat( sbuf, ' ' )
 end
@@ -890,7 +902,7 @@ end
 
 function chunk_element:write_value( w_packet )
   local buf = get_row_data( self.value )
-  w_packet:w_u16( table.getn( buf ) )
+  w_packet:w_u16( #buf )
   for _, byte in ipairs( buf ) do
     w_packet:w_u8( byte )
   end
@@ -956,10 +968,7 @@ function get_value( name, default_value, typ, subtype )
       set_value( name, default_value, typ, subtype )
       return default_value
     end
-    abort(
-      "get_value: neither value '" .. name
-        .. "' is exist, nor default value is provided"
-    )
+    abort( "get_value: neither value [%s] is exist, nor default value is provided", name )
   end
   return item:get_value()
 end

@@ -44,7 +44,6 @@ function on_actor_init()
 	wm = WeatherManager() -- создание
 end
 
-local total_debug = true
 --local always_reset = true
 
 -- если вторая граница фрейма с выбросом будет ближе пяти минут к моменту выброса,
@@ -381,8 +380,7 @@ function StaticForecast:load(forecast_data)
 		-- в конце ещё проверим на валидность
 		local point_idx = forecast_data:r_u8() -- индекс точки цикла
 		ASSERT(point_idx ~= 0, "[StaticForecast:on_load] cycle '%s' without index", p.cycle)
-		--p.time = ogse.read_ctime(forecast_data) -- абсолютное время точки
-		p.time = utils.r_CTime_ex(forecast_data)
+		p.time = forecast_data:r_CTime_ex() -- абсолютное время точки
 		-- в зависимости от типа точки обычная/выброс данные о цикле берём либо 
 		-- из общей таблицы погодных циклов, либо из дополнительно подгруженной таблицы для выброса
 		local cycle_points = {}
@@ -422,8 +420,7 @@ function StaticForecast:save(forecast_data)
 		forecast_data:w_u16(pflags:get())
 		--
 		forecast_data:w_u8(point_data.data.index) -- индекс точки цикла
-		--ogse.write_ctime(forecast_data, point_data.time) -- абсолютное время точки
-		utils.w_CTime_ex(forecast_data, point_data.time)
+		forecast_data:w_CTime_ex(point_data.time) -- абсолютное время точки
 		
 		ogse_surge_mgr.surge_log("cycle '%s', idx = %d, t = %s, %s %s", 
 			point_data.cycle, 
@@ -804,7 +801,7 @@ function DynamicForecast:__init(arg_weather_transitions) -- аргумент для экспери
 			section = cycle_section, 
 			skipped = 0,
 			points  = cycle_points,
-			}
+		}
 		self.idx2cycle[i + 1] = cycle_name
     end
 	ogse_surge_mgr.surge_log("DynamicForecast:__init - END")
@@ -1094,7 +1091,7 @@ class "wait_for_actor" (ogse_qt.quick_timer)
 function wait_for_actor:__init() super()
 end
 function wait_for_actor:condition()
-	return db.actor and device().precache_frame <= 1
+	return device().precache_frame <= 1
 end
 function wait_for_actor:action()
 	ogse.send_tip("Сбой погодного менеджера! Выполнен аварийный сброс прогноза.")
@@ -1343,7 +1340,7 @@ local function setup_frame(p1, p2)
 	
 	local t1 = compile_frame_point(p1)
 	local t2 = compile_frame_point(p2)
-	--print_table_inlog(t2, "t2")
+	--log3("--[SetEnvDescData]: %s, %s", t1, t2)
 	--
 	SetEnvDescData(t1, t2)
 	ogse_surge_mgr.surge_log("setup_frame - END")

@@ -1,3 +1,4 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
 -----------------------------------------------------------------------
 --- ogse.script
 --- Утилитарная база OGSE 0.6.9.3
@@ -23,15 +24,6 @@ deadmans_table = {} -- см. dsh_deadmans_table_proxy.script
 -- Формат хранения:
 -- [id] = { time_died = time_when_killed, killer = who:id() }
 ---------------------------------------------------------------
-
------------Псевдонимы для удобства вызова-----------
-save_var = ogse_unist.set_value
-load_var = ogse_unist.get_value
-load_var_safe = ogse_unist.get_value_safe
-var_exists = ogse_unist.value_exist
-delete_var = ogse_unist.remove_value
-save_or_delete_var = ogse_unist.set_or_remove_value
-----------------------------------------------------
 
 art_levels = {
 ["af_medusa"] = 1,
