@@ -25,7 +25,7 @@ local bits_mode = { --/ table of admissible flags
 	[3] = 3, --/ full packet ('state' + 'update')
 	[4] = 0  --/ for 'abstract' properties of packet (debug)
 }
-local shape_type = {
+shape_type = {
 	sphere = 0,
 	box    = 1
 }
@@ -34,7 +34,7 @@ local sModule = script_name() --/ string name of this file module
 --/ -----------------------------------------------------------------
 --/ for output of the debug information
 local log = function(fmt,...)
-	_G.log(sModule..":"..tostring(fmt),...)
+	if log3 then log3(sModule..":"..tostring(fmt),...) end
 end
 if to_log and type(string.exformat) == 'function' then
 	log = function(fmt,...) to_log(sModule..":"..string.exformat(fmt,...)) end
@@ -3270,74 +3270,63 @@ function get_net_class(script_clsid)
 	end
 	return net_class --/>
 end
+
 --/-------------------------------------------------------------------
 --/ global constants/flags/functions can be used with packets
 --/-------------------------------------------------------------------
-local FuncByName = {
-	["get_netpk"]  = this.get,
-	["shape_type"] = shape_type, --/#!# table
-	["net_dummy"]  = this.net_dummy --/#!# class-constructor
+_G.get_netpk = this.get
+_G.shape_type = this.shape_type --/#!# table
+_G.net_dummy = this.net_dummy --/#!# class-constructor
+--/ translate tables to global scope (optional)
+_G.object_flags = { --/ for alife_object
+	UseSwitches       =    1,
+	SwitchOnline      =    2,
+	SwitchOffline     =    4,
+	Interactive       =    8,
+	VisibleForAI      =   16,
+	UsefulForAI       =   32,
+	OfflineNoMove     =   64,
+	UsedAI_Locations  =  128,
+	UseGroupBehaviour =  256,
+	CanSave           =  512,
+	VisibleForMap     = 1024,
+	UseSmartTerrains  = 2048,
+	CheckForSeparator = 4096,
+	CorpseRemoval     = 8192
 }
-if FuncByName then
-	--/ translate tables to global scope (optional)
-	_G.object_flags = { --/ for alife_object
-		UseSwitches       =    1,
-		SwitchOnline      =    2,
-		SwitchOffline     =    4,
-		Interactive       =    8,
-		VisibleForAI      =   16,
-		UsefulForAI       =   32,
-		OfflineNoMove     =   64,
-		UsedAI_Locations  =  128,
-		UseGroupBehaviour =  256,
-		CanSave           =  512,
-		VisibleForMap     = 1024,
-		UseSmartTerrains  = 2048,
-		CheckForSeparator = 4096,
-		CorpseRemoval     = 8192
-	}
-	_G.trader_flags = { --/ trader
-		Dummy        = 0,
-		InfiniteAmmo = 1
-	}
-	_G.torch_flags = { --/ torch
-		Active            = 1,
-		NightVisionActive = 2,
-		Attached          = 4
-	}
-	_G.addon_flags = { --/ weapon
-		scope    = 1,
-		launcher = 2,
-		silencer = 4
-	}
-	_G.hanging_lamp_flags = { --/ hanging lamp
-		Physic       =  1,
-		CastShadow   =  2,
-		R1           =  4,
-		R2           =  8,
-		TypeSpot     = 16,
-		PointAmbient = 32
-	}
-	_G.visual_flags = { Obstacle= 1 } --/ visual
-	--/ types:
-	_G.restrictor_type = { --/ restrictor types
-		DefaultRestrictorTypeNone = 0,
-		DefaultRestrictorTypeOut  = 1,
-		DefaultRestrictorTypeIn   = 2,
-		RestrictorTypeNone        = 3,
-		RestrictorTypeIn          = 4,
-		RestrictorTypeOut         = 5
-	}
-	--/ translate (change) function/class/tables to global scope
-	setfenv(1,_G)
-	for name,func in pairs(FuncByName) do
-		_G[name] = func
-		if type(func) == 'number' then --/ if not class-constructor ('userdata') or table
-			setfenv(_G[name],_G)
-		end
-	end
-	FuncByName = nil
-end
+_G.trader_flags = { --/ trader
+	Dummy        = 0,
+	InfiniteAmmo = 1
+}
+_G.torch_flags = { --/ torch
+	Active            = 1,
+	NightVisionActive = 2,
+	Attached          = 4
+}
+--_G.addon_flags = { --/ weapon --KRodin: вот это совершенно не нужно, в ogse_wpn_utils свои флаги.
+--	scope    = 1,
+--	launcher = 2,
+--	silencer = 4
+--}
+_G.hanging_lamp_flags = { --/ hanging lamp
+	Physic       =  1,
+	CastShadow   =  2,
+	R1           =  4,
+	R2           =  8,
+	TypeSpot     = 16,
+	PointAmbient = 32
+}
+_G.visual_flags = { Obstacle = 1 } --/ visual
+--/ types:
+_G.restrictor_type = { --/ restrictor types
+	DefaultRestrictorTypeNone = 0,
+	DefaultRestrictorTypeOut  = 1,
+	DefaultRestrictorTypeIn   = 2,
+	RestrictorTypeNone        = 3,
+	RestrictorTypeIn          = 4,
+	RestrictorTypeOut         = 5
+}
+
 --/ -----------------------------------------------------------------
 --/ Attach module
 --/ -----------------------------------------------------------------
