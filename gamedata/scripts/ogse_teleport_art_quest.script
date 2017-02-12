@@ -51,18 +51,16 @@ function init_teleport_art_and_zone()
 	-- Рестриктор
 	local obj = alife():create("space_restrictor", teleport_art_restrictor_position, teleport_art_restrictor_lvid, teleport_art_restrictor_gvid)
 	id_table.sr = obj.id
-	local packet = xs_netpk.net_alife_space_restrictor(obj)
-	if packet:isOk() then
-		write_log("packet ok")
-		--write_log(packet:dumpDesc())
-		local my_table = packet:get()
-		my_table.shapes:addSphere(10)
-		my_table.restrictor_type = 3
-		my_table.custom_data:set("[logic] \nactive = sr_idle \n[sr_idle] \non_actor_inside = %+ogse_teleport_art_actor_inside -ogse_teleport_art_actor_outside% \non_actor_outside = {+ogse_teleport_art_actor_inside} %+ogse_teleport_art_actor_outside -ogse_teleport_art_actor_inside%")
-		packet:set(my_table)
-	else 
-		write_log("packet fail")
-	end
+	local packet = get_netpk(obj, 1)
+	ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
+	write_log("packet ok")
+	--write_log(packet:dumpDesc())
+	local my_table = packet:get()
+	my_table.shapes:addSphere(10)
+	my_table.restrictor_type = 3
+	my_table.custom_data:set("[logic] \nactive = sr_idle \n[sr_idle] \non_actor_inside = %+ogse_teleport_art_actor_inside -ogse_teleport_art_actor_outside% \non_actor_outside = {+ogse_teleport_art_actor_inside} %+ogse_teleport_art_actor_outside -ogse_teleport_art_actor_inside%")
+	packet:set(my_table)
+
 	-- Артефакт
 	local obj = alife():create("af_teleport_trap", teleport_art_restrictor_position, teleport_art_restrictor_lvid, teleport_art_restrictor_gvid)
 	id_table.art = obj.id
@@ -257,8 +255,8 @@ function spawn_dead_zone()
 		--local obj = alife():create(anomaly_type[math.random(#anomaly_type)], v.position, v.lvid, v.gvid)
 		local obj = ogse.quest_spawn_ex(anomaly_type[math.random(#anomaly_type)], 1, spawn_item)
 		table.insert(dead_zone_id, obj.id)
-		local packet = xs_netpk.anomaly(obj)
-		ASSERT(packet:isOk(), "[spawn_dead_zone] failed")
+		local packet = get_netpk(obj, 1)
+		ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
 		local my_table = packet:get()
 		my_table.shapes:addSphere(spawn_item.radius, vector():set(0,0,0)) 
 		my_table.max_power = spawn_item.power
@@ -344,23 +342,20 @@ function spawn_dead_zone()
 		local obj = ogse.quest_spawn_ex(anom_section, 1, spawn_item)
 		table.insert(dead_zone_id, obj.id)
 		
-		local packet = xs_netpk.anomaly(obj) 
-		if packet:isOk() then
-			local my_table = packet:get()
+		local packet = get_netpk(obj, 1) 
+		ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
+		local my_table = packet:get()
+
+		local coef_effective_radius = 1
+		if sys_ini:line_exist(anom_section, "effective_radius") then coef_effective_radius = sys_ini:r_float(anom_section, "effective_radius") end
 			
-			local coef_effective_radius = 1
-			if sys_ini:line_exist(anom_section, "effective_radius") then coef_effective_radius = sys_ini:r_float(anom_section, "effective_radius") end
-			
-			write_log("coef_effective_radius = "..coef_effective_radius)
-			write_log("new_radius = "..anom_rad*coef_effective_radius)
-			write_log("power = "..sys_ini:r_float(anom_section, "max_start_power"))
-			
-			
-			my_table.shapes:addSphere(anom_rad*coef_effective_radius, vector():set(0,0,0))
-			my_table.max_power = sys_ini:r_float(anom_section, "max_start_power")
-			packet:set(my_table)
-		else write_log("packet fail in deadzone")
-		end
+		write_log("coef_effective_radius = "..coef_effective_radius)
+		write_log("new_radius = "..anom_rad*coef_effective_radius)
+		write_log("power = "..sys_ini:r_float(anom_section, "max_start_power"))
+
+		my_table.shapes:addSphere(anom_rad*coef_effective_radius, vector():set(0,0,0))
+		my_table.max_power = sys_ini:r_float(anom_section, "max_start_power")
+		packet:set(my_table)
 	end
 	-- Рестриктор выхода
 	
@@ -375,23 +370,20 @@ function spawn_dead_zone()
 	
 	table.insert(dead_zone_id, obj.id)
 	
-	local packet = xs_netpk.net_alife_space_restrictor(obj)
-	ASSERT(packet:isOk(), "[] fail")
+	local packet = get_netpk(obj, 1)
+	ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
 	--write_log(packet:dumpDesc())
 	local my_table = packet:get()
 	my_table.shapes:addBox(
-		matrix():set(
-			vector():set(10, 0, 0), 
-			vector():set(0, 10, 0), 
-			vector():set(0, 0, 20), 
-			vector():set(0, 0, 0)
-			)
-		)
+		vector():set(10, 0, 0), 
+		vector():set(0, 10, 0), 
+		vector():set(0, 0, 20), 
+		vector():set(0, 0, 0)
+	)
 	my_table.restrictor_type = 3
 	my_table.custom_data:set("[logic] \nactive = sr_idle \n[sr_idle] \non_actor_inside = %+ogse_teleport_trap_research_art_actor_finish_dead_zone%")
 	packet:set(my_table)
 	
-	print_table_inlog(dead_zone_id)
 	xs_stor.set("dead_zone_id", dead_zone_id)	
 end
 

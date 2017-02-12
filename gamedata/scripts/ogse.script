@@ -1359,14 +1359,12 @@ end
 
 function kill_offline_npc(obj)
 	if not obj then return end
+	ASSERT( IsStalker(obj) or IsMonster(obj), "" )
 
-	local pk = xs_netpk.monster(obj)
-	if not pk:isOk() then
-		pk = xs_netpk.stalker(obj)
-	end
+	local pk = get_netpk(obj, 2)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", obj:name() )
 	local data = pk:get()
 	data.health = 0
-	data.updhealth = 0
 	pk:set(data)
 	obj.offline_dead = 1
 	smart_terrain.on_death( obj.id )
@@ -1375,15 +1373,13 @@ end
 -- возвращает уровень здоровья НПС, для проверки в оффлайне жив/мёртв НПС
 function check_offline_npc(obj)
 	if not obj then return end
+	ASSERT( IsStalker(obj) or IsMonster(obj), "" )
 
-	local pk = xs_netpk.monster(obj)
-	if not pk:isOk() then
-		pk = xs_netpk.stalker(obj)
-	end
+	local pk = get_netpk(obj, 2)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", obj:name() )
 	local data = pk:get()
-	local health = data.health
 
-	return health > 0
+	return data.health > 0
 end
 
 
@@ -1782,7 +1778,7 @@ function fix_restrictors(npc)
 	local pk
 	local sObj = alife():object(npc:id())
 	if sObj then
-		pk = xs_netpk.stalker(sObj)
+		pk = get_netpk(sObj, 1)
 	end
 
 	for k, v in pairs(t) do
@@ -1790,7 +1786,8 @@ function fix_restrictors(npc)
 			npc:remove_restrictions("", v)
 			log1("[OGSE] Invalid in restriction ["..v.."] for ["..npc:name().."], removed")
 		else	
-			if pk and pk:isOk() then
+			if pk then
+				ASSERT( pk:isOk(), "can't read netpacket of %s", sObj:name() )
 				local data = pk:get()
 				local base_out_restr = data.base_out_restrictors
 				if base_out_restr ~= "" then

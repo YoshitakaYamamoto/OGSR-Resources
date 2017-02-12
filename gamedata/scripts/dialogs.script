@@ -1153,10 +1153,12 @@ function modify_weapon(old, new)
 		local s_cur_weapon = alife():object(it:id())
 		local sect = it:section()
 		-- спавним актору патроны, которые заряжены в ствол
-		local cur_weapon_data = m_net_utils.get_weapon_data(s_cur_weapon)
+		local pk = get_netpk(s_cur_weapon, 1)
+		ASSERT( pk:isOk(), "can't read netpacket of %s", s_cur_weapon:name() )
+		local cur_weapon_data = pk:get()
 		local ammo_sections = get_names(sect, "ammo_class") -- получаем список секций патронов
 		local ammo_sec = ammo_sections[cur_weapon_data.ammo_type+1] -- и узнаём заряженную секцию
-		ogse.spawn_ammo_in_inv(ammo_sec, cur_weapon_data.ammo_elapsed, db.actor)
+		ogse.spawn_ammo_in_inv(ammo_sec, cur_weapon_data.ammo_elapsed)
 		-- снимаем стандартные аддоны
 		if ogse_addons.is_addon_installed(it, ogse_wpn_utils.addons_flags.scope) then
 			local scope = get_string(sect, "scope_name", "")

@@ -99,21 +99,17 @@ function se_on_before_register( sobj )
 end
 
 function set_none_smart_terrain( sobj )
-  local pk = xs_netpk.monster( sobj )
-  if not pk:isOk() then
-    pk = xs_netpk.stalker( sobj )
-  end
-  if pk:isOk() then
-    local data = pk:get()
-    local cd   = data.custom_data:getTable()
-    --log3("~~[Custom data %s before set_none_smart_terrain]: %s", sobj:name(), cd)
-    cd.smart_terrains = {
-      [ "none" ] = "true",
-    }
-    --log3("--[Custom data %s after set_none_smart_terrain]: %s", sobj:name(), cd)
-    data.custom_data:set( cd )
-    pk:set( data )
-  end
+  local pk = get_netpk( sobj, 1 )
+  ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
+  local data = pk:get()
+  local cd   = data.custom_data:getTable()
+  --log3("~~[Custom data %s before set_none_smart_terrain]: %s", sobj:name(), cd)
+  cd.smart_terrains = {
+    [ "none" ] = "true",
+  }
+  --log3("--[Custom data %s after set_none_smart_terrain]: %s", sobj:name(), cd)
+  data.custom_data:set( cd )
+  pk:set( data )
 end
 
 -- Создать свободного моба, которого не затянет в какой-нибудь гулаг.

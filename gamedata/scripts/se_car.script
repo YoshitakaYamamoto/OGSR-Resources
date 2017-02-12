@@ -30,17 +30,11 @@ function se_car:on_spawn()
 end
 --------------------
 function se_car:STATE_Write (packet)
-	ogse_signals.get_mgr():call("se_car:STATE_Write_begin", packet, self.id)
-
 	cse_alife_car.STATE_Write (self, packet)
 	if self.id == 65535 then return end
 	if self.trunk then
 		packet:w_stringZ(self.trunk)
 	end
-end
---------------------
-function se_car:on_unregister()
-	ogse_signals.get_mgr():call("se_car:on_unregister", self.id)
 end
 --------------------
 function se_car:STATE_Read (packet, size)

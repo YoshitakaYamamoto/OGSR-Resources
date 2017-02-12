@@ -66,7 +66,8 @@ local registry = {}
 
 local function create_storage_object(key)
 	local st_obj = alife():create("custom_storage", vector(), 0, 0)
-	local pk = xs_netpk.net_alife_dynamic_object(st_obj)
+	local pk = get_netpk(st_obj, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of [%s]", st_obj:name() )
 	local data = pk:get()
 	data.custom_data:setTable( { main = { key = key } } ) --"[main]\nkey = "..key
 	pk:set(data)

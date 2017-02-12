@@ -481,10 +481,12 @@ end
 
 function on_anomaly_spawn(obj)
 	if is_not_anomaly(alife():object(obj:id())) then return end --НЕ аномалии не учитываем. Они сюда и не должны попадать, но на всякий случай.
-
-	local rads = _geom_helpers.get_all_shapes_data( obj ) --Для точного рассчёта расстояния до аномалий. Теперь это не радиус, а специальная табличка.
-	--log3("[%s] All shapes data for [%s] : %s", script_name(), obj:name(), rads)
-
+	--
+	local pk = get_netpk(obj, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", obj:name() )
+	local data = pk:get()
+    local rads = data.shapes:getRadius()
+	--
 	anom_list[obj:id()] = { pos = obj:position(), clsid = obj:clsid(), radius = rads, section = obj:section() }
 	--log3("--[%s] Anomaly registered: [%s]", script_name(), obj:name())
 end
@@ -499,7 +501,7 @@ function get_nearest_anomaly_by_point(position)
 	local dist, mindist, anomid = 0, 20, nil
 
 	for id, anom in pairs(anom_list) do
-		dist = _geom_helpers.distance_from_zone_boundary( anom.radius, position ) --Пример использования этой функции подсмотрел в Dsh моде
+		dist = position:distance_to(anom.pos) - anom.radius
 		if dist < mindist then
 			mindist = dist --Минимальное расстояние до аномалии
 			anomid = id
@@ -519,7 +521,7 @@ end
 function get_all_nearest_anomalies_by_point_in_radius(position, rads)
 	local anom_out = {}
 	for id, anom in pairs(anom_list) do
-		local dist = _geom_helpers.distance_from_zone_boundary( anom.radius, position )
+		local dist = position:distance_to(anom.pos) - anom.radius
 		if dist < rads then
 			--log3("[get_all_nearest_anomalies_by_point_in_radius] dist from [%s] to [%s] = [%s], max radius = [%s]", level.object_by_id(id):name(), position, dist, rads)
 			--log3("%s", debug.traceback())
@@ -651,7 +653,7 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 				end
 			elseif isLc(sobj) then
 				--Учитываем точки входа на локациях.
-				local pk = xs_netpk.level_changer(sobj)
+				local pk = get_netpk(sobj, 1)
 				ASSERT(pk:isOk(), "PK is not OK in [%s]", sobj:name())
 				local lc_params = pk:get()
 				if lc_params.dest_level_name == lname then
@@ -669,18 +671,15 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 
 	if next(del_anoms_tbl) then --таблица не пуста
 		for npc_id, npc_sobj in pairs(npc_tbl) do --Снимаем рестрикшены удаляемых аномалий. Без этого 100% будут движковые вылеты.
-			local pk = xs_netpk.stalker(npc_sobj)
-			if not pk:isOk() then
-				pk = xs_netpk.monster(npc_sobj)
-			end
-			ASSERT(pk:isOk(), "It is not stalker and not monster: [%s]", npc_sobj:name())
+			local pk = get_netpk(npc_sobj, 1)
+			ASSERT( pk:isOk(), "can't read netpacket of %s", npc_sobj:name() )
 
 			local data = pk:get()
 			for _, anom_id in pairs(data.dynamic_in_restrictions) do
 				if del_anoms_tbl[anom_id] then
-					log3("~~[%s.get_lists] Removing in restriction [%s] from [%s]", script_name(), anom_id, npc_sobj:name())
+					--log3("~~[%s.get_lists] Removing in restriction [%s] from [%s]", script_name(), anom_id, npc_sobj:name())
 					sim:remove_in_restriction(npc_sobj, anom_id)
-					log3("~~[%s.get_lists] Removed in restriction [%s] from [%s]", script_name(), anom_id, npc_sobj:name())
+					--log3("~~[%s.get_lists] Removed in restriction [%s] from [%s]", script_name(), anom_id, npc_sobj:name())
 				end
 			end
 --[=[ --KRodin: Вроде бы это не нужно.
@@ -694,9 +693,9 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 --]=]
 		end
 		for anom_id, anom_sobj in pairs(del_anoms_tbl) do --Удаляем аномалии
-			log3("~~[%s.get_lists] Releasing anom [%s]", script_name(), anom_sobj:name())
+			--log3("~~[%s.get_lists] Releasing anom [%s]", script_name(), anom_sobj:name())
 			sim:release(anom_sobj, true)
-			log3("--[%s.get_lists] anom released!", script_name())
+			--log3("--[%s.get_lists] anom released!", script_name())
 		end
 	end
 
@@ -750,19 +749,17 @@ function generate_anoms(lname)
 		local section, shape = anomaly_section_choice(lname)
 		local sobj = alife():create(section, pos, new_lv, new_gv)
 		ASSERT(sobj, "Can't generate_anomaly [%s], [%s], [%s], [%s]", section or "nil", pos or "nil", new_lv or "nil", new_gv or "nil")
-		local pk = xs_netpk.anomaly(sobj)
-		ASSERT(pk:isOk(), "pk is not OK in anom: [%s]", section or "nil")
+		local pk = get_netpk(sobj, 1)
+		ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
 		local data = pk:get()
 		if shape.shtype == 0 then --/ sphere
 			data.shapes:addSphere(shape.radius * get_float(section, "effective_radius", 1), vector():set(unpack(shape.center)))
 		else --/ box
 			data.shapes:addBox(
-				matrix():set(
-					vector():set(unpack(shape.v1)), 
-					vector():set(unpack(shape.v2)), 
-					vector():set(unpack(shape.v3)), 
-					vector():set(unpack(shape.offset))
-				)
+				vector():set(unpack(shape.v1)), 
+				vector():set(unpack(shape.v2)), 
+				vector():set(unpack(shape.v3)), 
+				vector():set(unpack(shape.offset))
 			)
 		end
 		pk:set(data)
@@ -828,9 +825,7 @@ function set_anomaly_mode(anom_id, status)
 	local sobj = alife():object(anom_id)
 	if not sobj then return end
 
-	local fun_name = _geom_helpers.zones[sobj:clsid()]
-	ASSERT(fun_name, "get_all_shapes_data: unknown zone type")
-	local pk = xs_netpk[fun_name](sobj)
+	local pk = get_netpk(sobj, 1)
 	ASSERT(pk:isOk(), "PK is not OK in [%s]", sobj:name())
 	local data = pk:get()
 	local cd = data.custom_data:getTable()

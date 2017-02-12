@@ -62,7 +62,7 @@ function get_available_actions_for_slot(addon_sec, slot_num)
 	--log1(string.format("a=%x",available_actions:get()))
 	return available_actions
 end
-local monitored_addon_classes = {
+--[[local]] monitored_addon_classes = {
 	[clsid.wpn_grenade_launcher] = true,
 	[clsid.wpn_scope]            = true,
 	[clsid.wpn_scope_s]          = true,
@@ -93,15 +93,20 @@ function on_use(obj, sobj)
 	then
 		--log1("not addon")
 		return 
-	end 
-	local t1 = m_net_utils.get_item_data(sobj) -- получаем данные из поюзанного аддона
+	end
+	--
+	local pk1 = get_netpk(sobj, 1)
+	ASSERT( pk1:isOk(), "can't read netpacket of %s", sobj:name() )
+	local t1 = pk1:get() -- получаем данные из поюзанного аддона
 	-- использованный фейковый создали заново (вне зависимости от дальнейших действий предмет останется в инвентаре,
 	-- если надо будет удалить, то удалим повторно уже по факту установки аддона)
 	local s_new_fake_addon = ogse.spawn_item_in_inv(obj:section())
 	-- переносим кастомдату из удалённого аддона в свежесозданный
-	local t2 = m_net_utils.get_item_data(s_new_fake_addon)
-	t2.custom = t1.custom
-	m_net_utils.set_item_data(t2,s_new_fake_addon)
+	local pk2 = get_netpk(s_new_fake_addon, 1)
+	ASSERT( pk2:isOk(), "can't read netpacket of %s", s_new_fake_addon:name() )
+	local t2 = pk2:get()
+	t2.custom_data = t1.custom_data
+	pk2:set(t2)
 	-- Теперь выясняем, что можно сделать с этим аддоном в каждом из слотов
 	local slot1_actions = get_available_actions_for_slot(real_addon_section, 1)
 	local slot2_actions = get_available_actions_for_slot(real_addon_section, 2)
@@ -137,7 +142,7 @@ function convert_addon_to_slot(saddon, slot_number)
 end
 
 -- флаги аддонов
-addons_flags = ogse_wpn_utils.addons_flags
+local addons_flags = ogse_wpn_utils.addons_flags
 
 flag2status_param = {
 	[1]  = "scope_status",
@@ -219,10 +224,10 @@ function is_addon_permanent(wpn_section, addon_flag)
 end
 --
 function is_scope_removable(wpn_section)
-	return is_addon_removable(wpn_section, addon_flags.scope)
+	return is_addon_removable(wpn_section, addons_flags.scope)
 end
 function is_grenade_launcher_removable(wpn_section)
-	return is_addon_removable(wpn_section, addon_flags.gl)
+	return is_addon_removable(wpn_section, addons_flags.gl)
 end
 -- установлен ли аддон
 function is_addon_installed(obj, addon_flag)
@@ -274,40 +279,37 @@ function get_shg_params_from_cd(swpn)
 	cond = cd:r_float("shg_params", "condition")
 	return t,n,s,cond
 end
-function replace_shg_cd(data, t,n,s,cond)
-	local cd = m_net_utils.parse_custom_data(data.custom)
+function replace_shg_cd(data,t,n,s,cond)
+	local cd = data.custom_data:getTable()
 	cd.shg_params = {
 		ammo_type = t,
 		ammo_elapsed = n,
 		ammo_section = s,
 		condition = cond,
 	}
-	data.custom = m_net_utils.gen_custom_data(cd)
+	data.custom_data:set(cd)
 end
 -- Функция установки свойств подствольника.
 -- Сразу после создания объекта надо с помощью этой функции прописать ему кастомдату
 -- в противном случае будут вылеты!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-function set_shg_params_to_cd(swpn,t,n,s,cond)
-	local data = m_net_utils.get_weapon_data(swpn)
-	replace_shg_cd(data, t,n,s,cond)
-	m_net_utils.set_weapon_data(data,swpn)
-end
-
 function set_addon_shg_params_to_cd(sitem,t,n,s,cond)
 	if s == "" or s == nil then s = "-" end
-	local data = m_net_utils.get_item_data(sitem)
-	replace_shg_cd(data, t,n,s,cond)
-	m_net_utils.set_item_data(data,sitem)
+	local pk = get_netpk(sitem, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", sitem:name() )
+	local data = pk:get()
+	replace_shg_cd(data,t,n,s,cond)
+	pk:set(data)
 end
 
 function set_default_shg_params(sitem)
 	set_addon_shg_params_to_cd(sitem,0,0,"ammo_12x70_kart",1.0)
 end
 
-function print_cd(sitem)
-	local data = m_net_utils.get_item_data(sitem)
-	-- log1("object: "..sitem:section_name().." custom_data:")
-	-- log1(data.custom)
+function print_cd(sobj)
+	--local pk = get_netpk(sobj, 1)
+	--ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
+	--local data = pk:get()
+	--log3("[%s] Customdata of [%s]: %s", script_name(), sobj:name(), data.custom_data:getTable())
 end
 
 function get_wpn_parameters(wpn, swpn_, sec_)
@@ -360,8 +362,9 @@ function convert_after_shg_detached(cur_weapon)
 	local new_wpn_section = get_sect_to_convert_after_shg_removed(cur_weapon)
 	ASSERT(new_wpn_section, "convert_after_shg_detached: Can't get section for new weapon")
 	local s_cur_weapon = sim:object(cur_weapon:id())
-	local cur_weapon_data = m_net_utils.get_weapon_data(s_cur_weapon)
-	local modified_params = {}
+	local pk = get_netpk(s_cur_weapon, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", s_cur_weapon:name() )
+	local cur_weapon_data = pk:get()
 	-- безусловно "снимаем" аддон. На самом деле он здесь уже снят, но "неправильно", движковым действием,
 	-- наша задача снять его "правильно", т.е. попросту создать и задать нужные параметры (в кастомдате)
 	local removed_real_gl_sec = get_string(cur_weapon_sect, "grenade_launcher_name", nil)
@@ -374,13 +377,9 @@ function convert_after_shg_detached(cur_weapon)
 	-- надо добавить из него заряды в кастомдату снятого подствольного дробовика
 	-- проверяем текущий ствол
 	ASSERT(get_u32(removed_fake_gl_sec, "is_shotgun") == 1, "convert_after_shg_detached: detached addon doesn't has 'is_shotgun' parameter in its section '"..removed_fake_gl_sec.."'")
-	
+
 	local rif, shg = get_wpn_parameters(cur_weapon, s_cur_weapon, cur_weapon_sect)
-	modified_params.condition    = rif.condition           -- переносим состояние ствола
-	modified_params.ammo_type    = rif.ammo_type           -- тип боеприпаса
-	modified_params.ammo_elapsed = rif.ammo_elapsed        -- количество боеприпаса
-	modified_params.custom       = "" --cur_weapon_data.custom  -- кастомдату
-	
+
 	-- переносим данные дробовика в кастомдату аддона
 	set_addon_shg_params_to_cd(s_new_fake_addon,shg.ammo_type,shg.ammo_elapsed,shg.ammo_sections,shg.condition)
 
@@ -391,14 +390,19 @@ function convert_after_shg_detached(cur_weapon)
 	db.actor:move_to_ruck(cur_weapon) -- освобождаем слот
 	sim:release(s_cur_weapon, true) -- удаляем старый ствол
 	--
-	modified_params.addon_flags = bit_and(cur_weapon_data.addon_flags, bit_not(addons_flags.gl)) -- снимаем флажок аддона
-	se_item.modified_params = modified_params
-
+	se_item.modified_params = {
+		condition    = rif.condition,	-- переносим состояние ствола
+		ammo_type    = rif.ammo_type,	-- тип боеприпаса
+		ammo_elapsed = rif.ammo_elapsed,-- количество боеприпаса
+		custom_data  = m_netpk.custom_data(""), -- кастомдату
+		addon_flags  = bit_and(cur_weapon_data.addon_flags, bit_not(addons_flags.gl)) -- снимаем флажок аддона
+	}
 	local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
+	--
 	if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
 		move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
 	end
-
+	--
 	soundtrack.s_play_no_feedback([[interface\inv_attach_addon]])
 end
 -- служебная функция: по секции ствола и индексу типа патронов заспавнить нужное количество БП актору
@@ -415,12 +419,14 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 	ASSERT(cur_weapon, "install_remove_addon: 'cur_weapon' is a nil reference. Check logic of your code.")
 	local cur_weapon_sect = cur_weapon:section()
 	local s_cur_weapon = sim:object(cur_weapon:id())
-	local cur_weapon_data = m_net_utils.get_weapon_data(s_cur_weapon)
+	local pk = get_netpk(s_cur_weapon, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", s_cur_weapon:name() )
+	local cur_weapon_data = pk:get()
 	local modified_params = {}
 	modified_params.condition    = cur_weapon_data.condition       -- переносим состояние ствола
 	modified_params.ammo_type    = cur_weapon_data.ammo_type       -- тип боеприпаса
 	modified_params.ammo_elapsed = cur_weapon_data.ammo_elapsed    -- количество боеприпаса
-	modified_params.custom       = cur_weapon_data.custom          -- кастомдату
+	modified_params.custom_data  = cur_weapon_data.custom_data     -- кастомдату
 	--
 	local sfake_addon = nil
 	local removed_addon_flags = 0
@@ -526,7 +532,7 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 					modified_params.condition    = rif.condition           -- переносим состояние ствола
 					modified_params.ammo_type    = rif.ammo_type           -- тип боеприпаса
 					modified_params.ammo_elapsed = rif.ammo_elapsed        -- количество боеприпаса
-					modified_params.custom       = cur_weapon_data.custom  -- кастомдату
+					modified_params.custom_data  = cur_weapon_data.custom_data -- кастомдату
 
 					set_addon_shg_params_to_cd(s_new_fake_addon,shg.ammo_type,shg.ammo_elapsed,shg.ammo_sections,shg.condition)
 					
@@ -568,15 +574,16 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 	--- внимание!!!!!1 не так !!!!!!!!!!!!!!!!!!
 	if sfake_addon and get_u32(real_addon_section, "is_shotgun") == 1 then
 		local t,n,s,c = get_shg_params_from_cd(sfake_addon)
-		replace_shg_cd(modified_params, t,n,s,c)
+		replace_shg_cd(modified_params,t,n,s,c)
 	end
+	--
 	se_item.modified_params = modified_params
-
 	local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
+	--
 	if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
 		move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
 	end
-
+	--
 	soundtrack.s_play_no_feedback([[interface\inv_attach_addon]])
 	-- удаляем  фейковый аддон, если не снимали
 	if sfake_addon then
@@ -705,44 +712,46 @@ function switch_shg_mode(wpn)
 	if not new_wpn_section then return end -- нет секции для конвертации. Отдыхаем
 	local cur_weapon_sect = wpn:section()
 	ASSERT(sys_ini:section_exist(new_wpn_section), "switch_shg_mode: Section for shotgun convertion '"..new_wpn_section.."' doesn't exists. Check section: "..cur_weapon_sect)
-	local cur_weapon_data = m_net_utils.get_weapon_data(s_cur_weapon)
+	--
+	local pk = get_netpk(s_cur_weapon, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", s_cur_weapon:name() )
+	local cur_weapon_data = pk:get()
 	-- если НЕ установлен подствольник и НЕ перманентный подствольник, то это ошибка. Такое оружие не должно встречаться без подствольника.
 	ASSERT((bit_and(cur_weapon_data.addon_flags, addons_flags.gl) ~= 0) or is_addon_permanent(cur_weapon_sect, addons_flags.gl),
 		"switch_shg_mode: Gun with attachible shotgun has no addon at the moment of mode switching")
-	-- собираем информацию, которую сохраним в кастомдате
-	local ammo_sections = get_names(cur_weapon_sect, "ammo_class") -- получаем список секций текущих патронов
-	local modified_params = {}
-	-- запоминаемая информация - начало
-	local new_custom_data = {shg_params = {
-		ammo_type      = cur_weapon_data.ammo_type,
-		ammo_elapsed   = cur_weapon_data.ammo_elapsed,
-		ammo_section   = ammo_sections[cur_weapon_data.ammo_type+1],
-		condition      = cur_weapon_data.condition,
-	}}
-	modified_params.custom = m_net_utils.gen_custom_data(new_custom_data)
-	-- запоминаемая информация - конец
-	
-	-- переносимая информация - начало
-	modified_params.addon_flags = cur_weapon_data.addon_flags
-	-- переносимая информация - конец
-	
-	-- заменяем информацию на свойства второго ствола, полученные из кастомдаты
-	local cur_weapon_cd = m_net_utils.parse_custom_data(cur_weapon_data.custom)
+	-- собираем информацию, которую сохраним в кастомдате	
+	local cur_weapon_cd = cur_weapon_data.custom_data:getTable()
 	ASSERT(cur_weapon_cd.shg_params, "switch_shg_mode: No saved parameters in custom data")
-	modified_params.ammo_type    = tonumber(cur_weapon_cd.shg_params.ammo_type)
-	modified_params.ammo_elapsed = tonumber(cur_weapon_cd.shg_params.ammo_elapsed)
-	modified_params.condition    = tonumber(cur_weapon_cd.shg_params.condition)
-	--log1("move_to_ruck2")
-
+	--
+	--Для поддержки равнозначных слотов
 	local cur_wpn_slot_engine = get_inv_item_slot( wpn )
 	local cur_wpn_slot_cfg = get_u32(wpn:section(), "slot")
 	local is_slot_active = db.actor:active_slot() == cur_wpn_slot_engine
-
+	--Удаляем старый ствол
 	db.actor:move_to_ruck(wpn)
 	sim:release(s_cur_weapon, true)
-	se_item.modified_params = modified_params
-
+	--Переносим в новый ствол параметры старого
+	local ammo_sections = get_names(cur_weapon_sect, "ammo_class") -- получаем список секций текущих патронов
+	local cd = m_netpk.custom_data({
+		shg_params = {
+			ammo_type      = cur_weapon_data.ammo_type,
+			ammo_elapsed   = cur_weapon_data.ammo_elapsed,
+			ammo_section   = ammo_sections[cur_weapon_data.ammo_type+1],
+			condition      = cur_weapon_data.condition,
+		}
+	})
+	se_item.modified_params = {
+		custom_data  = cd:getString(), -- запоминаемая информация
+		-- переносимая информация
+		addon_flags  = cur_weapon_data.addon_flags,
+		-- заменяем информацию на свойства второго ствола, полученные из кастомдаты
+		ammo_type    = tonumber(cur_weapon_cd.shg_params.ammo_type),
+		ammo_elapsed = tonumber(cur_weapon_cd.shg_params.ammo_elapsed),
+		condition    = tonumber(cur_weapon_cd.shg_params.condition),
+	}
+	--Спавним новый
 	local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
+	--Для поддержки равнозначных слотов
 	if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
 		move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
 	end
@@ -767,7 +776,9 @@ function convert_shg_to_addon(swpn)
 	local fake_addon_section = get_string(cur_weapon_sect, "addon_mode_section")
 	ASSERT(fake_addon_section, "convert_shg_to_addon: no section for convertion defined. Check parameter 'addon_mode_section' in section: "..cur_weapon_sect)
 	
-	local data = m_net_utils.get_weapon_data(swpn)
+	local pk = get_netpk(swpn, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", swpn:name() )
+	local data = pk:get()
 	local ammo_sections = get_names(cur_weapon_sect, "ammo_class") -- получаем список секций патронов
 	local ammo_sec = ammo_sections[data.ammo_type+1] -- и узнаём заряженную секцию
 	local s_new_fake_addon = ogse.spawn_item_in_inv(fake_addon_section)
@@ -779,13 +790,15 @@ function convert_addon_to_shg(saddon)
 	local wpn_section = get_string(cur_addon_sect, "standalone_shotgun_section")
 	ASSERT(wpn_section, "convert_addon_to_shg: no section for convertion defined. Check parameter 'standalone_shotgun_section' in section: "..cur_addon_sect)
 	local t,n,s,cond = get_shg_params_from_cd(saddon)
+	sim:release(saddon, true)
+	--
 	se_item.modified_params = {
 		ammo_type    = t,
 		ammo_elapsed = n,
+		ammo_section = s, --KRodin: этого не было. Ошибка? Или его здесь не должно быть?
 		condition    = cond,
 	}
-	sim:release(saddon, true)
-	local s_new_weapon = ogse.spawn_item_in_inv(wpn_section)
+	--[[local s_new_weapon =]] ogse.spawn_item_in_inv(wpn_section)
 end
 -- следим за попаданием в инвентарь ствола XM-26 LSS в режиме автономного оружия для конвертации в аддон
 function on_item_to_ruck(obj, sobj)
@@ -807,7 +820,9 @@ function on_item_to_ruck(obj, sobj)
 				if wpn then
 --					log1("ON_ITEM_TO_RUCK: slot "..tostring(i).." has weapon "..wpn:name())
 					local s_cur_weapon = sim:object(wpn:id())
-					local cur_weapon_data = m_net_utils.get_weapon_data(s_cur_weapon)
+					local pk = get_netpk(s_cur_weapon, 1)
+					ASSERT( pk:isOk(), "can't read netpacket of %s", s_cur_weapon:name() )
+					local cur_weapon_data = pk:get()
 					local new_wpn_section =  get_string(wpn:section(), "scope_removed_section")
 					if new_wpn_section then
 --						log1("ON_ITEM_TO_RUCK: weapon "..wpn:name().." has parameter scope_removed_section ("..new_wpn_section..")")
@@ -822,10 +837,12 @@ function on_item_to_ruck(obj, sobj)
 
 						db.actor:move_to_ruck(wpn) -- освобождаем слот, чтобы туда мог встать новый ствол
 						sim:release(s_cur_weapon, true) -- удаляем старый ствол
-						se_item.modified_params = cur_weapon_data   -- переносим параметры старого ствола
-						se_item.modified_params.addon_flags = bit_and(cur_weapon_data.addon_flags, bit_not(addons_flags.scope)) -- снимаем флаг прицела, т.к. он не снимается сам
 
+						cur_weapon_data.addon_flags = bit_and(cur_weapon_data.addon_flags, bit_not(addons_flags.scope)) -- снимаем флаг прицела, т.к. он не снимается сам
+						se_item.modified_params = cur_weapon_data
+						--
 						local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
+						--
 						if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
 							move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
 						end
@@ -961,9 +978,9 @@ function detach_addon_ctrl:Update()
 	end
 	CUIScriptWnd.Update(self)
 end
-function detach_addon_ctrl:__finalize()
+--function detach_addon_ctrl:__finalize()
 	--log1("detach_addon_ctrl:__finalize")
-end
+--end
 
 -- Открытие/закрытие инвентаря
 local detach_grip_ctrl_wnd = detach_addon_ctrl()
@@ -1064,21 +1081,16 @@ function recreate_transfer_data(obj_to_del, sec_to_create)
 	if not sobj then return false end
 	-- не совсем верно проверять по секции создаваемого, 
 	-- но при правильной настройке оба (и удаляемый и создаваемый) должны иметь параметр "is_shotgun" или оба не иметь
-	if get_u32(sec_to_create, "is_shotgun") == 1 then
-		-- заменяем на систему xStream
-		--local pk1 = xs_netpk.net_alife_item(sobj)
-		--ASSERT(pk1:isOk(), "[recreate_transfer_data] cannot get netpacket for the object '%s'", sobj:get_name())
-		--local data = pk1:get()
-		--data.health = health
-		--data.updhealth = health
-		--pk:set(data)
-		
-		-- TODO: это заменить на систему xStream
-		local t1 = m_net_utils.get_item_data(sobj)
+	if get_u32(sec_to_create, "is_shotgun") == 1 then		
+		local pk1 = get_netpk(sobj, 1)
+		ASSERT( pk1:isOk(), "can't read netpacket of %s", sobj:name() )
+		local t1 = pk1:get()
 		local s_fake_item = ogse.spawn_item_in_inv(sec_to_create)
-		local t2 = m_net_utils.get_item_data(s_fake_item)
-		t2.custom = t1.custom
-		m_net_utils.set_item_data(t2,s_fake_item)
+		local pk2 = get_netpk(s_fake_item, 1)
+		ASSERT( pk2:isOk(), "can't read netpacket of %s", s_fake_item:name() )
+		local t2 = pk2:get()
+		t2.custom_data = t1.custom_data
+		pk2:set(t2)
 	else
 		ogse.spawn_item_in_inv(sec_to_create)
 	end

@@ -387,16 +387,13 @@ function se_stalker:on_register()
 	--if debug_flag then
 		-- log1("se_stalker register 6 "..self:name())
 		-- log1("se_stalker register end "..self:name())
-	--end	
+	--end
+
 	-- получаем имя персонажа для быстрого доступа в дальнейшем
-	local sobj = alife():object(self.id)
-	if sobj then
-		local pk = xs_netpk.stalker(sobj)
-		if pk and pk:isOk() then
-			local data = pk:get()
-			self._charname = data.character_name
-		end
-	end
+	local pk = get_netpk(self, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", self:name() )
+	local data = pk:get()
+	self._charname = data.character_name
 end
 function se_stalker:character_name()
 	return self._charname -- не меняется

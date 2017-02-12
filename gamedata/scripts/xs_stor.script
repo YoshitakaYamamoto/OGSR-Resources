@@ -41,6 +41,78 @@ function attach(sm)
 	sm:subscribe({ signal = "on_load_before_all",	fun = this.load })
 end
 
+--------------------
+-- serialize table to string reprezentation
+-- in: table|nil|string|number|boolean, nil
+-- out: string|nil, boolean(error)
+local function table_serialize(x, recur)
+	local t = type(x)
+	recur = recur or {}
+
+	if t == "nil" then
+		return "nil"
+	elseif t == "string" then
+		return string.format("%q", x)
+	elseif t == "number" then
+		return tostring(x), false
+	elseif t == "boolean" then
+		return x and "true" or "false"
+	elseif getmetatable(x) then
+		-- Can not serialize a table that has a metatable associated with it.
+		return nil, true
+	elseif t == "table" then
+		if recur[x] then
+			-- Can not serialize recursive tables.
+			return nil, true
+		end
+		recur[x] = true
+
+		if not next(x) then return "{}" end -- need to check if table is empty
+		local s, key, val = "{"
+		for k, v in pairs(x) do
+			key, err = table_serialize(k, recur)
+			if err then	--if something srong with table's keys
+				return nil, true
+			end
+			val, err = table_serialize(v, recur)
+			if err then	--if something srong with table's values
+				return nil, true
+			end
+			s = s .. "[" .. key .. "]" .. "=" .. val .. ","
+		end
+
+		return s:sub(0, s:len() - 1) .. "}"
+	end
+
+	-- Can not serialize value of passed type
+	return nil, true
+end
+
+--unserialize table from string
+local function table_unserialize(str) --нужно в хс_стор
+	if type(str)~='string' or str=='' then return {} end
+	return loadstring("return " .. str)() or {}
+end
+
+--clones table (metatables are cloned too), userdatas are not cloned
+local function table_clone(object) --Нужно в хс_стор
+    local lookup_table = {}
+    local function _copy(object)
+        if type(object) ~= "table" then
+            return object
+        elseif lookup_table[object] then
+            return lookup_table[object]
+        end
+        local new_table = {}
+        lookup_table[object] = new_table
+        for index, value in pairs(object) do
+            new_table[_copy(index)] = _copy(value)
+        end
+        return setmetatable(new_table, _copy( getmetatable(object)) )
+    end
+    return _copy(object)
+end
+-----------------------
 
 local storage_guid = "{005E17CE-3054-430E-9D68-08F264828F57}" -- НЕ МЕНЯТЬ!
 local st_marker = "XS_STOR_MARKER_"..storage_guid -- идентификатор маркера последнего хранилища
@@ -78,7 +150,7 @@ local function read_item(pk)
 	elseif allowed_types.boolean == typ then val = pk:r_bool()
 	elseif allowed_types.table   == typ then 
 		serialized_tables[key] = pk:r_stringZ()
-		val = table.unserialize(serialized_tables[key])
+		val = table_unserialize(serialized_tables[key])
 	else
 		abort("xs_stor.read_item: unknown type %d", typ)
 	end
@@ -183,7 +255,7 @@ function get(var_name, default)
 	ASSERT(loaded, "xs_stor.get: was not properly loaded!")
 	
 	if type(storage[var_name]) == 'table' then
-		return table.clone(storage[var_name])
+		return table_clone(storage[var_name])
 	end
 	
 	return storage[var_name] or default
@@ -199,14 +271,14 @@ function set(var_name, value)
 	
 	local key = tostring(var_name)
 	if lua_type=='table' then
-		local serialized, err = table.serialize(value)
+		local serialized, err = table_serialize(value)
 		ASSERT(not err, "xs_stor.set: can not serialize table '%s'", var_name)
 		local tbl_sz = string.len(serialized) + 1
 		ASSERT(not err, "xs_stor.set: can not serialize table '%s'", var_name)
 		ASSERT(tbl_sz <= max_packet_len, "xs_stor.set: serialized table '%s' is too long (%d bytes)", var_name, tbl_sz)
 		
 		serialized_tables[key] = serialized
-		storage[key] = table.clone(value)
+		storage[key] = table_clone(value)
 		return true
 	elseif lua_type=='string' then
 		local str_sz = string.len(value) + 1

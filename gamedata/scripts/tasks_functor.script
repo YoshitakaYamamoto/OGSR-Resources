@@ -1557,16 +1557,13 @@ function captive_on_agr_mill_base_spawn_guard_restr()
 	local logic = "[logic]\nactive = sr_idle\n[sr_idle]\non_actor_inside = nil %+captive_on_agr_mill_base_actor_guards_attack%"
 	for _,v in pairs(spawn_db.captive_on_agr_mill_base_spawn_guard_restr) do
 		local obj = ogse.spawn_object(v)
-		local packet = xs_netpk.net_alife_space_restrictor(obj)
-		if packet:isOk() then
-			local my_table = packet:get()
-			my_table.shapes:addSphere(5)
-			my_table.restrictor_type = 3
-			my_table.custom_data:set(logic)
-			packet:set(my_table)
-		else
-			log1("packet fail")
-		end
+		local packet = get_netpk(obj, 1)
+		ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
+		local my_table = packet:get()
+		my_table.shapes:addSphere(5)
+		my_table.restrictor_type = 3
+		my_table.custom_data:set(logic)
+		packet:set(my_table)
 	end
 end
 
@@ -1914,10 +1911,14 @@ end
 ----------------------- Квест "Гость на Элеваторе" -------------------------------
 function spawn_metka_qest_on_elevator()
 	local obj = ogse.spawn_object(spawn_db.spawn_metka_qest_on_elevator)
-	local t = m_net_utils.get_destroyable_data(obj)
-	t.visual = "actors\\novice\\green_stalker_3"
+	--
+	local pk = get_netpk(obj, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", obj:name() )
+	local t = pk:get()
+	t.visual_name = "actors\\novice\\green_stalker_3"
 	t.fixed_bones = "bip01_pelvis"
-	m_net_utils.set_destroyable_data(t,obj)
+	pk:set(t)
+	--
 	add_map_spot(obj.id, "sniper_qest_on_elevator", game.translate_string("guest_on_elevator_string"), "crlc_big")
 	xs_stor.set("elevator_sniper", obj.id)
 end
@@ -2252,9 +2253,13 @@ local WpnToSvyaznoi = nil
 function start_kvest_yan_search_case()
     news_manager.send_tip(db.actor, game.translate_string("yan_kvest_search_case_tip"), 0, "stalker", 37000)
 	local obj = ogse.spawn_object(spawn_db.zapis_a_case)
-	local t = m_net_utils.get_destroyable_data(obj)
+	--
+	local pk = get_netpk(obj, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", obj:name() )
+	local t = pk:get()
 	t.fixed_bones = "bone_base"
-	m_net_utils.set_destroyable_data(t,obj)
+	pk:set(t)
+	--
 	local obj_2 = ogse.spawn_object(spawn_db.case_use_rub)
 	add_map_spot(obj_2.id, "get_your_case", game.translate_string("dobrozhelatel_string1"))
 	spawn_mines_near_yan_search_case()
@@ -2269,14 +2274,12 @@ function spawn_mines_near_yan_search_case()
 	-- Работает теперь нормально, починил всё. Нетпакеты не виноваты. KamikaZze 27/08/12
 	for _,v in pairs(spawn_db.mines_table) do
 		local obj = ogse.spawn_object(v)
-		local pk = xs_netpk.net_zone_anom(obj)
-		if pk:isOk() then
-			local my_table = pk:get()
-			my_table.shapes:addSphere(0.8, vector():set(0,0,0))
-			my_table.max_power = 35
-			pk:set(my_table)
-		else ogse.send_tip(game.translate_string("fail"))
-		end
+		local pk = get_netpk(obj, 1)
+		ASSERT( pk:isOk(), "can't read netpacket of %s", obj:name() )
+		local my_table = pk:get()
+		my_table.shapes:addSphere(0.8, vector():set(0,0,0))
+		my_table.max_power = 35
+		pk:set(my_table)
 	end
 end
 
@@ -2286,28 +2289,20 @@ function have_yan_case()
 		db.actor:give_info_portion("rad_kvest_dobrozhelatel_search_code_start")
 		for index,v in ipairs(spawn_db.have_yan_case_spawn_table) do
 			local s_obj = ogse.spawn_object(v)
-			local pk = xs_netpk.monster(s_obj)
-			if not pk:isOk() then
-				pk = xs_netpk.stalker(s_obj)
-			end
-
-			if pk:isOk() then
-				local data = pk:get()
-				local custom_data = data.custom_data:getTable()
-				local custom_data_string = "[logic] \nactive = camper \n[camper] \npath_walk = yan_wellwisher_mon_"..tostring(index).."_walk_point \npath_look = "
-				local substring = ""
-				if index ~= 1 then substring = "yan_wellwisher_mon_look_point" else substring = "yan_wellwisher_mon_1_look_point" end
-				custom_data_string = custom_data_string..substring.." \ndanger = danger_condition \n[danger_condition] \nignore_distance = 5"
-				log1(custom_data_string)
-
-				data.custom_data:setString(custom_data_string)
-				pk:set(data)
-				--
-				s_obj.force_offline = true
-				amkii_equip.go_offline_watch_timer(s_obj.id):start()
-			else
-				log1("--FAIL")
-			end
+			local pk = get_netpk(s_obj, 1)
+			ASSERT( pk:isOk(), "can't read netpacket of %s", s_obj:name() )
+			local data = pk:get()
+			local custom_data_string = "[logic] \nactive = camper \n[camper] \npath_walk = yan_wellwisher_mon_"..tostring(index).."_walk_point \npath_look = "
+			local substring = ""
+			if index ~= 1 then substring = "yan_wellwisher_mon_look_point" else substring = "yan_wellwisher_mon_1_look_point" end
+			custom_data_string = custom_data_string..substring.." \ndanger = danger_condition \n[danger_condition] \nignore_distance = 5"
+			--local custom_data = data.custom_data:getTable()
+			--log3("~~[%s] Custom_data of [%s]: %s", script_name(), s_obj:name(), custom_data_string)
+			data.custom_data:setString(custom_data_string)
+			pk:set(data)
+			--
+			s_obj.force_offline = true
+			amkii_equip.go_offline_watch_timer(s_obj.id):start()
 		end
 
 		tell_about_monolith_near_yan_case()
@@ -3171,11 +3166,12 @@ end
 
 function search_diggers_in_x16()
 	if db.actor:object("pda_gribnik") and db.actor:object("pda_leshyi") then
-		local ros_dogger_gaz = ogse.spawn_object(spawn_db.ros_dogger_gaz)
-		local tbl = m_net_utils.get_stalker_data(ros_dogger_gaz)
+		local sobj = ogse.spawn_object(spawn_db.ros_dogger_gaz)
+		local pk = get_netpk(sobj, 2)
+		ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
+		local tbl = pk:get()
 		tbl.health = 0.27
-		tbl.updhealth = 0.27
-		m_net_utils.set_stalker_data(tbl, ros_dogger_gaz)
+		pk:set(tbl)
 		return true
 	end
   return false
@@ -3346,21 +3342,15 @@ function clothes_changing_actor_dont_see:action()
 
 	local s_obj = alife():object(self.npc_id)
 
-	local pk = xs_netpk.monster(s_obj)
-	if not pk:isOk() then
-		pk = xs_netpk.stalker(s_obj)
-	end
-
-	if pk:isOk() then
-		local data = pk:get()
-		data.visual_name = vis[math.random(#vis)]
-		local custom_data = data.custom_data:getTable()
-		print_table_inlog(custom_data)
-		custom_data = {}
-		local custom_data_string = "[logic] \n[logic] \non_death = death \n[death] \non_info = %+agr_dezerter_died% \n[smart_terrains] \nesc_lager = true"
-		data.custom_data:setString(custom_data_string)
-		pk:set(data)
-	end
+	local pk = get_netpk(s_obj, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", s_obj:name() )
+	local data = pk:get()
+	data.visual_name = vis[math.random(#vis)]
+	--local custom_data = data.custom_data:getTable()
+	--log3("~~[%s] Custom_data of [%s]: %s", script_name(), s_obj:name(), custom_data)
+	local custom_data_string = "[logic] \n[logic] \non_death = death \n[death] \non_info = %+agr_dezerter_died% \n[smart_terrains] \nesc_lager = true"
+	data.custom_data:setString(custom_data_string)
+	pk:set(data)
 
 	s_obj.force_offline = true
 	amkii_equip.go_offline_watch_timer(self.npc_id):start()
@@ -3503,16 +3493,13 @@ function spawn_psy_art(store_prefix, spawn_db, r_min, r_max, custom_data)
 	local obj = ogse.spawn_object_rand(spawn_db)
 	xs_stor.set(store_prefix.."_id", obj.id)
 	local ps_obj = alife():create("space_restrictor", obj.position, obj.m_level_vertex_id, obj.m_game_vertex_id)
-	local packet = xs_netpk.net_alife_space_restrictor(ps_obj)
-	if packet:isOk() then
-		local my_table = packet:get()
-		my_table.shapes:addSphere(math.random(r_min, r_max))
-		my_table.restrictor_type = 3
-		my_table.custom_data:set(custom_data)
-		packet:set(my_table)
-	else
-		log1("packet fail")
-	end
+	local packet = get_netpk(ps_obj, 1)
+	ASSERT( packet:isOk(), "can't read netpacket of %s", ps_obj:name() )
+	local my_table = packet:get()
+	my_table.shapes:addSphere(math.random(r_min, r_max))
+	my_table.restrictor_type = 3
+	my_table.custom_data:set(custom_data)
+	packet:set(my_table)
 	xs_stor.set(store_prefix.."_ps_id", ps_obj.id) -- удалим после квеста данную пси-зону
 end
 
@@ -3547,13 +3534,12 @@ end
 
 function question_of_immortality_fisrt_part_prepare_spawn_firefly()
 	local set_anom_param = function(sobj, max_power)
-		local packet = xs_netpk.anomaly(sobj)
-		if packet:isOk() then
-			local my_table = packet:get()
-			my_table.shapes:addSphere(5.0, vector():set(0,0,0))
-			my_table.max_power = max_power
-			packet:set(my_table)
-		end
+		local packet = get_netpk(sobj, 1)
+		ASSERT( packet:isOk(), "can't read netpacket of %s", sobj:name() )
+		local my_table = packet:get()
+		my_table.shapes:addSphere(5.0, vector():set(0,0,0))
+		my_table.max_power = max_power
+		packet:set(my_table)
 	end
 
 	-- Темная долина идет 2 раза в списке специально. Юра сказал шанс спавна на ней в 2 раза выше :)
@@ -3767,17 +3753,14 @@ end
 
 function dead_stalker_little_pseudogigant_spawn_sound_zone()
 	local obj = ogse.spawn_object(spawn_db.dead_stalker_little_pseudogigant_spawn_sound_zone)
-	local packet = xs_netpk.net_alife_space_restrictor(obj)
-	if packet:isOk() then
-		--log1(packet:dumpDesc())
-		local my_table = packet:get()
-		my_table.shapes:addSphere(5)
-		my_table.restrictor_type = 3
-		my_table.custom_data:set("[logic]\nactive = sr_idle\n[sr_idle]\non_actor_inside =  ph_sound\n[ph_sound]\nsnd = little_giant_hello\nlooped = false\non_signal = sound_end| nil")
-		packet:set(my_table)
-	else
-		log1("packet fail")
-	end
+	local packet = get_netpk(obj, 1)
+	ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
+	--log1(packet:dumpDesc())
+	local my_table = packet:get()
+	my_table.shapes:addSphere(5)
+	my_table.restrictor_type = 3
+	my_table.custom_data:set("[logic]\nactive = sr_idle\n[sr_idle]\non_actor_inside =  ph_sound\n[ph_sound]\nsnd = little_giant_hello\nlooped = false\non_signal = sound_end| nil")
+	packet:set(my_table)
 end
 
 function dead_stalker_little_pseudogigant_spawn_gigant()

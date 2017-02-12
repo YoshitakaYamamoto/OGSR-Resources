@@ -1292,7 +1292,8 @@ function save_logic_online(obj)
 	local sobj = alife():object(obj:id())
 	if sobj and not gulag then
 		if sobj.s_storage and sobj.s_storage ~= "_" then
-			local npc_data = m_net_utils.parse_custom_data(sobj.s_storage)
+			local npc_data = m_netpk.custom_data(sobj.s_storage)
+			npc_data = npc_data:getTable()
 			if not npc_data.logic_data then
 				npc_data.logic_data = {}
 			end
@@ -1326,8 +1327,8 @@ function save_logic_online(obj)
 					npc_data.logic_data["act_g_time"] = str_gtime
 				end            
 			end
-			local data_parsed = m_net_utils.gen_custom_data(npc_data)
-			sobj.s_storage = data_parsed
+			local data_parsed = m_netpk.custom_data(npc_data)
+			sobj.s_storage = data_parsed:getString()
 		else
 			local npc_data = {}
 			npc_data.logic_data = {}
@@ -1361,8 +1362,8 @@ function save_logic_online(obj)
 					npc_data.logic_data["act_g_time"] = str_gtime
 				end            
 			end      
-			local data_parsed = m_net_utils.gen_custom_data(npc_data)
-			sobj.s_storage = data_parsed
+			local data_parsed = m_netpk.custom_data(npc_data)
+			sobj.s_storage = data_parsed:getString()
 		end
 	end   
 end
@@ -1373,7 +1374,8 @@ function load_logic_online(obj)
 	local gulag = xr_gulag.get_npc_gulag(obj)
 	local sobj = alife():object(obj:id())
 	if sobj and not gulag and sobj.s_storage and sobj.s_storage ~= "_" then
-		local npc_data = m_net_utils.parse_custom_data(sobj.s_storage)
+		local npc_data = m_netpk.custom_data(sobj.s_storage)
+		npc_data = npc_data:getTable()
 		if npc_data.logic_data then
 			if npc_data.logic_data["ini"] and npc_data.logic_data["ini"] ~= "" then
 				st.ini_filename = npc_data.logic_data["ini"]

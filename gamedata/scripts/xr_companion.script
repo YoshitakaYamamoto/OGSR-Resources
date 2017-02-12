@@ -680,41 +680,6 @@ end
 -- 5) Актор на другом уровне, схема "жди тут" -- не принимать задания алайфа, стоять на месте
 -----------------------------------------------------
 -- teleport_on_actor_level - Телепортация напарника на другую локацию, использует добавленную в движок teleport_object (точнее она там была, и её восстановили)
--- для оригинальной игры НЕ подходит, в ней нужно использовать примерно такую конструкцию:
--- local changer = {pos = nil, lv = nil, gv = nil}
-
--- function on_actor_save(npc_id)
-	-- if utils.level_changing() then
-		-- local actor = alife():actor()
-		-- local s_npc = alife():object(npc_id)
-		-- if actor and s_npc then
-			-- local new_gamevertex = actor.m_game_vertex_id
-			-- local npc_vid 	= game_graph():vertex(s_npc.m_game_vertex_id):level_id()
-			-- local actor_vid = game_graph():vertex(new_gamevertex):level_id()
-			-- -- Проверим, нужно ли ждать на другом уровне
-			-- local w_level = load_var_companion(npc_id,"w_lvl",nil)
-			-- if (not w_level or w_level == "" or w_level == "nil") and actor_vid ~= npc_vid and actor then
-				-- -- недурно бы телепортнуться
-				-- changer = {pos = actor.position, lv = actor.m_level_vertex_id, gv = new_gamevertex}
-			-- end		
-		-- end
-	-- end
--- end
-
--- function on_companion_save(npc)
-	-- if npc and changer and changer.gv then
-		-- local s_npc = alife():object(npc:id())
-		-- local t = m_net_utils.get_stalker_full_data(s_npc)
-		-- t.gvid = changer.gv
-		-- t.lvid = changer.lv
-		-- m_net_utils.set_stalker_full_data(t,s_npc)
-		-- local pos = changer.pos
-		-- pos.x = pos.x + 5
-		-- pos.z = pos.z + 5
-		-- s_npc.position = pos
-		-- changer = {pos = nil, lv = nil, gv = nil}
-	-- end
--- end
 -----------------------------------------------------
 -- check_in_car - проверка в машине ли ГГ
 -----------------------------------------------------
@@ -744,7 +709,7 @@ function is_inside_my_car()
 			local last_car = tonumber(load_var_companion(id,"last_car",0))
 			if inside == "true" and tonumber(car:id()) == tonumber(last_car) then
 				is_inside = 1
-			end			
+			end
 		end
 		if is_inside == 1 then
 			return true
@@ -875,22 +840,23 @@ function save_var_companion(npc, var_name, var_value)
 	if sobj then
 		
 		if sobj.s_storage and sobj.s_storage ~= "_" then
-			local npc_data = m_net_utils.parse_custom_data(sobj.s_storage)
+			local npc_data = m_netpk.custom_data(sobj.s_storage)
+			npc_data = npc_data:getTable()
 			
 			if not npc_data.companion_data then
 				npc_data.companion_data = {}
 			end
 			
 			npc_data.companion_data[var_name] = var_value
-			local data_parsed = m_net_utils.gen_custom_data(npc_data)
-			sobj.s_storage = data_parsed
+			local data_parsed = m_netpk.custom_data(npc_data)
+			sobj.s_storage = data_parsed:getString()
 			-- log1("V2 COMP VAR SAVED: "..tostring(var_name).." value "..tostring(var_value))
 		else
 			local npc_data = {}
 			npc_data.companion_data = {}
 			npc_data.companion_data[var_name] = var_value
-			local data_parsed = m_net_utils.gen_custom_data(npc_data)
-			sobj.s_storage = data_parsed
+			local data_parsed = m_netpk.custom_data(npc_data)
+			sobj.s_storage = data_parsed:getString()
 			-- log1("V1 COMP VAR SAVED: "..tostring(var_name).." value "..tostring(var_value))
 		end
 
@@ -907,7 +873,8 @@ function load_var_companion(npc, var_name, def_value)
 	
 	if sobj and sobj.s_storage and sobj.s_storage ~= "_" then
 
-		local npc_data = m_net_utils.parse_custom_data(sobj.s_storage)
+		local npc_data = m_netpk.custom_data(sobj.s_storage)
+		npc_data = npc_data:getTable()
 		
 		if npc_data.companion_data and npc_data.companion_data[var_name] then
 			-- log1("COMP VAR RET: "..tostring(var_name).." value "..tostring(npc_data.companion_data[var_name]))

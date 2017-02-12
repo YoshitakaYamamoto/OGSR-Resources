@@ -2083,16 +2083,14 @@ function spawn_restrictor(ltx, radius, data)
 		obj = alife():create("space_restrictor", db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
 	end
 	id_table.sr = obj.id
-	local packet = xs_netpk.net_alife_space_restrictor(obj)
-	if packet:isOk() then
-		local my_table = packet:get()
-		my_table.shapes:addSphere(radius)
-		my_table.restrictor_type = 3
-		my_table.custom_data:set("[logic]\ncfg = "..ltx)
-		packet:set(my_table)
-	else
-		log1("packet fail")
-	end
+	local packet = get_netpk(obj, 1)
+	ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
+	local my_table = packet:get()
+	my_table.shapes:addSphere(radius)
+	my_table.restrictor_type = 3
+	my_table.custom_data:set("[logic]\ncfg = "..ltx)
+	packet:set(my_table)
+
 	return obj
 end
 

@@ -469,16 +469,8 @@ function get_npc_name(obj)
 			end
 		else
 			local ob = get_obj(obj.id)
-			if (ob and ob.character_name) then
+			if ob then
 				m_s_name = ob:character_name()
-			else
-				if (ogse and IsStalker(obj)) then
-					local pk = xs_netpk.stalker(obj)
-					if (pk and pk:isOk()) then
-						local data = pk:get()
-						m_s_name = data.character_name
-					end
-				end
 			end
 		end
 	end

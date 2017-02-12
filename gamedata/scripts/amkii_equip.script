@@ -418,8 +418,8 @@ function Update(oNpc, oItem)
 		log3("--[%s] Selected visual for [%s], exo: [%s]", script_name(), sVisual, sVis == "exo") 
 	end
 
-	local pk = xs_netpk.stalker(oNpc)
-	if not pk:isOk() then log3("!![%s] PK isn't OK in [%s]", script_name(), oNpc:name()) return end
+	local pk = get_netpk(oNpc, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", oNpc:name() )
 	local data = pk:get()
 
 	if sVisual then --Если доступен новый визуал, то переодеваем перса.

@@ -1531,14 +1531,10 @@ function set_npc_health(obj, health)
 	
 		write_log("SET_HEALTH "..obj:name().." "..health)
 		
-		local pk = xs_netpk.monster(obj)
-		if not pk:isOk() then
-			pk = xs_netpk.stalker(obj)
-		end
-		
+		local pk = get_netpk(obj, 2)
+		ASSERT( pk:isOk(), "can't read netpacket of %s", obj:name() )
 		local data = pk:get()
 		data.health = health
-		data.updhealth = health
 		pk:set(data)
 
 		write_log("SET_HEALTH_SET")	
@@ -1859,12 +1855,11 @@ function process_trade(npc)
 				end				
 			end
 			if (money > 0) then
-				local pk = xs_netpk.stalker(npc)
-				if pk and pk:isOk() then
-					local data = pk:get()
-					data.money = data.money + money
-					pk:set(data)
-				end
+				local pk = get_netpk(npc, 1)
+				ASSERT( pk:isOk(), "can't read netpacket of %s", npc:name() )
+				local data = pk:get()
+				data.money = data.money + money
+				pk:set(data)
 				--write_log("~~OFFLINE_ALIFE> Offline: "..npc:name().." было денег - "..old_money..", стало - "..old_money + money)
 				--news_amk_core.trace("Offline: "..npc:name().." было денег - "..old_money..", стало - "..old_money + money)
 			end

@@ -87,10 +87,8 @@ function delete_restrs()
 		local sobj = sim:object(i)
 		if sobj then
 			local pk
-			if IsStalker(sobj) then
-				pk = xs_netpk.stalker(sobj)
-			elseif IsMonster(sobj) then
-				pk = xs_netpk.monster(sobj)
+			if IsStalker(sobj) or IsMonster(sobj) then
+				pk = get_netpk(sobj, 1)
 			end
 			if pk then
 				ASSERT(pk:isOk(), "It is not stalker and not monster: [%s]", sobj:name())

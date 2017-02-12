@@ -517,22 +517,20 @@ function spawn_gg_clone()
 	for i=1, random_number do
 		local clone = alife():create("gg_clone_simple", db.actor:position():add(vector():set(math.random(-2,2), 1, 0)), 
 			db.actor:level_vertex_id(), db.actor:game_vertex_id())
-		local pk = xs_netpk.monster(clone)
-		if not pk:isOk() then
-			pk = xs_netpk.stalker(clone)
+
+		local pk = get_netpk(clone, 1)
+		ASSERT( pk:isOk(), "can't read netpacket of %s", clone:name() )
+		local data = pk:get()
+		local outfit_visual = ""
+		if not db.actor:item_in_slot(6) then 
+			outfit_visual = [[actors\stalker_hero\stalker_sviter]]
+		else 
+			outfit_visual = visuals[db.actor:item_in_slot(6):section()]
 		end
-		if pk:isOk() then
-			local data = pk:get()
-			local outfit_visual = ""
-			if not db.actor:item_in_slot(6) then 
-				outfit_visual = [[actors\stalker_hero\stalker_sviter]]
-			else 
-				outfit_visual = visuals[db.actor:item_in_slot(6):section()]
-			end
-			data.visual_name = outfit_visual
-			pk:set(data)
-			go_online_watch_timer(clone.id):start()
-		end
+		data.visual_name = outfit_visual
+		pk:set(data)
+
+		go_online_watch_timer(clone.id):start()
 	end
 end
 --]=]

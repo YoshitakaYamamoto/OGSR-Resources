@@ -69,9 +69,12 @@ function restrictor_binder:net_spawn( data )
       [ "self"   ] = self,
     }
     self.sm:subscribe( self.subscribed )
-    --log3("--Before shapes data for [%s]", self.object:name())
-    self.shapes_data = _geom_helpers.get_all_shapes_data( self.object ) --Для точного рассчёта расстояния до рестрикторов.
-    --log3("- [%s] Shapes data for [%s]: %s", script_name(), self.object:name(), self.shapes_data)
+	--
+	local pk = get_netpk(self.object, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", self.object:name() )
+	local data = pk:get()
+    self.radius = data.shapes:getRadius() --Для точного рассчёта расстояния до рестрикторов.
+	--
   --else
 	--log3("!!Restrictor NOT subscribed to update: [%s], logic is empty!", self.object:name())    
   end
@@ -123,7 +126,7 @@ function restrictor_binder:actor_update( delta )
     end
   end
 
-  local dist = _geom_helpers.distance_from_zone_boundary( self.shapes_data, db.actor:position() ) --Точный рассчёт расстояния от актора до рестриктора
+  local dist = self.object:position():distance_to(db.actor:position()) - self.radius --Точный рассчёт расстояния от актора до рестриктора
   self.sm:reschedule(
     ( dist < 15 and 200 )
 	or ( dist < 30 and math.random(1000, 2000) )

@@ -22,9 +22,11 @@ function set_gsc_mine()
 	for i=1, 65534 do
 		local sobj = alife():object(i)
 		if sobj and sobj:section_name() == "zone_mine_field" then
-			data = m_net_utils.get_anomaly_data(sobj)
-			data.custom = "gsc_mine"			
-			m_net_utils.set_anomaly_data(data,sobj)			
+			local pk = get_netpk(sobj, 1)
+			ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
+			local data = pk:get()
+			data.custom_data:set("gsc_mine")
+			pk:set(data)
 		end
 	end
 end
@@ -57,11 +59,13 @@ end
 
 function mines_binder:net_spawn(data)
 	local id = self.object:id()
-	local s_obj = alife():object(id)
+	local sobj = alife():object(id)
 
-	local data = m_net_utils.get_anomaly_data(s_obj)
-	if data.custom ~= "gsc_mine" then
-		--log3("!![%s] Adding in minefield table: [%s], IsAnomaly: [%s]", script_name(), s_obj:name(), IsAnomaly(s_obj))
+	local pk = get_netpk(sobj, 1)
+	ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
+	local data = pk:get()
+	if data.custom_data:getString() ~= "gsc_mine" then
+		--log3("!![%s] Adding in minefield table: [%s], IsAnomaly: [%s]", script_name(), sobj:name(), IsAnomaly(sobj))
 		minefield_table[id] = id
 	end	
 	return true

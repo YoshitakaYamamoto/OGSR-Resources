@@ -129,14 +129,18 @@ function init_trunk(car)
 	if not s_trunk then -- для этой машины ещё не создавали багажник
 		s_trunk = sim:create("trunk_box", vector():add(vector():set(0,-100,0)), 0, car_gvid) -- создаём под уровнем
 		reg[car_id] = s_trunk -- регистрируем в глобальном хранилище
-		local params = m_net_utils.get_invbox_data(s_trunk) -- запоминаем в серверном объекте идентификатор родительской машины
-		params.custom = "[params]\ncar_id = "..car:id()
-		params.oflags = 65339 -- 2 + 8 + 1024
-		m_net_utils.set_invbox_data(params,s_trunk)
+		--
+		local pk = get_netpk(s_trunk, 1)
+		ASSERT( pk:isOk(), "can't read netpacket of %s", s_trunk:name() )
+		local params = pk:get()
+		params.custom_data:set("[params]\ncar_id = "..car:id()) -- запоминаем в серверном объекте идентификатор родительской машины
+		params.object_flags = 65339 -- 2 + 8 + 1024
+		pk:set(params)
+		--
 	else  -- багажник есть,
 		if object_location_id(s_trunk) ~= object_location_id(car) then -- но на другом уровне. 
 			sim:teleport_object("", vector():add(vector():set(0,-100,0)), 0, car_gvid, s_trunk.id) -- переносим на один уровень с машиной
-			sim:teleport_object("", vector():add(vector():set(0,-100,0)), 0, car_gvid, s_trunk.id) -- переносим на один уровень с машиной
+			--sim:teleport_object("", vector():add(vector():set(0,-100,0)), 0, car_gvid, s_trunk.id) -- переносим на один уровень с машиной --KRodin: зачем два раза?
 		end
 		--sim:set_switch_online(s_trunk.id, true)
 		--sim:set_switch_offline(s_trunk.id, false)
