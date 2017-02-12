@@ -1,5 +1,4 @@
-
-bar_exceptions = {
+local bar_exceptions = {
    [4294967296] = true,
    [story_ids.second_neutral] = true,
    [story_ids.bar_kulg_agent] = true,
@@ -9,7 +8,7 @@ bar_exceptions = {
    [story_ids.izgoy_first_patient] = true,
    [story_ids.izgoy_second_patient] = true
 }
-function cannot_be_offline(npc)
+local function cannot_be_offline(npc)
 	if alife():level_id() == 7 then
 		local story = 4294967296
 		if npc then
@@ -20,7 +19,7 @@ function cannot_be_offline(npc)
 			end
 		end
 		return not bar_exceptions[story]
-	elseif 	alife():level_id() == 1 then
+	elseif alife():level_id() == 1 then
 		local profile = npc:profile_name()
 		if profile == "esc_wolf" or 
 		   profile == "esc_shustryi"
@@ -37,26 +36,19 @@ function cannot_be_offline(npc)
 	end
 	return false
 end
-military_online_npc = {
+local military_online_npc = {
 	[story_ids.Mil_Lukash]     = true, -- Лукаш
 	[story_ids.Mil_Miser]      = true, -- Скряга
 	[story_ids.Mil_Master_Max] = true, -- Макс
 	[story_ids.Mil_Cook]       = true, -- повар
 }
---local debug_flag = true
-
-local tmp_stalkers = {}
 
 class "se_stalker"	(cse_alife_human_stalker)
---------------------
 function se_stalker:__init (section) super (section)
 	self.ini = nil
 	self.ini_initialized = false
 
-	self.spawner_present = false
-
 	self.smart_terrain_conditions = nil
-	self.smart_terrain_conditions_initialized = false
 
 	-- этот флаг берётся из работы смарта
 	-- true     = всегда в онлайне
@@ -70,10 +62,10 @@ function se_stalker:__init (section) super (section)
 	self.was_in_smart_terrain = false
 
 	self.death_dropped = 0 --Генерил ли персонаж выпадаемые предметы или нет. (0 - нет, 1 - да)
-	
+
 	--' Флаг смерти в оффлайне
 	self.offline_dead = 0
-	
+
 	--' Хранилище данных
 	self.s_storage = "_"
 end
@@ -112,9 +104,10 @@ function se_stalker:can_switch_offline ()
 			end
 		end
 	end
-	if xr_companion.is_companion(self.id) 
-	and (db.actor and db.actor:position():distance_to(self.position) < 150) 
-	and not self.force_offline
+	if
+		xr_companion.is_companion(self.id) 
+		and (db.actor and db.actor:position():distance_to(self.position) < 150) 
+		and not self.force_offline
 	then
 		return false
 	end	
@@ -140,17 +133,14 @@ function se_stalker:can_switch_online ()
 		return cse_alife_human_stalker.can_switch_online(self)
 	end
     
-    if db.actor ~= nil and db.actor:alive () == false then
+    if db.actor and not db.actor:alive() then
 		return self.online
-    end    
+    end
     
 	if self.online == false then
 	    return (xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil) and cse_alife_human_stalker.can_switch_online(self)
     else
-        if xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil then 
-			return true
-        end
-        return false
+        return xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil
     end    	    
 end
 --------------------
@@ -182,28 +172,27 @@ end
 function se_stalker:STATE_Read (packet, size)
 	cse_alife_human_stalker.STATE_Read (self, packet, size)
 
-		local t = packet:r_u8()
+	local t = packet:r_u8()
 
-		if t == 0 then
-			self.job_online = true
-		elseif t == 1 then
-			self.job_online = false
-		elseif t == 2 then
-			self.job_online = nil
-		else
-			self.job_online_condlist = packet:r_stringZ()
+	if t == 0 then
+		self.job_online = true
+	elseif t == 1 then
+		self.job_online = false
+	elseif t == 2 then
+		self.job_online = nil
+	else
+		self.job_online_condlist = packet:r_stringZ()
+		self.job_online = xr_logic.parse_condlist(nil, "se_stalker:STATE_Read", "job_online", self.job_online_condlist)
+	end
 
-			self.job_online = xr_logic.parse_condlist(nil, "se_stalker:STATE_Read", "job_online", self.job_online_condlist)
-		end
+	self.was_in_smart_terrain = packet:r_bool()
 
-		self.was_in_smart_terrain = packet:r_bool()
+	self.death_dropped = packet:r_u8()
 
-		self.death_dropped = packet:r_u8()
-
-		if self.id ~= 65535 then
-			self.offline_dead = packet:r_u32()
-			self.s_storage = packet:r_stringZ() -- если есть, загрузим из сохранённой строки			
-		end
+	if self.id ~= 65535 then
+		self.offline_dead = packet:r_u32()
+		self.s_storage = packet:r_stringZ() -- если есть, загрузим из сохранённой строки			
+	end
 end
 --------------------
 function se_stalker:on_before_register()
@@ -214,37 +203,22 @@ function se_stalker:on_before_register()
 	end
 end
 --------------------
+local forbidden_comms = {
+	["zombied"] = true,
+	["monolith"] = true,
+	["arena_enemy"] = true
+}
 function se_stalker:on_register()
-	--if debug_flag then
-		-- log1("se_stalker register start "..self:name())
-	--end
-
 	cse_alife_human_stalker.on_register( self )
-	
-	--if debug_flag then
-		-- log1("se_stalker register 1 "..self:name())
-	--end	
-	
-	xr_companion.is_companion_se(self)
-	
-	--if debug_flag then
-		-- log1("se_stalker register 2 "..self:name())
-	--end
 
-	if(actor_stats.add_to_ranking~=nil)then
-		local community = self:community()
-		if not(community == "zombied" or
-		   community == "monolith" or
-		   community == "arena_enemy")
-		then
+	xr_companion.is_companion_se(self)
+
+	if actor_stats.add_to_ranking ~= nil then
+		if not forbidden_comms[self:community()] then
 			actor_stats.add_to_ranking(self.id)
 		end
 	end
-	
-	--if debug_flag then
-		-- log1("se_stalker register 3 "..self:name())
-	--end
-	
+
 	if xr_companion.is_companion(self.id) then
 		--' Не брать задания алайфа
 		self:brain():can_choose_alife_tasks(false)
@@ -252,11 +226,7 @@ function se_stalker:on_register()
 		--' Регистрация в таскменеджере
 		task_manager.get_random_task():register_target(self)	
 	end
-	
-	--if debug_flag then
-		-- log1("se_stalker register 4 "..self:name())
-	--end	
-	
+
 	if
 		self:alive()
 		and self:smart_terrain_id() == 65535
@@ -264,136 +234,14 @@ function se_stalker:on_register()
 	then
 		self:brain():update()
 	end
-	
-	--if debug_flag then
-		-- log1("se_stalker register 5 "..self:name())
-	--end
-
---[=[
-	--' Нарисовать мапспот с собой
-	if sim_statistic.show_stalker_spot == true and self:alive() then
-	
-		local community, rank = sim_statistic.getNpcType(self)
-		local target_obj = level.object_by_id(self.id)
-
-		
-		-- if target_obj then
-		
-			-- local gulag_val,scheme1,scheme2,anim,mental
-			-- local gulag = xr_gulag.get_npc_gulag(target_obj)
-			-- if gulag then
-				-- gulag = gulag.name
-				-- gulag_val = xr_gulag.getGulagPopulation(gulag)
-			-- end
-			-- local storage = storage
-			-- if storage then
-				-- scheme1 = tostring(storage.active_section)
-				-- scheme2 = tostring(storage.section_logic)
-				-- if storage.state_mgr then
-					-- anim = storage.state_mgr.animstate:state()
-					-- mental = state_lib.states[storage.state_mgr.target_state].mental
-					-- if mental_anims[mental] then
-						-- mental = mental_anims[mental]
-					-- else
-						-- mental = tostring(mental).." (unknown state!)"
-					-- end
-				-- end
-			-- end			
-			-- local scheme = storage.active_scheme
-			-- local state = state_mgr.get_state(target_obj)
-			-- local be = target_obj:best_enemy()
-			-- if be then
-				-- be = target_obj:best_enemy():name()
-			-- end
-			-- local best_danger = target_obj:best_danger()
-			-- local best_danger_name = "отсутствует"
-			-- local best_danger_type = "отсутствует"
-			-- if best_danger and best_danger:object() then
-				-- best_danger_name = best_danger:object():name()
-			-- end	
-			-- if best_danger then
-				-- local bd_type = best_danger:type()
-				-- if bd_type == danger_object.attack_sound then
-					-- best_danger_type = "звук нападения"
-				-- elseif bd_type == danger_object.bullet_ricochet then
-					-- best_danger_type = "рикошет пули"
-				-- elseif bd_type == danger_object.grenade then
-					-- best_danger_type = "граната"
-				-- elseif bd_type == danger_object.entity_corpse then
-					-- best_danger_type = "обнаружен труп"
-				-- elseif bd_type == danger_object.entity_attacked then
-					-- best_danger_type = "нападение существа"
-				-- elseif bd_type == danger_object.attacked then
-					-- best_danger_type = "нападение"
-				-- elseif bd_type == danger_object.enemy_sound then
-					-- best_danger_type = "звук врага"
-				-- elseif bd_type == danger_object.entity_death then
-					-- best_danger_type = "смерть существа"
-				-- end
-			-- end
-			-- local wound = xr_wounded.is_wounded(target_obj)			
-			-- local active_evaluator = "nil"
-			-- if ogse_debug.active_evaluators and ogse_debug.active_evaluators[target_obj:id()] then
-				-- active_evaluator = ogse_debug.active_evaluators[target_obj:id()]			
-			-- end
-			-- local range = target_obj:range()
-			-- local fov = target_obj:fov()				
-
-			-- "NAME: "..self:name()..
-			-- "\\nCOMM: "..community..
-			-- "\\nPROF: "..self:profile_name()..
-			-- "\\nSECT: "..self:section_name()..
-			-- "\\nGV: "..self.m_game_vertex_id..
-			-- "\\nLV: "..self.m_level_vertex_id..
-			-- "\\nHEALTH: "..self:health()..
-			-- "\\n--- ONLINE INFO ---\\n"..
-			-- "схема поведения: "..tostring(scheme).."\\n"..
-			-- "состояние: "..tostring(state).."\\n"..
-			-- "состояние анимации: "..tostring(anim).."\\n"..
-			-- "состояние психики: "..tostring(mental).."\\n"..
-			-- "последние активные эвалуаторы: "..tostring(active_evaluator).."\\n"..
-			-- "------------------\\n"..
-			-- "дальность зрения: "..tostring(range).."\\n"..
-			-- "угол обзора: "..tostring(fov).."\\n"..						
-			-- "------------------\\n"..
-			-- "best_enemy: "..tostring(be).."\\n"..
-			-- "best_danger: "..tostring(best_danger_name).."\\n"..
-			-- "best_danger_type: "..tostring(best_danger_type).."\\n"..
-			-- "------------------\\n"..
-			-- "гулаг: "..tostring(gulag).."\\n"..
-			-- "население гулага: "..tostring(gulag_val).."\\n"..
-			-- "работа в гулаге: "..scheme1.."\\n"..
-			-- "глобальная работа: "..scheme2.."\\n"..
-			-- "------------------\\n"..
-			-- "состояние раненности: "..tostring(wound).."\\n"..
-			-- "------------------\\n"..
-			-- "координаты: X "..tostring(target_obj:position().x)..", Y "..tostring(target_obj:position().y)..", Z "..tostring(target_obj:position().z)
-			
-			
-			-- )		
-		-- else
-			level_tasks.add_location_by_id(self.id, "alife_presentation_"..community, 
-			"NAME: "..self:name()..
-			"\\nCOMM: "..community..
-			"\\nPROF: "..self:profile_name()..
-			"\\nSECT: "..self:section_name()..
-			"\\nGV: "..self.m_game_vertex_id..
-			"\\nLV: "..self.m_level_vertex_id..
-			"\\nHEALTH: "..self:health()	)
-		-- end
-	end
---]=]
-
-	--if debug_flag then
-		-- log1("se_stalker register 6 "..self:name())
-		-- log1("se_stalker register end "..self:name())
-	--end
 
 	-- получаем имя персонажа для быстрого доступа в дальнейшем
 	local pk = get_netpk(self, 1)
 	ASSERT( pk:isOk(), "can't read netpacket of %s", self:name() )
 	local data = pk:get()
 	self._charname = data.character_name
+
+	alife():set_interactive( self, true )
 end
 function se_stalker:character_name()
 	return self._charname -- не меняется
@@ -401,72 +249,22 @@ end
 
 --------------------
 function se_stalker:on_unregister()
-
-	--ogse_offline_alife.stalkers[self.id] = nil
-
-	--if debug_flag then
-		-- log1("se_stalker unregister start "..self:name())
-	--end
-
 	cse_alife_human_stalker.on_unregister(self)
-	
-	--if debug_flag then
-		-- log1("se_stalker unregister 1 "..self:name())
-	--end	
-
-	--' Убрать мапспот с собой
-	--if sim_statistic.show_stalker_spot == true then
-	--	local community, rank = sim_statistic.getNpcType(self)
-	--	level_tasks.remove_location_by_id(self.id, "alife_presentation_"..community)
-	--end
-	
-	--if debug_flag then
-		-- log1("se_stalker unregister 2 "..self:name())
-	--end	
 
 	smart_terrain.unregister_npc(self)
-	
-	--if debug_flag then
-		-- log1("se_stalker unregister 3 "..self:name())
-	--end	
 
 	--' Отрегистрация в таскменеджере
 	task_manager.get_random_task():unregister_target(self)
-	
-	--if debug_flag then
-		-- log1("se_stalker unregister 4 "..self:name())
-	--end	
-	
-	if(actor_stats.remove_from_ranking~=nil)then
-		local community = self:community()
-		if community == "zombied" or
-		   community == "monolith" or
-		   community == "arena_enemy"
-		then
-			return
-		end
-		actor_stats.remove_from_ranking(self.id)
-	end
-	
-	--if debug_flag then
-		-- log1("se_stalker unregister end "..self:name())
-	--end	
-	
-end
---------------------
-function se_stalker:on_spawn()
-	cse_alife_human_stalker.on_spawn(self)
 
+	if actor_stats.remove_from_ranking ~= nil then
+		if not forbidden_comms[self:community()] then
+			actor_stats.remove_from_ranking(self.id)
+		end
+	end
 end
 --------------------
 function se_stalker:on_death(killer)
 	cse_alife_human_stalker.on_death(self, killer)
-
-	--' Убрать мапспот с собой
-	--if sim_statistic.show_stalker_spot == true then
-	--	local community, rank = sim_statistic.getNpcType(self)
-	--	level_tasks.remove_location_by_id(self.id, "alife_presentation_"..community)
-	--end
 
 	-- Удаление меток с квестовых персонажей
 	if level.map_has_object_spot(self.id, "green_location") ~= 0 then
@@ -474,8 +272,7 @@ function se_stalker:on_death(killer)
 	end
 
 	-- почистим отношения
-	local sm = ogse_signals.get_mgr()
-	sm:call("on_release_npc", self.id)
+	ogse_signals.get_mgr():call("on_release_npc", self.id)
 end
 --------------------
 function se_stalker:fill_exclusives()
@@ -489,9 +286,6 @@ function se_stalker:fill_exclusives()
 	end
 end
 
-function se_stalker:update ()
-	cse_alife_human_stalker.update(self)
-end
 
 --'Торговец
 class "se_trader" (cse_alife_trader)

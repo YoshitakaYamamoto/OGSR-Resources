@@ -5,11 +5,9 @@ function se_monster:__init (section) super (section)
 	self.ini = nil
 	self.ini_initialized = false
 
-	self.spawner_present = false
-
 	self.smart_terrain_conditions = nil
-	self.smart_terrain_conditions_initialized = false
 
+	self.spawner_present = false
 	self.check_distance = false
 	self.min_distance   = 150
 
@@ -83,8 +81,6 @@ function se_monster:can_switch_online ()
 		return self:get_job_online()
 	end
 
---'	self:get_ini()
-
     --стандартная проверка у родителя, если нет спавнера или игрок помер
 	if self.ini == nil or self.spawner_present == false then --or (db.actor ~= nil and db.actor:alive () == false)
 	--if self.ini == nil or self.spawner_present == false or db.actor == nil
@@ -139,8 +135,7 @@ function se_monster:STATE_Write(packet)
 	end
 
 	packet:w_bool(self.was_in_smart_terrain)
-	
-	-- log1("!!WR "..self:name().." DATA "..self.offline_dead)
+
 	if self.id ~= 65535 then
 		packet:w_u32(self.offline_dead)
 	end	
@@ -163,11 +158,10 @@ function se_monster:STATE_Read(packet, size)
 	end
 
 	self.was_in_smart_terrain = packet:r_bool()
-	
+
 	if self.id ~= 65535 then
 		self.offline_dead = packet:r_u32()
 	end	
-	-- log1("!!RD "..self:name().." DATA "..self.offline_dead)
 end
 --------------------
 function se_monster:on_before_register()
@@ -181,29 +175,11 @@ end
 function se_monster:on_register()
 	cse_alife_monster_base.on_register( self )
 
-	--'self:fill_exclusives()
-
-	--' Нарисовать мапспот с собой
-	--if self:alive() and sim_statistic.show_monster_spot == true then
-	--	local community, rank = sim_statistic.getNpcType(self)
-	--	level_tasks.add_location_by_id(self.id, "alife_presentation_monstr", 
-	--	"NAME: "..self:name()..
-	--	"\\nCOMM: "..community..
-	--	"\\nSECT: "..self:section_name()..
-	--	"\\nGV: "..self.m_game_vertex_id..
-	--	"\\nLV: "..self.m_level_vertex_id..
-	--	"\\nHEALTH: "..self:health())
-	--end
+	alife():set_interactive( self, true )
 end
 --------------------
 function se_monster:on_unregister()
 	cse_alife_monster_base.on_unregister( self )
-
-	--' Убрать мапспот с собой
-	--if sim_statistic.show_monster_spot == true then
-	--	local community, rank = sim_statistic.getNpcType(self)
-	--	level_tasks.remove_location_by_id(self.id, "alife_presentation_monstr")
-	--end
 
 	smart_terrain.unregister_npc(self)
 end
@@ -211,15 +187,8 @@ end
 function se_monster:on_death(killer)
 	cse_alife_monster_base.on_death(self, killer)
 
-	--' Убрать мапспот с собой
-	--if sim_statistic.show_monster_spot == true then
-	--	local community, rank = sim_statistic.getNpcType(self)
-	--	level_tasks.remove_location_by_id(self.id, "alife_presentation_monstr")
-	--end
-	
 	-- почистим отношения
-	local sm = ogse_signals.get_mgr()
-	sm:call("on_release_npc", self.id)
+	ogse_signals.get_mgr():call("on_release_npc", self.id)
 end
 --------------------
 function se_monster:fill_exclusives()
