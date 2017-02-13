@@ -637,13 +637,13 @@ end
 	return cnt,sprm
 end
 
-function weapon_manager:get_weapon_prior(wpn,addonf)
+function weapon_manager:get_weapon_prior(wpn)
 	local id,tg = wpn:id(),time_global()
 --	log1("[RX_WMGR] get prior for wpn "..wpn:name())
 	if tg > (self.priors_mem.tg or 0) then
 		self.priors_mem = {tg = tg+math.random(6000,8000)}
 	end
-	if self.priors_mem[id] and not addonf then
+	if self.priors_mem[id] then
 		return self.priors_mem[id]
 	else
 		local prm,pr = 0,0
@@ -667,9 +667,6 @@ function weapon_manager:get_weapon_prior(wpn,addonf)
 				end
 			end
 		end
-		if addonf then
-			addonf = addonf-rx_utils.get_addon_flag(wpn)+rx_utils.get_addon_flag(wpn,true)
-		end
 		if ogse_addons.is_scope_installed(wpn) then
 			pr = pr + prm*self.modes.scope/100
 		end
@@ -689,9 +686,7 @@ function weapon_manager:get_weapon_prior(wpn,addonf)
 			end
 		end
 		prm = prm+pr+id/100000+wpn:condition()*prm/50
-		if not addonf then
-			self.priors_mem[id] = prm
-		end
+		self.priors_mem[id] = prm
 		return prm
 	end
 end
