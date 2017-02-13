@@ -143,15 +143,10 @@ end
 
 function on_use_vehicle(obj)
 	if not current_car then -- действия, имеющие смысл только при нахождении снаружи машины
-		local car = car_which_trunk_we_looking_at()
-		if car then
-			trunk_inv.open_trunk_dialog(car)
-			ogse_signals.get_mgr():call("on_car_trunk_open", car)
-		else
-			local car = car_which_engine_door_we_looking_at()
-			if car then
-				ogse_signals.get_mgr():call("on_car_engine_open", car)
-			end
+		if car_which_trunk_we_looking_at(obj) then
+			ogse_signals.get_mgr():call("on_car_trunk_open", obj)
+		elseif car_which_engine_door_we_looking_at(obj) then
+			ogse_signals.get_mgr():call("on_car_engine_open", obj)
 		end
 	end
 end
@@ -315,20 +310,17 @@ function is_recognition_target_active()
 	return recognition_target_mode and recognition_target_operable
 end
 
--- получить машину, на задницу которой мы смотрим
-function car_which_trunk_we_looking_at()
-	if current_car then return nil end
-	local car = level.get_target_obj()
-	if not car then return nil end
+--Проверка, можно ли открыть багажник
+function car_which_trunk_we_looking_at(car)
 	local true_car = car:get_car()
 	if true_car and true_car:GetfHealth() > 0.05 then
 		local trunk_def = bind_car.read_door_definition(car, "trunk_door")
 		local bone_name = trunk_def and trunk_def.bone_name or "exhausts"
 		if db.actor:position():distance_to(car:bone_position(bone_name)) < 2 then
-			return car
+			return true
 		end
 	end
-	return nil
+	return false
 end
 
 -- получить машину, на топливный бак которой мы смотрим
@@ -349,20 +341,18 @@ function car_which_gastank_we_looking_at()
 	return nil
 end
 
-function car_which_engine_door_we_looking_at()
-	if current_car then return nil end
-	local car = level.get_target_obj()
-	if not car then return nil end
+--Проверка, можно ли открыть дверцу двигателя
+function car_which_engine_door_we_looking_at(car)
 	local true_car = car:get_car()
 	if true_car and true_car:GetfHealth() > 0.05 then
 		local trunk_def = bind_car.read_door_definition(car, "engine_door")
 		if trunk_def then
 			if db.actor:position():distance_to(car:bone_position(trunk_def.bone_name)) < 2 then
-				return car
+				return true
 			end
 		end
 	end
-	return nil
+	return false
 end
 
 -- коллбек на нажатие клавиши
@@ -1428,4 +1418,66 @@ function get_screen_coords(point)
     local x = 512 + dev.cam_right:dotproduct(ppp) * scr_dist / dp * (1024/scr_w)
     local y = 384 - dev.cam_top:dotproduct(ppp)   * scr_dist / dp * (768/scr_h)
     return x, y, scr_dist
+end
+
+
+--------Перенесено из trunk_inv.script--------
+--
+-- Получение ближайшей машины
+-- убрана нехорошая возможность получить любую машину по отсутствии секции
+-- для этого лучше сделать отдельную функцию get_any_car
+-- также функция возвращает клиентский объект машины вместо id
+function get_nearest_car_by_section(sect_name)
+	ASSERT(sect_name, "get_nearest_car_by_section: section parameter is nil or missed")
+	local nearest_car
+	local dist = math.huge
+	for k,car in pairs(db.cars) do
+		if car and car:section() == sect_name then
+			local actor_pos = db.actor:position()
+			local car_pos = car:position() --car:bone_position("exhausts")
+			if actor_pos:distance_to(car_pos) < dist then
+				nearest_car = car
+				dist = actor_pos:distance_to(car_pos)
+			end
+		end
+	end
+	return nearest_car
+end
+
+function get_car_nearby()
+	local nearest_car
+	local dist = 6
+	for k,car in pairs(db.cars) do
+		if car then
+			local actor_pos = db.actor:position()
+			local car_pos = car:position() --car:bone_position("exhausts")
+			local distance_to_car = actor_pos:distance_to(car_pos)
+			if distance_to_car < dist then
+				nearest_car = car
+				dist = distance_to_car
+			end
+		end
+	end
+	return nearest_car
+end
+
+function is_car_on_level(car_sect)
+	for k,car in pairs(db.cars) do
+		if car and car:section()==car_sect and car:get_car():GetfHealth()>0.05 then
+			return true
+		end
+	end
+	return false
+end
+
+--Расстояние от машины до нпс
+function car_in_range_exist(sid, section_name, dist)
+	local npc = level_object_by_sid(sid)
+	ASSERT(npc, "is_car_in_range: object not found for sid = "..sid)
+	for k, car in pairs(db.cars) do
+		if car and car:section() == section_name and npc:position():distance_to(car:position()) < dist then
+			return true
+		end
+	end
+	return false
 end

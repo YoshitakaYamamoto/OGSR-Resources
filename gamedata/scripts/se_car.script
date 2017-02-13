@@ -1,15 +1,8 @@
----------------------------------------------------------------------
 class "se_car" (cse_alife_car)
 --------------------
 function se_car:__init (section) super (section)
-	--log("_bp: set_car:__init")
 	self.ini = nil
 	self.spawner_present = false
-	self.trunk = nil
-end
---------------------
-function se_car:can_switch_offline ()
-	return cse_alife_car.can_switch_offline(self)
 end
 --------------------
 function se_car:can_switch_online ()
@@ -24,33 +17,24 @@ function se_car:can_switch_online ()
 	return xr_spawner.check_spawn (self)
 end    
 --------------------
-function se_car:on_spawn()
-	cse_alife_car.on_spawn(self)
-
-end
---------------------
-function se_car:STATE_Write (packet)
-	cse_alife_car.STATE_Write (self, packet)
-	if self.id == 65535 then return end
-	if self.trunk then
-		packet:w_stringZ(self.trunk)
-	end
-end
---------------------
-function se_car:STATE_Read (packet, size)
-	cse_alife_car.STATE_Read (self, packet, size)
-	if self.id == 65535 then return end
-	if packet:r_eof() then return end
-	
-	self.trunk = packet:r_stringZ()
-end
---------------------
 function se_car:keep_saved_data_anyway()
    return true
 end
+--------------------
+function se_car:on_unregister() --Вызывается не только при удалении объекта, но и при выходе из игры.
+	--log3("--[%s] Called on_unregister for [%s]", script_name(), self:name())
+	cse_alife_car.on_unregister( self )
+	--Удаляем данные багажника
+	local prefix = "dsh_rukzak."..self.id
+    ogse.delete_var( prefix .. ".all_types" )
+	ogse.delete_var( prefix .. ".conds"     )
+	ogse.delete_var( prefix .. ".counts"    )
+	ogse.delete_var( prefix .. ".infos"     )
+	ogse.delete_var( prefix .. ".sections"  )
+	ogse.delete_var( prefix .. ".types"     )
+end
 
-
---'Helicopter
+--****************************************************
 class "se_heli" (cse_alife_helicopter)
 --------------------
 function se_heli:__init (section) super (section)

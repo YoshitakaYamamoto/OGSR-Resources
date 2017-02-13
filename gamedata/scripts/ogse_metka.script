@@ -47,31 +47,17 @@ function on_item_drop(obj, sobj)
 			dropped_to_box = dropped_to_box - 1 
 			return true
 		end
-		if trunk_inv.trunk_is_opened() then
-			-- сбрасываем в багажник - метка на тачку
-			local car = trunk_inv.get_car_nearby()
-			gps_drop_timer(car):start()
-		else
-			-- просто бросаем
-			gps_drop_timer(obj):start()
-		end
+		-- просто бросаем на землю
+		gps_drop_timer(obj):start()
 		return true
 	end
 end
 
 function on_item_take(obj, sobj)
-	if sobj:section_name()=="amk_metka" then
-		if trunk_inv.trunk_is_opened() then
-			-- берем из багажника - метка на тачке
-			local car = trunk_inv.get_car_nearby()
-			if level.map_has_object_spot(car:id(), "red_location") == 1 then
-				level_tasks.remove_location_by_id(car:id(), "red_location")
-			end
-		else
-			-- просто с земли
-			if level.map_has_object_spot(sobj.id, "red_location") == 1 then
-				level_tasks.remove_location_by_id(sobj.id, "red_location")
-			end
+	if sobj:section_name() == "amk_metka" then
+		-- подбираем с земли
+		if level.map_has_object_spot(sobj.id, "red_location") == 1 then
+			level_tasks.remove_location_by_id(sobj.id, "red_location")
 		end
 		return true
 	end
@@ -140,7 +126,7 @@ function setup_gps_beacon:OnKeyboard(dik, keyboard_action)
 end
 
 function setup_gps_beacon:set_gps()
-	level_tasks.add_location_by_id(self.gps_obj,"red_location",self.edit_box:GetText())
+	level_tasks.add_location_by_id(self.gps_obj,"red_location","%c[red]"..self.edit_box:GetText())
 	self:on_quit()
 end
 
@@ -148,4 +134,3 @@ function setup_gps_beacon:on_quit()
 	self:GetHolder():start_stop_menu (self,true)
 	setup_gps_beacon_wnd = nil
 end
-

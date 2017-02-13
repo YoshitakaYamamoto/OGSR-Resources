@@ -481,7 +481,7 @@ end
 
 -- опустошение бензобака запорожца для квеста "Сделка с военными"
 function set_zaz_empty()
-	local car = trunk_inv.get_nearest_car_by_section("vehicle_zaz")
+	local car = ogse_car_control.get_nearest_car_by_section("vehicle_zaz")
 	if car then
 		car:set_fuel(0)
 	end

@@ -1194,10 +1194,6 @@ function esc_bandits_die(sctor,npc)
 	return false
 end
 
-function esc_lr_actor_in_car_by_sid(actor,npc,p)
-	return trunk_inv.is_in_car_by_sid(tonumber(p[1]))
-end
-
 ------------------------------------------------------------------------------------
 -- Special functions for LabX18
 ------------------------------------------------------------------------------------

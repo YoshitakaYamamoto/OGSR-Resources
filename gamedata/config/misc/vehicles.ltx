@@ -190,17 +190,13 @@ custom_data     = scripts\esc\esc_btr_unmove.ltx
 car_name        = esc_btr
 character_icon  = esc_vehicle_btr
 
-[trunk_box]
+[trunk_box] ;Надо бы удалить с НИ
 GroupControlSection  = spawn_group
 discovery_dependency = 
 $spawn               = 
 class                = O_INVBOX
 cform                = skeleton
 visual               = physics\box\expl_dinamit.ogf
-script_binding       = trunk_inv.bind
-
-[test_box]:trunk_box
-script_binding      = trunk_inv.test_bind
 
 ;==============================================================================
 ;= секции специальных предметов - карточки с изображениями машин для торговли =

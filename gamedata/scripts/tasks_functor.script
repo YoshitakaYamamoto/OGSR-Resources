@@ -10,22 +10,11 @@
 local spawn_db = ogse_spawn_db.script_spawn_registry.task_functor
 
 function attach(sm) -- для менеджера сигналов
-	sm:subscribe({signal = "on_take_from_box", fun = this.on_take_from_box})
 	sm:subscribe({signal = "on_take", fun = this.on_take})
 	sm:subscribe({signal = "on_use", fun = this.on_use})
 	sm:subscribe({signal = "on_sleep_finished", fun = this.on_sleep_finished})
 	sm:subscribe({signal = "on_first_update", fun = this.on_first_update})
 	sm:subscribe({signal = "on_info", fun = this.on_info})
-end
-
-function on_take_from_box(box, item, sitem)
-	--if sitem == nil then return end
-	if box:section() == "trunk_box" then
-		local car = level_object_by_sid(story_ids.esc_zaz_in_novice_lager)
-		if car and item:section() == "yashik_weapon" then
-			db.actor:transfer_item(item, box)
-		end
-	end
 end
 
 function on_take(obj, sobj)
@@ -558,15 +547,15 @@ end
 ----------------------- Квест "Сделка с военными" -----------------------
 
 function precond_give_yashik_to_actor()
-	return trunk_inv.car_in_range_exist(story_ids.esc_kuznetsov, "vehicle_zaz", 20.0)
+	return ogse_car_control.car_in_range_exist(story_ids.esc_kuznetsov, "vehicle_zaz", 20.0)
 end
 
 function precond_zaz_on_level()
-	return trunk_inv.is_car_on_level("vehicle_zaz")
+	return ogse_car_control.is_car_on_level("vehicle_zaz")
 end
 
 function not_precond_zaz_on_level()
-	return not trunk_inv.is_car_on_level("vehicle_zaz")
+	return not ogse_car_control.is_car_on_level("vehicle_zaz")
 end
 
 function precond_not_give_yashik_to_actor()
@@ -596,13 +585,9 @@ end
 
 function give_yashik_weapon_to_wolf(first_speaker, second_speaker)
 	local car = level_object_by_sid(story_ids.esc_zaz_in_novice_lager)
-	local item = trunk_inv.get_item_from_trunk_by_section(car, "yashik_weapon")
-	local trunk = trunk_inv.get_trunk_for_car(car)
-	if trunk then
-		trunk:drop_item(item)
-		local sobj = alife():object(item:id())
-		ASSERT(sobj, "cannot get sobj by id")
-		alife():release(sobj, true)
+	if not car then return end
+	if dsh_rukzak.is_item_in_rukzak(car:id(), "yashik_weapon") then
+		dsh_rukzak.remove_item_from_rukzak( car:id(), "yashik_weapon" )
 	end
 end
 
@@ -638,7 +623,7 @@ function drive_yashik_to_lager()
 		local car = level_object_by_sid(story_ids.esc_zaz_in_novice_lager)
 		if car and has_alife_info("escape_kvest_with_military_give_din_to_mils") then
 			if car:position():distance_to(wolf_pos) < 10 then
-				if trunk_inv.get_item_from_trunk_by_section(car, "yashik_weapon") then
+				if dsh_rukzak.is_item_in_rukzak(car:id(), "yashik_weapon") then
 					return true
 				end
 			end
@@ -3193,23 +3178,10 @@ end
 -----------------------------------------------------------------------------------------Призрак-----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function spawn_esc_spawn_box_in_car()
-	-- а проверять кто будет?! В этом месте машина должна быть однозначно
-	local car = trunk_inv.get_nearest_car_by_section("vehicle_zaz")
+	local car = ogse_car_control.get_nearest_car_by_section("vehicle_zaz")
 	ASSERT(car, "spawn_esc_spawn_box_in_car: car with section 'vehicle_zaz' doesn't exist or is offline")
-	trunk_inv.spawn_item_in_trunk(car,"yashik_weapon",1)
+	dsh_rukzak.spawn_item_in_rukzak( car:id(), "yashik_weapon" )
 end
-
-
-function check_esc_spawn_box_in_car_true()
-	local car = trunk_inv.get_nearest_car_by_section("vehicle_zaz")
-
-	return (trunk_inv.get_available_trunk_load(car) >= get_item_weight_by_section("yashik_weapon"))
-end
-
-function check_esc_spawn_box_in_car_false()
-	return not check_esc_spawn_box_in_car_true()
-end
-
 
 
 function take_1000(first,second)

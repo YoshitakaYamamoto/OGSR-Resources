@@ -7,9 +7,26 @@ end
 function on_spawn()
 	del_buggy_objects()
 	del_buggy_mapspots()
+	del_all_trunks() --Наверное тоже убрать с НИ.
 
 	lc_question_add()
 end
+
+
+function del_all_trunks()
+	if ogse.var_exists("TRUNK_FIX") then return end
+	for id = 1, 65534 do
+		local sobj = alife():object(id)
+		if sobj then
+			if sobj:section_name() == "trunk_box" then
+				log3( "~~[%s]: Found trunk [%s], removing...", script_name(), sobj:name() )
+				alife():release(sobj, true)
+			end
+		end
+	end
+	ogse.save_var("TRUNK_FIX", true)
+end
+
 
 --В будущем перенести на событие начала игры и всё, больше никогда не вызывать.
 function lc_question_add() --Переход "Припять - ЧАЭС" задаёт вопрос о смене уровня. Взято из аддона Naxac'а
@@ -21,7 +38,7 @@ function lc_question_add() --Переход "Припять - ЧАЭС" зада
 		if data.silent_mode ~= 0 then
 			data.silent_mode = 0
 			pk:set(data)
-			log3( "~~KRodin: fixed ['exit_to_stancia_01']..." )
+			log3( "~~[%s]: fixed ['exit_to_stancia_01']...", script_name() )
 		end
 	end
 end
@@ -34,12 +51,12 @@ function aem_fix()
 				if k == "aem_id" then
 					local sobj = alife():object(v)
 					if sobj then
-						log3( "~~KRodin: found [%s], removing...", sobj:name() )
+						log3( "~~[%s]: found [%s], removing...", script_name(), sobj:name() )
 						alife():release(sobj, true)
 					end
 				end
 				if db.storage[db.actor:id()].pstor[k] then
-					log3("!!REMOVING FROM PSTOR: [%s]", k)
+					log3("~~[%s]: REMOVING FROM PSTOR: [%s]", script_name(), k)
 					db.storage[db.actor:id()].pstor[k] = nil
 				end
 			end
@@ -79,7 +96,7 @@ function del_buggy_objects() --Удаление из игры глючных о�
 	for _, n in ipairs( names ) do
 		local sobj = alife():object( n )
 		if sobj then
-			log3( "~~KRodin: found [%s], removing...", sobj:name() )
+			log3( "~~[%s]: found [%s], removing...", script_name(), sobj:name() )
 			alife():release( sobj )
 		end
 	end

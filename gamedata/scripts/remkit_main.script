@@ -181,8 +181,8 @@ function remkit:InitControls()
 	if db.actor:item_in_slot(6) then
 		self.btn_3:Enable(true)
 	end
-	if trunk_inv.get_car_nearby() and not ogse_car_control.current_car then
-		local car = trunk_inv.get_car_nearby()
+	local car = ogse_car_control.get_car_nearby()
+	if car and not ogse_car_control.current_car then
 		local script_car = car:get_car()
 		local car_state = script_car:GetfHealth()
 		if car_state < 0.85 then
@@ -258,7 +258,7 @@ function remkit:rep_s6() --ремонт брони
 end
 -------------------------Ремонт транспорта-------------------------
 function remkit:rep_trans()
-	local car = trunk_inv.get_car_nearby()
+	local car = ogse_car_control.get_car_nearby()
 	if car and not ogse_car_control.current_car then
 		local s_car = car:get_car()
 		local car_state = s_car:GetfHealth()
