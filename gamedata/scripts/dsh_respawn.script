@@ -149,7 +149,7 @@ function swith_online_cond_timer:condition()
 	return self.npc_sobj.position:distance_to(db.actor:position()) > alife():switch_distance()
 end
 function swith_online_cond_timer:action()
-	log3("--[%s] Switching online: [%s]", script_name(), self.npc_sobj:name())
+	--log3("--[%s] Switching online: [%s]", script_name(), self.npc_sobj:name())
 	switch_online(self.npc_sobj.id)
 end
 
@@ -368,7 +368,7 @@ function dsh_respawner:create( prob )
 		else
 		  --Чтобы неписи и монстры не спавнились в присутствии актора.
           if object_level_name(sobj) == level.name() and sobj.position:distance_to(db.actor:position()) <= alife():switch_distance() then
-            log3("--[%s] Switching offline: [%s] on level: [%s]", script_name(), sobj:name(), object_level_name(sobj))
+            --log3("--[%s] Switching offline: [%s] on level: [%s]", script_name(), sobj:name(), object_level_name(sobj))
 			switch_offline(sobj.id)
             swith_online_cond_timer(sobj:name()):init(sobj.id):start()
           end

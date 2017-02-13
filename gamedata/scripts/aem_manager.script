@@ -699,7 +699,7 @@ function CArenaext:cleanup()
 	end
 
 	-- удаление объектов
-	for id=0, 65535 do
+	for id=1, 65534 do --Можно оставить, всё равно никогда не вызывается.
 		obj = sim:object(id)
 		if obj then
 			if string.find(obj:name(), "aem_") then
@@ -850,20 +850,16 @@ function CArenaext:reinit()
 	end
 	
 	-- обновляем рестрикты каждый раз при начале новой арены
-	for id=0, 65535 do
-		obj = level.object_by_id(id)
-		local sobj = alife():object(id)
-		if sobj and obj ~= nil then
-			section = obj:section()
-			if section == "aem_sound" or section == "aem_timer" then
-				local sobj = sim:object(id)
-				if sobj then
-					sim:release(sobj, true)
-				end
+	for name, zone in pairs(db.zone_by_name) do
+		local section = zone:section()
+		if section == "aem_sound" or section == "aem_timer" then
+			local sobj = alife():object(name)
+			if sobj then
+				sim:release(sobj, true)
 			end
 		end
 	end
-	
+
 	-- рестриктор, который будет выполнять озвучку и выход с арены
 	sim:create("aem_sound", vector():set(150.14, -14.16, 74.03), db.actor:level_vertex_id(), db.actor:game_vertex_id())
 	
@@ -1228,12 +1224,12 @@ function CArenaext:start_stake()
 	db.actor:give_info_portion("bar_arena_fight")
 	
 	-- смена группировки для team2
-	local npc
-	for id=0, 65535 do
-		npc = level.object_by_id(id)
-		local sobj = alife():object(id)
-		if sobj and npc ~= nil and string.find(npc:section(),"_t2_") then
-			npc:set_character_community("stalker", 0, 0)
+	for id, _ in pairs(db.creature) do
+		local bot = level.object_by_id(id)
+		if bot then
+			if string.find(bot:section(), "_t2_") then
+				bot:set_character_community("stalker", 0, 0)
+			end
 		end
 	end
 end
@@ -1275,12 +1271,10 @@ function CArenaext:finish()
 	db.actor:disable_info_portion("bar_arena_fight_begin")
 
 	-- массовое убийство врагов, оставшихся на арене после выхода ГГ
-	local bot
-	for id=0, 65535 do
-		bot = level.object_by_id(id)
-		local sobj = alife():object(id)
-		if sobj and bot ~= nil and bot:alive() == true then
-			if string.find(bot:out_restrictions(),"bar_arena_restrictor") then
+	for id, _ in pairs(db.creature) do
+		local bot = level.object_by_id(id)
+		if bot and bot:alive() then
+			if string.find(bot:out_restrictions(), "bar_arena_restrictor") then
 				bot:kill(bot)
 			end
 		end
@@ -2042,7 +2036,7 @@ function clear_offline_box(sid)
 	if obj then
 		local box = obj.id
 		local id
-		for id=0, 65535 do
+		for id=1, 65534 do
 			obj = sim:object(id)
 			local sobj = alife():object(id)
 			if sobj and obj and obj.parent_id == box then
@@ -2058,20 +2052,10 @@ end
 -- {id1, id2, ...} enum_box_items(game_object box)
 -------
 function enum_box_items(box)
-	--printf("enum_box_items(box='%s')", box:name())
-	local obj
-	local own
 	local ids = {}
-	for id=0, 65535 do
-		obj = level.object_by_id(id)
-		local sobj = alife():object(id)
-		if sobj and obj ~= nil then
-			own = obj:parent()
-			if own ~= nil and own:id() == box:id() then
-				--printf("enum section='%s' id=%d", obj:section(), id)
-				table.insert(ids, id)
-			end
-		end
+	for i=0, box:inv_box_count()-1 do
+		local obj = box:object_from_inv_box(i)
+		table.insert(ids, obj:id())
 	end
 	return ids
 end

@@ -109,19 +109,16 @@ end]]
 
 function add_zone( zone )
 	zone_by_name[zone:name()] = zone
-	add_obj( zone )
 end
 
 function del_zone( zone )
 	zone_by_name[zone:name()] = nil
-	del_obj( zone )
 end
 
 
 function add_actor( obj )
 	actor = obj
 	actor_proxy:net_spawn( obj )
-	add_obj( obj )
 end
 
 function del_actor()

@@ -570,9 +570,9 @@ function musicbox_base:OnTrackButtonClicked(i)
     --self.snd_obj = sound_object(music_dir..file)
 	self.snd_obj = xr_sound.get_safe_sound_object(music_dir..file)
     --------------------------------
-	log1("!!MUSBOX ["..tostring(music_dir..file).."]")
+	--log1("!!MUSBOX ["..tostring(music_dir..file).."]")
 	if not self.snd_obj then
-		log1("!!MUSBOX cannot create sndobj!")
+		log3("!!MUSBOX cannot create sndobj [%s]!", music_dir..file)
 		return
 	end
 	

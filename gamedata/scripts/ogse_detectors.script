@@ -146,25 +146,25 @@ function are_actor_in_strange_zone()
 end
 
 function check_actor_in_zone_action(frequency)
-	--write_log("!!IMPULSE_SCANNER check ["..tostring(frequency).."]")
+	--write_log("!!IMPULSE_SCANNER check ["..frequency.."]")
 	if not strange_zones_by_frequency[frequency] then
-		--write_log("!!IMPULSE_SCANNER INVALID FREQ ["..tostring(frequency).."]")
+		--write_log("!!IMPULSE_SCANNER INVALID FREQ ["..frequency.."]")
 		return
 	--else	
-		--write_log("!!IMPULSE_SCANNER check zone ["..tostring(strange_zones_by_frequency[frequency].name).."]")
+		--write_log("!!IMPULSE_SCANNER check zone ["..strange_zones_by_frequency[frequency].name.."]")
 	end	
 	if xr_conditions.actor_in_zone(nil,nil,{strange_zones_by_frequency[frequency].name}) then
 		soundtrack.afscanner_click3()
-		--write_log("!!IMPULSE_SCANNER check info [".."strangezone"..tostring(strange_zones_by_frequency[frequency].id).."_rebuild".."]")
-		if db.actor:has_info("strangezone"..tostring(strange_zones_by_frequency[frequency].id).."_rebuild") then
-			if jekan_work["afscanner_impulse"..tostring(strange_zones_by_frequency[frequency].id)] then
-				--write_log("!!IMPULSE_SCANNER START_FUNC [jekan_work.".."afscanner_impulse"..tostring(strange_zones_by_frequency[frequency].id).."]")
-				jekan_work["afscanner_impulse"..tostring(strange_zones_by_frequency[frequency].id)]()
+		--write_log("!!IMPULSE_SCANNER check info [".."strangezone"..strange_zones_by_frequency[frequency].id.."_rebuild".."]")
+		if db.actor:has_info("strangezone"..strange_zones_by_frequency[frequency].id.."_rebuild") then
+			if jekan_work["afscanner_impulse"..strange_zones_by_frequency[frequency].id] then
+				--write_log("!!IMPULSE_SCANNER START_FUNC [jekan_work.".."afscanner_impulse"..strange_zones_by_frequency[frequency].id.."]")
+				jekan_work["afscanner_impulse"..strange_zones_by_frequency[frequency].id]()
 			--else
-				--write_log("!!IMPULSE_SCANNER CANT_FIND!!! [jekan_work.".."afscanner_impulse"..tostring(strange_zones_by_frequency[frequency].id).."]")
+				--write_log("!!IMPULSE_SCANNER CANT_FIND!!! [jekan_work.".."afscanner_impulse"..strange_zones_by_frequency[frequency].id.."]")
 			end
-		elseif db.actor:has_info("strangezone"..tostring(strange_zones_by_frequency[frequency].id).."_has_same_art") then
-			--write_log("!!IMPULSE_SCANNER check info [".."strangezone"..tostring(strange_zones_by_frequency[frequency].id).."_has_same_art".."]")
+		elseif db.actor:has_info("strangezone"..strange_zones_by_frequency[frequency].id.."_has_same_art") then
+			--write_log("!!IMPULSE_SCANNER check info [".."strangezone"..strange_zones_by_frequency[frequency].id.."_has_same_art".."]")
 			news_manager.send_tip(db.actor, "strange_zone_af_need_reload", nil, "anomal", 5000, nil)
 		else
 			news_manager.send_tip(db.actor, "strangezone_empty", nil, "anomal", 5000, nil)
@@ -403,7 +403,9 @@ function add_mark_on_minimap(id, sect)
 	local spot = ogse_detectors_data.mapspots_for_anoms[sect]
 	if spot then
 		--log3("Called adding location by id for [%s], Spot: [%s]", id, spot)
-		level_tasks.add_location_by_id(id, spot)
+		if level.map_has_object_spot(id, spot) ~= 1 then --на всякий случай
+			level_tasks.add_location_by_id(id, spot)
+		end
 		anoms_to_show[id] = spot
 	end
 end

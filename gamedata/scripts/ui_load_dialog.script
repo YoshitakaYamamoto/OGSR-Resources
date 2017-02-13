@@ -5,7 +5,7 @@
 -- Author:      Serhiy Vynnychenko (narrator@gsc-game.kiev.ua)
 -- Version:     0.5
 
-local time_wipe = 1422733488 -- Sat, 31 Jan 2015 19:44:48 GMT
+--local time_wipe = 1422733488 -- Sat, 31 Jan 2015 19:44:48 GMT
 
 class "load_item" (CUIListItemEx)
 
@@ -60,14 +60,14 @@ function load_dialog:FillList()
 		local file		=	flist:GetAt(it)			
 		local file_name = string.sub(file:NameFull(), 0, (string.len(file:NameFull()) - 4))
 		local date_time = "[" .. file:ModifDigitOnly() .. "]"
-		local file_check = f:update_path("$game_saves$", file_name .. ".sav")
-		local control_time = f:get_file_age(file_check)
+		--local file_check = f:update_path("$game_saves$", file_name .. ".sav")
+		--local control_time = f:get_file_age(file_check)
 		
-		if control_time > time_wipe then
+		--if control_time > time_wipe then
 			self:AddItemToList(file_name, date_time)
-		else	
-			log1("!!OLD_SAVE "..tostring(file_name .. ".sav TIME ["..tostring(control_time).."]"))
-		end
+		--else	
+		--	log1("!!OLD_SAVE "..tostring(file_name .. ".sav TIME ["..tostring(control_time).."]"))
+		--end
 		
 	end
 	
@@ -130,15 +130,11 @@ function load_dialog:InitCallBacks()
 end
 
 function file_exist(fname)
-	local f = getFS();
+	local f = getFS()
 	local flist = f:file_list_open_ex("$game_saves$",bit_or(FS.FS_ListFiles,FS.FS_RootOnly) , fname)
 	local f_cnt = flist:Size()
-	
-	if f_cnt > 0 then
-		return true
-	else
-		return false
-	end	
+
+	return f_cnt > 0
 end
 
 function delete_save_game(filename)
@@ -344,18 +340,7 @@ function load_dialog:OnButton_del_clicked()
 end
 
 function load_dialog:OnKeyboard(dik, keyboard_action)  --virtual function
-   ui_base_dialog.base_dialog.OnKeyboard(self,dik,keyboard_action)
-	
-   DIK_RETURN = 28
-   WINDOW_KEY_PRESSED = 6
-
-	if dik == DIK_RETURN and keyboard_action == WINDOW_KEY_PRESSED then
-		self:GetHolder():start_stop_menu	(self.owner, true) --new
-		self:GetHolder():start_stop_menu	(self,true)
-		self.owner:Show						(true)
-	end
-   
-	return true
+	return ui_base_dialog.base_dialog.OnKeyboard(self,dik,keyboard_action)
 end
 
 function load_dialog:AddItemToList(file_name, date_time)
@@ -366,6 +351,3 @@ function load_dialog:AddItemToList(file_name, date_time)
 	local list_box			= self:GetListWnd("list_window")
 	list_box:AddItem		(_itm)
 end
-
-
-
