@@ -1289,6 +1289,7 @@ end
 -----------------------------------------------------------------------------------------
 --*****************************************************************************************************
 
+--[=[ --KRodin: не используется. Да и вообще лучше использовать метод get_weight() у инвентарных объектов.
 function get_item_weight_by_section(section)
 	local res = get_float(section, "inv_weight")
 	ASSERT(res, "get_item_weight_by_section: there is no 'inv_weight' parameters in section '"..section.."'")
@@ -1301,6 +1302,7 @@ function get_ammo_weight_by_section(section, count)
 	ASSERT(box_size > 0, "get_ammo_weight_by_section: 'box_size' parameters in section '"..section.."' is zero or missed")
 	return box_weight * count / box_size
 end
+--]=]
 
 function print_vector(name, v)
 	log2("%s: %9.3f, %9.3f, %9.3f", name, v.x, v.y, v.z)

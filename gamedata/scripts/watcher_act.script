@@ -183,7 +183,7 @@ function max_weight(npc)
 	if npc then
 		npc:iterate_inventory(function(dummy, item)
 			if item then
-				total_weight = total_weight + get_float(item:section(), "inv_weight", 0)
+				total_weight = total_weight + item:get_weight()
 			end
 		end, nil)
 	end
