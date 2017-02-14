@@ -285,10 +285,13 @@ end
 
 local debug_flag = false
 function motivator_binder:net_spawn(sobject)
+	ASSERT( db.net_spawning_obj == nil, "found net_spawning_obj = %s", db.net_spawning_obj and db.net_spawning_obj:name() or "" )
+	db.net_spawning_obj = self.object
+
 --log3("~~[%s] Start net_spawn [%s]", script_name(), self.object and self.object:name() or "nil")
 	--ogse.fix_restrictors(self.object)
 
-	if not object_binder.net_spawn(self, sobject) then return false end
+	if not object_binder.net_spawn(self, sobject) then db.net_spawning_obj = nil return false end
 
 	db.add_obj(self.object)
 
@@ -341,6 +344,14 @@ function motivator_binder:net_spawn(sobject)
 
 		local s_obj = alife():object(self.object:id())
 
+--[=[ --Почему-то не заработало. Надо вынести флаг self.treasure_processed в серверный объект и тогда уже включить. Может тогда заработает.
+		if s_obj.offline_dead == 0 then
+			if s_obj.m_story_id ~= 4294967296 and self.treasure_processed then --Вечные трупы будут удаляться только после того как их обыщет актор.
+				log3("--[%s] Added trup to delete: [%s]", script_name(), s_obj:name())
+				s_obj.offline_dead = 1
+			end
+		end
+--]=]
 		if s_obj.offline_dead == 1 then
 			if debug_flag then
 				log1("--ВНИМАНИЕ! Обнаружен погибший в оффлайне! Объект: ИД: "..self.object:id().." ИМЯ:"..self.object:name().." Будет произведена обработка лута и постановка объекта на удаление!")					
@@ -370,12 +381,10 @@ function motivator_binder:net_spawn(sobject)
 				end
 				checker_minefield.add_to_delete(self.object:id())
 			end
-
-			--self.am:call( "on_npc_spawn", self.object, self )
-			--return true
 		end
 
 		--self.am:call( "on_npc_spawn", self.object, self )
+		db.net_spawning_obj = nil
 		return true
 	end
 
@@ -430,6 +439,7 @@ function motivator_binder:net_spawn(sobject)
 	--// xr_companion	
 
 	self.am:call( "on_npc_spawn", self.object, self )
+	db.net_spawning_obj = nil
 	return true
 end
 
@@ -509,7 +519,7 @@ function motivator_binder:before_hit_callback(p_s_hit, p_ignore_flags)
 				and IsStalker(obj)
 				and self.object:relation( obj ) ~= game_object.enemy
 				and obj:relation( self.object ) ~= game_object.enemy
-				and not xr_companion.is_companion(obj_id)
+				--and not xr_companion.is_companion(obj_id)
 			then
 				write_memory_int(1, p_ignore_flags) --Подстрелил друг, игнорируем
 			end
@@ -707,6 +717,9 @@ function motivator_binder:net_save_relevant()
 end
 
 function motivator_binder:save(packet)
+	ASSERT( db.saving_obj == nil, "found saving_obj = %s", db.saving_obj and db.saving_obj:name() or "" )
+	db.saving_obj = self.object
+
 	xr_logic.pstor_store(self.object, "anom_invis", get_anomaly_invisibility(self.object))
 
 	xr_logic.pstor_store(self.object, "is_invulnerable", self.object:invulnerable())
@@ -720,6 +733,8 @@ function motivator_binder:save(packet)
 	dialog_manager.save(self.object, packet)
 
 	trade_manager.save(self.object, packet)
+
+	db.saving_obj = nil
 end
 
 function motivator_binder:load(reader)

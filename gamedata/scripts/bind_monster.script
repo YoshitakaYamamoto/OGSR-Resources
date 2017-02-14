@@ -42,8 +42,12 @@ end
 
 local debug_flag = false
 function generic_object_binder:net_spawn(sobject)
+	ASSERT( db.net_spawning_obj == nil, "found net_spawning_obj = %s", db.net_spawning_obj and db.net_spawning_obj:name() or "" )
+	db.net_spawning_obj = self.object
+
 --log3("~~[%s] Start net_spawn [%s]", script_name(), self.object and self.object:name() or "nil")
-	if not object_binder.net_spawn(self, sobject) then return false end
+
+	if not object_binder.net_spawn(self, sobject) then db.net_spawning_obj = nil return false end
 
 	self:subscribe_updaters()
 
@@ -91,10 +95,12 @@ function generic_object_binder:net_spawn(sobject)
 			checker_minefield.add_to_delete(self.object:id())
 		end
 
+		db.net_spawning_obj = nil
 		return true
 	end
 
 	self.am:call( "on_monster_spawn", self.object, self )
+	db.net_spawning_obj = nil
 	return true
 end
 
@@ -262,7 +268,10 @@ function generic_object_binder:net_save_relevant()
 end
 
 function generic_object_binder:save(packet)
-	if string.find(self.object:name(), "crow_") then return false end
+	ASSERT( db.saving_obj == nil, "found saving_obj = %s", db.saving_obj and db.saving_obj:name() or "" )
+	db.saving_obj = self.object
+
+	if string.find(self.object:name(), "crow_") then db.saving_obj = nil return false end
 
 	if self.object:clsid() ~= clsid.script_trader then
 		xr_logic.pstor_store(self.object, "is_invulnerable", self.object:invulnerable())
@@ -275,35 +284,9 @@ function generic_object_binder:save(packet)
 	if self.object:clsid() == clsid.script_trader then
 		trade_manager.save(self.object, packet)
 	end
-end
 
--- применять так: if self:actor_targets_monster(self.object) then ...
--- Проверяет в прицеле ли монстр
---[[function generic_object_binder:actor_targets_monster(npc)
-	if npc then
-	  local dangerang=1/npc:position():distance_to(db.actor:position())
-	  local ang = horz_angle(device().cam_dir,npc:position():sub(device().cam_pos))
-	  local tgt=ang>-dangerang and ang<dangerang
-	    if tgt then
-		  if self.tgt_time then
-		    	return self.tgt_time<time_global()
-		  else
-			  self.tgt_time=time_global()+600
-		  return false end
-	    else
-		   self.tgt_time=nil
-	   end
-	   return false
-   end
+	db.saving_obj = nil
 end
-
--- Возвращает угол между проекциями векторов vec1 и vec2 на горизонтальную плоскость
--- положительный угол - доворот vec1 до vec2 по часовой.
-function horz_angle(vec1,vec2)
-  local x=vec2.x*vec1.x+vec2.z*vec1.z
-  local y=-vec2.z*vec1.x+vec2.x*vec1.z -- повернули систему координат     
-  return math.atan2(y,x) -- угол доворота от -pi до pi
-end]]
 
 function generic_object_binder:load(reader)
 --log3("~~[%s] Start load [%s]", script_name(), self.object and self.object:name() or "nil")

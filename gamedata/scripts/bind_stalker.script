@@ -22,6 +22,9 @@ function actor_binder:__finalize()
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:net_spawn(data)
+	ASSERT( db.net_spawning_obj == nil, "found net_spawning_obj = %s", db.net_spawning_obj and db.net_spawning_obj:name() or "" )
+	db.net_spawning_obj = self.object
+
 	cmd("r2_dof_control", "off")
 	cmd("unbind", "contacts") --Отключаем в PDA вкладку "Контакты"
 
@@ -72,6 +75,8 @@ function actor_binder:net_spawn(data)
 	self.am:subscribe({ signal = "on_trade_hide", fun = this.restore_weapon })
 
 	self.am:call("on_spawn", data)
+
+	db.net_spawning_obj = nil
 	return true
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -472,12 +477,17 @@ function actor_binder:on_create_cell_item( obj )
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:save(packet)
+	ASSERT( db.saving_obj == nil, "found saving_obj = %s", db.saving_obj and db.saving_obj:name() or "" )
+	db.saving_obj = self.object
+
 	ogse.save_var("game_difficulty", level.get_game_difficulty()) --Сохраняем уровень сложности
 
 	xr_logic.pstor_save_all(self.object, packet)
 
 	self.am:call("on_save", packet)
 	self.am:call("on_save_after_all")
+
+	db.saving_obj = nil
 end 
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:after_save()

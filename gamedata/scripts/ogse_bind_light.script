@@ -303,6 +303,9 @@ function light_binder:net_save_relevant()
 end
 -- MARKER: save
 function light_binder:save(packet)
+	ASSERT( db.saving_obj == nil, "found saving_obj = %s", db.saving_obj and db.saving_obj:name() or "" )
+	db.saving_obj = self.object
+
 	-- сохраняем состояние, если есть что сохранять
 	if self.has_light_config then
 		xr_logic.pstor_store(self.object, "is_on", self.is_on)
@@ -320,6 +323,8 @@ function light_binder:save(packet)
 	end
 	--
 	xr_logic.save_obj(self.object, packet)
+
+	db.saving_obj = nil
 end
 -- MARKER: load
 function light_binder:load(reader)

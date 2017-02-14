@@ -163,13 +163,16 @@ function heli_binder:net_save_relevant()
 end
 
 function heli_binder:save( packet )
-	object_binder.save( self, packet )
+	ASSERT( db.saving_obj == nil, "found saving_obj = %s", db.saving_obj and db.saving_obj:name() or "" )
+	db.saving_obj = self.object
 
-	printf( "heli_binder: save")
+	object_binder.save( self, packet )
 
 	xr_logic.save_obj( self.object, packet )
 
 	self.st.combat:save( packet )
+
+	db.saving_obj = nil
 end
 
 function heli_binder:load( packet )

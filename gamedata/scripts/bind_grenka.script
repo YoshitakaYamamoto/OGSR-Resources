@@ -7,22 +7,6 @@ class "grenka_binder" (object_binder)
 function grenka_binder:__init(obj) super(obj)
 end
 
-function grenka_binder:load(reader)
-	object_binder.load(self, reader)
-end
-
-function grenka_binder:reload(section)
-	object_binder.reload(self, section)
-end
-
-function grenka_binder:save(packet)
-   object_binder.save(self, packet)
-end
-
-function grenka_binder:reload(section)
-	object_binder.reload(self, section)
-end
-
 function grenka_binder:net_save_relevant()
 	return true
 end
@@ -34,15 +18,6 @@ function grenka_binder:net_spawn(server_object)
 	end
 	log1("!!DEBUG_GRENKA I AM ALIVE ["..tostring(self.object:id()).."]")
 	return true
-end
-
-function grenka_binder:reinit()
-	object_binder.reinit(self)
-end
-
-function grenka_binder:net_destroy()
-
-	object_binder.net_destroy(self)
 end
 
 function grenka_binder:update(delta)
