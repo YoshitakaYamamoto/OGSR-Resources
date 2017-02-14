@@ -56,9 +56,6 @@ local not_ready_states = {  -- состояния не готовности к огню, нужно заставить в
 local game_difficulty = level.get_game_difficulty()
 local diff_level = game_difficulty_by_num[game_difficulty]	
 
--- рестрикшены, которые нельзя восстанавливать если они были сняты, находятся в скриптe _g
-local restrictions_off = true --false
-
 local low_range_npc_aggr = 30
 local far_range_mon_aggr = 50 --25
 local low_range_mon_aggr = 5
@@ -340,8 +337,6 @@ local hit_memory			= {}		-- хитоая память
 local active_grenades 		= {}		-- активные гранатные угрозы
 local deadman_vtx 			= {}		-- точка откуда будем ждать успокоения
 local count_update 			= {}		-- Счетчик апдейтов
-local backup_restrictions_in 	= {}		-- табличка для сохранения рестрикторов
-local backup_restrictions_out	= {}		-- табличка для сохранения рестрикторов
 local grenka_already_shout 	= {}
 local grenka_already_blow 	= {}
 local escape_point 			= {}
@@ -418,7 +413,6 @@ function evaluator_check_altcombat:evaluate()
 		(string.find(self.object:name(), "sniper") or string.find(self.object:name(), "roof"))
 	)
 	then
-		restore_restrictions(self.object)
 		in_combat[self.object:id()] = nil
 		return false
 	else
@@ -506,7 +500,6 @@ function evaluator_check_altcombat:evaluate()
 				in_combat[self.object:id()] = true
 				return true
 			end
-			restore_restrictions(self.object)
 			in_combat[self.object:id()] = nil
 			return false
 		end
@@ -525,7 +518,6 @@ function evaluator_check_altcombat:evaluate()
 		if intro_time[self.object:id()] and not self.object:best_danger() then
 			intro_time[self.object:id()] = nil
 		end
-		restore_restrictions(self.object)
 		in_combat[self.object:id()] = nil
 		return false
 	end
@@ -598,7 +590,6 @@ function action_altcombat:execute()
 		bw = (wm and wm:get_weapon()) or npc:best_weapon()
 	end
 
-	process_restrictions(npc)	
 	self:check_objects(bw, enemy) --строим список врагов/друзей, проверяем линию огня - в своих и нейтралов чтоб не стрелять	
 
 	self.object:movement_enabled(true)
@@ -1603,7 +1594,6 @@ function reset_everything(npc)
 	hit_memory[npc:id()] = nil
 	deadman_vtx[npc:id()] = nil
 	last_choosed_path[npc:id()] = nil
-	restore_restrictions(npc)
 end
 
 function its_a_trap(npc, vertex)
@@ -2796,7 +2786,7 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 			
 			write_log("--XRS_BATTLE_AI: WPNS_FIRE_2_RTC_4 "..npc:name().." : "..tostring(enemy:id()))
 			
-			ray_pick.init(aim_point, dir_enemy, (distance + 5), rq_target.rqtBoth, npc)
+			ray_pick.init(aim_point, dir_enemy, (distance + 1--[[5 --зачем так много?]]), rq_target.rqtBoth, npc)
 			
 			write_log("--XRS_BATTLE_AI: WPNS_FIRE_2_RTC_5 "..npc:name().." : "..tostring(enemy:id()))
 	
@@ -2813,30 +2803,34 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 				
 				write_log("--XRS_BATTLE_AI: RAYTRACE PHASE_2 "..npc:name().." : "..tostring(enemy:id()))
 				
-				local is_alive_mob = obj and ( IsStalker( obj ) or IsMonster( obj ) ) and obj:alive()
+				local is_alive_mob = obj and ( obj:is_stalker() or obj:is_monster() or obj:is_actor() ) and obj:alive() --KRodin: а что, если добавить сюда ещё и проверку на актора? Ведь актор - не IsStalker().
+				
 				if obj and ( obj:id() == enemy:id() or ( is_alive_mob and check_is_enemy( npc, obj, true ) ) ) then
 					type_of_fire = object.fire1
 				else
 					if is_alive_mob then
-						-- log2(
-						--   "dsh: XRS_BATTLE_AI: RAYTRACE WRONG: %s -> %s, distance = %s: %s, dist = %s",
-						--   npc:name(), enemy:name(), distance, obj:name(), dist
-						-- )
+						--log3(
+						--	"!!XRS_BATTLE_AI: RAYTRACE WRONG: %s -> %s, distance = %s: %s, dist = %s",
+						--	npc:name(), enemy:name(), distance, obj:name(), dist
+						--)
 						type_of_fire = object.aim1
 					else
-						write_log("--XRS_BATTLE_AI: RAYTRACE FAIL "..npc:name().." : "..tostring(enemy:id()))
 						if npc:see(enemy) and not in_hideout(npc) then
-							write_log("--XRS_BATTLE_AI: RAYTRACE FAIL BUT SEE "..npc:name().." : "..tostring(enemy:id()))
+							--log3("--XRS_BATTLE_AI: RAYTRACE FAIL BUT SEE [%s] : [%s]", npc:name(), enemy:id())
 							type_of_fire = object.fire1
+						else
+							--log3("~~XRS_BATTLE_AI: RAYTRACE FAIL [%s] : [%s]", npc:name(), enemy:id())
+							type_of_fire = object.aim1 --KRodin: добавил на всякий случай.
 						end
 					end
 				end
-			else	
-				--log2(
-				--	"dsh: XRS_BATTLE_AI: RAYTRACE CHECK DOESN RETURN RESULT: %s -> %s, distance = %s",
-				--	npc:name(), enemy:name(), distance
-				--)
-				type_of_fire = object.fire1
+			else
+				log3(
+					"!!XRS_BATTLE_AI: RAYTRACE CHECK DOESN RETURN RESULT: %s -> %s, distance = %s",
+					npc:name(), enemy:name(), distance
+				)
+				type_of_fire = object.aim1 --KRodin: наверное в таких случаях стрелять не надо.
+				--type_of_fire = object.fire1
 			end
 		else	
 			write_log("--XRS_BATTLE_AI: RAYTRACE SWITCHED OFF - FIRING AT WILL "..npc:name().." : "..tostring(enemy:id()))
@@ -3790,97 +3784,6 @@ function correct_position(gi,npc)
 		return npc:vertex_in_direction(gi:level_vertex_id(),diff,len)
 	else
 		return gi:level_vertex_id()
-	end
-end
-
-function process_restrictions(npc)
-	if restrictions_off then
-		return
-	end
-
-	local name = npc:name()
-	local profile = npc:profile_name()
-	
-	if string.find(name, "sniper") or string.find(profile, "sniper")
-	or string.find(name, "watch") or string.find(profile, "watch")
-	or string.find(name, "commander") or string.find(profile, "commander")
-	or string.find(name, "leader") or string.find(profile, "leader")
-	or string.find(name, "aem_") or string.find(profile, "aem_")
-	or string.find(name, "bar_arena") or string.find(profile, "bar_arena")
-	then
-		return false
-	end
-	
-	local restr_out = npc:out_restrictions()
-	local restr_in = npc:in_restrictions()
-	
-	if not backup_restrictions_out[npc:id()] then
-		backup_restrictions_out[npc:id()] = restr_out
-		-- write_log("--XRS_BATTLE_AI: RESTRICTIONS_OUT BACKUP FOR "..npc:name().." : "..restr_out)
-	end
-	if not backup_restrictions_in[npc:id()] then
-		backup_restrictions_in[npc:id()] = restr_in
-		-- write_log("--XRS_BATTLE_AI: RESTRICTIONS_IN BACKUP FOR "..npc:name().." : "..restr_in)
-	end	
-	log1("[XRS BATTLE AI] REMOVING ALL RESTRICTIONS FOR "..npc:name())
-	npc:remove_all_restrictions()
-end
-
-function clean_restrictions(str_restr)
-	local out_str_1 = ""
-	local out_str_2 = ""
-	local out_str_3 = ""
-	local out_str = str_restr
-	local result = 0
-	for k, v in pairs(excluded_restrictors) do
-		local pattern_1 = k..","
-		local pattern_2 = ","..k
-		local pattern_3 = k
-		out_str_1, result = string.gsub(out_str, pattern_1, "")
-		out_str = out_str_1
-		out_str_2, result = string.gsub(out_str_1, pattern_2, "")
-		out_str = out_str_2
-		out_str_3, result = string.gsub(out_str_2, pattern_3, "")
-		out_str = out_str_3
-	end
-	return out_str
-end
-
-function restore_restrictions(npc)
-
-	if restrictions_off then
-		return
-	end
-
-	local name = npc:name()
-	local profile = npc:profile_name()
-
-	if string.find(name, "sniper") or string.find(profile, "sniper")
-	or string.find(name, "watch") or string.find(profile, "watch")
-	or string.find(name, "commander") or string.find(profile, "commander")
-	or string.find(name, "leader") or string.find(profile, "leader")
-	or string.find(name, "aem_") or string.find(profile, "aem_")
-	or string.find(name, "bar_arena") or string.find(profile, "bar_arena")	
-	or string.find(name, "trader") or string.find(profile, "trader")
-	or string.find(name, "gunsmith") or string.find(profile, "gunsmith")
-	or string.find(name, "guider") or string.find(profile, "guider")
-	then
-		return false
-	end
-
-	if backup_restrictions_out[npc:id()] or backup_restrictions_in[npc:id()] then
-		log1("[XRS BATTLE AI] REMOVING ALL RESTRICTIONS FOR "..npc:name())
-		npc:remove_all_restrictions()
-		local restr_out = clean_restrictions(backup_restrictions_out[npc:id()])
-		local restr_in = clean_restrictions(backup_restrictions_in[npc:id()])
-		log1("[XRS BATTLE AI] ADDING IN RESTRICTIONS "..restr_out.." FOR "..npc:name())
-		log1("[XRS BATTLE AI] ADDING OUT RESTRICTIONS "..restr_out.." FOR "..npc:name())
-		npc:add_restrictions(restr_out, restr_in)
-		-- write_log("--XRS_BATTLE_AI: RESTRICTIONS RESTORED FOR "..npc:name().." OUT: ["..restr_out.."] IN: ["..restr_in.."]")
-		backup_restrictions_out[npc:id()] = nil
-		backup_restrictions_in[npc:id()] = nil
-		
-		--ogse.fix_restrictors(npc)
 	end
 end
 

@@ -13,7 +13,6 @@ act_psy_effect = act_base+2
 act_inhide = act_base+3
 
 local debug_flag = false
-local restrictions_off = true --false
 
 local locked_vertexes 		= {}		-- занятые вертексы
 
@@ -134,7 +133,6 @@ local level_name = level.name()
 end
 
 --->> nice one, taken from Monnoroch AI
-
 local hostile_treshold = get_float("game_relations", "attitude_neutal_threshold")
 function is_hostile(comm,target)
 	if IsMonster(target) then
@@ -157,76 +155,7 @@ function is_hostile(comm,target)
 
 	return utils2.community_relation_safe(comm, target:id(), t_comm) < hostile_treshold
 end
-
 ---<< from Monnoroch AI
-
-local backup_restrictions_out = {}
-local backup_restrictions_in = {}
-
-function process_restrictions(npc)
-	if restrictions_off then
-		return
-	end
-
-	local name = npc:name()
-	local profile = npc:profile_name()
-
-	local restr_out = npc:out_restrictions()
-	local restr_in = npc:in_restrictions()
-	
-	if not backup_restrictions_out[npc:id()] then
-		backup_restrictions_out[npc:id()] = restr_out
-		-- write_log("--OGSM_HIDEOUT: RESTRICTIONS_OUT BACKUP FOR "..npc:name().." : "..restr_out)
-	end
-	if not backup_restrictions_in[npc:id()] then
-		backup_restrictions_in[npc:id()] = restr_in
-		-- write_log("--OGSM_HIDEOUT: RESTRICTIONS_IN BACKUP FOR "..npc:name().." : "..restr_in)
-	end	
-	log1("[OGSE HIDEOUT] REMOVING ALL RESTRICTIONS FOR "..npc:name())
-	npc:remove_all_restrictions()
-end
-
-function clean_restrictions(str_restr)
-	local out_str_1 = ""
-	local out_str_2 = ""
-	local out_str_3 = ""
-	local out_str = str_restr
-	local result = 0
-	for k, v in pairs(excluded_restrictors) do
-		local pattern_1 = k..","
-		local pattern_2 = ","..k
-		local pattern_3 = k
-		out_str_1, result = string.gsub(out_str, pattern_1, "")
-		out_str = out_str_1
-		out_str_2, result = string.gsub(out_str_1, pattern_2, "")
-		out_str = out_str_2
-		out_str_3, result = string.gsub(out_str_2, pattern_3, "")
-		out_str = out_str_3
-	end
-	return out_str
-end
-
-function restore_restrictions(npc)
-
-	if restrictions_off then
-		return
-	end
-
-	if backup_restrictions_out[npc:id()] or backup_restrictions_in[npc:id()] then
-		log1("[OGSE HIDEOUT] REMOVING ALL RESTRICTIONS FOR "..npc:name())
-		npc:remove_all_restrictions()
-		local restr_out = clean_restrictions(backup_restrictions_out[npc:id()])
-		local restr_in = clean_restrictions(backup_restrictions_in[npc:id()])
-		log1("[OGSE HIDEOUT] ADDING IN RESTRICTIONS "..restr_in.." FOR "..npc:name())
-		log1("[OGSE HIDEOUT] ADDING OUT RESTRICTIONS "..restr_out.." FOR "..npc:name())
-		npc:add_restrictions(restr_out, restr_in)
-		-- write_log("--XRS_BATTLE_AI: RESTRICTIONS RESTORED FOR "..npc:name().." OUT: ["..restr_out.."] IN: ["..restr_in.."]")
-		backup_restrictions_out[npc:id()] = nil
-		backup_restrictions_in[npc:id()] = nil
-		
-		--ogse.fix_restrictors(npc)
-	end
-end
 
 local count_update 			= 0	-- Счетчик апдейтов. Нельзя чтобы схема стартовала включенной сразу же, иначе 
 local engage_after_update 	= 10 -- будут глюки на переключении схем и выборе оружия
@@ -281,8 +210,7 @@ function evaluator_blowout:evaluate()
 		if not has_alife_info("blowout") and 
 		not has_alife_info("pre_blowout") and 
 		not has_alife_info("pre_blowout2")  then
-			restore_restrictions(self.object)
-			locked_vertexes 		= {}
+			locked_vertexes = {}
 		end
 	end
 	return self.st.blowout == true
@@ -371,7 +299,6 @@ function action_hideout:initialize()
 	self.st.deadman = 0
 	if self.hide then
 		-- есть укрытие
-		process_restrictions(npc)
 		self.st.dest_lvid = self.hide.obj:level_vertex_id()
 		if npc:accessible(self.st.dest_lvid) then
 			npc:movement_enabled(true)
