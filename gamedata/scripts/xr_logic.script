@@ -1083,38 +1083,32 @@ function pstor_save_all(obj, packet)
 		db.storage[npc_id].pstor = pstor
 	end
 
-	local is_actor = obj:id() == db.actor:id()
-	if is_actor then
-		packet = net_packet()
-		packet:w_begin( 123 )
-		packet:r_seek( 2 )
-	end
-
-	local ctr = 0
-	for k, v in pairs(pstor) do
-		ctr = ctr + 1
-	end
-	packet:w_u32(ctr)
-
-	for k, v in pairs(pstor) do
- 		packet:w_stringZ(k)
-		local tv = type(v)
-		if tv == "number" then
-			packet:w_u8(pstor_number)
-	 		packet:w_float(v)
-	 	elseif tv == "string" then
-			packet:w_u8(pstor_string)
-	 		packet:w_stringZ(v)
-	 	elseif tv == "boolean" then
-			packet:w_u8(pstor_boolean)
-	 		packet:w_bool(v)
-		else
-			abort("xr_logic: pstor_save_all: not registered type encountered in ", " NPC "..tostring(obj:name()).." varname "..tostring(k).." value "..tostring(v))
+	if obj:is_actor() then
+		--log3("[%s] Saved actor pstor: %s", script_name(), pstor)
+		ogse.save_var( script_name()..".pstor_actor", pstor, "table" )
+	else
+		local ctr = 0
+		for k, v in pairs(pstor) do
+			ctr = ctr + 1
 		end
-	end
+		packet:w_u32(ctr)
 
-	if is_actor then
-		ogse.save_var( script_name() .. ".actor_pstor", packet, "chunk")
+		for k, v in pairs(pstor) do
+			packet:w_stringZ(k)
+			local tv = type(v)
+			if tv == "number" then
+				packet:w_u8(pstor_number)
+				packet:w_float(v)
+			elseif tv == "string" then
+				packet:w_u8(pstor_string)
+				packet:w_stringZ(v)
+			elseif tv == "boolean" then
+				packet:w_u8(pstor_boolean)
+				packet:w_bool(v)
+			else
+				abort("xr_logic: pstor_save_all: not registered type encountered in ", " NPC "..tostring(obj:name()).." varname "..tostring(k).." value "..tostring(v))
+			end
+		end
 	end
 end
 
@@ -1126,34 +1120,40 @@ function pstor_load_all(obj, reader)
 		db.storage[npc_id].pstor = pstor
 	end
 
-	if obj:name() == "single_player" then
-		if ogse.var_exists( script_name() .. ".actor_pstor" ) then
-			reader = ogse.load_var( script_name() .. ".actor_pstor" )
-		else
-			return
+	if obj:is_actor() and ogse.var_exists( script_name() .. ".pstor_actor" ) then
+		pstor = ogse.load_var( script_name() .. ".pstor_actor" )
+		--log3("[%s] Loaded actor pstor: %s", script_name(), pstor)
+	else
+		if obj:is_actor() then --Óáğàòü ñ ÍÈ!!!
+			if ogse.var_exists( script_name() .. ".actor_pstor" ) then
+				reader = ogse.load_var( script_name() .. ".actor_pstor" )
+				ogse.delete_var( script_name() .. ".actor_pstor" )
+				--log3("[%s] Loaded old actor pstor: %s", script_name(), reader)
+			else
+				return
+			end
 		end
-	end
 
-	local ctr = reader:r_u32()
+		local ctr = reader:r_u32()
 
-	if ctr > 20 and obj:name() ~= "single_player" then 
-		log1("!!ÎÁÍÀĞÓÆÅÍ ÎÁÚÅÊÒ Ñ ÏÎÂĞÅÆÄÅÍÍÛÌ PSTOR: "..obj:name().." ÁÓÄÅÒ ÏĞÎÈÇÂÅÄÅÍÀ ÏÎÏÛÒÊÀ ÂÎÑÑÒÀÍÎÂËÅÍÈß")
-		ctr = 20 		
-	end		
+		if ctr > 20 and not obj:is_actor() then --Ïğîâåğêó íà àêòîğà óáğàòü ñ ÍÈ!!!
+			log3("!!ÎÁÍÀĞÓÆÅÍ ÎÁÚÅÊÒ Ñ ÏÎÂĞÅÆÄÅÍÍÛÌ PSTOR: [%s] ÁÓÄÅÒ ÏĞÎÈÇÂÅÄÅÍÀ ÏÎÏÛÒÊÀ ÂÎÑÑÒÀÍÎÂËÅÍÈß", obj:name())
+			ctr = 20 		
+		end		
 
-	for i = 1, ctr do
-		
-		local varname = reader:r_stringZ()
-		local tn = reader:r_u8()
-		if tn == pstor_number then
-			pstor[varname] = reader:r_float()
-		elseif tn == pstor_string then
-			pstor[varname] = reader:r_stringZ()
-		elseif tn == pstor_boolean then
-			pstor[varname] = reader:r_bool()
-		else
-			pstor[varname] = nil
-			---("xr_logic: pstor_load_all: not registered type encountered in ", " NPC "..tostring(obj:name()).." varname "..tostring(varname).." value "..tostring(tn))
+		for i = 1, ctr do
+			local varname = reader:r_stringZ()
+			local tn = reader:r_u8()
+			if tn == pstor_number then
+				pstor[varname] = reader:r_float()
+			elseif tn == pstor_string then
+				pstor[varname] = reader:r_stringZ()
+			elseif tn == pstor_boolean then
+				pstor[varname] = reader:r_bool()
+			else
+				pstor[varname] = nil
+				--("xr_logic: pstor_load_all: not registered type encountered in ", " NPC "..tostring(obj:name()).." varname "..tostring(varname).." value "..tostring(tn))
+			end
 		end
 	end
 end
