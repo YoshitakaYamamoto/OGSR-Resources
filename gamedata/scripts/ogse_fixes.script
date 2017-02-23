@@ -7,11 +7,28 @@ end
 function on_spawn()
 	del_buggy_objects()
 	del_buggy_mapspots()
-	del_all_trunks() --Наверное тоже убрать с НИ.
+	del_all_trunks() --Убрать с НИ.
+	fix_dsh_rukzak_storage() --Убрать с НИ.
 
-	lc_question_add()
+	lc_question_add() --С НИ перенести на событие начала игры и всё, больше никогда не вызывать.
 end
 
+function fix_dsh_rukzak_storage( ver )
+  if ogse.var_exists("fix_dsh_rukzak_storage") then return end
+  for _, k in ipairs( ogse_unist.get_all_names() ) do
+    local id = string.match( k, "^dsh_rukzak%.([^.]+)%.sections$" )
+    if id then
+      id = tonumber( id )
+      local items = dsh_rukzak.load_rukzak( id )
+      log3(
+        "[%s]: change storage type of dsh_rukzak: %s",
+        script_name(), id
+      )
+      dsh_rukzak.save_rukzak( id, items )
+    end
+  end
+  ogse.save_var("fix_dsh_rukzak_storage", true)
+end
 
 function del_all_trunks()
 	if ogse.var_exists("TRUNK_FIX") then return end
@@ -28,7 +45,7 @@ function del_all_trunks()
 end
 
 
---В будущем перенести на событие начала игры и всё, больше никогда не вызывать.
+
 function lc_question_add() --Переход "Припять - ЧАЭС" задаёт вопрос о смене уровня. Взято из аддона Naxac'а
 	local sobj = alife():object("exit_to_stancia_01")
 	if sobj then
