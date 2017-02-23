@@ -197,29 +197,34 @@ function CTreasure:treasure_empty(box, box_story_id)
 	level_tasks.remove_location_by_id(box:id(), "treasure")
 end
 
---' Сохранение
+--Сохранение
 function CTreasure:save()
-	local p = net_packet()
-	p:w_begin( 123 )
-	p:r_seek( 2 )
-
-	--' Сохраняем размер таблицы
-	local size = 0
+	local treasures = {}
 	for k,v in pairs(self.treasure_info) do
-		size = size + 1
+		table.insert( treasures, { v.target, v.active, v.done } )
 	end
-	p:w_u16(size)
-	for k,v in pairs(self.treasure_info) do
-		p:w_u16(v.target)
-		p:w_bool(v.active)
-		p:w_bool(v.done)
-	end
-
-	ogse.save_var( script_name() .. ".treasure_info", p, "chunk")
+	ogse.save_var(
+		script_name() .. ".treasures", treasures, "array_template",
+		{ "u16", "bool", "bool" }
+	)
+	--log3("[%s] saved treasures: %s", script_name(), treasures)
 end
 
---' Загрузка
-function CTreasure:load()
+--Загрузка
+function CTreasure:load( p )
+	local treasures = ogse.load_var_safe( script_name() .. ".treasures" )
+	if not treasures then return self:load_old() end --Убрать с НИ.
+	--log3("[%s] loaded treasures: %s", script_name(), treasures)
+	for _, item in ipairs( treasures ) do
+		local id, active, done = unpack( item )
+		local k    = self.treasure_by_target[ id ]
+		local info = self.treasure_info[ k ]
+		info.active = active
+		info.done   = done
+	end
+end
+
+function CTreasure:load_old() --Убрать с НИ.
 	if not ogse.var_exists( script_name() .. ".treasure_info") then return end
 	local p = ogse.load_var( script_name() .. ".treasure_info")
 
@@ -229,6 +234,7 @@ function CTreasure:load()
 		self.treasure_info[k].active = p:r_bool()
 		self.treasure_info[k].done = p:r_bool()
 	end
+	ogse.delete_var( script_name() .. ".treasure_info")
 end
 
 
