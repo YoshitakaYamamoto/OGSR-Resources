@@ -147,31 +147,6 @@ level.advance_game_time = function(game_ms) --KRodin: универсальная функция для 
 	set_ignore_game_state_update()
 end
 
-net_packet.w_CTime_ex = function( p, t ) --Запись CTime в пакет.
-	ASSERT(t, "[w_CTime_ex] time is nil")
-	local Y, M, D, h, m, s, ms = -1, 0, 0, 0, 0, 0, 0
-	if t and t ~= game.CTime() then
-		Y, M, D, h, m, s, ms = t:get()
-		Y = Y - 2000
-	end
-	p:w_u8 ( Y )
-	p:w_u8 ( M )
-	p:w_u8 ( D )
-	p:w_u8 ( h )
-	p:w_u8 ( m )
-	p:w_u8 ( s )
-	p:w_u16( ms )
-end
-
-net_packet.r_CTime_ex = function( p ) --Чтение CTime из пакета
-	local Y, M, D, h, m, s, ms = p:r_s8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u16()
-	local t = game.CTime()
-	if Y ~= -1 then
-		t:set( Y + 2000,  M, D, h, m, s, ms)
-	end
-	return t
-end
-
 log1("~~Инициализация расширений движка закончена!")
 --******************************************** Инициализация расширений движка закончена ********************************************
 
