@@ -70,44 +70,68 @@ end
 
 
 function save()
-  local chunks, cnt = {}, 0
-  for k, v in pairs( relation_table ) do
-    local pk = net_packet()
-    pk:w_begin( 123 )     -- двухбайтова¤ заглушка
-    pk:r_seek( 2 )        -- чтобы пропустить эти два байта при чтении
-    table.insert( chunks, pk )
-    local table_size = table.getn( v )
-    cnt = cnt + table_size
---    log1(
---      "[RELATIONS] SAVING RELATION TABLE RECORD "
---        .. tostring( k ) .. " WITH SIZE " .. tostring( table_size )
---    )
-    if k == "actor" then
-      pk:w_u16( 0 )
-    else
-      pk:w_u16( k )
-    end
-    pk:w_u16( table_size )
-    for _, id in ipairs( v ) do
-      pk:w_u16( id )
---      log1(
---        "[RELATIONS] SAVING RELATION TO "
---          .. tostring( k ) .. " FROM " .. tostring( id )
---      )
-    end
+  local records, cnt = {}, 0
+  for k, items in pairs( relation_table ) do
+    table.insert(
+      records,
+      {
+        k == "actor" and 0 or k,
+        items,
+      }
+    )
+	cnt = cnt + #items
   end
   log3(
-    "--[RELATIONS] RELATION TABLE SIZE IS [%s]: [%s] items",
-    table.getn( chunks ), cnt
+    "--[%s] RELATION TABLE SIZE IS [%s]: [%s] items",
+    script_name(), #records, cnt
   )
-  ogse.save_var( script_name() .. ".chunks", chunks, "array", "chunk" )
+  --log3("[%s] Saved relations table: %s", script_name(), records)
+  ogse.save_var(
+    script_name() .. ".records", records, "array_template",
+    {
+      "u16",
+      { "array_template", { "u16" } },
+    }
+  )
 end
 
 
 function load()
+  local records = ogse.load_var_safe( script_name() .. ".records" )
+  if not records then return load_old() end
+  log3( "--[%s]: RELATION TABLE SIZE IS [%s]", script_name(), #records )
+  --log3("[%s] Loaded relations table: %s", script_name(), records)
+  local cnt = 0
+  for _, pk in ipairs( records ) do
+    local to_id, items = unpack( pk )
+    cnt = cnt + #items
+    --log3(
+    --  "[%s]: LOADING RELATION TABLE RECORD %s WITH SIZE %s",
+    --  script_name(), to_id, #items
+    --)
+    if to_id == 0 then to_id = "actor" end
+    relation_seen[ to_id  ] = {}
+    relation_table[ to_id ] = {}
+    for _, curr_id in ipairs( items ) do
+      ASSERT(
+        ( not relation_seen[ to_id ][ curr_id ] ),
+        "[RELATIONS] FOUND SECOND RECORD TO %s FROM %s", to_id, curr_id
+      )
+      table.insert( relation_table[ to_id ], curr_id )
+      relation_seen[ to_id ][ curr_id ] = true
+      --log3(
+      --  "[%s]: LOADING RELATION TO %s FROM %s", script_name(), to_id, curr_id
+      --)
+    end
+  end
+  log3( "--[RELATIONS] RELATION TABLE LOADED: [%s] items!", cnt )
+end
+
+
+function load_old()
   local old = ogse.load_var_safe( "ogse_relation_reverse_table" )
   if old then
-    return load_old( old )
+    return load_old2( old )
   end
 
   local chunks = ogse.load_var_safe( script_name() .. ".chunks" )
@@ -142,15 +166,16 @@ function load()
 --        )
       end
     end
-    log3( "--[RELATIONS] RELATION TABLE LOADED: [%s] items!", cnt )
+    log3( "--[RELATIONS] OLD RELATION TABLE LOADED: [%s] items!", cnt )
+	ogse.delete_var( script_name() .. ".chunks" )
   end
 end
 
 
-function load_old( pk )
+function load_old2( pk )
   if pk then
     local table_size = pk:r_u16()
-    log3( "~~[RELATIONS] OLD RELATION TABLE SIZE IS [%s]", table_size )
+    log3( "~~[RELATIONS] OLD2 RELATION TABLE SIZE IS [%s]", table_size )
     for i = 1, table_size do
       local to_id   = pk:r_u16()
       local to_size = pk:r_u16()
@@ -178,7 +203,7 @@ function load_old( pk )
 --        )
       end
     end
-    log1( "~~[RELATIONS] OLD RELATION TABLE LOADED!" )
+    log1( "~~[RELATIONS] OLD2 RELATION TABLE LOADED!" )
     ogse.delete_var( "ogse_relation_reverse_table" )
   end
 end
