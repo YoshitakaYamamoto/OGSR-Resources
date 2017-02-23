@@ -166,7 +166,7 @@ end
 class "health_effect_timer" (ogse_st_mgr.savable_timer)
 
 function health_effect_timer:__init(name) super(name)
-	self._class = script_name()..".health_effect_timer"
+	self.class = script_name()..".health_effect_timer"
 	self.last_time = game.get_game_time()
 	self.prop_list = {
 		--{"остаток", "скор. изм.", "имя свойства актора"},
@@ -206,23 +206,26 @@ function health_effect_timer:init(hpar)
 	return self
 end
 -- перегруженные методы загрузки/сохранения пользовательских данных
-function health_effect_timer:load(packet)
+function health_effect_timer:load(t)
 	self.last_time = game.get_game_time()
 	self.hpar = {}
 	for _,v in ipairs(self.prop_list) do
-		self.hpar[v[1]] = packet:r_float()
+		self.hpar[v[1]] = table.remove( t, 1 )
 	end
 	for _,v in ipairs(self.prop_list) do
-		self.hpar[v[2]] = packet:r_float()
+		self.hpar[v[2]] = table.remove( t, 1 )
 	end
 end
-function health_effect_timer:save(packet)
+function health_effect_timer:save(t, template)
 	for _,v in ipairs(self.prop_list) do
-		packet:w_float(self.hpar[v[1]])
+		table.insert( template, "float" )
+		table.insert( t, self.hpar[v[1]] )
 	end
 	for _,v in ipairs(self.prop_list) do
-		packet:w_float(self.hpar[v[2]])
+		table.insert( template, "float" )
+		table.insert( t, self.hpar[v[2]] )
 	end
+	return template
 end
 function health_effect_timer:print(comment) -- отладочный метод
 	log1(comment)
@@ -275,7 +278,7 @@ end
 
 class "medkit_timer" (health_effect_timer)
 function medkit_timer:__init(name) super(name)
-	self._class = script_name()..".medkit_timer"
+	self.class = script_name()..".medkit_timer"
 end
 function medkit_timer:start()
 	medkits_counter = medkits_counter + 1
@@ -565,7 +568,7 @@ end
 ------------ Таймер замедленных эффектов здоровья с добавленным изменением иммунитетов -------------
 class "health_effect_timer_ex" (health_effect_timer)
 function health_effect_timer_ex:__init(name) super(name)
-	self._class = script_name()..".health_effect_timer_ex"
+	self.class = script_name()..".health_effect_timer_ex"
 end
 function health_effect_timer_ex:init(section)
 	self.section = section
@@ -585,17 +588,19 @@ function health_effect_timer_ex:init(section)
 	self:set_gdelay(self.total_time)
 	return self
 end
-function health_effect_timer_ex:load(packet)
-	health_effect_timer.load(self, packet)
-	self.section = packet:r_stringZ()
+function health_effect_timer_ex:load(t)
+	health_effect_timer.load(self, t)
+	self.section = table.remove( t, 1 )
 	self.immunities = get_immunities_effects(self.section)
 	local t = get_float(self.section, "effect_time", nil)
 	ASSERT(t, "")
 	self.total_time = t * default_time_factor
 end
-function health_effect_timer_ex:save(packet)
-	health_effect_timer.save(self, packet)
-	packet:w_stringZ(self.section)
+function health_effect_timer_ex:save(t, template)
+	health_effect_timer.save(self, t, template)
+	table.insert( template, "string" )
+	table.insert( t, self.section )
+	return template
 end
 -- обновляем текущие иммунитеты от таймера
 function health_effect_timer_ex:condition()
@@ -605,13 +610,13 @@ function health_effect_timer_ex:condition()
 	--log1("DEBUG!! Medicine ["..self.section.."] time ["..relative_time.."]")
 	for immunity_name,values in pairs(self.immunities) do
 		--immunities[immunity_name] = immunities[immunity_name] or {}
-		timers_immunities[immunity_name][self._id] = values[1] + (values[2] - values[1]) * relative_time
+		timers_immunities[immunity_name][self.id] = values[1] + (values[2] - values[1]) * relative_time
 	end
     return health_effect_timer.condition(self)
 end
 function health_effect_timer_ex:action() -- обнуляем все иммунитеты, связанные с этим таймером
 	for immunity_name,_ in pairs(timers_immunities) do
-		timers_immunities[immunity_name][self._id] = nil
+		timers_immunities[immunity_name][self.id] = nil
 	end
 	--log1("DEBUG!! Medicine ["..self.section.."] STOP!")
 	--self:stop()
@@ -627,7 +632,7 @@ end
 -- при окончании работы возвращает обратно уменьшенное значение
 class "dix_timer" (health_effect_timer_ex)
 function dix_timer:__init(name) super(name)
-	self._class = script_name()..".dix_timer"
+	self.class = script_name()..".dix_timer"
 end
 function dix_timer:init(section)
 	--db.actor.max_power = - 0.1 -- TODO: раскомментировать, когда будет доделан сон
@@ -637,13 +642,17 @@ function dix_timer:init(section)
 	health_effect_timer_ex.init(self, section)
 	return self
 end
-function dix_timer:load(packet)
-	health_effect_timer_ex.load(self, packet)
-	self.normal_max_power = packet:r_float()
+function dix_timer:load(t)
+	health_effect_timer_ex.load(self, t)
+
+	self.normal_max_power = table.remove( t, 1 )
 end
-function dix_timer:save(packet)
-	health_effect_timer_ex.save(self, packet)
-	packet:w_float(self.normal_max_power)
+function dix_timer:save(t, template)
+	health_effect_timer_ex.save(self, t, template)
+
+	table.insert( template, "float" )
+	table.insert( t, self.normal_max_power )
+	return template
 end
 function dix_timer:action() -- обнуляем все иммунитеты, связанные с этим таймером
 	db.actor.max_power = self.normal_max_power - db.actor.max_power

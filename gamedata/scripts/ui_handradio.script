@@ -288,7 +288,7 @@ end
 class "sound_cycle_waiting" (ogse_st_mgr.savable_timer)
 function sound_cycle_waiting:__init() super()
 	-- обязательная строка с именем класса таймера
-	self._class = script_name()..".sound_cycle_waiting"
+	self.class = script_name()..".sound_cycle_waiting"
 end
 
 function sound_cycle_waiting:set_data(count, delay)

@@ -3223,7 +3223,7 @@ end
 class "delete_when_offline" (ogse_st_mgr.savable_timer)
 function delete_when_offline:__init(npc_id) super()
 	-- об€зательна€ строка с именем класса таймера
-	self._class = script_name()..".delete_when_offline"
+	self.class = script_name()..".delete_when_offline"
 	self.npc_id = npc_id
 end
 
@@ -3231,23 +3231,20 @@ function delete_when_offline:condition()
 	return not level.object_by_id(self.npc_id)
 end
 
-function delete_when_offline:load(packet)
-	self.npc_id = packet:r_u16()
+function delete_when_offline:load(t)
+	self.npc_id = table.remove( t, 1 )
 end
 
-function delete_when_offline:save(packet)
-	packet:w_u16(self.npc_id)
+function delete_when_offline:save(t, template)
+  table.insert( template, "u16" )
+  table.insert( t, self.npc_id )
+  return template
 end
 
 function delete_when_offline:action()
 	local sobj = alife():object(self.npc_id)
 	if sobj then 
-		local sect = sobj:section_name()
-		if string.find(sect, "restrictor") or string.find(sect, "zone") then
-			checker_minefield.release_restrictor(sobj.id)
-		else
-			alife():release(sobj, true) 
-		end
+		checker_minefield.release_restrictor(sobj.id) --“аким способом можно что угодно удал€ть
 	end
 end
 

@@ -132,17 +132,19 @@ end
 --Служебный таймер. Использовать только здесь и больше нигде.
 class "swith_online_cond_timer" (ogse_st_mgr.savable_timer)
 function swith_online_cond_timer:__init(timer_id) super(timer_id)
-	self._class = script_name()..".swith_online_cond_timer"
+	self.class = script_name()..".swith_online_cond_timer"
 end
 function swith_online_cond_timer:init(npc_id)
 	self.npc_id = npc_id
 	return self
 end
-function swith_online_cond_timer:load(packet)
-	self.npc_id = packet:r_u16()
+function swith_online_cond_timer:load(t)
+	self.npc_id = unpack( t )
 end
-function swith_online_cond_timer:save(packet)
-	packet:w_u16(self.npc_id)
+function swith_online_cond_timer:save(t, template)
+	table.insert( template, "u16"       )
+	table.insert( t,        self.npc_id )
+	return template
 end
 function swith_online_cond_timer:condition()
 	self.npc_sobj = alife():object(self.npc_id)

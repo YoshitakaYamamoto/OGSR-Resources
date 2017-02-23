@@ -120,7 +120,7 @@ end
 
 class "play_timer" (ogse_st_mgr.savable_timer)
 function play_timer:__init(timer_id) super(timer_id)
-	self._class = script_name()..".play_timer"
+	self.class = script_name()..".play_timer"
 end
 -- проверка того, что руки заняты в недопустимой степени для выбранного музыкального инструмента
 -- здесь можно задать так, чтобы скажем на гармошке можно было играть и держать в другой руке пистолет
@@ -170,14 +170,16 @@ function play_timer:init(item_section)
 	return self -- для вызова цепочкой
 end
 -- перегруженные методы загрузки/сохранения пользовательских данных
-function play_timer:load(packet)
+function play_timer:load(t)
 	-- здесь намеренно сохраняется только секция предмета и не сохраняется играемая музыка
 	-- после загрузки игры никто не вспомнит, что сохранялся, играя на чём-то,
 	-- поэтому надо просто тихо вернуть в инвентарь предмет
-	self.item_section = packet:r_stringZ()
+	self.item_section = table.remove( t, 1 )
 end
-function play_timer:save(packet)
-	packet:w_stringZ(self.item_section)
+function play_timer:save(t, template)
+	table.insert( template, "string" )
+	table.insert( t, self.item_section )
+	return template
 end
 function play_timer:condition()
 	-- проверяем ситуацию, когда всё ещё идёт скрывание активного предмета
