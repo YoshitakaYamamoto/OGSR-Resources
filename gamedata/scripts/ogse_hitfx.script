@@ -71,7 +71,7 @@ function npc_on_death(victim, who)
 	if cur_weapon then
 		local cur_weapon_sec = cur_weapon:section()
 		local victim_pos = victim:position()
-		if get_effect_for_curr_weapon(cur_weapon_sec) and (IsStalker(victim) or IsMonster(victim)) then
+		if get_effect_for_curr_weapon(cur_weapon_sec) then
 			action(victim,particle(get_effect_for_curr_weapon(cur_weapon_sec),"bip01_head", particle_params(vector():set(0, 0, 0.3),vector():set(0, 0, 0),vector():set(1, 0, 0)), false),cond(cond.time_end, 1000))
 		end
 	end

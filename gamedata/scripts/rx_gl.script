@@ -58,11 +58,11 @@ local forbidden_monster_clsids = {
 	[clsid.cat_s] = true,
 }
 function valid_target(obj)
-	if obj:id() == db.actor:id() then
+	if obj:is_actor() then
 		return true
-	elseif IsStalker(obj) then
+	elseif obj:is_stalker() then
 		return not xr_wounded.is_wounded(obj) and ogse.armor_type(obj) <= 3
-	elseif IsMonster(obj) then
+	elseif obj:is_monster() then
 		return not forbidden_monster_clsids[obj:clsid()]
 	end
 	return false

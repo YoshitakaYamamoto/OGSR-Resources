@@ -242,16 +242,6 @@ function get_npc_community(obj)
 	return m_s_c
 end
 
-function IsActor(obj)
-	if obj then
-		local m_comm  = get_npc_community(obj)
-		if (m_comm == "actor" or m_comm == "actor_dolg" or m_comm == "actor_freedom") then
-			return true
-		end
-	end
-	return false
-end
-
 function community_filter(obj)
 	if (obj and IsStalker(obj)) then
 		local community  = get_npc_community(obj)

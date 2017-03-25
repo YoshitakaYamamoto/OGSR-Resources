@@ -291,7 +291,7 @@ function Cwound_manager:update()
 		hp=1 -- симулируем раненость
 	end
 
-	if db.actor and comm ~= "ecolog" and comm ~= "trader" and comm ~= "zombied" and isWeapon(db.actor:active_item()) and
+	if db.actor and comm ~= "ecolog" and comm ~= "trader" and comm ~= "zombied" and db.actor:active_item() and db.actor:active_item():is_weapon() and
 		self.npc:relation(db.actor) == game_object.enemy and 
 		self.npc.health < 0.35 and 
 		self.npc:position():distance_to(db.actor:position()) < 10 and
@@ -739,7 +739,7 @@ function is_wounded(npc)
 	-- log1("!!TEST "..npc:name().." WOUND "..tostring(db.storage[npc:id()].wounded.wound_manager.state))
 --    return tostring(db.storage[npc:id()].wounded.wound_manager.state) ~= "nil"
 --  end
-	if not (IsStalker(npc) or IsMonster(npc)) then
+	if not (npc:is_stalker() or npc:is_monster()) then
 		return false
 	end
 

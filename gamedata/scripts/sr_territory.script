@@ -16,7 +16,7 @@ function action_territory:update(delta)
 end
 function action_territory:hit_callback(obj, amount, local_direction, who, bone_index)
 	--log3("territory hit callback: [%s][%s]", amount, who:name())
-	if who:id() ~= db.actor:id() then
+	if not who:is_actor() then
 		return
 	end
 	if obj:relation(db.actor) == game_object.enemy then
@@ -26,7 +26,7 @@ function action_territory:hit_callback(obj, amount, local_direction, who, bone_i
 end
 function action_territory:death_callback(victim, who)
 	--log3("territory death callback: [%s][%s]", victim:name(), who:name())
-	if who:id() ~= db.actor:id() then
+	if not who:is_actor() then
 		return
 	end
 --	if victim:relation(db.actor) == game_object.enemy then

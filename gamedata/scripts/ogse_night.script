@@ -75,10 +75,10 @@ local fov_night =
 
 function check_night(npc)
 	local htime = level.get_time_hours()
-	if htime and npc then
+	if htime then
 		local nid = npc:id()
 		
-		if npc and IsStalker(npc) then
+		--if npc and npc:is_stalker() then
 			if
 				xr_companion.is_companion(nid)
 				or npc:character_community() == "zombied"  
@@ -213,6 +213,6 @@ function check_night(npc)
 					npc:set_fov(fov_in_danger)
 				end
 			end
-		end
+		--end
 	end
 end

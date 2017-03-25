@@ -103,12 +103,9 @@ function switch_firing(car, fire)
 end
 
 function get_aiming_point_for_target(targ)
-	if targ:id() == db.actor:id() then
-		local pos = device().cam_pos
-		return pos
-	end
-
-	if targ:is_stalker() then
+	if targ:is_actor() then
+		return device().cam_pos
+	elseif targ:is_stalker() then
 		return targ:bone_position("bip01_pelvis")
 	elseif targ:is_monster() then
 		return targ:bone_position("bip01_spine")
@@ -156,7 +153,7 @@ end
 function process_enemy(car, enemy)
 	--log3("Called process_enemy for [%s]", enemy:name())
 	if enemy and enemy:alive() then
-		if IsStalker(enemy) or IsMonster(enemy) then
+		if IsStalker(enemy) or enemy:is_monster() then
 			-- человек ты иль монструшка
 			register_as_target(car, enemy)
 		else
@@ -434,7 +431,7 @@ function check_single_object(car, obj)
 			elseif relation >= 500 then
 				objects[game_object.friend][obj:id()] = obj
 			end
-		elseif IsMonster(obj) then
+		elseif obj:is_monster() then
 			objects.monsters[obj:id()] = obj
 		end 
 	end

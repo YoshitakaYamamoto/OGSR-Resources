@@ -9,7 +9,7 @@ local forbidden_combat_types = {
 function set_combat_type( npc, actor, t )
 	-- это нужно для функций в xr_conditions.script
 	local be = npc:best_enemy()
-	if be and (IsMonster(be) or IsStalker(be)) and be:alive() then
+	if be and (be:is_monster() or IsStalker(be)) and be:alive() then
 		db.storage[npc:id()].enemy = be
 	end
 

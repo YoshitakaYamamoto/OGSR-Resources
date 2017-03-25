@@ -29,7 +29,7 @@ function check_critical(amount, bone_index, who)
 			level.add_cam_effector("camera_effects\\hit_front.anm", 100, false, "")
 		elseif (bone_index >= 11 and bone_index < 18) then	
 			str = " попадание в голову "
-			if IsStalker(who) then
+			if who:is_stalker() then
 				if enabled == 2 then
 					if db.actor.health < 0.3 and not ( ogse_autodoc.ad_on_belt and ogse_autodoc.switch_on.ad ) then
 						level.add_pp_effector("blink.ppe", 99, false)
@@ -67,7 +67,7 @@ function check_critical(amount, bone_index, who)
 			end
 			if need_drop then
 				local active_item = db.actor:active_item()
-				if active_item and active_item:section()~= "bolt" and not isKnife(active_item) then
+				if active_item and active_item:section()~= "bolt" and not active_item:is_knife() then
 					--active_item:set_condition(math.random(25,65)/100)
 					db.actor:drop_item(active_item)
 				end			

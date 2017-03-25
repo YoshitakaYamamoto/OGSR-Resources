@@ -137,7 +137,7 @@ function npc_in_cover(npc)
 		for o in npc:memory_visible_objects() do
 			local obj = o:object()
 			local id = obj:id()
-			if obj and obj.clsid and (IsStalker(obj) or IsMonster(obj)) and obj:alive() and npc:relation(obj) == game_object.enemy and not xr_wounded.is_wounded(obj) then
+			if obj and obj.clsid and (IsStalker(obj) or obj:is_monster()) and obj:alive() and npc:relation(obj) == game_object.enemy and not xr_wounded.is_wounded(obj) then
 				table.insert(enemies,obj)
 				tt[id] = true
 			end
@@ -146,7 +146,7 @@ function npc_in_cover(npc)
 			local obj = o:object()
 			local id = obj:id()
 			if not tt[id] then
-				if obj and obj.clsid and (IsStalker(obj) or IsMonster(obj)) and obj:alive() and npc:relation(obj) == game_object.enemy and not xr_wounded.is_wounded(obj) then
+				if obj and obj.clsid and (IsStalker(obj) or obj:is_monster()) and obj:alive() and npc:relation(obj) == game_object.enemy and not xr_wounded.is_wounded(obj) then
 					table.insert(enemies,obj)
 				end
 			end

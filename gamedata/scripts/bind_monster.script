@@ -181,7 +181,7 @@ function generic_object_binder:death_callback(victim, who)
 	end
 
 	--if db.actor then -- добавлено KamikaZze  с целью отладки 25/02/2009
-	--	if who:id() == db.actor:id() then
+	--	if who:is_actor() then
 	-- добавление опыта за убийство
 			xr_statistic.addKillCount(who, self.object)
 	--	end

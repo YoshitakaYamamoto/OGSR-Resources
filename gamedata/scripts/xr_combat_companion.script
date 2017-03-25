@@ -257,7 +257,7 @@ end
 function hit_callback(companion, enemy, amount)
 	-- если объект был ранее забыт - очухиваем его, если нету в табличке - записываем в табличку
 	-- данная функция помещается в xr_motivator.hit_callback
-	if --[[amount and amount > 0.02 and]] not enemy:id() == db.actor:id() then
+	if --[[amount and amount > 0.02 and]] not enemy:is_actor() then
 		xr_companion.being_attacked = true
 		dont_touch_us = false
 		enable_object(companion, enemy)
@@ -276,8 +276,8 @@ end
 function process_enemy(npc, enemy)
 	-- проверка выбора врагом напарника или ГГ
 	-- данная функция помещается в апдейты монстров и неписей
-	if enemy and enemy.clsid and (IsStalker(enemy) or IsMonster(enemy)) and enemy:alive() and enemy:id() ~= db.actor:id() and not xr_companion.is_companion(enemy:id()) then
-		write_log("!!!PROCESSING_"..enemy:name().." RESULT IS_STK ["..tostring(IsStalker(enemy)).."] IS_MNSTR ["..tostring(IsMonster(enemy)).."] CHK ["..tostring(we_are_under_attack(enemy)).."]")
+	if enemy and enemy.clsid and (enemy:is_stalker() or enemy:is_monster()) and enemy:alive() and not xr_companion.is_companion(enemy:id()) then
+		write_log("!!!PROCESSING_"..enemy:name().." RESULT IS_STK ["..tostring(enemy:is_stalker()).."] IS_MNSTR ["..tostring(enemy:is_monster()).."] CHK ["..tostring(we_are_under_attack(enemy)).."]")
 		if we_are_under_attack(enemy) then
 			-- человек ты иль монструшка
 			register_as_target(enemy)
@@ -344,7 +344,7 @@ function register_as_target(enemy)
 		write_log("!!XR_COMBAT_COMP: REG_TARGET "..enemy:name())
 		if chk_comp ~= {} then
 			for companion_id, v in pairs(chk_comp) do
-				if companion_id == id or db.actor:id() == id or enemy:name() == "single_player" then
+				if companion_id == id or enemy:is_actor() then
 					return
 				end
 				local companion = level.object_by_id(companion_id)
@@ -678,9 +678,8 @@ end
 
 function check_is_enemy_of_me_or_actor(npc, enemy)
 	if not npc or not enemy then return false end
-	if IsMonster(enemy) then return true end
-	if IsStalker(enemy) then
-		if enemy:id() == db.actor:id() then return false end
+	if enemy:is_monster() then return true
+	elseif enemy:is_stalker() then
 		local is_engine_enemy = enemy:relation(npc) == game_object.enemy
 		local is_engine_enemy_actor = enemy:relation(db.actor) == game_object.enemy
 		if is_engine_enemy or is_engine_enemy_actor then
@@ -746,7 +745,7 @@ function set_weapons_fire(npc, enemy, weapon)
 					end
 				else
 					if obj then
-						if check_is_enemy_of_me_or_actor(npc, obj) and not obj:id() == db.actor:id() then
+						if check_is_enemy_of_me_or_actor(npc, obj) and not obj:is_actor() then
 							type_of_fire = object.fire1
 							if debug_flag then
 								write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_FAIL_BUT_VALID_TARGET: "..tostring(obj:id()))
@@ -1366,7 +1365,7 @@ function action_combat_activity:execute()
 	local act_item = self.object:item_in_slot(self.object:active_slot())
 	local bw = nil
 	
-	if not act_item or isKnife(act_item) then
+	if not act_item or act_item:is_knife() then
 		local wm = rx_wmgr and rx_wmgr.get_wm(self.object)
 		bw = (wm and wm:get_weapon()) or self.object:best_weapon()
 	else

@@ -60,7 +60,7 @@ function get_target_area(area_data)
 					end
 				end
 				if target_type == "monster" or target_type == "alive" or target_type == "all" then 
-					if IsMonster(obj) and obj:alive() and heli_combat.distance_2d(obj:position(),center) <= area_r then
+					if obj:is_monster() and obj:alive() and heli_combat.distance_2d(obj:position(),center) <= area_r then
 						table.insert(targets,k)
 					end
 				end
@@ -116,7 +116,7 @@ end
 function get_target_priority(obj)
 	if not obj then return 0 end
 	local prior = 1
-	if IsMonster(obj) then
+	if obj:is_monster() then
 		prior = 1
 	elseif IsStalker(obj) then -- максимум - 5
 		local wpn = obj:item_in_slot(obj:active_slot())

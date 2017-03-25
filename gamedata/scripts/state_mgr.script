@@ -193,7 +193,7 @@ function eva_state_mgr_end:evaluate()
 	local be = self.object:best_enemy()
 	local bd = self.object:best_danger()
 	
-	if (not bd or (bd and not bd:object())) and (not be or (be and IsStalker(be) and be:alive() == false) or (be and IsMonster(be) and (be:alive() == false or (not self.object:see(be) and be:position():distance_to(self.object:position()) > 40)))) then
+	if (not bd or (bd and not bd:object())) and (not be or (be and IsStalker(be) and be:alive() == false) or (be and be:is_monster() and (be:alive() == false or (not self.object:see(be) and be:position():distance_to(self.object:position()) > 40)))) then
 		post_combat[self.object:id()] = time_global()
 	else	
 		post_combat[self.object:id()] = nil
@@ -204,9 +204,10 @@ function eva_state_mgr_end:evaluate()
 		post_combat[self.object:id()] = nil
 	end
 	
-	if bd and bd:object() and IsStalker(bd:object()) and bd:object():alive() and bd:object():id() ~= db.actor:id() then
-		if self.object:relation(bd:object()) ~= game_object.enemy and bd:object():relation(self.object) ~= game_object.enemy then
-			local bd_object = bd:object()
+	if bd then
+	local bd_object = bd:object()
+	if bd_object and bd_object:is_stalker() and bd_object:alive() then
+		if self.object:relation(bd_object) ~= game_object.enemy and bd_object:relation(self.object) ~= game_object.enemy then
 			local bd_enemy = bd_object:best_enemy()
 			local bd_danger = bd_object:best_danger()
 			if not bd_enemy and not bd_danger then
@@ -219,11 +220,12 @@ function eva_state_mgr_end:evaluate()
 					self.st.combat = false
 				elseif bd_danger_obj and bd_danger_obj:id() == self.object:id() then	
 					self.st.combat = false
-				elseif bd_danger_obj and (IsStalker(bd_danger_obj) or IsMonster(bd_danger_obj)) and not bd_danger_obj:alive() then	
+				elseif bd_danger_obj and (IsStalker(bd_danger_obj) or bd_danger_obj:is_monster()) and not bd_danger_obj:alive() then	
 					self.st.combat = false
 				end				
 			end
 		end
+	end
 	end
 
 	local current_action_id = self.mgr:current_action_id()

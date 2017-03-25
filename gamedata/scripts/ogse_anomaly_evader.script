@@ -14,7 +14,7 @@ last_position = {}
 
 
 local excluded_npc = { --Запретные профили/имена/story_id
-	["bar_ecolog_professor"] = true,
+	--["bar_ecolog_professor"] = true, --Круглов
 	["dik_the_drifter"] = true,
 	["zona_brother1"] = true,
 	["zona_brother2"] = true,
@@ -54,7 +54,7 @@ function can_evade(npc)
     excluded_locations[ level.name() ]
     or not npc:alive()
     or (
-      IsStalker( npc )
+      npc:is_stalker()
       and (
         excluded_comms[ npc:character_community() ]
         or excluded_npc[ npc:profile_name() ]

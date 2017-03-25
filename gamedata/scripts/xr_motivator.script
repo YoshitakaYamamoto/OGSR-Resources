@@ -14,8 +14,8 @@ local snd_check_timer = {}
 
 function look_to_shot(object, who)
 	if object and who then
-		if  IsStalker(object) and object:alive() and not xr_wounded.is_wounded(object)
-			and who:alive() and ((IsStalker(who) and object:relation(who) ~= game_object.friend) or IsMonster(who))
+		if IsStalker(object) and object:alive() and not xr_wounded.is_wounded(object)
+			and who:alive() and ((IsStalker(who) and object:relation(who) ~= game_object.friend) or who:is_monster())
 		then
 			if object:best_enemy() then
 				local be = object:best_enemy()
@@ -125,7 +125,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 	end
 
 	-- Отсеиваем свои звуки и звуки друзей
-	if (who:is_monster() or who:is_stalker() or who:id() == db.actor:id()) 
+	if (who:is_monster() or who:is_stalker() or who:is_actor()) 
 	and (who:alive() and self:alive()) then
 		if who:id() == self:id() 
 		or (who:is_car() and self:relation(db.actor) ~= game_object.enemy)
@@ -205,7 +205,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 				self:set_sight(look.point,sound_position)
 				self:set_mental_state(anim.danger)			
 			end			
-		elseif IsMonster(who) and self:relation( who ) == game_object.enemy and self:binded_object():enemy_callback( self, who ) then
+		elseif who:is_monster() and self:relation( who ) == game_object.enemy and self:binded_object():enemy_callback( self, who ) then
 			if who_dist > check_dist then
 				if not silent_level() then
 					if not warn_check_timer[self:id()] or warn_check_timer[self:id()] < time_global() then
@@ -514,9 +514,8 @@ function motivator_binder:before_hit_callback(p_s_hit, p_ignore_flags)
 				write_memory_int(db.actor:cast_game_object(), p_s_hit, hit_offset.who)
 				write_memory_int16(db.actor:id(), p_s_hit, hit_offset.whoID)
 			elseif --Проверяем условия игнорирования урона от дружественного огня
-				obj_id ~= db.actor:id() --если не актор
+				obj:is_stalker()
 				and obj_id ~= self.object:id() --если не сам себя
-				and IsStalker(obj)
 				and self.object:relation( obj ) ~= game_object.enemy
 				and obj:relation( self.object ) ~= game_object.enemy
 				--and not xr_companion.is_companion(obj_id)

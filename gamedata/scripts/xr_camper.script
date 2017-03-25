@@ -346,7 +346,7 @@ function action_patrol:process_danger()
 		return false
 	end	
 	
-	local is_monster_obj = IsMonster(danger_obj)
+	local is_monster_obj = danger_obj:is_monster()
 	local is_stalker_obj = IsStalker(danger_obj)
 	local is_still_alive = danger_obj:alive()	
 	
@@ -386,7 +386,7 @@ function action_patrol:process_danger()
 	
 	-- Проверка на запрещенный денжер от актера
 	if danger_obj ~= nil and
-	   (db.actor and danger_obj:id() == db.actor:id()) and
+	   danger_obj:is_actor() and
 	   (bd_type == danger_object.attack_sound or
 	   bd_type == danger_object.bullet_ricochet)
 	then

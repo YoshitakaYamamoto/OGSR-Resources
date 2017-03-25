@@ -176,7 +176,7 @@ function npc_inside_safe_zone(obj)
 	end
 
 	if obj and obj:alive() then	
-		if ogse_car_control.in_btr and obj:id() == db.actor:id() then
+		if ogse_car_control.in_btr and obj:is_actor() then
 			return true
 		end
 	

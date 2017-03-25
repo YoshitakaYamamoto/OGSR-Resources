@@ -1008,13 +1008,9 @@ function combat_multiplier(enemy_is_npc)
 end
 
 function process_enemy(car, enemy)
-	if enemy and enemy:alive() and enemy:id() ~= db.actor:id() then
-		if IsStalker(enemy) or IsMonster(enemy) then
-			-- человек ты иль монструшка
-			register_as_target(car, enemy)
-		else
-			return
-		end
+	if enemy and ( enemy:is_stalker() or enemy:is_monster() ) and enemy:alive() then
+		-- человек ты иль монструшка
+		register_as_target(car, enemy)
 	end
 end
 

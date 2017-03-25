@@ -88,7 +88,7 @@ function evaluator_see_deadman:evaluate()
 	local function check_item(o)
 			local obj=o:object()
 			--если есть рядом с костром труп сталкера или монстра, его еще никто не прихватил себе и трупец нигде не застрял, то забираем его...
-			if obj and obj.clsid and (IsStalker(obj) or IsMonster(obj)) and not obj:alive() and (not deadmansids[obj:id()] or not level.object_by_id(deadmansids[obj:id()]) or not level.object_by_id(deadmansids[obj:id()]):alive()) and obj:position():distance_to(patrol(self.a.center_point):point(0))<10 then
+			if obj and obj.clsid and (obj:is_stalker() or obj:is_monster()) and not obj:alive() and (not deadmansids[obj:id()] or not level.object_by_id(deadmansids[obj:id()]) or not level.object_by_id(deadmansids[obj:id()]):alive()) and obj:position():distance_to(patrol(self.a.center_point):point(0))<10 then
 				if not deadmansidsuses[obj:id()] or deadmansidsuses[obj:id()]<3 then
 					deadmansids[obj:id()]=npc:id()
 					self.a.choosed_deadman=obj:id()

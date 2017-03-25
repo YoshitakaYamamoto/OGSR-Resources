@@ -294,7 +294,8 @@ end
 function Cmeet_manager:process_meet()
 	local key
 	local is_talking = self.npc:is_talking()
-	if isWeapon(db.actor:active_item())	and
+	local act_it = db.actor:active_item()
+	if act_it and act_it:is_weapon() and
        self.npc:relation(db.actor) ~= game_object.friend and self:actor_targets_npc(self.npc) and not xr_companion.is_companion(self.npc:id())
     then
 		key = self:get_key_from_distance(self.a.meet_state_wpn)
@@ -337,7 +338,8 @@ function Cmeet_manager:process_meet()
 end
 function Cmeet_manager:process_victim()
 	local key
-	if isWeapon(db.actor:active_item()) and not xr_companion.is_companion(self.npc:id())	then
+	local act_it = db.actor:active_item()
+	if act_it and act_it:is_weapon() and not xr_companion.is_companion(self.npc:id())	then
 		key = self:get_key_from_distance(self.a.victim_wpn)
 		if key ~= nil then
 			return tostring(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.victim_wpn[key].state))
@@ -401,7 +403,8 @@ function Cmeet_manager:process_use()
 	end
 	
 	local t
-	if isWeapon(db.actor:active_item()) and not xr_companion.is_companion(self.npc:id()) then
+	local act_it = db.actor:active_item()
+	if act_it and act_it:is_weapon() and not xr_companion.is_companion(self.npc:id()) then
 		t = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.use_wpn)
 		if t == "false" then
 			self.disable_talk_weapon = true
@@ -839,9 +842,8 @@ end
 function cannot_talk_by_weapon(npc)
 	local st = db.storage[npc:id()].meet
 	if st then
-		if not isWeapon(db.actor:active_item())	then			
-			return false
-		end		
+		local act_it = db.actor:active_item()
+		if not act_it or not act_it:is_weapon() then return false end
 		if st.use then
 			local t = xr_logic.pick_section_from_condlist(db.actor, npc, st.use)
 			if t == "false" then

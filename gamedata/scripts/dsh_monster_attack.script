@@ -154,7 +154,7 @@ local master_koef = 1 / ( 4 - level.get_game_difficulty() )
 function bloodsucker_attack( obj )
 	if not may_attack() then return end
 	local enemy = obj:best_enemy()
-	if not enemy or enemy:id() ~= db.actor:id() or not obj:see( enemy ) then return end
+	if not enemy or not enemy:is_actor() or not obj:see( enemy ) then return end
 	local dist = obj:position():distance_to( enemy:position() )
 	local attack_dist = 3
 	ogse_signals.get_mgr():reschedule( ( dist < attack_dist and 1000 ) or ( dist < obj:range() and 2000 ) or 5000 )
@@ -178,7 +178,7 @@ function bloodsucker_attack( obj )
 	if
 		active_item
 		and active_item:section() ~= "bolt"
-		and not isKnife(active_item)
+		and not active_item:is_knife()
 		and math.random() > 0.7
 	then
 		enemy:drop_item(active_item) --Выбиваем из рук оружие
@@ -220,7 +220,7 @@ function burer_attack( obj )
   local enemy = obj:best_enemy()
   if
     not (
-      enemy and enemy:id() == db.actor:id() and obj:see( enemy )
+      enemy and enemy:is_actor() and obj:see( enemy )
     )
   then
     return
@@ -241,7 +241,7 @@ function burer_attack( obj )
 	  active_item
 	  and math.random() < (diff / 20)
 	  and active_item:section() ~= "bolt"
-	  and not isKnife(active_item)
+	  and not active_item:is_knife()
 	then
 	  enemy:drop_item(active_item)
 	end
@@ -316,7 +316,7 @@ function controller_attack( obj )
   )
   if dist > attack_dist then return end
   local enemy = obj:best_enemy()
-  if not ( enemy and enemy:id() == db.actor:id() and obj:see( enemy ) ) then return end
+  if not ( enemy and enemy:is_actor() and obj:see( enemy ) ) then return end
   if math.random() < 0.5 then
     local dir = device().cam_dir
     local x   = dir.x - ( 1.5 - 3 * math.random() )
@@ -336,9 +336,7 @@ function controller_psy_attack( obj )
 	local npc = obj:get_enemy()
 	if npc then
 		if
-			IsStalker(npc)
-			and npc:id() ~= db.actor:id()
-			and npc:clsid() == clsid.script_stalker
+			npc:is_stalker()
 			and obj:see(npc)
 			and npc:character_community() ~= "zombied"
 			and npc:character_community() ~= "actor_zombied"
@@ -351,7 +349,7 @@ function controller_psy_attack( obj )
 			end
 		end
 ----------------------------------------------------------------------
-		if npc:id() == db.actor:id() and obj:see(npc) and may_attack() then
+		if npc:is_actor() and obj:see(npc) and may_attack() then
 			if not may_attack() then return end
 			if obj:position():distance_to(npc:position()) < math.random(10, 100) then
 				local binder = obj:binded_object()
@@ -367,7 +365,7 @@ function controller_psy_attack( obj )
 				end
 
 				local active_item = npc:active_item()
-				if active_item and active_item:section() ~= "bolt" and not isKnife(active_item) and math.random(100) / 100 > npc.psy_health then
+				if active_item and active_item:section() ~= "bolt" and not active_item:is_knife() and math.random(100) / 100 > npc.psy_health then
 					npc:drop_item(active_item)
 				end
 			end
@@ -391,7 +389,7 @@ function dog_attack( obj )
   if not may_attack() then return end
   local enemy = obj:best_enemy()
   if not (
-    enemy and enemy:id() == db.actor:id() and obj:see( enemy )
+    enemy and enemy:is_actor() and obj:see( enemy )
   ) then
     return
   end
@@ -416,7 +414,7 @@ function dog_attack( obj )
 	active_item
 	and math.random() < drop
 	and active_item:section() ~= "bolt"
-	and not isKnife(active_item)
+	and not active_item:is_knife()
   then
     enemy:drop_item(active_item)
   end
@@ -429,7 +427,7 @@ function dog_attack_phantom( obj )
   ogse_signals.get_mgr():reschedule(5000)
   local enemy = obj:best_enemy()
   if not (
-    enemy and enemy:id() == db.actor:id() and obj:see( enemy )
+    enemy and enemy:is_actor() and obj:see( enemy )
   ) then
     return
   end
@@ -575,7 +573,7 @@ function quest_functions_on_death( obj, who )
 -----------------------------------------------
 	elseif string.find(section_name, "zombie_rusty") then -- Уничтожение зомби-камикадзе + спаун руки
 		blow_zombie(obj)
-		if who_hit_name == "single_player" then
+		if who:is_actor() then
 			if not has_alife_info("zombie_rusty_dead") then
 				db.actor:give_info_portion("zombie_rusty_dead")
 				local obj = ogse.spawn_object(ogse_spawn_db.script_spawn_registry.ogsm_mutants.secret_treasure)
@@ -598,7 +596,7 @@ function quest_functions_on_death( obj, who )
 	end
 
 	-- Выдача статей энциклопедии при убийстве монстров
-	if who_hit_name == "single_player" then
+	if who:is_actor() then
 		if db.actor ~= nil then -- вставлено KamikaZze 25/02/2009
 			for k,v in pairs(monster_infoportion.multiple) do
 				if string.find(obj:section(), v) then

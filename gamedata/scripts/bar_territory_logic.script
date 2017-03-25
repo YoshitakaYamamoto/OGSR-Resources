@@ -20,7 +20,7 @@ end
 local hit_objects_ids = {}
 local bar_hit_count = 0
 function bar_territory_hit(obj, amount, local_direction, who)
-	if who:id() == db.actor:id() and obj:relation(who) ~= game_object.enemy then
+	if who:is_actor() and obj:relation(who) ~= game_object.enemy then
 		local bar_territory_sobj = alife():object("bar_dolg_territory")
 		if not bar_territory_sobj then return end
 		local bar_territory_obj = level.object_by_id(bar_territory_sobj.id)
@@ -66,7 +66,7 @@ function bar_territory_hit(obj, amount, local_direction, who)
 end
 
 function bar_territory_death(obj, who)
-	if who:id() == db.actor:id() and ( hit_objects_ids[obj:id()] or obj:relation(who) ~= game_object.enemy ) then
+	if who:is_actor() and ( hit_objects_ids[obj:id()] or obj:relation(who) ~= game_object.enemy ) then
 		local bar_territory_sobj = alife():object("bar_dolg_territory")
 		if not bar_territory_sobj then return end
 		local bar_territory_obj = level.object_by_id(bar_territory_sobj.id)

@@ -65,7 +65,7 @@ class "evaluator_facer" (property_evaluator)
 function evaluator_facer:__init(npc,name,storage) super (nil,name)
 	self.st = storage
 	local weapon = npc:active_item()
-	if weapon and (isKnife(weapon) or xrs_battle_ai.knife_scheme[npc:id()]) then
+	if weapon and (weapon:is_knife() or xrs_battle_ai.knife_scheme[npc:id()]) then
 		self.st.check_time = time_global()+100
 	else
 		self.st.check_time = time_global()+math.random(facer_sets.check_prd,500)
@@ -125,7 +125,7 @@ function evaluator_facer:evaluate()
 		if epos:distance_to_sqr(spos) < 4.1 and spos.y - epos.y < 0.8 then
 			self.st.target = be:id()
 			local weapon = npc:active_item()
-			if weapon and (isKnife(weapon) or xrs_battle_ai.knife_scheme[npc:id()]) then
+			if weapon and (weapon:is_knife() or xrs_battle_ai.knife_scheme[npc:id()]) then
 				self.st.check_time = tg+100
 			else
 				self.st.check_time = tg+facer_sets.check_prd
@@ -313,7 +313,7 @@ function action_facer:cancel()
 		mind = 1000
 	end
 	local weapon = npc:active_item()
-	if weapon and isKnife(weapon) then
+	if weapon and weapon:is_knife() then
 		self.st.check_time = tg+300
 		self.st.abtime = tg+400		
 	else

@@ -418,7 +418,7 @@ function weapon_manager:update_weapon()
 					local amm1,amm2 = wpn:get_ammo_in_magazine(),weapon_params[w.sec].mag
 					if amm1 ~= amm2 and amm1 == 0 then
 						local bebe = get_best_enemy(be)
-						if be:see(self.npc) and ((bebe and bebe:id() == self.npc_id) or (db.actor and db.actor:id() == be:id())) then
+						if be:see(self.npc) and ((bebe and bebe:id() == self.npc_id) or be:is_actor()) then
 							pr = pr - w.prm*self.modes.mag_lowering_fc/100
 						else
 							pr = pr - w.prm*self.modes.mag_lowering/100
@@ -430,7 +430,7 @@ function weapon_manager:update_weapon()
 						if curwpn and curwpn:id() == w.id and self.last_change and (wm_modes.types.line ~= "ef_weapon_type" or weapon_params[curwpn:section()].typ ~= "8") then
 							local tg = time_global()
 							local bebe = get_best_enemy(be)
-							if be:see(self.npc) and ((bebe and bebe:id() == self.npc_id) or (db.actor and db.actor:id() == be:id())) and self.last_change+self.modes.tchange_time_fc > tg then
+							if be:see(self.npc) and ((bebe and bebe:id() == self.npc_id) or be:is_actor()) and self.last_change+self.modes.tchange_time_fc > tg then
 								local add = (self.last_change+self.modes.tchange_time_fc-tg)/40
 								pr = pr + mprm*add/100
 							elseif self.last_change+self.modes.tchange_time > tg then
@@ -1048,16 +1048,10 @@ end
 -- определение валидности цели для РПГ-7 или РГ-6
 function valid_target(obj)
 	if obj then
-		local section = obj:section()
-		if obj:clsid() == clsid.actor then return true end
-		if IsStalker(obj) then return true
-		elseif IsMonster(obj) then
-			local id = get_clsid (obj)
-			if id == clsid.dog_s or
-			   id == clsid.flesh_s or
-			   id == clsid.cat_s then
-			   return false else return true
-			end
+		if obj:is_actor() or obj:is_stalker() then return true
+		elseif obj:is_monster() then
+			local id = obj:clsid()
+			return id ~= clsid.dog_s and id ~= clsid.flesh_s and id ~= clsid.cat_s
 		end
 	end
 	return false

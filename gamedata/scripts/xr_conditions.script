@@ -712,7 +712,7 @@ function actor_has_weapon (actor, npc)
 	local be = npc:best_enemy()
 	local see = npc:see(actor)
 	local dist = actor:position():distance_to(npc:position())
-    if obj == nil or isWeapon (obj) == false or (be and be:id() ~= db.actor:id()) or not see or dist > 6 then return false end
+    if not obj or not obj:is_weapon() or (be and not be:is_actor()) or not see or dist > 6 then return false end
     return true
 end
 
@@ -1074,7 +1074,7 @@ function val_fighting_sacrifice_bloodsucker(actor, npc)
 	if valid == false then
 		return false
 	end	
-	if enemy and IsMonster(enemy) and enemy:alive() then
+	if enemy and enemy:is_monster() and enemy:alive() then
 		return enemy:story_id() == 403
 	else	
 		return false
@@ -1732,7 +1732,7 @@ function dist_to_friendly_npc_le(actor, npc, p)
 				local npc_chk = level.object_by_id(npc_id)
 				if npc_chk and npc_chk:alive() then
 					if not gulag:npc_is_enemy_of_stalkers(npc_chk) then
-						if npc:position():distance_to_sqr(npc_chk:position()) <= d * d and npc_id ~= db.actor:id() then
+						if npc:position():distance_to_sqr(npc_chk:position()) <= d * d and not npc_chk:is_actor() then
 							return true
 						end					
 					end	

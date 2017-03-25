@@ -2332,11 +2332,8 @@ function svyazony_not_have_weapon()
 end
 
 function search_weapon(npc, item)
-	if npc and item and (isWeapon(item)) then
+	if item and item:is_weapon_magazined() then
 		local weapon_section = item:section()
-		if string.find(weapon_section, "grenade") then
-			return
-		end
 		local w_cl = 0
 		w_cl = xr_companion.get_parameters_from_table(weapon_section)
 		if xr_companion.weapon_class[w_cl] then

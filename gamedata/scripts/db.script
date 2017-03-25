@@ -21,7 +21,7 @@ artefacts			= {} --TODO: вынести в bind_artefact.
 function add_obj( obj )
 	if IsStalker(obj) then
 		creature[obj:id()] = true
-	elseif IsMonster(obj) then
+	elseif obj:is_monster() then
 		creature[obj:id()] = false
 	end
 end
@@ -44,7 +44,7 @@ function()
 		for k, v in pairs(db.creature) do
 			local obj = level.object_by_id(k)
 			local sobj = alife():object(k)
-			if obj and not obj:alive() and v and obj:name() ~= "single_player" and sobj.offline_dead == 0 then
+			if obj and not obj:alive() and v and not obj:is_actor() and sobj.offline_dead == 0 then
 				log1("!!UNREGISTERED BODY FOUND - TO DELAYED "..obj:id().." "..obj:name())
 				db.actor:give_game_news("ВНИМАНИЕ! Обнаружен потенциально повреждённый неразрегистрированный труп! Объект: "..obj:character_name().." ИД: "..obj:id().." Профиль: "..obj:profile_name().." Будет произведена попытка разрегистрации и удаления объекта!", "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
 				if not delayed[obj:id()] then delayed[obj:id()] = obj:id() end

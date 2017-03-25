@@ -132,7 +132,7 @@ function set_first_blow()
 	if not has_alife_info("first_blowout") then db.actor:give_info_portion("first_blowout") end
 end
 
-surge_db = {}
+local surge_db = {}
 function surge_db_init()
 	surge_db.surge_process_stage_01 = {
 		on_info = {
@@ -628,7 +628,7 @@ function deadly_blowout()
 		level.add_cam_effector("camera_effects\\fusker.anm",959,false,"")
 		
 		local active_item = db.actor:active_item()
-		if active_item and active_item:section()~= "bolt" and not isKnife(active_item) then
+		if active_item and active_item:section()~= "bolt" and not active_item:is_knife() then
 			db.actor:drop_item(active_item)
 		end		
 		

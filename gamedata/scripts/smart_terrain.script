@@ -1043,14 +1043,6 @@ function se_smart_terrain:update()
 	end
 end
 
-function prot_smt_td(obj)
-	if IsStalker(obj) or IsMonster(obj) then
-		return obj:smart_terrain_id()
-	else	
-		return 65535
-	end
-end
-
 --------------------
 -- найти и почистить гулаг объекта
 -- вызывается из кучи мест. Скорее всего дубируется многократно

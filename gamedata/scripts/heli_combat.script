@@ -312,7 +312,7 @@ end
 
 local hostile_treshold = get_float("game_relations", "attitude_neutal_threshold")
 function is_hostile(comm,target)
-	if IsMonster(target) then -- мутанты враги всем
+	if target:is_monster() then -- мутанты враги всем
 		return true
 	end
 

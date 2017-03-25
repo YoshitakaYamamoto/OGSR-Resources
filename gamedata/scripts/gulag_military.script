@@ -703,10 +703,10 @@ end
 -------------------------------------------------------------------------------------------
 -- Проверка, имеется ли у гулага враг
 -------------------------------------------------------------------------------------------
-function check_enemy (gulag)
+function check_enemy(gulag)
     for k,v in pairs(gulag.Object) do
         if v ~= true then
-           if v:best_enemy () ~= nil and v:story_id () ~= 710 and not IsMonster(v:best_enemy ()) then 
+           if v:best_enemy() and v:story_id() ~= 710 and not v:best_enemy():is_monster() then 
               return true
            end
         end

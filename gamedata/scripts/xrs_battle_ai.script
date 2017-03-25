@@ -451,7 +451,7 @@ function evaluator_check_altcombat:evaluate()
 	else	
 		need_knife[self.object:id()] = nil
 	end
-	if bw and isKnife(bw) and (npc_rank == "veteran" or npc_rank == "master") then
+	if bw and bw:is_knife() and (npc_rank == "veteran" or npc_rank == "master") then
 		knife_scheme[self.object:id()] = true
 		self.object:set_mental_state(anim.danger)
 	else	
@@ -482,7 +482,7 @@ function evaluator_check_altcombat:evaluate()
 		and not (IsStalker(best_enemy) and xr_wounded.is_wounded(best_enemy))
 		and not is_exclusion(self.object)
 		and not (wm and ammo_check == false)
-		and ((best_enemy:position():distance_to(self.object:position()) >= 2.0 and (bw and not isKnife(bw))) or (best_enemy:position():distance_to(self.object:position()) < close_combat_distance and knife_scheme[self.object:id()]))
+		and ((best_enemy:position():distance_to(self.object:position()) >= 2.0 and (bw and not bw:is_knife())) or (best_enemy:position():distance_to(self.object:position()) < close_combat_distance and knife_scheme[self.object:id()]))
 		then
 			ogse_debug.add_active_eval( self.object, script_name(), "altcombat" )
 			if not already_hear[self.object:id()] then
@@ -728,7 +728,7 @@ function action_altcombat:execute()
 	end
 
 	local height = be_pos.y - npc_pos.y
-	local actor_at_height = (be_pos.y > npc_pos.y and height > 3 and be:id() == db.actor:id())
+	local actor_at_height = (be_pos.y > npc_pos.y and height > 3 and be:is_actor())
 
 	process_combat_sound(npc)
 	
@@ -736,7 +736,7 @@ function action_altcombat:execute()
 	
 	local raytrace_see = false
 
-	if be:id() == db.actor:id() then
+	if be:is_actor() then
 		if use_raytrace then
 			raytrace_see = actor_see_raytrace(npc)
 		else
@@ -1038,7 +1038,7 @@ function action_altcombat:execute()
 		
 	end
 	
-	if IsMonster(be) then
+	if be:is_monster() then
 		assist_point = select_position(npc)	
 		last_algorythm = "select_pos_monster"
 	end	
@@ -1119,11 +1119,11 @@ end
 function action_altcombat:check_single_object(obj)
 	local npc = self.object
 	if not obj then return end
-	if not (IsStalker(obj) or IsMonster(obj)) then return end
+	if not (IsStalker(obj) or obj:is_monster()) then return end
 	if obj.clsid and obj:alive() and npc:id()~=obj:id() then
 		if IsStalker(obj) and not primary_target[npc:id()] == obj:id() then 
 			self.objects[npc:relation(obj)][obj:id()] = obj
-		elseif IsMonster(obj) then
+		elseif obj:is_monster() then
 			self.objects.monsters[obj:id()] = obj
 		end 
 	end
@@ -1177,8 +1177,8 @@ end
 function check_friends_enemy( npc, enemy_id )
   local function check_enemy( npc, obj )
     if
-      obj and obj.clsid  and IsStalker( obj ) and obj:alive()
-      and npc:id() ~= obj:id() and obj:id() ~= db.actor:id()
+      obj and obj.clsid  and obj:is_stalker() and obj:alive()
+      and npc:id() ~= obj:id()
     then
       if
         npc:relation( obj ) == game_object.friend
@@ -1214,9 +1214,8 @@ end
 function notify_friends( npc, enemy )
   local function notify_friend( npc, obj )
     if
-      obj and obj.clsid and IsStalker( obj ) and obj:alive()
+      obj and obj.clsid and obj:is_stalker() and obj:alive()
       and npc:id() ~= obj:id()
-      and obj:id() ~= db.actor:id()
       and not xr_wounded.is_wounded( obj )
     then
       if
@@ -1463,7 +1462,7 @@ function hit_callback(  obj, amount, local_direction, who, bone_index )
 		if IsStalker(who) then
 			if who:alive() then
 				if targets_list[npc:id()] and not targets_list[npc:id()][who:id()] then
-					if who:id() == db.actor:id() then
+					if who:is_actor() then
 						enable_object(obj, who)
 						if check_is_enemy(obj, who) then
 							write_log("!!XRS_BATTLE_AI REG_TARG_1 NPC ["..obj:name().."] ENEMY ["..who:name().."]")
@@ -1490,7 +1489,7 @@ function hit_callback(  obj, amount, local_direction, who, bone_index )
 					enemy_record.last_time_seen = time_global()
 					enemy_record.vertex = who:level_vertex_id()
 				end
-				if not ((obj:relation(who) ~= game_object.enemy or obj:character_community() == who:character_community()) and not who:id() == db.actor:id() and not xr_companion.is_companion(who:id())) then
+				if not ((obj:relation(who) ~= game_object.enemy or obj:character_community() == who:character_community()) and not who:is_actor() and not xr_companion.is_companion(who:id())) then
 					if not hit_memory[obj:id()] then
 						hit_memory[obj:id()] = {}
 					end
@@ -1504,7 +1503,7 @@ function hit_callback(  obj, amount, local_direction, who, bone_index )
 					set_sound_event(npc, "ff")
 				end				
 			end
-		elseif IsMonster(who) then
+		elseif who:is_monster() then
 			if who:alive() then
 				if targets_list[npc:id()] and not targets_list[npc:id()][who:id()] then
 					enable_object(obj, who)
@@ -1606,7 +1605,7 @@ function its_a_trap(npc, vertex)
 			if v.comm == community then
 				local enemy = level.object_by_id(v.killer)
 				if enemy 
-				and (IsStalker(enemy) or v.killer == db.actor:id() or is_armor(enemy)) 
+				and (enemy:is_stalker() or enemy:is_actor() or is_armor(enemy)) 
 				and (enemy:alive() or (is_armor(enemy) and armor_alive(enemy)))
 				and not xr_wounded.is_wounded(enemy) then
 					return true
@@ -1652,7 +1651,7 @@ function process_enemy(npc, may_be_enemy)
 			if IsStalker(enemy) and check_is_enemy(npc, enemy) then
 				write_log("!!XRS_BATTLE_AI REG_TARG_3 NPC ["..npc:name().."] ENEMY ["..enemy:name().."]")
 				register_as_target(npc, enemy)
-			elseif IsMonster(enemy) and check_is_enemy(npc, enemy) then
+			elseif enemy:is_monster() and check_is_enemy(npc, enemy) then
 				write_log("!!XRS_BATTLE_AI REG_TARG_MON NPC ["..npc:name().."] ENEMY ["..enemy:name().."]")
 				register_as_target(npc, enemy)
 			end
@@ -1661,7 +1660,7 @@ function process_enemy(npc, may_be_enemy)
 end
 
 function we_are_under_attack(npc, enemy)
-	if enemy:id() ~= db.actor:id() then
+	if not enemy:is_actor() then
 		local target 		= enemy:best_enemy()
 		local danger_by_engine = enemy:best_danger()
 		local best_danger_object = nil
@@ -1699,9 +1698,9 @@ function we_are_under_attack(npc, enemy)
 			if bd then
 				bd_obj = bd:object()
 			end
-			if be and be:id() == db.actor:id() then
+			if be and be:is_actor() then
 				return true
-			elseif bd_obj and bd_obj:id() == db.actor:id() then
+			elseif bd_obj and bd_obj:is_actor() then
 				local bd_type = bd:type()
 				if needed_dangers[bd_type] then
 					return true
@@ -1731,7 +1730,7 @@ function register_as_target_companions(npc)
 					enemy_record.npc = IsStalker(enemy)
 					enemy_record.range = dist
 					local sobj = alife():object(id)
-					enemy_record.vis = enemy:see(npc) or (enemy:id() == db.actor:id() and actor_see(npc))
+					enemy_record.vis = enemy:see(npc) or (enemy:is_actor() and actor_see(npc))
 					if sobj and string.find(sobj:section_name(), "zombie_") then
 						if dist < close_combat_distance then
 							enemy_record.vis = true
@@ -1754,7 +1753,7 @@ end
 function register_as_target(npc, enemy)
 	local id = enemy:id()
 	if not targets_list[npc:id()] or not targets_list[npc:id()][id] then
-		if id == db.actor:id() then
+		if enemy:is_actor() then
 			register_as_target_companions(npc)
 		end	
 		if npc and npc:alive() and not xr_wounded.is_wounded(npc) then
@@ -1767,7 +1766,7 @@ function register_as_target(npc, enemy)
 			enemy_record.npc = IsStalker(enemy)
 			enemy_record.range = dist
 			local sobj = alife():object(id)
-			enemy_record.vis = enemy:see(npc) or (enemy:id() == db.actor:id() and actor_see(npc))
+			enemy_record.vis = enemy:see(npc) or (enemy:is_actor() and actor_see(npc))
 			if sobj and string.find(sobj:section_name(), "zombie_") then
 				if dist < close_combat_distance then
 					enemy_record.vis = true
@@ -1982,7 +1981,7 @@ function refresh_targets(npc)
 	-- обновление реестра врагов, вызываетс€ из reprioritize_targets
 	-- добавление движкового врага
 	local enemy_by_engine = npc:best_enemy()
-	if enemy_by_engine and enemy_by_engine:alive() and not (IsStalker(enemy_by_engine) and xr_wounded.is_wounded(enemy_by_engine)) and (enemy_by_engine:see(npc) or (enemy_by_engine:id() == db.actor:id() and actor_see(npc))) then
+	if enemy_by_engine and enemy_by_engine:alive() and not (IsStalker(enemy_by_engine) and xr_wounded.is_wounded(enemy_by_engine)) and (enemy_by_engine:see(npc) or (enemy_by_engine:is_actor() and actor_see(npc))) then
 		if not targets_list[npc:id()][enemy_by_engine:id()] and not (disabled_objects[npc:id()] and disabled_objects[npc:id()][enemy_by_engine:id()]) then
 			write_log("!!XRS_BATTLE_AI: ALT_COMBAT_ENGINE_BE FOR "..npc:name().." : "..tostring(enemy_by_engine:name()))
 			if check_is_enemy(npc, enemy_by_engine) or (xr_companion.is_companion(enemy_by_engine:id()) and check_is_enemy(npc, db.actor)) then
@@ -2034,7 +2033,7 @@ function refresh_targets(npc)
 			if is_armor(check_target) then
 				v.vis	= get_armor_vis(check_target, npc)
 			else
-				v.vis	= (check_target:see(npc) or (check_target:id() == db.actor:id() and actor_see(npc)))
+				v.vis	= (check_target:see(npc) or (check_target:is_actor() and actor_see(npc)))
 			end
 			v.range	= dist
 			if v.vis == false then
@@ -2061,7 +2060,7 @@ function refresh_targets(npc)
 					end
 				else
 					if check_is_enemy(npc, check_target) then
-						if dist > 100 and k ~= db.actor:id() then
+						if dist > 100 and not check_target:is_actor() then
 							disable_object(npc, check_target)
 							if primary_target[npc:id()] == k then
 								last_target[npc:id()][primary_target[npc:id()]] = time_global()
@@ -2316,7 +2315,7 @@ function have_fresh_deadman(npc)
 		if obj and IsStalker(obj) then
 			timeout = timeout*2
 		end
-		if obj and not IsStalker(obj) and not IsMonster(obj) then
+		if obj and not IsStalker(obj) and not obj:is_monster() then
 			write_log("XRS_BATTLE_AI: DELETING FRESH ARMOR DEADMAN FOR "..npc:name())
 			last_target[npc:id()][k] = nil
 			postcombat[npc:id()] = nil
@@ -2803,7 +2802,7 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 				
 				write_log("--XRS_BATTLE_AI: RAYTRACE PHASE_2 "..npc:name().." : "..tostring(enemy:id()))
 				
-				local is_alive_mob = obj and ( obj:is_stalker() or obj:is_monster() or obj:is_actor() ) and obj:alive() --KRodin: а что, если добавить сюда ещЄ и проверку на актора? ¬едь актор - не IsStalker().
+				local is_alive_mob = obj and ( IsStalker(obj) or obj:is_monster() ) and obj:alive()
 				
 				if obj and ( obj:id() == enemy:id() or ( is_alive_mob and check_is_enemy( npc, obj, true ) ) ) then
 					type_of_fire = object.fire1
@@ -3352,7 +3351,7 @@ function select_position(npc, target, flag)
 		
 		if pos.y > pos_npc.y then
 			local height = pos.y - pos_npc.y
-			if height < 3 or target:id() ~= db.actor:id() then
+			if height < 3 or not target:is_actor() then
 				if IsShotgun(bw) then
 					random_offset_1 = math.random(5,7)
 					random_offset_2 = math.random(5,7)
@@ -3368,7 +3367,7 @@ function select_position(npc, target, flag)
 				end
 			else	
 				write_log("--XRS_BATTLE_AI: ENEMY_ON_HILL "..npc:name())
-				if target:id() == db.actor:id() and height >= 3 then
+				if target:is_actor() and height >= 3 then
 					random_rotate_1 = math.random(90,150)
 					random_rotate_2 = -math.random(90,150)	
 				end
@@ -3773,8 +3772,9 @@ function evade_grenades(npc)
 
 end
 
+--[=[
 function correct_position(gi,npc)
-	if IsStalker(gi) or IsMonster(gi) then
+	if IsStalker(gi) or gi:is_monster() then
 		-- ¬ычисл€ем вектор разницы между координатами кости и level vertex. ѕытаемс€ найти level vertex наиболее близкий к кости
 		local diff = gi:bone_position("bip01_head"):sub(level.vertex_position(gi:level_vertex_id()))
 		local len = diff:magnitude()
@@ -3786,6 +3786,7 @@ function correct_position(gi,npc)
 		return gi:level_vertex_id()
 	end
 end
+--]=]
 
 function is_exclusion(npc)
 	local name = npc:name()

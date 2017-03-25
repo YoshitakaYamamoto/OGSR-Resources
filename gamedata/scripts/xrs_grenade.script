@@ -333,7 +333,7 @@ function evaluator_love_napalm_smell:check_grenade(section)
 	local function check_item(obj)
 		obj=obj:object()
 		if obj==nil or obj.clsid==nil then return false end
-		if not obj:clsid() == clsid.actor and not obj:clsid() == clsid.script_stalker then return false end
+		if not obj:is_actor() and not obj:is_stalker() then return false end
 		if npc:relation(obj) ~= game_object.enemy then
 			local d=bp:distance_to(obj:position())
 			if d<self.a.grenades[section].radius then return true end
@@ -463,7 +463,7 @@ function action_kill_it_with_fire:execute()
 				if obj and obj.clsid and obj:alive() then
 					local od=self.a.target_point:distance_to(obj:position())
 					if od<r then
-						if obj:clsid() == clsid.actor or v == true then
+						if obj:is_actor() or v == true then
 							if npc:relation(obj) == game_object.enemy then
 								en_inj=true
 							else
@@ -825,8 +825,8 @@ end
 
 function check_enemy(npc,be)
 	return npc:alive() and be and (
-		be:clsid() == clsid.script_stalker or
-		be:clsid() == clsid.actor or 
+		be:is_stalker() or
+		be:is_actor() or 
 		be:clsid() == clsid.bloodsucker_s or
 		be:clsid() == clsid.burer_s or
 		be:clsid() == clsid.controller_s or

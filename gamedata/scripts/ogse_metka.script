@@ -32,7 +32,7 @@ function gps_drop_timer:condition()
 		if not parent:alive() then -- если выложили в ящик или труп
 			level.start_stop_menu(setup_gps_beacon(self.gps_obj:id()), true) -- ставм метку
 			return true 
-		elseif parent:id() ~= db.actor:id() then -- если отдали или продали живому персонажу
+		elseif not parent:is_actor() then -- если отдали или продали живому персонажу
 			return true -- то просто ничего не делаем
 		end
 	end

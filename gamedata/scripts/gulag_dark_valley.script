@@ -1149,25 +1149,19 @@ gulags.val_lager_bandits.state = function(gulag)
         for k,v in pairs(gulag.Object) do
             if v ~= true then
                 local enemy = v:best_enemy()
-                if enemy ~= nil then
-                    local enemy_type = get_clsid(enemy)
-					if enemy_type then
-						if enemy_type == clsid.actor and
-							utils.npc_in_zone(db.actor, db.zone_by_name["val_lager_bandits_restrictor"]) then
-							printf("gulag <val_lager_bandits>: STATE ALARM ACTOR")
-							return state_alarm_actor_inside
-						end
-						if enemy_type == clsid.actor or enemy_type == clsid.script_stalker then --or enemy_type == clsid.trader
-							printf("gulag <val_lager_bandits>: STATE ALARM")
-							return state_alarm
-						end
+                if enemy then
+					if enemy:is_actor() and
+						utils.npc_in_zone(enemy, db.zone_by_name["val_lager_bandits_restrictor"]) then
+						return state_alarm_actor_inside
 					end
-                end
+					if enemy:is_stalker() then
+						return state_alarm
+					end
+               end
             end
         end
     end
-    
-    printf("gulag <val_lager_bandits>: STATE NORMAL")
+
     return state_normal
 end
 

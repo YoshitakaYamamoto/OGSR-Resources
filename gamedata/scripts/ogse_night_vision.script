@@ -190,7 +190,7 @@ end
 
 function chek_outfit_double_pnv(obj) --Проверка "двойного" надевания ПНВ при смене костюма
 	local is_nv_obj = sys_ini:line_exist(obj:section(), "nightvision_sect") --Проверка, есть ли в конфиге объекта строка nightvision_sect
-	local is_outfit_nv = isOutfit(obj) and is_nv_obj --проверка, является ли объект костюмом в котором есть встроенный ПНВ
+	local is_outfit_nv = obj:is_outfit() and is_nv_obj --проверка, является ли объект костюмом в котором есть встроенный ПНВ
 
 	local nv_slot = db.actor:item_in_slot(11) --предмет в слоте ПНВ
 

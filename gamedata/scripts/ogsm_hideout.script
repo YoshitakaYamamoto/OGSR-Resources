@@ -135,7 +135,7 @@ end
 --->> nice one, taken from Monnoroch AI
 local hostile_treshold = get_float("game_relations", "attitude_neutal_threshold")
 function is_hostile(comm,target)
-	if IsMonster(target) then
+	if target:is_monster() then
 		return true
 	end
 
