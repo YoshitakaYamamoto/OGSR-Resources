@@ -1,23 +1,10 @@
 
 function attach(sm)
-	sm:subscribe({signal = "on_spawn", fun = this.init})
 	sm:subscribe({signal = "on_take",  fun = this.on_take}) --должен вызываться первым в on_take!
 end
 
-
-ammo = {} --Используется во многих скриптах
+local ammo = {}
 local repack = false
-
-
-function init() --Инициализация переменных, выполняется единожды
-	for k, _ in pairs(ammo_section) do --Список патронов возьмём из таблицы в _G
-		ammo[k] = {
-			["repack"] = false,
-			["box"] = sys_ini:r_u32(k, "box_size")
-		}
-	end
-	--log3("AMMO tbl afther init: %s", ammo)
-end
 
 --------
 -- вызывается при добавлении в инвентарь ГГ любых патрон
@@ -28,19 +15,24 @@ end
 --------
 function on_take(obj, s_obj)
 	if device().precache_frame > 1 then return end --Во время загрузки ничего не делаем
+	if not obj:is_ammo() then return end
 
-	local section = s_obj:section_name()
-	if ammo[section] then
-		--log3("~~[%s.on_take] Size of [%s]: [%s], default in box: [%s]", script_name(), obj:name(), get_ammo_size(obj), ammo[section].box)
-		if not ammo[section].repack then
-			if get_ammo_size(obj) < ammo[section].box then
-				ammo[section].repack = true
-				repack = true
-				run_repack_ammo_timer()
-			end
-		end
-		return true --Вроде бы патроны более в on_take нигде не нужны, можно закончить цепочку вызовов.
+	local section = obj:section()
+	if not ammo[section] then
+		ammo[section] = {
+			["repack"] = false,
+			["box"] = get_u32(section, "box_size")
+		}
 	end
+	--log3("~~[%s.on_take] Size of [%s]: [%s], default in box: [%s]", script_name(), obj:name(), get_ammo_size(obj), ammo[section].box)
+	if not ammo[section].repack then
+		if get_ammo_size(obj) < ammo[section].box then
+			ammo[section].repack = true
+			repack = true
+			run_repack_ammo_timer()
+		end
+	end
+	return true --Вроде бы патроны более в on_take нигде не нужны, можно закончить цепочку вызовов.
 end
 
 
@@ -105,13 +97,4 @@ function check_repack_ammo_timer:condition()
 end
 function check_repack_ammo_timer:action()
   repack_ammo_t = nil
-end
-
-
---------
--- возвращает колличество патрон в пачке
--- http://www.amk-team.ru/forum/index.php?showtopic=10538&p=713968
---------
-function get_ammo_size(obj)
-	return obj:get_go_int16( "", 476 )
 end

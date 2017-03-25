@@ -163,7 +163,7 @@ function CTreasure:give_treasure(k)
 -------------------------------
 
 	for k,t in pairs(v.items) do
-		if ammo_section[t.section] then
+		if get_class(t.section) == clsid.ammo then
 			ogse.spawn_ammo_in_inv(t.section, t.prob, sobj)
 		else
 			ogse.spawn_item_in_inv(t.section, sobj, t.prob)

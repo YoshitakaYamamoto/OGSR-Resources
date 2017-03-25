@@ -348,13 +348,7 @@ end
 
 
 function get_ammo_box_size( sect )
-  local box_size
-  if dunin_ammo.ammo[ sect ] then
-    box_size = dunin_ammo.ammo[ sect ].box
-  else
-    box_size = get_u32( sect, "box_size" )
-  end
-  return box_size
+  return get_u32( sect, "box_size" )
 end
 
 
@@ -386,9 +380,9 @@ function get_actor_items( check_f )
       end
       if item.game_type == "ammo" then
         if item.count then
-          item.count = item.count + dunin_ammo.get_ammo_size( obj )
+          item.count = item.count + get_ammo_size( obj )
         else
-          item.count = dunin_ammo.get_ammo_size( obj )
+          item.count = get_ammo_size( obj )
         end
       end
     end
@@ -961,7 +955,7 @@ function ui_rukzak:move_from_our( ui_item )
   end
   local size
   if item.game_type == "ammo" then
-    size = dunin_ammo.get_ammo_size( obj )
+    size = get_ammo_size( obj )
     item.count = item.count - size
   else
     size = 1

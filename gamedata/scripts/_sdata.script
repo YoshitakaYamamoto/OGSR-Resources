@@ -190,7 +190,7 @@ function info_about_npc()
 	
 	local target_obj = level.get_target_obj()
 	if target_obj then 
-		if (IsStalker(target_obj) or IsMonster(target_obj)) then
+		if target_obj:is_stalker() or target_obj:is_monster() then
 	
 			local gulag_val,scheme1,scheme2,anim,mental,pos,lv,gv
 		
@@ -248,7 +248,7 @@ function info_about_npc()
 				end
 			end
 			local community = "monster"
-			if IsStalker(target_obj) then
+			if target_obj:is_stalker() then
 				community = target_obj:character_community()
 			end
 			local wound = xr_wounded.is_wounded(target_obj)
@@ -337,7 +337,7 @@ function info_about_npc()
 						"game_vertex: "..tostring(target_obj:game_vertex_id())
 						
 			if target_obj:is_ammo() then
-				LogicText = LogicText.."\\n \\nbullets in pack:"..dunin_ammo.get_ammo_size(target_obj)
+				LogicText = LogicText.."\\n \\nbullets in pack:"..get_ammo_size(target_obj)
 			end
 			
 			if PosLogic ~= nil then PosLogic:wnd():SetText(LogicText) end			

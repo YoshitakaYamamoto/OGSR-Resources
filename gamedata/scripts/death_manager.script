@@ -338,7 +338,7 @@ function keep_item(npc, item)
 			alife():release(srv_obj, true)
 		end
 	elseif item:is_ammo() then
-		local ammo_sz = dunin_ammo.get_ammo_size(item)
+		local ammo_sz = get_ammo_size(item)
 		if ammo_sz >= 1 then
 			local ammo_new_sz = math.random(1, ammo_sz)
 			set_ammo_size(item, ammo_new_sz)

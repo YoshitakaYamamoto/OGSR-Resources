@@ -226,13 +226,13 @@ end
 
 function validate_enemy_object( enemy )
   if not ( enemy and enemy.clsid ) then return false, nil end
-  if not ( IsStalker( enemy ) or IsMonster( enemy) ) then 
-    return false, nil
-  end
   if enemy.health == nil or enemy.health <= 0 then 
     return false, nil
   end
   if enemy.m_story_id ~= nil then -- это грязный хак чтобы выяснить не попался ли нам серверный объект
+    if not ( IsStalker( enemy ) or IsMonster( enemy) ) then
+      return false, nil
+    end
     local id = enemy.id
     local enemy_gameobj = level.object_by_id( id )
     if not enemy_gameobj then
@@ -241,6 +241,9 @@ function validate_enemy_object( enemy )
       return true, enemy_gameobj
     end
   else	
+    if not ( IsStalker(enemy) or enemy:is_monster() ) then
+      return false, nil
+    end
     return true, enemy
   end
 end
@@ -328,7 +331,8 @@ end
 -------------------------------------------------------------------------------------------------------
 
 function get_clsid(npc)
-    if not npc then return nil end
+--[=[
+	if not npc then return nil end
 	if npc and npc.id then
 		if type(npc.id) == "function" then
 			local id = npc:id()
@@ -352,6 +356,9 @@ function get_clsid(npc)
 		log1("!!DEBUG_GETCLSID DEAD_ON_ARRIVAL")
 		return nil
 	end
+--]=]
+	if obj then return obj:clsid() end
+	return nil
 end
 
 --/ Вычисляет yaw в радианах
@@ -431,29 +438,27 @@ local weapon_classes = {}
 -------------------------------------------------------------------------------------------
 local outfit_classes = {}
 -------------------------------------------------------------------------------------------
-local indoor_levels = {}
--------------------------------------------------------------------------------------------
-function IsMonster (object, class_id)
+function IsMonster(object, class_id)
 	local id = class_id or get_clsid(object)
 	return id and monster_classes[id]
 end
 -------------------------------------------------------------------------------------------
-function IsActor (object, class_id)
+function IsActor(object, class_id)
 	local id = class_id or get_clsid(object)
-	return id and id == clsid.actor
+	return id == clsid.actor
 end
 -------------------------------------------------------------------------------------------
-function IsStalker (object, class_id)
+function IsStalker(object, class_id)
 	local id = class_id or get_clsid(object)
 	return id and stalker_classes[id]
 end
 -------------------------------------------------------------------------------------------
-function IsAnomaly (object, class_id)
+function IsAnomaly(object, class_id)
 	local id = class_id or get_clsid(object)
 	return id and anomaly_classes[id]
 end
 -------------------------------------------------------------------------------------------
-function isWeapon (object, class_id)
+function isWeapon(object, class_id)
 	--[[if object and string.find(object:name(), "wpn_binoc") then
 		return false
 	end]]
@@ -473,13 +478,13 @@ end
 -------------------------------------------------------------------------------------------
 function isKnife(object, class_id)
 	local id = class_id or get_clsid(object)
-	return id and (id == clsid.wpn_knife or id == clsid.wpn_knife_s)
+	return id == clsid.wpn_knife or id == clsid.wpn_knife_s
 end
 -------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------
-function isIndoor(level_name)
-	return indoor_levels[level_name]
+function isIndoor(level_name) --KRodin: всем подземным уровням прописывается НЕ default погода. По этому признаку и будем проверять.
+	return get_string(level_name, "weathers", nil, game_ini()) ~= "default"
 end
 -------------------------------------------------------------------------------------------
 
@@ -763,15 +768,6 @@ function start_game_callback()
 		[clsid.equ_stalker] 			= true,
 		[clsid.equ_stalker_s] 			= true	
 	}
-	indoor_levels = {
-		["l03u_agr_underground"]		= true,
-		["l04u_labx18"]					= true,
-		["l08u_brainlab"]				= true,
-		["l10u_bunker"]					= true,
-		["l12u_sarcofag"]				= true,
-		["l12u_control_monolith"]		= true,
-		["l23_x9"]						= true
-	}
 
 	m_netpk.attach()
 
@@ -780,69 +776,6 @@ function start_game_callback()
 	dialog_manager.fill_phrase_table()	
 end
 
-ammo_section = {
-	["ammo_9x18_fmj"]		= true,
-	["ammo_9x18_pmm"]		= true,
-	["ammo_9x19_fmj"]		= true,
-	["ammo_9x19_pbp"]		= true,
-	["ammo_5.45x39_fmj"]	= true,
-	["ammo_5.45x39_ap"]		= true,
-	["ammo_5.56x45_ss190"]	= true,
-	["ammo_5.56x45_ap"]		= true,
-	["ammo_7.62x54_7h1"]	= true,
-	["ammo_7.62x54_ap"]		= true,
-	["ammo_7.62x54_7h14"]	= true,
-	["ammo_9x39_pab9"]		= true,
-	["ammo_9x39_ap"]		= true,
-	["ammo_11.43x23_fmj"]	= true,
-	["ammo_11.43x23_hydro"]	= true,
-	["ammo_12x70_kart"]	    = true,
-	["ammo_12x76_zhekan"]	= true,
-	["ammo_gauss"]		    = true,
-	["ammo_7.62x25_p"]	    = true,
-	["ammo_7.62x25_ps"]	    = true,
-	["ammo_og-7b"]	        = true,
-	["ammo_vog-25p"]	    = true,
-	["ammo_vog-25"]	        = true,
-	["ammo_m209"]	        = true,
-	["ammo_m208a"]	        = true,
-	["ammo_7.62x39_fmj"]	= true,
-	["ammo_7.62x39_ap"]	    = true,
-	["ammo_flame"]          = true,
-	["ammo_arbolt"]         = true,
-	["ammo_8.6x70_lm"]		= true,
-}
-
-quest_section = {
-	["btr_control_module_upgrade"]	= true,
-	["btr_control_module"]	= true,
-	["accum_depleted"]		= true,
-	["accum_full"]			= true,
-	["af_uley"]			= true,
-	["af_kolya"]			= true,
-	["quest_btr_keys"]		= true,
-	["gunslinger_flash"]	= true,
-	["af_blood_tutorial"]	= true,
-	["esc_wounded_flash"]	= true,
-	["quest_case_02"]		= true,
-	["dar_document1"]		= true,
-	["dar_document2"]		= true,
-	["dar_document3"]		= true,
-	["dar_document4"]		= true,
-	["dar_document5"]		= true,
-	["kruglov_flash"]		= true,
-	["lab_x16_documents"]	= true,
-	["good_psy_helmet"]	= true,
-	["bad_psy_helmet"]		= true,
-	["decoder"]			= true,
-	["dynamite"]			= true,
-	["quest_case_01"]		= true,
-	["hunters_toz"]		= true,
-	["wpn_montirovka"]		= true,
-	["bar_ecolog_flash"]	= true,
-	["bar_tiran_pda"]		= true,
-	["bar_lucky_pda"]		= true,
-}
 
 -------------------------------------------------------------------------------
 --                            Добавлено в OGSE                               --
@@ -914,10 +847,10 @@ function dbg_sys_ini:r_string(sec, param)
 	log3(debug.traceback())
 	return orig_sys_ini:r_string(sec, param)
 end
-function dbg_sys_ini:r_token(...)
+function dbg_sys_ini:r_token(sec, param)
 	log3("dbg_sys_ini:r_token: %s - %s", sec, param)
 	log3(debug.traceback())
-	return orig_sys_ini:r_token(...)
+	return orig_sys_ini:r_token(sec, param)
 end
 function dbg_sys_ini:r_line(sec, line_num)
 	log3("dbg_sys_ini:r_line: %s - %s", sec, line_num)
@@ -1800,6 +1733,11 @@ function reset_actor_items_tradability()
 end
 
 
+-- возвращает колличество патрон в пачке
+-- http://www.amk-team.ru/forum/index.php?showtopic=10538&p=713968
+function get_ammo_size(obj)
+	return obj:get_go_int16( "", 476 )
+end
 --Задать кол-во патронов в пачке
 function set_ammo_size(item, size)
 	item:set_go_int16(476, size)
@@ -1809,7 +1747,6 @@ end
 function get_inv_item_slot( obj )
 	return obj:get_inventory_item_int( nil, 156 )
 end
-
 function set_inv_item_slot( obj, slot )
 	obj:set_inventory_item_int( 156, slot )
 end
