@@ -17,7 +17,6 @@ function attach(sm)
 	sm:subscribe({signal = "on_item_to_slot",	fun = this.on_item_to_slot})
 	sm:subscribe({signal = "on_item_to_ruck",	fun = this.on_item_to_ruck})
 	sm:subscribe({signal = "on_drop",			fun = this.on_item_to_ruck})
-	sm:subscribe({signal = "on_destroy",		fun = this.remove_all_marks_from_minimap})
 end
 
 local subscribed
@@ -395,7 +394,7 @@ end
 
 function remove_mark_from_minimap(id, spot)
 	--log3("Called removing location by id for [%s], Spot: [%s]", id, spot)
-	level_tasks.remove_location_by_id(id, spot)
+	level.map_remove_object_spot(id, spot)
 	anoms_to_show[id] = nil
 end
 
@@ -403,9 +402,7 @@ function add_mark_on_minimap(id, sect)
 	local spot = ogse_detectors_data.mapspots_for_anoms[sect]
 	if spot then
 		--log3("Called adding location by id for [%s], Spot: [%s]", id, spot)
-		if level.map_has_object_spot(id, spot) ~= 1 then --на всякий случай
-			level_tasks.add_location_by_id(id, spot)
-		end
+		level.map_add_object_spot(id, spot, "")
 		anoms_to_show[id] = spot
 	end
 end
@@ -508,22 +505,16 @@ function on_update()
 		local new_anom_tbl = {}
 		--
 		for id, anm in pairs(anm_table) do
-			local obj = level.object_by_id(id)
-			if obj and not string.find(anm.sect, "nodetect") then
-				--
-				if not anoms_to_show[id] then
-					add_mark_on_minimap(id, anm.sect) --Установили метку на миникарте
-				end
-				new_anom_tbl[id] = true
-				--
-				local pos_y = anm.pos.y
-				anm.pos.y = 0
-				anm.dist = anm.pos:distance_to(act_pos_no_y)
-				anm.pos.y = pos_y
-				pair = pair + 1
-			else
-				anm_table[id] = nil
+			if not anoms_to_show[id] then
+				add_mark_on_minimap(id, anm.sect) --Установили метку на миникарте
 			end
+			new_anom_tbl[id] = true
+			--
+			local pos_y = anm.pos.y
+			anm.pos.y = 0
+			anm.dist = anm.pos:distance_to(act_pos_no_y)
+			anm.pos.y = pos_y
+			pair = pair + 1
 		end
 		--
 		for id, spot in pairs(anoms_to_show) do --Удаляем метки с аномалий, которые больше не нужно показывать на карте
