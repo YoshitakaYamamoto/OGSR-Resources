@@ -119,6 +119,7 @@ end
 function add_actor( obj )
 	actor = obj
 	actor_proxy:net_spawn( obj )
+	add_obj( obj )
 end
 
 function del_actor()

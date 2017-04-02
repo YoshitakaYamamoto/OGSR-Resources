@@ -357,7 +357,7 @@ function get_clsid(npc)
 		return nil
 	end
 --]=]
-	if obj then return obj:clsid() end
+	if npc then return npc:clsid() end
 	return nil
 end
 

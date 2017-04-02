@@ -21,6 +21,7 @@ function attach(sm)
 	sm:subscribe({ signal = "on_destroy",		fun = this.on_destroy })
 	sm:subscribe({ signal = "on_save",			fun = this.on_save })
 	sm:subscribe({ signal = "on_info",			fun = this.on_info })
+	sm:subscribe({ signal = "on_finalize",		fun = this.turn_off_scope_sights_lighting })
 end
 
 --==========================================================Настройки=================================================================
