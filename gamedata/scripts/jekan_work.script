@@ -351,83 +351,103 @@ function start_new_zagadka_timer()
 end
 
 function spawn_hunter_shron_1()
-	ogse.spawn_object(spawn_db.hunter_shron_1)
+	local data = spawn_db.hunter_shron_1
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_2()
-	ogse.spawn_object(spawn_db.hunter_shron_2)
+	local data = spawn_db.hunter_shron_2
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_3()
-	ogse.spawn_object(spawn_db.hunter_shron_3)
+	local data = spawn_db.hunter_shron_3
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_4()
-	ogse.spawn_object(spawn_db.hunter_shron_4)
+	local data = spawn_db.hunter_shron_4
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_5()
-	ogse.spawn_object(spawn_db.hunter_shron_5)
+	local data = spawn_db.hunter_shron_5
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_6()
-	ogse.spawn_object(spawn_db.hunter_shron_6)
+	local data = spawn_db.hunter_shron_6
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_7()
-	ogse.spawn_object(spawn_db.hunter_shron_7)
+	local data = spawn_db.hunter_shron_7
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_8()
-	ogse.spawn_object(spawn_db.hunter_shron_8)
+	local data = spawn_db.hunter_shron_8
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_9()
-	ogse.spawn_object(spawn_db.hunter_shron_9)
+	local data = spawn_db.hunter_shron_9
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_10()
-	ogse.spawn_object(spawn_db.hunter_shron_10)
+	local data = spawn_db.hunter_shron_10
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_11()
-	ogse.spawn_object(spawn_db.hunter_shron_11)
+	local data = spawn_db.hunter_shron_11
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_12()
-	ogse.spawn_object(spawn_db.hunter_shron_12)
+	local data = spawn_db.hunter_shron_12
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_13()
-	ogse.spawn_object(spawn_db.hunter_shron_13)
+	local data = spawn_db.hunter_shron_13
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_14()
-	ogse.spawn_object(spawn_db.hunter_shron_14)
+	local data = spawn_db.hunter_shron_14
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_15()
-	ogse.spawn_object(spawn_db.hunter_shron_15)
+	local data = spawn_db.hunter_shron_15
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_16()
-	ogse.spawn_object(spawn_db.hunter_shron_16)
+	local data = spawn_db.hunter_shron_16
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_17()
-	ogse.spawn_object(spawn_db.hunter_shron_17)
+	local data = spawn_db.hunter_shron_17
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_18()
-	ogse.spawn_object(spawn_db.hunter_shron_18)
+	local data = spawn_db.hunter_shron_18
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_19()
-	ogse.spawn_object(spawn_db.hunter_shron_19)
+	local data = spawn_db.hunter_shron_19
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 function spawn_hunter_shron_20()
-	ogse.spawn_object(spawn_db.hunter_shron_20)
+	local data = spawn_db.hunter_shron_20
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -637,7 +657,8 @@ function prof_zapiska_find()
 end
 ]]
 function spawn_bloha_shron()
-	ogse.spawn_object(spawn_db.bloha_shron)
+	local data = spawn_db.bloha_shron
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 --[[
 function have_prof_zapiska(stalker, player)
@@ -673,7 +694,8 @@ function plenniy_arts_out(first_speaker, second_speaker)
 end
 
 function spawn_plenniy_shron_fleshka()
-	ogse.spawn_object(spawn_db.bloha_shron2)
+	local data = spawn_db.bloha_shron2
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -3226,7 +3248,9 @@ end
 snd = xr_sound.get_safe_sound_object([[anomaly\bfuzz_blowout]])
 
 function spawn_afscanner()
-	ogse.spawn_object_rand(spawn_db.radist_shron)
+	local data = spawn_db.radist_shron[math.random(#spawn_db.radist_shron)]
+	dsh_rukzak.create_rukzak_by_section( data.sec, vector():set(unpack(data.pos)), data.lvid, data.gvid )
+	--
 	local rest = spawn_db.radist_shron_rest
 	for i = 1,#rest do
 		log1("i = "..tostring(i))
@@ -4454,7 +4478,7 @@ end
 function spawn_engine_restrictor()
 	local sobj = spawn_restrictor("scripts\\jek@n\\restrictions\\agr_under_engine_sound.ltx", 3, spawn_db.agr_under_engine_sound)
 	level_tasks.add_location_by_id(sobj.id,"green_location","anomal_engine_name")
-	ogse.save_var("engine_id", sobj.id, "u32")
+	ogse.save_var("engine_id", sobj.id, "u16")
 end
 
 -- Торговый караван --------------------------------------------------------------------------------

@@ -5,7 +5,7 @@ function attach( sm )
   sm:subscribe({ signal = "on_use",  fun = this.on_use })
   sm:subscribe({ signal = "on_rukzak_use", fun = this.on_rukzak_use })
   --
-  sm:subscribe({ signal = "on_car_trunk_open", fun = this.on_rukzak_use }) --KRodin: �������� ��� ����� ������ �������� �����, � ��������� � se_car:on_unregister()
+  sm:subscribe({ signal = "on_car_trunk_open", fun = this.on_rukzak_use }) --KRodin: багажник для машин теперь создаётся здесь, а удаляется в se_car:on_unregister()
 end
 
 
@@ -37,6 +37,8 @@ function spawn_magic_rukzak( sect )
     local new  = alife():create(
       real, pos, db.actor:level_vertex_id(), db.actor:game_vertex_id()
     )
+	local sobj = alife():object( new.id )
+    sobj:use_ai_locations( false )
 end
 
 
@@ -68,24 +70,24 @@ function override_game_type( sect )
     local gtype = override_game_types[ sect ]
     if gtype then
       gtype = gtype == "other" and "" or gtype
-    elseif string.find( sect, "^fake_wpn_" ) then --����-��������
+    elseif string.find( sect, "^fake_wpn_" ) then --фейк-предметы
       gtype = "knife"
-    elseif string.find( sect, "^mutant_" ) then --����� ��������
+    elseif string.find( sect, "^mutant_" ) then --части монстров
       gtype = "mutant_part"
-    elseif string.find( sect, "^af_maska_" ) --�����������
-	  or string.find( sect, "exo" ) --�����������
+    elseif string.find( sect, "^af_maska_" ) --противогазы
+	  or string.find( sect, "exo" ) --экзоскелеты
 	then
 	  gtype = "outfit"
-    elseif string.find( sect, "^cartridge_" ) then --��������� ��� �����������
+    elseif string.find( sect, "^cartridge_" ) then --картриджи для автодоктора
 	  gtype = "medkit"
-    elseif string.find( sect, "^wpn_addon_" ) then --������ ��� ������
+    elseif string.find( sect, "^wpn_addon_" ) then --аддоны для оружия
 	  gtype = "gl"
     elseif string.find( sect, "^wpn_binoc" )
-      or string.find( sect, "detector" ) --��������� ����������, ��� � ��.
-      or string.find( sect, "^firmware_" ) --�������� ��� ���������
-      or string.find( sect, "^device_pnv_" ) --���
-      or string.find( sect, "^book_" ) --������
-      or string.find( sect, "^sigaret" ) --��������
+      or string.find( sect, "detector" ) --детекторы артефактов, мин и тд.
+      or string.find( sect, "^firmware_" ) --прошивки для биорадара
+      or string.find( sect, "^device_pnv_" ) --ПНВ
+      or string.find( sect, "^book_" ) --Книжки
+      or string.find( sect, "^sigaret" ) --сигареты
     then
       gtype = ""
     end
@@ -347,11 +349,6 @@ function spawn_weapon_in_inv( sect, info_str, who, override, modified_params )
 end
 
 
-function get_ammo_box_size( sect )
-  return get_u32( sect, "box_size" )
-end
-
-
 function get_actor_items( check_f )
   local items_our = {}
   local by_key    = {}
@@ -371,7 +368,7 @@ function get_actor_items( check_f )
           [ "section"   ] = sect,
           [ "condition" ] = tonumber( cond ),
           [ "game_objs" ] = { obj },
-          [ "game_type" ] = get_game_type( obj ),
+          [ "game_type" ] = get_game_type( sect ),
           [ "info"      ] = info,
           [ "key"       ] = key,
         }
@@ -406,42 +403,111 @@ function can_include_into_actor_items( item )
 end
 
 
-function get_game_type( obj )
+--KRodin: заменил здесь проверки obj:is_*() на проверки по классу, указаному в секции.
+--Чтобы можно было определять тип объекта, когда есть только его секция.
+--Подглядел список классов в исходниках, вроде бы ничего не забыл.
+local wpn_magazined_clsids = {
+	[clsid.wpn_wmagaz] = true,
+	[clsid.wpn_wmaggl] = true,
+	[clsid.wpn_fn2000] = true,
+	[clsid.wpn_ak74] = true,
+	[clsid.wpn_lr300] = true,
+	[clsid.wpn_hpsa] = true,
+	[clsid.wpn_pm] = true,
+	[clsid.wpn_fort] = true,
+	[clsid.wpn_binocular] = true,
+	[clsid.wpn_shotgun] = true,
+	[clsid.wpn_svd] = true,
+	[clsid.wpn_svu] = true,
+	[clsid.wpn_rpg7] = true,
+	[clsid.wpn_val] = true,
+	[clsid.wpn_vintorez] = true,
+	[clsid.wpn_walther] = true,
+	[clsid.wpn_usp45] = true,
+	[clsid.wpn_groza] = true,
+	[clsid.wpn_bm16] = true,
+	[clsid.wpn_rg6] = true,
+	--
+	[clsid.wpn_ak74_s] = true,
+	[clsid.wpn_lr300_s] = true,
+	[clsid.wpn_binocular_s] = true,
+	[clsid.wpn_bm16_s] = true,
+	[clsid.wpn_groza_s] = true,
+	[clsid.wpn_svd_s] = true,
+	[clsid.wpn_hpsa_s] = true,
+	[clsid.wpn_pm_s] = true,
+	[clsid.wpn_rg6_s] = true,
+	[clsid.wpn_rpg7_s] = true,
+	[clsid.wpn_shotgun_s] = true,
+	[clsid.wpn_svu_s] = true,
+	[clsid.wpn_usp45_s] = true,
+	[clsid.wpn_val_s] = true,
+	[clsid.wpn_vintorez_s] = true,
+	--[clsid.wpn_walther_s] = true, --В ОГСЕ вырезан в class_registrator'e
+}
+local artefact_clsids = {
+	[clsid.art_mercury_ball] = true,
+	[clsid.art_black_drops] = true,
+	[clsid.art_needles] = true,
+	[clsid.art_bast_artefact] = true,
+	[clsid.art_gravi_black] = true,
+	[clsid.art_dummy] = true,
+	[clsid.art_zuda] = true,
+	[clsid.art_thorn] = true,
+	[clsid.art_faded_ball] = true,
+	[clsid.art_electric_ball] = true,
+	[clsid.art_rusty_hair] = true,
+	[clsid.art_galantine] = true,
+	[clsid.art_gravi] = true,
+	[clsid.artefact] = true,
+	--
+	[clsid.artefact_s] = true,
+}
+local ammo_clsids = {
+	[clsid.wpn_ammo] = true,
+	[clsid.wpn_ammo_vog25] = true,
+	[clsid.wpn_ammo_og7b] = true,
+	[clsid.wpn_ammo_m209] = true,
+}
+local outfit_clsids = {
+	[clsid.equ_scientific] = true,
+	[clsid.equ_stalker] = true,
+	[clsid.equ_stalker_s] = true,
+	[clsid.equ_military] = true,
+	[clsid.equ_exo] = true,
+}
+function get_game_type( sect )
   local game_type
-  local sect          = obj:section()
+  local class = get_class( sect )
   local override_type = override_game_type( sect )
-  if override_type then
-    game_type = override_type
-  elseif obj:is_ammo() then
+  if override_type then return override_type end
+  --
+  if ammo_clsids[class] then
     game_type = "ammo"
-  elseif obj:is_knife() then
+  elseif class == clsid.wpn_knife or class == clsid.wpn_knife_s then
     game_type = "knife"
-  elseif obj:is_weapon_magazined() then
+  elseif wpn_magazined_clsids[class] then
     game_type = "weapon"
-  elseif obj:is_outfit() then
+  elseif outfit_clsids[class] then
     game_type = "outfit"
-  elseif obj:is_artefact() then
+  elseif artefact_clsids[class] then
     game_type = "artefact"
-  elseif obj:is_grenade() then
+  elseif class == clsid.wpn_grenade_f1 or class == clsid.wpn_grenade_rgd5 then
     game_type = "grenade"
-  elseif obj:is_missile() then
-    game_type = "missile"
-  elseif obj:is_scope() then
+  elseif class == clsid.wpn_scope or class == clsid.wpn_scope_s then
     game_type = "scope"
-  elseif obj:is_silencer() then
+  elseif class == clsid.wpn_silencer then
     game_type = "silencer"
-  elseif obj:is_grenade_launcher() then
+  elseif class == clsid.wpn_grenade_launcher then
     game_type = "gl"
-  elseif obj:is_medkit() then
+  elseif class == clsid.obj_medkit or class == clsid.obj_bandage then
     game_type = "medkit"
-  elseif obj:is_antirad() then
+  elseif class == clsid.obj_antirad then
     game_type = "antirad"
-  elseif obj:is_food_item() then
+  elseif class == clsid.obj_food then
     game_type = "food"
-  elseif obj:is_bottle_item() then
+  elseif class == clsid.obj_bottle then
     game_type = "bottle"
-  elseif obj:is_eatable_item() then
-    game_type = "eatable"
   end
   return game_type or ""
 end
@@ -511,7 +577,7 @@ function get_art_info_text( sect )
       table.insert(
         texts,
         string.format(
-          "%%c[default]� %-12s %s%+.0f %s",
+          "%%c[default]X %-12s %s%+.0f %s",
           game.translate_string( af_ui_name[ k ] ), color, af_val, sn
         )
       )
@@ -532,7 +598,7 @@ function get_art_info_text( sect )
         table.insert(
           texts,
           string.format(
-            "%%c[default]� %-12s %s%+.0f %s",
+            "%%c[default]X %-12s %s%+.0f %s",
             game.translate_string( af_ui_name[ k ] ), color, af_val, "%"
           )
         )
@@ -653,7 +719,7 @@ function ui_rukzak:__init( obj ) super()
   self.index_other = {}
   self.index_our = {}
   self.owner_id = obj:id()
-  self.is_car = obj:is_car() --KRodin: ������ ��� ��������� ���������� � �������
+  self.is_car = obj:is_car() --KRodin: сделал для поддержки багажников в машинах
   self.xml_fname = "ui_dsh_rukzak.xml"
   self:InitControls()
   self:InitCallBacks()
@@ -872,7 +938,7 @@ function ui_rukzak:move_from_other( ui_item )
   local size, sobj
   if our.game_type == "ammo" then
     if not our.count then our.count = 0 end
-    local box_size = get_ammo_box_size( item.section )
+    local box_size = get_u32( item.section, "box_size" )
     if item.count > box_size then
       sobj = spawn_ammo_in_inv( item.section, box_size )
       size       = box_size
@@ -1085,7 +1151,7 @@ function ui_rukzak:show_cur_weight()
   else
     self.label_weight:SetTextColor( 255, 238, 153, 26 )
   end
-  self.label_weight:SetText( string.format( "���: %.1f ��.", inv_weight ) )
+  self.label_weight:SetText( string.format( "%s: %.1f kg.", game.translate_string("ui_inv_weight"), inv_weight ) )
 end
 
 
@@ -1195,19 +1261,19 @@ function ui_rukzak:show_filtered_items( keep_search )
   local filtered_our   = self.filtered_our
   if not ( filtered_other and filtered_our ) then
     local by_type;
-    if     show_idx == 1 then   -- ������
+    if     show_idx == 1 then   -- оружие
       by_type = function( item )
         return item.game_type == "weapon" or item.game_type == "knife"
       end
-    elseif show_idx == 2 then   -- �������
+    elseif show_idx == 2 then   -- патроны
       by_type = function( item )
         return item.game_type == "ammo"
       end
-    elseif show_idx == 3 then   -- �������
+    elseif show_idx == 3 then   -- гранаты
       by_type = function( item )
-        return item.game_type == "grenade" or item.game_type == "missile"
+        return item.game_type == "grenade"
       end
-    elseif show_idx == 4 then   -- ������ �� ������
+    elseif show_idx == 4 then   -- обвесы на оружие
       by_type = function( item )
         return
           item.game_type == "scope"
@@ -1216,28 +1282,25 @@ function ui_rukzak:show_filtered_items( keep_search )
           or
           item.game_type == "gl"
       end
-    elseif show_idx == 5 then   -- �����
+    elseif show_idx == 5 then   -- броня
       by_type = function( item )
         return item.game_type == "outfit"
       end
-    elseif show_idx == 6 then   -- ���������
+    elseif show_idx == 6 then   -- артефакты
       by_type = function( item )
         return item.game_type == "artefact"
       end
-    elseif show_idx == 7 then   -- ���
+    elseif show_idx == 7 then   -- еда
       by_type = function( item )
         return
-          item.game_type == "food"
-          or
-          item.game_type == "bottle"
-          or
-          item.game_type == "eatable"
+             item.game_type == "food"
+          or item.game_type == "bottle"
       end
-    elseif show_idx == 8 then   -- ��������
+    elseif show_idx == 8 then   -- медицина
       by_type = function( item )
         return item.game_type == "medkit" or item.game_type == "antirad"
       end
-    elseif show_idx == 9 then   -- ����� ��������
+    elseif show_idx == 9 then   -- части мутантов
       by_type = function( item )
         return item.game_type == "mutant_part"
       end
@@ -1343,25 +1406,23 @@ function ui_rukzak:get_item_description( item )
 end
 
 
-function spawn_item_in_rukzak( rukzak_id, section, num )
-	ASSERT(rukzak_id and section, "") --�� ������ ������
-
-	local items = load_rukzak( rukzak_id )
-	local item = {
-		[ "section"   ] = section,
-		[ "condition" ] = 100,
-		[ "game_type" ] = override_game_type( section ) or "",
-		[ "count"     ] = num or 1,
-		[ "info"      ] = "",
-		[ "key"       ] = string.format( "%s:%.2f:", section, 100 ),
-	}
+function spawn_item_in_rukzak( rukzak_id, sect, num )
+	ASSERT(rukzak_id and sect, "") --на всякий случай
+	local items    = load_rukzak( rukzak_id )
+	local class    = get_class( sect )
+	local item     = {}
+	item.section   = sect
+	item.condition = 100
+	item.game_type = get_game_type( sect )
+	item.count     = ammo_clsids[class] and get_u32(sect, "box_size") * (num or 1) or (num or 1)
+	item.info      = wpn_magazined_clsids[class] and "1,"..get_string_wq(sect, "ammo_mag_size")..",0,0,0,0,0" or ""
+	item.key       = string.format( "%s:%.2f:%s", sect, 100, item.info )
 	table.insert( items, item )
 	save_rukzak( rukzak_id, items )
 end
 
 function is_item_in_rukzak(rukzak_id, section)
-	ASSERT(rukzak_id and section, "") --�� ������ ������
-
+	ASSERT(rukzak_id and section, "") --на всякий случай
 	local items = load_rukzak( rukzak_id )
 	for i=1, #items do
 		local item = items[i]
@@ -1373,13 +1434,12 @@ function is_item_in_rukzak(rukzak_id, section)
 end
 
 function remove_item_from_rukzak(rukzak_id, section)
-	ASSERT(rukzak_id and section, "") --�� ������ ������
-
+	ASSERT(rukzak_id and section, "") --на всякий случай
 	local items = load_rukzak( rukzak_id )
-	for i = #items, 1 , -1 do --���� � �������� �������, ����� ��������� ������� table.remove. ��, �� ������ ������.
+	for i = #items, 1 , -1 do --Цикл в обратном порядке, чтобы корректно работал table.remove. Ну, на всякий случай.
 		local item = items[i]
 		if item.section == section then
-			item.count = item.count - 1
+			item.count = ammo_clsids[get_class(section)] and item.count - get_u32(section, "box_size") or item.count - 1
 			if item.count < 1 then
 				table.remove(items, i)
 			end
@@ -1387,4 +1447,65 @@ function remove_item_from_rukzak(rukzak_id, section)
 		end
 	end
 	save_rukzak( rukzak_id, items )
+end
+
+
+--[=[
+Универсальная функция для создания тайников.
+Пример использования:
+	local items = {
+		["wpn_swd_svd10_pso1"] = 1,
+		["ammo_7.62x54_7h14"] = 5,
+		["wpn_groza"] = 1,
+		["ammo_vog-25p"] = 5,
+	}
+	dsh_rukzak.create_rukzak( db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), items, "green_location", "Rukzak" )
+]=]
+function create_rukzak( pos, lv, gv, items, mapspot, hint )
+	local ruck = alife():create( "dsh_treasure_item", pos, lv, gv )
+	local sobj = alife():object( ruck.id )
+    sobj:use_ai_locations( false )
+	--
+	local ruck_items = load_rukzak( ruck.id )
+	for sect, num in pairs( items ) do
+		local class    = get_class( sect )
+		local item     = {}
+		item.section   = sect
+		item.condition = 100
+		item.game_type = get_game_type( sect )
+		item.count     = ammo_clsids[class] and get_u32(sect, "box_size") * num or num
+		item.info      = wpn_magazined_clsids[class] and "1,"..get_string_wq(sect, "ammo_mag_size")..",0,0,0,0,0" or ""
+		item.key       = string.format( "%s:%.2f:%s", sect, 100, item.info )
+		table.insert( ruck_items, item )
+	end
+	save_rukzak( ruck.id, ruck_items )
+	--
+	if mapspot then
+		ASSERT( hint, "hint not found!" )
+		level.map_add_object_spot_ser( ruck.id, mapspot, hint )
+	end
+end
+
+
+--[=[
+Специальная функция для упрощённого перевода старых тайников на новую систему.
+Например, конструкцию вида:
+alife():create("a_inventory_box12",vector():set(1146.6,-0.78,-30.55),477896,2280)
+Можно просто заменить на:
+dsh_rukzak.create_rukzak_by_section("a_inventory_box12",vector():set(1146.6,-0.78,-30.55),477896,2280)
+После этого вместо обычного рюкзака будет заспавнен волшебный.
+--]=]
+function create_rukzak_by_section( sect, pos, lv, gv, mapspot, hint )
+	ASSERT(sect, "") --на всякий случай
+	local path = get_string(sect, "custom_data")
+	ASSERT(path, "Can't find custom_data in section [%s]", sect)
+	local ini = ini_file(path)
+	ASSERT(ini, "Can't find file [%s]", path)
+	local spawn_cd = get_section_keys_and_values( "spawn", ini )
+	--log3("[%s] spawn_cd of [%s]: %s", script_name(), sect, spawn_cd)
+	for k,v in pairs(spawn_cd) do
+		spawn_cd[k] = v == "" and 1 or tonumber(v)
+		ASSERT( type(spawn_cd[k]) == "number", "!![%s] Incorrect count of [%s]! Rukzak section: [%s]", script_name(), k, sect )
+	end
+	create_rukzak( pos, lv, gv, spawn_cd, mapspot, hint )
 end
