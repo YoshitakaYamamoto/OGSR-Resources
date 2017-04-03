@@ -136,8 +136,10 @@ local surge_db = {}
 function surge_db_init()
 	surge_db.surge_process_stage_01 = {
 		on_info = {
-			call1 = this.set_info_preblow,  -- инфо предвыброса
-			call2 = news_main_new.vubros_msg,  -- новость о выбросе
+			call1 = function()
+				set_info_preblow() --Инфо предвыброса
+				news_main_new.vubros_msg() --Новость о выбросе
+			end,
 		},
 		on_info_deferred = {
 			if_surface = {
@@ -201,8 +203,10 @@ function surge_db_init()
 	}
 	surge_db.surge_process_stage_05 = { --3. Проигрываем промежуточные эффекты
 		on_info = {
-			call1 = news_main_data.on_disconnect_vbs, -- выдаем сообщение о дисконнекте
-			call2 = this.set_no_net_signal,
+			call1 = function()
+				news_main_data.on_disconnect_vbs() --Выдаем сообщение о дисконнекте
+				set_no_net_signal()
+			end,
 			if_surface = {Flag2 = 1,},
 			if_underground = {Flag2 = 0,},
 		},
@@ -229,8 +233,10 @@ function surge_db_init()
 				call1 = soundtrack.surge_wave_2, -- хитрое гудение
 				snd1 = [[anomaly\blowout]], -- раскаты грома с сиренами
 			},
-			call1 = soundtrack.strange_sounds, -- рандомные звуки: гудение, шум воздуха и пр.
-			call2 = soundtrack.earthquake_sound, -- низкий глухой шум воздуха с раскатами грома в фоне
+			call1 = function()
+				soundtrack.strange_sounds() --Рандомные звуки: гудение, шум воздуха и пр.
+				soundtrack.earthquake_sound() --Низкий глухой шум воздуха с раскатами грома в фоне
+			end,
 			pp_eff1 = {"vibros.ppe", 1974, false},  -- разовое двоение картинки с покраснением, выбелением, выцветанием картинки в конце
 			cam_eff1 = {"camera_effects\\earthquake.anm", 1974, true}, -- землетрясение
 		},
@@ -394,8 +400,10 @@ function surge_db_init()
 				Flag2 = 0, 
 				Dead2 = 0,					
 			},
-			call1 = this.set_first_blow,
-			call2 = this.on_surge_end, --  сюда скинул всё, что неудобно вызывать в простой форме
+			call1 = function()
+				set_first_blow()
+				on_surge_end() --Cюда скинул всё, что неудобно вызывать в простой форме
+			end,
 			Dead2 = 0, 
 			Flag2 = 0,
 		},
