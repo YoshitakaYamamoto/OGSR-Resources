@@ -438,7 +438,7 @@ function saharov_tell_about_complete_timer()
 	local text = game.translate_string("ogse_tp_art_4_text")
 	db.actor:give_info_portion("ogse_teleport_trap_find_art_get_trouble")
 	ogse.send_tip(text, game.translate_string("yan_saharov_name")..":", 0, 15, "saharov", "task")
-	ogse.start_visual_timer(nil, 15, script_name() .. ".saharov_tell_about_complete")
+	ogse_st_mgr.start_visual_timer(nil, 15, script_name() .. ".saharov_tell_about_complete")
 end
 
 function ogse_teleport_trap_art_destiny_taction()

@@ -917,7 +917,7 @@ function spawn_bomba()
 	level.client_spawn_manager():add( sbomb.id, -1, function(id, obj)
 		obj:set_tip_text("spawn_bomba_text")
 	end )
-	ogse.start_conditional_visual_timer(nil, 180, script_name() .. ".DetonateBombCond", script_name() .. ".DetonateBomb")
+	ogse_st_mgr.start_conditional_visual_timer(nil, 180, script_name() .. ".DetonateBombCond", script_name() .. ".DetonateBomb")
 end
 
 function DetonateBombCond()
@@ -953,7 +953,7 @@ end
 function on_use_mic()
 	if actor_near_esc_killers() then
 		ogse.save_var("StoreSound", true, "bool")
-		ogse.start_conditional_visual_timer(nil, 51, script_name() .. ".WaitSoundRecordCond", script_name() .. ".WaitSoundRecord")
+		ogse_st_mgr.start_conditional_visual_timer(nil, 51, script_name() .. ".WaitSoundRecordCond", script_name() .. ".WaitSoundRecord")
 	else
 		news_manager.send_tip(db.actor, "on_use_mic_text", 0, "stalker", 7000)
 		local act = db.actor
@@ -1214,7 +1214,7 @@ function on_hit_sv_enemy()
     news_manager.send_tip(db.actor, "on_hit_sv_enemy_text", 0, "freedom", 7000)
 	local time_to_explose = 90
 	if db.actor:has_info("bar_kvest_friend_of_barman_lost_glassbeads") then time_to_explose = time_to_explose*2 end
-	ogse.start_visual_timer("bar_kvest_friend_of_barman_bomb_explose", time_to_explose, script_name()..".babah_bomba_friend_barman")
+	ogse_st_mgr.start_visual_timer("bar_kvest_friend_of_barman_bomb_explose", time_to_explose, script_name()..".babah_bomba_friend_barman")
 end
 
 function add_spot_friend_barman()
@@ -1482,7 +1482,7 @@ function captive_on_agr_mill_base_send_tip_about_heli()
 end
 
 function captive_on_agr_mill_base_start_heli_timer()
-	ogse.start_visual_timer("captive_on_agr_mill_base_start_heli", 6*60, script_name()..".captive_on_agr_mill_base_save_start_heli")
+	ogse_st_mgr.start_visual_timer("captive_on_agr_mill_base_start_heli", 6*60, script_name()..".captive_on_agr_mill_base_save_start_heli")
 end
 
 -- Вертолет летит по душу пленника
@@ -2073,7 +2073,7 @@ function on_actor_zombie_2()
 		log1("ERROR! No chuk!")
 	end
 	-- Запустим таймер окончания зомбирования
-	ogse.start_visual_timer(nil, 420, script_name() .. ".make_actor_normal")
+	ogse_st_mgr.start_visual_timer(nil, 420, script_name() .. ".make_actor_normal")
 end
 
 function make_actor_normal()
