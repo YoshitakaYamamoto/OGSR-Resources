@@ -1780,7 +1780,8 @@ function spawn_rpg()
 end
 
 function spawn_rpg1()
-	alife():create("wpn_rpg7", vector():set(-105.93, -2.5, -491.782), 274706, 3077)
+	local rpg_sobj = alife():create("wpn_rpg7", vector():set(-105.93, -2.5, -491.782), 274706, 3077)
+	dsh.clear_useful_for_ai( rpg_sobj ) --Чтобы наёмники гранатомёт не подобрали
 	alife():create("ammo_og-7b", vector():set(-105.93, -2.5, -491.782), 274706, 3077)
 end
 
