@@ -23,6 +23,11 @@ local state_moving = 1
 local state_standing = 2
 
 local sync = {}
+
+local extrapolate_hack_type = {
+	[ "yan_scientist_door_2_walk" ] = patrol.custom
+}
+
 ------------------------------------------------------------------------------------------------------------------
 function alt_choose_look_point(patrol_look, path_look_info, search_for)
 	local this_val -- значение флагов текущей точки
@@ -120,6 +125,10 @@ function move_mgr:extrapolate_callback(npc)
 	self.can_use_get_current_point_index = true
 	self.current_point_init_time = time_global()
 	self.current_point_index = self.object:get_current_point_index()
+	-- https://github.com/dsh2dsh/op2ogse/commit/aa47bc6f07ada7c477fe191b81f99d500f72d406
+	-- https://github.com/dsh2dsh/op2ogse/commit/e78862f4ba544e6b2b28bf660236d7e89a7e4e2f
+	self.object:set_start_point(self.current_point_index)
+	self.object:set_patrol_path(self.path_walk, ( extrapolate_hack_type[ self.path_walk ] or patrol.next ), patrol.continue, true)
 end
 
 function move_mgr:standing_on_terminal_waypoint()
