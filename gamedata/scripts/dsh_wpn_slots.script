@@ -107,10 +107,7 @@ function on_save()
       )
       if orig_slot ~= slot then
 		table.insert(
-          active, (
-            db.actor:active_item()
-            and db.actor:active_item():id() == item_in_slot:id()
-          ) and true or false
+          active, ( db.actor:active_item() and db.actor:active_item():id() == item_in_slot:id() )
         )
         table.insert( items, item_in_slot:id() )
         table.insert( new_slots, slot )

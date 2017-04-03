@@ -19,7 +19,7 @@ for i = 1, 65534 do
 	local sobj = alife():object(i)
 	if sobj then
 		if sobj:clsid() == clsid.respawn then
-			local pk = get_netpk.net_respawn(sobj, 1)
+			local pk = get_netpk(sobj, 1)
 			ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
 			local data = pk:get()
 			log4("[Respawners]", "[Data of %s]: %s", sobj:name(), data)

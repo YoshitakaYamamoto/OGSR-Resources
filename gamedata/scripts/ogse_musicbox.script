@@ -161,12 +161,12 @@ function on_load()
         musicbox_mem.obj = musicbox_base(obj)
         local mbox = musicbox_mem.obj
         if mbox then
-            mbox.checkedPlate   = ogse_unist.get_value('mbox_checkedPlate'  , 0    , "number")
-            mbox.checkedTrack   = ogse_unist.get_value('mbox_checkedTrack'  , 0    , "number")
-            mbox.actionPlate    = ogse_unist.get_value('mbox_actionPlate'   , 0    , "number")
-            mbox.actionTrack    = ogse_unist.get_value('mbox_actionTrack'   , 0    , "number")
-            mbox.checkedPlayAll = ogse_unist.get_value('mbox_checkedPlayAll', false, "bool"  )
-            local changer       = ogse_unist.get_value('mbox_changer'       , {}   , "array" )
+            mbox.checkedPlate   = ogse.load_var('mbox_checkedPlate'  , 0    , "number")
+            mbox.checkedTrack   = ogse.load_var('mbox_checkedTrack'  , 0    , "number")
+            mbox.actionPlate    = ogse.load_var('mbox_actionPlate'   , 0    , "number")
+            mbox.actionTrack    = ogse.load_var('mbox_actionTrack'   , 0    , "number")
+            mbox.checkedPlayAll = ogse.load_var('mbox_checkedPlayAll', false, "bool"  )
+            local changer       = ogse.load_var('mbox_changer'       , {}   , "array" )
             for i = 1, #changer do
                 mbox.changer[i] = {section = changer[i]}
             end
@@ -184,16 +184,16 @@ end
 function on_save()
     local mbox = musicbox_mem.obj
     if isUserdata(mbox) then
-        ogse_unist.set_value('mbox_checkedPlate'  , mbox.checkedPlate   , "number")
-        ogse_unist.set_value('mbox_checkedTrack'  , mbox.checkedTrack   , "number")
-        ogse_unist.set_value('mbox_actionPlate'   , mbox.actionPlate    , "number")
-        ogse_unist.set_value('mbox_actionTrack'   , mbox.actionTrack    , "number")
-        ogse_unist.set_value('mbox_checkedPlayAll', mbox.checkedPlayAll , "bool")
+        ogse.save_var('mbox_checkedPlate'  , mbox.checkedPlate   , "number")
+        ogse.save_var('mbox_checkedTrack'  , mbox.checkedTrack   , "number")
+        ogse.save_var('mbox_actionPlate'   , mbox.actionPlate    , "number")
+        ogse.save_var('mbox_actionTrack'   , mbox.actionTrack    , "number")
+        ogse.save_var('mbox_checkedPlayAll', mbox.checkedPlayAll , "bool")
         local changer = {}
         for i = 1, #mbox.changer do
             changer[#changer+1] = mbox.changer[i].section
         end
-        ogse_unist.set_value('mbox_changer', changer, "array")
+        ogse.save_var('mbox_changer', changer, "array")
     end
 end
 

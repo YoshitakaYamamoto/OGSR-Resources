@@ -218,7 +218,7 @@ function lc_hide(sid, spot)
 end
 
 --[[function lc_get_spot_state(lc_name, show)
-    show = ogse_unist.get_value(lc_name, false, "bool") or toBoolean(show)
+    show = ogse.load_var(lc_name, false, "bool") or toBoolean(show)
     return show
 end]]
 
@@ -315,7 +315,7 @@ function on_storyline_start()
 	for i = 1, #lc_common_list do 
 		local name_sid  = lc_common_list[i][1]
 		local spot_show = lc_common_list[i][2][2]
-		ogse_unist.set_value(name_sid, not spot_show , "bool")
+		ogse.save_var(name_sid, not spot_show , "bool")
 		if sim:story_object(story_ids[name_sid]) then
 			if lc_common_list[i][4] then
 				this[name_sid..'_remove']()
@@ -329,7 +329,7 @@ function lc_restore_location()
 	for i = 1, #lc_common_list do 
 		local sid  = lc_common_list[i][1]
 		local spot = lc_common_list[i][2]
-		local show = ogse_unist.get_value(sid, false, "bool")
+		local show = ogse.load_var(sid, false, "bool")
 		if show then
 		    local hint = lc_common_list[i][3]
 		    lc_show(spawn_story_ids[sid], spot, hint)
@@ -458,7 +458,7 @@ function on_save()
 		local spawn_sid = spawn_story_ids[name_sid]
 		local location  = lc_common_list[i][2][1]
 		local spot_show = level_tasks.is_map_spot_present(spawn_sid, location)
-		ogse_unist.set_value(name_sid, spot_show , "bool")
+		ogse.save_var(name_sid, spot_show , "bool")
 	end
 end
 

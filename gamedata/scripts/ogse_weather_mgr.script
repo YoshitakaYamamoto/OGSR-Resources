@@ -145,7 +145,8 @@ function get_weather_mgr()
 	return wm
 end
 
-enabled = true
+local enabled = true
+ASSERT(enabled == true, "") --Отключать нельзя! Для чего сделана эта опция - понятия не имею.
 
 -- параметры погодного имитатора. На данный момент этот алгоритм НЕ используется.
 local A0 = -0.35  -- общее смещение, нулевой уровень, больше нуля - больше дождя в целом, ниже нуля, больше ясной погоды
@@ -266,13 +267,6 @@ min_transition_time:setHMS(0,_min_transition_time,0)
 local search_step = game.CTime()
 search_step:setHMS(0,0,1)
 ----------------------------------------------------------------------------------------------------
-
--- check if level name corresponds to one of the levels
--- that should use special indoor level as configured
--- in game_maps_single.ltx
-local function is_scenario(level_name)
-    return (( level_name == "l12_stancia" or level_name == "l12_stancia_2") and not has_alife_info("pri_what_the_fuck"))	
-end
 
 local function read_cycle_points(cycle_section, points_table)
 	for line = 0, sys_ini:line_count(cycle_section) - 1 do
