@@ -3,8 +3,6 @@
 actor_theme   = sound_theme_data.actor_theme
 theme         = sound_theme_data.theme
 
-local nstl = 64
-
 
 function attach( sm )
   sm:subscribe({ signal = "on_init",             fun = this.on_actor_init }) --Нужно вызывать до начала спавна НПС.
@@ -62,27 +60,24 @@ end
 local default_prefix = "characters_voice\\"
 
 function load_sound_from_ltx( obj, name, tbl )
-  tbl.max_ids[ obj:id() ] = {}
+  local id = obj:id()
+  tbl.max_ids[ id ] = {}
   for _, sf in ipairs({ "_rnd", "_spec", "_seq", "_single" }) do
     local n = name..sf
     if preloaded[ n ] then
       local path, use_def = select_sound_from_ltx( obj, n )
       if path then
-        local prefix
+        local t = {
+          [ "path" ] = path,
+        }
         if use_def then
-          prefix = obj:sound_prefix()
-          obj:sound_prefix( default_prefix )
+          t.prefix = default_prefix
         end
 	    local snd_key = ( sf == "_rnd" or sf == "_spec" ) and "rnd" or "into"
-        tbl.max_ids[ obj:id() ][snd_key.."_max"] = obj:add_sound(
-          path, nstl, snd_type.talk, 2, 1, tbl[snd_key.."_id"]
-        )
 		if snd_key == "into" then
-		  tbl.max_ids[ obj:id() ].into_cycled = true
+		  tbl.max_ids[ id ].into_cycled = sf == "_seq"
 		end
-        if prefix then
-          obj:sound_prefix( prefix )
-        end
+		tbl.max_ids[ id ][snd_key.."_load"] = t
       end
     end
   end

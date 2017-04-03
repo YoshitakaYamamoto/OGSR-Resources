@@ -38,23 +38,53 @@ local sound_removal_threshold = 5000 -- 5 сек
 key_by_id = {}
 group_idle = {}
 
-function get_sound(path, tt, npc)
-	if path == nil then return nil end
-	if path.exec == nil then
-		-- чтение настроек темы
+
+local nstl = 64
+function load_theme_sounds( npc, load, id )
+  local prefix
+  if load.prefix then
+    prefix = npc:sound_prefix()
+    npc:sound_prefix( load.prefix )
+  end
+  local max = npc:add_sound( load.path, nstl, snd_type.talk, 2, 1, id )
+  if prefix then
+    npc:sound_prefix( prefix )
+  end
+  return max
+end
+
+
+function get_sound( theme, tt, npc, path )
+	if not path then
+		path = sound_theme_data.theme[ theme ]
+	end
+	if not path then return end
+	if path.exec then
+		theme = path.exec( path.types, npc )
+		get_sound( theme, tt, npc, path.types[ theme ] )
+	else -- чтение настроек темы
+		local st = path.max_ids[ npc:id() ]
+		ASSERT( st, "path.max_ids not found: %s", npc:name() )
+		if not st.loaded then
+			if st.into_load then
+				st.into_max = load_theme_sounds( npc, st.into_load, path.into_id )
+			end
+			if st.rnd_load then
+				st.rnd_max = load_theme_sounds( npc, st.rnd_load, path.rnd_id )
+			end
+			st.loaded = true
+		end
 		tt.into_id = path.into_id
-		tt.into_max = path.max_ids[npc:id()].into_max
+		tt.into_max = st.into_max
 		tt.into_last = nil
 
 		tt.rnd_id = path.rnd_id
-		tt.rnd_max = path.max_ids[npc:id()].rnd_max
+		tt.rnd_max = st.rnd_max
 		tt.rnd_last = nil
 
 		tt.min_snd = path.min_snd
 		tt.max_snd = path.max_snd
 		tt.rnd_snd = path.rnd_snd
-	else
-		get_sound(path.types[path.exec(path.types, npc)], tt, npc)
 	end
 end
 -- Формирование ключа персонажа
@@ -115,7 +145,7 @@ function set_sound(npc, sound, now, into_timeout)
 			local t = 0		
 			for k,v in pairs(db.sound[npc_id].snd) do
 				snd_table[t] = {}
-				get_sound(sound_theme.theme[v], snd_table[t], npc)
+				get_sound(v, snd_table[t], npc)
 				t = t + 1
 			end	
 			for k,v in pairs(snd_table) do
@@ -207,7 +237,7 @@ function play_sound(npc, themes, timeout)
 		snd_table[t] = {}
 		if sound_theme.theme[v] ~= nil then
 			snd_table[t].theme = v
-			get_sound(sound_theme.theme[v], snd_table[t], npc)
+			get_sound(v, snd_table[t], npc)
 		else
 			abort("ERROR: ILLEGAL PLAY SOUND!!! %s for %s", v, npc:name())
 		end
@@ -283,7 +313,7 @@ function get_last_IDS(npc, theme)
 	local last_table = db.sound[npc:id()].last_snd
 	local snd_table = {}
 	if sound_theme.theme[theme] ~= nil then
-		get_sound(sound_theme.theme[theme], snd_table, npc)
+		get_sound(theme, snd_table, npc)
 	end	
 	--printf("LAST INTO ID for [%s] = [%s], max [%s]", theme, last_table[snd_table.into_id], snd_table.into_max)
 	return last_table[snd_table.into_id], snd_table.into_max
