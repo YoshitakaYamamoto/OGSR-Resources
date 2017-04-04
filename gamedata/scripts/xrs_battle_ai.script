@@ -426,6 +426,12 @@ function evaluator_check_altcombat:evaluate()
 		check_for_grenades(self.object)
 	end
 
+	if not xr_combat_ignore.is_enemy( self.object ) then --KRodin: ÍÈ Â ÊÎÅÌ ÑËÓ×ÀÅ ÍÅ ÇÀÊÎÌÌÅÍÒÈĞÎÂÀÒÜ! Èíà÷å áóäóò çàâèñàòü ÍÏÑ!
+		primary_target[self.object:id()] = nil
+		in_combat[self.object:id()] = nil
+		return false
+	end	
+
 	local bw = nil
 	local wm = rx_wmgr and rx_wmgr.get_wm(self.object)
 

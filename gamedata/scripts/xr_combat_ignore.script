@@ -6,7 +6,7 @@ function attach( sm )
 end
 
 function enemy_callback( obj, enemy, result )
-  --if obj:critically_wounded() then return end --Ёто тут вообще зачем?
+  if obj:critically_wounded() then return end
 
   if xr_companion.is_companion(obj:id()) then --≈сли напарник хочет атаковать кого-то, делаем проверку, может ли этот кто-то атаковать актора. ≈сли нет - запрещаем атаку.
 	obj = enemy
@@ -30,6 +30,22 @@ function enemy_callback( obj, enemy, result )
     table.insert( result, false )
     return true
   end
+end
+
+
+function is_enemy( obj ) --»спользуетс€ в xrs_battle_ai
+  if obj:critically_wounded() then return true end
+
+  local st = db.storage[ obj:id() ].combat_ignore
+  if not st or not st.enabled then return true end
+
+  local overrides = xr_logic.generic_scheme_overrides( obj )
+  if overrides and overrides.combat_ignore then
+    return overrides.combat_ignore.cached_condlist
+      :pick_section_from_condlist( db.actor, obj ) == nil
+  end
+
+  return true
 end
 
 
