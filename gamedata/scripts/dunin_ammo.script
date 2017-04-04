@@ -4,7 +4,6 @@ function attach(sm)
 end
 
 local ammo = {}
-local repack = false
 
 --------
 -- вызывается при добавлении в инвентарь ГГ любых патрон
@@ -28,8 +27,7 @@ function on_take(obj, s_obj)
 	if not ammo[section].repack then
 		if get_ammo_size(obj) < ammo[section].box then
 			ammo[section].repack = true
-			repack = true
-			run_repack_ammo_timer()
+			dsh.exec_on_update( this.on_update )
 		end
 	end
 	return true --Вроде бы патроны более в on_take нигде не нужны, можно закончить цепочку вызовов.
@@ -37,8 +35,7 @@ end
 
 
 function on_update() --Поиск в инвентаре неполных пачек и их переупаковка
-	if not repack then return end
-	if level.get_inventory_wnd():IsShown() then return end
+	if level.main_input_receiver() then return end
 
 	local repack_tbl = {}
 	db.actor:inventory_for_each(function(obj, npc)
@@ -63,10 +60,9 @@ function on_update() --Поиск в инвентаре неполных пач�
 		if #v.remove_ids > 1 and v.size > 0 then
 			for i = 1, #v.remove_ids do
 				local id = v.remove_ids[i]
-				local obj = level.object_by_id(id)
-				if obj then
-					db.actor:drop_item(obj) --НЕ ЗАКОММЕНТИРОВАТЬ НИ В КОЕМ СЛУЧАЕ!!!
-					death_manager.shedule_release(obj)
+				local sobj = alife():object(id)
+				if sobj then
+					alife():release(s_obj)
 				end
 			end
 			--log3("--[%s] Create ammo! Section: [%s], size: [%s]", script_name(), k, v.size)
@@ -77,24 +73,4 @@ function on_update() --Поиск в инвентаре неполных пач�
 	for k, v in pairs(ammo) do
 		if v.repack then ammo[k].repack = false end
 	end
-	repack = false
-end
-
-
-local repack_ammo_t
-function run_repack_ammo_timer()
-  if not repack_ammo_t then
-    repack_ammo_t = check_repack_ammo_timer():start()
-  end
-end
-
-class "check_repack_ammo_timer" ( ogse_qt.quick_timer )
-function check_repack_ammo_timer:__init() super()
-end
-function check_repack_ammo_timer:condition()
-  on_update()
-  return not repack
-end
-function check_repack_ammo_timer:action()
-  repack_ammo_t = nil
 end

@@ -301,43 +301,6 @@ function actor_binder:article_callback(npc, group, name, article_type)
 	self.am:call("on_article", npc, group, name, article_type)
 end
 ----------------------------------------------------------------------------------------------------------------------
-
---[=[
-local remove_this_shit_immediately = {
-	["fake_grenades_base"] = true,
-	["grenade_f1_fake"] = true,
-	["grenade_rgd5_fake"] = true,
-	["grenade_gd-05_fake"] = true,
-	["grenade_light_fake"] = true,
-	["grenade_f1_test"] = true,
-	["grenade_rgd5_test"] = true,
-	["grenade_gd-05_test"] = true,
-	["grenade_light_test"] = true,
-	["gl_test_shell"] = true,
-	["wpn_fake_missile"] = true,
-	["gl_test_shell_ammo_vog-25"] = true,
-	["gl_test_shell_ammo_vog-25p"] = true,
-	["gl_test_shell_ammo_m209"] = true,
-	["gl_test_shell_ammo_m208a"] = true,
-	["gl_fake_missile"] = true,
-	["gl_fake_missile_ammo_vog-25"] = true,
-	["gl_fake_missile_ammo_vog-25p"] = true,
-	["gl_fake_missile_ammo_m209"] = true,
-	["gl_fake_missile_ammo_m208a"] = true,
-}
-
-function check_pickup_fake_gren(obj, srv_obj)
-	local section = srv_obj:section_name()
-	if remove_this_shit_immediately[section] then
-		log1("!!DEBUG! Removing fake item begin")
-		death_manager.shedule_release(obj)
-		log1("!!DEBUG! Removing fake item end")
-		return true	
-	end	
-	return false
-end
---]=]
-
 function actor_binder:on_item_take(obj)
 	if not obj then return end
 	local sobj = alife():object(obj:id())
@@ -347,8 +310,6 @@ function actor_binder:on_item_take(obj)
 		end
 		return
 	end
-
-	--if check_pickup_fake_gren(obj, sobj) then return end --KRodin: Этим предметам установлен запрет на подбирание актором, они сюда попасть вообще не могут.
 
     level_tasks.proceed()
 

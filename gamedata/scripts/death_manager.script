@@ -339,78 +339,16 @@ function keep_item(npc, item)
 		end
 	elseif item:is_ammo() then
 		local ammo_sz = get_ammo_size(item)
-		if ammo_sz >= 1 then
-			local ammo_new_sz = math.random(1, ammo_sz)
+		if ammo_sz > 0 then
+			local ammo_new_sz = math.random(ammo_sz)
 			set_ammo_size(item, ammo_new_sz)
 		else
-			shedule_release(item)
+			alife():release(srv_obj, true)
 		end
 	elseif item:is_weapon_magazined() then
 		set_weapon_drop_condition(item,npc)
 	end
 end
-
-
--------------------------------------------------------------------------------------------------
-function shedule_release(item)
-	if item then
-		if not deferred_release[item:id()] then
-			deferred_release[item:id()] = time_global()
-			run_shedule_release_timer()
-		end
-	end
-end
-
-local shedule_release_t
-function run_shedule_release_timer()
-  if not shedule_release_t then
-    shedule_release_t = check_shedule_release_timer():start()
-  end
-end
-
-class "check_shedule_release_timer" ( ogse_qt.quick_timer )
-function check_shedule_release_timer:__init() super()
-end
-function check_shedule_release_timer:condition()
-  release_deferred_ammo()
-  return next(deferred_release) == nil
-end
-function check_shedule_release_timer:action()
-  shedule_release_t = nil
-end
-
-function release_deferred_ammo()
-	for k, v in pairs(deferred_release) do
-		local game_object = level.object_by_id(k)
-		local s_obj = alife():object(k)
-		if not s_obj and not game_object then
-			-- если нет ни геймобъекта ни серверного - удалилось как надо
-			deferred_release[k] = nil
-		elseif s_obj and game_object then
-			-- если есть и то и другое - все ок, удаляем
-			local parent = game_object:parent()
-			if v < time_global() then
-				if not parent then
-					--write_log("!!DEFFERED_DEBUG DEBUG_DELETING_NORMAL "..tostring(s_obj.id))
-					alife():release(s_obj, true)
-					deferred_release[k] = nil
-				else	
-					--write_log("!!DEFFERED_DEBUG DEBUG_TELEPORT "..tostring(s_obj.id))
-					parent:drop_item(game_object)
-				end
-			end
-		elseif s_obj then	
-			-- если только серверный - срочно убиваем
-			--write_log("!!DEFFERED_DEBUG DEBUG_DELETING_SRV "..tostring(s_obj.id))
-			alife():release(s_obj, true)
-			deferred_release[k] = nil
-		--elseif game_object then
-			-- если только геймобъект - он ещё не успел сдохнуть, сцуко, не трогаем его
-			--write_log("!!DEFFERED_DEBUG DEBUG_DELETING_ONLY_GAMEOBJ")
-		end		
-	end
-end
--------------------------------------------------------------------------------------------------
 
 
 --' Функция вызывается для каждого предмета в инвентаре убитого напарника
