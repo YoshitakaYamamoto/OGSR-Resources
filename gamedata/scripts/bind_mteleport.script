@@ -65,10 +65,10 @@ function restrictor_teleport:net_spawn(data)
 		end
 
 		-- Запомним позицию что-бы каждый раз не считать
-		local s_obj = alife():object(self.object:id())
-		self.parametrs["x"] = s_obj.position.x
-		self.parametrs["y"] = s_obj.position.y
-		self.parametrs["z"] = s_obj.position.z
+		local pos = self.object:position()
+		self.parametrs["x"] = pos.x
+		self.parametrs["y"] = pos.y
+		self.parametrs["z"] = pos.z
 
 		-- Запомним координаты куда телепортимся
 		self.parametrs["poz_x"] = get_float(self.section, "poz_x")
