@@ -624,13 +624,7 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 		local sobj = sim:object(i)
 		if sobj then
 			local sobj_lname = object_level_name( sobj )
-			if IsStalker( sobj ) or IsMonster( sobj ) then
-				npc_tbl[i] = sobj
-				if sobj_lname == lname then
-					lvids_forbidden[ sobj.m_level_vertex_id ] = true
-					table.insert( position_forbidden, sobj.position )
-				end
-			elseif IsAnomaly(sobj) then
+			if IsAnomaly(sobj) then
 				local status = get_anomaly_mode(sobj)
 				local forbidden_anom = is_not_anomaly(sobj) or is_exclusion_anomaly(sobj)
 				if status ~= "anom_off" then
@@ -662,6 +656,14 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 					table.insert(position_forbidden, lc_params.dest_position)
 				end
 				if sobj_lname == lname then --Учитываем точки ухода с локаций
+					lvids_forbidden[ sobj.m_level_vertex_id ] = true
+					table.insert( position_forbidden, sobj.position )
+				end
+			else --Не создавать аномалии там, где вообще хоть что-нибудь есть. Не важно, сталкер это или физический объект и тд.
+				if IsStalker( sobj ) or IsMonster( sobj ) then
+					npc_tbl[i] = sobj
+				end
+				if sobj_lname == lname then
 					lvids_forbidden[ sobj.m_level_vertex_id ] = true
 					table.insert( position_forbidden, sobj.position )
 				end
