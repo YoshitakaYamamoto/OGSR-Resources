@@ -107,14 +107,16 @@ function actor_have_medkit_revers(first_speaker, second_speaker)
 		   second_speaker:object("medkit_scientic") ~= nil
 end
 
+--KRodin: убрал здесь установку отношений с напарниками. Не понятно, зачем это нужно.
+--Если для того, чтобы не воевали - enemy_callback и так им воевать не разрешит.
 function make_relationship_with_actor(relation, npc, actor)
-	for companion_id, _ in pairs(xr_companion.companions) do
-		local companion = level.object_by_id(companion_id)
-		if relation == "friend" then
-			xrs_battle_ai.reset_everything(npc)
-			npc:set_relation(game_object.friend, db.actor)
-			npc:set_goodwill(5000, db.actor)
-			xrs_battle_ai.disable_object(npc, db.actor)
+	if relation == "friend" then
+		xrs_battle_ai.reset_everything(npc)
+		npc:set_relation(game_object.friend, actor)
+		npc:set_goodwill(5000, actor)
+		xrs_battle_ai.disable_object(npc, actor)
+		--[=[for companion_id, _ in pairs(xr_companion.companions) do
+			local companion = level.object_by_id(companion_id)
 			if companion then
 				npc:set_relation(game_object.friend, companion)
 				npc:set_goodwill(5000, companion)
@@ -123,11 +125,14 @@ function make_relationship_with_actor(relation, npc, actor)
 				xrs_battle_ai.disable_object(npc, companion)
 				xr_combat_companion.disable_object(companion, npc) 
 			end
-		elseif relation == "neutral" then
-			xrs_battle_ai.reset_everything(npc)
-			npc:set_relation(game_object.neutral, db.actor)
-			npc:set_goodwill(500, db.actor)
-			xrs_battle_ai.disable_object(npc, db.actor)
+		end--]=]
+	elseif relation == "neutral" then
+		xrs_battle_ai.reset_everything(npc)
+		npc:set_relation(game_object.neutral, actor)
+		npc:set_goodwill(500, actor)
+		xrs_battle_ai.disable_object(npc, actor)
+		--[=[for companion_id, _ in pairs(xr_companion.companions) do
+			local companion = level.object_by_id(companion_id)
 			if companion then
 				npc:set_relation(game_object.neutral, companion)
 				npc:set_goodwill(500, companion)
@@ -135,17 +140,20 @@ function make_relationship_with_actor(relation, npc, actor)
 				companion:set_goodwill(500, npc)		
 				xrs_battle_ai.disable_object(npc, companion)
 				xr_combat_companion.disable_object(companion, npc) 			
-			end		
-		elseif relation == "enemy" then
-			npc:set_relation(game_object.enemy, db.actor)
-			npc:set_goodwill(-5000, db.actor)
+			end
+		end--]=]
+	elseif relation == "enemy" then
+		npc:set_relation(game_object.enemy, actor)
+		npc:set_goodwill(-5000, actor)
+		--[=[for companion_id, _ in pairs(xr_companion.companions) do
+			local companion = level.object_by_id(companion_id)
 			if companion then
 				npc:set_relation(game_object.enemy, companion)
 				npc:set_goodwill(-5000, companion)
 				companion:set_relation(game_object.enemy, npc)
 				companion:set_goodwill(-5000, npc)			
 			end			
-		end
+		end--]=]
 	end	
 end
 
