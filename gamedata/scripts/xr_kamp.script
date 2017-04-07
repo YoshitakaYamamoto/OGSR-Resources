@@ -1,1181 +1,1709 @@
-----------------------------------------------------------------------------------------------------------------------
---	Схема лагерь. Чудак(и) у костра.
---	автор: Диденко Руслан (Stohe)
---	TODO: 
-----------------------------------------------------------------------------------------------------------------------
+-- -*- mode: lua; coding: windows-1251-dos -*-
+--
+-- РЎС…РµРјР° Р»Р°РіРµСЂСЊ. Р§СѓРґР°Рє(Рё) Сѓ РєРѕСЃС‚СЂР°.
+-- Р°РІС‚РѕСЂ: Р”РёРґРµРЅРєРѕ Р СѓСЃР»Р°РЅ (Stohe)
+-- TODO:
 
---function printf(fmt, ...)
---	local msg = string.format(fmt, ...)
---	local msg_no_ws = string.gsub(msg, "%s", "_")
---	get_console():execute("dbg:" .. msg_no_ws)
---end
-
-kamps = {}
-kamp_stalkers = {} -- могут ли сталкеры в лагере юзаться игроком.
--- Объявления итераторов
-deadmansids={} -- кто какой труп оттаскивает
-deadmansidsuses={} -- сколько попыток оттащить было сделано
-local k,v,kk,vv = 0,0,0,0
-
----------------------------------------------------------------------------------------------------------------------
---Evaluators
-----------------------------------------------------------------------------------------------------------------------
---' Условие завершения скрипта
-class "evaluator_kamp_end" (property_evaluator)
-function evaluator_kamp_end:__init(name, storage) super (nil, name)
-	self.a = storage
-end
-function evaluator_kamp_end:evaluate()
-	return not xr_logic.is_active(self.object, self.a)
-end
---' Находимся ли мы на заданной позиции
-local updates_passed = {}
-
-class "evaluator_on_position" (property_evaluator)
-function evaluator_on_position:__init(name, storage) super (nil, name)
-	self.a = storage
-end
-function evaluator_on_position:evaluate()
-	if not updates_passed[self.object:id()] then
-		updates_passed[self.object:id()] = 0
-	elseif updates_passed[self.object:id()] < 20 then
-		updates_passed[self.object:id()] = updates_passed[self.object:id()] + 1
-	end
-    if self.object:level_vertex_id() == self.a.pos_vertex then
-		if updates_passed[self.object:id()] < 10 then
-			return false			
-		end	
-		ogse_debug.add_active_eval( self.object, script_name(), "on_position" )
-		return true
-	end
-	return false
-end
---added by xStream--
---' Оп-па! Увидели труп поблизости от костра, непорядок...
-class "evaluator_see_deadman" (property_evaluator)
-function evaluator_see_deadman:__init(name, storage) super (nil, name)
-	self.a = storage
-end
-function evaluator_see_deadman:evaluate()
-	local npc = self.object
-	-- Есть дела поважнее, чем трупы складировать...
-	if not xr_logic.is_active(self.object, self.a) then
-		if self.a.choosed_deadman then 
-			deadmansids[self.a.choosed_deadman]=nil
-			self.a.choosed_deadman=nil
-			self.a.reached=nil
-		end
-		return false
-	end
-
-	-- Труп себе уже выбрали, не спускаем с него глаз...
-	if self.a.choosed_deadman then 
-		local obj = level.object_by_id(self.a.choosed_deadman)
-		if obj and obj:position():distance_to(patrol(self.a.center_point):point(0))<20 then
-			ogse_debug.add_active_eval( self.object, script_name(), "see_deadman" )
-			return true 
-		end
-		-- если утащен далеко, то ну его нафиг...
-		if self.a.choosed_deadman then
-			deadmansids[self.a.choosed_deadman]=nil
-			self.a.choosed_deadman=nil
-			self.a.reached=nil			
-		end
-
-		return false
-	end
-	
-	local function check_item(o)
-			local obj=o:object()
-			--если есть рядом с костром труп сталкера или монстра, его еще никто не прихватил себе и трупец нигде не застрял, то забираем его...
-			if obj and obj.clsid and (obj:is_stalker() or obj:is_monster()) and not obj:alive() and (not deadmansids[obj:id()] or not level.object_by_id(deadmansids[obj:id()]) or not level.object_by_id(deadmansids[obj:id()]):alive()) and obj:position():distance_to(patrol(self.a.center_point):point(0))<10 then
-				if not deadmansidsuses[obj:id()] or deadmansidsuses[obj:id()]<3 then
-					deadmansids[obj:id()]=npc:id()
-					self.a.choosed_deadman=obj:id()
-					deadmansidsuses[obj:id()] = (deadmansidsuses[obj:id()] or 0) +1
-					-- ...заодно сразу прикидываем, куда бы его оттащить от костра, желательно под забор, стену дома и т.п., 
-					-- за неимением таковых - будем тащить куда попало, главное - подальше от костра
-				  self.a.drop_lvid=npc:level_vertex_id()
-				  local gi=level.object_by_id(self.a.choosed_deadman)
-				  if gi then
-				    local center = gi:level_vertex_id()
-				    local center_pos = patrol(self.a.center_point):point(0)
-				    local max_dist=0
-				    local tgt_vertex=nil
-				    local base_dir=gi:position():sub(center_pos)
-				    local base_point=npc:vertex_in_direction(center,gi:position():sub(center_pos):mul(-1),20)
-				    for ang=-90,90,20 do
-				      local cur_vert=npc:vertex_in_direction(base_point,vector_rotate_y(base_dir,ang),20)
-				      local dist=level.vertex_position(cur_vert):distance_to(center_pos)
-				      if dist>11 and dist<17 then
-				        if dist>max_dist then
-				          max_dist=dist
-				          tgt_vertex=cur_vert
-				        end
-				      end
-				    end
-				    if tgt_vertex==nil then
-				      tgt_vertex=npc:vertex_in_direction(base_point,vector_rotate_y(base_dir,math.random()*180-90),20)
-				    end
-				    
-				    self.a.drop_lvid = tgt_vertex
-				    self.a.ps=gi:get_physics_shell()
-				  end
-					ogse_debug.add_active_eval( self.object, script_name(), "see_deadman_2" )
-					return true
-				end
-			end
-	end	
-	
-	for o in npc:memory_visible_objects() do
-		check_item(o)
-	end
-	for o in npc:memory_sound_objects() do
-		check_item(o)
-	end
-	for o in npc:not_yet_visible_objects() do
-		check_item(o)
-	end
-	return false
+function attach( sm )
+  sm:subscribe({ signal = "on_monster_death", fun = this.on_death })
+  sm:subscribe({ signal = "on_npc_death",     fun = this.on_death })
 end
 
---' Тащим труп
-class "evaluator_can_move_deadman" (property_evaluator)
-function evaluator_can_move_deadman:__init(name, storage) super (nil, name)
-	self.a = storage
-end
-function evaluator_can_move_deadman:evaluate()
-  local npc=self.object
-	local obj = level.object_by_id(self.a.choosed_deadman)
-	--если труп застрял (расстояние увеличилось), то возвращаемся к нему
-	--или если ГГ подошел, то уделяем ему чуточку внимания
-  return self.a.reached==1 and obj and obj:bone_position("bip01_spine1"):distance_to(npc:position())<2 and obj:bone_position("bip01_spine1"):distance_to(db.actor:position())>3.0
-end
---end--
-----------------------------------------------------------------------------------------------------------------------
---Actions
-----------------------------------------------------------------------------------------------------------------------
---' Идет в заданную область
-class "action_go_position" (action_base)
-function action_go_position:__init (npc_name,action_name,storage) super (nil,action_name)
-	self.a = storage
-end
-function action_go_position:initialize()
-	action_base.initialize(self)
---	self.object:set_node_evaluator()
---	self.object:set_path_evaluator()
-	self.object:set_desired_position()
-	self.object:set_desired_direction()
-	
-	self.a.pos_vertex = nil
+
+local last_death_t
+function on_death( obj, who )
+  last_death_t = time_global()
 end
 
-local already_catched = {}
 
-function clear_catch(npc)
-	for k, v in pairs(already_catched) do
-		if v == npc:id() then
-			k = nil
-		end
-	end
-end
+kamps           = {}
+kamp_stalkers   = {}    -- РјРѕРіСѓС‚ Р»Рё СЃС‚Р°Р»РєРµСЂС‹ РІ Р»Р°РіРµСЂРµ СЋР·Р°С‚СЊСЃСЏ РёРіСЂРѕРєРѕРј.
+-- РћР±СЉСЏРІР»РµРЅРёСЏ РёС‚РµСЂР°С‚РѕСЂРѕРІ
+deadmansids     = {}          -- РєС‚Рѕ РєР°РєРѕР№ С‚СЂСѓРї РѕС‚С‚Р°СЃРєРёРІР°РµС‚
+deadmansidsuses = {}          -- СЃРєРѕР»СЊРєРѕ РїРѕРїС‹С‚РѕРє РѕС‚С‚Р°С‰РёС‚СЊ Р±С‹Р»Рѕ СЃРґРµР»Р°РЅРѕ
 
-function action_go_position:check_npc_block(object, dest_vtx)
-	local blocked_vtx = {}
-	for npc_id, is_npc in pairs(db.creature) do
-		if is_npc then
-			local npc = level.object_by_id(npc_id)
-			if npc and object:id() ~= npc_id then
-				blocked_vtx[npc:level_vertex_id()] = npc_id
-			end
-		end
-	end
-	for k, v in pairs(blocked_vtx) do
-		if k == dest_vtx then
-			--log1("~~VTX blocked for "..object:name())
-			return true
-		end
-	end
-	return false
-end
-function action_go_position:execute ()
-	action_base.execute (self)
+local body_grab_bones = {
+  [ clsid.snork_s    ] = "bip01_spine2",
+  [ clsid.tushkano_s ] = "bip01_head",
+  [ clsid.flesh_s    ] = "bip01_head",
+  [ clsid.boar_s     ] = "bip01_spine2",
+  [ clsid.gigant_s   ] = "bip01_l_calf",
+  [ clsid.chimera_s  ] = "bip01_l_calf",
+}
 
-	if db.actor then
-		if xr_logic.try_switch_to_another_section(self.object, self.a, db.actor) then
-			return
-		end
-	end	
-	
-	if not updates_passed[self.object:id()] then
-		updates_passed[self.object:id()] = 0
-		return
-	elseif updates_passed[self.object:id()] < 10 then
-		return			
-	end		
-	
-	--log1("!!ACTION action_go_position ["..tostring(self.object:name()).."]")
-	
-	local tmp_pos_vertex = kamps[self.a.center_point]:getDestVertex(self.object:id(), self.a.radius)
-	
-	--log1("!!ACTION action_go_position ["..tostring(self.object:name()).."] tmp ["..tostring(tmp_pos_vertex).."]")
-	--log1("!!ACTION action_go_position ["..tostring(self.object:name()).."] vtx ["..tostring(self.a.pos_vertex).."]")
-	
-	if self.a.pos_vertex ~= tmp_pos_vertex then
-		self.a.pos_vertex = tmp_pos_vertex
-		
-		if self.object:position():distance_to(level.vertex_position(self.a.pp)) < 1.5 or not self.a.pos_vertex then
-			-- вообще никуда идти не надо
-			self.a.pos_vertex = self.object:level_vertex_id()
-		end
-		
-		if not already_catched[self.a.pos_vertex] then
-			already_catched[self.a.pos_vertex] = self.object:id()
-		end
-		
-		if not self.object:accessible(self.a.pos_vertex) 
-		or (already_catched[self.a.pos_vertex] and not already_catched[self.a.pos_vertex] == self.object:id()) 
-		or self:check_npc_block(self.object, self.a.pos_vertex)
-		then
-			--log3("!!ACTION action_go_position [%s] KAMP NODE NOT ACCESSIBLE. Get accessible nearest", self.object:name())
-			local ttp = vector():set(math.random(-1,1),0,math.random(-1,1))
-			self.a.pos_vertex = self.object:accessible_nearest(level.vertex_position(self.a.pos_vertex), ttp)
-		end
-		
-		--log1("!!ACTION EXEC action_go_position ["..tostring(self.object:name()).."] vtx ["..tostring(self.a.pos_vertex).."]")
-		
-		self.a.pp = patrol(self.a.center_point):level_vertex_id(0)
-		self.a.pp = level.vertex_in_direction(self.a.pp, vector():set(math.random(-1,1), 0, math.random(-1,1)), math.random(0,0.5))
-		self.object:set_dest_level_vertex_id(self.a.pos_vertex)
-		self.object:set_desired_direction(vector():sub(level.vertex_position(self.a.pp),level.vertex_position(self.a.pos_vertex)))
-		self.object:set_detail_path_type ( move.curve )
-		self.object:set_path_type(game_object.level_path)
-		state_mgr.set_state( "xr_kamp_0", self.object, self.a.def_state_moving)
-		
-	end
-end
-function action_go_position:finalize ()
-	action_base.finalize (self)
-end
 
---' Просто сидит и втыкает
-class "action_wait" (action_base)
-function action_wait:__init (npc_name,action_name,storage) super (nil,action_name)
-	self.a = storage
-end
-function action_wait:initialize()
-	action_base.initialize(self)
---	self.object:set_node_evaluator()
---	self.object:set_path_evaluator()
-	self.object:set_desired_position()
-	self.object:set_desired_direction()
-	
-	kamps[self.a.center_point]:increasePops(self.object)
-end
-function action_wait:activate_scheme()
-end
-function action_wait:execute()
-	action_base.execute (self)
-	if db.actor then
-		if xr_logic.try_switch_to_another_section(self.object, self.a, db.actor) then
-			return
-		end
-	end
-	local state, sound, substate = kamps[self.a.center_point]:updateNpc(self.object)
-	
-	if state == nil then
-		state = "wait"
-		--log1("!!XR_CAMP WARNING - CAMP UPDATE CANNOT RETRIEVE STATE")
-	end
-	
-	--' повернуть его лицом к центру	
-	state_mgr.set_state( "xr_kamp_1", self.object, state, nil, nil, {look_position = level.vertex_position(self.a.pp)}, nil, nil, {subanim = substate})
-	xr_sound.set_sound(self.object, sound)
-end
-function action_wait:finalize()
-	clear_catch(self.object)
-	kamps[self.a.center_point]:decreasePops(self.object)
-	action_base.finalize (self)
-end
-function action_wait:deactivate(npc)
-	clear_catch(self.object)
-	kamps[self.a.center_point]:removeNpc(npc)
-end
-function action_wait:death_callback(npc)
-	clear_catch(self.object)
-	kamps[self.a.center_point]:removeNpc(npc)
-end
-function action_wait:net_destroy(npc)
-	clear_catch(self.object)
-	kamps[self.a.center_point]:decreasePops(self.object)	--<< Dynamic campfire mod
-	kamps[self.a.center_point]:removeNpc(npc)
-end
---added by xStream--
---Идет к бездыханному товарищу
-class "action_go_to_deadman" (action_base)
-function action_go_to_deadman:__init (npc_name,action_name,storage) super (nil,action_name)
-	self.a = storage
-end
-function action_go_to_deadman:initialize()
-	action_base.initialize(self)
-	local npc=self.object
-	local gi=level.object_by_id(self.a.choosed_deadman)
-	if gi then 
-		--попремся в сторону головы - за шкирятник тащить бум
-		self.a.dest_lvid=gi:level_vertex_id()
-		local diff=gi:bone_position("bip01_spine"):sub(gi:position())
-		local len=diff:magnitude()*2.5
-		self.a.dest_lvid=npc:vertex_in_direction(self.a.dest_lvid,diff,len)
-			if not npc:accessible(self.a.dest_lvid) then
-				self.a.dest_lvid = npc:accessible_nearest(level.vertex_position(self.a.dest_lvid), vector():set(0,0,0))
-			end
-	else
-		self.a.dest_lvid=npc:level_vertex_id()
-	end
-	self.a.reached=0
-	self.a.cur_dead_lvid=gi:level_vertex_id()
-	--пойдем не спеша...
-	state_mgr.set_state( "xr_kamp_2", self.object, self.a.def_state_moving)
-	--на все гулянки в сторону трупа дается 30 секунд, если не успел, то да ну нафиг заморачиваться :)
-	self.a.go_time_end=time_global()+30000
-	self.a.captures = (self.a.captures or 0) + 1
-	xr_sound.set_sound(npc, nil)
-	stop_play_sound(npc)
-end
-
-function action_go_to_deadman:execute ()
-	action_base.execute (self)
-	local npc=self.object
-  local gi=level.object_by_id(self.a.choosed_deadman)
-	-- если уже задолбало дергать труп, а он застрял (дергаем 3 раза), то нафиг его
-	-- так же если какой то мимопроходящий товарищ труп с места сдвинул - то туда ему и дорога (трупу), а нам он больше не интересен
-  if self.a.captures==4 or self.a.go_time_end<time_global() or gi==nil or gi:level_vertex_id()~=self.a.cur_dead_lvid then
-	if self.a.choosed_deadman then
-		deadmansids[self.a.choosed_deadman]=nil
-		self.a.choosed_deadman=nil
-		self.a.reached=nil		
-	end
-		self.a.captures=nil
-  else
-		npc:set_dest_level_vertex_id(self.a.dest_lvid)
-		-- долгое путешествие до трупа успешно завершилось, ура, товарищи
-    if self.a.dest_lvid and self.a.dest_lvid==npc:level_vertex_id() then
-      self.a.reached=1
-    end
-  end
-end
-
-function action_go_to_deadman:finalize ()
-	action_base.finalize (self)
-end
-
---Тащит трупец
-class "action_moving_deadman" (action_base)
-function action_moving_deadman:__init (npc_name,action_name,storage) super (nil,action_name)
-	self.a = storage
-end
-function action_moving_deadman:initialize()
-	action_base.initialize(self)
-  local npc=self.object
-  --если пушка в руках - прячем, а то тащить неудобно
-  if npc:weapon_unstrapped() then
-    npc:set_item(object.idle,nil)
-  end
-	--потащим медленно, осторожно и на карачках
-	npc:set_movement_type(move.walk)
-	npc:set_mental_state(anim.danger)
-	npc:set_body_state(move.crouch)
-	npc:movement_enabled(true)
-
-	--на таскание трупа в грязи даем 40 секунд
-  self.a.time_end=time_global()+40000
-  self.force=vector():set(0,0,0)
-	--на приседание рядом с трупом и разворот лицом дадим секунду
-  self.time_drag=time_global()+1000
-end
-
-function action_moving_deadman:execute ()
-	action_base.execute (self)
-  local npc=self.object
-  local gi=level.object_by_id(self.a.choosed_deadman)
-  
-	--хватит таскать труп - время истекло, пусть другие этим занимаются
-  if self.a.time_end<time_global() then
-	if self.a.choosed_deadman then
-		deadmansids[self.a.choosed_deadman]=nil
-		self.a.choosed_deadman=nil
-		self.a.reached=nil		
-	end
-    return 
-  end
-	
-	-- смотри мне в глаза!
-	local dir=gi:position():sub(npc:position())
-	dir.y=0
-	npc:set_movement_type(move.walk)
-	npc:set_mental_state(anim.danger)
-	npc:set_body_state(move.crouch)
-	npc:movement_enabled(true)
-	npc:set_sight(look.direction,dir,true)
-
-  if self.a.ps and self.time_drag<time_global() then
-    npc:set_dest_level_vertex_id(self.a.drop_lvid)
-  	-- непись сильный - тащит левой рукой за туловище трупа
-	local bone="bip01_spine1"
-    local dir=npc:bone_position("bip01_l_hand"):sub(gi:bone_position(bone))
-    dir:mul(25000)
-	dir.y=9000
-    self.force:mul(0.5)
-    dir:mul(0.5)
-    self.force:add(dir)
-    if self.a.ps:get_element_by_bone_name(bone) then
-		self.a.ps:get_element_by_bone_name(bone):apply_force(self.force.x,self.force.y,self.force.z)
+function get_kamp_level_vertex_id( path )
+  local sect = "dsh.xr_kamp." .. path
+  local vertex
+  if sys_ini:section_exist( sect ) then
+    local center_point = get_string( sect, "center_point" )
+    if center_point then
+      path = center_point
     else
+      vertex = get_u32( sect, "level_vertex_id" )
     end
   end
-  
-	-- уф! дотащили... всем спасибо, все свободны...
-  if self.a.drop_lvid and self.a.drop_lvid==npc:level_vertex_id() then
-	if self.a.choosed_deadman then
-		deadmansids[self.a.choosed_deadman]=nil
-		self.a.choosed_deadman=nil
-		self.a.reached=nil		
-	end
+  if not vertex then
+    local patrol = patrol( path )
+    vertex = patrol:level_vertex_id( 0 )
   end
+  local level_vertexes = amk_anoms.level_vertexes[ level.name() ]
+  ASSERT(
+    vertex <= level_vertexes,
+    "[%]: kamp %s has wrong level_vertex_id = %s on %s",
+    script_name(), path, vertex, level.name()
+  )
+  return vertex
 end
 
-function action_moving_deadman:finalize ()
-	action_base.finalize (self)
-	state_mgr.set_state( "xr_kamp_3", self.object, self.a.def_state_moving)
+
+function get_my_kamp( npc, path, scheme, radius )
+  local vertex = get_kamp_level_vertex_id( path )
+  local kamp   = kamps[ vertex ]
+  if not kamp then
+    local pos     = level.vertex_position( vertex )
+    local nearest = {}
+    for lvid, k in pairs( kamps ) do
+      local pos2 = level.vertex_position( lvid )
+      if math.abs( pos.y - pos2.y ) < 1 then
+        table.insert(
+          nearest,
+          {
+            [ "kamp" ] = k,
+            [ "pos"  ] = pos2,
+          }
+        );
+      end
+    end
+    table.sort(
+      nearest,
+      function( a, b )
+        return pos:distance_to( a.pos ) < pos:distance_to( b.pos )
+      end
+    )
+    if
+      table.getn( nearest ) > 0 and pos:distance_to( nearest[ 1 ].pos ) < 10
+    then
+      kamp = nearest[ 1 ].kamp
+    end
+  end
+  if kamp then
+    local sobj = alife():object( npc:id() )
+    ASSERT(
+      sobj,
+      "[%s]: [%s]: %s not found in alife()",
+      script_name(), path, npc:name()
+    )
+    if kamp.smart_terrain_id <= sobj:smart_terrain_id() then
+      kamps[ vertex ] = kamp
+    else
+      kamps[ vertex ] = CKampManager( path, vertex, scheme, radius, kamp )
+    end
+  else
+    kamps[ vertex ] = CKampManager( path, vertex, scheme, radius )
+  end
+  return kamps[ vertex ]
 end
---end--
+
+
+function get_pos( center, dist, allow_sector )
+  local ai_step      = 0.7 -- С€Р°Рі AI СЃРµС‚РєРё
+  local math_pi_180  = 180 / math.pi
+  local pi2          = math.pi * 2
+
+  local anomalies    = amk_anoms.get_anomaly_list_for_pos(
+    level.vertex_position( center ), dist
+  )
+  local dir          = vector():set( 1, 0, 0 ):normalize()
+
+  -- РёС‚РµСЂР°С‚РѕСЂ РІСЂР°С‰РµРЅРёСЏ РЅР°РїСЂР°РІР»РµРЅРёСЏ
+  local rotate_angle = math.asin( ai_step / dist )
+  local cur_angle    = 0
+  local found, seen  = {}, {}
+  while cur_angle < pi2 do
+    local good_angle
+    if allow_sector then
+      good_angle = false
+      for i = 1, table.getn( allow_sector ), 2 do
+        if
+          cur_angle >= allow_sector[ i ]
+          and cur_angle <= allow_sector[ i + 1 ]
+        then
+          good_angle = true
+          break
+        end
+      end
+    else
+      good_angle = true
+    end
+    local vertex = level.vertex_in_direction( center, dir, dist )
+    if good_angle and vertex ~= center and not seen[ vertex ] then
+      local pos       = level.vertex_position( vertex )
+      local near_anom = false
+      for _, anom in ipairs( anomalies ) do
+        local dist = pos:distance_to( anom.pos ) - anom.radius
+        if dist < 5 then
+          near_anom = true
+          break
+        end
+      end
+      if not near_anom then
+        table.insert( found, vertex )
+        seen[ vertex ] = true
+      end
+    end
+    -- РїРѕРІРѕСЂР°С‡РёРІР°РµРј РЅР°РїСЂР°РІР»РµРЅРёРµ РїРѕРёСЃРєР°
+    cur_angle = cur_angle + rotate_angle
+    dir       = vector_rotate_y( dir, rotate_angle * math_pi_180 )
+  end
+  return found
+end
+
 
 class "CKampManager"
-function CKampManager:__init(path)
-	self.kamp_name = path
-	self.patrol = patrol(path)
-	self.center = self.patrol:level_vertex_id(0)
-	self.position = {{dir = vector():set(1, 0, 0),	used = nil},
-					 {dir = vector():set(1, 0, 1),	used = nil},
-					 {dir = vector():set(0, 0, 1),	used = nil},
-					 {dir = vector():set(-1, 0, 1),	used = nil},
-					 {dir = vector():set(-1, 0, 0),	used = nil},
-					 {dir = vector():set(-1, 0, -1),used = nil},
-					 {dir = vector():set(0, 0, -1),	used = nil},
-					 {dir = vector():set(1, 0, -1),	used = nil}}
-	self.npc = {}
-	self.population = 0
-	self.kamp_state = "idle"	
-	-- Где то здесь распарсим патрульный путь и проапдейтим вектор позиций.
-	-- 0 вершина - центр лагеря.
-	-- 1 флаг - сектор занят, в поинте можно сидеть.
-	-- 2 флаг - сектор занят, в поинте нельзя сидеть.
-	for k = 1, self.patrol:count() - 1 do
-		-- если есть 1 или 2 флажок - отметить сектор как занятый
-		if self.patrol:flag(k,1) or
-		   self.patrol:flag(k,2)
-		then
-			-- отметить сектор как занятый
-			for key,value in pairs(self.position) do
-				dir = vector():sub(level.vertex_position(self.patrol:level_vertex_id(k)), level.vertex_position(self.center))
-				if value.dir then
-					yaw = yaw_degree(dir, value.dir)
-					if yaw <=23 then
-						--'printf("KAMP node[%s], sector[%s,] yaw[%s]", k, key, yaw_degree(dir, value.dir))
-						value.used = -1
-						break						
-					end
-				end
-			end
-			
-		end
-		
-		-- если есть 1 флажок - создать место для сидения в точке пути
-		if self.patrol:flag(k,1) then
-			-- создать точку для сидения
-			table.insert(self.position, {vertex = self.patrol:level_vertex_id(k)})
-		end		
-	end
-	--print_table(self.position)
-			--Таблица соответствий состояния лагеря и допустимых анимаций и звуков.	
-	self.avail_state = {idle				= { directed	= { "wait", "sit", "sit_ass", "sit_knee", "use_pda", "eat_kolbasa", "eat_vodka", "eat_energy", "eat_bread", "trans"}, 
-												undirected	= { "wait", "sit", "sit_ass", "sit_knee", "use_pda", "eat_kolbasa", "eat_vodka", "eat_energy", "eat_bread", "trans"}},
-						pre_harmonica		= { directed	= { "wait_harmonica"},
-												undirected	= { "wait", "sit", "sit_ass", "sit_knee", "use_pda", "eat_kolbasa", "eat_vodka", "eat_energy", "eat_bread", "trans"}},
-						harmonica			= { directed	= { "play_harmonica"},
-												undirected	= { "wait", "sit", "sit_ass", "sit_knee", "use_pda", "eat_kolbasa", "eat_vodka", "eat_energy", "eat_bread", "trans"}},
-						post_harmonica		= { directed	= { "wait_harmonica"},
-												undirected	= { "wait", "sit", "sit_ass", "sit_knee", "use_pda", "eat_kolbasa", "eat_vodka", "eat_energy", "eat_bread", "trans"}},
-						pre_guitar			= { directed	= { "wait_guitar"},
-												undirected	= { "wait", "sit", "sit_ass", "sit_knee", "use_pda", "kurit", "kurit", "trans"}},
-						guitar				= { directed	= { "play_guitar"},
-												undirected	= { "wait", "sit", "sit_ass", "sit_knee", "kurit", "use_pda", "kurit", "trans"}},
-						post_guitar			= { directed	= { "wait_guitar"},
-												undirected	= { "wait", "sit", "sit_ass", "sit_knee", "kurit", "use_pda", "kurit", "trans"}},
-						story				= { directed	= { "declarate"},
-												undirected	= { "wait", "sit", "sit_ass", "sit_knee", "kurit", "use_pda", "kurit", "trans"}},
-						post_story			= { directed	= { "declarate"},
-												undirected	= { "wait", "sit", "sit_ass", "sit_knee", "kurit", "use_pda", "kurit", "trans"}},
-						pre_joke			= { directed	= { "declarate"},
-												undirected	= { "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "use_pda", "eat_vodka", "eat_energy", "eat_bread", "trans"}},
-						joke				= { directed	= { "declarate"},
-												undirected	= { "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "use_pda", "eat_vodka", "eat_energy", "eat_bread", "trans"}},
-						post_joke			= { directed	= { "declarate"},
-												undirected	= { "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "use_pda", "eat_vodka", "eat_energy", "eat_bread", "trans"}}}
-	self.avail_sound = {idle				= { directed = "idle", undirected="idle"},
-						pre_harmonica		= { directed = "pre_harmonica", undirected = ""},
-						harmonica			= { directed = "play_harmonica", undirected = ""},
-						post_harmonica		= { directed = "", undirected = "reac_harmonica"},
-						pre_guitar			= { directed = "pre_guitar", undirected = ""},
-						guitar				= { directed = "play_guitar", undirected = ""},
-						post_guitar			= { directed = "", undirected = "reac_guitar"},
-						story				= { directed = "play_story", undirected = ""},
-						post_story			= { directed = "", undirected = "reac_story"},
-						pre_joke			= { directed = "pre_joke", undirected = ""},
-						joke				= { directed = "play_joke", undirected = ""},
-						post_joke			= { directed = "", undirected = "reac_joke"}}
-	-- Таблица таймаутов по состоянию. Если состояние установилось, то некоторое время оно не может быт изменено.						
-	self.timeout	 = {idle				= { min = 30000 },
-						pre_harmonica		= { min = 3000 },
-						harmonica			= { min = 5000, soundstart = true },
-						post_harmonica		= { min = 3000 },
-						pre_guitar			= { min = 3000 },
-						guitar				= { min = 5000, soundstart = true },
-						post_guitar			= { min = 3000 },
-						story				= { min = 1000, soundstart = true },
-						post_story			= { min = 3000 },
-						pre_joke			= { min = 3000 },
-						joke				= { min = 5000, soundstart = true },
-						post_joke			= { min = 3000 }}
-	-- Таблица глобальных состояний лагеря.
-	self.kamp_states = { idle = true, 
-						 pre_harmonica = false, harmonica = false, post_harmonica = false,
-						 pre_guitar = false, guitar = false, post_guitar = false,
-						 story = false, post_story = false,
-						 pre_joke = true, joke = true, post_joke = true}
-	-- Таблица допустимых переходов между состояниями с вероятностями.
-	self.trans_kamp = { idle			= { idle = 10, pre_harmonica = 20, pre_guitar = 20, story = 30, pre_joke = 20 }, 
-						pre_harmonica	= { harmonica = 100 }, 
-						harmonica		= { post_harmonica = 100 }, 
-						post_harmonica	= { idle = 70, harmonica = 30 },
-						pre_guitar		= { guitar = 100 }, 
-						guitar			= { post_guitar = 100 }, 
-						post_guitar		= { idle = 70, guitar = 30 },
-						story			= { post_story = 100 }, 
-						post_story		= { idle = 100 },
-						pre_joke		= { joke = 100 }, 
-						joke			= { post_joke = 100 }, 
-						post_joke		= { idle = 100 }}
-	-- Хранилище для режиссера лагеря. Режиссерем является сталкер, затеявший необычное поведение
-	self.director = nil
-end
-function CKampManager:selectPosition(npc_id, bind)
-	--пытаемся разместить в заданном в логике месте. А если занято, то как обычно
-	if bind and self.position[bind] and self.position[bind].used == nil then
-		self.position[bind].used = npc_id
-		self.npc[npc_id].position = bind
-		return
-	end
-
-	-- создаем список доступных позиций
-	--printf("KAMP. [%s] called select position", npc_id)
-	local free = {}
-	for k,v in pairs(self.position) do
-		if v.used == nil then
-			table.insert(free, k)
-		end
-	end
-	--' затем из доступных позиций выбрать рандомно одну.
-	if table.getn(free) > 0 then
-		--printf("KAMP [%s] free node > 0", npc_id)
-		local rr = math.random(table.getn(free))
-		self.position[free[rr]].used = npc_id
-		self.npc[npc_id].position = free[rr]
-	end
-	--printf("KAMP [%s] npc table", npc_id)
-	--print_table(self.npc)
-	--printf("KAMP [%s] position table", npc_id)
-	--print_table(self.position)
-end
-function CKampManager:getDestVertex(npc_id, radius)
-
-	if npc_id == nil then return nil end
-	
-	if self.npc[npc_id] == nil then return nil end
-
-	--printf("get dest Vertex called [%s]", npc_id)
-	if self.npc[npc_id].position == nil then
-		--printf("-------debug_info-------------")
-		--print_table(self.npc)
-		--printf("-------debug_info-------------")
-		--print_table(self.position)
-		--printf("-------debug_info-------------")
-		abort("get dest Vertex: nil [%s]", npc_id)
-		return nil
-	end
-	
-	local position = self.position[self.npc[npc_id].position]
-	if position.vertex ~= nil then
-		--printf("vertex preselected [%s]", npc_id)
-		return position.vertex
-	end
-	-- высчитываем вертех по направлению
-   	local pp = level.vertex_in_direction(self.center, self.position[self.npc[npc_id].position].dir, radius)
-   	pp = level.vertex_in_direction(pp, vector():set(math.random(-1,1), 0, math.random(-1,1)), math.random(0,0.5))
-	--printf("vertex selected [%s]", npc_id)   	
-	return pp		
-end
-function CKampManager:proceedState(npc)
-	-- Проверка на таймаут
-	local npc_id = npc:id()
-		if self.npc == nil or self.npc[npc_id] == nil then return end
-	local active_sound_count = npc:active_sound_count()
-	if self.npc[npc_id].need_sound_begin == true then
-		if active_sound_count == 0 then
-			return
-		else			
-			self.npc[npc_id].need_sound_begin = false
-		end
-	end
-	if self.begin ~= nil and
-	   time_global() - self.begin < self.timeout[self.kamp_state].min
-	then
-		return
-	end
-
-	-- Если режиссер не закончил говорить - ждем конца фразы.
-	if active_sound_count > 0 then
-		return
-	end
-
-	--printf("Proceed state for [%s]", npc_id)
-	-- В случае с историей переход обрабатывается отдельно
-	if self.kamp_state == "post_story" then
-		if self.story_last < self.story_max - 1 then
-			self.npc[npc_id].begin = nil
-			self.npc[npc_id].need_sound_begin = true
-			self.director = npc_id
-			self.kamp_state = "story"
-			self.begin = time_global()
-			for kk,vv in pairs(self.npc) do
-				vv.new = true
-			end		
-			return
-		else
-			self.selected_story = nil
-		end
-	end
-	-- Определяются допустимые в данный момент переходы.
-	local temp = {}
-	local max_rnd = 0
-	for k,v in pairs(self.trans_kamp[self.kamp_state]) do		
-		-- Определяются допустимые состояния для лагеря.
-		if self.kamp_states[k] == true then
-			temp[k] = v
-			max_rnd = max_rnd + v
-		end
-	end
-	-- Осуществляется рандомный взвешенный переход.
-	if max_rnd == 0 then
-		-- Если переходить некуда - переходим в айдл
-		temp["idle"] = 100
-		max_rnd = 100
-	end
-	local p = math.random(0,max_rnd)
-	for k,v in pairs(temp) do
-		p = p - v
-		if p <= 0 then
-			--printf("Selected [%s]", k)
-			if k == "idle" then
-				self.director = nil
-				if self.kamp_state ~= "idle" then
-					self.npc[npc_id].begin = nil
-				end
-			else
-				self.npc[npc_id].begin = nil
-				if self.timeout[k].soundstart == true then
-					self.npc[npc_id].need_sound_begin = true
-				end
-				self.director = npc_id
-				self.censor = nil
-			end			
-			self.kamp_state = k
-			self.begin = time_global()
-			-- Меняем таймаут для истории
-			if k == "post_story" then
-				local dep = sound_theme.theme[self.selected_story].depence[self.story_last]
-				if dep and dep.min and dep.max then
-					self.timeout["post_story"].min = math.random(dep.min, dep.max)*1000
-				end
-			end
-			for kk,vv in pairs(self.npc) do
-				vv.new = true
-			end
-			return
-		end
-	end
-end
-function CKampManager:proceedRole(npc, director)
-	--printf("Proceed Role for [%s]", npc:id())
-	-- Определить список доступных анимаций по состоянию лагеря.
-	-- определить список доступных анимаций по наличию предметов
-	-- выбрать одну из них (то же самое со звуком).
-	local states = 0
-	local sound = ""
-	local state = ""
-	local npc_id = npc:id()
-		if self.npc == nil or self.npc[npc_id] == nil then return nil, nil end
-	if self.npc[npc_id].begin == nil or
-	   time_global() - self.npc[npc_id].begin >= self.npc[npc_id].state_idle
-	then
-		if director then
-			states = self.avail_state[self.kamp_state].directed
-			sound = self.avail_sound[self.kamp_state].directed
-		else
-			states = self.avail_state[self.kamp_state].undirected
-			sound = self.avail_sound[self.kamp_state].undirected
-		end
-		-- Выбирать новое состояние только раз в какое то время.
-		local temp = {}
-		for k,v in pairs(states) do
-			if self.npc[npc_id].states[v] == true then
-				table.insert(temp, v)
-			end
-		end
-		
-		-- Если мы решили говорить историю, надо выбрать какую именно говорить.
-		if sound == "play_story" and self.selected_story == nil and db.story_by_id[npc_id] ~= nil then
-			local story_num = table.getn(db.story_by_id[npc_id])
-			if story_num > 0 then
-				self.selected_story = db.story_by_id[npc_id][math.random(story_num)]
-			end			
-		end
-		if table.getn(temp) > 0 then
-			self.npc[npc_id].begin = time_global()
-			state = temp[math.random(table.getn(temp))]
-			self.npc[npc_id].state_selected = state
-			self.npc[npc_id].state_idle = math.random(15000,20000)		
-		else
-			state = self.npc[npc_id].state_selected	
-		end
-	else
-		if director then
-			sound = self.avail_sound[self.kamp_state].directed
-		else
-			sound = self.avail_sound[self.kamp_state].undirected
-		end
-		state = self.npc[npc_id].state_selected	
-	end
-	--printf("Proceed Role state [%s] sound [%s]", state, sound)	
-	return state, sound
-end
-function CKampManager:updateNpc(npc)
-	-- Проверка что сталкер может делать, а что нет.
-	self:checkNpcAbility(npc)
-	-- Просим лагерь выбрать текущее состояние. Менять состояние лагеря
-	-- имеет право только режиссер.
-	local npc_id = npc:id()
-		if self.npc == nil or self.npc[npc_id] == nil then return nil, nil, nil end
-	local director = ( self.director == nil or self.director == npc_id ) and npc_id~=self.forbiddendirector
-	if director	then
-		self:proceedState(npc)
-	end
-	-- Говорим чудаку выбрать себе состояние для текущего состояния лагеря.
-	local state, sound = self:proceedRole(npc, director)
-	
-	local substate = nil
-	if state == "wait_harmonica" then
-		if sound == "pre_harmonica" and self.npc[npc_id].new == true then
-			xr_sound.set_sound_play(npc, "intro_music", math.random(2000,3000))
-			self.npc[npc_id].new = false
-		end
-		state = "harmonica"
-		xr_kamp.kamp_stalkers[npc_id] = false
-	elseif state == "play_harmonica" then
-		state = "harmonica"
-		substate = 1
-		xr_kamp.kamp_stalkers[npc_id] = false
-	elseif state == "wait_guitar" then
-		if sound == "pre_guitar" and self.npc[npc_id].new == true then
-			xr_sound.set_sound_play(npc, "intro_music", math.random(2000,3000))
-			self.npc[npc_id].new = false
-		end
-		state = "guitar"
-		xr_kamp.kamp_stalkers[npc_id] = false
-	elseif state == "play_guitar" then
-		state = "guitar"
-		substate = 1
-		xr_kamp.kamp_stalkers[npc_id] = false
-	elseif state == "declarate" then
-		if self.npc[npc_id].new == true then
-			if sound == "pre_joke" then
-				xr_sound.set_sound_play(npc, "intro_joke", math.random(2000,3000))
-			elseif sound == "play_joke" then
-				xr_sound.set_sound_play(npc, "joke", math.random(2000,3000))
-			elseif sound == "play_story" then
-				xr_sound.set_sound_play(npc, self.selected_story)
-				self.story_last, self.story_max = xr_sound.get_last_IDS(npc, self.selected_story)
-				if self.story_last==nil then
-					self.story_last=0
-					self.story_max=1
-					xr_sound.set_sound_play(npc, "threat_back", math.random(1000,2000))
-					--- dirty hack
-					self.kamp_state="idle"
-					self.forbiddendirector=self.director
-					self.director=nil
-				end
-			end
-			self.npc[npc_id].new = false
-		end
-		if npc:character_community() == "monolith" then
-			local t = math.mod(npc_id, 2)
-			if t == 0 then
-				state = "trans_0"
-			else
-				state = "trans_1"
-			end
-		elseif npc:character_community() == "zombied" then
-			state = "trans_zombied"
-		else
-			local t = math.mod(npc_id, 3)
-			if t == 0 then
-				state = "sit"
-			elseif t == 1 then
-				state = "sit_ass"
-			else
-				state = "sit_knee"
-			end
-		end
-		xr_kamp.kamp_stalkers[npc_id] = false
-	elseif state == "trans" then
-		if npc:character_community() == "monolith" then
-			local t = math.mod(npc_id, 2)
-			if t == 0 then
-				state = "trans_0"
-			else
-				state = "trans_1"
-			end
-		elseif npc:character_community() == "zombied" then
-			state = "trans_zombied"
-		end
-		xr_kamp.kamp_stalkers[npc_id] = false
-	else
-		xr_kamp.kamp_stalkers[npc_id] = true
-	end
-	-- Выбор реальных звуков
-	if sound == "idle" then
-		sound = "weather, state"
-	elseif sound == "reac_guitar" then
-		sound = "reac_music"
-	elseif sound == "reac_harmonica" then
-		sound = "reac_music"
-	elseif sound == "reac_joke" then
-		sound = ""	
-		if self.npc[npc_id].new == true then
-			if self.censor == nil then
-				xr_sound.set_sound_play(npc, "reac_joke", math.random(2000,3000))
-				self.censor = npc_id
-			else
-				xr_sound.set_sound_play(npc, "story_reac_laughter", math.random(100,300))
-			end
-			self.npc[npc_id].new = false
-		end
-	elseif sound == "reac_story" then
-		sound = ""
-		if self.npc[npc_id].new == true then
-			local dep
-			if self.story_last then
-				dep = sound_theme.theme[self.selected_story].depence[self.story_last+1]
-			end
-			if dep then
-				if dep.type == "all" then
-					xr_sound.set_sound_play(npc, dep.theme, math.random(100,300))
-				else
-					sound = dep.theme
-				end
-			end
-		end
-	elseif sound == "reac_story" then
-		sound = ""
-	else
-		sound = ""
-	end
-
-	--printf("Proceed Update Npc [%s] sound [%s]", state, sound)	
-	return state, sound, substate
-end
-function CKampManager:checkNpcAbility(npc)
-	local npc_id = npc:id()
-	
-	if npc:character_community() ~= "monolith" and
-	   npc:character_community() ~= "zombied"
-	then
-	
-		if not self.npc[npc_id] then return end
-		
-		local can_eat = ogse_kamp_eating.can_eat(npc)
-		
-		self.npc[npc_id].states["trans"] = false
-		-- есть колбасу
-		if npc:object("kolbasa_a") and can_eat and math.random(99) > 20 then		-- вероятность 80%
-			self.npc[npc_id].states["eat_kolbasa"] = true
-		else
-			self.npc[npc_id].states["eat_kolbasa"] = false
-		end
-		-- пить водку
-		if npc:object("vodka_a") and can_eat and math.random(99) > 60 then		-- вероятность 40%
-			self.npc[npc_id].states["eat_vodka"] = true
-		else
-			self.npc[npc_id].states["eat_vodka"] = false
-		end
-		-- втыкать в интернеты
-		if npc:object("device_pda") and math.random(99) > 50 then		-- вероятность 50%
-			self.npc[npc_id].states["use_pda"] = true
-		else
-			self.npc[npc_id].states["use_pda"] = false
-		end		
-		-- пить енергитический напиток
-		if npc:object("energy_drink") and can_eat and math.random(99) > 40 then		-- вероятность 60%
-			self.npc[npc_id].states["eat_energy"] = true
-		else
-			self.npc[npc_id].states["eat_energy"] = false
-		end
-		-- есть хлеб
-		if npc:object("bread_a") and can_eat and math.random(99) > 20 then		-- вероятность 80%
-			self.npc[npc_id].states["eat_bread"] = true
-		else
-			self.npc[npc_id].states["eat_bread"] = false
-		end
-		-- курит
-		if npc:object("sigaret") and can_eat and math.random(99) > 20 then		-- вероятность 80%
-			self.npc[npc_id].states["kurit"] = true
-		else
-			self.npc[npc_id].states["kurit"] = false
-		end
-		-- играть на гармошке
-		if npc:object("harmonica_a") and can_eat then
-			self.npc[npc_id].states["play_harmonica"] = true
-			self.npc[npc_id].states["wait_harmonica"] = true
-			self.kamp_states["pre_harmonica"] = true
-			self.kamp_states["harmonica"] = true
-			self.kamp_states["post_harmonica"] = true
-		else
-			self.npc[npc_id].states["play_harmonica"] = false
-			self.npc[npc_id].states["wait_harmonica"] = false
-			self.kamp_states["pre_harmonica"] = false
-			self.kamp_states["harmonica"] = false
-			self.kamp_states["post_harmonica"] = false
-		end
-		-- играть на гитаре
-		if npc:object("guitar_a") then
-			self.npc[npc_id].states["play_guitar"] = true
-			self.npc[npc_id].states["wait_guitar"] = true
-			self.kamp_states["pre_guitar"] = true
-			self.kamp_states["guitar"] = true
-			self.kamp_states["post_guitar"] = true
-		else
-			self.npc[npc_id].states["play_guitar"] = false
-			self.npc[npc_id].states["wait_guitar"] = false
-			self.kamp_states["pre_guitar"] = false
-			self.kamp_states["guitar"] = false
-			self.kamp_states["post_guitar"] = false
-		end
-		-- анекдоты
-		if self.population > 1 then
-			self.kamp_states["pre_joke"] = true
-			self.kamp_states["joke"] = true
-			self.kamp_states["post_joke"] = true
-		else
-			self.kamp_states["pre_joke"] = false
-			self.kamp_states["joke"] = false
-			self.kamp_states["post_joke"] = false
-		end	
-	end
-	
-	-- Если чувак знает истории, надо добавить их к лагерю
-	
-	if self.population > 1 and db.story_by_id[npc:id()] ~= nil then
-		self.kamp_states["story"] = true
-		self.kamp_states["post_story"] = true
-	else
-		self.kamp_states["story"] = false
-		self.kamp_states["post_story"] = false	
-	end
-
+function CKampManager:__init( name, level_vertex_id, scheme, min_radius, src_kamp )
+  self.scheme      = scheme
+  self.kamp_name   = name
+  self.center      = level_vertex_id
+  self.min_radius  = min_radius or 2
+  self.npc         = {}
+  self.population  = 0
+  self.population_comed = 0
+  self.kamp_state  = "idle"
+  self.avail_state = xr_kamp_data.avail_state
+  self.avail_sound = xr_kamp_data.avail_sound
+  self.timeout     = table.clone( xr_kamp_data.timeout )
+  self.kamp_states = table.clone( xr_kamp_data.kamp_states )
+  self.trans_kamp  = xr_kamp_data.trans_kamp
+  -- РҐСЂР°РЅРёР»РёС‰Рµ РґР»СЏ СЂРµР¶РёСЃСЃРµСЂР° Р»Р°РіРµСЂСЏ. Р РµР¶РёСЃСЃРµСЂРµРј СЏРІР»СЏРµС‚СЃСЏ СЃС‚Р°Р»РєРµСЂ,
+  -- Р·Р°С‚РµСЏРІС€РёР№ РЅРµРѕР±С‹С‡РЅРѕРµ РїРѕРІРµРґРµРЅРёРµ.
+  self.director    = nil
+  self:init_sectors()
+  self:init_drop_points()
+  self:init_seats()
+  self.seats_assigned = false
+  if src_kamp then
+    for npc_id, v in pairs( src_kamp.npc ) do
+      local npc = level.object_by_id( npc_id )
+      if npc and npc:alive() then
+        local st = db.storage[ npc_id ][ src_kamp.scheme ]
+        ASSERT(
+          st,
+          "[%s]: [%s]: storage not found for %s from %s: scheme = %s",
+          script_name(), self.kamp_name, npc:name(), src_kamp.kamp_name,
+          src_kamp.scheme
+        )
+        src_kamp:removeNpc( npc )
+        st.kamp = self
+        self:addNpc( npc )
+      end
+    end
+  end
 end
 
-function CKampManager:addNpc(npc, bind)
-	--printf("KAMP [%s] add npc", npc:name())
-	if self.npc[npc:id()] ~= nil then
-		--printf("NPC is already exist")
-		return
-	end
-	
-	if npc:character_community() == "monolith" or npc:character_community() == "zombied" then
-		self.npc[npc:id()] = {name = npc:name(), position = nil, current = nil, speak = 0, states = {
-								stand_wait = false, sit = false, sit_ass = false, sit_knee = false, declarate = true,
-								use_pda = false, eat_kolbasa = false, eat_vodka = false, eat_energy = false, eat_bread = false, kurit = false, trans = true,
-								play_harmonica = false, play_guitar = false, play_joke = false, play_story = false}}
-	else
-		self.npc[npc:id()] = {name = npc:name(), position = nil, current = nil, speak = 0, states = {
-								stand_wait = true, sit = true, sit_ass = true, sit_knee = true, declarate = true,
-								use_pda = false, eat_kolbasa = false, eat_vodka = false, eat_energy = false, eat_bread = false, kurit = false, trans = false,
-								play_harmonica = false, play_guitar = false, play_joke = false, play_story = false}}
-	end
-	self:selectPosition(npc:id(), bind)	
-	if db.story_by_id[npc:id()] == nil then
-		local char_ini1 = dsh.cached_ini_file("scripts\\stories.ltx")
-		xr_info.loadInfo(npc, char_ini1)
-	end
+
+function CKampManager:init_sectors()
+  local sect = "dsh.xr_kamp." .. self.kamp_name
+  if sys_ini:section_exist( sect ) then
+    local s = get_string( sect, "allow_sector" )
+    if s then
+      local t = parse_nums( s )
+      ASSERT(
+        table.getn( t ) % 2 == 0,
+        "[%s]: section '%s' has wrong option 'allow_sector': %s",
+        script_name(), sect, s
+      )
+      self.allow_sector = {}
+      for _, n in ipairs( t ) do
+        table.insert( self.allow_sector, math.rad( n ) )
+      end
+    end
+  end
 end
 
-function CKampManager:removeNpc(npc)
-	--printf("KAMP [%s] remove npc", npc:name())
-	local npc_id = npc:id()
-	if self.npc[npc_id] ~= nil then
-		-- Если удаляем режиссера - необходимо форсированно перевести лагерь в идловое состояние.
-		if self.director == npc_id then
-			self.director = nil
-			self.npc[npc_id].begin = nil
-			self.censor = nil
-			self.kamp_state = "idle"
-			self.begin = time_global()
-			for kk,vv in pairs(self.npc) do
-				vv.new = true
-			end
-			xr_sound.set_sound(npc, nil)
-			stop_play_sound(npc)
-		end
-		-- nv 071105 - prevent crash if "defend border from Monolith" skipped
-		if self.npc[npc_id].position ~= nil then
-			self.position[self.npc[npc_id].position].used = nil
-		end
-		self.npc[npc_id] = nil
-	end
+
+function CKampManager:getDestVertex( npc )
+  if not self.seats_assigned then
+    self:reassign_seats()
+  end
+  local st = self.npc[ npc:id() ]
+  return self.active_seats[ st.seat ].vertex
 end
 
-function CKampManager:increasePops(npc)
-	self.population = self.population + 1
+
+function CKampManager:proceedState( npc )
+  -- РџСЂРѕРІРµСЂРєР° РЅР° С‚Р°Р№РјР°СѓС‚
+  local npc_id = npc:id()
+  if self.npc[ npc_id ] == nil then return end
+  local active_sound_count = npc:active_sound_count()
+  if self.npc[ npc_id ].need_sound_begin == true then
+    if active_sound_count == 0 then
+      return
+    else
+      self.npc[ npc_id ].need_sound_begin = false
+    end
+  end
+  if self.begin ~= nil and
+    time_global() - self.begin < self.timeout[ self.kamp_state ].min
+  then
+    return
+  end
+
+  -- Р•СЃР»Рё СЂРµР¶РёСЃСЃРµСЂ РЅРµ Р·Р°РєРѕРЅС‡РёР» РіРѕРІРѕСЂРёС‚СЊ - Р¶РґРµРј РєРѕРЅС†Р° С„СЂР°Р·С‹.
+  if active_sound_count > 0 then
+    return
+  end
+
+  -- Р’ СЃР»СѓС‡Р°Рµ СЃ РёСЃС‚РѕСЂРёРµР№ РїРµСЂРµС…РѕРґ РѕР±СЂР°Р±Р°С‚С‹РІР°РµС‚СЃСЏ РѕС‚РґРµР»СЊРЅРѕ
+  if self.kamp_state == "post_story" then
+    if self.story_last < self.story_max - 1 then
+      self.npc[ npc_id ].begin            = nil
+      self.npc[ npc_id ].need_sound_begin = true
+      self.director   = npc_id
+      self.kamp_state = "story"
+      self.begin      = time_global()
+      for kk, vv in pairs( self.npc ) do
+        vv.new = true
+      end
+      return
+    else
+      self.selected_story = nil
+    end
+  end
+  -- РћРїСЂРµРґРµР»СЏСЋС‚СЃСЏ РґРѕРїСѓСЃС‚РёРјС‹Рµ РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚ РїРµСЂРµС…РѕРґС‹.
+  local temp    = {}
+  local max_rnd = 0
+  for k, v in pairs( self.trans_kamp[ self.kamp_state ] ) do
+    -- РћРїСЂРµРґРµР»СЏСЋС‚СЃСЏ РґРѕРїСѓСЃС‚РёРјС‹Рµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РґР»СЏ Р»Р°РіРµСЂСЏ.
+    if self.kamp_states[ k ] == true then
+      temp[ k ] = v
+      max_rnd   = max_rnd + v
+    end
+  end
+  -- РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚СЃСЏ СЂР°РЅРґРѕРјРЅС‹Р№ РІР·РІРµС€РµРЅРЅС‹Р№ РїРµСЂРµС…РѕРґ.
+  if max_rnd == 0 then
+    -- Р•СЃР»Рё РїРµСЂРµС…РѕРґРёС‚СЊ РЅРµРєСѓРґР° - РїРµСЂРµС…РѕРґРёРј РІ Р°Р№РґР»
+    temp.idle = 100
+    max_rnd   = 100
+  end
+  local p = math.random( 0, max_rnd )
+  for k, v in pairs( temp ) do
+    p = p - v
+    if p <= 0 then
+      if k == "idle" then
+        self.director = nil
+        if self.kamp_state ~= "idle" then
+          self.npc[ npc_id ].begin = nil
+        end
+      else
+        self.npc[ npc_id ].begin = nil
+        if self.timeout[ k ].soundstart == true then
+          self.npc[ npc_id ].need_sound_begin = true
+        end
+        self.director = npc_id
+        self.censor   = nil
+      end
+      self.kamp_state = k
+      self.begin      = time_global()
+      -- РњРµРЅСЏРµРј С‚Р°Р№РјР°СѓС‚ РґР»СЏ РёСЃС‚РѕСЂРёРё
+      if k == "post_story" then
+        local dep = sound_theme_data.theme[ self.selected_story ].depence[ self.story_last ]
+        if dep and dep.min and dep.max then
+          self.timeout[ "post_story" ].min = math.random( dep.min, dep.max ) * 1000
+        end
+      end
+      for kk, vv in pairs( self.npc ) do
+        vv.new = true
+      end
+      return
+    end
+  end
 end
 
-function CKampManager:decreasePops(npc)
-	self.population = self.population - 1
+
+function CKampManager:proceedRole( npc, director )
+  -- РћРїСЂРµРґРµР»РёС‚СЊ СЃРїРёСЃРѕРє РґРѕСЃС‚СѓРїРЅС‹С… Р°РЅРёРјР°С†РёР№ РїРѕ СЃРѕСЃС‚РѕСЏРЅРёСЋ Р»Р°РіРµСЂСЏ.
+  -- РѕРїСЂРµРґРµР»РёС‚СЊ СЃРїРёСЃРѕРє РґРѕСЃС‚СѓРїРЅС‹С… Р°РЅРёРјР°С†РёР№ РїРѕ РЅР°Р»РёС‡РёСЋ РїСЂРµРґРјРµС‚РѕРІ
+  -- РІС‹Р±СЂР°С‚СЊ РѕРґРЅСѓ РёР· РЅРёС… (С‚Рѕ Р¶Рµ СЃР°РјРѕРµ СЃРѕ Р·РІСѓРєРѕРј).
+  local states = 0
+  local sound  = ""
+  local state  = ""
+  local npc_id = npc:id()
+  if self.npc[ npc_id ] == nil then return nil, nil end
+  if
+    self.npc[ npc_id ].begin == nil
+    or time_global() - self.npc[ npc_id ].begin >= self.npc[ npc_id ].state_idle
+  then
+    if director then
+      states = self.avail_state[ self.kamp_state ].directed
+      sound  = self.avail_sound[ self.kamp_state ].directed
+    else
+      states = self.avail_state[ self.kamp_state ].undirected
+      sound  = self.avail_sound[ self.kamp_state ].undirected
+    end
+    -- Р’С‹Р±РёСЂР°С‚СЊ РЅРѕРІРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ С‚РѕР»СЊРєРѕ СЂР°Р· РІ РєР°РєРѕРµ С‚Рѕ РІСЂРµРјСЏ.
+    local temp = {}
+    for k, v in pairs( states ) do
+      if self.npc[ npc_id ].states[ v ] == true then
+        table.insert( temp, v )
+      end
+    end
+
+    -- Р•СЃР»Рё РјС‹ СЂРµС€РёР»Рё РіРѕРІРѕСЂРёС‚СЊ РёСЃС‚РѕСЂРёСЋ, РЅР°РґРѕ РІС‹Р±СЂР°С‚СЊ РєР°РєСѓСЋ РёРјРµРЅРЅРѕ РіРѕРІРѕСЂРёС‚СЊ.
+    if
+      sound == "play_story" and self.selected_story == nil
+      and db.story_by_id[ npc_id ] ~= nil
+    then
+      local story_num = table.getn( db.story_by_id[ npc_id ] )
+      if story_num > 0 then
+        self.selected_story = db.story_by_id[ npc_id ][ math.random( story_num ) ]
+      end
+    end
+    if table.getn( temp ) > 0 then
+      state = temp[ math.random( table.getn( temp ) ) ]
+      self.npc[ npc_id ].begin          = time_global()
+      self.npc[ npc_id ].state_selected = state
+      self.npc[ npc_id ].state_idle     = math.random( 15000, 20000 )
+    else
+      state = self.npc[ npc_id ].state_selected
+    end
+  else
+    if director then
+      sound = self.avail_sound[ self.kamp_state ].directed
+    else
+      sound = self.avail_sound[ self.kamp_state ].undirected
+    end
+    state = self.npc[ npc_id ].state_selected
+  end
+  return state, sound
 end
 
-----------------------------------------------------------------------------------------------------------------------
---Kamp binder
-----------------------------------------------------------------------------------------------------------------------
-function add_to_binder(object, ini, scheme, section, storage)
-	local operators		= {}
-	local properties	= {}
 
-	local manager = object:motivation_action_manager()
-	
-	properties["kamp_end"]		= xr_evaluators_id.stohe_kamp_base + 1
-	properties["on_position"]	= xr_evaluators_id.stohe_kamp_base + 2
-	properties["contact"]		= xr_evaluators_id.stohe_meet_base + 1    
+function CKampManager:updateNpc( npc )
+  -- РџСЂРѕРІРµСЂРєР° С‡С‚Рѕ СЃС‚Р°Р»РєРµСЂ РјРѕР¶РµС‚ РґРµР»Р°С‚СЊ, Р° С‡С‚Рѕ РЅРµС‚.
+  self:checkNpcAbility( npc )
+  -- РџСЂРѕСЃРёРј Р»Р°РіРµСЂСЊ РІС‹Р±СЂР°С‚СЊ С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ. РњРµРЅСЏС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ Р»Р°РіРµСЂСЏ
+  -- РёРјРµРµС‚ РїСЂР°РІРѕ С‚РѕР»СЊРєРѕ СЂРµР¶РёСЃСЃРµСЂ.
+  local npc_id = npc:id()
+  if self.npc[ npc_id ] == nil then return nil, nil, nil end
+  local director = ( self.director == nil or self.director == npc_id )
+    and npc_id ~= self.forbiddendirector
+  if director then
+    self:proceedState( npc )
+  end
+  -- Р“РѕРІРѕСЂРёРј С‡СѓРґР°РєСѓ РІС‹Р±СЂР°С‚СЊ СЃРµР±Рµ СЃРѕСЃС‚РѕСЏРЅРёРµ РґР»СЏ С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ Р»Р°РіРµСЂСЏ.
+  local state, sound = self:proceedRole( npc, director )
 
-	properties["see_deadman"]	= xr_evaluators_id.stohe_kamp_base + 3
-	properties["can_move_deadman"]	= xr_evaluators_id.stohe_kamp_base + 5
-	properties["state_mgr_off"]	= xr_evaluators_id.state_mgr+3
+  local substate
+  if state == "wait_harmonica" then
+    if sound == "pre_harmonica" and self.npc[ npc_id ].new == true then
+      xr_sound.set_sound_play( npc, "intro_music", math.random( 2000,3000 ) )
+      self.npc[ npc_id ].new = false
+    end
+    state = "harmonica"
+    kamp_stalkers[ npc_id ] = false
+  elseif state == "play_harmonica" then
+    state    = "harmonica"
+    substate = 1
+    kamp_stalkers[ npc_id ] = false
+  elseif state == "wait_guitar" then
+    if sound == "pre_guitar" and self.npc[ npc_id ].new == true then
+      xr_sound.set_sound_play( npc, "intro_music", math.random( 2000,3000 ) )
+      self.npc[ npc_id ].new = false
+    end
+    state = "guitar"
+    kamp_stalkers[ npc_id ] = false
+  elseif state == "play_guitar" then
+    state    = "guitar"
+    substate = 1
+    kamp_stalkers[ npc_id ] = false
+  elseif state == "wait_balalaika" then
+    if sound == "pre_balalaika" and self.npc[ npc_id ].new == true then
+      xr_sound.set_sound_play( npc, "intro_music", math.random( 2000,3000 ) )
+      self.npc[ npc_id ].new = false
+    end
+    state = "balalaika"
+    kamp_stalkers[ npc_id ] = false
+  elseif state == "play_balalaika" then
+    state    = "balalaika"
+    substate = 1
+    kamp_stalkers[ npc_id ] = false
+  elseif state == "declarate" then
+    if self.npc[ npc_id ].new == true then
+      if sound == "pre_joke" then
+        xr_sound.set_sound_play( npc, "intro_joke", math.random( 2000,3000 ) )
+      elseif sound == "play_joke" then
+        xr_sound.set_sound_play( npc, "joke", math.random( 2000, 3000 ) )
+      elseif sound == "play_story" then
+        xr_sound.set_sound_play( npc, self.selected_story )
+        self.story_last, self.story_max = xr_sound.get_last_IDS(
+          npc, self.selected_story
+        )
+        if self.story_last == nil then
+          self.story_last = 0
+          self.story_max  = 1
+          xr_sound.set_sound_play( npc, "threat_back", math.random( 1000,2000 ) )
+          --- dirty hack
+          self.kamp_state        = "idle"
+          self.forbiddendirector = self.director
+          self.director          = nil
+        end
+      end
+      self.npc[ npc_id ].new = false
+    end
+    if npc:character_community() == "monolith" then
+      local t = math.mod( npc_id, 2 )
+      if t == 0 then
+        state = "trans_0"
+      else
+        state = "trans_1"
+      end
+    elseif npc:character_community() == "zombied" then
+      state = "trans_zombied"
+    else
+      local t = math.mod( npc_id, 3 )
+      if t == 0 then
+        state = "sit"
+      elseif t == 1 then
+        state = "sit_ass"
+      else
+        state = "sit_knee"
+      end
+    end
+    kamp_stalkers[ npc_id ] = false
+  elseif state == "trans" then
+    if npc:character_community() == "monolith" then
+      local t = math.mod( npc_id, 2 )
+      if t == 0 then
+        state = "trans_0"
+      else
+        state = "trans_1"
+      end
+    elseif npc:character_community() == "zombied" then
+      state = "trans_zombied"
+    end
+    kamp_stalkers[ npc_id ] = false
+  else
+    kamp_stalkers[ npc_id ] = true
+  end
+  -- Р’С‹Р±РѕСЂ СЂРµР°Р»СЊРЅС‹С… Р·РІСѓРєРѕРІ
+  if sound == "idle" then
+    sound = "weather, state"
+  elseif sound == "reac_guitar" then
+    sound = "reac_music"
+  elseif sound == "reac_balalaika" then
+    sound = "reac_music"
+  elseif sound == "reac_harmonica" then
+    sound = "reac_music"
+  elseif sound == "reac_joke" then
+    sound = ""
+    if self.npc[ npc_id ].new == true then
+      if self.censor == nil then
+        xr_sound.set_sound_play( npc, "reac_joke", math.random( 2000,3000 ) )
+        self.censor = npc_id
+      else
+        xr_sound.set_sound_play(
+          npc, "story_reac_laughter", math.random( 100,300 )
+        )
+      end
+      self.npc[ npc_id ].new = false
+    end
+  elseif sound == "reac_story" then
+    sound = ""
+    if self.npc[ npc_id ].new == true then
+      local dep
+      if self.story_last then
+        dep = sound_theme.theme[ self.selected_story ].depence[ self.story_last + 1 ]
+      end
+      if dep then
+        if dep.type == "all" then
+          xr_sound.set_sound_play( npc, dep.theme, math.random( 100,300 ) )
+        else
+          sound = dep.theme
+        end
+      end
+    end
+  elseif sound == "reac_story" then
+    sound = ""
+  else
+    sound = ""
+  end
 
-	operators["go_position"]	= xr_actions_id.stohe_kamp_base + 1
-	operators["wait"]		= xr_actions_id.stohe_kamp_base + 3
-
-	operators["go_to_deadman"]		= xr_actions_id.stohe_kamp_base + 4
-	operators["move_deadman"]		= xr_actions_id.stohe_kamp_base + 5
-
-	-- Evaluators                                                                            
-	manager:add_evaluator (properties["kamp_end"], 		this.evaluator_kamp_end		("kamp_end", storage, "kamp_end"))
-	manager:add_evaluator (properties["on_position"],	this.evaluator_on_position	("kamp_on_position", storage, "kamp_on_position"))
-
-	local zombi=object:character_community()=="zombied" or object:character_community()=="trader" or
-		  object:character_community()=="arena_enemy" or object:name()=="mil_stalker0012" or object:name()=="yantar_ecolog_general"
-
-	if zombi then
-		manager:add_evaluator (properties["see_deadman"], property_evaluator_const(false))
-		manager:add_evaluator (properties["can_move_deadman"], property_evaluator_const(false))
-	else
-		manager:add_evaluator (properties["see_deadman"],	this.evaluator_see_deadman	("see_deadman", storage, "see_deadman"))
-		manager:add_evaluator (properties["can_move_deadman"],	this.evaluator_can_move_deadman	("can_move_deadman", storage, "can_move_deadman"))
-	end
-
-	---printf("PRP %s", stalker_ids.property_script)
-
-
-	-- Actions
-	local action = this.action_wait (object:name(),"action_kamp_wait", storage)
-	action:add_precondition		(world_property(stalker_ids.property_alive, true))
-	action:add_precondition		(world_property(stalker_ids.property_danger,false))
-	action:add_precondition		(world_property(stalker_ids.property_enemy,	false))
-	action:add_precondition		(world_property(stalker_ids.property_anomaly,false))
-	action:add_precondition 	(world_property(properties["see_deadman"], 	false))
-	xr_motivator.addCommonPrecondition(action)
-	action:add_precondition		(world_property(properties["on_position"], 	true))
-	action:add_effect 		(world_property(properties["kamp_end"], 	true))
-	manager:add_action (operators["wait"], action)
-	xr_logic.subscribe_action_for_events(object, storage, action)
-	
-	action = this.action_go_position (object:name(),"action_go_kamp", storage)
-	action:add_precondition		(world_property(stalker_ids.property_alive, true))
-	action:add_precondition		(world_property(stalker_ids.property_danger,false))
-	action:add_precondition		(world_property(stalker_ids.property_enemy,	false))
-	action:add_precondition		(world_property(stalker_ids.property_anomaly,false))
-	action:add_precondition 	(world_property(properties["see_deadman"], 	false))
-	xr_motivator.addCommonPrecondition(action)
-	action:add_precondition 	(world_property(properties["on_position"], 	false))
-	action:add_effect 		(world_property(properties["on_position"], 	true))
-	manager:add_action (operators["go_position"], action)
-
-	-- видим труп - идем разбираться...
-	action = this.action_go_to_deadman (object:name(),"action_go_to_deadman", storage)
-	action:add_precondition		(world_property(stalker_ids.property_alive, true))
-	action:add_precondition		(world_property(stalker_ids.property_danger,false))
-	action:add_precondition		(world_property(stalker_ids.property_enemy,	false))
-	action:add_precondition		(world_property(stalker_ids.property_anomaly,false))
-	xr_motivator.addCommonPrecondition(action)
-	action:add_precondition 	(world_property(properties["see_deadman"], 	true))
-	action:add_precondition 	(world_property(properties["can_move_deadman"], 	false))
-	action:add_precondition		(world_property(properties["kamp_end"],		false))
-	action:add_effect 		(world_property(properties["can_move_deadman"], 	true))
-	manager:add_action (operators["go_to_deadman"], action)
-
-	--тащим труп подальше от тусовки
-	action = this.action_moving_deadman (object:name(),"action_moving_deadman", storage)
-	action:add_precondition		(world_property(stalker_ids.property_alive, true))
-	action:add_precondition		(world_property(stalker_ids.property_danger,false))
-	action:add_precondition		(world_property(stalker_ids.property_enemy,	false))
-	action:add_precondition		(world_property(stalker_ids.property_anomaly,false))
-	xr_motivator.addCommonPrecondition(action)
-	action:add_precondition 	(world_property(properties["see_deadman"], 	true))
-	action:add_precondition 	(world_property(properties["can_move_deadman"], 	true))
-	action:add_precondition		(world_property(properties["kamp_end"],		false))
-	action:add_effect 			(world_property(properties["see_deadman"], 	false))
-	action:add_effect 			(world_property(properties["can_move_deadman"], 	false))
-	manager:add_action (operators["move_deadman"], action)
-
-	action = manager:action (xr_actions_id.alife)	
-	action:add_precondition		(world_property(properties["kamp_end"],		true))
-	
+  return state, sound, substate
 end
--- включение лагеря
-function set_scheme(npc, ini, scheme, section, gulag_name)
-	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 
-	st.logic     = xr_logic.cfg_get_switch_conditions(ini, section, npc)		
-    
-	st.center_point = utils.cfg_get_string(ini, section, "center_point", npc, true,  gulag_name)
-	st.radius		= utils.cfg_get_number(ini, section, "radius", npc, false, 2)
-	local bind = utils.cfg_get_number(ini, section, "bind", npc, false, nil)
+
+function CKampManager:checkNpcAbility( npc )
+  local npc_id = npc:id()
+  if not self.npc[ npc_id ] then return end
+  if
+    npc:character_community() ~= "monolith"
+    and npc:character_community() ~= "zombied"
+  then
+    local states = self.npc[ npc_id ].states
+    states[ "trans" ] = false
+    if self.npc[ npc_id ].can_eat then
+      -- РµСЃС‚СЊ РєРѕР»Р±Р°СЃСѓ
+      if npc:object( "kolbasa" ) and math.random( 99 ) > 20 then
+        -- РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ 80%
+        states[ "eat_kolbasa" ] = true
+      else
+        states[ "eat_kolbasa" ] = false
+      end
+      -- РїРёС‚СЊ РІРѕРґРєСѓ
+      if npc:object( "vodka" ) and math.random( 99 ) > 60 then
+        -- РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ 40%
+        states[ "eat_vodka" ] = true
+      else
+        states[ "eat_vodka" ] = false
+      end
+      -- РїРёС‚СЊ РµРЅРµСЂРіРёС‚РёС‡РµСЃРєРёР№ РЅР°РїРёС‚РѕРє
+      if npc:object( "energy_drink" ) and math.random( 99 ) > 40 then
+        -- РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ 60%
+        states[ "eat_energy" ] = true
+      else
+        states[ "eat_energy" ] = false
+      end
+      -- РµСЃС‚СЊ С…Р»РµР±
+      if npc:object( "bread" ) and math.random( 99 ) > 20 then
+        -- РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ 80%
+        states[ "eat_bread" ] = true
+      else
+        states[ "eat_bread" ] = false
+      end
+      -- РєСѓСЂРёС‚
+      if npc:object( "sigaret" ) and math.random( 99 ) > 20 then
+        -- РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ 80%
+        states[ "kurit" ] = true
+      else
+        states[ "kurit" ] = false
+      end
+      -- РїРёС‚СЊ РёР· С„Р»СЏР¶РєРё
+      if npc:object( "flaska" ) and math.random( 99 ) > 20 then
+        -- РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ 80%
+        states[ "flaska" ] = true
+      else
+        states[ "flaska" ] = false
+      end
+      -- РїРёС‚СЊ РїРёРІРѕ
+      if npc:object( "beer_a" ) and math.random( 99 ) > 20 then
+        -- РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ 80%
+        states[ "beer_a" ] = true
+      else
+        states[ "beer_a" ] = false
+      end
+      -- РєСѓСЂРёС‚ СЃРёРіР°СЂСѓ
+      if npc:object( "cigara" ) and math.random( 99 ) > 20 then
+        -- РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ 80%
+        states[ "kurit_cigara" ] = true
+      else
+        states[ "kurit_cigara" ] = false
+      end
+      -- РµСЃС‚СЊ Р±СѓС‚РµСЂР±СЂРѕРґ
+      if npc:object( "sandwich" ) and math.random( 99 ) > 20 then
+        -- РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ 80%
+        states[ "eat_sandwich" ] = true
+      else
+        states[ "eat_sandwich" ] = false
+      end
+      -- РёРіСЂР°С‚СЊ РЅР° РіР°СЂРјРѕС€РєРµ
+      if npc:object( "harmonica_a" ) then
+        states[ "play_harmonica" ] = true
+        states[ "wait_harmonica" ] = true
+        self.kamp_states[ "pre_harmonica"  ] = true
+        self.kamp_states[ "harmonica"      ] = true
+        self.kamp_states[ "post_harmonica" ] = true
+      else
+        states[ "play_harmonica" ] = false
+        states[ "wait_harmonica" ] = false
+        self.kamp_states[ "pre_harmonica"  ] = false
+        self.kamp_states[ "harmonica"      ] = false
+        self.kamp_states[ "post_harmonica" ] = false
+      end
+    else
+        states[ "eat_kolbasa"    ] = false
+        states[ "eat_vodka"      ] = false
+        states[ "eat_energy"     ] = false
+        states[ "eat_bread"      ] = false
+        states[ "kurit"          ] = false
+        states[ "flaska"         ] = false
+        states[ "beer_a"         ] = false
+        states[ "kurit_cigara"   ] = false
+        states[ "eat_sandwich"   ] = false
+        states[ "play_harmonica" ] = false
+        states[ "wait_harmonica" ] = false
+        self.kamp_states[ "pre_harmonica"  ] = false
+        self.kamp_states[ "harmonica"      ] = false
+        self.kamp_states[ "post_harmonica" ] = false
+    end
+
+    -- РІС‚С‹РєР°С‚СЊ РІ РёРЅС‚РµСЂРЅРµС‚С‹
+    if npc:object( "device_pda" ) and math.random( 99 ) > 50 then
+      -- РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ 50%
+      states[ "use_pda" ] = true
+    else
+      states[ "use_pda" ] = false
+    end
+    -- РёРіСЂР°С‚СЊ РЅР° РіРёС‚Р°СЂРµ
+    if npc:object( "guitar_a" ) then
+      states[ "play_guitar" ] = true
+      states[ "wait_guitar" ] = true
+      self.kamp_states[ "pre_guitar"  ] = true
+      self.kamp_states[ "guitar"      ] = true
+      self.kamp_states[ "post_guitar" ] = true
+    else
+      states[ "play_guitar" ] = false
+      states[ "wait_guitar" ] = false
+      self.kamp_states[ "pre_guitar"  ] = false
+      self.kamp_states[ "guitar"      ] = false
+      self.kamp_states[ "post_guitar" ] = false
+    end
+    -- РёРіСЂР°С‚СЊ РЅР° Р±Р°Р»Р°Р»Р°Р№РєРµ
+    if npc:object( "balalaika_a" ) then
+      states[ "play_balalaika" ] = true
+      states[ "wait_balalaika" ] = true
+      self.kamp_states[ "pre_balalaika"  ] = true
+      self.kamp_states[ "balalaika"      ] = true
+      self.kamp_states[ "post_balalaika" ] = true
+    else
+      states[ "play_balalaika" ] = false
+      states[ "wait_balalaika" ] = false
+      self.kamp_states[ "pre_balalaika"  ] = false
+      self.kamp_states[ "balalaika"      ] = false
+      self.kamp_states[ "post_balalaika" ] = false
+    end
+    -- Р°РЅРµРєРґРѕС‚С‹
+    if self.population_comed > 1 then
+      self.kamp_states[ "pre_joke"  ] = true
+      self.kamp_states[ "joke"      ] = true
+      self.kamp_states[ "post_joke" ] = true
+    else
+      self.kamp_states[ "pre_joke"  ] = false
+      self.kamp_states[ "joke"      ] = false
+      self.kamp_states[ "post_joke" ] = false
+    end
+  end
+
+  -- Р•СЃР»Рё С‡СѓРІР°Рє Р·РЅР°РµС‚ РёСЃС‚РѕСЂРёРё, РЅР°РґРѕ РґРѕР±Р°РІРёС‚СЊ РёС… Рє Р»Р°РіРµСЂСЋ
+  if self.population_comed > 1 and db.story_by_id[ npc:id() ] ~= nil then
+    self.kamp_states[ "story"      ] = true
+    self.kamp_states[ "post_story" ] = true
+  else
+    self.kamp_states[ "story"      ] = false
+    self.kamp_states[ "post_story" ] = false
+  end
+end
+
+
+function CKampManager:addNpc( npc )
+  if self.npc[ npc:id() ] ~= nil then return end
+  if
+    npc:character_community() == "monolith"
+    or npc:character_community() == "zombied"
+  then
+    self.npc[ npc:id() ] = {
+      name     = npc:name(),
+      can_eat  = ogse_kamp_eating.can_eat( npc ),
+      current  = nil,
+      speak    = 0,
+      states   = {
+        beer_a         = false,
+        declarate      = true,
+        eat_bread      = false,
+        eat_energy     = false,
+        eat_kolbasa    = false,
+        eat_sandwich   = false,
+        eat_vodka      = false,
+        flaska         = false,
+        kurit          = false,
+        kurit_cigara   = false,
+        play_balalaika = false,
+        play_guitar    = false,
+        play_harmonica = false,
+        play_joke      = false,
+        play_story     = false,
+        sit            = false,
+        sit_ass        = false,
+        sit_knee       = false,
+        sweetness      = false,
+        trans          = true,
+        use_pda        = false,
+      },
+    }
+  else
+    self.npc[ npc:id() ] = {
+      name     = npc:name(),
+      can_eat  = ogse_kamp_eating.can_eat( npc ),
+      current  = nil,
+      speak    = 0,
+      states   = {
+        beer_a         = false,
+        declarate      = true,
+        eat_bread      = false,
+        eat_energy     = false,
+        eat_kolbasa    = false,
+        eat_sandwich   = false,
+        eat_vodka      = false,
+        flaska         = false,
+        kurit          = false,
+        kurit_cigara   = false,
+        play_balalaika = false,
+        play_guitar    = false,
+        play_harmonica = false,
+        play_joke      = false,
+        play_story     = false,
+        sit            = true,
+        sit_ass        = true,
+        sit_knee       = true,
+        sweetness      = false,
+        trans          = false,
+        use_pda        = false,
+      },
+    }
+  end
+  if db.story_by_id[ npc:id() ] == nil then
+    local char_ini1 = ini_file( "scripts\\stories.ltx" )
+    xr_info.loadInfo( npc, char_ini1 )
+  end
+  self.population     = self.population + 1
+  self.seats_assigned = false
+  local sobj = alife():object( npc:id() )
+  ASSERT(
+    sobj,
+    "[%s]: [%s]: %s not found in alife()",
+    script_name(), self.kamp_name, npc:name()
+  )
+  if
+    ( not self.smart_terrain_id )
+    or sobj:smart_terrain_id() < self.smart_terrain_id
+  then
+    self.smart_terrain_id = sobj:smart_terrain_id()
+  end
+end
+
+
+function CKampManager:removeNpc( npc )
+  local npc_id = npc:id()
+  if self.npc[ npc_id ] == nil then return end
+  -- Р•СЃР»Рё СѓРґР°Р»СЏРµРј СЂРµР¶РёСЃСЃРµСЂР° - РЅРµРѕР±С…РѕРґРёРјРѕ С„РѕСЂСЃРёСЂРѕРІР°РЅРЅРѕ РїРµСЂРµРІРµСЃС‚Рё Р»Р°РіРµСЂСЊ
+  -- РІ РёРґР»РѕРІРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ.
+  if self.director == npc_id then
+    self.npc[ npc_id ].begin = nil
+    self.director   = nil
+    self.censor     = nil
+    self.kamp_state = "idle"
+    self.begin      = time_global()
+    for kk, vv in pairs( self.npc ) do
+      vv.new = true
+    end
+    xr_sound.set_sound( npc, nil )
+    stop_play_sound( npc )
+  end
+  self:free_seat( npc )
+  self.npc[ npc_id ] = nil
+  self.population = self.population - 1
+end
+
+
+function CKampManager:increasePops( npc )
+  self.population_comed = self.population_comed + 1
+end
+
+
+function CKampManager:decreasePops( npc )
+  self.population_comed = self.population_comed - 1
+end
+
+
+function CKampManager:init_drop_points()
+  local found  = get_pos( self.center, 20 )
+  local point0 = level.vertex_position( self.center )
+  self.drop_points = {}
+  for _, vertex in ipairs( found ) do
+    local pos = level.vertex_position( vertex )
+    if pos:distance_to( point0 ) > 10 then
+      table.insert( self.drop_points, vertex )
+    end
+  end
+  if table.getn( self.drop_points ) == 0 and table.getn( found ) > 0 then
+    self.drop_points = found
+  end
+end
+
+
+function CKampManager:get_nearest_drop_point( obj )
+  local obj_pos = obj:position()
+  table.sort(
+    self.drop_points,
+    function( a, b )
+      local dist_a = level.vertex_position( a ):distance_to( obj_pos )
+      local dist_b = level.vertex_position( b ):distance_to( obj_pos )
+      return dist_a < dist_b
+    end
+  )
+  return self.drop_points[ 1 ]
+end
+
+
+function CKampManager:init_seats()
+  local sect = "dsh.xr_kamp." .. self.kamp_name
+  if sys_ini:section_exist( sect ) then
+    local seats = get_string( sect, "preferred_seats" )
+    if seats then
+      local preferred_seats = get_numbers( sect, "preferred_seats" )
+      if table.getn( preferred_seats ) > 0 then
+        self.preferred_seats  = {}
+        for _, vertex in ipairs( preferred_seats ) do
+          table.insert( self.preferred_seats, {
+            [ "vertex" ] = vertex,
+          });
+        end
+      end
+    end
+  end
+  self.seats = {}
+  local ai_step = 0.7 -- С€Р°Рі AI СЃРµС‚РєРё
+  local dist    = self.min_radius
+  while dist < 10 do
+    local found = get_pos( self.center, dist, self.allow_sector )
+    local seats = {}
+    for _, vertex in ipairs( found ) do
+      table.insert( seats, {
+        [ "vertex" ] = vertex,
+      });
+    end
+    if table.getn( seats ) > 0 then
+      table.insert( self.seats, seats )
+    end
+    dist = dist + ai_step
+  end
+end
+
+
+function CKampManager:get_accessible_seats()
+  local members = {}
+  for npc_id, st in pairs( self.npc ) do
+    local npc = level.object_by_id( npc_id )
+    if npc and npc:alive() then
+      table.insert( members, npc )
+    end
+  end
+  local accessible = {}
+  for _, seats in ipairs( self.seats ) do
+    local good_seats = {}
+    for _, seat in ipairs( seats ) do
+      local bad = false
+      for _, npc in ipairs( members ) do
+        if not npc:accessible( seat.vertex ) then
+          bad = true
+          break
+        end
+      end
+      if not bad then
+        table.insert( good_seats, seat )
+      end
+    end
+    if table.getn( good_seats ) > 0 then
+      table.insert( accessible, good_seats )
+    end
+  end
+  return accessible
+end
+
+
+function CKampManager:reassign_seats()
+  if self.active_seats then
+    for _, seat in ipairs( self.active_seats ) do
+      seat.npc = nil
+    end
+  end
+  self.active_seats   = nil
+  self.seats_assigned = false
+  local accessible_seats = self:get_accessible_seats()
+  local found_seats
+  for k = 2, 1, -1 do
+    for i, seats in ipairs( accessible_seats ) do
+      if table.getn( seats ) >= self.population * k then
+        found_seats = i
+        break
+      end
+    end
+    if found_seats then break end
+  end
+  ASSERT(
+    found_seats,
+    "[%s]: can't find active_seats for %s", script_name(), self.kamp_name
+  )
+  for npc_id, st in pairs( self.npc ) do
+    st.seat = nil
+  end
+  local avail_seats = {}
+  if self.preferred_seats then
+    table.insert( avail_seats, self.preferred_seats )
+  end
+  for i = found_seats, table.getn( accessible_seats ) do
+    table.insert( avail_seats, accessible_seats[ i ] )
+  end
+  for _, seats in ipairs( avail_seats ) do
+    self.active_seats = seats
+    local cnt  = 0
+    local step = math.floor(
+      table.getn( self.active_seats ) / self.population
+    )
+    for j = 1, table.getn( self.active_seats ), step do
+      local seat     = self.active_seats[ j ]
+      local seat_pos = level.vertex_position( seat.vertex )
+      local min_dist, nearest_npc
+      for npc_id, st in pairs( self.npc ) do
+        local npc = level.object_by_id( npc_id )
+        ASSERT(
+          ( npc and npc:alive() ),
+          "[%s]: [%s]: npc_id = %s not found or dead",
+          script_name(), self.kamp_name, npc_id
+        )
+        if not st.seat then
+          local dist = npc:position():distance_to( seat_pos )
+          if ( not min_dist ) or dist < min_dist then
+            min_dist    = dist
+            nearest_npc = npc
+          end
+        end
+      end
+      if not nearest_npc then break end
+      seat.npc = nearest_npc:id()
+      self.npc[ nearest_npc:id() ].seat = j
+      cnt = cnt + 1
+      if cnt == self.population then
+        self.seats_assigned = true
+        break
+      end
+    end
+    if self.seats_assigned then break end
+  end
+  ASSERT(
+    self.seats_assigned,
+    "[%s]: [%s]: can't reassign seats", script_name(), self.kamp_name
+  )
+end
+
+
+function CKampManager:free_seat( npc )
+  local npc_id = npc:id()
+  local st     = self.npc[ npc_id ]
+  if st.seat then
+    local seat = self.active_seats[ st.seat ]
+    seat.npc = nil
+    st.seat  = nil
+  end
+end
+
+
+-- Evaluators
+-- РЈСЃР»РѕРІРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ СЃРєСЂРёРїС‚Р°
+class "evaluator_kamp_end" ( property_evaluator )
+function evaluator_kamp_end:__init( name, storage ) super( nil, name )
+  self.a = storage
+end
+
+function evaluator_kamp_end:evaluate()
+  return not xr_logic.is_active( self.object, self.a )
+end
+
+
+-- РќР°С…РѕРґРёРјСЃСЏ Р»Рё РјС‹ РЅР° Р·Р°РґР°РЅРЅРѕР№ РїРѕР·РёС†РёРё
+class "evaluator_on_position" ( property_evaluator )
+function evaluator_on_position:__init( name, storage ) super( nil, name )
+  self.a = storage
+end
+
+function evaluator_on_position:evaluate()
+  if not self.a.updates_passed then
+    self.a.updates_passed = 0
+  elseif self.a.updates_passed < 20 then
+    self.a.updates_passed = self.a.updates_passed + 1
+  end
+  if
+    self.object:level_vertex_id() == self.a.pos_vertex
+    or (
+      self.a.pos_vertex and self.object:path_completed()
+      and level.vertex_position( self.a.pos_vertex ):distance_to_sqr(
+        self.object:position()
+      ) < 8
+    )
+  then
+    if self.a.updates_passed < 10 then
+      return false
+    end
+    ogse_debug.add_active_eval( self.object, script_name(), "on_position" )
+    return true
+  end
+  return false
+end
+
+
+--added by xStream--
+-- РћРї-РїР°! РЈРІРёРґРµР»Рё С‚СЂСѓРї РїРѕР±Р»РёР·РѕСЃС‚Рё РѕС‚ РєРѕСЃС‚СЂР°, РЅРµРїРѕСЂСЏРґРѕРє...
+class "evaluator_see_deadman" ( property_evaluator )
+function evaluator_see_deadman:__init( name, storage ) super( nil, name )
+  self.a = storage
+end
+
+
+function evaluator_see_deadman:evaluate()
+  local npc = self.object
+  -- Р•СЃС‚СЊ РґРµР»Р° РїРѕРІР°Р¶РЅРµРµ, С‡РµРј С‚СЂСѓРїС‹ СЃРєР»Р°РґРёСЂРѕРІР°С‚СЊ...
+  if
+    not (
+      xr_logic.is_active( self.object, self.a )
+      and table.getn( self.a.kamp.drop_points ) > 0
+    )
+  then
+    if self.a.choosed_deadman then
+      deadmansids[ self.a.choosed_deadman ] = nil
+      self.a.choosed_deadman = nil
+      self.a.reached         = nil
+    end
+    return false
+  end
+
+  -- РўСЂСѓРї СЃРµР±Рµ СѓР¶Рµ РІС‹Р±СЂР°Р»Рё, РЅРµ СЃРїСѓСЃРєР°РµРј СЃ РЅРµРіРѕ РіР»Р°Р·...
+  local point0 = level.vertex_position( self.a.kamp.center )
+  if self.a.choosed_deadman then
+    local obj = level.object_by_id( self.a.choosed_deadman )
+    if obj and obj:position():distance_to( point0 ) < 10 then
+      ogse_debug.add_active_eval( self.object, script_name(), "see_deadman" )
+      return true
+    end
+    -- РµСЃР»Рё СѓС‚Р°С‰РµРЅ РґР°Р»РµРєРѕ, С‚Рѕ РЅСѓ РµРіРѕ РЅР°С„РёРі...
+    deadmansids[ self.a.choosed_deadman ] = nil
+    self.a.choosed_deadman = nil
+    self.a.reached         = nil
+    return false
+  end
+
+  if
+    not (
+      self.a.see_deadman_t
+      and (
+        ( not last_death_t ) or self.a.see_deadman_t > last_death_t
+      )
+    )
+  then
+    for o in npc:memory_visible_objects() do
+      if self:check_item( o:object(), point0 ) then return true end
+    end
+    -- for o in npc:memory_sound_objects() do
+    --   self:check_item( o:object(), point0 )
+    -- end
+    -- for o in npc:not_yet_visible_objects() do
+    --   self:check_item( o:object(), point0 )
+    -- end
+    self.a.see_deadman_t = time_global()
+  end
+  return false
+end
+
+
+function evaluator_see_deadman:check_item( obj, point0 )
+  local npc = self.object
+  -- РµСЃР»Рё РµСЃС‚СЊ СЂСЏРґРѕРј СЃ РєРѕСЃС‚СЂРѕРј С‚СЂСѓРї СЃС‚Р°Р»РєРµСЂР° РёР»Рё РјРѕРЅСЃС‚СЂР°, РµРіРѕ РµС‰Рµ
+  -- РЅРёРєС‚Рѕ РЅРµ РїСЂРёС…РІР°С‚РёР» СЃРµР±Рµ Рё С‚СЂСѓРїРµС† РЅРёРіРґРµ РЅРµ Р·Р°СЃС‚СЂСЏР», С‚Рѕ Р·Р°Р±РёСЂР°РµРј
+  -- РµРіРѕ...
+  obj = level.object_by_id( obj:id() )
+  if
+    obj and obj.clsid and ( IsStalker( obj ) or IsMonster( obj ) )
+    and ( not obj:alive() )
+    and (
+      ( not deadmansids[ obj:id() ] )
+      or ( not level.object_by_id( deadmansids[ obj:id() ] ) )
+      or ( not level.object_by_id( deadmansids[ obj:id() ] ):alive() )
+    )
+    and obj:position():distance_to( point0 ) < 10
+  then
+    if
+      not ( deadmansidsuses[ obj:id() ] and deadmansidsuses[ obj:id() ] == 3 )
+    then
+      self.a.choosed_deadman = obj:id()
+      self.a.drop_lvid       = self.a.kamp:get_nearest_drop_point( obj )
+      deadmansids[ obj:id() ]     = npc:id()
+      deadmansidsuses[ obj:id() ] = ( deadmansidsuses[ obj:id() ] or 0 ) + 1
+      ogse_debug.add_active_eval(
+        self.object, script_name(), "see_deadman_2"
+      )
+      return true
+    end
+  end
+  return false
+end
+
+
+-- РўР°С‰РёРј С‚СЂСѓРї
+class "evaluator_can_move_deadman" ( property_evaluator )
+function evaluator_can_move_deadman:__init( name, storage ) super( nil, name )
+  self.a = storage
+end
+
+function evaluator_can_move_deadman:evaluate()
+  if self.a.reached ~= 1 then return false end
+  local obj = level.object_by_id( self.a.choosed_deadman )
+  -- РµСЃР»Рё С‚СЂСѓРї Р·Р°СЃС‚СЂСЏР» (СЂР°СЃСЃС‚РѕСЏРЅРёРµ СѓРІРµР»РёС‡РёР»РѕСЃСЊ), С‚Рѕ РІРѕР·РІСЂР°С‰Р°РµРјСЃСЏ Рє РЅРµРјСѓ
+  return obj and obj:center():distance_to( self.object:position() ) < 2.1
+end
+
+
+-- Actions
+-- РРґРµС‚ РІ Р·Р°РґР°РЅРЅСѓСЋ РѕР±Р»Р°СЃС‚СЊ
+class "action_go_position" ( action_base )
+function action_go_position:__init( npc_name, action_name, storage)
+  super( nil, action_name )
+  self.a = storage
+end
+
+
+function action_go_position:initialize()
+  action_base.initialize( self )
+  self.object:set_desired_position()
+  self.object:set_desired_direction()
+  self.a.pos_vertex = nil
+end
+
+
+function action_go_position:execute()
+  action_base.execute( self )
+  if
+    db.actor
+    and xr_logic.try_switch_to_another_section( self.object, self.a, db.actor )
+  then
+    return
+  end
+  if not ( self.a.updates_passed and self.a.updates_passed >= 10 ) then
+    return
+  end
+  local target_vertex = self.a.kamp:getDestVertex( self.object )
+  if target_vertex and self.a.pos_vertex ~= target_vertex then
+    self.a.pos_vertex = target_vertex
+    self.object:set_dest_level_vertex_id( self.a.pos_vertex )
+    local pp  = level.vertex_position( self.a.kamp.center ):add(
+      vector():set(
+        math.random( -12, 12 ) / 10,
+        0,
+        math.random( -12, 12 ) / 10
+      )
+    )
+    local dir = vector():sub(
+      pp, level.vertex_position( self.a.pos_vertex )
+    )
+    self.object:set_desired_direction( dir )
+    self.object:set_detail_path_type( move.curve )
+    self.object:set_path_type( game_object.level_path )
+    state_mgr.set_state( self.object, self.a.def_state_moving )
+  end
+end
+
+
+function action_go_position:finalize()
+  action_base.finalize( self )
+end
+
+
+--' РџСЂРѕСЃС‚Рѕ СЃРёРґРёС‚ Рё РІС‚С‹РєР°РµС‚
+class "action_wait" ( action_base )
+function action_wait:__init( npc_name, action_name, storage)
+  super( nil, action_name )
+  self.a = storage
+end
+
+
+function action_wait:initialize()
+  action_base.initialize( self )
+  self.object:set_desired_position()
+  self.object:set_desired_direction()
+  self.a.kamp:increasePops( self.object )
+end
+
+
+function action_wait:activate_scheme()
+end
+
+
+function action_wait:execute()
+  action_base.execute( self )
+  if
+  db.actor
+    and xr_logic.try_switch_to_another_section( self.object, self.a, db.actor )
+  then
+    return
+  end
+  local state, sound, substate = self.a.kamp:updateNpc( self.object )
+  if state == nil then
+    state = "wait"
+  end
+  --' РїРѕРІРµСЂРЅСѓС‚СЊ РµРіРѕ Р»РёС†РѕРј Рє С†РµРЅС‚СЂСѓ
+  state_mgr.set_state(
+    self.object, state, nil, nil,
+    { look_position = level.vertex_position( self.a.kamp.center ) },
+    nil, nil, { subanim = substate }
+  )
+  xr_sound.set_sound( self.object, sound )
+end
+
+
+function action_wait:finalize()
+  -- СѓР±РёСЂР°РµРј СЃСЂР°Р·Сѓ Р·РІСѓРє РіРёС‚Р°СЂС‹
+  local stop_sound
+  for _, s in ipairs({ "guitar_a", "harmonica_a", "balalaika_a" }) do
+    local obj = self.object:object( s )
+    if obj and obj:attachable_item_enabled() then
+      stop_sound = true
+      break
+    end
+  end
+  xr_sound.set_sound( self.object, nil, stop_sound )
+  self.a.kamp:decreasePops( self.object )
+  action_base.finalize( self )
+end
+
+
+function action_wait:deactivate( npc )
+  self.a.kamp:removeNpc( npc )
+end
+
+
+function action_wait:death_callback( npc )
+  self.a.kamp:removeNpc( npc )
+end
+
+
+function action_wait:net_destroy( npc )
+  self.a.kamp:decreasePops( self.object )
+  self.a.kamp:removeNpc( npc )
+end
+
+
+-- added by xStream--
+-- РРґРµС‚ Рє Р±РµР·РґС‹С…Р°РЅРЅРѕРјСѓ С‚РѕРІР°СЂРёС‰Сѓ
+class "action_go_to_deadman" ( action_base )
+function action_go_to_deadman:__init( npc_name, action_name, storage)
+  super( nil, action_name )
+  self.a = storage
+end
+
+
+function action_go_to_deadman:initialize()
+  action_base.initialize( self )
+  local npc = self.object
+  npc:set_desired_position()
+  npc:set_desired_direction()
+  npc:set_path_type( game_object.level_path )
+  local gi  = level.object_by_id( self.a.choosed_deadman )
+  if gi then
+    -- РїРѕРїСЂРµРјСЃСЏ РІ СЃС‚РѕСЂРѕРЅСѓ РіРѕР»РѕРІС‹ - Р·Р° С€РєРёСЂСЏС‚РЅРёРє С‚Р°С‰РёС‚СЊ Р±СѓРј
+    self.a.dest_lvid = gi:level_vertex_id()
+    local bone = body_grab_bones[ gi:clsid() ] == "bip01_l_calf" and "bip01_l_calf" or "bip01_head"
+    local diff = gi:bone_position( bone ):sub(
+      level.vertex_position( self.a.dest_lvid )
+    )
+    local len  = diff:magnitude() * 1.4
+    self.a.dest_lvid = npc:vertex_in_direction( self.a.dest_lvid, diff, len )
+    if not npc:accessible( self.a.dest_lvid ) then
+      self.a.dest_lvid = npc:accessible_nearest(
+        level.vertex_position( self.a.dest_lvid ), vector():set( 0, 0, 0 )
+      )
+    end
+  else
+    self.a.dest_lvid = npc:level_vertex_id()
+  end
+  self.target_id       = self.a.choosed_deadman
+  self.a.reached       = 0
+  self.a.cur_dead_lvid = gi and gi:level_vertex_id()
+  -- РїРѕР№РґРµРј РЅРµ СЃРїРµС€Р°...
+  state_mgr.set_state( self.object, self.a.def_state_moving )
+  -- РЅР° РІСЃРµ РіСѓР»СЏРЅРєРё РІ СЃС‚РѕСЂРѕРЅСѓ С‚СЂСѓРїР° РґР°РµС‚СЃСЏ 30 СЃРµРєСѓРЅРґ, РµСЃР»Рё РЅРµ СѓСЃРїРµР», С‚Рѕ
+  -- РґР° РЅСѓ РЅР°С„РёРі Р·Р°РјРѕСЂР°С‡РёРІР°С‚СЊСЃСЏ :)
+  self.a.go_time_end = time_global() + 30000
+  self.a.captures    = ( self.a.captures or 0 ) + 1
+  xr_sound.set_sound( npc, nil )
+  stop_play_sound( npc )
+end
+
+
+function action_go_to_deadman:execute()
+  action_base.execute ( self )
+  if self.target_id ~= self.a.choosed_deadman then
+    self:initialize()
+    return
+  end
+  local npc = self.object
+  local gi  = level.object_by_id( self.a.choosed_deadman )
+  -- РµСЃР»Рё СѓР¶Рµ Р·Р°РґРѕР»Р±Р°Р»Рѕ РґРµСЂРіР°С‚СЊ С‚СЂСѓРї, Р° РѕРЅ Р·Р°СЃС‚СЂСЏР» (РґРµСЂРіР°РµРј 3 СЂР°Р·Р°),
+  -- С‚Рѕ РЅР°С„РёРі РµРіРѕ. С‚Р°Рє Р¶Рµ РµСЃР»Рё РєР°РєРѕР№ С‚Рѕ РјРёРјРѕРїСЂРѕС…РѕРґСЏС‰РёР№ С‚РѕРІР°СЂРёС‰ С‚СЂСѓРї СЃ
+  -- РјРµСЃС‚Р° СЃРґРІРёРЅСѓР» - С‚Рѕ С‚СѓРґР° РµРјСѓ Рё РґРѕСЂРѕРіР° (С‚СЂСѓРїСѓ), Р° РЅР°Рј РѕРЅ Р±РѕР»СЊС€Рµ РЅРµ
+  -- РёРЅС‚РµСЂРµСЃРµРЅ.
+  if
+    self.a.captures == 5 or self.a.go_time_end < time_global()
+    or gi == nil or gi:level_vertex_id() ~= self.a.cur_dead_lvid
+  then
+    if self.a.choosed_deadman then
+      deadmansids[ self.a.choosed_deadman ] = nil
+      self.a.choosed_deadman = nil
+      self.a.reached         = nil
+    end
+    self.a.captures = nil
+  else
+    npc:set_dest_level_vertex_id( self.a.dest_lvid )
+    -- РґРѕР»РіРѕРµ РїСѓС‚РµС€РµСЃС‚РІРёРµ РґРѕ С‚СЂСѓРїР° СѓСЃРїРµС€РЅРѕ Р·Р°РІРµСЂС€РёР»РѕСЃСЊ, СѓСЂР°, С‚РѕРІР°СЂРёС‰Рё
+    local dist = npc:position():distance_to( gi:center() )
+    if
+      (
+        self.a.dest_lvid and self.a.dest_lvid == npc:level_vertex_id()
+        and dist < 1.7
+      )
+      or dist < 1
+    then
+      self.a.reached = 1
+      npc:set_dest_level_vertex_id( npc:level_vertex_id() )
+    elseif npc:path_completed() then
+      deadmansids[ self.a.choosed_deadman ] = nil
+      self.a.choosed_deadman = nil
+      self.a.reached         = nil
+      self.a.captures        = nil
+    end
+  end
+end
+
+
+function action_go_to_deadman:finalize()
+  action_base.finalize( self )
+end
+
+
+-- РўР°С‰РёС‚ С‚СЂСѓРїРµС†
+class "action_moving_deadman"( action_base )
+function action_moving_deadman:__init( npc_name, action_name, storage )
+  super( nil, action_name )
+  self.a = storage
+end
+
+
+function action_moving_deadman:initialize()
+  action_base.initialize( self )
+  local npc = self.object
+
+  -- РµСЃР»Рё РїСѓС€РєР° РІ СЂСѓРєР°С… - РїСЂСЏС‡РµРј, Р° С‚Рѕ С‚Р°С‰РёС‚СЊ РЅРµСѓРґРѕР±РЅРѕ
+  if npc:weapon_unstrapped() then
+    npc:set_item( object.idle, nil )
+  end
+
+  -- РїРѕС‚Р°С‰РёРј РјРµРґР»РµРЅРЅРѕ, РѕСЃС‚РѕСЂРѕР¶РЅРѕ Рё РЅР° РєР°СЂР°С‡РєР°С…
+  npc:set_movement_type( move.walk )
+  npc:set_mental_state( anim.danger )
+  npc:set_body_state( move.crouch )
+  npc:movement_enabled( true )
+
+  -- РЅР° С‚Р°СЃРєР°РЅРёРµ С‚СЂСѓРїР° РІ РіСЂСЏР·Рё РґР°РµРј 30 СЃРµРєСѓРЅРґ
+  self.a.time_end  = time_global() + 40000
+  self.force       = vector():set( 0, 0, 0 )
+  -- РЅР° РїСЂРёСЃРµРґР°РЅРёРµ СЂСЏРґРѕРј СЃ С‚СЂСѓРїРѕРј Рё СЂР°Р·РІРѕСЂРѕС‚ Р»РёС†РѕРј РґР°РґРёРј СЃРµРєСѓРЅРґСѓ
+  self.time_drag = time_global() +    1000
+
+  local gi = level.object_by_id( self.a.choosed_deadman )
+  local ps = gi and gi:get_physics_shell()
+  if not ps then
+      deadmansids[ self.a.choosed_deadman ] = nil
+      self.a.choosed_deadman = nil
+      self.a.reached         = nil
+      return
+  end
+
+  -- СЃРјРѕС‚СЂРё РјРЅРµ РІ РіР»Р°Р·Р°!
+  npc:set_sight( gi, false, false, true )
+  -- РЅСѓР¶РЅРѕ РІС‹Р±СЂР°С‚СЊ РєРѕСЃС‚РѕС‡РєСѓ РґР»СЏ С‚СЏРіРё
+  self.bone = body_grab_bones[ gi:clsid() ] or "bip01_spine1"
+  if not ps:get_element_by_bone_name( self.bone ) then
+    self.bone = nil
+  end
+  if not self.bone then
+      deadmansids[ self.a.choosed_deadman ] = nil
+      self.a.choosed_deadman = nil
+      self.a.reached         = nil
+      return
+  end
+end
+
+
+function action_moving_deadman:execute()
+  action_base.execute( self )
+  if not self.a.choosed_deadman then return end
+  local npc = self.object
+  local gi  = level.object_by_id( self.a.choosed_deadman )
+  -- С…РІР°С‚РёС‚ С‚Р°СЃРєР°С‚СЊ С‚СЂСѓРї - РІСЂРµРјСЏ РёСЃС‚РµРєР»Рѕ, РїСѓСЃС‚СЊ РґСЂСѓРіРёРµ СЌС‚РёРј Р·Р°РЅРёРјР°СЋС‚СЃСЏ
+  if self.a.time_end < time_global() then
+    if self.a.choosed_deadman then
+      deadmansids[ self.a.choosed_deadman ] = nil
+      self.a.choosed_deadman = nil
+      self.a.reached         = nil
+    end
+    return
+  end
 	
-	if kamps[st.center_point] == nil then
-		kamps[st.center_point] = CKampManager(st.center_point)
-	end
-	kamps[st.center_point]:addNpc(npc, bind)
-	st.pos_vertex = nil
+  local dir=gi:position():sub( npc:position() )
+  dir.y = 0
+  npc:set_sight( look.direction, dir, true )
+  npc:set_movement_type( move.walk )
+  npc:set_mental_state( anim.danger )
+  npc:set_body_state( move.crouch )
+  npc:movement_enabled( true )
 
-	st.def_state_moving = utils.cfg_get_string(ini, section, "def_state_moving", npc, false, "", "walk")
-	if st.def_state_moving == nil or st.def_state_moving == "nil" then
-		st.def_state_moving = "walk"
-	end
+  if self.time_drag > time_global() then return end
+
+  npc:set_dest_level_vertex_id( self.a.drop_lvid )
+  if not self.call then
+    self.call = true
+    npc:set_fastcall( self.move_body, self )
+  end
+
+  -- СѓС„! РґРѕС‚Р°С‰РёР»Рё... РІСЃРµРј СЃРїР°СЃРёР±Рѕ, РІСЃРµ СЃРІРѕР±РѕРґРЅС‹...
+  if self.a.drop_lvid == npc:level_vertex_id() then
+    if self.a.choosed_deadman then
+      deadmansids[ self.a.choosed_deadman ] = nil
+      self.a.choosed_deadman = nil
+      self.a.reached         = nil
+    end
+  end
+end
+
+
+function action_moving_deadman:move_body()
+  if not ( self.call and self.a.choosed_deadman ) then
+    return true
+  end
+  local gi = level.object_by_id( self.a.choosed_deadman )
+  local ps = gi and gi:get_physics_shell()
+  if not ps then
+    deadmansids[ self.a.choosed_deadman ] = nil
+    self.a.choosed_deadman = nil
+    self.a.reached         = nil
+    return true
+  end
+  -- РЅРµРїРёСЃСЊ СЃРёР»СЊРЅС‹Р№ - С‚Р°С‰РёС‚ Р»РµРІРѕР№ СЂСѓРєРѕР№ Р·Р° С‚СѓР»РѕРІРёС‰Рµ С‚СЂСѓРїР°
+  local el = ps:get_element_by_bone_name( self.bone )
+  if not el then
+    deadmansids[ self.a.choosed_deadman ] = nil
+    self.a.choosed_deadman = nil
+    self.a.reached         = nil
+    return true
+  end
+  local dir = self.object:bone_position( "bip01_l_hand" )
+    :sub( gi:bone_position( self.bone ) )
+  local d = vector():set( dir )
+  d.y = 0
+  d = d:magnitude() + 0.45
+  dir:mul( 40 * gi:mass() )
+  dir.y = ( dir.y > 0 and dir.y or 0 ) + 8 * gi:mass() * d + 50
+  self.force:mul( 0.5 )
+  dir:mul( 0.5 )
+  self.force:add( dir )
+  ps:apply_force( 0, gi:mass() * 10, 0 )
+  el:apply_force( self.force.x, self.force.y, self.force.z )
+  return false
+end
+
+
+function action_moving_deadman:finalize()
+  action_base.finalize( self )
+  state_mgr.set_state( self.object, self.a.def_state_moving )
+  self.anim     = nil
+  self.call     = nil
+  self.bone     = nil
+end
+
+
+-- Kamp binder
+function add_to_binder( object, ini, scheme, section, storage )
+  local properties = {
+    [ "kamp_end"         ] = xr_evaluators_id.stohe_kamp_base + 1,
+    [ "on_position"      ] = xr_evaluators_id.stohe_kamp_base + 2,
+    [ "see_deadman"      ] = xr_evaluators_id.stohe_kamp_base + 3,
+    [ "can_move_deadman" ] = xr_evaluators_id.stohe_kamp_base + 5,
+    [ "contact"          ] = xr_evaluators_id.stohe_meet_base + 1,
+    [ "state_mgr_off"    ] = xr_evaluators_id.state_mgr + 3,
+  }
+
+  local operators  = {
+    [ "go_position"   ] = xr_actions_id.stohe_kamp_base + 1,
+    [ "wait"          ] = xr_actions_id.stohe_kamp_base + 3,
+    [ "go_to_deadman" ] = xr_actions_id.stohe_kamp_base + 4,
+    [ "move_deadman"  ] = xr_actions_id.stohe_kamp_base + 5,
+  }
+
+  -- Evaluators
+  local manager = object:motivation_action_manager()
+  manager:add_evaluator(
+    properties.kamp_end,
+    this.evaluator_kamp_end( "kamp_end", storage, "kamp_end" )
+  )
+  manager:add_evaluator(
+    properties.on_position,
+    this.evaluator_on_position(
+      "kamp_on_position", storage, "kamp_on_position"
+    )
+  )
+
+  local zombi = object:character_community() == "zombied"
+    or object:character_community() == "trader"
+    or object:character_community() == "arena_enemy"
+    or object:name() == "mil_stalker0012"
+    or object:name() == "yantar_ecolog_general"
+  if zombi then
+    manager:add_evaluator(
+      properties.see_deadman, property_evaluator_const( false )
+    )
+    manager:add_evaluator(
+      properties.can_move_deadman, property_evaluator_const( false )
+    )
+  else
+    manager:add_evaluator(
+      properties.see_deadman,
+      this.evaluator_see_deadman( "see_deadman", storage, "see_deadman" )
+    )
+    manager:add_evaluator(
+      properties.can_move_deadman,
+      this.evaluator_can_move_deadman(
+        "can_move_deadman", storage, "can_move_deadman"
+      )
+    )
+  end
+
+  -- Actions
+  local action = this.action_wait( object:name(), "action_kamp_wait", storage )
+  action:add_precondition(
+    world_property( stalker_ids.property_alive,   true  )
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_danger,  false )
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_enemy,   false )
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_anomaly, false )
+  )
+  action:add_precondition(
+    world_property( properties.see_deadman,       false )
+  )
+  xr_motivator.addCommonPrecondition( action )
+  action:add_precondition(
+    world_property( properties.on_position,       true  )
+  )
+  action:add_effect( world_property( properties.kamp_end, true ) )
+  manager:add_action( operators.wait, action )
+  xr_logic.subscribe_action_for_events( object, storage, action )
+
+  action = this.action_go_position( object:name(), "action_go_kamp", storage )
+  action:add_precondition(
+    world_property( stalker_ids.property_alive,   true  )
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_danger,  false )
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_enemy,   false )
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_anomaly, false )
+  )
+  action:add_precondition(
+    world_property( properties.see_deadman,       false )
+  )
+  xr_motivator.addCommonPrecondition( action )
+  action:add_precondition(
+    world_property( properties.on_position,       false )
+  )
+  action:add_effect( world_property( properties.on_position, true ) )
+  manager:add_action( operators.go_position, action )
+
+  -- РІРёРґРёРј С‚СЂСѓРї - РёРґРµРј СЂР°Р·Р±РёСЂР°С‚СЊСЃСЏ...
+  action = this.action_go_to_deadman(
+    object:name(), "action_go_to_deadman", storage
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_alive,   true  )
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_danger,  false )
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_enemy,   false )
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_anomaly, false )
+  )
+  xr_motivator.addCommonPrecondition( action )
+  action:add_precondition(
+    world_property( properties.see_deadman,       true  )
+  )
+  action:add_precondition(
+    world_property( properties.can_move_deadman,  false )
+  )
+  action:add_precondition(
+    world_property( properties.kamp_end,          false )
+  )
+  action:add_effect( world_property( properties.can_move_deadman, true ) )
+  manager:add_action( operators.go_to_deadman, action )
+
+  -- С‚Р°С‰РёРј С‚СЂСѓРї РїРѕРґР°Р»СЊС€Рµ РѕС‚ С‚СѓСЃРѕРІРєРё
+  action = this.action_moving_deadman(
+    object:name(), "action_moving_deadman", storage
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_alive,   true  )
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_danger,  false )
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_enemy,   false )
+  )
+  action:add_precondition(
+    world_property( stalker_ids.property_anomaly, false )
+  )
+  xr_motivator.addCommonPrecondition( action )
+  action:add_precondition(
+    world_property( properties.see_deadman,       true  )
+  )
+  action:add_precondition(
+    world_property( properties.can_move_deadman,  true  )
+  )
+  action:add_precondition(
+    world_property( properties.kamp_end,          false )
+  )
+  action:add_effect( world_property( properties.see_deadman,      false ) )
+  action:add_effect( world_property( properties.can_move_deadman, false ) )
+  manager:add_action( operators.move_deadman, action )
+
+  action = manager:action(xr_actions_id.alife )
+  action:add_precondition(
+    world_property( properties.kamp_end, true )
+  )
+end
+
+
+-- РІРєР»СЋС‡РµРЅРёРµ Р»Р°РіРµСЂСЏ
+function set_scheme( npc, ini, scheme, section, gulag_name )
+  local st = xr_logic.assign_storage_and_bind( npc, ini, scheme, section )
+  st.logic = xr_logic.cfg_get_switch_conditions( ini, section, npc )
+  local center_point = utils.cfg_get_string(
+    ini, section, "center_point", npc, true, gulag_name
+  )
+  local radius       = get_float( section, "radius", nil, ini )
+  st.kamp            = get_my_kamp( npc, center_point, scheme, radius )
+  st.kamp:addNpc( npc )
+  st.pos_vertex      = nil
+
+  st.def_state_moving = utils.cfg_get_string(
+    ini, section, "def_state_moving", npc, false, "", "walk"
+  )
+  if st.def_state_moving == nil or st.def_state_moving == "nil" then
+    st.def_state_moving = "walk"
+  end
 end
