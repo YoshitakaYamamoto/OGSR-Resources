@@ -1,129 +1,87 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
--- “аблица соответствий состо¤ни¤ лагер¤ и допустимых анимаций и звуков.
+-- Таблица соответствий состояния лагеря и допустимых анимаций и звуков.
 avail_state = {
   idle = {
     directed   = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "kurit", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "use_pda", "eat_kolbasa", "eat_vodka",
+	  "eat_energy", "eat_bread", "trans",
     },
     undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "kurit",
-      "eat_vodka", "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich",
-      "beer_a", "sweetness", "flaska", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "use_pda", "eat_kolbasa", "eat_vodka",
+	  "eat_energy", "eat_bread", "trans",
     }
   },
   pre_harmonica = {
     directed   = { "wait_harmonica", },
     undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "kurit", "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich",
-      "beer_a", "sweetness", "flaska", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "use_pda", "eat_kolbasa", "eat_vodka",
+	  "eat_energy", "eat_bread", "trans",
     }
   },
   harmonica = {
     directed   = { "play_harmonica", },
     undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "use_pda", "eat_kolbasa", "eat_vodka",
+	  "eat_energy", "eat_bread", "trans",
     }
   },
   post_harmonica = {
     directed   = { "wait_harmonica", },
     undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "use_pda", "eat_kolbasa", "eat_vodka",
+	  "eat_energy", "eat_bread", "trans",
     }
   },
   pre_guitar = {
     directed   = { "wait_guitar", },
     undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "use_pda", "kurit", "kurit", "trans",
     }
   },
   guitar = {
     directed   = { "play_guitar", },
     undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "use_pda", "kurit", "kurit", "trans",
     }
   },
   post_guitar = {
     directed   = { "wait_guitar", },
     undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
-    }
-  },
-  pre_balalaika = {
-    directed   = { "wait_balalaika", },
-    undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
-    }
-  },
-  balalaika = {
-    directed   = { "play_balalaika", },
-    undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
-    }
-  },
-  post_balalaika = {
-    directed   = { "wait_balalaika", },
-    undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "use_pda", "kurit", "kurit", "trans",
     }
   },
   story = {
     directed   = { "declarate", },
     undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "use_pda", "kurit", "kurit", "trans",
     }
   },
   post_story = {
     directed   = { "declarate", },
     undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "use_pda", "kurit", "kurit", "trans",
     }
   },
   pre_joke = {
     directed   = { "declarate", },
     undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "use_pda", "eat_vodka",
+	  "eat_energy", "eat_bread", "trans",
     }
   },
   joke = {
     directed   = { "declarate", },
     undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "use_pda", "eat_vodka",
+	  "eat_energy", "eat_bread", "trans",
     }
   },
   post_joke = {
     directed   = { "declarate", },
     undirected = {
-      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "eat_vodka", "kurit",
-      "eat_energy", "eat_bread", "kurit_cigara", "eat_sandwich", "beer_a",
-      "sweetness", "flaska", "trans", "use_pda",
+      "wait", "sit", "sit_ass", "sit_knee", "eat_kolbasa", "use_pda", "eat_vodka",
+	  "eat_energy", "eat_bread", "trans",
     }
   }
 }
@@ -151,15 +109,6 @@ avail_sound = {
   post_guitar    = {
     directed = "",               undirected = "reac_guitar",
   },
-  pre_balalaika  = {
-    directed = "pre_balalaika",  undirected = "",
-  },
-  balalaika      = {
-    directed = "play_balalaika", undirected = "",
-  },
-  post_balalaika = {
-    directed = "",               undirected = "reac_balalaika",
-  },
   story          = {
     directed = "play_story",     undirected = "",
   },
@@ -178,8 +127,8 @@ avail_sound = {
 }
 
 
--- “аблица таймаутов по состо¤нию. ≈сли состо¤ние установилось, то
--- некоторое врем¤ оно не может быт изменено.
+-- Таблица таймаутов по состоянию. Если состояние установилось, то
+-- некоторое время оно не может быть изменено.
 timeout = {
   idle           = { min = 30000 },
   pre_harmonica  = { min = 3000  },
@@ -188,9 +137,6 @@ timeout = {
   pre_guitar     = { min = 3000  },
   guitar         = { min = 5000, soundstart = true },
   post_guitar    = { min = 3000  },
-  pre_balalaika  = { min = 3000  },
-  balalaika      = { min = 5000, soundstart = true },
-  post_balalaika = { min = 3000  },
   story          = { min = 1000, soundstart = true },
   post_story     = { min = 3000  },
   pre_joke       = { min = 3000  },
@@ -199,7 +145,7 @@ timeout = {
 }
 
 
--- “аблица глобальных состо¤ний лагер¤.
+-- Таблица глобальных состояний лагеря.
 kamp_states = {
   idle           = true,
   pre_harmonica  = false,
@@ -208,9 +154,6 @@ kamp_states = {
   pre_guitar     = false,
   guitar         = false,
   post_guitar    = false,
-  pre_balalaika  = false,
-  balalaika      = false,
-  post_balalaika = false,
   story          = false,
   post_story     = false,
   pre_joke       = true,
@@ -219,13 +162,12 @@ kamp_states = {
 }
 
 
--- “аблица допустимых переходов между состо¤ни¤ми с веро¤тност¤ми.
+-- Таблица допустимых переходов между состояниями с вероятностями.
 trans_kamp = {
   idle = {
     idle           =   0,
     pre_harmonica  =  30,
     pre_guitar     =  30,
-    pre_balalaika  =  30,
     story          =  20,
     pre_joke       =  30,
   },
@@ -248,16 +190,6 @@ trans_kamp = {
   post_guitar = {
     idle           =  70,
     guitar         =  30,
-  },
-  pre_balalaika = {
-    balalaika      = 100,
-  },
-  balalaika = {
-    post_balalaika = 100,
-  },
-  post_balalaika = {
-    idle           =  70,
-    balalaika      =  30,
   },
   story = {
     post_story     = 100,

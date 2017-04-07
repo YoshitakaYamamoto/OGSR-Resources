@@ -1,8 +1,6 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
---
--- Схема лагерь. Чудак(и) у костра.
--- автор: Диденко Руслан (Stohe)
--- TODO:
+-- https://github.com/dsh2dsh/op2ogse/blob/master/gamedata/scripts/xr_kamp.script
+
 
 function attach( sm )
   sm:subscribe({ signal = "on_monster_death", fun = this.on_death })
@@ -16,11 +14,11 @@ function on_death( obj, who )
 end
 
 
-kamps           = {}
-kamp_stalkers   = {}    -- могут ли сталкеры в лагере юзаться игроком.
+local kamps   = {}
+kamp_stalkers = {} -- могут ли сталкеры в лагере юзаться игроком.
 -- Объявления итераторов
-deadmansids     = {}          -- кто какой труп оттаскивает
-deadmansidsuses = {}          -- сколько попыток оттащить было сделано
+local deadmansids     = {} -- кто какой труп оттаскивает
+local deadmansidsuses = {} -- сколько попыток оттащить было сделано
 
 local body_grab_bones = {
   [ clsid.snork_s    ] = "bip01_spine2",
@@ -33,8 +31,8 @@ local body_grab_bones = {
 
 
 function get_kamp_level_vertex_id( path )
-  local sect = "dsh.xr_kamp." .. path
   local vertex
+  local sect = "dsh.xr_kamp." .. path
   if sys_ini:section_exist( sect ) then
     local center_point = get_string( sect, "center_point" )
     if center_point then
@@ -47,7 +45,7 @@ function get_kamp_level_vertex_id( path )
     local patrol = patrol( path )
     vertex = patrol:level_vertex_id( 0 )
   end
-  local level_vertexes = amk_anoms.level_vertexes[ level.name() ]
+  local level_vertexes = ogse.level_vertexes[ level.name() ]
   ASSERT(
     vertex <= level_vertexes,
     "[%]: kamp %s has wrong level_vertex_id = %s on %s",
@@ -72,7 +70,7 @@ function get_my_kamp( npc, path, scheme, radius )
             [ "kamp" ] = k,
             [ "pos"  ] = pos2,
           }
-        );
+        )
       end
     end
     table.sort(
@@ -111,7 +109,7 @@ function get_pos( center, dist, allow_sector )
   local math_pi_180  = 180 / math.pi
   local pi2          = math.pi * 2
 
-  local anomalies    = amk_anoms.get_anomaly_list_for_pos(
+  local anomalies    = ogse_anomaly.get_all_nearest_anomalies_by_point_in_radius(
     level.vertex_position( center ), dist
   )
   local dir          = vector():set( 1, 0, 0 ):normalize()
@@ -159,6 +157,24 @@ function get_pos( center, dist, allow_sector )
   return found
 end
 
+--clones table (metatables are cloned too), userdatas are not cloned
+local function table_clone(object)
+    local lookup_table = {}
+    local function _copy(object)
+        if type(object) ~= "table" then
+            return object
+        elseif lookup_table[object] then
+            return lookup_table[object]
+        end
+        local new_table = {}
+        lookup_table[object] = new_table
+        for index, value in pairs(object) do
+            new_table[_copy(index)] = _copy(value)
+        end
+        return setmetatable(new_table, _copy( getmetatable(object)) )
+    end
+    return _copy(object)
+end
 
 class "CKampManager"
 function CKampManager:__init( name, level_vertex_id, scheme, min_radius, src_kamp )
@@ -172,8 +188,8 @@ function CKampManager:__init( name, level_vertex_id, scheme, min_radius, src_kam
   self.kamp_state  = "idle"
   self.avail_state = xr_kamp_data.avail_state
   self.avail_sound = xr_kamp_data.avail_sound
-  self.timeout     = table.clone( xr_kamp_data.timeout )
-  self.kamp_states = table.clone( xr_kamp_data.kamp_states )
+  self.timeout     = table_clone( xr_kamp_data.timeout )
+  self.kamp_states = table_clone( xr_kamp_data.kamp_states )
   self.trans_kamp  = xr_kamp_data.trans_kamp
   -- Хранилище для режиссера лагеря. Режиссерем является сталкер,
   -- затеявший необычное поведение.
@@ -417,17 +433,6 @@ function CKampManager:updateNpc( npc )
     state    = "guitar"
     substate = 1
     kamp_stalkers[ npc_id ] = false
-  elseif state == "wait_balalaika" then
-    if sound == "pre_balalaika" and self.npc[ npc_id ].new == true then
-      xr_sound.set_sound_play( npc, "intro_music", math.random( 2000,3000 ) )
-      self.npc[ npc_id ].new = false
-    end
-    state = "balalaika"
-    kamp_stalkers[ npc_id ] = false
-  elseif state == "play_balalaika" then
-    state    = "balalaika"
-    substate = 1
-    kamp_stalkers[ npc_id ] = false
   elseif state == "declarate" then
     if self.npc[ npc_id ].new == true then
       if sound == "pre_joke" then
@@ -491,8 +496,6 @@ function CKampManager:updateNpc( npc )
     sound = "weather, state"
   elseif sound == "reac_guitar" then
     sound = "reac_music"
-  elseif sound == "reac_balalaika" then
-    sound = "reac_music"
   elseif sound == "reac_harmonica" then
     sound = "reac_music"
   elseif sound == "reac_joke" then
@@ -544,14 +547,14 @@ function CKampManager:checkNpcAbility( npc )
     states[ "trans" ] = false
     if self.npc[ npc_id ].can_eat then
       -- есть колбасу
-      if npc:object( "kolbasa" ) and math.random( 99 ) > 20 then
+      if npc:object( "kolbasa_a" ) and math.random( 99 ) > 20 then
         -- вероятность 80%
         states[ "eat_kolbasa" ] = true
       else
         states[ "eat_kolbasa" ] = false
       end
       -- пить водку
-      if npc:object( "vodka" ) and math.random( 99 ) > 60 then
+      if npc:object( "vodka_a" ) and math.random( 99 ) > 60 then
         -- вероятность 40%
         states[ "eat_vodka" ] = true
       else
@@ -565,7 +568,7 @@ function CKampManager:checkNpcAbility( npc )
         states[ "eat_energy" ] = false
       end
       -- есть хлеб
-      if npc:object( "bread" ) and math.random( 99 ) > 20 then
+      if npc:object( "bread_a" ) and math.random( 99 ) > 20 then
         -- вероятность 80%
         states[ "eat_bread" ] = true
       else
@@ -577,34 +580,6 @@ function CKampManager:checkNpcAbility( npc )
         states[ "kurit" ] = true
       else
         states[ "kurit" ] = false
-      end
-      -- пить из фляжки
-      if npc:object( "flaska" ) and math.random( 99 ) > 20 then
-        -- вероятность 80%
-        states[ "flaska" ] = true
-      else
-        states[ "flaska" ] = false
-      end
-      -- пить пиво
-      if npc:object( "beer_a" ) and math.random( 99 ) > 20 then
-        -- вероятность 80%
-        states[ "beer_a" ] = true
-      else
-        states[ "beer_a" ] = false
-      end
-      -- курит сигару
-      if npc:object( "cigara" ) and math.random( 99 ) > 20 then
-        -- вероятность 80%
-        states[ "kurit_cigara" ] = true
-      else
-        states[ "kurit_cigara" ] = false
-      end
-      -- есть бутерброд
-      if npc:object( "sandwich" ) and math.random( 99 ) > 20 then
-        -- вероятность 80%
-        states[ "eat_sandwich" ] = true
-      else
-        states[ "eat_sandwich" ] = false
       end
       -- играть на гармошке
       if npc:object( "harmonica_a" ) then
@@ -626,10 +601,6 @@ function CKampManager:checkNpcAbility( npc )
         states[ "eat_energy"     ] = false
         states[ "eat_bread"      ] = false
         states[ "kurit"          ] = false
-        states[ "flaska"         ] = false
-        states[ "beer_a"         ] = false
-        states[ "kurit_cigara"   ] = false
-        states[ "eat_sandwich"   ] = false
         states[ "play_harmonica" ] = false
         states[ "wait_harmonica" ] = false
         self.kamp_states[ "pre_harmonica"  ] = false
@@ -657,20 +628,6 @@ function CKampManager:checkNpcAbility( npc )
       self.kamp_states[ "pre_guitar"  ] = false
       self.kamp_states[ "guitar"      ] = false
       self.kamp_states[ "post_guitar" ] = false
-    end
-    -- играть на балалайке
-    if npc:object( "balalaika_a" ) then
-      states[ "play_balalaika" ] = true
-      states[ "wait_balalaika" ] = true
-      self.kamp_states[ "pre_balalaika"  ] = true
-      self.kamp_states[ "balalaika"      ] = true
-      self.kamp_states[ "post_balalaika" ] = true
-    else
-      states[ "play_balalaika" ] = false
-      states[ "wait_balalaika" ] = false
-      self.kamp_states[ "pre_balalaika"  ] = false
-      self.kamp_states[ "balalaika"      ] = false
-      self.kamp_states[ "post_balalaika" ] = false
     end
     -- анекдоты
     if self.population_comed > 1 then
@@ -707,17 +664,12 @@ function CKampManager:addNpc( npc )
       current  = nil,
       speak    = 0,
       states   = {
-        beer_a         = false,
         declarate      = true,
         eat_bread      = false,
         eat_energy     = false,
         eat_kolbasa    = false,
-        eat_sandwich   = false,
         eat_vodka      = false,
-        flaska         = false,
         kurit          = false,
-        kurit_cigara   = false,
-        play_balalaika = false,
         play_guitar    = false,
         play_harmonica = false,
         play_joke      = false,
@@ -737,17 +689,12 @@ function CKampManager:addNpc( npc )
       current  = nil,
       speak    = 0,
       states   = {
-        beer_a         = false,
         declarate      = true,
         eat_bread      = false,
         eat_energy     = false,
         eat_kolbasa    = false,
-        eat_sandwich   = false,
         eat_vodka      = false,
-        flaska         = false,
         kurit          = false,
-        kurit_cigara   = false,
-        play_balalaika = false,
         play_guitar    = false,
         play_harmonica = false,
         play_joke      = false,
@@ -762,7 +709,7 @@ function CKampManager:addNpc( npc )
     }
   end
   if db.story_by_id[ npc:id() ] == nil then
-    local char_ini1 = ini_file( "scripts\\stories.ltx" )
+    local char_ini1 = dsh.cached_ini_file( "scripts\\stories.ltx" )
     xr_info.loadInfo( npc, char_ini1 )
   end
   self.population     = self.population + 1
@@ -870,7 +817,7 @@ function CKampManager:init_seats()
     for _, vertex in ipairs( found ) do
       table.insert( seats, {
         [ "vertex" ] = vertex,
-      });
+      })
     end
     if table.getn( seats ) > 0 then
       table.insert( self.seats, seats )
@@ -1031,7 +978,7 @@ function evaluator_on_position:evaluate()
       ) < 8
     )
   then
-    if self.a.updates_passed < 10 then
+    if self.a.updates_passed < --[[10]] 15 then --KRodin: увеличил до 15, возможно поможет от зависаний НПС.
       return false
     end
     ogse_debug.add_active_eval( self.object, script_name(), "on_position" )
@@ -1111,7 +1058,7 @@ function evaluator_see_deadman:check_item( obj, point0 )
   -- его...
   obj = level.object_by_id( obj:id() )
   if
-    obj and obj.clsid and ( IsStalker( obj ) or IsMonster( obj ) )
+    obj and obj.clsid and (obj:is_stalker() or obj:is_monster())
     and ( not obj:alive() )
     and (
       ( not deadmansids[ obj:id() ] )
@@ -1196,7 +1143,7 @@ function action_go_position:execute()
     self.object:set_desired_direction( dir )
     self.object:set_detail_path_type( move.curve )
     self.object:set_path_type( game_object.level_path )
-    state_mgr.set_state( self.object, self.a.def_state_moving )
+    state_mgr.set_state( "xr_kamp_1", self.object, self.a.def_state_moving )
   end
 end
 
@@ -1240,7 +1187,7 @@ function action_wait:execute()
   end
   --' повернуть его лицом к центру
   state_mgr.set_state(
-    self.object, state, nil, nil,
+    "xr_kamp_2", self.object, state, nil, nil,
     { look_position = level.vertex_position( self.a.kamp.center ) },
     nil, nil, { subanim = substate }
   )
@@ -1251,7 +1198,7 @@ end
 function action_wait:finalize()
   -- убираем сразу звук гитары
   local stop_sound
-  for _, s in ipairs({ "guitar_a", "harmonica_a", "balalaika_a" }) do
+  for _, s in ipairs({ "guitar_a", "harmonica_a" }) do
     local obj = self.object:object( s )
     if obj and obj:attachable_item_enabled() then
       stop_sound = true
@@ -1317,7 +1264,7 @@ function action_go_to_deadman:initialize()
   self.a.reached       = 0
   self.a.cur_dead_lvid = gi and gi:level_vertex_id()
   -- пойдем не спеша...
-  state_mgr.set_state( self.object, self.a.def_state_moving )
+  state_mgr.set_state( "xr_kamp_3", self.object, self.a.def_state_moving )
   -- на все гулянки в сторону трупа дается 30 секунд, если не успел, то
   -- да ну нафиг заморачиваться :)
   self.a.go_time_end = time_global() + 30000
@@ -1511,7 +1458,7 @@ end
 
 function action_moving_deadman:finalize()
   action_base.finalize( self )
-  state_mgr.set_state( self.object, self.a.def_state_moving )
+  state_mgr.set_state( "xr_kamp_4", self.object, self.a.def_state_moving )
   self.anim     = nil
   self.call     = nil
   self.bone     = nil
