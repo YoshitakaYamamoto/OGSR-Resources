@@ -16,7 +16,9 @@ function on_item_to_slot(item, sitem)
 		end
 	end
 end
+
 local write_debug_log = false
+
 function init(obj)
 	obj:bind_object(wpn_binder(obj))
 end
@@ -154,13 +156,14 @@ function wpn_binder:__init (obj) super(obj)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function wpn_binder:reinit()
-	self.object:set_callback(158, self.init_addons, self)
+	self.object:set_callback(callback_ex.init_addons, self.init_addons, self)
 	self.object:set_callback(callback_ex.update_hud_addons_visibility, self.update_hud_addons_visibility, self)
-	--self.object:set_callback(callback_ex.update_addons_visibility,     self.update_addons_visibility,    self)
+	self.object:set_callback(callback_ex.update_addons_visibility, self.update_addons_visibility, self)
 	--self:dbg_log("wpn_binder:reinit")
 end
 ----------------------------------------------------------------------------------------------------------------------
 function wpn_binder:init_addons(a,b)
+	--log3("[wpn_binder:init_addons][%s] arg1: [%s], arg2: [%s]", self.object:name(), a, b)
 	if a == 1 and self.object:is_weapon_gl() then
 		--log1("skip")
 		return
@@ -186,17 +189,8 @@ end
 function wpn_binder:net_destroy()
 	--self:dbg_log("wpn_binder:net_destroy")
 	self.object:set_callback(callback_ex.update_hud_addons_visibility, nil)
-	self.object:set_callback(158, nil)
-end
-
-function wpn_binder:update()
-	--self:dbg_log("wpn_binder:update: %s, %s", tostring(ogse_wpn_utils.get_visibility_updates_activated(self.object)), type(self.managed_bones))
-	
-	local p = self.object:parent()
-	if not (p and p:is_actor()) then -- если не у актора в инвентаре
-		self:update_addons_visibility()
-		--self:dbg_log("wpn_binder:update")
-	end
+	self.object:set_callback(callback_ex.update_addons_visibility, nil)
+	self.object:set_callback(callback_ex.init_addons, nil)
 end
 
 function wpn_binder:set_hud_bones_visibility(bones_list, vis)
@@ -218,6 +212,7 @@ function wpn_binder:set_bones_visibility(bones_list, vis)
 end
 
 function wpn_binder:update_addons_visibility(arg1, arg2)
+	--log3("[wpn_binder:update_addons_visibility][%s] arg1: [%s], arg2: [%s]", self.object:name(), arg1, arg2)
 	--self:dbg_log("wpn_binder:update_addons_visibility")
 	if not self.wm_initialized then
 		--self:dbg_log("wpn_binder:update_addons_visibility - the very first")
