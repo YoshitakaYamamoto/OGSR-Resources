@@ -348,12 +348,11 @@ end
 
 --// Метод описан и открыт Malandrinus'om. 
 function main_menu:personal_test()
-	--/* Файл промежуточен, так называемый файл обменный. 
-	-- В файле дополнительно нужно настроить путь непосредственно к вашему скрипту теста. */
-	local res, err = pcall(personal_test_proxy.main)
-	log1(res and "~~Succesfull MyTest3 Execution!" or "~~"..err)
-	flush_log()
-	--// Можно использовать кратко log1(res and "Succesfull_MyTest3_Execution!" or string.gsub(err, " ", "_")), но в данном случае, я приверженец старых методов. Phoenix.	
+	local res, err = pcall( function()
+		local chunk, err = dofile(getFS():update_path("$game_scripts$", "personal_test.lua"))
+		if err then log1("!!"..err) end
+	end )
+	log1(res and "~~Succesfull personal_test Execution!" or "~~"..err)
 end
 
 function main_menu:test_spawn()

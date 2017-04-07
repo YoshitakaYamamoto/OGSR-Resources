@@ -35,20 +35,20 @@ function main_main_tab:InitControls(x, y, handler)
 							 width = self.btn.width,
 							 height = self.btn.height}
 							 
-	local btn_multi_rect  = {x = self.btn.x,
+	--[=[local btn_multi_rect  = {x = self.btn.x,
+							 y = btn_save_rect.y + btn_save_rect.height ,
+							 width = self.btn.width,
+							 height = self.btn.height}--]=]
+	
+	local btn_opt_rect    = {x = self.btn.x,
 							 y = btn_save_rect.y + btn_save_rect.height ,
 							 width = self.btn.width,
 							 height = self.btn.height}
-	
-	local btn_opt_rect    = {x = self.btn.x,
-							 y = btn_multi_rect.y + btn_multi_rect.height ,
-							 width = self.btn.width,
-							 height = self.btn.height}
 
-	local btn_bonus_rect  = {x = self.btn.x,
+	--[=[local btn_bonus_rect  = {x = self.btn.x,
 							 y = btn_opt_rect.y + btn_opt_rect.height,
 							 width = self.btn.width,
-							 height = self.btn.height}
+							 height = self.btn.height}--]=]
 							 
 	local btn_quit_rect   = {x = self.btn.x,
 							 y = self.main_rect.height - self.btn.height,
@@ -98,9 +98,8 @@ function main_main_tab:InitControls(x, y, handler)
 	self:AttachChild(btn)	
 	
 	btn:Enable(level.present())
-	
-		
-	--------->> MULTIPLAYER
+
+	--[=[------->> MULTIPLAYER
 	btn = CUI3tButton()
 	btn:SetAutoDelete(true)
 	btn:SetWindowName("btn_multiplayer")
@@ -113,7 +112,8 @@ function main_main_tab:InitControls(x, y, handler)
 	self:AttachChild(btn)
 	
 	btn:Enable(not level.present())
-	
+	--]=]
+
 	--------->> OPTIONS
 	btn = CUI3tButton()
 	btn:SetAutoDelete(true)
@@ -140,7 +140,7 @@ function main_main_tab:InitControls(x, y, handler)
 	handler:Register(btn)
 	self:AttachChild(btn)
 	
-	--------->> BONUS
+	--[=[------->> BONUS
 	btn = CUI3tButton()
 	btn:SetAutoDelete(true)
 	btn:SetWindowName("btn_bonus")
@@ -153,8 +153,8 @@ function main_main_tab:InitControls(x, y, handler)
 	self:AttachChild(btn)
 	
 	btn:Enable(false)
-	
-	
+--]=]
+
 --[[	btn = CUIComboBox()
 	btn:SetAutoDelete(true)
 	btn:SetWindowName("combo")

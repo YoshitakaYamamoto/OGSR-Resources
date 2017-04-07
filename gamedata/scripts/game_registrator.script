@@ -1,17 +1,17 @@
 function register(object_factory)
-	if (editor() == false) then
-		object_factory:register ("game_last_sv.game_sv_LastStanding","SV_LAST","game_sv_LastStanding")
-		object_factory:register ("game_last_cl.game_cl_LastStanding","CL_LAST","game_cl_LastStanding")
-	end
+	--if (editor() == false) then
+	--	object_factory:register ("game_last_sv.game_sv_LastStanding","SV_LAST","game_sv_LastStanding")
+	--	object_factory:register ("game_last_cl.game_cl_LastStanding","CL_LAST","game_cl_LastStanding")
+	--end
 end
 
 function get_game_clsid(game_type_option,is_server)
 
-	if(is_server==true) then
-		if(game_type_option == "single") then 
-			  return "SV_SINGL"	end
+	if is_server == true then
+		--if(game_type_option == "single") then 
+			  return "SV_SINGL"	--end
 
-		if(game_type_option == "deathmatch") then 
+		--[=[if(game_type_option == "deathmatch") then 
 			return "SV_DM" end
 
 		if(game_type_option == "teamdeathmatch") then 
@@ -21,15 +21,12 @@ function get_game_clsid(game_type_option,is_server)
 			return "SV_AHUNT" end
 
 		if(game_type_option == "laststanding") then 
-			return "SV_LAST" end
-		
-	end	
+			return "SV_LAST" end--]=]
+	elseif is_server == false then
+		--if(game_type_option == "single") then 
+			  return "CL_SINGL"	--end
 
-	if(is_server==false) then
-		if(game_type_option == "single") then 
-			  return "CL_SINGL"	end
-
-		if(game_type_option == "deathmatch") then 
+		--[=[if(game_type_option == "deathmatch") then 
 			return "CL_DM" end
 
 		if(game_type_option == "teamdeathmatch") then 
@@ -38,9 +35,8 @@ function get_game_clsid(game_type_option,is_server)
 		if(game_type_option == "artefacthunt") then 
 			return "CL_AHUNT" end
 
-
 		if(game_type_option == "laststanding") then 
-			return "CL_LAST" end
+			return "CL_LAST" end--]=]
 	end
 	return ""
 end
