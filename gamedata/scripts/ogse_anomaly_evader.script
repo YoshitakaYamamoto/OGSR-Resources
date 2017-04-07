@@ -18,8 +18,8 @@ local excluded_npc = { --Запретные профили/имена/story_id
 	["dik_the_drifter"] = true,
 	["zona_brother1"] = true,
 	["zona_brother2"] = true,
-	["val_escort_captive"] = true,
-	["val_escort_nap1"] = true,
+	--["val_escort_captive"] = true,
+	--["val_escort_nap1"] = true,
 	["bandit_trader"] =	true,
 	["bandit_trader_spawn"]	= true,		
 }

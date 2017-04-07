@@ -3707,8 +3707,9 @@ function afscanner_impulse7()
 end
 
 -- Пуля и напарник ---------------------------------------------------------------------------------
-
+--KRodin: повыключал это, на мой взгляд это не нужно вообще.
 function val_escort_combat(actor, npc)
+--[=[
 	local nap = level_object_by_sid(story_ids.val_escort_nap1)
 	if not nap:alive() then
 		return
@@ -3733,34 +3734,43 @@ function val_escort_combat(actor, npc)
 		captive:set_relation(game_object.enemy, bandit2)
 			bandit2:set_relation(game_object.enemy, captive)
 	end
+--]=]
 end
 
 function set_nap_band_friend()
+--[=[
 	local npc = level_object_by_sid(story_ids.val_escort_nap1)
 	-- if npc:alive() then
 	relation_registry.set_community_goodwill("bandit", npc:id (), 5000)
 	-- end
+--]=]
 end
 
 function set_captive_band_friend()
+--[=[
 	local npc = level_object_by_sid(story_ids.val_escort_captive)
 	-- if npc:alive() then
 	relation_registry.set_community_goodwill("bandit", npc:id (), 5000)
 	-- end
+--]=]
 end
 
 function set_nap_invulnerable()
+--[=[
 	local npc = level_object_by_sid(story_ids.val_escort_nap1)
-	if npc:alive() == true then
+	if npc:alive() then
 		set_anomaly_invisibility(npc, true)
 	end
+--]=]
 end
 
 function set_captive_invulnerable()
+--[=[
 	local npc = level_object_by_sid(story_ids.val_escort_captive)
-	if npc:alive() == true then
+	if npc:alive() then
 		set_anomaly_invisibility(npc, true)
 	end
+--]=]
 end
 
 -- Радист на Янтаре --------------------------------------------------------------------------------

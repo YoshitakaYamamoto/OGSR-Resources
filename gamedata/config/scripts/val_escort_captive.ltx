@@ -1,3 +1,4 @@
+; Долговец, которого спасаем вместе с Пулей.
 [logic@val_escort_captive]
 active          = patrol@val_escort_captive_wait1
 on_death        = death@val_escort_captive
@@ -162,8 +163,8 @@ danger              = danger@val_escort_captive
 anim                = wait_na
 snd                 = val_escort_dead
 ;target              = 406
-on_signal           = sound_end | {+val_escort_actor_helped} remark@val_escort_captive_talk_phrase, patrol@val_escort_captive_leave
-on_timer            = 20000 | {+val_escort_actor_helped} remark@val_escort_captive_talk_phrase, patrol@val_escort_captive_leave
+on_signal           = sound_end | {+val_escort_actor_helped} remark@val_escort_captive_talk_phrase, %+val_escort_scene_end%
+on_timer            = 20000 | {+val_escort_actor_helped} remark@val_escort_captive_talk_phrase, %+val_escort_scene_end%
 meet                = no_meet
 danger              = danger@val_escort_captive
 ;wounded             = wounded@val_escort_captive
@@ -226,8 +227,6 @@ danger              = danger@val_escort_captive
 [remark@val_escort_captive_talk]
 anim                    = wait
 target                  = actor
-;on_timer               = 60000 | patrol@val_escort_captive_leave
-on_actor_dist_ge_nvis   = 30 | patrol@val_escort_captive_leave
 meet                    = meet@val_escort_captive_talk
 danger                  = danger@val_escort_captive_free
 ;wounded                 = wounded@val_escort_captive
@@ -239,20 +238,8 @@ danger                  = danger@val_escort_captive_free
 [remark@val_escort_captive_wait2]
 anim                = wait
 target              = 406 ;logic@val_escort_nap1
-on_info             = {+val_escort_nap1_phrase2_end} patrol@val_escort_captive_leave %=give_items(wpn_beretta:ammo_9x19_fmj:medkit:bandage)%
+on_info             = {+val_escort_nap1_phrase2_end} %=give_items(wpn_beretta:ammo_9x19_fmj:medkit:bandage)%
 meet                = no_meet
 danger              = danger@val_escort_captive_free
 ;wounded             = wounded@val_escort_captive
-;combat_ignore_cond  = always
-
-;--------------------------------------------------------------------------
-; уходим с уровня
-;--------------------------------------------------------------------------
-[patrol@val_escort_captive_leave]
-path_walk           = leave_walk
-path_look           = leave_look
-formation           = line
-on_signal           = arrived | %+val_escort_captive_offline +val_escort_scene_end%
-meet                = meet@val_escort_captive_talk
-danger              = danger@val_escort_captive_free
 ;combat_ignore_cond  = always

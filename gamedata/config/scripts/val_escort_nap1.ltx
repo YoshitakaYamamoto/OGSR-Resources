@@ -1,3 +1,4 @@
+;Долговец Пуля
 [logic@val_escort_nap1]
 active        = walker@val_escort_nap1_begin1
 ;on_combat     = combat@val_escort_nap1
@@ -285,7 +286,7 @@ combat_ignore_cond  = {=check_fighting(407:408) -val_escort_combat}
 anim                = hide
 ;snd                 = val_escort_nap1_fail
 target              = val_escort_nap1_rescue_look, 0 ;actor
-on_timer            = 20000 | patrol@val_escort_nap1_leave
+on_timer            = 20000 | %+val_escort_scene_end%
 meet                = no_meet
 danger              = danger@val_escort_nap1_small
 wounded             = wounded@val_escort_nap1
@@ -349,7 +350,7 @@ wounded             = wounded@val_escort_nap1
 anim                = guard_na
 snd                 = val_escort_nap1_phrase5
 target              = 400 ;logic@val_escort_captive
-on_signal           = sound_end | remark@val_escort_nap1_wait_to_talk_phrase %+val_escort_nap1_phrase1_end% ; =drop_npc_items(wpn_beretta:ammo_9x19_fmj:medkit:bandage)% ;:ammo_5.45x39_fmj:ammo_5.45x39_fmj:medkit:bandage)%
+on_signal           = sound_end | remark@val_escort_nap1_wait_to_talk_phrase %+val_escort_nap1_phrase1_end%
 meet                = no_meet
 danger              = danger@val_escort_nap1_small
 wounded             = wounded@val_escort_nap1
@@ -372,7 +373,7 @@ wounded             = wounded@val_escort_nap1
 anim                = guard
 snd                 = val_escort_nap1_go_home
 target              = 400 ;logic@val_escort_captive
-on_signal           = sound_end | patrol@val_escort_nap1_leave %+val_escort_nap1_phrase2_end%
+on_signal           = sound_end | %+val_escort_scene_end% %+val_escort_nap1_phrase2_end%
 meet                = no_meet
 danger              = danger@val_escort_nap1_small
 wounded             = wounded@val_escort_nap1
@@ -399,8 +400,8 @@ wounded             = wounded@val_escort_nap1
 anim                = guard_na
 snd                 = val_escort_dead
 target              = 400 ;logic@val_escort_captive
-on_signal           = sound_end | {+val_escort_actor_helped} remark@val_escort_nap1_wait_to_talk_phrase, patrol@val_escort_nap1_leave
-on_timer            = 20000 | {+val_escort_actor_helped} remark@val_escort_nap1_wait_to_talk_phrase, patrol@val_escort_nap1_leave
+on_signal           = sound_end | {+val_escort_actor_helped} remark@val_escort_nap1_wait_to_talk_phrase, %+val_escort_scene_end%
+on_timer            = 20000 | {+val_escort_actor_helped} remark@val_escort_nap1_wait_to_talk_phrase, %+val_escort_scene_end%
 meet                = no_meet
 danger              = danger@val_escort_nap1_small
 wounded             = wounded@val_escort_nap1
@@ -423,20 +424,7 @@ wounded     = wounded@val_escort_nap1
 [remark@val_escort_nap1_wait_to_talk]
 anim                    = guard
 target                  = actor
-;on_timer                = 60000 | patrol@val_escort_nap1_leave ; ждем минуту и уходим
-on_actor_dist_ge_nvis   = 30 | patrol@val_escort_nap1_leave
+on_actor_dist_ge_nvis   = 10 | %+val_escort_scene_end%
 meet                    = meet@val_escort_nap1_talk
 danger                  = danger@val_escort_nap1_free ;small
 wounded                 = wounded@val_escort_nap1
-
-;--------------------------------------------------------------------------
-; уходим с уровня
-;--------------------------------------------------------------------------
-[patrol@val_escort_nap1_leave]
-path_walk   = leave_walk
-path_look   = leave_look
-commander   = true
-formation   = line
-on_signal   = arrived | %+val_escort_scene_end%
-meet        = meet@val_escort_nap1_talk
-danger      = danger@val_escort_nap1_free

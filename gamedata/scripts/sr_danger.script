@@ -13,7 +13,7 @@ function on_spawn()
 end
 
 function on_info(npc, info_id)
-	if info_id == "val_prisoner_free" then --Инфопоршень выдаётся когда актор освобождает долговца из тюрьмы. После этого скрипт прекращает работу.
+	if info_id == "val_prisoner_scene_end" then --Инфопоршень выдаётся когда актор освобождает долговца из тюрьмы. После этого скрипт прекращает работу.
 		check_subscribe_enemy_callback()
 	end
 end
@@ -22,7 +22,7 @@ local enemy_callback
 function check_subscribe_enemy_callback()
 	local sobj = alife():story_object(story_ids.val_prisoner)
 	local sm = ogse_signals.get_mgr()
-	if sobj and sobj:alive() and object_level_name(sobj) == "l04_darkvalley" and not has_alife_info("val_prisoner_free") and not enemy_callback then
+	if sobj and sobj:alive() and object_level_name(sobj) == "l04_darkvalley" and not has_alife_info("val_prisoner_scene_end") and not enemy_callback then
 		enemy_callback = {
 			{ signal = "on_npc_enemy_callback", fun = this.on_npc_enemy_callback },
 			{ signal = "on_info", fun = this.on_info },
