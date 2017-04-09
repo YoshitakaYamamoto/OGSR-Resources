@@ -842,6 +842,11 @@ function companion_start_following(npc, actor)
 		
 		npc:remove_all_restrictions() --Удалять все рестрикшены необходимо именно здесь!
 		ogse_anomaly_evader.last_position[ npc:id() ] = nil --Сразу же переустанавливаем рестрикшены обхода аномалий
+
+		local sobj = alife():object(npc:id())
+		if sobj then
+			sobj:brain():can_choose_alife_tasks( false )
+		end
 	end	
 end
 
@@ -871,6 +876,12 @@ function companion_stop_following(npc, actor)
 	xr_gulag.resetJob(npc)
 
 	xr_companion.unsubscribe(npc:id())
+
+	local sobj = alife():object(npc:id())
+	if sobj then
+		sobj:brain():can_choose_alife_tasks( true )
+		sobj:brain():update()
+	end
 end
 
 function quest_companion_stop_following(npc, actor)
@@ -896,6 +907,12 @@ function quest_companion_stop_following(npc, actor)
 	xr_gulag.resetJob(npc)
 
 	xr_companion.unsubscribe(npc:id())
+
+	local sobj = alife():object(npc:id())
+	if sobj then
+		sobj:brain():can_choose_alife_tasks( true )
+		sobj:brain():update()
+	end
 end
 
 function is_companion(actor, npc)
