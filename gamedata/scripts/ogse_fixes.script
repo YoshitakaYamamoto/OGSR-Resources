@@ -11,6 +11,7 @@ function on_spawn()
 	fix_dsh_rukzak_storage() --Убрать с НИ.
 
 	lc_question_add() --С НИ перенести на событие начала игры и всё, больше никогда не вызывать.
+	fix_gar_boars_territory2_logic() --тоже самое.
 end
 
 function fix_dsh_rukzak_storage( ver )
@@ -44,6 +45,20 @@ function del_all_trunks()
 	ogse.save_var("TRUNK_FIX", true)
 end
 
+
+function fix_gar_boars_territory2_logic() --Исправление кривой логики рестриктора на свалке. Ему вообще не нужна логика.
+	if ogse.var_exists("gar_boars_territory2_fix") then return end
+	local sobj = alife():object("gar_boars_territory2")
+	if sobj then
+		local packet = get_netpk(sobj, 1)
+		ASSERT( packet:isOk(), "can't read netpacket of %s", sobj:name() )
+		local my_table = packet:get()
+		my_table.custom_data:set("")
+		packet:set(my_table)
+		log3( "--[%s]: Fixed logic in restrictor [%s]!", script_name(), sobj:name() )
+	end
+	ogse.save_var("gar_boars_territory2_fix", true)
+end
 
 
 function lc_question_add() --Переход "Припять - ЧАЭС" задаёт вопрос о смене уровня. Взято из аддона Naxac'а
@@ -114,7 +129,7 @@ function del_buggy_objects() --Удаление из игры глючных о�
 		local sobj = alife():object( n )
 		if sobj then
 			log3( "~~[%s]: found [%s], removing...", script_name(), sobj:name() )
-			alife():release( sobj )
+			checker_minefield.release_restrictor(sobj.id) --безопасное удаление
 		end
 	end
 end
