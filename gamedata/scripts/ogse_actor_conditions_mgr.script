@@ -72,18 +72,7 @@ local function get_item_cond_effect( item )
   return ef
 end
 
-function on_update()
-  if not db.actor:alive() then return end
-
-  local act = db.actor
-  local previous_check_time = game.CTime()
-  previous_check_time:set( unpack( pt ) )
-  local current_time = game.get_game_time()
-  local dt = current_time:diffSec( previous_check_time )
-  if dt == 0 then return end
-  pt = { current_time:get() }
-
-  local ext = {
+local ext = {
     --[ "alcohol_restore_speed"    ] = 0,
     --[ "bleeding_restore_speed"   ] = 0,
     --[ "health_restore_speed"     ] = 0,
@@ -96,7 +85,21 @@ function on_update()
 	[ "walk_accel" ]		= 0,
 	[ "run_factor" ]		= 0,
 	[ "run_back_factor" ]	= 0,
-  }
+}
+function on_update()
+  if not db.actor:alive() then return end
+
+  local act = db.actor
+  local previous_check_time = game.CTime()
+  previous_check_time:set( unpack( pt ) )
+  local current_time = game.get_game_time()
+  local dt = current_time:diffSec( previous_check_time )
+  if dt == 0 then return end
+  pt = { current_time:get() }
+
+  for k, _ in pairs( ext ) do
+    ext[ k ] = 0
+  end
   ogse_signals.get_mgr():call( "on_before_actor_conditions_update", ext )
 
   -- учитываем здесь естественное оголодание, а также

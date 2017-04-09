@@ -1,8 +1,9 @@
-function write_log(npc, str)
+
+function write_log(npc, ...)
 	if _sdata.GlobalEnable == true then
 		local target_obj = level.get_target_obj()
 		if target_obj and target_obj:id() == npc:id() then
-			log1(str)
+			log3(...)
 		end
 	end
 end
@@ -154,7 +155,7 @@ end
 function act_state_mgr_animstate_2sit:initialize()
 	action_base.initialize(self)
 	if self.npc then
-	write_log(self.npc, "~~STMGR_ANIMST ["..self.npc:name().."] animstate_act_1")
+		write_log(self.npc, "~~STMGR_ANIMST [%s] animstate_act_1", self.npc:name())
 	end
 	self.st.animstate:set_state("sit")
 end
@@ -172,7 +173,7 @@ end
 function act_state_mgr_animstate_2sit_knee:initialize()
 	action_base.initialize(self)
 	if self.npc then
-	write_log(self.npc, "~~STMGR_ANIMST ["..self.npc:name().."] animstate_act_2")
+		write_log(self.npc, "~~STMGR_ANIMST [%s] animstate_act_2", self.npc:name())
 	end
 	self.st.animstate:set_state("sit_knee")
 end
@@ -190,7 +191,7 @@ end
 function act_state_mgr_animstate_2sit_ass:initialize()
 	action_base.initialize(self)
 	if self.npc then
-	write_log(self.npc, "~~STMGR_ANIMST ["..self.npc:name().."] animstate_act_3")
+		write_log(self.npc, "~~STMGR_ANIMST [%s] animstate_act_3", self.npc:name())
 	end
 	self.st.animstate:set_state("sit_ass")
 end
@@ -208,7 +209,7 @@ end
 function act_state_mgr_animstate_2idle:initialize()
 	action_base.initialize(self)
 	if self.npc then
-	write_log(self.npc, "~~STMGR_ANIMST ["..self.npc:name().."] animstate_act_4")
+		write_log(self.npc, "~~STMGR_ANIMST [%s] animstate_act_4", self.npc:name())
 	end
 	self.st.animstate:set_state("stand")
 end
@@ -226,7 +227,7 @@ end
 function act_state_mgr_animstate_2sleep:initialize()
 	action_base.initialize(self)
 	if self.npc then
-	write_log(self.npc, "~~STMGR_ANIMST ["..self.npc:name().."] animstate_act_5")
+		write_log(self.npc, "~~STMGR_ANIMST [%s] animstate_act_5", self.npc:name())
 	end
 	self.st.animstate:set_state("sleep")
 end
@@ -244,7 +245,7 @@ end
 function act_state_mgr_animstate_2wounded:initialize()
 	action_base.initialize(self)
 	if self.npc then
-	write_log(self.npc, "~~STMGR_ANIMST ["..self.npc:name().."] animstate_act_6")
+		write_log(self.npc, "~~STMGR_ANIMST [%s] animstate_act_6", self.npc:name())
 	end
 	self.st.animstate:set_state("wounded")
 end
@@ -262,7 +263,7 @@ end
 function act_state_mgr_animstate_2wounded_heavy:initialize()
 	action_base.initialize(self)
 	if self.npc then
-	write_log(self.npc, "~~STMGR_ANIMST ["..self.npc:name().."] animstate_act_7")
+		write_log(self.npc, "~~STMGR_ANIMST [%s] animstate_act_7", self.npc:name())
 	end
 	self.st.animstate:set_state("wounded_heavy")
 end
@@ -326,7 +327,7 @@ end
 --' ѕровер€ет закончили ли мы изменение положени€ тела
 function body_state:update()
 	if self.npc then
-	write_log(self.npc, "~~STMGR_ANIMST ["..self.npc:name().."] animstate_body_state:update_1")
+		write_log(self.npc, "~~STMGR_ANIMST [%s] animstate_body_state:update_1", self.npc:name())
 	end
 	if self.target_state ~= self.current_state then
 		if self.idle_anim[self.target_state] ~= nil then
@@ -340,7 +341,7 @@ function body_state:update()
 		end
 	end
 	if self.npc then
-	write_log(self.npc, "~~STMGR_ANIMST ["..self.npc:name().."] animstate_body_state:update_end")
+		write_log(self.npc, "~~STMGR_ANIMST [%s] animstate_body_state:update_end", self.npc:name())
 	end
 end
 --' ¬озвращает текущее состо€ние тела
@@ -351,7 +352,7 @@ end
 --' ”становка нового положени€ тела
 function body_state:set_state(id)
 	if self.npc then
-	write_log(self.npc, "~~STMGR_ANIMST ["..self.npc:name().."] animstate_body_state:set_state_1")
+		write_log(self.npc, "~~STMGR_ANIMST [%s] animstate_body_state:set_state_1", self.npc:name())
 	end
 	
 	self.npc:clear_animations()
@@ -385,14 +386,14 @@ function body_state:set_state(id)
 	self.current_state = "busy"
 	self.target_state = id
 	if self.npc then
-	write_log(self.npc, "~~STMGR_ANIMST ["..self.npc:name().."] animstate_body_state:set_state_end")
+		write_log(self.npc, "~~STMGR_ANIMST [%s] animstate_body_state:set_state_end", self.npc:name())
 	end
 end
 --' ¬осстанавливаем зацикленную айдловую анимацию
 function body_state:add_idle_animation()
 	if self.idle_anim[self.current_state] ~= nil then
 		if self.npc then
-			write_log(self.npc, "~~STMGR_ANIMST ["..self.npc:name().."] add_idle_animation")
+			write_log(self.npc, "~~STMGR_ANIMST [%s] add_idle_animation", self.npc:name())
 		end
 		self.npc:add_animation(self.idle_anim[self.current_state], true, false)
 	end

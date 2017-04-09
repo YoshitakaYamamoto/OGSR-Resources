@@ -144,9 +144,9 @@ function prints(fmt, ...)
 	end
 end
 
-function write_log(str)
+function write_log(...)
 	if debug_flag then
-		log1(str)
+		log3(...)
 	end
 end
 ----------------------------------------------------------------------------------------------------
@@ -277,7 +277,7 @@ function process_enemy(npc, enemy)
 	-- проверка выбора врагом напарника или ГГ
 	-- данная функция помещается в апдейты монстров и неписей
 	if enemy and enemy.clsid and (enemy:is_stalker() or enemy:is_monster()) and enemy:alive() and not xr_companion.is_companion(enemy:id()) then
-		write_log("!!!PROCESSING_"..enemy:name().." RESULT IS_STK ["..tostring(enemy:is_stalker()).."] IS_MNSTR ["..tostring(enemy:is_monster()).."] CHK ["..tostring(we_are_under_attack(enemy)).."]")
+		write_log("!!!PROCESSING_%s RESULT IS_STK [%s] IS_MNSTR [%s] CHK [%s]", enemy:name(), enemy:is_stalker(), enemy:is_monster(), we_are_under_attack(enemy))
 		if we_are_under_attack(enemy) then
 			-- человек ты иль монструшка
 			register_as_target(enemy)
@@ -310,13 +310,13 @@ function we_are_under_attack(enemy)
 					local enemy_status = check_is_enemy_of_me_or_actor(npc, enemy)
 					local enemy_target = xrs_battle_ai.primary_target[enemy:id()]
 					if (target:id() == actor_id or (enemy_target and enemy_target == actor_id)) and not must_stay(npc) then
-						write_log("!!**XR_COMBAT_COMP: ACTOR BEST ENEMY OF "..enemy:name().." ENEMY_STAT ["..tostring(enemy_status).."]")
+						write_log("!!**XR_COMBAT_COMP: ACTOR BEST ENEMY OF %s ENEMY_STAT [%s]", enemy:name(), enemy_status)
 						if enemy_status then
 							return true
 						end						
 					end
 					if target:id() == npc:id() or (enemy_target and enemy_target == npc:id()) then
-						write_log("!!**XR_COMBAT_COMP: COMPANION BEST ENEMY OF "..enemy:name().." ENEMY_STAT ["..tostring(enemy_status).."]")
+						write_log("!!**XR_COMBAT_COMP: COMPANION BEST ENEMY OF %s ENEMY_STAT [%s]", enemy:name(), enemy_status)
 						if enemy_status then
 							return true
 						end				
@@ -331,7 +331,7 @@ function we_are_under_attack(enemy)
 end
 
 function register_as_target(enemy)
-	write_log("!!XR_COMBAT_COMP: REG_TARGET "..enemy:name())
+	write_log("!!XR_COMBAT_COMP: REG_TARGET %s", enemy:name())
 	chk_comp = {}
 	local id = enemy:id()
 	if not targets_list[id] then
@@ -341,7 +341,7 @@ function register_as_target(enemy)
 				chk_comp[ids] = true
 			end
 		end
-		write_log("!!XR_COMBAT_COMP: REG_TARGET "..enemy:name())
+		write_log("!!XR_COMBAT_COMP: REG_TARGET %s", enemy:name())
 		if chk_comp ~= {} then
 			for companion_id, v in pairs(chk_comp) do
 				if companion_id == id or enemy:is_actor() then
@@ -472,7 +472,7 @@ function reprioritize_targets(companion)
 		last_reprioritize = time_global()
 		xr_companion.being_attacked = true
 		if debug_flag then
-			write_log("--XR_COMBAT_COMP: Выбрана цель: "..tostring(primary_target))
+			write_log("--XR_COMBAT_COMP: Выбрана цель: %s", primary_target)
 		end
 		return
 	else
@@ -499,7 +499,7 @@ function refresh_targets(companion)
 		if not targets_list[enemy_by_engine:id()] and (check_is_enemy_of_me_or_actor(companion, enemy_by_engine) or 
 		(xrs_battle_ai and (xrs_battle_ai.primary_target[enemy_by_engine:id()] and (xrs_battle_ai.primary_target[enemy_by_engine:id()] == companion_id or xrs_battle_ai.primary_target[enemy_by_engine:id()] == actor_id))))
 		then
-			write_log("!!**XR_COMBAT_COMP: WE'RE ENGINE ENEMY OF "..enemy_by_engine:name())
+			write_log("!!**XR_COMBAT_COMP: WE'RE ENGINE ENEMY OF %s", enemy_by_engine:name())
 			register_as_target(enemy_by_engine)
 		end
 	end
@@ -580,10 +580,10 @@ function get_max_weapon_range(companion)
 			if sys_ini:section_exist(sect) and sys_ini:line_exist(sect, "max_radius") then
 				return sys_ini:r_float(sect, "max_radius")
 			elseif not sys_ini:section_exist(sect) then	
-				write_log("!!XR_COMBAT_COMP: WEAPON SECTION NOT EXIST ["..tostring(sect).."]")
+				write_log("!!XR_COMBAT_COMP: WEAPON SECTION NOT EXIST [%s]", sect)
 				return 36.0
 			elseif not sys_ini:line_exist(sect, "max_radius") then	
-				write_log("!!XR_COMBAT_COMP: WEAPON RADIUS NOT EXIST ["..tostring(sect).."]")
+				write_log("!!XR_COMBAT_COMP: WEAPON RADIUS NOT EXIST [%s]", sect)
 				return 36.0
 			end
 		else
@@ -697,7 +697,7 @@ function set_weapons_fire(npc, enemy, weapon)
 		if use_raytrace then
 
 			if debug_flag then
-				write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE: "..tostring(enemy:id()))
+				write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE: %s", enemy:id())
 			end
 		
 			local be_pos = enemy:position()
@@ -722,45 +722,45 @@ function set_weapons_fire(npc, enemy, weapon)
 			local res = ray_pick.check()
 			
 			if debug_flag then
-				write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_PREPARED: "..tostring(enemy:id()))
+				write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_PREPARED: %s", enemy:id())
 			end			
 			
 			if res then
 			
 				if debug_flag then
-					write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_PHASE_1: "..tostring(enemy:id()))
+					write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_PHASE_1: %s", enemy:id())
 				end			
 			
 				local dist = ray_pick.get_dist()
 				local obj = ray_pick.get_obj()
 				
 				if debug_flag then
-					write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_PHASE_2: "..tostring(enemy:id()))
+					write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_PHASE_2: %s", enemy:id())
 				end					
 				
 				if obj and obj:id() == enemy:id() then
 					type_of_fire = object.fire1
 					if debug_flag then
-						write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_SUCCESS: "..tostring(enemy:id()))
+						write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_SUCCESS: %s", enemy:id())
 					end
 				else
 					if obj then
 						if check_is_enemy_of_me_or_actor(npc, obj) and not obj:is_actor() then
 							type_of_fire = object.fire1
 							if debug_flag then
-								write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_FAIL_BUT_VALID_TARGET: "..tostring(obj:id()))
+								write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_FAIL_BUT_VALID_TARGET: %s", obj:id())
 							end
 						else
 							type_of_fire = object.aim1
 							if debug_flag then
-								write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_FAIL_ACTOR_OR_FRIENDLY: "..tostring(obj:id()))
+								write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_FAIL_ACTOR_OR_FRIENDLY: %s", obj:id())
 							end
 						end
 					else
 						if npc:see(enemy) then
 							type_of_fire = object.fire1
 							if debug_flag then
-								write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_FAIL_TRY_TO_SEE: "..tostring(enemy:id()))
+								write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_FAIL_TRY_TO_SEE: %s", enemy:id())
 							end
 						end
 					end
@@ -770,13 +770,13 @@ function set_weapons_fire(npc, enemy, weapon)
 				-- если рейтрейс не вернул результат
 				type_of_fire = object.fire1
 				if debug_flag then
-					write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_ERROR: "..tostring(enemy:id()))
+					write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_ERROR: %s", enemy:id())
 				end				
 			end			
 	
 		else
 			if debug_flag then
-				write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_OFF: "..tostring(enemy:id()))
+				write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_OFF: %s", enemy:id())
 			end		
 			type_of_fire = object.fire1
 		end
@@ -1063,7 +1063,7 @@ function find_cover(npc, enemy, mode)
 			end
 			local move_time = dist_to_cover / move_speed
 			if debug_flag then
-				write_log("--!!XR_COMBAT_COMP: УКРЫТИЕ "..tostring(cover_vertex).." ДИСТАНЦИЯ: "..tostring(dist_to_cover).." ВРЕМЯ НА ПУТЬ: "..tostring(move_time))
+				write_log("--!!XR_COMBAT_COMP: УКРЫТИЕ %s ДИСТАНЦИЯ: %s ВРЕМЯ НА ПУТЬ: %s", cover_vertex, dist_to_cover, move_time)
 			end
 			if locked_actor_vertex and cover_vertex == locked_actor_vertex then
 				if debug_flag then
@@ -1335,7 +1335,7 @@ function action_combat_activity:execute()
 	end
 	if not enemy and deadman == false then
 		if debug_flag then
-			write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_NO_TARGET: "..tostring(primary_target))
+			write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_NO_TARGET: %s", primary_target)
 		end
 		last_time_send = nil
 		last_enemy = nil
@@ -1686,7 +1686,7 @@ function enable_scheme(npc, ini)
 		if tostring(flag) == "1" then
 			st.enabled = true
 			current_companion = npc:id()
-			write_log("--XR_COMBAT_COMP: Схема боёвки напарника включена для "..npc:name())
+			write_log("--XR_COMBAT_COMP: Схема боёвки напарника включена для %s", npc:name())
 		else
 			st.enabled = false
 		end

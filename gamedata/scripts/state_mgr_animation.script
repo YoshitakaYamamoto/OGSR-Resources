@@ -1,11 +1,3 @@
-function write_log(npc, str)
-	if _sdata.GlobalEnable == true then
-		local target_obj = level.get_target_obj()
-		if target_obj and target_obj:id() == npc:id() then
-			log1(str)
-		end
-	end
-end
 
 function write_log_3(npc, fmt, ...)
 	if _sdata.GlobalEnable == true then
@@ -116,7 +108,7 @@ function eva_state_mgr_animation_locked:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_animation_locked:evaluate()
-	write_log_3(self.object, "~~STMGR: animstate %s", utils.to_str(self.st.animation:state()))
+	write_log_3(self.object, "~~STMGR: animstate %s", tostring(self.st.animation:state()))
 	if (self.st.animation:state() == "_wait" or self.st.animation:state() == "_new") and state_lib.states[self.st.target_state].animation ~= nil then
 		ogse_debug.add_active_anim( self.object, "anim_locked" )
 		return true
@@ -134,7 +126,7 @@ function act_state_mgr_animation_start:initialize()
 	action_base.initialize(self)
 	ogse_debug.add_active_anim( self.object, "start["..tostring(state_lib.states[self.st.target_state].animation).."]" )
 	if state_lib.states[self.st.target_state].animation == nil then
-		write_log_3(self.object, "~~STMGR: WARNING NIL START %s", utils.to_str(self.st.target_state))
+		write_log_3(self.object, "~~STMGR: WARNING NIL START %s", tostring(self.st.target_state))
 	end
 	self.st.animation:set_state(state_lib.states[self.st.target_state].animation)
 end
@@ -153,7 +145,7 @@ function act_state_mgr_animation_reset:initialize()
 	action_base.initialize(self)
 	ogse_debug.add_active_anim( self.object, "reset["..tostring(state_lib.states[self.st.target_state].animation).."]" )
 	if state_lib.states[self.st.target_state].animation == nil then
-		write_log_3(self.object, "~~STMGR: WARNING NIL RESET %s", utils.to_str(self.st.target_state))
+		write_log_3(self.object, "~~STMGR: WARNING NIL RESET %s", tostring(self.st.target_state))
 	end	
 	self.st.animation:set_state(state_lib.states[self.st.target_state].animation, true)
 	self.st.reset_state = false
@@ -218,19 +210,19 @@ end
 --' установка нового состояния
 function animation:set_state(id, reset)
 	write_log_3(self.npc, "~~STMGR: [%s] set new animation [%s], current_state [%s]", self.npc:name(), tostring(id), tostring(self.states.target_state))
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_1")	
+	write_log_3(self.npc, "~~STMGR[%s] animation_set_state_1", self.npc:name())	
 	local nn = 0
 	local wpn_slot = self:weapon_slot()
 	--' выход из старого состояния
 	self.npc:clear_animations()
 	self:clear_anim_callback()
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2")	
+	write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2", self.npc:name())
 	local anim_list = state_mgr_animation_list.animations
 	if anim_list[self.states.target_state] ~= nil then
 		if self.mgr.emerg.animation_nout == true or
 		   self.mgr.emerg.animation == true
 		then
-				write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2A")	
+				write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2A", self.npc:name())	
 			--' обнулить озвучку (только если он задан в анимации)
 			if self.npc:active_sound_count() > 0 then
 				if self.mgr.subanim > 0 then
@@ -243,7 +235,7 @@ function animation:set_state(id, reset)
 					end
 				end
 			end
-			write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2B")
+			write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2B", self.npc:name())
 			--' (2) экстренный выход, необходимо дропнуть приатаченные предметы
 			if anim_list[self.states.target_state].out ~= nil then
 				local anima = self:anim_for_slot(wpn_slot, anim_list[self.states.target_state].out)
@@ -263,9 +255,9 @@ function animation:set_state(id, reset)
 					end
 				end	
 			end
-			write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2C")
+			write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2C", self.npc:name())
 		else
-			write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2D")
+			write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2D", self.npc:name())
 			--' выход из поданимаций	
 			if self.mgr.subanim > 0 then
 				for key = self.mgr.subanim, 0 do
@@ -273,9 +265,9 @@ function animation:set_state(id, reset)
 					if a then 
 						if a.out then
 							local anima = self:anim_for_slot(wpn_slot,a.out)
-							write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_out_2DA ["..tostring(anima).."] slot ["..tostring(wpn_slot).."]")
+							write_log_3(self.npc, "~~STMGR[%s] animation_out_2DA [%s] slot [%s]", self.npc:name(), anima, wpn_slot)
 							if anima then
-								write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2DE")
+								write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2DE", self.npc:name())
 								add_anim(self.npc, anima, true)							
 							end
 						end
@@ -285,34 +277,34 @@ function animation:set_state(id, reset)
 					end
 				end
 			end			
-			write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2E")
+			write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2E", self.npc:name())
 			local a = anim_list[self.states.target_state]
 			if a.out ~= nil then
 				local anima = self:anim_for_slot(wpn_slot, a.out)
-				write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_out_2EA slot ["..tostring(wpn_slot).."]")
+				write_log_3(self.npc, "~~STMGR[%s] animation_out_2EA slot [%s]", self.npc:name(), wpn_slot)
 				if anima then
 					if type(anima) == "table" then
 						for k,v in pairs(anima) do
 							if type(v) == "table" then
-								write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2EA1")
+								write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2EA1", self.npc:name())
 								self:set_anim_callback(v)
 							else
-								write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2EA2")
+								write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2EA2", self.npc:name())
 								add_anim(self.npc, v, true)
 							end
 						end
 					else
-						write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2EA3")
+						write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2EA3", self.npc:name())
 						add_anim(self.npc, anima, true)
 					end
 					nn = nn +1
 				end			
 			end
-			write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_2F")
+			write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2F", self.npc:name())
 		end
 	end
 
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_3")
+	write_log_3(self.npc, "~~STMGR[%s] animation_set_state_3", self.npc:name())
 	--' Экстренные деаттач деаттачиваемых предметов, если новая анимация назначилась в момент деаттача.
 	if self.states.current_state == "_new" then
 		write_log_3(self.npc, "~~STMGR: [%s]", self.npc:name())
@@ -321,7 +313,7 @@ function animation:set_state(id, reset)
 			local t = self.npc:object(k)
 			if t then
 				if v.mode == "attach" then
-					write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_3DETACH")
+					write_log_3(self.npc, "~~STMGR[%s] animation_set_state_3DETACH", self.npc:name())
 					t:enable_attachable_item(false)
 				end
 			end
@@ -330,15 +322,15 @@ function animation:set_state(id, reset)
 		end
 	end
 	
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_4")
+	write_log_3(self.npc, "~~STMGR[%s] animation_set_state_4", self.npc:name())
 
 	--' вход в новое состояние
 	local a = anim_list[id]	
 	
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5")
+	write_log_3(self.npc, "~~STMGR[%s] animation_set_state_5", self.npc:name())
 	
 	if a ~= nil then
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5A")
+		write_log_3(self.npc, "~~STMGR[%s] animation_set_state_5A", self.npc:name())
 		if a.into ~= nil then
 			local anima = self:anim_for_slot(wpn_slot,a.into)
 			if type(anima) == "table" then
@@ -346,7 +338,7 @@ function animation:set_state(id, reset)
 					if type(v) == "table" then
 						self:set_anim_callback(v)
 					else
-						write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5A ["..tostring(v).."]")
+						write_log_3(self.npc, "~~STMGR[%s] animation_set_state_5A [%s]", self.npc:name(), v)
 						add_anim(self.npc, v, true)
 					end
 				end
@@ -356,19 +348,19 @@ function animation:set_state(id, reset)
 				nn = nn +1
 			end
 		end
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5B")
+		write_log_3(self.npc, "~~STMGR[%s] animation_set_state_5B", self.npc:name())
 		if reset == true then
 			if self.mgr.callback ~= nil then
 				self.mgr.callback.begin = nil
 			end
 			self:play_rnd(id, 100)			
 		end
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5C")
+		write_log_3(self.npc, "~~STMGR[%s] animation_set_state_5C", self.npc:name())
 		local a = anim_list[id]
 		if a.idle ~= nil then
 			local anima = self:anim_for_slot(wpn_slot,a.idle)
 			if anima then
-				write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5C ["..tostring(anima).."]")
+				write_log_3(self.npc, "~~STMGR[%s] animation_set_state_5C [%s]", self.npc:name(), anima)
 				add_anim(self.npc, anima, true)
 			end
 			nn = nn + 1
@@ -376,15 +368,15 @@ function animation:set_state(id, reset)
 			-- Для политкорректности просим анимстейт отыграть свою айдловую анимацию
 			self.mgr.animstate:add_idle_animation()
 		end
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5CA")
+		write_log_3(self.npc, "~~STMGR[%s] animation_set_state_5CA", self.npc:name())
 	else
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5D")
+		write_log_3(self.npc, "~~STMGR[%s] animation_set_state_5D", self.npc:name())
 		-- Для политкорректности просим анимстейт отыграть свою айдловую анимацию
 		self.mgr.animstate:add_idle_animation()
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_5E")
+		write_log_3(self.npc, "~~STMGR[%s] animation_set_state_5E", self.npc:name())
 	end
 
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_6")
+	write_log_3(self.npc, "~~STMGR[%s] animation_set_state_6", self.npc:name())
 	
 	self.states.current_state = "_new"
 	self.states.target_state = id
@@ -392,24 +384,24 @@ function animation:set_state(id, reset)
 	self.states.anim_level = 0
 	self.mgr.emerg.animation = nil
 	
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_set_state_7")
+	write_log_3(self.npc, "~~STMGR[%s] animation_set_state_7", self.npc:name())
 end
 --' апдейт
 function animation:update()
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_1")
+	write_log_3(self.npc, "~~STMGR[%s] animation_update_1", self.npc:name())
 	write_log_3(self.npc, "~~STMGR: 		time %s", time_global())				
-	write_log_3(self.npc, "~~STMGR: 		current state %s", utils.to_str(self.states.current_state))
-	write_log_3(self.npc, "~~STMGR: 		target state %s", utils.to_str(self.states.target_state))
+	write_log_3(self.npc, "~~STMGR: 		current state %s", tostring(self.states.current_state))
+	write_log_3(self.npc, "~~STMGR: 		target state %s", tostring(self.states.target_state))
 	write_log_3(self.npc, "~~STMGR: 		anims %s", self.npc:animation_count())
 	self.is_called = false
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_2")
+	write_log_3(self.npc, "~~STMGR[%s] animation_update_2", self.npc:name())
 	-- !!! проверка что закончился играться наш звук
 	if self.sound_played then
 		if self.npc:active_sound_count() == 0 then
 			self.sound_played = false
 		end
 	end	
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_3")
+	write_log_3(self.npc, "~~STMGR[%s] animation_update_3", self.npc:name())
 	-- АТТАЧ ДЕТАЧ ОБЪЕКТОВ
 	for k,v in pairs(self.states.attach_items) do
 		write_log_3(self.npc, "~~STMGR: Trying to attach [%s]", tostring(k))
@@ -429,13 +421,13 @@ function animation:update()
 			v.done = true
 		end
 	end
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_4")
+	write_log_3(self.npc, "~~STMGR[%s] animation_update_4", self.npc:name())
 	if self.states.current_state == nil then
 		self:callback_process()
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_EXIT")
+		write_log_3(self.npc, "~~STMGR[%s] animation_update_EXIT", self.npc:name())
 		return
 	end
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_5")
+	write_log_3(self.npc, "~~STMGR[%s] animation_update_5", self.npc:name())
 	-- обрубить анимации и экстренно начать сразу
 	if self.mgr.emerg ~= nil and  
 	   self.mgr.emerg.animation == true then
@@ -446,10 +438,10 @@ function animation:update()
 		---state_mgr.log1("state_manager_antmation 0 - nil strage set state called: "..self.npc:name())
 		self.states.current_state = nil
 		self.mgr.emerg.animation = nil
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_EXIT_2")
+		write_log_3(self.npc, "~~STMGR[%s] animation_update_EXIT_2", self.npc:name())
 		return
 	end
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_6")
+	write_log_3(self.npc, "~~STMGR[%s] animation_update_6", self.npc:name())
 	-- проверка закончился ли переход в состояние
 	local animations = state_mgr_animation_list.animations
 	if self.states.current_state == "_new" then
@@ -464,11 +456,11 @@ function animation:update()
 			self.states.current_state = self.states.target_state
 			self:callback_init()
 		end
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_EXIT_3")
+		write_log_3(self.npc, "~~STMGR[%s] animation_update_EXIT_3", self.npc:name())
 		return
 	end
 	
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_7")
+	write_log_3(self.npc, "~~STMGR[%s] animation_update_7", self.npc:name())
 	
 	--' ожидаем окончания перехода.
 	if self.states.current_state == "_wait" then		
@@ -491,25 +483,25 @@ function animation:update()
 			self:callback_init(true)
 		end
 		self:callback_process()
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_EXIT_4")
+		write_log_3(self.npc, "~~STMGR[%s] animation_update_EXIT_4", self.npc:name())
 		return
 	end
 	
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_8")
+	write_log_3(self.npc, "~~STMGR[%s] animation_update_8", self.npc:name())
 	
 	-- Отыгрыш рандомных анимашек, если они есть
 	if 	self.states.current_state == self.states.target_state then
 		-- Инициализация колбека
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_8_1")
+		write_log_3(self.npc, "~~STMGR[%s] animation_update_8_1", self.npc:name())
 		if self.mgr.callback and self.mgr.callback.func and self.mgr.callback.timeout and
 		   self.mgr.callback.begin == nil
 		then
 			self:callback_init(true)
 		end
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_8_2")
+		write_log_3(self.npc, "~~STMGR[%s] animation_update_8_2", self.npc:name())
 		--' проверка на экстренный ресет схемы	
 		if self:callback_process() == true then
-			write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_8_EXIT")
+			write_log_3(self.npc, "~~STMGR[%s] animation_update_8_EXIT", self.npc:name())
 			return
 		end
 		local wpn_slot = self:weapon_slot()
@@ -519,7 +511,7 @@ function animation:update()
 			self.states.anim_level = 0
 			self.mgr.subanim = 0
 		end
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_8_3")
+		write_log_3(self.npc, "~~STMGR[%s] animation_update_8_3", self.npc:name())
 		-- если нужный уровень рекурсии достигнут - играть рандомные и зацикленные айдлы из него.
 		-- если нет - отыграть весь набор входных анимаций до него.
 		if self.states.anim_level < self.mgr.subanim then
@@ -545,10 +537,10 @@ function animation:update()
 				add_anim(self.npc, anima, true)
 			end		
 			self.states.current_state = "_wait"
-			write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_8_3_EXIT")
+			write_log_3(self.npc, "~~STMGR[%s] animation_update_8_3_EXIT", self.npc:name())
 			return
 		end
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_8_4")
+		write_log_3(self.npc, "~~STMGR[%s] animation_update_8_4", self.npc:name())
 		-- если текущий уровень рекурсии выше, чем необходимый - отыграть набор выходных анимаций из него.
 		if self.states.anim_level > self.mgr.subanim then
 			self.npc:clear_animations()
@@ -574,11 +566,11 @@ function animation:update()
 				add_anim(self.npc, anima, true)
 			end		
 			self.states.current_state = "_wait"
-			write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_8_4_EXIT")
+			write_log_3(self.npc, "~~STMGR[%s] animation_update_8_4_EXIT", self.npc:name())
 			return
 		end
 		--' Определяем нужно ли добавлять анимацию или ждать
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_8_5")
+		write_log_3(self.npc, "~~STMGR[%s] animation_update_8_5", self.npc:name())
 		if	animations[self.states.current_state] ~= nil then
 			local state			
 			if self.states.anim_level == 0 then
@@ -594,26 +586,26 @@ function animation:update()
 				end
 			end
 		end	
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_8_6")
+		write_log_3(self.npc, "~~STMGR[%s] animation_update_8_6", self.npc:name())
 	
 	end
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_update_9")
+	write_log_3(self.npc, "~~STMGR[%s] animation_update_9", self.npc:name())
 end
 -- Отыгрыш рандомной анимации
 function animation:play_rnd(state, must_play)
-	write_log_3(self.npc, "~~STMGR: try to add rnd animation [%s] for [%s]", utils.to_str(state), utils.to_str(rnd))
+	write_log_3(self.npc, "~~STMGR: try to add rnd animation [%s] for [%s]", tostring(state), tostring(rnd))
 	-- нельзя добавлять рандом во время лока схемы.
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_play_rnd_1")
+	write_log_3(self.npc, "~~STMGR[%s] animation_play_rnd_1", self.npc:name())
 	-- Попробуем апдейтнуть оружие (чтобы вовремя началась стрельба)
 	self.mgr.planner:action(self.mgr.operators["end"]):weapon_update()
 	if not (self.mgr.planner:evaluator(self.mgr.properties["animation"]):evaluate() and
 	        self.mgr.planner:evaluator(self.mgr.properties["weapon"]):evaluate())
 	then
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_play_rnd_EXIT")
+		write_log_3(self.npc, "~~STMGR[%s] animation_play_rnd_EXIT", self.npc:name())
 		return
 	end
 	
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_play_rnd_2")
+	write_log_3(self.npc, "~~STMGR[%s] animation_play_rnd_2", self.npc:name())
 	-- !!! проверка что закончился играться наш звук
 	if self.sound_played then
 		if self.npc:active_sound_count() == 0 then
@@ -622,7 +614,7 @@ function animation:play_rnd(state, must_play)
 		return
 	end
 	
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_play_rnd_3")
+	write_log_3(self.npc, "~~STMGR[%s] animation_play_rnd_3", self.npc:name())
 	--' Определение промежутков времени между анимациями	
 	self.states.begin = time_global()
 	
@@ -631,12 +623,12 @@ function animation:play_rnd(state, must_play)
     else
     	self.states.idle = (math.random(state.prop.maxidle) + state.prop.sumidle) * 1000
     end
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_play_rnd_3A")
+	write_log_3(self.npc, "~~STMGR[%s] animation_play_rnd_3A", self.npc:name())
 	if math.random(100) < state.prop.rnd or must_play then	
 		local wpn_slot = self:weapon_slot()
 		local anima = self:anim_for_slot(wpn_slot,state.rnd)
 		if anima == nil then
-			write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_play_rnd_4")
+			write_log_3(self.npc, "~~STMGR[%s] animation_play_rnd_4", self.npc:name())
 			return
 		end
 		
@@ -655,7 +647,7 @@ function animation:play_rnd(state, must_play)
 		else
 			r = 1
 		end	
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_play_rnd_5")
+		write_log_3(self.npc, "~~STMGR[%s] animation_play_rnd_5", self.npc:name())
 		self.npc:clear_animations()
 		if anima[r] ~= nil then
 			add_anim(self.npc, anima[r], true)
@@ -676,13 +668,13 @@ function animation:play_rnd(state, must_play)
 		end				
 		self.states.current_state = "_wait"				
 	end
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_play_rnd_4")
+	write_log_3(self.npc, "~~STMGR[%s] animation_play_rnd_4", self.npc:name())
 end
 -- Инициализация коллбека
 function animation:callback_init(recall)
 		write_log_3(self.npc, "~~STMGR: callback init anim[%s]", tostring(self.states.current_state))
 		write_log_3(self.npc, "~~STMGR: state_lib.states[self.mgr.target_state].animation == self.states.current_state [%s]", tostring(state_lib.states[self.mgr.target_state].animation == self.states.current_state))
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_callback_init_1")
+		write_log_3(self.npc, "~~STMGR[%s] animation_callback_init_1", self.npc:name())
 		if self.mgr.callback ~= nil and
 		   self.mgr.callback.func ~= nil and
 		   (state_lib.states[self.mgr.target_state].animation == self.states.current_state or
@@ -693,29 +685,29 @@ function animation:callback_init(recall)
 			write_log_3(self.npc, "~~STMGR: 		Callback initialized %s", time_global())
 		else
 			if not self.mgr.callback then
-				write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_callback_not_init_1 [nil]")
+				write_log_3(self.npc, "~~STMGR[%s] animation_callback_not_init_1 [nil]", self.npc:name())
 			else
 				if not self.mgr.callback.func then
-					write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_callback_not_init_2 [nil]")
+					write_log_3(self.npc, "~~STMGR[%s] animation_callback_not_init_2 [nil]", self.npc:name())
 				end
 			end
-			write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_callback_not_init_3 ["..tostring(recall).."]")
+			write_log_3(self.npc, "~~STMGR[%s] animation_callback_not_init_3 [%s]", self.npc:name(), tostring(recall))
 			if self.mgr.callback and self.mgr.callback.begin then
-				write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_callback_not_init_4 ["..tostring(self.mgr.callback.begin).."]")
+				write_log_3(self.npc, "~~STMGR[%s] animation_callback_not_init_4 [%s]", self.npc:name(), self.mgr.callback.begin)
 			end
 		end
 end
 --' обработка колбека на время
 function animation:callback_process()
 		local ret = false
-		write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_callback_process_1")
+		write_log_3(self.npc, "~~STMGR[%s] animation_callback_process_1", self.npc:name())
 		
 		if self.mgr.callback ~= nil and
 		   self.mgr.callback.func ~= nil and
 		   self.mgr.callback.begin ~= nil
 		then
 			write_log_3(self.npc, "~~STMGR: callback process")
-			write_log_3(self.npc, "~~STMGR: 	%s - %s ? %s", time_global(), utils.to_str(self.mgr.callback.begin), utils.to_str(self.mgr.callback.timeout))
+			write_log_3(self.npc, "~~STMGR: 	%s - %s ? %s", time_global(), tostring(self.mgr.callback.begin), tostring(self.mgr.callback.timeout))
 			if time_global() - self.mgr.callback.begin >= self.mgr.callback.timeout then
 				write_log_3(self.npc, "~~STMGR: 		Callback called %s", time_global())
 				
@@ -757,7 +749,7 @@ function animation:set_anim_callback(value)
 end
 --' коллбек на особые действия
 function animation:anim_callback()
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_anim_callback_1")
+	write_log_3(self.npc, "~~STMGR[%s] animation_anim_callback_1", self.npc:name())
 	write_log_3(self.npc, "~~STMGR: anim callback [%s]", self.npc:animation_count())
 	--print_table(self.clb_settings)
 	-- Проходим по таблице, из 1 позиции вычитываем действий. Остальные просто сдвигаем
@@ -775,14 +767,14 @@ function animation:anim_callback()
 	if v.a ~= nil and
 		self.states.attach_items[v.a] ~= nil 
 	then
-		write_log_3(self.npc, "~~STMGR: item [%s] attach", utils.to_str(v.a))
+		write_log_3(self.npc, "~~STMGR: item [%s] attach", tostring(v.a))
 		self.states.attach_items[v.a].mode = "attach"
 		self.states.attach_items[v.a].done = false
 	end
 	if v.d ~= nil and
 		self.states.attach_items[v.d] ~= nil 
 	then
-		write_log_3(self.npc, "~~STMGR: item [%s] detach", utils.to_str(v.d))	
+		write_log_3(self.npc, "~~STMGR: item [%s] detach", tostring(v.d))	
 		self.states.attach_items[v.d].mode = "detach"
 		self.states.attach_items[v.d].done = false
 	end
@@ -817,13 +809,13 @@ function animation:target_state()
 end
 --' оружейный слот
 function animation:weapon_slot()
-	write_log(self.npc, "~~STMGR["..self.npc:name().."] animation_weapon_slot_1")
+	write_log_3(self.npc, "~~STMGR[%s] animation_weapon_slot_1", self.npc:name())
 	local weapon = self.npc:active_item()
 	if weapon == nil or self.npc:weapon_strapped() == true then
 		return 0
 	end
 	
-	write_log_3(self.npc, "~~STMGR: SLOT [%s]", utils.to_str(weapon:animation_slot()))
+	write_log_3(self.npc, "~~STMGR: SLOT [%s]", tostring(weapon:animation_slot()))
 		
 	return weapon:animation_slot()
 end
@@ -858,7 +850,7 @@ end
 
 
 function add_anim(npc, anim, bb)
-	write_log(npc, "~~STMGR["..npc:name().."] add_anim")
+	write_log_3(npc, "~~STMGR[%s] add_anim", npc:name())
 	write_log_3(npc, "~~STMGR: ANIMATION [%s] added [%s]", npc:name(), anim)
 	npc:add_animation(anim, bb, false)
 end

@@ -16,14 +16,6 @@ function on_death( obj )
 end
 
 
-local total_debug = false
-
-function write_log(str)
-	if total_debug then
-		log1(str)
-	end
-end
-
 remove_this_shit_immediately = { --Таблица с секциями предметов, которые надо удалять из трупов. Вызывается так же из db.
 	["fake_grenades_base"] = true,
 	["grenade_f1_fake"] = true,
