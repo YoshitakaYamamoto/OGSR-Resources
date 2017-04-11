@@ -124,10 +124,12 @@ function add_deadcity_zombies(number)
 	end
 end
 
-function on_first_update()
-	if level.name() ~= "l09_deadcity_ogse" or db.actor:has_info("master_quest_soup_ready") then return end
+local subscribed = nil
 
-	for id = 1, 65534 do
+function on_first_update()
+	if level.name() ~= "l09_deadcity_ogse" or has_alife_info("master_quest_soup_ready") then return end
+
+	for id = 1, 65534 do --Да, тормозной вариант, но хз, как сделать без этого. db.creature же учитывает только онлайновых НПС, а нам нужны все на локации, в т.ч. в которые в оффлайне.
 		local npc = alife():object(id)
 		if npc then
 			local sect = npc:section_name()
@@ -144,30 +146,35 @@ function on_first_update()
 	end
 
 	--log3("~~DCity zombies count on FIRST update: %s: %s", #deadcity_zombies, deadcity_zombies)
-	check_spawn_zomb()
+	if not subscribed then
+		subscribed = { signal = "on_update", fun = this.update }
+		ogse_signals.get_mgr():subscribe(subscribed)
+	end
 end
 
 function update()
-	if db.actor:has_info("master_quest_soup_ready") then return end
-
-	for i = #deadcity_zombies, 1, -1 do --Цикл в обратном порядке, чтобы адекватно работал table.remove
-		local id = deadcity_zombies[i]
-		local npc
-		if id then npc = alife():object(id) end
-		if not npc or not npc:alive() then
-			table.remove(deadcity_zombies, i)
+	if has_alife_info("master_quest_soup_ready") and subscribed then
+		ogse_signals.get_mgr():unsubscribe(subscribed)
+		subscribed = nil
+		return
+	end
+	--
+	if not utils.is_day() then
+		for i = #deadcity_zombies, 1, -1 do --Цикл в обратном порядке, чтобы адекватно работал table.remove
+			local id = deadcity_zombies[i]
+			local npc
+			if id then npc = alife():object(id) end
+			if not npc or not npc:alive() then
+				table.remove(deadcity_zombies, i)
+			end
+		end
+		--
+		--log3("~~DCity zombies count on update: %s: %s", #deadcity_zombies, deadcity_zombies)
+		if #deadcity_zombies < base_deadcity_zombies then
+			local num = base_deadcity_zombies - #deadcity_zombies
+			add_deadcity_zombies(num)
 		end
 	end
-
-	--log3("~~DCity zombies count on update: %s: %s", #deadcity_zombies, deadcity_zombies)
-	check_spawn_zomb()
-end
-
-function check_spawn_zomb()
-	if #deadcity_zombies < base_deadcity_zombies and not utils.is_day() then
-		local num = base_deadcity_zombies - #deadcity_zombies
-		add_deadcity_zombies(num)
-	end
-
-	dsh.timeout(math.random(60000, 80000), update)
+	--
+	ogse_signals.get_mgr():reschedule(math.random(60000, 80000))
 end
