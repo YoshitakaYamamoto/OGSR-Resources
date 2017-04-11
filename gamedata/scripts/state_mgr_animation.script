@@ -178,7 +178,6 @@ class "animation"
 function animation:__init(npc, mgr)
 	self.mgr = mgr
 	self.npc = npc
-	
 	self.states = {
 		last_id = nil,
 		current_state = nil,
@@ -186,26 +185,8 @@ function animation:__init(npc, mgr)
 		begin = nil,
 		idle = nil,
 		anim_level = 0,
-		attach_items = {
-			hand_radio	= {mode = "detach", done = true},
-			bread_a		= {mode = "detach", done = true},
-			vodka_a		= {mode = "detach", done = true},
-			energy_drink= {mode = "detach", done = true},
-			kolbasa_a	= {mode = "detach", done = true},
-			guitar_a	= {mode = "detach", done = true},
-			harmonica_a	= {mode = "detach", done = true},
-			wpn_binoc	= {mode = "detach", done = true},
-			device_pda	= {mode = "detach", done = true},
-			psy_helmet_a= {mode = "detach", done = true},
---			wpn_sigaret	= {mode = "detach", done = true},
---			sigareta	= {mode = "detach", done = true},
-			sigaret		= {mode = "detach", done = true},
-			kruglov_flash = {mode = "detach", done = true}
-		}
 	}
-	
 	self.clb_settings = {}
-	self.clb_cnt = 0
 end
 --' установка нового состояния
 function animation:set_state(id, reset)
@@ -237,23 +218,12 @@ function animation:set_state(id, reset)
 			end
 			write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2B", self.npc:name())
 			--' (2) экстренный выход, необходимо дропнуть приатаченные предметы
-			if anim_list[self.states.target_state].out ~= nil then
-				local anima = self:anim_for_slot(wpn_slot, anim_list[self.states.target_state].out)
-				if anima then
-					if type(anima) == "table" then
-						for k,v in pairs(anima) do
-							if type(v) == "table" and v.d ~= nil then
-								local obj = self.npc:object(v.d)
-								if obj then
-									write_log_3(self.npc, "~~STMGR: extra detached [%s] for [%s]", obj:name(), self.npc:name())
-									obj:enable_attachable_item(false)
-								end
-								self.states.attach_items[v.d].mode = "detach"
-								self.states.attach_items[v.d].done = true
-							end
-						end
-					end
-				end	
+			if self.attached_item then
+				local obj = self.npc:object( self.attached_item )
+				if obj then
+					obj:enable_attachable_item( false )
+				end
+				self.attached_item = nil
 			end
 			write_log_3(self.npc, "~~STMGR[%s] animation_set_state_2C", self.npc:name())
 		else
@@ -308,17 +278,12 @@ function animation:set_state(id, reset)
 	--' Экстренные деаттач деаттачиваемых предметов, если новая анимация назначилась в момент деаттача.
 	if self.states.current_state == "_new" then
 		write_log_3(self.npc, "~~STMGR: [%s]", self.npc:name())
---'		print_table(self.states.attach_items)
-		for k,v in pairs(self.states.attach_items) do
-			local t = self.npc:object(k)
-			if t then
-				if v.mode == "attach" then
-					write_log_3(self.npc, "~~STMGR[%s] animation_set_state_3DETACH", self.npc:name())
-					t:enable_attachable_item(false)
-				end
+		if self.attached_item then
+			local obj = self.npc:object( self.attached_item )
+			if obj then
+				obj:enable_attachable_item( false )
 			end
-			v.mode = "detach"
-			v.done = true				
+			self.attached_item = nil
 		end
 	end
 	
@@ -402,26 +367,6 @@ function animation:update()
 		end
 	end	
 	write_log_3(self.npc, "~~STMGR[%s] animation_update_3", self.npc:name())
-	-- АТТАЧ ДЕТАЧ ОБЪЕКТОВ
-	for k,v in pairs(self.states.attach_items) do
-		write_log_3(self.npc, "~~STMGR: Trying to attach [%s]", tostring(k))
-		if v.done == false then
-			write_log_3(self.npc, "~~STMGR: proceed [%s]", tostring(k))
-			local t = self.npc:object(k)
-			if t then
-				write_log_3(self.npc, "~~STMGR: item [%s] exist", tostring(k))
-				if v.mode == "attach" then
-					write_log_3(self.npc, "~~STMGR: item [%s] attached for [%s]", tostring(k), self.npc:name())
-					t:enable_attachable_item(true)
-				elseif v.mode == "detach" then
-					write_log_3(self.npc, "~~STMGR: item [%s] detached for [%s]", tostring(k), self.npc:name())
-					t:enable_attachable_item(false)
-				end
-			end
-			v.done = true
-		end
-	end
-	write_log_3(self.npc, "~~STMGR[%s] animation_update_4", self.npc:name())
 	if self.states.current_state == nil then
 		self:callback_process()
 		write_log_3(self.npc, "~~STMGR[%s] animation_update_EXIT", self.npc:name())
@@ -735,17 +680,10 @@ function animation:set_anim_callback(value)
 	local anim_count = self.npc:animation_count()
 	write_log_3(self.npc, "~~STMGR: for debug [%s] [%s]", table_size, anim_count)
 	
-	for key = table_size+1, anim_count do
-		table.insert(self.clb_settings, "nil")
-	end
-	self.clb_settings[table.getn(self.clb_settings)] = {
-		a = value.a,
-		d = value.d,
-		s = value.s,
-		sh = value.sh,
-		f = value.f
-	}
-	--print_table(self.clb_settings)
+	for key = 1, anim_count - table_size - 1 do
+		table.insert( self.clb_settings, false )
+    end
+	table.insert( self.clb_settings, value )
 end
 --' коллбек на особые действия
 function animation:anim_callback()
@@ -757,26 +695,36 @@ function animation:anim_callback()
 	
 	if v == nil then
 		return true
-	end	
-	if v == "nil" then
+	end
+
+	if not v then
 		table.remove(self.clb_settings, 1)
 		return true
 	end
 	
 	-- Производим действия находящиеся на 1 позиции
-	if v.a ~= nil and
-		self.states.attach_items[v.a] ~= nil 
-	then
-		write_log_3(self.npc, "~~STMGR: item [%s] attach", tostring(v.a))
-		self.states.attach_items[v.a].mode = "attach"
-		self.states.attach_items[v.a].done = false
-	end
-	if v.d ~= nil and
-		self.states.attach_items[v.d] ~= nil 
-	then
-		write_log_3(self.npc, "~~STMGR: item [%s] detach", tostring(v.d))	
-		self.states.attach_items[v.d].mode = "detach"
-		self.states.attach_items[v.d].done = false
+	if v.a then
+		ASSERT(
+			( not self.attached_item ),
+			"[%s]: %s is trying to attach %s, but %s is already attached",
+			script_name(), self.npc:name(), v.a, tostring( self.attached_item )
+		)
+		local obj = self.npc:object( v.a )
+		if obj then
+			obj:enable_attachable_item( true )
+		end
+		self.attached_item = v.a
+	elseif v.d and self.attached_item then
+		ASSERT(
+			self.attached_item == v.d,
+			"[%s]: %s is trying to detach %s, but %s is attached",
+			script_name(), self.npc:name(), v.d, tostring( self.attached_item )
+		)
+		local obj = self.npc:object( v.d )
+		if obj then
+			obj:enable_attachable_item( false )
+		end
+		self.attached_item = nil
 	end
 	if v.s ~= nil then
 		xr_sound.set_sound_play(self.npc, v.s)
@@ -822,30 +770,8 @@ end
 --' оружейный слот
 function animation:anim_for_slot(slot, t)
 	write_log_3(self.npc, "~~STMGR: ANIM for SLOT [%s]", slot)
-	if t[slot] ~= nil then
-		return t[slot]
-	else
-		for i=1,9 do
-			if t[i] ~= nil then
-				return t[i]
-			end
-		end
-		log3("!!WARNING! Cant find animation substitute for slot %s", tonumber(slot))	
-		return t[0]
-		-- if t[1] ~= nil then
-			-- print_table_inlog_v2(t)
-			-- log3("!!WARNING! Cant find animation for slot %s", tonumber(slot))
-			-- return t[1]
-		-- else
-			-- print_table_inlog_v2(t)
-			-- log3("!!WARNING! Cant find animation substitute for slot %s", tonumber(slot))		
-			-- -- if t[0] == nil then
-				-- -- print_table_inlog_v2(t)
-				-- -- abort("cant find animation for slot %s", tonumber(slot))
-			-- -- end
-			-- return t[0]
-		-- end
-	end			
+	if not t[ slot ] then slot = 0 end
+	return t[ slot ]
 end
 
 

@@ -1,8 +1,7 @@
-----------------------------------------------------------------------------------------------------------------------
+---------------------------------------
 --	Менеджер изменения состояния тела
 --	автор: Диденко Руслан (Stohe)
---	TODO: 
-----------------------------------------------------------------------------------------------------------------------
+---------------------------------------
 
 function attach( sm )
 	sm:subscribe({ signal = "on_npc_death", fun = this.on_npc_death })
@@ -567,9 +566,9 @@ function state_manager:update()
 	--self.planner:show("")
 end
 
-function set_state(caller, npc, state_name, callback, timeout, target, emerg, synsound, extrakeys)
+function set_state(caller, npc, ...)
 	if db.storage[npc:id()].state_mgr then
-		db.storage[npc:id()].state_mgr:set_state( caller, state_name, callback, timeout, target, emerg, synsound, extrakeys)
+		db.storage[npc:id()].state_mgr:set_state( caller, ...)
 	end
 end
 function get_state(npc)
