@@ -98,7 +98,7 @@ function on_stalker_death(victim_, killer_)
 	
 	if (victim_ == nil) then return	end
 	
-	if (xs_stor.get("need_shutdown_stalker_news", false) == true) then return end
+	if ogse.var_exists("need_shutdown_stalker_news") then return end
 	
 	if total_debug == true then printf("Сообщения о смерти. victim_  не равно нулю.") end
 	

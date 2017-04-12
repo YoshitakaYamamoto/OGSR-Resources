@@ -136,7 +136,7 @@ function on_stalker_death(victim_, killer_)
 	if (victim_ == nil) then
 		return
 	end
-	if (xs_stor.get("need_shutdown_stalker_news", false) == true) then return end
+	if ogse.var_exists("need_shutdown_stalker_news") then return end
 	local m_killer = ""
 	local m_killer_s = ""
 	local m_victim = ""
@@ -239,7 +239,7 @@ function on_npc_death(victim_, killer_)
 	if victim_ == nil then
 		return
 	end
-	if (xs_stor.get("need_shutdown_stalker_news", false) == true) then return end
+	if ogse.var_exists("need_shutdown_stalker_news") then return end
 	local m_victim = ""
 	local m_killer = ""
 	local killer

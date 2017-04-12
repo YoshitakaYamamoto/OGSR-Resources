@@ -885,9 +885,10 @@ function wpn_sniper_qest_on_elevator(id,obj)
 	obj = ogse.spawn_object(spawn_db.esc_sniper_qest_on_elevator)
 	obj:on_death()
 	ogse.give_info("esc_kvest_qest_on_elevator_kill_sniper")
-	if alife():object(xs_stor.get("elevator_sniper", 0)) then
-		alife():release(alife():object(xs_stor.get("elevator_sniper", 0)), true)
-		xs_stor.set("elevator_sniper", nil)
+	local sobj = alife():object(ogse.load_var("elevator_sniper"))
+	if sobj then
+		alife():release(sobj, true)
+		ogse.delete_var("elevator_sniper")
 	end
 	level.client_spawn_manager():remove(id, 0)
 	ogse.save_variable("when_actor_found_visitor",game.time())

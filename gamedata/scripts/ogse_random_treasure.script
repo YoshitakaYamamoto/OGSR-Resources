@@ -95,8 +95,7 @@ function random_treasure:__init(treasure_name, treasure_id)
 		self.current_template = "" -- Шаблон для награды
 		
 		-- Берём из хранилища данные о наполнении предыдущих тайников
-		self.item_data = xs_stor.get("random_treasure_item_data", nil)
-		if not self.item_data then self.item_data = {} end 
+		self.item_data = ogse.var_exists("random_treasure_item_data") and ogse.load_var("random_treasure_item_data") or {}
 	end
 end
 
@@ -151,9 +150,8 @@ function random_treasure:generate_treasure_reward()
 			self.item_data[self.treasure_placement][self.treasure_id] = working_table
 		end	
 		
-		--print_table_inlog(self.item_data, "self.item_data:")
-		xs_stor.set("random_treasure_item_data", self.item_data) -- сохраняем данные в табличку
-		
+		log3("[%s] Saving self.item_data: %s", script_name(), self.item_data)
+		ogse.save_var("random_treasure_item_data", self.item_data, "table") -- сохраняем данные в табличку
 	else
 		self.current_reward = nil  -- Ничего менять не надо, поэтому в treasure_manager'е подхватим nil и выставим дефолтный тайник
 	end

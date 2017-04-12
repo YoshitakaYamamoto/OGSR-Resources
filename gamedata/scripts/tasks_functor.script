@@ -25,7 +25,7 @@ function on_take(obj, sobj)
 		return true
 	elseif sect == "zapis_3_a_case" then
 		db.actor:give_info_portion("rad_kvest_dobrozhelatel_letter_get_letter")
-		xs_stor.set("help_to_svyaznoy", "cnfkrthrksr")
+		ogse.save_var("help_to_svyaznoy", true, "bool")
 		db.actor:give_info_portion("rad_kvest_dobrozhelatel_have_all_password")
 		return true
 	elseif sect == "pda_monolit" then
@@ -51,7 +51,7 @@ function on_take(obj, sobj)
 		return true
 	elseif sect == "af_chameleon" then
 		db.actor:give_info_portion("dead_stalker_question_of_immortality_get_chameleon")
-		xs_stor.set("art_chameleon_id", nil)
+		ogse.delete_var("art_chameleon_id")
 		return true
 	elseif sect == "af_esc_anomaly" then
 		if not db.actor:has_info("af_esc_anomaly_off") then
@@ -296,10 +296,11 @@ end
 --VarName - имя метки
 --Delete - удалять объект?
 function delete_map_spot(VarName, Delete, location)
-	local ReadSpot = ogse.load_var(VarName, -1, "u16")
-	if ReadSpot == -1 then return end
+	if not ogse.var_exists(VarName) then return end
+
 	if not location then location = "green_location" end
-	if ReadSpot and level.map_has_object_spot(ReadSpot, location) then
+	local ReadSpot = ogse.load_var(VarName)
+	if level.map_has_object_spot(ReadSpot, location) then
 		level_tasks.remove_location_by_id(ReadSpot, location)
 		ogse.delete_var(VarName)
 		if Delete then
@@ -928,9 +929,8 @@ end
 function DetonateBomb()
 	db.actor:give_info_portion("esc_kvest_killers_mined_lager_2_fail")
 	db.actor:give_info_portion("esc_kvest_killers_mined_lager_fail")
-	local id = ogse.load_var("BombID", -1, "u16")
-	ASSERT(id ~= -1, "cannot get id")
-	local b = level.object_by_id(id)
+	ASSERT(ogse.var_exists("BombID"), "cannot get id")
+	local b = level.object_by_id(ogse.load_var("BombID"))
 	hit_object(b, vector():set(0, 0, 0), 0, db.actor, 1000000, hit.explosion) --1000
 	ogse.delete_var("BombID")
 end
@@ -1122,11 +1122,8 @@ function val_spawn_scene_st_sv()
     local stl4 = ogse.spawn_object(spawn_db.val_stalkers_barman4)
 	local bomb = ogse.spawn_object(spawn_db.bomba_easy)
 	-- Запомним ID Швида, дабы не плодить лишнего SID'а (да и остальных на всякий случай)
-	xs_stor.set("shvid_id", shvid_sobj.id)
-	xs_stor.set("val_stalkers_barman1_id", stl1.id)
-	xs_stor.set("val_stalkers_barman2_id", stl2.id)
-	xs_stor.set("val_stalkers_barman3_id", stl3.id)
-	xs_stor.set("val_stalkers_barman4_id", stl4.id)
+	ogse.save_var("shvid_id", shvid_sobj.id, "u16")
+	ogse.save_var("val_stalkers_barman_ids", { stl1.id, stl2.id, stl3.id, stl4.id }, "array", "u16")
 	ogse.save_variable("val_bomba_id", bomb.id)
 end
 
@@ -1143,7 +1140,7 @@ function val_delete_all_from_quest()
 end
 
 function make_shvid_trade_obmen(first_speaker, second_spreaker)
-	local shvid_obj = level.object_by_id(xs_stor.get("shvid_id", -1))
+	local shvid_obj = level.object_by_id(ogse.load_var("shvid_id"))
 	if shvid_obj then
 		trade_manager.trade_init(shvid_obj, "misc\\trade_obmen.ltx")
 	else log1("!! Cannot find shvid!")
@@ -1151,7 +1148,7 @@ function make_shvid_trade_obmen(first_speaker, second_spreaker)
 end
 
 function make_shvid_trade_generic(first_speaker, second_spreaker)
-	local shvid_obj = level.object_by_id(xs_stor.get("shvid_id", -1))
+	local shvid_obj = level.object_by_id(ogse.load_var("shvid_id"))
 	if shvid_obj then
 		trade_manager.trade_init(shvid_obj, "misc\\trade_generic.ltx")
 	else log1("!! Cannot find shvid!")
@@ -1218,8 +1215,9 @@ function on_hit_sv_enemy()
 end
 
 function add_spot_friend_barman()
-	local id = xs_stor.get("shvid_id", -1)
+	local id = ogse.load_var("shvid_id")
 	local sobj = alife():object(id)
+	ASSERT(sobj, "")
 	if ogse.check_offline_npc(sobj) == true then
 		-- ogse.send_tip("Швид жив, id = "..id)
 		level_tasks.add_location_by_id(id, "blue_location", game.translate_string("scvid_location_string"))		
@@ -1227,19 +1225,13 @@ function add_spot_friend_barman()
 end
 
 function remove_spot_friend_barman()
-	local id = xs_stor.get("shvid_id", -1)
-	local sobj = alife():object(id)
-	-- if ogse.check_offline_npc(sobj) == true then
-		-- ogse.send_tip("Швид жив, id = "..id)
-	if id then
-		level_tasks.remove_location_by_id(id, "blue_location")	
-	end
-	-- end
+	level_tasks.remove_location_by_id(ogse.load_var("shvid_id"), "blue_location")	
 end
 
 function bar_kvest_friend_of_barman_check_status_of_bomb()
-	local shvid_obj = level.object_by_id(xs_stor.get("shvid_id", -1))
-	local sobj = alife():object(xs_stor.get("shvid_id", -1))
+	local id = ogse.load_var("shvid_id")
+	local shvid_obj = level.object_by_id(id)
+	local sobj = alife():object(id)
 	if sobj and not shvid_obj then
 		return -- Пока Швид в оффлайне
 	end
@@ -1272,8 +1264,9 @@ function bar_kvest_friend_of_barman_id_dead()
 	end
 
 	-- При выходе в оффлайн удалим товарищей-пленников
-	for i=1,4 do
-		local id = xs_stor.get("val_stalkers_barman"..i.."_id", -1)
+	local tbl = ogse.load_var("val_stalkers_barman_ids")
+	for i=1, #tbl do
+		local id = tbl[i]
 		local sobj = alife():object(id)
 		if sobj then
 			local obj = level.object_by_id(id)
@@ -1283,12 +1276,12 @@ function bar_kvest_friend_of_barman_id_dead()
 				delete_when_offline(id):start()
 			end
 		end
-		xs_stor.set("val_stalkers_barman"..i, nil)
 	end
+	ogse.delete_var("val_stalkers_barman_ids")
 
 	-- Если есть возможность - удалим и Швида
 
-	local id = xs_stor.get("shvid_id", -1)
+	local id = ogse.load_var("shvid_id")
 	local sobj = alife():object(id)
 	if sobj then
 		local obj = level.object_by_id(id)
@@ -1298,7 +1291,7 @@ function bar_kvest_friend_of_barman_id_dead()
 			delete_when_offline(id):start()
 		end
 		remove_spot_friend_barman()
-		xs_stor.set("shvid_id", nil)
+		ogse.delete_var("shvid_id")
 	end
 
 	-- Да и бомбу все же удалим
@@ -1345,8 +1338,8 @@ function give_reward_on_kvest_friend_of_barman(first_speaker, second_speaker)
 		alife():release(bomb, true)
 		ogse.del_variable("val_bomba_id")
 	end
-	xs_stor.set("shvid_id", nil)
-	for i=1,4 do xs_stor.set("val_stalkers_barman"..i, nil) end
+	ogse.delete_var("shvid_id")
+	ogse.delete_var("val_stalkers_barman_ids")
 	friend_of_barman_disable_infoportion()
 end
 
@@ -1682,7 +1675,7 @@ function captive_on_agr_mill_base_clean_ssi()
 end
 
 function captive_on_agr_mill_base_shutdown_news()
-	xs_stor.set("need_shutdown_stalker_news", true)
+	ogse.save_var("need_shutdown_stalker_news", true, "bool")
 	local text = game.translate_string("captive_on_agr_mill_base_shutdown_news_text")
 	ogse.send_tip(text, game.translate_string("bar_barmen_name"), 5, 10, "barman", "pda_news")
 
@@ -1905,7 +1898,7 @@ function spawn_metka_qest_on_elevator()
 	pk:set(t)
 	--
 	add_map_spot(obj.id, "sniper_qest_on_elevator", game.translate_string("guest_on_elevator_string"), "crlc_big")
-	xs_stor.set("elevator_sniper", obj.id)
+	ogse.save_var("elevator_sniper", obj.id, "u16")
 end
 
 function esc_qest_on_elevator_go_to()
@@ -2364,7 +2357,7 @@ end
 
 function search_code_of_case()
 	if Actor_Has_Items("zapis_2_a_case") then
-		xs_stor.set("zapis_2_a_case", "20061204")
+		ogse.save_var("zapis_2_a_case", true, "bool")
 		return true
 	end
 	return false
@@ -2408,12 +2401,13 @@ end
 
 function case_use_rub:open_case()
   local password = self.EditBoxPassword:GetText()
-	if password == "20061204" and xs_stor.get("zapis_2_a_case", nil) ~= nil then
+	if password == "20061204" and ogse.var_exists("zapis_2_a_case") then
 		ogse.spawn_item_in_inv("pol_code_of_case")
 		db.actor:give_info_portion("rad_kvest_dobrozhelatel_search_code_2_start")
 		local obj = ogse.spawn_object(spawn_db.case_use_rub_open_case_bread)
 		add_map_spot(obj.id, "search_code_2_svaznoi", game.translate_string("dobrozhelatel_string4"))
 		self:GetHolder():start_stop_menu(self, true)
+		ogse.delete_var("zapis_2_a_case")
 	else
 		ogse.autohiding_msg(game.translate_string("dobrozhelatel_string5"), 5000)
 	end
@@ -2505,7 +2499,7 @@ function spawn_monolit_on_base_bantits()
 end
 
 function rad_kvest_dobrozhelatel_help_to_svyaznoy()
-	xs_stor.set("help_to_svyaznoy", "cnfkrthrksr")
+	ogse.save_var("help_to_svyaznoy", true, "bool")
 	delete_when_offline(id_by_sid(story_ids.val_kvestx10_svyaznoy)):start()
 	db.actor:give_info_portion("rad_kvest_dobrozhelatel_have_all_password")
 end
@@ -2575,11 +2569,12 @@ end
 
 function ui_bun_comp:ok()
   local password = self.EditBoxPassword:GetText()
-	if password == "cnfkrthrksr" and xs_stor.get("help_to_svyaznoy", nil) ~= nil then
+	if password == "cnfkrthrksr" and ogse.var_exists("help_to_svyaznoy") then
 		db.actor:give_info_portion("rad_kvest_dobrozhelatel_password_enter")
 		self:quit_ui_bun_comp()
 		delete_dobroshelatel_docs()
 		ogse.autohiding_msg(game.translate_string("dobrozhelatel_string6"), 10000)
+		ogse.delete_var("help_to_svyaznoy")
 	else
 		ogse.autohiding_msg(game.translate_string("dobrozhelatel_string5"), 5000)
 	end
@@ -3292,19 +3287,19 @@ function clothes_changing_actor_dont_see:action()
     local vis = {}
     --if level.object_by_id(self.npc_id):object("novice_outfit") then vis = novice_visuals else vis = stalker_visuials end
 
-    --if xs_stor.get("agr_swamp_ratcatcher_actor_give_stalker_outfit", "novice_outfit") == "stalker_outfit" then vis = stalker_visuials else vis = novice_visuals end
-    if xs_stor.get("agr_swamp_ratcatcher_actor_give_stalker_outfit", "novice_outfit") == "stalker_outfit" then vis = stalker_visuials_dez else vis = novice_visuals_dez end
+    --if ogse.load_var("agr_swamp_ratcatcher_actor_give_stalker_outfit", "novice_outfit") == "stalker_outfit" then vis = stalker_visuials else vis = novice_visuals end
+    if ogse.load_var("agr_swamp_ratcatcher_actor_give_stalker_outfit", "novice_outfit") == "stalker_outfit" then vis = stalker_visuials_dez else vis = novice_visuals_dez end
 
 	local ratcatcher = level.object_by_id(self.npc_id)
 	if ratcatcher then
-		local out = ratcatcher:object(xs_stor.get("agr_swamp_ratcatcher_actor_give_stalker_outfit", "novice_outfit"))
+		local out = ratcatcher:object(ogse.load_var("agr_swamp_ratcatcher_actor_give_stalker_outfit", "novice_outfit"))
 		if out then
 			local s_out = alife():object(out:id())
 			alife():release(s_out, true)
 		end
 	end
 
-	xs_stor.set("agr_swamp_ratcatcher_actor_give_stalker_outfit", nil)
+	ogse.delete_var("agr_swamp_ratcatcher_actor_give_stalker_outfit")
 
 	local s_obj = alife():object(self.npc_id)
 
@@ -3332,7 +3327,7 @@ end
 
 -- Включение сталкеровской сети через сутки
 function captive_on_agr_mill_base_shutdown_news_timer_taction()
-	xs_stor.set("need_shutdown_stalker_news", false)
+	ogse.delete_var("need_shutdown_stalker_news")
 end
 
 
@@ -3351,10 +3346,10 @@ function agr_swamp_ratcatcher_actor_give_stalker_outfit(first_speaker, second_sp
 	if 	(db.actor:object("novice_outfit") and db.actor:object("stalker_outfit"))
 			or db.actor:object("stalker_outfit") then
 				outfit = "stalker_outfit"
-				xs_stor.set("agr_swamp_ratcatcher_actor_give_stalker_outfit", "stalker_outfit")
+				ogse.save_var("agr_swamp_ratcatcher_actor_give_stalker_outfit", "stalker_outfit")
 	elseif db.actor:object("novice_outfit") then
 		outfit = "novice_outfit"
-		xs_stor.set("agr_swamp_ratcatcher_actor_give_stalker_outfit", "novice_outfit")
+		ogse.save_var("agr_swamp_ratcatcher_actor_give_stalker_outfit", "novice_outfit")
 	end
 
 	dialogs.relocate_item_section(second_speaker, outfit, "out")
@@ -3457,7 +3452,7 @@ end
 
 function spawn_psy_art(store_prefix, spawn_db, r_min, r_max, custom_data)
 	local obj = ogse.spawn_object_rand(spawn_db)
-	xs_stor.set(store_prefix.."_id", obj.id)
+	ogse.save_var(store_prefix.."_id", obj.id, "u16")
 	local ps_obj = alife():create("space_restrictor", obj.position, obj.m_level_vertex_id, obj.m_game_vertex_id)
 	local packet = get_netpk(ps_obj, 1)
 	ASSERT( packet:isOk(), "can't read netpacket of %s", ps_obj:name() )
@@ -3466,17 +3461,17 @@ function spawn_psy_art(store_prefix, spawn_db, r_min, r_max, custom_data)
 	my_table.restrictor_type = 3
 	my_table.custom_data:set(custom_data)
 	packet:set(my_table)
-	xs_stor.set(store_prefix.."_ps_id", ps_obj.id) -- удалим после квеста данную пси-зону
+	ogse.save_var(store_prefix.."_ps_id", ps_obj.id, "u16") -- удалим после квеста данную пси-зону
 end
 
 function delete_psy_art_trash(store_prefix)
 	-- Удалим пси-зону при сдаче артефакта
-	local id = xs_stor.get(store_prefix.."_ps_id", -1)
-	local obj = alife():object(id)
-	if obj then
+	local id = ogse.load_var(store_prefix.."_ps_id")
+	local sobj = alife():object(id)
+	if sobj then
 		delete_when_offline(id):start()
-		xs_stor.set(store_prefix.."_ps_id", nil)
-		xs_stor.set(store_prefix.."_id", nil)
+		ogse.delete_var(store_prefix.."_ps_id")
+		ogse.delete_var(store_prefix.."_id")
 	end
 end
 
@@ -3515,38 +3510,36 @@ function question_of_immortality_fisrt_part_prepare_spawn_firefly()
 	local spawn_item = spawn_tbl[math.random(#spawn_tbl)]
 	local green_anom = ogse.quest_spawn_ex("noartf_witches_galantine_green", 1, spawn_item)
 	set_anom_param(green_anom, 1.0)
-	xs_stor.set("green_anomaly_id", green_anom.id)
+	ogse.save_var("green_anomaly_id", green_anom.id, "u16")
 	local common_anom = ogse.quest_spawn_ex("firefly_anom_common", 1, spawn_item)
 	set_anom_param(common_anom, 0.4)
-	xs_stor.set("common_anomaly_id", common_anom.id)
+	ogse.save_var("common_anomaly_id", common_anom.id, "u16")
 end
 
 function on_first_update_firefly()
 	if not db.actor:has_info("dead_stalker_question_of_immortality_first_part_start") or
 	db.actor:has_info("dead_stalker_question_of_immortality_get_firefly") then return end
 
-	local green_id = xs_stor.get("green_anomaly_id", -1)
-	if green_id == -1 then return end
-	local sobj = alife():object(green_id)
-	if sobj == nil then return end
+	if not ogse.var_exists("green_anomaly_id") then return end
+	local sobj = alife():object(ogse.load_var("green_anomaly_id"))
+	if not sobj then return end
 	if level.name() ~= level_system_name_by_gvid(sobj.m_game_vertex_id) then return end
 
-	ogse_signals.get_mgr():subscribe({signal = "on_update", fun = this.on_firefly_update})
+	ogse_signals.get_mgr():subscribe({ signal = "on_update", fun = this.on_firefly_update, queued = true })
 
-	local art_id = xs_stor.get("art_firefly_id", -1)
-	if art_id ~= -1 then
-		local fix_firefly = function() fix_art(art_id, "root") end
-		level.client_spawn_manager():add(art_id, -1, fix_firefly)
+	if ogse.var_exists("art_firefly_id") then
+		local art_id = ogse.load_var("art_firefly_id")
+		level.client_spawn_manager():add( art_id, -1, function() fix_art(art_id, "root") end )
 	end
 end
 
 local anom_status = ""
 function on_firefly_update()
-	ogse_signals.get_mgr():reschedule(1000)
+	ogse_signals.get_mgr():reschedule(math.random(5000, 10000))
 
-	local art_id = xs_stor.get("art_firefly_id", -1)
+	local art_spawned = ogse.var_exists("art_firefly_id")
 	if level.rain_factor() > 0 then
-		if art_id == -1 then
+		if not art_spawned then
 			question_of_immortality_fisrt_part_spawn_firefly()
 		end
 		if anom_status ~= "green" then
@@ -3554,7 +3547,7 @@ function on_firefly_update()
 			anom_status = "green"
 		end
 	else
-		if art_id ~= -1 then
+		if art_spawned then
 			question_of_immortality_fisrt_part_delete_firefly()
 		end
 		if anom_status ~= "common" then
@@ -3576,13 +3569,8 @@ end
 
 
 function question_of_immortality_fisrt_part_green(enable)
-	local green_id = xs_stor.get("green_anomaly_id", -1)
-	ASSERT(green_id ~= -1, "green_id ~= -1")
-	local common_id = xs_stor.get("common_anomaly_id", -1)
-	ASSERT(common_id ~= -1, "common_id ~= -1")
-
-	local green_anom = level.object_by_id(green_id)
-	local common_anom = level.object_by_id(common_id)
+	local green_anom = level.object_by_id(ogse.load_var("green_anomaly_id"))
+	local common_anom = level.object_by_id(ogse.load_var("common_anomaly_id"))
 	if enable then
 		green_anom:enable_anomaly()
 		common_anom:disable_anomaly()
@@ -3593,49 +3581,39 @@ function question_of_immortality_fisrt_part_green(enable)
 end
 
 function question_of_immortality_fisrt_part_spawn_firefly()
-	local green_id = xs_stor.get("green_anomaly_id", -1)
-	ASSERT(green_id ~= -1, "green_id ~= -1")
-	local green_anom = alife():object(green_id)
-	ASSERT(green_anom ~= nil, "green_anom ~= nil")
+	local green_anom = alife():object(ogse.load_var("green_anomaly_id"))
+	ASSERT(green_anom, "green_anom ~= nil")
 	local art = alife():create("af_firefly", green_anom.position, green_anom.m_level_vertex_id, green_anom.m_game_vertex_id)
-	xs_stor.set("art_firefly_id", art.id)
-	local fix_firefly = function() fix_art(art.id, "root") end
-	level.client_spawn_manager():add(art.id, -1, fix_firefly)
+	ogse.save_var("art_firefly_id", art.id, "u16")
+	level.client_spawn_manager():add( art.id, -1, function() fix_art(art.id, "root") end )
 end
 
 function question_of_immortality_fisrt_part_delete_firefly()
-	local art_id = xs_stor.get("art_firefly_id", -1)
-	ASSERT(art_id ~= -1, "art_id ~= -1")
-	alife():release(alife():object(art_id), true)
-	xs_stor.set("art_firefly_id", nil)
+	local sobj = alife():object(ogse.load_var("art_firefly_id"))
+	ASSERT(sobj, "")
+	alife():release(sobj, true)
+	ogse.delete_var("art_firefly_id")
 end
 
 function question_of_immortality_fisrt_part_delete_firefly_trash()
-	local enquee_anom_to_delete = function(anom_id)
-		ogse_anomaly.set_anomaly_mode(anom_id, "anom_off")
-	end
-
-	local green_id = xs_stor.get("green_anomaly_id", -1)
-	ASSERT(green_id ~= -1, "green_id ~= -1")
-	local common_id = xs_stor.get("common_anomaly_id", -1)
-	ASSERT(common_id ~= -1, "common_id ~= -1")
 	question_of_immortality_fisrt_part_green(false)
-	enquee_anom_to_delete(green_id)
-	enquee_anom_to_delete(common_id)
 
-	xs_stor.set("green_anomaly_id", nil)
-	xs_stor.set("common_anomaly_id", nil)
-	xs_stor.set("art_firefly_id", nil)
+	ogse_anomaly.set_anomaly_mode(ogse.load_var("green_anomaly_id"), "anom_off")
+	ogse_anomaly.set_anomaly_mode(ogse.load_var("common_anomaly_id"), "anom_off")
+
+	ogse.delete_var("green_anomaly_id")
+	ogse.delete_var("common_anomaly_id")
+	ogse.delete_var("art_firefly_id")
 
 	ogse_signals.get_mgr():unsubscribe({signal = "on_update", fun = this.on_firefly_update})
 	ogse.give_info("dead_stalker_question_of_immortality_delete_firefly_trash")
 end
 
 function on_first_update_chameleon()
-	local art_id = xs_stor.get("art_chameleon_id", -1)
-	if art_id == -1 then return end
-	local fix_chameleon = function() fix_art(art_id, "bone01") end
-	level.client_spawn_manager():add(art_id, -1, fix_chameleon)
+	if not ogse.var_exists("art_chameleon_id") then return end
+
+	local art_id = ogse.load_var("art_chameleon_id")
+	level.client_spawn_manager():add( art_id, -1, function() fix_art(art_id, "bone01") end )
 end
 
 function question_of_immortality_fisrt_part_spawn_chameleon()
@@ -3662,7 +3640,7 @@ function question_of_immortality_fisrt_part_spawn_chameleon()
 --		log1("FINAL art_pos is "..tostring(art_pos.x)..", "..tostring(art_pos.y)..", "..tostring(art_pos.z))
 		local art = alife():create("af_chameleon", art_pos, art_lvid, db.actor:game_vertex_id())
 		if art then
-			xs_stor.set("art_chameleon_id", art.id)
+			ogse.save_var("art_chameleon_id", art.id, "u16")
 			local fix_chameleon = function() fix_art(art.id, "bone01") end
 			level.client_spawn_manager():add(art.id, -1, fix_chameleon)
 		end
@@ -3670,11 +3648,11 @@ function question_of_immortality_fisrt_part_spawn_chameleon()
 end
 
 function question_of_immortality_fisrt_part_delete_chameleon()
-	local id = xs_stor.get("art_chameleon_id", -1)
-	if id == -1 then return end
-	local obj = alife():object(id)
-	if obj then
-		alife():release(obj, true)
+	if not ogse.var_exists("art_chameleon_id") then return end
+
+	local sobj = alife():object(ogse.load_var("art_chameleon_id"))
+	if sobj then
+		alife():release(sobj, true)
 	end
 end
 

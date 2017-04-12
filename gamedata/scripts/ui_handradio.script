@@ -174,7 +174,7 @@ function handradio:listen()
 	end
 	if snd and not snd:playing() then
 		snd:play_no_feedback(db.actor,sound_object.s2d, 0, vector():set(0, 0, 0), 1.0)
-		-- Реакция на "Мутень"
+		--[=[ --Реакция на "Мутень" --KRodin: не используется
 		local muten_id = xs_stor.get("muten_id", nil)
 		if muten_id then
 			local muten_obj = level.object_by_id(muten_id)
@@ -193,6 +193,7 @@ function handradio:listen()
 				end
 			end
 		end
+		--]=]
 	end
 	spawn_radio_if_used()
 	self:GetHolder():start_stop_menu (self,true)

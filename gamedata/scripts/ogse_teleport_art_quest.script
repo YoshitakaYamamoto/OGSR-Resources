@@ -43,7 +43,6 @@ local teleport_position =
 	{["position"] = vector():set(198.33, 0.18, -188.55)}
 }
 				
-			--xs_stor.set("teleport_position", teleport_position)
 
 -- Спаун рестриктора + артефакта
 function init_teleport_art_and_zone()
@@ -64,8 +63,7 @@ function init_teleport_art_and_zone()
 	-- Артефакт
 	local obj = alife():create("af_teleport_trap", teleport_art_restrictor_position, teleport_art_restrictor_lvid, teleport_art_restrictor_gvid)
 	id_table.art = obj.id
-	xs_stor.set("ogse_teleport_art_id", id_table)
-	
+	ogse.save_var("ogse_teleport_art_id", id_table, "table")
 end
 
 -- Телепортация актора
@@ -83,10 +81,10 @@ function teleport_actor_in_zone()
 			write_log("will begin teleport actor!")
 			teleport_actor(teleport_art_restrictor_position)
 			if db.actor:has_info("ogse_teleport_trap_find_art_get_trouble") then
-				local teleport_count = tonumber(xs_stor.get("teleport_count", nil))
+				local teleport_count = ogse.var_exists("teleport_count") and ogse.load_var("teleport_count") or false
 				write_log("teleport count "..tostring(teleport_count))
 				if not teleport_count then
-					xs_stor.set("teleport_count", 1)
+					ogse.save_var("teleport_count", 1, "u8")
 					write_log("no teleport count set 1")
 				else
 					write_log("teleport count already "..teleport_count)
@@ -97,7 +95,7 @@ function teleport_actor_in_zone()
 					elseif teleport_count == 15 then
 						ogse.send_tip(game.translate_string("ogse_tp_art_3_text"))
 					end
-					xs_stor.set("teleport_count", teleport_count + 1)
+					ogse.save_var("teleport_count", teleport_count + 1, "u8")
 				end
 			end
 			if not db.actor:has_info("ogse_teleport_art_actor_teleported") then db.actor:give_info_portion("ogse_teleport_art_actor_teleported") end
@@ -111,14 +109,15 @@ end
 
 -- Получение id ящика из "Изолята Пруденко"
 
-local telekill_case_id --= xs_stor.get("telekill_case_id", nil)
+local telekill_case_id
 
 function get_telekill_case()
-	telekill_case_id = tonumber(xs_stor.get("telekill_case_id", nil))
+	telekill_case_id = ogse.var_exists("telekill_case_id") and ogse.load_var("telekill_case_id") or false
 	if not telekill_case_id then
-		if db.actor:object("telekill_case") then
-			telekill_case_id = db.actor:object("telekill_case"):id()
-			xs_stor.set("telekill_case_id", telekill_case_id)
+		local obj = db.actor:object("telekill_case")
+		if obj then
+			telekill_case_id = obj:id()
+			ogse.save_var("telekill_case_id", telekill_case_id, "u16")
 		end
 	end
 end
@@ -133,10 +132,10 @@ end
 class "af_teleport_trap_binder" (object_binder)
 
 function af_teleport_trap_binder:__init(obj) super(obj)
-	local id_table = xs_stor.get("ogse_teleport_art_id", nil)
+	local id_table = ogse.var_exists("ogse_teleport_art_id") and ogse.load_var("ogse_teleport_art_id") or false
 	if id_table then
 		id_table.art = self.object:id() -- переопределяем id артефакта
-		xs_stor.set("ogse_teleport_art_id", id_table)
+		ogse.save_var("ogse_teleport_art_id", id_table, "table")
 	end
 	self.id_table = id_table
 end 
@@ -148,7 +147,7 @@ end
 
 function af_teleport_trap_binder:reinit()
 	write_log("af_teleport_trap_binder:reinit")
-	telekill_case_id = tonumber(xs_stor.get("telekill_case_id", nil))
+	telekill_case_id = ogse.var_exists("telekill_case_id") and ogse.load_var("telekill_case_id") or false
 
    object_binder.reinit(self)
 end
@@ -383,13 +382,12 @@ function spawn_dead_zone()
 	my_table.restrictor_type = 3
 	my_table.custom_data:set("[logic] \nactive = sr_idle \n[sr_idle] \non_actor_inside = %+ogse_teleport_trap_research_art_actor_finish_dead_zone%")
 	packet:set(my_table)
-	
-	xs_stor.set("dead_zone_id", dead_zone_id)	
+
+	ogse.save_var("dead_zone_id", dead_zone_id, "array", "u16")
 end
 
 function journey_step()
 	write_log("journey_step")
---	local teleport_position = xs_stor.get("teleport_position", nil)
 	if teleport_position then
 		if #teleport_position >= 6 then
 			local step = {}
@@ -397,7 +395,6 @@ function journey_step()
 			
 			step = teleport_position[index]
 			table.remove(teleport_position, index)
-			--xs_stor.set("teleport_position", teleport_position)
 
 			ogse_st_mgr.delayed_fun_start("ogse_teleport_trap_journey"):set_delay(5):init(script_name()..".journey_step"):start(true)
 
@@ -448,13 +445,13 @@ end
 -- Удаляем аномалии + тот рестриктор
 function delete_dead_zone()
 	level.add_pp_effector ("teleport.ppe", 2006, false)
-	local dead_zone_id = xs_stor.get("dead_zone_id", nil)
+	local dead_zone_id = ogse.var_exists("dead_zone_id") and ogse.load_var("dead_zone_id") or false
 	if dead_zone_id then
 		for _, id in pairs(dead_zone_id) do
 			checker_minefield.release_restrictor(id)
 		end
 	end
-	xs_stor.set("dead_zone_id", nil)
+	ogse.delete_var("dead_zone_id")
 end
 
 -- Tips
@@ -508,14 +505,14 @@ function spawn_case_with_art()
 	write_log("start")
 	level.add_pp_effector ("teleport.ppe", 2006, false)
 	-- Удаляем арт, зону, кейс, спавним кейс с артефактом
-	local table_id = xs_stor.get("ogse_teleport_art_id", nil)
+	local table_id = ogse.var_exists("ogse_teleport_art_id") and ogse.load_var("ogse_teleport_art_id") or false
 	if table_id then
 		for _, id in pairs(table_id) do
 			checker_minefield.release_restrictor(id)
 		end
 	else write_log("table_id not found!")
 	end
-	xs_stor.set("ogse_teleport_art_id", nil)
+	ogse.delete_var("ogse_teleport_art_id")
 	if telekill_case_id then
 		local case = level.object_by_id(telekill_case_id)
 		local p = {}
@@ -526,7 +523,7 @@ function spawn_case_with_art()
 			alife():release(alife():object(telekill_case_id), true)
 		end
 		alife():create("telekill_case_with_art", p.pos, p.lvid, p.gvid)
-		xs_stor.set("telekill_case_id", nil)
+		ogse.delete_var("telekill_case_id")
 	end
 	
 	-- Спавним монстров

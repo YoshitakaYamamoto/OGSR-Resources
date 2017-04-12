@@ -441,7 +441,7 @@ function actor_binder:save(packet)
 	ASSERT( db.saving_obj == nil, "found saving_obj = %s", db.saving_obj and db.saving_obj:name() or "" )
 	db.saving_obj = self.object
 
-	ogse.save_var("game_difficulty", level.get_game_difficulty()) --Сохраняем уровень сложности
+	ogse.save_var("game_difficulty", level.get_game_difficulty(), "u8") --Сохраняем уровень сложности
 
 	xr_logic.pstor_save_all(self.object, packet)
 

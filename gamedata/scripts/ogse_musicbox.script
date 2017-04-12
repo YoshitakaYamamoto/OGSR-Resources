@@ -161,10 +161,10 @@ function on_load()
         musicbox_mem.obj = musicbox_base(obj)
         local mbox = musicbox_mem.obj
         if mbox then
-            mbox.checkedPlate   = ogse.load_var('mbox_checkedPlate'  , 0    , "number")
-            mbox.checkedTrack   = ogse.load_var('mbox_checkedTrack'  , 0    , "number")
-            mbox.actionPlate    = ogse.load_var('mbox_actionPlate'   , 0    , "number")
-            mbox.actionTrack    = ogse.load_var('mbox_actionTrack'   , 0    , "number")
+            mbox.checkedPlate   = ogse.load_var('mbox_checkedPlate'  , 0    , "u8")
+            mbox.checkedTrack   = ogse.load_var('mbox_checkedTrack'  , 0    , "u8")
+            mbox.actionPlate    = ogse.load_var('mbox_actionPlate'   , 0    , "u8")
+            mbox.actionTrack    = ogse.load_var('mbox_actionTrack'   , 0    , "u8")
             mbox.checkedPlayAll = ogse.load_var('mbox_checkedPlayAll', false, "bool"  )
             local changer       = ogse.load_var('mbox_changer'       , {}   , "array" )
             for i = 1, #changer do
@@ -184,10 +184,10 @@ end
 function on_save()
     local mbox = musicbox_mem.obj
     if isUserdata(mbox) then
-        ogse.save_var('mbox_checkedPlate'  , mbox.checkedPlate   , "number")
-        ogse.save_var('mbox_checkedTrack'  , mbox.checkedTrack   , "number")
-        ogse.save_var('mbox_actionPlate'   , mbox.actionPlate    , "number")
-        ogse.save_var('mbox_actionTrack'   , mbox.actionTrack    , "number")
+        ogse.save_var('mbox_checkedPlate'  , mbox.checkedPlate   , "u8")
+        ogse.save_var('mbox_checkedTrack'  , mbox.checkedTrack   , "u8")
+        ogse.save_var('mbox_actionPlate'   , mbox.actionPlate    , "u8")
+        ogse.save_var('mbox_actionTrack'   , mbox.actionTrack    , "u8")
         ogse.save_var('mbox_checkedPlayAll', mbox.checkedPlayAll , "bool")
         local changer = {}
         for i = 1, #mbox.changer do
