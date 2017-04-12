@@ -2306,8 +2306,12 @@ function net_se_stalker:__init(obj,mode)
 	self.st_props = {
 		{ name = 'job_online',           type = 'u8', default = 2 ,     ver = 3 }, --/ SHoC&CS
 		{ name = 'job_online_condlist',  type = 'sz', default = '',     ver = 3 }, --/ SHoC&CS
-		{ name = 'was_in_smart_terrain', type = 'u8', default = 0 ,     ver = 1 }, --/ SHoC
+		{ name = 'was_in_smart_terrain', type = 'b8', default = false,  ver = 1 }, --/ SHoC --KRodin: fixed for OGSE
 		{ name = 'death_dropped',        type = 'u8', default = 0 ,     ver = 3 }, --/ SHoC&CS
+		--
+		{ name = 'offline_dead',         type = 'u32', default = 0,     ver = 1 }, --/ OGSE
+		{ name = 's_storage',            type = 'sz', default = '_',    ver = 1 }, --/ OGSE
+		--
 		{ name = 'squad_id',             type = 'sz', default = '',     ver = 2 }, --/ CS
 		{ name = 'sim_forced_online',    type = 'u8', default = 0 ,     ver = 2 }, --/ CS
 		{ name = 'old_lvid',             type = 'sz', default = 'nil',  ver = 4 }, --/ SCoP ('last_lvid')
@@ -2353,7 +2357,9 @@ function net_se_trader:__init(obj,mode)
 	self.bases = {
 		net_cse_alife_trader(nil, mode)
 	}
-	self.st_props = {}
+	self.st_props = {
+		{ name = 's_storage', type = 'sz', default = '_', ver = 1 }, --/ OGSE
+	}
 	self.up_props = {}
 end
 --/ -----------------------------------------------------------------
@@ -2419,7 +2425,10 @@ function net_se_monster:__init(obj,mode)
 	self.st_props = {
 		{ name = 'job_online',           type = 'u8', default = 2 ,    ver = 3 }, --/ SHoC&CS
 		{ name = 'job_online_condlist',  type = 'sz', default = '',    ver = 3 }, --/ SHoC&CS
-		{ name = 'was_in_smart_terrain', type = 'u8', default = 0 ,    ver = 1 }, --/ SHoC
+		{ name = 'was_in_smart_terrain', type = 'b8', default = false, ver = 1 }, --/ SHoC --KRodin: fixed for OGSE
+		--
+		{ name = 'offline_dead',         type = 'u32', default = 0 ,   ver = 1 }, --/ OGSE
+		--
 		{ name = 'squad_id',             type = 'sz', default = '',    ver = 2 }, --/ CS
 		{ name = 'sim_forced_online',    type = 'u8', default = 0 ,    ver = 2 }, --/ CS
 		{ name = 'old_lvid',             type = 'sz', default = 'nil', ver = 4 }, --/ SCoP
