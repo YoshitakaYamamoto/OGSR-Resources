@@ -130,6 +130,7 @@ end
 
 function on_select_item( obj, sobj )
   --log3("~~Selected item : [%s]", obj:name())
+  if not obj:is_inventory_item() then return end --на всякий случай
   selected_item_id = obj:id()
 end
 
@@ -220,10 +221,11 @@ end
 
 
 function on_drop(obj) --Чтобы не было глюков при продаже неписям
-	if not obj:is_weapon_magazined() then return end
+	if not obj:is_inventory_item() then return end --на всякий случай
 
 	local slot_engine = get_inv_item_slot(obj)
-	local slot_cfg = get_u32(obj:section(), "slot")
+	--log3("--Slot_engine of [%s]: [%s]", obj:name(), slot_engine)
+	local slot_cfg = get_u32(obj:section(), "slot", -1)
 	if slot_engine ~= slot_cfg then
 		set_inv_item_slot(obj, slot_cfg)
 		--log3("--Change clot for [%s]: [%s]", obj:name(), slot_cfg)

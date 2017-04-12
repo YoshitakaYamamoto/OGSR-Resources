@@ -136,9 +136,9 @@ function se_monster:STATE_Write(packet)
 
 	packet:w_bool(self.was_in_smart_terrain)
 
-	if self.id ~= 65535 then
+	--if self.id ~= 65535 then --Разве такое может быть?
 		packet:w_u32(self.offline_dead)
-	end	
+	--end	
 end
 --------------------
 function se_monster:STATE_Read(packet, size)
@@ -159,9 +159,9 @@ function se_monster:STATE_Read(packet, size)
 
 	self.was_in_smart_terrain = packet:r_bool()
 
-	if self.id ~= 65535 then
+	--if self.id ~= 65535 then --Разве такое может быть?
 		self.offline_dead = packet:r_u32()
-	end	
+	--end	
 end
 --------------------
 function se_monster:on_before_register()

@@ -291,6 +291,9 @@ function item_inside_anomaly(item, storage)
 end
 --]=]
 
+--Будем исходить из предположения, что если предмет находится в
+--аномалии, то его вертекс не доступен для непися. Поэтому нет нужды
+--перебирать аномалии, ведь обходчик аномалий уже расставил ограничения.
 function item_inside_anomaly( item, storage, npc )
   if item and not npc:accessible( item:level_vertex_id() ) then
     storage.disabled_objects[ item:id() ] = true

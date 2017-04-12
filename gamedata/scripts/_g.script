@@ -317,7 +317,8 @@ end
 -------------------------------------------------------------------------------------------------------
 
 function get_clsid(npc)
---[=[
+	--Надо бы изучить, в каких случаях сюда попадают несуществующие объекты,
+	--Исправить это, и тогда можно будет убрать эти нагромождения отсюда.
 	if not npc then return nil end
 	if npc and npc.id then
 		if type(npc.id) == "function" then
@@ -342,9 +343,9 @@ function get_clsid(npc)
 		log1("!!DEBUG_GETCLSID DEAD_ON_ARRIVAL")
 		return nil
 	end
---]=]
-	if npc then return npc:clsid() end
-	return nil
+	--
+	--if npc then return npc:clsid() end
+	--return nil
 end
 
 --/ Вычисляет yaw в радианах
@@ -1097,6 +1098,9 @@ function log3(fmt, ...)
 		args[i] = tostring_all(args[i])
 	end
 	local res, msg = pcall(string.format, fmt, unpack(args))
+	--
+	--if res then msg = msg.."\nlog3 called from: "..debug.traceback() end
+	--
 	if not res then --Если произошла ошибка
 		msg = "!!log3 failed: "..msg.."\n"..debug.traceback()
 	end

@@ -358,6 +358,7 @@ function dsh_respawner:create( prob )
 			parent_id
 		)
 	end
+	--level.map_add_object_spot_ser(sobj.id, "red_location", script_name()..": "..sobj:name()) --DEBUG
 
     local tt = self.sectSpawnProps[ spawn_section ]
 	if not self.parent then
