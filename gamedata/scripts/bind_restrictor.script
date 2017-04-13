@@ -159,7 +159,12 @@ end
 
 
 function restrictor_binder:load( reader )
-  self.loaded = true
-  object_binder.load( self, reader )
-  xr_logic.load_obj( self.object, reader )
+	ASSERT( db.loading_obj == nil, "found loading_obj = %s", db.loading_obj and db.loading_obj:name() or "" )
+	db.loading_obj = self.object
+
+	self.loaded = true
+	object_binder.load( self, reader )
+	xr_logic.load_obj( self.object, reader )
+
+	db.loading_obj = nil
 end

@@ -458,12 +458,17 @@ end
 local game_difficulty_by_num = {"gd_novice", "gd_stalker", "gd_veteran", "gd_master"}
 function actor_binder:load(reader)
 --log3("~~[%s] Start load [%s]", script_name(), self.object and self.object:name() or "nil")
+	ASSERT( db.loading_obj == nil, "found loading_obj = %s", db.loading_obj and db.loading_obj:name() or "" )
+	db.loading_obj = self.object
+
 	local game_difficulty = ogse.load_var("game_difficulty", 3) --«агружаем уровень сложности
 	cmd("g_game_difficulty", game_difficulty_by_num[game_difficulty + 1]) --и устанавливаем его.
 
 	xr_logic.pstor_load_all(self.object, reader)
 
 	self.am:call("on_load", reader)
+
+	db.loading_obj = nil
 --log3("--[%s] End load [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 ----------------------------------------------------------------------------------------------------------------------

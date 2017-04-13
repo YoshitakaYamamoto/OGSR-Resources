@@ -290,7 +290,10 @@ end
 
 function generic_object_binder:load(reader)
 --log3("~~[%s] Start load [%s]", script_name(), self.object and self.object:name() or "nil")
-	if string.find(self.object:name(), "crow_") then return false end
+	ASSERT( db.loading_obj == nil, "found loading_obj = %s", db.loading_obj and db.loading_obj:name() or "" )
+	db.loading_obj = self.object
+
+	if string.find(self.object:name(), "crow_") then db.loading_obj = nil return false end
 
 	self.loaded = true
 
@@ -308,6 +311,8 @@ function generic_object_binder:load(reader)
 		local is_invulnerable = xr_logic.pstor_retrieve(self.object, "is_invulnerable", false)
 		self.object:invulnerable(is_invulnerable)
 	end
+
+	db.loading_obj = nil
 --log3("--[%s] End load [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 

@@ -135,11 +135,16 @@ function generic_physics_binder:save(packet)
 end
 -- MARKER: load
 function generic_physics_binder:load(reader)
+	ASSERT( db.loading_obj == nil, "found loading_obj = %s", db.loading_obj and db.loading_obj:name() or "" )
+	db.loading_obj = self.object
+
 	self.loaded = true
 
 	object_binder.load(self, reader)
 
 	xr_logic.load_obj(self.object, reader)
+
+	db.loading_obj = nil
 end
 -- MARKER: use_callback
 function generic_physics_binder:use_callback(obj, who)
