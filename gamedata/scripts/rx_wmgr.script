@@ -1082,7 +1082,7 @@ function check_if_safe_rpg7(npc)
 
 	local function check_object(obj)
 		if obj and obj.clsid and obj:alive() and npc:id() ~= obj:id() then
-			if IsStalker(obj) and npc:relation(obj) ~= game_object.enemy then
+			if ( obj:is_stalker() or obj:is_actor() ) and npc:relation(obj) ~= game_object.enemy then
 				table.insert(friends,obj)
 			end
 		end

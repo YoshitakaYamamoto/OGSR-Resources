@@ -19,7 +19,7 @@ artefacts			= {} --TODO: вынести в bind_artefact.
 
 
 function add_obj( obj )
-	if IsStalker(obj) then
+	if ( obj:is_stalker() or obj:is_actor() ) then
 		creature[obj:id()] = true
 	elseif obj:is_monster() then
 		creature[obj:id()] = false

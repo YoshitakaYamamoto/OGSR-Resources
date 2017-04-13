@@ -227,7 +227,7 @@ function validate_enemy_object( enemy )
       return true, enemy_gameobj
     end
   else	
-    if not ( IsStalker(enemy) or enemy:is_monster() ) then
+    if not ( enemy:is_stalker() or enemy:is_actor() or enemy:is_monster() ) then
       return false, nil
     end
     return true, enemy

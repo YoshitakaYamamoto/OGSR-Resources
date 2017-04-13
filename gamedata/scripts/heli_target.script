@@ -55,7 +55,7 @@ function get_target_area(area_data)
 			local sobj = alife():object(k)
 			if sobj then
 				if target_type == "stalker" or target_type == "alive" or target_type == "all" then 
-					if IsStalker(obj) and obj:alive() and heli_combat.distance_2d(obj:position(),center) <= area_r then
+					if ( obj:is_stalker() or obj:is_actor() ) and obj:alive() and heli_combat.distance_2d(obj:position(),center) <= area_r then
 						table.insert(targets,k)
 					end
 				end
@@ -65,7 +65,7 @@ function get_target_area(area_data)
 					end
 				end
 				if valid_communities[target_type] then 
-					if IsStalker(obj) and obj:alive() and obj:character_community() == target_type and heli_combat.distance_2d(obj:position(),center) <= area_r then
+					if ( obj:is_stalker() or obj:is_actor() ) and obj:alive() and obj:character_community() == target_type and heli_combat.distance_2d(obj:position(),center) <= area_r then
 						table.insert(targets,k)
 					end
 				end				
@@ -118,7 +118,7 @@ function get_target_priority(obj)
 	local prior = 1
 	if obj:is_monster() then
 		prior = 1
-	elseif IsStalker(obj) then -- максимум - 5
+	elseif ( obj:is_stalker() or obj:is_actor() ) then -- максимум - 5
 		local wpn = obj:item_in_slot(obj:active_slot())
 		if wpn then
 			local ammo, fm

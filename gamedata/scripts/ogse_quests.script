@@ -745,7 +745,7 @@ function set_complete_tasks()
 --[=[ --KRodin: вот тут, мне кажется, надо проверять как минимум группировку, а не имя профиля + сносить все респавнеры монолитовцев. Или вообще не делать ничего.
 		for k, v in pairs(db.creature) do
 			local npc = level.object_by_id(k)
-			if v == true and npc and npc:alive() and IsStalker(npc) then
+			if v == true and npc and npc:alive() and ( npc:is_stalker() or npc:is_actor() ) then
 				local profile = npc:profile_name()
 				if string.find(profile, "monolit") then
 					npc:kill( npc )
@@ -1567,7 +1567,7 @@ end
 
 --Запрещаем военным атаковать актора и его напарников, если он ведёт полковника на блокпост.
 function prohibit_military_attacks_actor( obj, enemy, result )
-  if not IsStalker(enemy) then return end
+  if not ( enemy:is_stalker() or enemy:is_actor() ) then return end
 
   if
     ( obj:character_community() == "military" and (enemy:is_actor() or xr_companion.is_companion(enemy:id())) ) --Запрещаем военным атаковать актора и его напарников

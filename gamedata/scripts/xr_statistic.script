@@ -135,7 +135,7 @@ function getNpcType(npc)
 
 	if not npc then return nil,nil end
 
-	if IsStalker(npc) then
+	if npc:is_stalker() or npc:is_actor() then
 		local community = "neutral"
 		if     npc:character_community() == "monolith" then	community = "monolith"
 		elseif npc:character_community() == "military" then community = "military"

@@ -13,7 +13,7 @@ end
 
 
 function on_death( obj, who )
-  if who and IsStalker(who) then
+  if who and ( who:is_stalker() or who:is_actor() ) then
     local weapon = who:active_item()
     if not weapon then return end
     if weapon:section() == "wpn_flame" then

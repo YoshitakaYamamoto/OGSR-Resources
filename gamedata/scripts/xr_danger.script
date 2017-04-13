@@ -121,7 +121,7 @@ function evaluator_danger:evaluate()
 	write_log("!!XR_DANGER_8 [%s]", self.object:name())
 	
 	local is_monster_obj = best_danger_object:is_monster()
-	local is_stalker_obj = IsStalker(best_danger_object)
+	local is_stalker_obj = ( best_danger_object:is_stalker() or best_danger_object:is_actor() )
 	local is_still_alive = best_danger_object:alive()	
 	
 	write_log("!!XR_DANGER_9 [%s]", self.object:name())
@@ -206,7 +206,7 @@ function evaluator_danger:evaluate()
 				elseif best_danger_object_test and best_danger_object_test:id() == self.object:id() then
 					write_log("!!XR_DANGER_ATTK_WE_ARE_FRIENDS_IDIOT [%s]", self.object:name()) -- нас боится, при этом дружелюбен, идиот. Игнорируем.
 					return false
-				elseif best_danger_object_test and (IsStalker(best_danger_object_test) or best_danger_object_test:is_monster()) and not best_danger_object_test:alive() then	
+				elseif best_danger_object_test and ( ( best_danger_object_test:is_stalker() or best_danger_object_test:is_actor() ) or best_danger_object_test:is_monster() ) and not best_danger_object_test:alive() then	
 					write_log("!!XR_DANGER_ATTK_DANGER_DEAD_IDIOT [%s]", self.object:name()) -- боится атаки трупа. Игнорируем.
 					return false
 				end				
@@ -244,7 +244,7 @@ function evaluator_danger:evaluate()
 				end
 				if (time_died+(30*60*1000)) > game.time() then
 					local enemy = level.object_by_id(killer)
-					if (not already_noticed[self.object:id()] or (already_noticed[self.object:id()] and not already_noticed[self.object:id()][best_danger_object:id()])) and enemy and enemy:alive() and (IsStalker(enemy) or enemy:is_monster()) and not (IsStalker(enemy) and xr_wounded.is_wounded(enemy)) then
+					if (not already_noticed[self.object:id()] or (already_noticed[self.object:id()] and not already_noticed[self.object:id()][best_danger_object:id()])) and enemy and enemy:alive() and ( ( ( enemy:is_stalker() or enemy:is_actor() ) and not xr_wounded.is_wounded(enemy) ) or enemy:is_monster() ) then
 						if not already_noticed[self.object:id()] then
 							already_noticed[self.object:id()] = {}
 						end

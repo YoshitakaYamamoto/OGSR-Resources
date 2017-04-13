@@ -263,7 +263,7 @@ function hit_callback(companion, enemy, amount)
 		enable_object(companion, enemy)
 		process_enemy(companion, enemy)
 		--companion:make_object_visible_somewhen(enemy)
-		if IsStalker(enemy) then
+		if ( enemy:is_stalker() or enemy:is_actor() ) then
 			primary_target = enemy:id()
 			hit_memory[enemy:id()] = enemy
 		end
@@ -359,7 +359,7 @@ function register_as_target(enemy)
 						range = 0,
 						vis = false		
 					}
-					enemy_record.npc = IsStalker(enemy)
+					enemy_record.npc = ( enemy:is_stalker() or enemy:is_actor() )
 					enemy_record.range = dist
 					enemy_record.vis = enemy:see(companion) or (enemy:see(db.actor) and not must_stay(companion))
 					enemy_record.weight = 1000
@@ -873,7 +873,7 @@ function set_combat_sight(npc, enemy, weapon)
 	local bodystate = enemy:body_state()
 	local distance = npc_pos:distance_to(enemy_pos)
 
-	if IsStalker(enemy) then
+	if ( enemy:is_stalker() or enemy:is_actor() ) then
 		if xrs_battle_ai.IsShotgun(weapon) then
 			if enemy_pos.y < (npc_pos.y - 1) then
 				look_pos = enemy:bone_position("bip01_head")
@@ -1213,7 +1213,7 @@ function have_fresh_deadman()
 	for k, v in pairs(last_target) do
 		local obj = level.object_by_id(k)
 		local timeout = remember_enemy
-		if obj and IsStalker(obj) then
+		if obj and ( obj:is_stalker() or obj:is_actor() ) then
 			timeout = timeout*3
 		end
 		local time_check = time_global() - remember_enemy
@@ -1377,7 +1377,7 @@ function action_combat_activity:execute()
 	if not bw and enemy then 
 		printf("Напарник совсем без оружия "..enemy:name())
 		set_combat_state(self.object, enemy, true, true, true)
-		if IsStalker(enemy) then
+		if ( enemy:is_stalker() or enemy:is_actor() ) then
 			assist_point = find_cover(self.object, enemy, 0)
 		else
 			assist_point = select_position(self.object, nil, true)
@@ -1457,7 +1457,7 @@ function action_combat_activity:execute()
 		set_combat_state(self.object, enemy, true, true, in_ambush(self.object))
 		set_combat_sight(self.object, enemy, bw)
 		-- set_weapons_fire(self.object, enemy, bw)
-		if IsStalker(enemy) then
+		if ( enemy:is_stalker() or enemy:is_actor() ) then
 			assist_point = find_cover(self.object, enemy, 0)
 		else
 			assist_point = select_position(self.object, nil, true)
@@ -1485,7 +1485,7 @@ function action_combat_activity:execute()
 			end
 			-- и он нас видит - мочим и отходим
 			set_combat_state(self.object, enemy, false, true, in_ambush(self.object))
-			if IsStalker(enemy) and math.random() > 0.5 then
+			if ( enemy:is_stalker() or enemy:is_actor() ) and math.random() > 0.5 then
 				assist_point = find_cover(self.object, enemy, 1)
 			else
 				assist_point = select_position(self.object, nil, stay)
@@ -1504,7 +1504,7 @@ function action_combat_activity:execute()
 			end		
 			-- и он нас не видит - мочим гада
 			set_combat_state(self.object, enemy, false, false, in_ambush(self.object))
-			if IsStalker(enemy) then
+			if ( enemy:is_stalker() or enemy:is_actor() ) then
 				assist_point = self.object:level_vertex_id()
 			else
 				assist_point = select_position(self.object, nil, stay)
@@ -1527,7 +1527,7 @@ function action_combat_activity:execute()
 			end			
 			-- и он нас видит - пугающе постреливаем и уходим
 			set_combat_state(self.object, enemy, false, false, in_ambush(self.object))
-			if IsStalker(enemy) and math.random() > 0.5 then
+			if ( enemy:is_stalker() or enemy:is_actor() ) and math.random() > 0.5 then
 				assist_point = find_cover(self.object, enemy, 0)
 			else
 				assist_point = select_position(self.object, nil, stay)
@@ -1549,7 +1549,7 @@ function action_combat_activity:execute()
 			set_combat_sight(self.object, enemy, bw)
 			self.object:set_item(object.aim1,bw)
 			assist_point = select_position(self.object, nil, stay)
-			if IsStalker(enemy) then
+			if ( enemy:is_stalker() or enemy:is_actor() ) then
 				defensive_send(self.object, enemy, stay)
 			else
 				combat_send(self.object, assist_point)

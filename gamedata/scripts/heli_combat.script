@@ -318,7 +318,7 @@ function is_hostile(comm,target)
 
 	local t_comm_number = 1
 	local t_comm = "actor"
-	if IsStalker(target) then
+	if ( target:is_stalker() or target:is_actor() ) then
 		t_comm = target:character_community()
 	elseif string.find(target:section(),"helicopter") then
 		if target:spawn_ini():line_exist("logic","community") then

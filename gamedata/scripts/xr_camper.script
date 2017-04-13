@@ -347,7 +347,7 @@ function action_patrol:process_danger()
 	end	
 	
 	local is_monster_obj = danger_obj:is_monster()
-	local is_stalker_obj = IsStalker(danger_obj)
+	local is_stalker_obj = ( danger_obj:is_stalker() or danger_obj:is_actor() )
 	local is_still_alive = danger_obj:alive()	
 	
 	local passed_time = time_global() - best_danger:time()

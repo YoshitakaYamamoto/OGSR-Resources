@@ -153,7 +153,7 @@ end
 function process_enemy(car, enemy)
 	--log3("Called process_enemy for [%s]", enemy:name())
 	if enemy and enemy:alive() then
-		if IsStalker(enemy) or enemy:is_monster() then
+		if enemy:is_stalker() or enemy:is_actor() or enemy:is_monster() then
 			-- человек ты иль монструшка
 			register_as_target(car, enemy)
 		else
@@ -172,7 +172,7 @@ function register_as_target(car, enemy)
 			range = 0,
 			vis = false		
 		}
-		enemy_record.npc = IsStalker(enemy)
+		enemy_record.npc = ( enemy:is_stalker() or enemy:is_actor() )
 		enemy_record.range = dist
 		enemy_record.vis = script_car:IsObjectVisible(enemy) or enemy:see(car) -- мы видим текущую цель или она видит нас
 		enemy_record.weight = 1000
@@ -402,7 +402,7 @@ function is_enemy(car, object)
 	if not comm then
 		comm = "military"
 	end
-	return (IsStalker(object) and utils2.community_relation_safe(comm, object:id(), object:character_community()) <= -400) or object:is_monster()
+	return (( object:is_stalker() or object:is_actor() ) and utils2.community_relation_safe(comm, object:id(), object:character_community()) <= -400) or object:is_monster()
 end
 
 function can_be_target(car, object)
@@ -418,7 +418,7 @@ end
 
 function check_single_object(car, obj)
 	if obj and obj.clsid and obj:alive() and car:id()~=obj:id() then
-		if IsStalker(obj) and primary_target ~= obj:id() then 
+		if ( obj:is_stalker() or obj:is_actor() ) and primary_target ~= obj:id() then 
 			local comm = cars_comm[car:name()]
 			if not comm then
 				comm = "military"

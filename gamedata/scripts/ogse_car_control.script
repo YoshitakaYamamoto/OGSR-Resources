@@ -1024,7 +1024,7 @@ function register_as_target(car, enemy)
 			range = 0,
 			vis = false		
 		}
-		enemy_record.npc = IsStalker(enemy)
+		enemy_record.npc = ( enemy:is_stalker() or enemy:is_actor() )
 		enemy_record.range = dist
 		enemy_record.vis = script_car:IsObjectVisible(enemy) or enemy:see(car) or false -- мы видим текущую цель или она видит нас
 		enemy_record.weight = 1000

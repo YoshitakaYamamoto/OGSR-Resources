@@ -14,8 +14,8 @@ local snd_check_timer = {}
 
 function look_to_shot(object, who)
 	if object and who then
-		if IsStalker(object) and object:alive() and not xr_wounded.is_wounded(object)
-			and who:alive() and ((IsStalker(who) and object:relation(who) ~= game_object.friend) or who:is_monster())
+		if ( object:is_stalker() or object:is_actor() ) and object:alive() and not xr_wounded.is_wounded(object)
+			and who:alive() and (( ( who:is_stalker() or who:is_actor() ) and object:relation(who) ~= game_object.friend) or who:is_monster())
 		then
 			if object:best_enemy() then
 				local be = object:best_enemy()
@@ -147,7 +147,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 
 	-- Если тип задан проверим реакцию на него
 	if snd_t and snd_t ~= "NIL" and not self:best_enemy() then
-		if IsStalker(who) and self:relation(who) == game_object.enemy and self:binded_object():enemy_callback( self, who ) then
+		if ( who:is_stalker() or who:is_actor() ) and self:relation(who) == game_object.enemy and self:binded_object():enemy_callback( self, who ) then
 			if snd_t == "WPN_empty" or
 			snd_t == "WPN_reload" or 
 			snd_t == "ITM_drop" or
@@ -197,7 +197,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 				--	xr_combat_companion.process_enemy(self, who)				
 				--end			
 			end
-		elseif IsStalker(who) and self:relation(who) ~= game_object.enemy then
+		elseif ( who:is_stalker() or who:is_actor() ) and self:relation(who) ~= game_object.enemy then
 			if snd_t == "ATTCK" or
 			snd_t == "BULLET" or
 			snd_t == "DIE" or
