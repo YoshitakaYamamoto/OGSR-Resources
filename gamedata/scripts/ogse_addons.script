@@ -21,7 +21,7 @@ function on_spawn() -- при появлении актора проинитить используемые в будущем гл
 	sim = alife()
 end
 -- 
-slot_actions = {do_nothing = 0, install = 1, take = 2,}
+local slot_actions = {do_nothing = 0, install = 1, take = 2,}
 -- функция проверяет, что можно сделать с аддоном заданного типа в заданном слоте в данный момент
 -- результат возвращается в виде комбинации флажков из slot_actions
 function get_available_actions_for_slot(addon_sec, slot_num)

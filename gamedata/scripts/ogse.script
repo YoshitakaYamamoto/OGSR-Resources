@@ -1364,7 +1364,7 @@ function kill_offline_npc(obj)
 	local pk = get_netpk(obj, 2)
 	ASSERT( pk:isOk(), "can't read netpacket of %s", obj:name() )
 	local data = pk:get()
-	data.health = 0
+	data.upd.health = 0
 	pk:set(data)
 	obj.offline_dead = 1
 	smart_terrain.on_death( obj.id )
@@ -1378,8 +1378,9 @@ function check_offline_npc(obj)
 	local pk = get_netpk(obj, 2)
 	ASSERT( pk:isOk(), "can't read netpacket of %s", obj:name() )
 	local data = pk:get()
+	--log3("Data of [%s]: %s", obj:name(), data)
 
-	return data.health > 0
+	return data.upd.health > 0
 end
 
 

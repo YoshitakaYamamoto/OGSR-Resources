@@ -975,7 +975,7 @@ function ui_rukzak:move_from_other( ui_item )
   level.client_spawn_manager():add(
     sobj.id, -1, function( id, obj )
       if our.condition < 100 then
-        dsh.set_condition( obj, our.condition / 100 )
+        obj:set_condition( our.condition / 100 )
       end
       table.insert( our.game_objs, obj )
       ui_our.item_cnt:SetText(
@@ -1486,6 +1486,8 @@ function create_rukzak( pos, lv, gv, items, mapspot, hint )
 		ASSERT( hint, "hint not found!" )
 		level.map_add_object_spot_ser( ruck.id, mapspot, hint )
 	end
+	--
+	return sobj
 end
 
 
@@ -1509,5 +1511,5 @@ function create_rukzak_by_section( sect, pos, lv, gv, mapspot, hint )
 		spawn_cd[k] = v == "" and 1 or tonumber(v)
 		ASSERT( type(spawn_cd[k]) == "number", "!![%s] Incorrect count of [%s]! Rukzak section: [%s]", script_name(), k, sect )
 	end
-	create_rukzak( pos, lv, gv, spawn_cd, mapspot, hint )
+	return create_rukzak( pos, lv, gv, spawn_cd, mapspot, hint )
 end

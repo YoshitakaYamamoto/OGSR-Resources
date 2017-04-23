@@ -3147,7 +3147,7 @@ function search_diggers_in_x16()
 		local pk = get_netpk(sobj, 2)
 		ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
 		local tbl = pk:get()
-		tbl.health = 0.27
+		tbl.upd.health = 0.27
 		pk:set(tbl)
 		return true
 	end

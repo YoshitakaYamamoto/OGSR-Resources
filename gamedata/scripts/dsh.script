@@ -10,10 +10,12 @@ end
 
 function timeout( delay, fun, ... )
   local tmout = timeout_timer( delay, fun, ... )
-  local d     = debug.getinfo( 2, "S" )
-  if d then
-    tmout.script_name = d.source
-  end
+  --
+  local d = debug.getinfo(2)
+  ASSERT(d, "")
+  tmout.script_name = d.short_src
+  tmout.line = d.linedefined
+  --
   tmout:start()
   return tmout
 end
@@ -37,10 +39,12 @@ end
 
 function wait_condition( ... )
   local tmout = condition_timer( ... )
-  local d     = debug.getinfo( 2, "S" )
-  if d then
-    tmout.script_name = d.source
-  end
+  --
+  local d = debug.getinfo(2)
+  ASSERT(d, "")
+  tmout.script_name = d.short_src
+  tmout.line = d.linedefined
+  --
   tmout:start()
   return tmout
 end
@@ -60,19 +64,17 @@ end
 
 function exec_on_update( ... )
   local tmout = exec_on_update_timer( ... )
-  local d     = debug.getinfo( 2, "S" )
-  if d then
-    tmout.script_name = d.source
-  end
+  --
+  local d = debug.getinfo(2)
+  ASSERT(d, "")
+  tmout.script_name = d.short_src
+  tmout.line = d.linedefined
+  --
   tmout:start()
   return tmout
 end
 -------------------------------------------------------------
 
-
-function set_condition( item, cond )
-  item:set_condition( cond )
-end
 
 function remove_quotes( s ) --Вырезать все кавычки из строки
   return string.gsub( s, "[«»\"\']", "" )
@@ -126,6 +128,18 @@ function cached_ini_file( fname )
     ini_file_cache[ fname ] = ini_file( fname )
   end
   return ini_file_cache[ fname ]
+end
+
+
+--Можно использовать эту функцию, если по каким-то причинам недоступен метод use_ai_locations( false ) у серверного объекта
+function clear_used_ai_locations( sobj )
+  local pk = get_netpk( sobj, 1 )
+  ASSERT( ( pk and pk:isOk() ), "can't read netpacket of %s", sobj:name() )
+  local data = pk:get()
+  data.object_flags = bit_and(
+    data.object_flags, bit_not( object_flags.UsedAI_Locations )
+  ) -- снять флаг flUsedAI_Locations
+  pk:set( data )
 end
 
 
