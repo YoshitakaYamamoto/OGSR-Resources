@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)https://xray-engine.org/index.php?title=X-Ray_extensions -->
+<html lang="ru" dir="ltr" class="client-js"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>X-Ray extensions — xrWiki</title>
+<script>document.documentElement.className = document.documentElement.className.replace( /(^|\s)client-nojs(\s|$)/, "$1client-js$2" );</script>
+<script>(window.RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"X-Ray_extensions","wgTitle":"X-Ray extensions","wgCurRevisionId":267,"wgRevisionId":267,"wgArticleId":91,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":["Редактирование движка"],"wgBreakFrames":false,"wgPageContentLanguage":"ru","wgPageContentModel":"wikitext","wgSeparatorTransformTable":[",\t."," \t,"],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"],"wgMonthNamesShort":["","янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"],"wgRelevantPageName":"X-Ray_extensions","wgRelevantArticleId":91,"wgRequestId":"WRcBmx8fxCwAABo84q8AAAAI","wgIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgWikiEditorEnabledModules":{"toolbar":true,"dialogs":true,"preview":true,"publish":true},"wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true});mw.loader.implement("user.options",function($,jQuery,require,module){mw.user.options.set({"variant":"ru"});});mw.loader.implement("user.tokens",function ( $, jQuery, require, module ) {
+mw.user.tokens.set({"editToken":"+\\","patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});/*@nomin*/;
+
+});mw.loader.load(["mediawiki.page.startup","skins.vector.js"]);});</script>
+<link rel="stylesheet" href="./X-Ray extensions — xrWiki_files/load.php">
+<style>
+.mw-collapsible-toggle{float:right;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none}  .mw-content-ltr .mw-collapsible-toggle,.mw-content-rtl .mw-content-ltr .mw-collapsible-toggle{float:right} .mw-content-rtl .mw-collapsible-toggle,.mw-content-ltr .mw-content-rtl .mw-collapsible-toggle{float:left}.mw-customtoggle,.mw-collapsible-toggle{cursor:pointer} caption .mw-collapsible-toggle,.mw-content-ltr caption .mw-collapsible-toggle,.mw-content-rtl caption .mw-collapsible-toggle,.mw-content-rtl .mw-content-ltr caption .mw-collapsible-toggle,.mw-content-ltr .mw-content-rtl caption .mw-collapsible-toggle{float:none} li .mw-collapsible-toggle,.mw-content-ltr li .mw-collapsible-toggle,.mw-content-rtl li .mw-collapsible-toggle,.mw-content-rtl .mw-content-ltr li .mw-collapsible-toggle,.mw-content-ltr .mw-content-rtl li .mw-collapsible-toggle{float:none} .mw-collapsible-toggle-li{list-style:none}
+.suggestions{overflow:hidden;position:absolute;top:0;left:0;width:0;border:none;z-index:1099;padding:0;margin:-1px 0 0 0}.suggestions-special{position:relative;background-color:white;cursor:pointer;border:solid 1px #aaaaaa;padding:0;margin:0;margin-top:-2px;display:none;padding:0.25em 0.25em;line-height:1.25em}.suggestions-results{background-color:white;cursor:pointer;border:solid 1px #aaaaaa;padding:0;margin:0}.suggestions-result{color:black;margin:0;line-height:1.5em;padding:0.01em 0.25em;text-align:left; overflow:hidden;-o-text-overflow:ellipsis; text-overflow:ellipsis;white-space:nowrap}.suggestions-result-current{background-color:#4C59A6;color:white}.suggestions-special .special-label{color:gray;text-align:left}.suggestions-special .special-query{color:black;font-style:italic;text-align:left}.suggestions-special .special-hover{background-color:silver}.suggestions-result-current .special-label,.suggestions-result-current .special-query{color:white}.highlight{font-weight:bold}
+@media screen {
+	.tochidden,.toctoggle{-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none}.toctoggle{font-size:94%}}
+@media print {
+	#toc.tochidden,.toctoggle{display:none}}
+.postedit-container{margin:0 auto;position:fixed;top:0;height:0;left:50%;z-index:1000;font-size:13px}.postedit-container:hover{cursor:pointer}.postedit{position:relative;top:0.6em;left:-50%;padding:.6em 3.6em .6em 1.1em;line-height:1.5625em;color:#626465;background-color:#f4f4f4;border:1px solid #dcd9d9;text-shadow:0 0.0625em 0 rgba(255,255,255,0.5);border-radius:5px;box-shadow:0 2px 5px 0 #ccc;-webkit-transition:all 0.25s ease-in-out;-moz-transition:all 0.25s ease-in-out;-ms-transition:all 0.25s ease-in-out;-o-transition:all 0.25s ease-in-out;transition:all 0.25s ease-in-out}.skin-monobook .postedit{top:6em !important}.postedit-faded{opacity:0}.postedit-icon{padding-left:41px;  line-height:25px;background-repeat:no-repeat;background-position:8px 50%}.postedit-icon-checkmark{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB9ElEQVR4AZWRA3AYURQArxrVHtW2bdu2bdu2zdi2bdu2bWxs7zeehZaw4f70kbs+zI3e/nWK+RWx3aOFlrL56Sy5SxrruG69hlv6OyK+mz+8KDSXdXembj0ispT7tjs4ZTIbpYBvxGSGKzZTeFrb7W/meN002swFs0U8ttpHTkF2BvCqWQrW35929bTsKm5Zb+SEwWwcY8wAngB9m7Z+d+rIPZ/npdy12M5p47n8dXsCYAf0qPy06eGMdktuDu9Qf+JmKl3SWM91qzVcN9tAbEYkwMaq0tyb1m/To5kP170el/BK8/qa6sJr70ydf+T/Uu5ab+Oo/lS0AkUBpIFWlZ9WPhxpse/PHO7YbOOczjL0vZV2lNxPPtG73dYXM+xvm2znrOl83tidoqCwMBgYXsPFB0on5S6pr+eK5TKuW67lgvaKvF8mL1dtfTL32FHxRdyx3cQpg7m4x9sCXKkTIzA4LDH44zWdzaUf71hv5rTG4uyzcusybxSX7aThbMQ8XgCYAp3rzTTQOiIh9PNlzY3FSuZxrzjme1Y7uGS6kjsWO4jPjM4FVjRZsvD4kO9XtTZzQn82NyzWc0B7AmZh6gA/hOYSGhfw9YbOVnarj+S7800AL2BIsxUAbWNToj7bhBuQmZcOsFdoKUC74rGheCwXmqAIQTc9jQcrADIAAAAASUVORK5CYII=);background-image:url(/resources/src/mediawiki.action/images/green-checkmark.png?d94f1)!ie;background-position:left}.postedit-close{position:absolute;padding:0 .8em;right:0;top:0;font-size:1.25em;font-weight:bold;line-height:2.3em;color:black;text-shadow:0 0.0625em 0 white;text-decoration:none;opacity:0.2;filter:alpha(opacity=20)}.postedit-close:hover{color:black;text-decoration:none;opacity:0.4;filter:alpha(opacity=40)}</style><style>
+.suggestions a.mw-searchSuggest-link,.suggestions a.mw-searchSuggest-link:hover,.suggestions a.mw-searchSuggest-link:active,.suggestions a.mw-searchSuggest-link:focus{color:black;text-decoration:none}.suggestions-result-current a.mw-searchSuggest-link,.suggestions-result-current a.mw-searchSuggest-link:hover,.suggestions-result-current a.mw-searchSuggest-link:active,.suggestions-result-current a.mw-searchSuggest-link:focus{color:white}.suggestions a.mw-searchSuggest-link .special-query{ overflow:hidden;-o-text-overflow:ellipsis; text-overflow:ellipsis;white-space:nowrap}</style><meta name="ResourceLoaderDynamicStyles" content="">
+<script async="" src="./X-Ray extensions — xrWiki_files/load(1).php"></script>
+<meta name="generator" content="MediaWiki 1.27.2">
+<link rel="alternate" type="application/x-wiki" title="Править" href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit">
+<link rel="edit" title="Править" href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit">
+<link rel="shortcut icon" href="https://xray-engine.org/favicon.png">
+<link rel="search" type="application/opensearchdescription+xml" href="https://xray-engine.org/opensearch_desc.php" title="xrWiki (ru)">
+<link rel="EditURI" type="application/rsd+xml" href="https://xray-engine.org/api.php?action=rsd">
+<link rel="copyright" href="https://xray-engine.org/index.php?title=License">
+<link rel="alternate" type="application/atom+xml" title="xrWiki — Atom-лента" href="https://xray-engine.org/index.php?title=%D0%A1%D0%BB%D1%83%D0%B6%D0%B5%D0%B1%D0%BD%D0%B0%D1%8F:%D0%A1%D0%B2%D0%B5%D0%B6%D0%B8%D0%B5_%D0%BF%D1%80%D0%B0%D0%B2%D0%BA%D0%B8&amp;feed=atom">
+<style type="text/css">
+:root #content > #center > .dose > .dosesingle,
+:root #content > #right > .dose > .dosesingle,
+:root #searchform > #gb > #gbw .gb_Mc[aria-label="promo"] > .gb_ea,
+:root #searchform > #gb > #gbw .gb_Vc[aria-label="promo"] > .gb_ga
+{ display: none !important; }</style><script src="./X-Ray extensions — xrWiki_files/load(2).php"></script></head>
+<body class="mediawiki ltr sitedir-ltr ns-0 ns-subject page-X-Ray_extensions rootpage-X-Ray_extensions skin-vector action-view">
+		<div id="mw-page-base" class="noprint"></div>
+		<div id="mw-head-base" class="noprint"></div>
+		<div id="content" class="mw-body" role="main">
+			<a id="top"></a>
+
+						<div class="mw-indicators">
+</div>
+			<h1 id="firstHeading" class="firstHeading" lang="ru">X-Ray extensions</h1>
+									<div id="bodyContent" class="mw-body-content">
+									<div id="siteSub">Материал из xrWiki</div>
+								<div id="contentSub"></div>
+												<div id="jump-to-nav" class="mw-jump">
+					Перейти к:					<a href="https://xray-engine.org/index.php?title=X-Ray_extensions#mw-head">навигация</a>, 					<a href="https://xray-engine.org/index.php?title=X-Ray_extensions#p-search">поиск</a>
+				</div>
+				<div id="mw-content-text" lang="ru" dir="ltr" class="mw-content-ltr"><div style="padding: .5em 1em; float: right; background: #f2f2f2; border: 1px solid #aaaaaa;">
+<p><big><b>X-Ray extensions</b></big>
+</p>
+<hr>
+<table style="border: none">
+<tbody><tr>
+<td> <b>Тип</b>                     </td>
+<td> Расширения движка
+</td></tr>
+<tr>
+<td> <b>Авторы</b>                  </td>
+<td> malandrinus, kolmogor, K.D., RayTwitty (aka Shadows),
+<p>Real Wolf, kstn, _призрак_, SkyLoader
+</p>
+</td></tr>
+<tr>
+<td> <b>Официальный репозиторий</b> </td>
+<td> <a target="_blank" rel="nofollow noreferrer noopener" class="external text" href="https://github.com/KD87/xray-extensions">GitHub</a>
+</td></tr>
+<tr>
+<td> <b>Официальная тема</b>        </td>
+<td> <a target="_blank" rel="nofollow noreferrer noopener" class="external text" href="http://www.amk-team.ru/forum/topic/10538-x-ray-extensions">AMK форум</a>
+</td></tr></tbody></table>
+</div>
+<p>Этот проект представляет собой набор добавлений, расширяющих возможности движка для скриптеров, а также, в ряде случаев, меняющих поведение игры. Изменения реализованы в виде бинарных патчей библиотек и исполняемых файлов.
+</p><p>Информация данной статьи актуальна для <b>177</b> ревизии официального репозитория.
+</p>
+<div id="toc" class="toc"><div id="toctitle"><h2>Содержание</h2><span class="toctoggle">&nbsp;[<a href="https://xray-engine.org/index.php?title=X-Ray_extensions#" id="togglelink" data-vivaldi-spatnav-clickable="1">убрать</a>]&nbsp;</span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.98.D0.B7.D0.BC.D0.B5.D0.BD.D0.B5.D0.BD.D0.B8.D1.8F"><span class="tocnumber">1</span> <span class="toctext">Изменения</span></a>
+<ul>
+<li class="toclevel-2 tocsection-2"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.A2.D0.A7"><span class="tocnumber">1.1</span> <span class="toctext">ТЧ</span></a>
+<ul>
+<li class="toclevel-3 tocsection-3"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9A.D0.BB.D0.B0.D1.81.D1.81_game_object"><span class="tocnumber">1.1.1</span> <span class="toctext">Класс game_object</span></a>
+<ul>
+<li class="toclevel-4 tocsection-4"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9E.D1.81.D0.BD.D0.BE.D0.B2.D0.BD.D1.8B.D0.B5_.D0.BC.D0.B5.D1.82.D0.BE.D0.B4.D1.8B"><span class="tocnumber">1.1.1.1</span> <span class="toctext">Основные методы</span></a>
+<ul>
+<li class="toclevel-5 tocsection-5"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CActor"><span class="tocnumber">1.1.1.1.1</span> <span class="toctext">CActor</span></a></li>
+<li class="toclevel-5 tocsection-6"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CCar"><span class="tocnumber">1.1.1.1.2</span> <span class="toctext">CCar</span></a></li>
+<li class="toclevel-5 tocsection-7"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CEntityAlive"><span class="tocnumber">1.1.1.1.3</span> <span class="toctext">CEntityAlive</span></a></li>
+<li class="toclevel-5 tocsection-8"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CGameObject"><span class="tocnumber">1.1.1.1.4</span> <span class="toctext">CGameObject</span></a></li>
+<li class="toclevel-5 tocsection-9"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CHangingLamp"><span class="tocnumber">1.1.1.1.5</span> <span class="toctext">CHangingLamp</span></a></li>
+<li class="toclevel-5 tocsection-10"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CHolderCustom"><span class="tocnumber">1.1.1.1.6</span> <span class="toctext">CHolderCustom</span></a></li>
+<li class="toclevel-5 tocsection-11"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CHudItem"><span class="tocnumber">1.1.1.1.7</span> <span class="toctext">CHudItem</span></a></li>
+<li class="toclevel-5 tocsection-12"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CInventoryBox"><span class="tocnumber">1.1.1.1.8</span> <span class="toctext">CInventoryBox</span></a></li>
+<li class="toclevel-5 tocsection-13"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CInventoryItem"><span class="tocnumber">1.1.1.1.9</span> <span class="toctext">CInventoryItem</span></a></li>
+<li class="toclevel-5 tocsection-14"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CInventoryOwner"><span class="tocnumber">1.1.1.1.10</span> <span class="toctext">CInventoryOwner</span></a></li>
+<li class="toclevel-5 tocsection-15"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CObject"><span class="tocnumber">1.1.1.1.11</span> <span class="toctext">CObject</span></a></li>
+<li class="toclevel-5 tocsection-16"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CProjector"><span class="tocnumber">1.1.1.1.12</span> <span class="toctext">CProjector</span></a></li>
+<li class="toclevel-5 tocsection-17"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CSpaceRestrictor"><span class="tocnumber">1.1.1.1.13</span> <span class="toctext">CSpaceRestrictor</span></a></li>
+<li class="toclevel-5 tocsection-18"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CTorch"><span class="tocnumber">1.1.1.1.14</span> <span class="toctext">CTorch</span></a></li>
+<li class="toclevel-5 tocsection-19"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#CWeapon"><span class="tocnumber">1.1.1.1.15</span> <span class="toctext">CWeapon</span></a></li>
+</ul>
+</li>
+<li class="toclevel-4 tocsection-20"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.A5.D0.B0.D0.BA_.D0.B4.D0.BB.D1.8F_.D0.B8.D0.B7.D0.BC.D0.B5.D0.BD.D0.B5.D0.BD.D0.B8.D1.8F_.D0.B7.D0.BD.D0.B0.D1.87.D0.B5.D0.BD.D0.B8.D0.B9_.D0.B2_.D0.BF.D0.B0.D0.BC.D1.8F.D1.82.D0.B8_.D0.BE.D0.B1.D1.8A.D0.B5.D0.BA.D1.82.D0.BE.D0.B2"><span class="tocnumber">1.1.1.2</span> <span class="toctext">Хак для изменения значений в памяти объектов</span></a></li>
+<li class="toclevel-4 tocsection-21"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9C.D0.B5.D1.82.D0.BE.D0.B4.D1.8B_.D0.B4.D0.BB.D1.8F_.D0.BF.D0.BE.D0.BB.D1.83.D1.87.D0.B5.D0.BD.D0.B8.D1.8F_.D0.B0.D0.B4.D1.80.D0.B5.D1.81.D0.B0_.D0.B1.D0.B0.D0.B7.D0.BE.D0.B2.D0.BE.D0.B3.D0.BE_.D0.BE.D0.B1.D1.8A.D0.B5.D0.BA.D1.82.D0.B0"><span class="tocnumber">1.1.1.3</span> <span class="toctext">Методы для получения адреса базового объекта</span></a></li>
+<li class="toclevel-4 tocsection-22"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9C.D0.B5.D1.82.D0.BE.D0.B4.D1.8B_.D0.B4.D0.BB.D1.8F_.D0.BF.D1.80.D0.BE.D0.B2.D0.B5.D1.80.D0.BA.D0.B8_.D1.82.D0.B8.D0.BF.D0.B0_.D0.BE.D0.B1.D1.8A.D0.B5.D0.BA.D1.82.D0.B0"><span class="tocnumber">1.1.1.4</span> <span class="toctext">Методы для проверки типа объекта</span></a></li>
+<li class="toclevel-4 tocsection-23"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9C.D0.B5.D1.82.D0.BE.D0.B4.D1.8B_.D0.BD.D0.B5_.D0.B8.D0.BC.D0.B5.D1.8E.D1.89.D0.B8.D0.B5_.D0.BF.D1.80.D0.B8.D0.B2.D1.8F.D0.B7.D0.BA.D0.B8_.D0.BA_.D0.BE.D0.BF.D1.80.D0.B5.D0.B4.D0.B5.D0.BB.D0.B5.D0.BD.D0.BD.D0.BE.D0.BC.D1.83_.D0.BE.D0.B1.D1.8A.D0.B5.D0.BA.D1.82.D1.83"><span class="tocnumber">1.1.1.5</span> <span class="toctext">Методы не имеющие привязки к определенному объекту</span></a></li>
+</ul>
+</li>
+<li class="toclevel-3 tocsection-24"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9A.D0.BB.D0.B0.D1.81.D1.81_matrix"><span class="tocnumber">1.1.2</span> <span class="toctext">Класс matrix</span></a></li>
+<li class="toclevel-3 tocsection-25"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9A.D0.BB.D0.B0.D1.81.D1.81_CTime"><span class="tocnumber">1.1.3</span> <span class="toctext">Класс CTime</span></a></li>
+<li class="toclevel-3 tocsection-26"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9A.D0.BB.D0.B0.D1.81.D1.81_CALifeSimulator"><span class="tocnumber">1.1.4</span> <span class="toctext">Класс CALifeSimulator</span></a></li>
+<li class="toclevel-3 tocsection-27"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9A.D0.BB.D0.B0.D1.81.D1.81_CSE_Abstract"><span class="tocnumber">1.1.5</span> <span class="toctext">Класс CSE_Abstract</span></a></li>
+<li class="toclevel-3 tocsection-28"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9A.D0.BB.D0.B0.D1.81.D1.81_CSE_ALifeObject"><span class="tocnumber">1.1.6</span> <span class="toctext">Класс CSE_ALifeObject</span></a></li>
+<li class="toclevel-3 tocsection-29"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9F.D1.80.D0.BE.D1.81.D1.82.D1.80.D0.B0.D0.BD.D1.81.D1.82.D0.B2.D0.BE_.D0.B8.D0.BC.D0.B5.D0.BD_level"><span class="tocnumber">1.1.7</span> <span class="toctext">Пространство имен level</span></a></li>
+<li class="toclevel-3 tocsection-30"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.93.D0.BB.D0.BE.D0.B1.D0.B0.D0.BB.D1.8C.D0.BD.D0.BE.D0.B5_.D0.BF.D1.80.D0.BE.D1.81.D1.82.D1.80.D0.B0.D0.BD.D1.81.D1.82.D0.B2.D0.BE_.D0.B8.D0.BC.D0.B5.D0.BD"><span class="tocnumber">1.1.8</span> <span class="toctext">Глобальное пространство имен</span></a></li>
+<li class="toclevel-3 tocsection-31"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9E.D0.BA.D0.BE.D0.BD.D0.BD.D1.8B.D0.B5_.D0.BA.D0.BB.D0.B0.D1.81.D1.81.D1.8B"><span class="tocnumber">1.1.9</span> <span class="toctext">Оконные классы</span></a>
+<ul>
+<li class="toclevel-4 tocsection-32"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9A.D0.BB.D0.B0.D1.81.D1.81_CUIWindow"><span class="tocnumber">1.1.9.1</span> <span class="toctext">Класс CUIWindow</span></a></li>
+<li class="toclevel-4 tocsection-33"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9A.D0.BB.D0.B0.D1.81.D1.81_CUIStatic"><span class="tocnumber">1.1.9.2</span> <span class="toctext">Класс CUIStatic</span></a></li>
+<li class="toclevel-4 tocsection-34"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9A.D0.BB.D0.B0.D1.81.D1.81_CUIListWnd"><span class="tocnumber">1.1.9.3</span> <span class="toctext">Класс CUIListWnd</span></a></li>
+<li class="toclevel-4 tocsection-35"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9A.D0.BB.D0.B0.D1.81.D1.81_CUIComboBox"><span class="tocnumber">1.1.9.4</span> <span class="toctext">Класс CUIComboBox</span></a></li>
+<li class="toclevel-4 tocsection-36"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9A.D0.BB.D0.B0.D1.81.D1.81_CUITrackBar"><span class="tocnumber">1.1.9.5</span> <span class="toctext">Класс CUITrackBar</span></a></li>
+</ul>
+</li>
+<li class="toclevel-3 tocsection-37"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.94.D0.BE.D0.BF.D0.BE.D0.BB.D0.BD.D0.B8.D1.82.D0.B5.D0.BB.D1.8C.D0.BD.D0.B0.D1.8F_.D0.B8.D0.BD.D1.84.D0.BE.D1.80.D0.BC.D0.B0.D1.86.D0.B8.D1.8F"><span class="tocnumber">1.1.10</span> <span class="toctext">Дополнительная информация</span></a>
+<ul>
+<li class="toclevel-4 tocsection-38"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9F.D0.BE.D0.B4.D1.81.D0.B2.D0.B5.D1.82.D0.BA.D0.B0_.D1.82.D0.B5.D0.BA.D1.81.D1.82.D0.B0_.D0.B2_.D0.BA.D0.BE.D0.BD.D1.81.D0.BE.D0.BB.D0.B8"><span class="tocnumber">1.1.10.1</span> <span class="toctext">Подсветка текста в консоли</span></a></li>
+<li class="toclevel-4 tocsection-39"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#.D0.9E.D0.B1.D1.89.D0.B8.D0.B5_.D1.80.D0.B5.D0.BA.D0.BE.D0.BC.D0.B5.D0.BD.D0.B4.D0.B0.D1.86.D0.B8.D0.B8"><span class="tocnumber">1.1.10.2</span> <span class="toctext">Общие рекомендации</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+
+<h1><span class="mw-headline" id=".D0.98.D0.B7.D0.BC.D0.B5.D0.BD.D0.B5.D0.BD.D0.B8.D1.8F">Изменения</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=1" title="Редактировать раздел «Изменения»">править</a><span class="mw-editsection-bracket">]</span></span></h1>
+<h2><span class="mw-headline" id=".D0.A2.D0.A7">ТЧ</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=2" title="Редактировать раздел «ТЧ»">править</a><span class="mw-editsection-bracket">]</span></span></h2>
+<h3><span class="mw-headline" id=".D0.9A.D0.BB.D0.B0.D1.81.D1.81_game_object">Класс game_object</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=3" title="Редактировать раздел «Класс game object»">править</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h4><span class="mw-headline" id=".D0.9E.D1.81.D0.BD.D0.BE.D0.B2.D0.BD.D1.8B.D0.B5_.D0.BC.D0.B5.D1.82.D0.BE.D0.B4.D1.8B">Основные методы</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=4" title="Редактировать раздел «Основные методы»">править</a><span class="mw-editsection-bracket">]</span></span></h4>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="o">//</span> <span class="n">CActor</span>
+<span class="n">set_actor_visual</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="n">float</span> <span class="n">get_sprint_factor</span><span class="p">()</span>
+<span class="n">set_sprint_factor</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">float</span> <span class="n">get_actor_take_dist</span><span class="p">()</span>
+<span class="n">set_actor_take_dist</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">float</span> <span class="n">get_actor_max_weight</span><span class="p">()</span>
+<span class="n">set_actor_max_weight</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">float</span> <span class="n">get_actor_max_walk_weight</span><span class="p">()</span>
+<span class="n">set_actor_max_walk_weight</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">open_inventory_box</span><span class="p">(</span><span class="n">game_object</span><span class="o">*</span><span class="p">)</span>
+<span class="n">set_camera_direction</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+<span class="n">update_camera_direction</span><span class="p">(</span><span class="n">game_object</span><span class="o">*</span><span class="p">)</span>
+<span class="n">enable_car_panel</span><span class="p">(</span><span class="n">bool</span><span class="p">)</span>
+<span class="n">attach_vehicle</span><span class="p">(</span><span class="n">game_object</span><span class="o">*</span><span class="p">)</span>
+<span class="n">detach_vehicle</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+<span class="n">set_goodwill_ex</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">change_goodwill_ex</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">float</span> <span class="n">get_camera_fov</span><span class="p">()</span>
+<span class="n">set_camera_fov</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">restore_camera_fov</span><span class="p">()</span>
+<span class="n">float</span> <span class="n">get_hud_fov</span><span class="p">()</span>
+<span class="n">set_hud_fov</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">set_hud_animation_channel</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">set_hud_animation_callback_param</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">set_use_hud_animation_callback</span><span class="p">(</span><span class="n">bool</span><span class="p">)</span>
+<span class="n">clear_personal_record</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">uint</span> <span class="n">actor_body_state</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_actor_normal</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_actor_crouch</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_actor_creep</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_actor_climb</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_actor_walking</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_actor_running</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_actor_sprinting</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_actor_crouching</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_actor_creeping</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_actor_climbing</span><span class="p">()</span>
+
+<span class="o">//</span> <span class="n">CCar</span>
+<span class="n">float</span> <span class="n">get_fuel</span><span class="p">()</span>
+<span class="n">set_fuel</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">float</span> <span class="n">get_fuel_consumption</span><span class="p">()</span>
+<span class="n">set_fuel_consumption</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">float</span> <span class="n">get_fuel_tank</span><span class="p">()</span>
+
+<span class="o">//</span> <span class="n">CEntityAlive</span>
+<span class="n">heal_wounds</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">update_condition</span><span class="p">()</span>
+
+<span class="o">//</span> <span class="n">CGameObject</span>
+<span class="n">string</span> <span class="n">specific_character</span><span class="p">()</span>
+<span class="n">int</span> <span class="n">get_bone_visible</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_bone_visible</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_bone_id</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">string</span> <span class="n">get_bone_name</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">has_visual</span><span class="p">()</span>
+<span class="n">ini_file</span><span class="o">*</span> <span class="n">get_visual_ini</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">nonscript_usable</span><span class="p">()</span>
+
+<span class="o">//</span> <span class="n">CHangingLamp</span>
+<span class="n">set_lsf_speed</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">set_lsf_amount</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">set_lsf_smap_jitter</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">float</span> <span class="n">get_lsf_speed</span><span class="p">()</span>
+
+<span class="o">//</span> <span class="n">CHolderCustom</span>
+<span class="n">game_object</span><span class="o">*</span> <span class="n">get_holder_owner</span><span class="p">()</span>
+
+<span class="o">//</span> <span class="n">CHudItem</span>
+<span class="n">play_hud_animation</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">bool</span><span class="p">)</span>
+<span class="n">uint</span> <span class="n">get_hud_animation_remaining_time</span><span class="p">()</span>
+<span class="n">int</span> <span class="n">get_hud_animation_length</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">bool</span> <span class="n">is_cyclic_hud_animation</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">has_hud_animation</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="n">uint</span> <span class="n">get_hud_item_state</span><span class="p">()</span>
+<span class="n">int</span> <span class="n">get_hud_bone_id</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">vector</span> <span class="n">get_hud_bone_pos</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_hud_bone_visible</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_hud_bone_visible</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">CInventoryBox</span>
+<span class="n">game_object</span><span class="o">*</span> <span class="n">object_from_inv_box</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">uint</span> <span class="n">inv_box_count</span><span class="p">()</span>
+
+<span class="o">//</span> <span class="n">CInventoryItem</span>
+<span class="n">float</span> <span class="n">get_weight</span><span class="p">()</span>
+
+<span class="o">//</span> <span class="n">CInventoryOwner</span>
+<span class="n">bool</span> <span class="n">is_on_belt</span><span class="p">(</span><span class="n">game_object</span><span class="o">*</span><span class="p">)</span>
+<span class="n">bool</span> <span class="n">is_in_ruck</span><span class="p">(</span><span class="n">game_object</span><span class="o">*</span><span class="p">)</span>
+<span class="n">bool</span> <span class="n">is_in_slot</span><span class="p">(</span><span class="n">game_object</span><span class="o">*</span><span class="p">)</span>
+<span class="n">bool</span> <span class="n">move_to_ruck</span><span class="p">(</span><span class="n">game_object</span><span class="o">*</span><span class="p">)</span>
+<span class="n">bool</span> <span class="n">move_to_belt</span><span class="p">(</span><span class="n">game_object</span><span class="o">*</span><span class="p">)</span>
+<span class="n">bool</span> <span class="n">move_to_slot</span><span class="p">(</span><span class="n">game_object</span><span class="o">*</span><span class="p">)</span>
+<span class="n">bool</span> <span class="n">move_to_slot_and_activate</span><span class="p">(</span><span class="n">game_object</span><span class="o">*</span><span class="p">)</span>
+<span class="n">game_object</span><span class="o">*</span> <span class="n">item_on_belt</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">game_object</span><span class="o">*</span> <span class="n">item_in_ruck</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">uint</span> <span class="n">belt_count</span><span class="p">()</span>
+<span class="n">uint</span> <span class="n">ruck_count</span><span class="p">()</span>
+<span class="n">uint</span> <span class="n">slot_number</span><span class="p">()</span>
+<span class="n">float</span> <span class="n">get_inventory_weight</span><span class="p">()</span>
+<span class="n">invalidate_inventory</span><span class="p">()</span>
+
+<span class="o">//</span> <span class="n">CObject</span>
+<span class="n">float</span> <span class="n">radius</span><span class="p">()</span>
+<span class="n">string</span> <span class="n">get_visual_name</span><span class="p">()</span>
+<span class="n">set_visual_name</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">CProjector</span>
+<span class="n">projector_on</span><span class="p">()</span>
+<span class="n">projector_off</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">projector_is_on</span><span class="p">()</span>
+<span class="n">switch_projector</span><span class="p">(</span><span class="n">bool</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">CSpaceRestrictor</span>
+<span class="n">float</span> <span class="n">get_shape_radius</span><span class="p">()</span>
+
+<span class="o">//</span> <span class="n">CTorch</span>
+<span class="n">switch_torch</span><span class="p">(</span><span class="n">bool</span><span class="p">)</span>
+<span class="n">bool</span> <span class="n">is_torch_enabled</span><span class="p">()</span>
+<span class="n">set_torch_range</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">set_torch_color</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+<span class="n">set_torch_omni_range</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">set_torch_omni_color</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+<span class="n">set_torch_glow_radius</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">set_torch_spot_angle</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">set_torch_color_animator</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="n">switch_night_vision</span><span class="p">(</span><span class="n">bool</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">CWeapon</span>
+<span class="n">int</span> <span class="n">get_wpn_bone_visible</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_wpn_bone_visible</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+</pre></div>
+<h5><span class="mw-headline" id="CActor">CActor</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=5" title="Редактировать раздел «CActor»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>set_actor_visual(string&lt;path&gt;)</code> - устанавливает путь до визуала.<br>
+<code>float&lt;speed&gt; get_sprint_factor()</code> - возвращает скорость бега.<br>
+<code>set_sprint_factor(float&lt;speed&gt;)</code> - устанавливает скорость бега.<br>
+<code>float&lt;dist&gt; get_actor_take_dist()</code> - возвращает дистанцию поднятия предметов.<br>
+<code>set_actor_take_dist(float&lt;dist&gt;)</code> - устанавливает дистанцию поднятия предметов.<br>
+<code>float&lt;max_weight&gt; get_actor_max_weight()</code> - возвращает максимальный вес рюкзака.<br>
+<code>set_actor_max_weight(float&lt;max_weight&gt;)</code> - устанавливает максимальный вес рюкзака.<br>
+<code>float&lt;max_walk_weight&gt; get_actor_max_walk_weight()</code> - возвращает максимально-переносимый вес рюкзака.<br>
+<code>set_actor_max_walk_weight(float&lt;max_walk_weight&gt;)</code> - устанавливает максимально-переносимый вес рюкзака.<br>
+<code>open_inventory_box(game_object*&lt;box_obj&gt;)</code> - открывает окно обыска инвентарного ящика.<br>
+<code>set_camera_direction(vector&lt;x, y, z&gt;)</code> - устанавливает направление камеры.<br>
+<code>update_camera_direction(game_object*&lt;target_obj&gt;)</code> - направляет камеру в позицию объекта.<br>
+<code>enable_car_panel(bool&lt;is_visible&gt;)</code> - устанавливает видимость панели машины (прогресс-бар состояния).<br>
+<code>attach_vehicle(game_object*&lt;holder_obj&gt;)</code> - садит ГГ в машину или станковое оружие.<br>
+<code>detach_vehicle(vector&lt;exit_pos&gt;)</code> - высаживает ГГ из машины в заданную позицию на уровне.<br>
+<code>set_goodwill_ex(int&lt;who_id&gt;, int&lt;to_whom_id&gt;, int&lt;goodwill&gt;)</code> - устанавливает отношения между персонажами.<br>
+<code>change_goodwill_ex(int&lt;who_id&gt;, int&lt;to_whom_id&gt;, int&lt;goodwill_change&gt;)</code> - изменяет отношения между персонажами на заданное значение.<br>
+<code>float&lt;fov&gt; get_camera_fov()</code> - возвращает текущий fov камеры.<br>
+<code>set_camera_fov(float&lt;fov&gt;)</code> - устанавливает fov камеры.<br>
+<code>restore_camera_fov()</code> - восстанавливает предыдущий fov камеры (заданный методом <code>set_camera_fov</code>).<br>
+<code>float&lt;dist&gt; get_hud_fov()</code> - возвращает расстояние от камеры до худа оружия.<br>
+<code>set_hud_fov(float&lt;dist&gt;)</code> - устанавливает расстояние от камеры до худа оружия.<br>
+<code>set_hud_animation_channel(int&lt;blend_channel&gt;)</code> -- устанавливает номер канала блендинга анимации, который будет передан в колбек на завершение анимации (только при проигрывании анимации через метод <code>play_hud_animation</code>).<br>
+<code>set_hud_animation_callback_param(int&lt;param&gt;)</code> -- устанавливает произвольный параметр, который будет передан в колбек на завершение анимации (только при проигрывании анимации через метод <code>play_hud_animation</code>).<br>
+<code>set_use_hud_animation_callback(bool&lt;use_callback&gt;)</code> -- включает использование колбека на завершение анимации (только при проигрывании анимации через метод <code>play_hud_animation</code>).<br>
+<code>clear_personal_record(int&lt;id_from&gt;, int&lt;id_to&gt;)</code> - очищает отношения между двумя мобами по их id.<br>
+<code>uint&lt;state&gt; actor_body_state()</code> - возвращает номер текущего стейта.<br>
+<code>bool is_actor_normal()</code> - возвратит true, если ГГ просто стоит.<br>
+<code>bool is_actor_crouch()</code> - возвратит true, если ГГ присел.<br>
+<code>bool is_actor_creep()</code> - возвратит true, если ГГ глубоко присел.<br>
+<code>bool is_actor_climb()</code> - возвратит true, если ГГ находится на лестнице.<br>
+<code>bool is_actor_walking()</code> - возвратит true, если ГГ идет медленным шагом.<br>
+<code>bool is_actor_running()</code> - возвратит true, если ГГ идет быстрым шагом.<br>
+<code>bool is_actor_sprinting()</code> - возвратит true, если ГГ бежит.<br>
+<code>bool is_actor_crouching()</code> - возвратит true, если ГГ двигается в присяде.<br>
+<code>bool is_actor_creeping()</code> - возвратит true, если ГГ двигается в глубоком присяде.<br>
+<code>bool is_actor_climbing()</code> - возвратит true, если ГГ двигается на лестнице.<br>
+</p>
+<h5><span class="mw-headline" id="CCar">CCar</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=6" title="Редактировать раздел «CCar»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>float&lt;fuel&gt; get_fuel()</code> - возвращает текущее количество топлива.<br>
+<code>set_fuel(float&lt;fuel&gt;)</code> - устанавливает текущее количество топлива.<br>
+<code>float&lt;consumption&gt; get_fuel_consumption()</code> - возвращает расход топлива.<br>
+<code>set_fuel_consumption(float&lt;consumption&gt;)</code> - устанавливает расход топлива.<br>
+<code>float&lt;tank_size&gt; get_fuel_tank()</code> - возвращает размер топливного бака.<br>
+</p>
+<h5><span class="mw-headline" id="CEntityAlive">CEntityAlive</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=7" title="Редактировать раздел «CEntityAlive»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>heal_wounds(float&lt;factor&gt;)</code> - уменьшает силу кровотечения.<br>
+<code>update_condition()</code> - принудительно обновляет внутренние параметры состояния персонажа (жизнь, выносливость, кровотечение и т.д.).<br>
+</p>
+<h5><span class="mw-headline" id="CGameObject">CGameObject</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=8" title="Редактировать раздел «CGameObject»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>string&lt;profile_name&gt; specific_character()</code> - возвращает название профиля персонажа.<br>
+<code>int&lt;is_visible&gt;[0 or 1] get_bone_visible(string&lt;bone_name&gt;)</code> - возвращает видимость кости по имени.<br>
+<code>set_bone_visible(string&lt;bone_name&gt;, int&lt;visible&gt;[0 or 1])</code> - устанавливает видимость кости по имени.<br>
+<code>int&lt;bone_id&gt; get_bone_id(string&lt;bone_name&gt;)</code> - возвращает id кости по имени.<br>
+<code>string&lt;bone_name&gt; get_bone_name()</code> - возвращает имя кости по id (для установки id кости, необходимо использовать глобальную функцию <code>set_int_arg0(int&lt;bone_id&gt;)</code>).<br>
+<code>bool&lt;visual&gt; has_visual()</code> - возвратит true, если объект имеет визуал.<br>
+<code>ini_file* get_visual_ini()</code> - возвращает ссылку на внутренний конфиг модели.<br>
+<code>bool&lt;is_usable&gt; nonscript_usable()</code> - возвратит true, если над объектом разрешены нескриптовые действия.<br>
+</p>
+<h5><span class="mw-headline" id="CHangingLamp">CHangingLamp</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=9" title="Редактировать раздел «CHangingLamp»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>set_lsf_speed(float&lt;speed&gt;)</code> - устанавливает скорость затухания тени (чем больше - тем быстрее).<br>
+<code>set_lsf_amount(float&lt;amount&gt;)</code> - устанавливает максимальное ослабление тени (1.0 - пропадает до нуля, 0.0 - не ослабляется вовсе).<br>
+<code>set_lsf_smap_jitter(float&lt;jitter&gt;)</code> - устанавливает коэффициент размытия теней (чем больше число, тем больше размытие с отдалением от источника).<br>
+<code>float&lt;speed&gt; get_lsf_speed()</code> - возвращает скорость затухания тени.<br>
+Для работы данных методов необходимы дополнительные правки движка и шейдеров. Этот функционал широко используются в моде OGSE/OGSR.<br>
+</p>
+<h5><span class="mw-headline" id="CHolderCustom">CHolderCustom</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=10" title="Редактировать раздел «CHolderCustom»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>game_object*&lt;owner_obj&gt; get_holder_owner()</code> - возвращает владельца машины или станкового оружия.<br>
+</p>
+<h5><span class="mw-headline" id="CHudItem">CHudItem</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=11" title="Редактировать раздел «CHudItem»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>play_hud_animation(string&lt;anim_name&gt;, bool&lt;mix_in&gt;)</code> - проигрывает анимацию с заданным именем.<br>
+<code>uint&lt;remaining_time&gt; get_hud_animation_remaining_time()</code> - возвращает время, оставшееся до окончания текущей анимации.<br>
+<code>int&lt;length&gt; get_hud_animation_length(string&lt;anim_name&gt;)</code> - возвращает длительность анимации по её имени.<br>
+<code>bool&lt;is_cyclic&gt; is_cyclic_hud_animation()</code> - возвратит true, если текущая анимация зациклена.<br>
+<code>bool&lt;has_anim&gt; has_hud_animation(string&lt;anim_name&gt;)</code> - возвратит true, если анимация есть в модели.<br>
+<code>uint&lt;state&gt; get_hud_item_state()</code> - возвращает номер текущего стейта.<br>
+<code>int&lt;bone_id&gt; get_hud_bone_id(string&lt;bone_name&gt;)</code> - возвращает id кости по имени.<br>
+<code>vector&lt;pos&gt; get_hud_bone_pos(string&lt;bone_name&gt;)</code> - возвращает позицию кости по имени.<br>
+<code>int&lt;is_visible&gt;[0 or 1] get_hud_bone_visible(string&lt;bone_name&gt;)</code> - возвращает видимость кости по имени.<br>
+<code>set_hud_bone_visible(string&lt;bone_name&gt;, int&lt;visible&gt;[0 or 1])</code> - устанавливает видимость кости по имени.<br>
+</p>
+<h5><span class="mw-headline" id="CInventoryBox">CInventoryBox</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=12" title="Редактировать раздел «CInventoryBox»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>game_object*&lt;item_obj&gt; object_from_inv_box(int&lt;object_number&gt;)</code> - возвращает предмет в ящике по номеру.<br>
+<code>uint&lt;items_count&gt; inv_box_count()</code> - возвращает количество предметов в ящике.<br>
+</p>
+<h5><span class="mw-headline" id="CInventoryItem">CInventoryItem</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=13" title="Редактировать раздел «CInventoryItem»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>float&lt;weight&gt; get_weight()</code> - возвращает вес предмета.<br>
+</p>
+<h5><span class="mw-headline" id="CInventoryOwner">CInventoryOwner</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=14" title="Редактировать раздел «CInventoryOwner»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>bool&lt;is_on_belt&gt; is_on_belt(game_object*&lt;item_obj&gt;)</code> - возвратит true, если предмет на поясе.<br>
+<code>bool&lt;is_in_ruck&gt; is_in_ruck(game_object*&lt;item_obj&gt;)</code> - возвратит true, если предмет в рюкзаке.<br>
+<code>bool&lt;is_in_slot&gt; is_in_slot(game_object*&lt;item_obj&gt;)</code> - возвратит true, если предмет в слоте.<br>
+<code>move_to_ruck(game_object*&lt;item_obj&gt;)</code> - перемещает предмет в рюкзак.<br>
+<code>move_to_belt(game_object*&lt;item_obj&gt;)</code> - перемещает предмет на пояс.<br>
+<code>move_to_slot(game_object*&lt;item_obj&gt;)</code> - перемещает предмет в слот.<br>
+<code>move_to_slot_and_activate(game_object*&lt;item_obj&gt;)</code> - перемещает предмет в слот и активирует его.<br>
+<code>game_object*&lt;item_obj&gt; item_on_belt(int&lt;object_number&gt;)</code> - возвращает предмет на поясе по номеру.<br>
+<code>game_object*&lt;item_obj&gt; item_in_ruck(int&lt;object_number&gt;)</code> - возвращает предмет в рюкзаке по номеру.<br>
+<code>uint&lt;count&gt; belt_count()</code> - возвращает количество предметов на поясе.<br>
+<code>uint&lt;count&gt; ruck_count()</code> - возвращает количество предметов в рюкзаке.<br>
+<code>uint&lt;number&gt; slot_number()</code> - возвращает количество слотов.<br>
+<code>float&lt;total_weight&gt; get_inventory_weight()</code> - возвращает суммарный вес инвентаря.<br>
+<code>invalidate_inventory()</code> - принудительно обновляет все данные в инвентаре.<br>
+</p>
+<h5><span class="mw-headline" id="CObject">CObject</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=15" title="Редактировать раздел «CObject»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>float&lt;radius&gt; radius()</code> - возвращает виртуальный радиус объекта.<br>
+<code>string&lt;path&gt; get_visual_name()</code> - возвращает путь до визуала объекта.<br>
+<code>set_visual_name(string&lt;path&gt;)</code> - устанавливает путь до визуала объекта.<br>
+</p>
+<h5><span class="mw-headline" id="CProjector">CProjector</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=16" title="Редактировать раздел «CProjector»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>projector_on()</code> - включает прожектор.<br>
+<code>projector_off()</code> - выключает прожектор.<br>
+<code>bool&lt;is_on&gt; projector_is_on()</code> - возвратит true, если прожектор включён.<br>
+<code>switch_projector(bool&lt;switch_on&gt;)</code> - переключает прожектор.<br>
+</p>
+<h5><span class="mw-headline" id="CSpaceRestrictor">CSpaceRestrictor</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=17" title="Редактировать раздел «CSpaceRestrictor»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>float&lt;radius&gt; get_shape_radius()</code> - возвращает радиус рестриктора.<br>
+</p>
+<h5><span class="mw-headline" id="CTorch">CTorch</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=18" title="Редактировать раздел «CTorch»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>switch_torch(bool&lt;switch_on&gt;)</code> - переключает фонарь.<br>
+<code>bool&lt;is_on&gt; is_torch_enabled()</code> - возвратит true, если фонарь включён.<br>
+<code>set_torch_range(float&lt;range&gt;)</code> - устанавливает дальность основного света фонаря.<br>
+<code>set_torch_color(vector&lt;R, G, B&gt;)</code> - устанавливает цвет основного света от фонаря.<br>
+<code>set_torch_omni_range(float&lt;range&gt;)</code> - устанавливает дальность амбиент-света фонаря.<br>
+<code>set_torch_omni_color(vector&lt;R, G, B&gt;)</code> - устанавливает цвет амбиент-света от фонаря.<br>
+<code>set_torch_glow_radius(float&lt;radius&gt;)</code> - устанавливает радиус глоу-эффекта от фонарика.<br>
+<code>set_torch_spot_angle(float&lt;angle&gt;)</code> - устанавливает радиус светового пятна от фонарика.<br>
+<code>set_torch_color_animator(string&lt;path&gt;)</code> - устанавливает путь до аниматора цвета.<br>
+<code>switch_night_vision(bool&lt;switch_on&gt;)</code> - переключает состояние ПНВ.<br>
+</p>
+<h5><span class="mw-headline" id="CWeapon">CWeapon</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=19" title="Редактировать раздел «CWeapon»">править</a><span class="mw-editsection-bracket">]</span></span></h5>
+<p><code>int&lt;is_visible&gt;[0 or 1] get_wpn_bone_visible(string&lt;bone_name&gt;)</code> - возвращает видимость кости оружия по имени.<br>
+<code>set_wpn_bone_visible(string&lt;bone_name&gt;, int&lt;visible&gt;[0 or 1])</code> - устанавливает видимость кости оружия по имени.<br>
+</p>
+<h4><span class="mw-headline" id=".D0.A5.D0.B0.D0.BA_.D0.B4.D0.BB.D1.8F_.D0.B8.D0.B7.D0.BC.D0.B5.D0.BD.D0.B5.D0.BD.D0.B8.D1.8F_.D0.B7.D0.BD.D0.B0.D1.87.D0.B5.D0.BD.D0.B8.D0.B9_.D0.B2_.D0.BF.D0.B0.D0.BC.D1.8F.D1.82.D0.B8_.D0.BE.D0.B1.D1.8A.D0.B5.D0.BA.D1.82.D0.BE.D0.B2">Хак для изменения значений в памяти объектов</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=20" title="Редактировать раздел «Хак для изменения значений в памяти объектов»">править</a><span class="mw-editsection-bracket">]</span></span></h4>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="o">//</span> <span class="n">CActor</span>
+<span class="n">float</span> <span class="n">get_actor_float</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">set_actor_float</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">float</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_actor_int</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_actor_int</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_actor_int16</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">string</span> <span class="n">get_actor_shared_str</span><span class="p">()</span>
+<span class="n">int</span> <span class="n">set_actor_shared_str</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">float</span> <span class="n">get_actor_condition_float</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">set_actor_condition_float</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">float</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_actor_condition_int</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">CCar</span>
+<span class="n">float</span> <span class="n">get_car_float</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">set_car_float</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">float</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_car_int</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_car_int</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_car_int16</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_car_int16</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">CCustomMonster</span>
+<span class="n">float</span> <span class="n">get_custom_monster_float</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_custom_monster_int</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">CGameObject</span>
+<span class="n">float</span> <span class="n">get_go_float</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">set_go_float</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">float</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_go_int</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_go_int</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_go_int16</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_go_int16</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">string</span> <span class="n">get_go_shared_str</span><span class="p">()</span>
+<span class="n">int</span> <span class="n">set_go_shared_str</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">CHolderCustom</span>
+<span class="n">int</span> <span class="n">get_holder_int</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">CHudItem</span>
+<span class="n">float</span> <span class="n">get_hud_float</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">set_hud_float</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">float</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">string</span> <span class="n">get_hud_shared_str</span><span class="p">()</span>
+<span class="n">int</span> <span class="n">set_hud_shared_str</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">save_hud_bone_float</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">CInventoryItem</span>
+<span class="n">float</span> <span class="n">get_inventory_item_float</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">set_inventory_item_float</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">float</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_inventory_item_int</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_inventory_item_int</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_inventory_item_int8</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_inventory_item_int8</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_inventory_item_int16</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_inventory_item_int16</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">string</span> <span class="n">get_inventory_item_shared_str</span><span class="p">()</span>
+<span class="n">int</span> <span class="n">set_inventory_item_shared_str</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">CWeapon</span>
+<span class="n">float</span> <span class="n">get_wpn_float</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">set_wpn_float</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">float</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_wpn_int</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_wpn_int</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_wpn_int8</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_wpn_int8</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_wpn_int16</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_wpn_int16</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">string</span> <span class="n">get_wpn_shared_str</span><span class="p">()</span>
+<span class="n">int</span> <span class="n">set_wpn_shared_str</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">CWeaponMagazinedWGrenade</span>
+<span class="n">int</span> <span class="n">get_wpn_gl_int</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="n">Memory</span> <span class="n">access</span> <span class="n">functions</span>
+<span class="n">float</span> <span class="n">get_memory_float</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">set_memory_float</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">float</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_memory_int</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_memory_int</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_memory_int8</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_memory_int8</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_memory_int16</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_memory_int16</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+</pre></div>
+<p>Методы предназначены для изменения тех значений в памяти игровых объектов, которые недоступны через стандартные средства.<br>
+Применение всех функций практически одинаково, поэтому далее будет рассматриваться только пример на классе <i>CGameObject</i>.<br>
+</p><p><i>Смещение</i> - это позиция нужной переменной в памяти относительно начала класса. Узнать смещение можно несколькими способами:<br>
+</p>
+<ol><li> при помощи движка с отладочной информацией через дизассемблер (например, в <i>IDA Pro</i> выбрав нужную структуру во вкладке <i>Local Types</i>);<br></li>
+<li> сканируя все смещения и выводя их значения в лог (однако, чтобы выяснить какое значение соответствует какому свойству класса, необходимо проводить дополнительные проверки).</li></ol>
+<p><b>Функция для сканирования значений класса CActor</b><br>
+<i>mode</i> - режим поиска (<code>"int"</code> - целочисленный тип, <code>"float"</code> - число с плавающей запятой)<br>
+<i>range</i> - диапазон сканирования (например, 2000)<br>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="k">function</span> <span class="nf">scan_actor_values</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">range</span><span class="p">)</span>
+	<span class="n">get_console</span><span class="p">():</span><span class="n">execute</span><span class="p">(</span><span class="s2">"</span><span class="s">clear_log"</span><span class="p">)</span>
+	<span class="n">log1</span><span class="p">(</span><span class="s2">"</span><span class="s">~ scan "</span><span class="o">..</span><span class="n">mode</span><span class="o">..</span><span class="s2">"</span><span class="s"> values"</span><span class="p">)</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">range</span> <span class="k">do</span>
+		<span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"</span><span class="s">int"</span> <span class="k">then</span>
+			<span class="n">log1</span><span class="p">(</span><span class="n">i</span><span class="o">..</span><span class="s2">"</span><span class="s"> = "</span><span class="o">..</span><span class="n">db</span><span class="p">.</span><span class="n">actor</span><span class="p">:</span><span class="n">get_actor_int</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+		<span class="k">elseif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"</span><span class="s">float"</span> <span class="k">then</span>
+			<span class="n">log1</span><span class="p">(</span><span class="n">i</span><span class="o">..</span><span class="s2">"</span><span class="s"> = "</span><span class="o">..</span><span class="n">db</span><span class="p">.</span><span class="n">actor</span><span class="p">:</span><span class="n">get_actor_float</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+		<span class="k">end</span>
+	<span class="k">end</span>
+	<span class="n">flush_log</span><span class="p">()</span>
+<span class="k">end</span>
+</pre></div>
+<p>Результат работы функции записывается в лог игры.
+</p><p><code>float&lt;value&gt; get_go_float(int&lt;offset&gt;)</code> - возвращает значение с плавающей точкой по заданному смещению.<br>
+<code>set_go_float(nil, float&lt;value&gt;, int&lt;offset&gt;)</code> - устанавливает значение с плавающей точкой по заданному смещению (первый аргумент - заглушка).<br>
+<code>int&lt;value&gt; get_go_int(nil, int&lt;offset&gt;)</code> - возвращает целочисленное значение по заданному смещению (первый аргумент - заглушка).<br>
+<code>set_go_int(int&lt;offset&gt;, int&lt;value&gt;)</code> - устанавливает целочисленное значение по заданному смещению.<br>
+<code>string&lt;value&gt; get_go_shared_str()</code> - возвращает строковое значение по заданному смещению (смещение задается через глобальную функцию <code>set_int_arg0(int&lt;offset&gt;)</code>).<br>
+<code>set_go_shared_str(string&lt;value&gt;, int&lt;offset&gt;)</code> - устанавливает строковое значение по заданному смещению.<br>
+</p>
+<table style="background-color: #fffdee;" width="100%">
+<tbody><tr>
+<td><span style="color:#172172;"><b>Важно!</b></span>
+<hr>
+<p>При поиске значений для ГГ необходимо учитывать тот факт, что часть из них находится в отдельном классе - <i>CActorCondition</i>. Сила прыжка, сытость, алкоголизм и другие свойства расположены именно тут.
+</p>
+</td></tr></tbody></table>
+<h4><span class="mw-headline" id=".D0.9C.D0.B5.D1.82.D0.BE.D0.B4.D1.8B_.D0.B4.D0.BB.D1.8F_.D0.BF.D0.BE.D0.BB.D1.83.D1.87.D0.B5.D0.BD.D0.B8.D1.8F_.D0.B0.D0.B4.D1.80.D0.B5.D1.81.D0.B0_.D0.B1.D0.B0.D0.B7.D0.BE.D0.B2.D0.BE.D0.B3.D0.BE_.D0.BE.D0.B1.D1.8A.D0.B5.D0.BA.D1.82.D0.B0">Методы для получения адреса базового объекта</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=21" title="Редактировать раздел «Методы для получения адреса базового объекта»">править</a><span class="mw-editsection-bracket">]</span></span></h4>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">uint</span> <span class="n">cast_car</span><span class="p">()</span>
+<span class="n">uint</span> <span class="n">cast_game_object</span><span class="p">()</span>
+<span class="n">uint</span> <span class="n">cast_hud_item</span><span class="p">()</span>
+<span class="n">uint</span> <span class="n">cast_inventory_box</span><span class="p">()</span>
+<span class="n">uint</span> <span class="n">cast_inventory_item</span><span class="p">()</span>
+<span class="n">uint</span> <span class="n">cast_weapon</span><span class="p">()</span>
+</pre></div>
+<p>Методы позволяют получить адрес в памяти, откуда начинается базовый объект (адрес в большинстве случаев не совпадает с началом объекта в целом). Результат можно использовать в разных хаках, когда известно смещение относительно конкретного класса.
+</p>
+<h4><span class="mw-headline" id=".D0.9C.D0.B5.D1.82.D0.BE.D0.B4.D1.8B_.D0.B4.D0.BB.D1.8F_.D0.BF.D1.80.D0.BE.D0.B2.D0.B5.D1.80.D0.BA.D0.B8_.D1.82.D0.B8.D0.BF.D0.B0_.D0.BE.D0.B1.D1.8A.D0.B5.D0.BA.D1.82.D0.B0">Методы для проверки типа объекта</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=22" title="Редактировать раздел «Методы для проверки типа объекта»">править</a><span class="mw-editsection-bracket">]</span></span></h4>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">bool</span> <span class="n">is_actor</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_ammo</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_anomaly</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_antirad</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_artefact</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_binoculars</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_bottle_item</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_car</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_custom_monster</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_eatable_item</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_entity_alive</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_explosive</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_food_item</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_game_object</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_grenade</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_grenade_launcher</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_hanging_lamp</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_helicopter</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_holder</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_hud_item</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_inventory_box</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_inventory_item</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_inventory_owner</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_knife</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_medkit</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_missile</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_monster</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_outfit</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_physics_shell_holder</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_projector</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_scope</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_script_zone</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_silencer</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_space_restrictor</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_stalker</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_torch</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_trader</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_weapon</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_weapon_gl</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_weapon_magazined</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_weapon_pistol</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">is_weapon_shotgun</span><span class="p">()</span>
+</pre></div>
+<p>Методы предназначены для проверки типа объекта (к какому классу принадлежит). Применение достаточно простое:
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="k">if</span> <span class="n">obj</span><span class="p">:</span><span class="n">is_</span><span class="o">&lt;</span><span class="n">class_name</span><span class="o">&gt;</span><span class="p">()</span> <span class="k">then</span>
+<span class="o">...</span>
+<span class="k">end</span>
+</pre></div>
+<h4><span class="mw-headline" id=".D0.9C.D0.B5.D1.82.D0.BE.D0.B4.D1.8B_.D0.BD.D0.B5_.D0.B8.D0.BC.D0.B5.D1.8E.D1.89.D0.B8.D0.B5_.D0.BF.D1.80.D0.B8.D0.B2.D1.8F.D0.B7.D0.BA.D0.B8_.D0.BA_.D0.BE.D0.BF.D1.80.D0.B5.D0.B4.D0.B5.D0.BB.D0.B5.D0.BD.D0.BD.D0.BE.D0.BC.D1.83_.D0.BE.D0.B1.D1.8A.D0.B5.D0.BA.D1.82.D1.83">Методы не имеющие привязки к определенному объекту</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=23" title="Редактировать раздел «Методы не имеющие привязки к определенному объекту»">править</a><span class="mw-editsection-bracket">]</span></span></h4>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">game_object</span><span class="o">*</span> <span class="n">get_object_arg_1</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">set_object_arg_1</span><span class="p">(</span><span class="n">game_object</span><span class="o">*</span><span class="p">)</span>
+<span class="n">set_calibrating_vector</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+<span class="n">set_vector_global_arg_1</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+<span class="n">set_vector_global_arg_2</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+<span class="n">set_vector_global_arg_3</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+<span class="n">set_vector_global_arg_4</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+</pre></div>
+<p>Эти методы предназначены для передачи или получения значений в(из) другие(их) методы(ов), в которых, по причине отсутствия необходимого прототипа, штатно это сделать нельзя.
+Могут вызываться для любого типа объекта в игре.
+</p>
+<h3><span class="mw-headline" id=".D0.9A.D0.BB.D0.B0.D1.81.D1.81_matrix">Класс matrix</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=24" title="Редактировать раздел «Класс matrix»">править</a><span class="mw-editsection-bracket">]</span></span></h3>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">mul_43</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
+<span class="n">transform_tiny</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">vector</span><span class="p">)</span>
+<span class="n">transform_tiny1</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">vector</span><span class="p">)</span>
+<span class="n">transpose</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+</pre></div>
+<p><code>mul_43(matrix&lt;m1&gt;, matrix&lt;m2&gt;)</code> - умножает две матрицы без последнего столбца и записывает результат в матрицу для которой вызывался метод.<br>
+<code>transform_tiny(vector&lt;res&gt;, vector&lt;v&gt;)</code> - умножает матрицу на вектор (перевод из одной системы координат в другую), с записыванием результата в вектор res.<br>
+<code>transform_tiny1(vector&lt;v&gt;)</code> - умножает матрицу на вектор (перевод из одной системы координат в другую), с записыванием результата в сам вектор.<br>
+<code>transpose()</code> - транспонирует матрицу (зеркалирование относительно главной диагонали).<br>
+</p>
+<h3><span class="mw-headline" id=".D0.9A.D0.BB.D0.B0.D1.81.D1.81_CTime">Класс CTime</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=25" title="Редактировать раздел «Класс CTime»">править</a><span class="mw-editsection-bracket">]</span></span></h3>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">set_value</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">,</span> <span class="n">int</span> <span class="n">get_value</span><span class="p">()</span>
+</pre></div>
+<p><code>set_value(int&lt;lv&gt;, int&lt;gv&gt;)</code> - устанавливает значение объекта из компонент.<br>
+<code>int&lt;lv&gt;, int&lt;gv&gt; get_value()</code> - возвращает младшую и старшую часть счетчика.<br>
+</p>
+<h3><span class="mw-headline" id=".D0.9A.D0.BB.D0.B0.D1.81.D1.81_CALifeSimulator">Класс CALifeSimulator</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=26" title="Редактировать раздел «Класс CALifeSimulator»">править</a><span class="mw-editsection-bracket">]</span></span></h3>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">CSE_Abstract</span><span class="o">*</span> <span class="n">teleport_object</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">uint</span><span class="p">,</span> <span class="n">uint</span><span class="p">,</span> <span class="n">uint</span><span class="p">)</span>
+<span class="n">CSE_Abstract</span><span class="o">*</span> <span class="n">assign_story_id</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">uint</span><span class="p">,</span> <span class="n">uint</span><span class="p">,</span> <span class="n">uint</span><span class="p">)</span>
+</pre></div>
+<p><code>teleport_object(nil, vector&lt;position&gt;, uint&lt;level_vertex_id&gt;, uint&lt;game_vertex_id&gt;, uint&lt;id&gt;)</code> - телепортирует объект по его id в заданную позицию на уровне.<br>
+<code>assign_story_id(nil, nil, uint&lt;id&gt;, uint&lt;story_id&gt;)</code> - устанавливает story_id объекту по его id.<br>
+</p>
+<h3><span class="mw-headline" id=".D0.9A.D0.BB.D0.B0.D1.81.D1.81_CSE_Abstract">Класс CSE_Abstract</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=27" title="Редактировать раздел «Класс CSE Abstract»">править</a><span class="mw-editsection-bracket">]</span></span></h3>
+<p><b>Свойства</b><br>
+<code>angle&lt;vector&gt;</code> - задает направление поворота объекта.
+</p>
+<h3><span class="mw-headline" id=".D0.9A.D0.BB.D0.B0.D1.81.D1.81_CSE_ALifeObject">Класс CSE_ALifeObject</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=28" title="Редактировать раздел «Класс CSE ALifeObject»">править</a><span class="mw-editsection-bracket">]</span></span></h3>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">use_ai_locations</span><span class="p">(</span><span class="n">bool</span><span class="p">)</span>
+</pre></div>
+<p><code>use_ai_locations(bool&lt;use&gt;)</code> - задает использование AI-локаций (сетки) для объекта.
+</p>
+<h3><span class="mw-headline" id=".D0.9F.D1.80.D0.BE.D1.81.D1.82.D1.80.D0.B0.D0.BD.D1.81.D1.82.D0.B2.D0.BE_.D0.B8.D0.BC.D0.B5.D0.BD_level">Пространство имен level</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=29" title="Редактировать раздел «Пространство имен level»">править</a><span class="mw-editsection-bracket">]</span></span></h3>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">game_object</span><span class="o">*</span> <span class="n">get_target_obj</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">float</span> <span class="n">get_target_dist</span><span class="p">()</span>
+<span class="n">int</span> <span class="n">get_target_element</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+
+<span class="n">int</span> <span class="n">has_cam_effector</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">has_pp_effector</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">bool</span> <span class="n">has_indicators</span><span class="p">()</span>
+
+<span class="n">int</span> <span class="n">advance_game_time</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">game_object</span><span class="o">*</span> <span class="n">get_second_talker</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">vertex_id</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+
+<span class="n">float</span> <span class="n">get_memory_float</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">,</span> <span class="n">bool</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_memory_int</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+
+<span class="n">bool</span> <span class="n">perform_ray_pick_query</span><span class="p">()</span>
+<span class="n">float</span> <span class="n">get_ray_pick_dist</span><span class="p">()</span>
+<span class="n">game_object</span><span class="o">*</span> <span class="n">get_ray_pick_obj</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_ray_pick_element</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+
+<span class="n">CUIDialogWnd</span><span class="o">*</span> <span class="n">get_inventory_wnd</span><span class="p">()</span>
+<span class="n">CUIDialogWnd</span><span class="o">*</span> <span class="n">get_pda_wnd</span><span class="p">()</span>
+<span class="n">CUIDialogWnd</span><span class="o">*</span> <span class="n">get_talk_wnd</span><span class="p">()</span>
+<span class="n">CUIDialogWnd</span><span class="o">*</span> <span class="n">get_car_body_wnd</span><span class="p">()</span>
+<span class="n">CUIDialogWnd</span><span class="o">*</span> <span class="n">get_trade_wnd</span><span class="p">()</span>
+
+<span class="n">int</span> <span class="n">send_event_mouse_wheel</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">send_event_key_hold</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">send_event_key_release</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">send_event_key_press</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+
+<span class="n">set_ce_time</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">set_ce_amplitude</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">set_ce_period_number</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">set_ce_power</span><span class="p">(</span><span class="n">float</span><span class="p">)</span>
+<span class="n">bool</span> <span class="n">add_ce</span><span class="p">()</span>
+
+<span class="n">vector</span> <span class="n">get_tri_vertex1</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">vector</span> <span class="n">get_tri_vertex2</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+<span class="n">vector</span> <span class="n">get_tri_vertex3</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+
+<span class="n">float</span> <span class="n">get_tri_shootfactor</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">int</span><span class="p">,</span> <span class="n">bool</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_tri_flags</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+</pre></div>
+<p><code>game_object*&lt;obj&gt; get_target_obj()</code> - возвращает игровой объект (если он имеет шейпы), на который в данный момент направлена камера.<br>
+<code>float&lt;dist&gt; get_target_dist()</code> - возвращает дистанцию до точки, на которую в данный момент направлена камера.<br>
+<code>int&lt;element&gt; get_target_element()</code> - если камера направлена на игровой объект (который имеет шейпы), то возвращает номер кости, иначе возвращает номер полигона статической геометрии.<br>
+</p><p><code>int&lt;is_cam_eff&gt;[0 or +] has_cam_effector(int&lt;effect_id&gt;)</code> - вернет true, если заданный эффектор камеры в данный момент активен (0 - эффектор не активен, иначе - активен).<br>
+<code>int&lt;is_pp_eff&gt;[0 or +] has_pp_effector(int&lt;effect_id&gt;)</code> - вернет true, если заданный эффектор постпроцесса в данный момент активен (0 - эффектор не активен, иначе - активен).<br>
+<code>bool has_indicators()</code> - вернет true, если интерфейс худа сейчас показан.<br>
+</p><p><code>advance_game_time(int&lt;time_ms&gt;)</code> - прокручивает игровое время вперед на заданное количество миллисекунд.<br>
+<code>game_object*&lt;obj&gt; get_second_talker()</code> - возвращает игровой объект, с которым в данный момент открыто окно разговора.<br>
+<code>int&lt;lvid&gt; vertex_id()</code> - возвращает level_vertex_id по позиции на уровне (для установки позиции, необходимо использовать функцию игрового объекта <code>obj:set_vector_global_arg_1(vector&lt;pos&gt;)</code>).<br>
+</p><p><code>float&lt;value&gt; get_memory_float(nil, int&lt;addr&gt;)</code> - возвращает число с плавающей точкой по абсолютному адресу.<br>
+<code>int&lt;value&gt; get_memory_int(int&lt;addr&gt;)</code> - возвращает целое число по абсолютному адресу.<br>
+</p><p><code>bool&lt;check&gt; perform_ray_pick_query()</code> - выполнит запрос на трассировку и вернет true, если она была успешна.<br>
+<code>float&lt;dist&gt; get_ray_pick_dist()</code> - если трассировка была успешна, вернет дистанцию до точки, иначе вернет ранее заданный диапазон трассировки.<br>
+<code>game_object*&lt;obj&gt; get_ray_pick_obj()</code> - если трассировка была успешна, вернет игровой объект.<br>
+<code>int&lt;element&gt; get_ray_pick_element()</code> - если луч пересек игровой объект, то вернет номер кости, иначе вернет номер полигона статической геометрии (при неудачной трассировке вернет -1).<br>
+</p><p><code>CUIDialogWnd*&lt;inv_wnd&gt; get_inventory_wnd()</code> - возвращает объект окна инвентаря.<br>
+<code>CUIDialogWnd*&lt;pda_wnd&gt; get_pda_wnd()</code> - возвращает объект окна КПК.<br>
+<code>CUIDialogWnd*&lt;talk_wnd&gt; get_talk_wnd()</code> - возвращает объект окна разговора.<br>
+<code>CUIDialogWnd*&lt;carbody_wnd&gt; get_car_body_wnd()</code> - возвращает объект окна обыска.<br>
+<code>CUIDialogWnd*&lt;trade_wnd&gt; get_trade_wnd()</code> - возвращает объект окна торговли.<br>
+</p><p><code>send_event_mouse_wheel(int&lt;vol&gt;)</code> - имитация события вращения колеса мыши.<br>
+<code>send_event_key_hold(int&lt;DIK_keys&gt;)</code> - имитация события удержания кнопки.<br>
+<code>send_event_key_release(int&lt;DIK_keys&gt;)</code> - имитация события отпускания кнопки.<br>
+<code>send_event_key_press(int&lt;DIK_keys&gt;)</code> - имитация события нажатия кнопки.<br>
+</p><p><code>set_ce_time(float&lt;total_time&gt;)</code> - устанавливает продолжительность эффектора шатания камеры.<br>
+<code>set_ce_amplitude(float&lt;amp&gt;)</code> - устанавливает максимальную амплитуду эффектора шатания камеры.<br>
+<code>set_ce_period_number(float&lt;periods&gt;)</code> - устанавливает количество циклов эффектора шатания камеры.<br>
+<code>set_ce_power(float&lt;power&gt;)</code> - устанавливает интенсивность эффектора шатания камеры.<br>
+<code>add_ce()</code> - запускает эффектор шатания камеры с ранее установленными параметрами.<br>
+</p><p><code>vector&lt;pos&gt; get_tri_vertex1(int&lt;element&gt;)</code> - возвращает первую вершину статического треугольника.<br>
+<code>vector&lt;pos&gt; get_tri_vertex2(int&lt;element&gt;)</code> - возвращает вторую вершину статического треугольника.<br>
+<code>vector&lt;pos&gt; get_tri_vertex3(int&lt;element&gt;)</code> - возвращает третью вершину статического треугольника.<br>
+</p><p><code>float&lt;factor&gt; get_tri_shootfactor(nil, int&lt;element&gt;)</code> - возвращает фактор пробиваемости материала геометрии (0.0 - непробиваемый, 1.0 - полностью пробиваемый).<br>
+<code>int&lt;flags&gt; get_tri_flags(int&lt;element&gt;)</code> - возвращает флаги материала геометрии (<a href="https://xray-engine.org/index.php?title=X-Ray_extensions#mtlFlags">#mtlFlags</a>).<br>
+</p>
+<h3><span class="mw-headline" id=".D0.93.D0.BB.D0.BE.D0.B1.D0.B0.D0.BB.D1.8C.D0.BD.D0.BE.D0.B5_.D0.BF.D1.80.D0.BE.D1.81.D1.82.D1.80.D0.B0.D0.BD.D1.81.D1.82.D0.B2.D0.BE_.D0.B8.D0.BC.D0.B5.D0.BD">Глобальное пространство имен</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=30" title="Редактировать раздел «Глобальное пространство имен»">править</a><span class="mw-editsection-bracket">]</span></span></h3>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">log1</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="n">fail</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">flush_log</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">bind_to_dik</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="n">int</span> <span class="n">get_extensions_flags</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_extensions_flags</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_actor_flags</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_actor_flags</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_input_language</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_input_language</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="n">int</span> <span class="n">set_trade_filtration_on</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_trade_filtration_off</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_manual_grouping_on</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_manual_grouping_off</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_manual_highlight_on</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_manual_highlight_off</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">get_manual_highlight</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_highlight_color</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="n">int</span> <span class="n">sum_args</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">sub_args</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="n">int</span> <span class="n">GetGoodwill</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">update_inventory_window</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">init_external_libs</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+
+<span class="n">set_game_time</span><span class="p">(</span><span class="n">float</span><span class="p">,</span> <span class="n">float</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">print_level_time</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">print_alife_time</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_ignore_game_state_update</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+
+<span class="n">screenshot0</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="n">screenshot1</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="n">screenshot2</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="n">screenshot3</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+
+<span class="n">set_hud_inertia</span><span class="p">(</span><span class="n">float</span><span class="p">,</span> <span class="n">float</span><span class="p">)</span>
+<span class="n">set_hud_inertia_param2</span><span class="p">(</span><span class="n">float</span><span class="p">,</span> <span class="n">float</span><span class="p">)</span>
+
+<span class="n">float</span> <span class="n">get_static_rescale_factor</span><span class="p">()</span>
+<span class="n">set_static_rescale_factor</span><span class="p">(</span><span class="n">float</span><span class="p">,</span> <span class="n">float</span><span class="p">)</span>
+
+<span class="n">int</span> <span class="n">set_int_arg0</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_int_arg1</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_int_arg2</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_int_arg3</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_int_arg4</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_int_arg5</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">int</span> <span class="n">set_int_arg6</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">int</span><span class="p">)</span>
+<span class="n">set_float_args_12</span><span class="p">(</span><span class="n">float</span><span class="p">,</span> <span class="n">float</span><span class="p">)</span>
+<span class="n">set_float_args_34</span><span class="p">(</span><span class="n">float</span><span class="p">,</span> <span class="n">float</span><span class="p">)</span>
+</pre></div>
+<p><code>log1(string&lt;message&gt;)</code> - выводит строку-сообщение в лог.<br>
+<code>fail(string&lt;message&gt;)</code> - принудительно останавливает игру и выводит сообщение в лог.<br>
+<code>flush_log()</code> - записывает содержимое лога в лог-файл (аналогично вызову консольной команды flush).<br>
+<code>int&lt;DIK_keys&gt; bind_to_dik(int&lt;key_bindings&gt;)</code> - переводит код команды-экшена в код клавиши, забинденной на этот экшен.<br>
+</p><p><code>int&lt;ex_flags&gt; get_extensions_flags()</code> - возвращает состояние флагов работы колбеков (1 - key_press, 2 - key_release, 4 - key_hold, 8 - mouse_wheel, 16 - mouse_move).<br>
+<code>set_extensions_flags(int&lt;ex_flags&gt;)</code> - устанавливает состояние флагов работы колбеков (1 - key_press, 2 - key_release, 4 - key_hold, 8 - mouse_wheel, 16 - mouse_move).<br>
+<code>int&lt;flags&gt; get_actor_flags()</code> - возвращает состояние флагов из перечисления psActorFlags.<br>
+<code>set_actor_flags(int&lt;flags&gt;)</code> - устанавливает состояние флагов из перечисления psActorFlags.<br>
+<code>int&lt;lang&gt;[0 or 1] get_input_language()</code> - возвращает номер языка для ввода в полях редактирования (0 - eng, 1 - rus).<br>
+<code>set_input_language(int&lt;lang&gt;[0 or 1])</code> - устанавливает номер языка для ввода в полях редактирования (0 - eng, 1 - rus).<br>
+</p><p><code>set_trade_filtration_on()</code> - включает режим скриптовой фильтрации предметов в окне торговли.<br>
+<code>set_trade_filtration_off()</code> - выключает режим скриптовой фильтрации предметов в окне торговли.<br>
+<code>set_manual_grouping_on()</code> - включает режим скриптовой группировки предметов в окне торговли и обыска.<br>
+<code>set_manual_grouping_off()</code> - выключает режим скриптовой группировки предметов в окне торговли и обыска.<br>
+<code>set_manual_highlight_on()</code> - включает режим скриптовой подсветки предметов в окне торговли и обыска.<br>
+<code>set_manual_highlight_off()</code> - выключает режим скриптовой подсветки предметов в окне торговли и обыска.<br>
+<code>int&lt;is_highlight&gt;[0 or 1] get_manual_highlight()</code> - возвращает включенность режима скриптовой подсветки предметов.<br>
+<code>set_highlight_color(int&lt;color_id&gt;, int&lt;GetARGB(A, R, G, B)&gt;)</code> - устанавливает соответствие между индексом цвета и кодом цвета.<br>
+</p><p><code>int&lt;result&gt; sum_args(int&lt;val1&gt;, int&lt;val2&gt;)</code> - производит сложение двух чисел и возвращает целочисленный результат (при ариф. операциях, Lua возвращает число с плавающей точкой).<br>
+<code>int&lt;result&gt; sub_args(int&lt;val1&gt;, int&lt;val2&gt;)</code> - производит вычитание двух чисел и возвращает целочисленный результат (при ариф. операциях, Lua возвращает число с плавающей точкой).<br>
+</p><p><code>int&lt;goodwill&gt; GetGoodwill(int&lt;who_id&gt;, int&lt;to_whom_id&gt;)</code> - возвращает текущее отношение между персонажами.<br>
+<code>update_inventory_window()</code> - обновляет все графические элементы окна инвентаря.<br>
+<code>init_external_libs()</code> - вызывает подключение дополнительных библиотек, прописанных в движке, внутри этой функции (используется в моде OGSE/OGSR).<br>
+</p><p><code>print_level_time()</code> - выводит отладочную информацию в лог о времени уровня.<br>
+<code>print_alife_time()</code> - выводит отладочную информацию в лог о времени алайфа.<br>
+<code>set_ignore_game_state_update()</code> - устанавливает запрет на выполнение одного цикла обновления внутренних параметров времени (используется в моде OGSE/OGSR).<br>
+</p><p><code>screenshot0(string&lt;path&gt;)</code> - создает скриншот в обычном режиме и сохраняет файл по указанному пути.<br>
+<code>screenshot1(string&lt;path&gt;)</code> - создает скриншот в режиме cubemap и сохраняет файл по указанному пути.<br>
+<code>screenshot2(string&lt;path&gt;)</code> - создает скриншот в режиме save и сохраняет файл по указанному пути.<br>
+<code>screenshot3(string&lt;path&gt;)</code> - создает скриншот в режиме levelmap и сохраняет файл по указанному пути.<br>
+</p><p><code>set_hud_inertia(float&lt;speed&gt;)</code> - устанавливает скорость инерции худа.<br>
+<code>set_hud_inertia_param2(float&lt;shift&gt;)</code> - устанавливает силу инерции худа.<br>
+</p><p><code>float&lt;rescale&gt; get_static_rescale_factor()</code> - возвращает коэффициент сжатия элементов окна на выбранном разрешении.<br>
+<code>set_static_rescale_factor(float&lt;rescale&gt;)</code> - устанавливает коэффициент сжатия элементов окна на выбранном разрешении.<br>
+</p><p>Остальные методы предназначены для передачи или получения значений в(из) другие(их) методы(ов), в которых, по причине отсутствия необходимого прототипа, штатно это сделать нельзя.
+</p>
+<h3><span class="mw-headline" id=".D0.9E.D0.BA.D0.BE.D0.BD.D0.BD.D1.8B.D0.B5_.D0.BA.D0.BB.D0.B0.D1.81.D1.81.D1.8B">Оконные классы</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=31" title="Редактировать раздел «Оконные классы»">править</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h4><span class="mw-headline" id=".D0.9A.D0.BB.D0.B0.D1.81.D1.81_CUIWindow">Класс CUIWindow</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=32" title="Редактировать раздел «Класс CUIWindow»">править</a><span class="mw-editsection-bracket">]</span></span></h4>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">DetachFromParent</span><span class="p">()</span>
+<span class="n">BringToTop</span><span class="p">()</span>
+<span class="n">Update</span><span class="p">()</span>
+<span class="n">float</span> <span class="n">GetVPos</span><span class="p">()</span>
+<span class="n">float</span> <span class="n">GetHPos</span><span class="p">()</span>
+<span class="n">float</span> <span class="n">GetCursorX</span><span class="p">()</span>
+<span class="n">float</span> <span class="n">GetCursorY</span><span class="p">()</span>
+<span class="n">float</span> <span class="n">GetAbsolutePosX</span><span class="p">()</span>
+<span class="n">float</span> <span class="n">GetAbsolutePosY</span><span class="p">()</span>
+</pre></div>
+<p><code>DetachFromParent()</code> - отсоединяет окно от родительского с последующем удалением.<br>
+<code>BringToTop()</code> - перемещает окно на вершину в иерархии дочерних окон.<br>
+<code>Update()</code> - дополнительно вызывает виртуальный метод обновления окна.<br>
+<code>float&lt;x&gt; GetVPos()</code> - возвращает положение окна по оси X.<br>
+<code>float&lt;y&gt; GetHPos()</code> - возвращает положение окна по оси Y.<br>
+<code>float&lt;x&gt; GetCursorX()</code> - возвращает положение мыши в окне по оси X.<br>
+<code>float&lt;y&gt; GetCursorY()</code> - возвращает положение мыши в окне по оси Y.<br>
+<code>float&lt;x&gt; GetAbsolutePosX()</code> - возвращает абсолютное положение окна по оси X.<br>
+<code>float&lt;y&gt; GetAbsolutePosY()</code> - возвращает абсолютное положение окна по оси Y.<br>
+</p>
+<h4><span class="mw-headline" id=".D0.9A.D0.BB.D0.B0.D1.81.D1.81_CUIStatic">Класс CUIStatic</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=33" title="Редактировать раздел «Класс CUIStatic»">править</a><span class="mw-editsection-bracket">]</span></span></h4>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">SetTextComplexMode</span><span class="p">(</span><span class="n">bool</span><span class="p">)</span>
+<span class="n">AdjustWidthToText</span><span class="p">()</span>
+<span class="n">AdjustHeightToText</span><span class="p">()</span>
+<span class="n">SetVTextAlign</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span>
+<span class="n">SetTextPos</span><span class="p">(</span><span class="n">float</span><span class="p">,</span> <span class="n">float</span><span class="p">)</span>
+<span class="n">CanRotate</span><span class="p">(</span><span class="n">bool</span><span class="p">)</span>
+</pre></div>
+<p><code>SetTextComplexMode(bool&lt;mode&gt;)</code> - включает режим комплексной работы с текстом.<br>
+<code>AdjustWidthToText()</code> - растягивает ширину окна под размер текста.<br>
+<code>AdjustHeightToText()</code> - растягивает высоту окна под размер текста.<br>
+<code>SetVTextAlign(uint&lt;align&gt;)</code> - задает выравнивание текста по вертикали (<a href="https://xray-engine.org/index.php?title=X-Ray_extensions#EVTextAlignment">#EVTextAlignment</a>).<br>
+<code>SetTextPos(float&lt;x&gt;, float&lt;y&gt;)</code> - задает положение текста внутри окна.<br>
+<code>CanRotate(bool)</code> - устанавливает возможность вращения текстуры окна.<br>
+</p>
+<h4><span class="mw-headline" id=".D0.9A.D0.BB.D0.B0.D1.81.D1.81_CUIListWnd">Класс CUIListWnd</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=34" title="Редактировать раздел «Класс CUIListWnd»">править</a><span class="mw-editsection-bracket">]</span></span></h4>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">SetSelectedItem</span><span class="p">(</span><span class="n">int</span><span class="p">)</span>
+</pre></div>
+<p><code>SetSelectedItem(int&lt;idx&gt;)</code> - устанавливает выбранный элемент списка по его индексу.
+</p>
+<h4><span class="mw-headline" id=".D0.9A.D0.BB.D0.B0.D1.81.D1.81_CUIComboBox">Класс CUIComboBox</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=35" title="Редактировать раздел «Класс CUIComboBox»">править</a><span class="mw-editsection-bracket">]</span></span></h4>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">AddItem</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="n">string</span> <span class="n">GetText</span><span class="p">()</span>
+</pre></div>
+<p><code>AddItem(string&lt;text&gt;)</code> - добавляет новый элемент с заданным текстом.<br>
+<code>string&lt;text&gt; GetText()</code> - возвращает текущую надпись в окне выпадающего списка.<br>
+</p>
+<h4><span class="mw-headline" id=".D0.9A.D0.BB.D0.B0.D1.81.D1.81_CUITrackBar">Класс CUITrackBar</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=36" title="Редактировать раздел «Класс CUITrackBar»">править</a><span class="mw-editsection-bracket">]</span></span></h4>
+<p><b>Регистрация функций в движке</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">float</span> <span class="n">GetFValue</span><span class="p">()</span>
+<span class="n">bool</span> <span class="n">IsChanged</span><span class="p">()</span>
+</pre></div>
+<p><code>float&lt;value&gt; GetFValue()</code> - возвращает текущее значение ползунка.<br>
+<code>bool&lt;changed&gt; IsChanged()</code> - возвратит true, если значение было изменено с момента последнего сохранения окна опций.<br>
+</p>
+<h3><span class="mw-headline" id=".D0.94.D0.BE.D0.BF.D0.BE.D0.BB.D0.BD.D0.B8.D1.82.D0.B5.D0.BB.D1.8C.D0.BD.D0.B0.D1.8F_.D0.B8.D0.BD.D1.84.D0.BE.D1.80.D0.BC.D0.B0.D1.86.D0.B8.D1.8F">Дополнительная информация</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=37" title="Редактировать раздел «Дополнительная информация»">править</a><span class="mw-editsection-bracket">]</span></span></h3>
+<h4><span class="mw-headline" id=".D0.9F.D0.BE.D0.B4.D1.81.D0.B2.D0.B5.D1.82.D0.BA.D0.B0_.D1.82.D0.B5.D0.BA.D1.81.D1.82.D0.B0_.D0.B2_.D0.BA.D0.BE.D0.BD.D1.81.D0.BE.D0.BB.D0.B8">Подсветка текста в консоли</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=38" title="Редактировать раздел «Подсветка текста в консоли»">править</a><span class="mw-editsection-bracket">]</span></span></h4>
+<p>В связи с добавлением функции вывода произвольного текста в лог, стала доступна возможность выделять этот текст различными цветами.
+</p>
+<table class="wikitable">
+
+<tbody><tr>
+<th> Цвет </th>
+<th> Спец-символ цвета </th>
+<th> Код цвета в формате RGBA
+</th></tr>
+<tr>
+<td> Зеленый </td>
+<td> "-" </td>
+<td> (0, 255, 0, 255)
+</td></tr>
+<tr>
+<td> Красный </td>
+<td> "!" </td>
+<td> (255, 0, 0, 255)
+</td></tr>
+<tr>
+<td> Желтый </td>
+<td> "~" </td>
+<td> (255, 255, 0, 255)
+</td></tr>
+<tr>
+<td> Серый </td>
+<td> "*" </td>
+<td> (128, 128, 128, 255)
+</td></tr>
+<tr>
+<td> Бирюзовый </td>
+<td> "#" </td>
+<td> (0, 222, 205, 145)
+</td></tr></tbody></table>
+<p><b>Пример использования</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">log1</span><span class="p">(</span><span class="s2">"</span><span class="s"># Hello world!"</span><span class="p">)</span> <span class="c1">-- текст будет отображаться бирюзовым цветом</span>
+</pre></div>
+<p>После спец-символа цвета обязательно должен быть хотя бы один пробел, иначе строка будет выведена обрезанной.
+</p>
+<h4><span class="mw-headline" id=".D0.9E.D0.B1.D1.89.D0.B8.D0.B5_.D1.80.D0.B5.D0.BA.D0.BE.D0.BC.D0.B5.D0.BD.D0.B4.D0.B0.D1.86.D0.B8.D0.B8">Общие рекомендации</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit&amp;section=39" title="Редактировать раздел «Общие рекомендации»">править</a><span class="mw-editsection-bracket">]</span></span></h4>
+<p>При использовании правок движка из этого проекта, рекомендуется расширить некоторые таблицы новыми значениями, например таблицы с идентификаторами колбеков, идентификаторами клавиш и т.п.<br>
+Код следует поместить в главный модуль <b>_g.script</b>.
+</p><p><b>callback</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">on_key_press"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">123</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">on_key_release"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">124</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">on_key_hold"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">125</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">on_mouse_wheel"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">126</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">on_mouse_move"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">127</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">anomaly_hit"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">drop_item_from_inventory"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">129</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">on_item_belt"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">130</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">on_item_ruck"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">131</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">on_item_slot"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">132</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">select_inventory_item"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">133</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">switch_torch"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">134</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">set_dest_lvid"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">135</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">create_cell_item"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">136</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">attach_vehicle"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">137</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">use_vehicle"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">138</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">detach_vehicle"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">139</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">after_save"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">140</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">cell_item_focus_start"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">141</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">cell_item_focus_end"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">142</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">group_cell_item"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">143</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">hit_effector"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">144</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">set_goodwill"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">145</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">before_update"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">150</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">drop_item_in_box"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">151</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">before_hit"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">152</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">npc_hit"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">153</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">update_addons_visibility"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">154</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">update_hud_addons_visibility"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">155</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">before_use"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">156</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">animation_end"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">157</span>
+<span class="n">callback</span><span class="p">[</span><span class="s2">"</span><span class="s">select_pda_contact"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">180</span>
+</pre></div>
+<p><b>DIK_keys</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">DIK_keys</span><span class="p">[</span><span class="s2">"</span><span class="s">MOUSE_4"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">340</span>
+<span class="n">DIK_keys</span><span class="p">[</span><span class="s2">"</span><span class="s">MOUSE_5"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">341</span>
+<span class="n">DIK_keys</span><span class="p">[</span><span class="s2">"</span><span class="s">MOUSE_6"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">342</span>
+<span class="n">DIK_keys</span><span class="p">[</span><span class="s2">"</span><span class="s">MOUSE_7"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">343</span>
+<span class="n">DIK_keys</span><span class="p">[</span><span class="s2">"</span><span class="s">MOUSE_8"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">344</span>
+</pre></div>
+<p><b>key_bindings</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kSPRINT_TOGGLE"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kENGINE"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kARTEFACT"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kWPN_FIREMODE_PREV"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">38</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kWPN_FIREMODE_NEXT"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">39</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kPAUSE"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kCHAT_TEAM"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">45</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kACTIVE_JOBS"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">53</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kMAP"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">54</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kCONTACTS"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">55</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kVOTE_BEGIN"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">57</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kVOTE"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">58</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kVOTEYES"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">59</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kVOTENO"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kSPEECH_MENU_0"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">63</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kSPEECH_MENU_1"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kUSE_BANDAGE"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">73</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kUSE_MEDKIT"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">74</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kQUICK_SAVE"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">75</span>
+<span class="n">key_bindings</span><span class="p">[</span><span class="s2">"</span><span class="s">kQUICK_LOAD"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">76</span>
+</pre></div>
+<p><span id="EVTextAlignment"></span> <b>EVTextAlignment</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="c1">-- вертикальное центрирование текста</span>
+<span class="n">EVTextAlignment</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="n">valTop</span>			<span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+	<span class="n">valCenter</span>		<span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+	<span class="n">valBottom</span>		<span class="o">=</span> <span class="mi">2</span>
+<span class="p">}</span>
+</pre></div>
+<p><span id="mtlFlags"></span> <b>mtlFlags</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="c1">-- флаги материала геометрии</span>
+<span class="n">mtlFlags</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="n">flBreakable</span>				<span class="o">=</span> <span class="mi">1</span><span class="p">,</span>			<span class="c1">-- 0    разрушаемый</span>
+	<span class="n">flBounceable</span>			<span class="o">=</span> <span class="mi">4</span><span class="p">,</span>			<span class="c1">-- 2    возможность рикошета (0 - есть, 1 - нет)</span>
+	<span class="n">flSkidmark</span>				<span class="o">=</span> <span class="mi">8</span><span class="p">,</span>			<span class="c1">-- 3    оставляет тормозной след</span>
+	<span class="n">flBloodmark</span>				<span class="o">=</span> <span class="mi">16</span><span class="p">,</span>			<span class="c1">-- 4    оставляет кровь</span>
+	<span class="n">flClimable</span>				<span class="o">=</span> <span class="mi">32</span><span class="p">,</span>			<span class="c1">-- 5    невидимая лестница</span>
+	<span class="n">flPassable</span>				<span class="o">=</span> <span class="mi">128</span><span class="p">,</span>			<span class="c1">-- 7    проходимый для физических объектов</span>
+	<span class="n">flDynamic</span>				<span class="o">=</span> <span class="mi">256</span><span class="p">,</span>			<span class="c1">-- 8    динамический объект</span>
+	<span class="n">flLiquid</span>				<span class="o">=</span> <span class="mi">512</span><span class="p">,</span>			<span class="c1">-- 9    жидкость (вода)</span>
+	<span class="n">flSuppressShadows</span>		<span class="o">=</span> <span class="mi">1024</span><span class="p">,</span>			<span class="c1">-- 10   заглушает тени</span>
+	<span class="n">flSuppressWallmarks</span>		<span class="o">=</span> <span class="mi">2048</span><span class="p">,</span>			<span class="c1">-- 11   заглушает отметины от пуль</span>
+	<span class="n">flActorObstacle</span>			<span class="o">=</span> <span class="mi">4096</span><span class="p">,</span>			<span class="c1">-- 12   препятствие (силовое поле) для ГГ</span>
+	<span class="n">flInjurious</span>				<span class="o">=</span> <span class="mi">268435456</span><span class="p">,</span>	<span class="c1">-- 28   отбирает здоровье</span>
+	<span class="n">flShootable</span>				<span class="o">=</span> <span class="mi">536870912</span><span class="p">,</span>	<span class="c1">-- 29   непростреливаемый</span>
+	<span class="n">flTransparent</span>			<span class="o">=</span> <span class="mi">1073741824</span><span class="p">,</span>	<span class="c1">-- 30   непрозрачный</span>
+	<span class="n">flSlowDown</span>				<span class="o">=</span> <span class="mi">2147483648</span>	<span class="c1">-- 31   замедляет движение</span>
+<span class="p">}</span>
+</pre></div>
+<p><span id="rq_target"></span> <b>rq_target</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="c1">-- флаги трассировки</span>
+<span class="n">rq_target</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="n">rqtNone</span><span class="p">,</span>
+	<span class="n">rqtObject</span>		<span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+	<span class="n">rqtStatic</span>		<span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+	<span class="n">rqtShape</span>		<span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+	<span class="n">rqtObstacle</span>		<span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+	<span class="n">rqtBoth</span>			<span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="c1">-- rqtObject + rqtStatic</span>
+	<span class="n">rqtDyn</span>			<span class="o">=</span> <span class="mi">13</span><span class="p">,</span> <span class="c1">-- rqtObject + rqtShape + rqtObstacle</span>
+<span class="p">}</span>
+</pre></div>
+<p>Также рекомендуется использовать следующие скриптовые обвязки:<br>
+</p><p><b>Глобальное пространство имен</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="c1">-- возвращает имя кости по ее индексу</span>
+<span class="k">function</span> <span class="nc">_G</span><span class="p">.</span><span class="nf">get_bone_name_by_id</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">bone_id</span><span class="p">)</span>
+	<span class="n">set_int_arg0</span><span class="p">(</span><span class="n">bone_id</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">obj</span><span class="p">:</span><span class="n">get_bone_name</span><span class="p">()</span>
+<span class="k">end</span>
+</pre></div>
+<p><b>level</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="c1">-- прокручивает игровое время вперед на заданное количество минут, часов и дней</span>
+<span class="k">function</span> <span class="nc">level</span><span class="p">.</span><span class="nf">change_game_time</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+	<span class="n">level</span><span class="p">.</span><span class="n">advance_game_time</span><span class="p">((</span><span class="n">m</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">60000</span> <span class="o">+</span> <span class="p">(</span><span class="n">h</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3600000</span> <span class="o">+</span> <span class="p">(</span><span class="n">d</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">86400000</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="c1">-- возвращает level_vertex_id по позиции на уровне</span>
+<span class="k">function</span> <span class="nc">level</span><span class="p">.</span><span class="nf">vertex_id_by_pos</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+	<span class="n">db</span><span class="p">.</span><span class="n">actor</span><span class="p">:</span><span class="n">set_vector_global_arg_1</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">level</span><span class="p">.</span><span class="n">vertex_id</span><span class="p">()</span>
+<span class="k">end</span>
+
+<span class="c1">-- запускает эффектор шатания камеры с заданными параметрами</span>
+<span class="k">function</span> <span class="nc">level</span><span class="p">.</span><span class="nf">add_cam_effector3</span><span class="p">(</span><span class="n">total_time</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">period_number</span><span class="p">,</span> <span class="n">power</span><span class="p">)</span>
+	<span class="n">level</span><span class="p">.</span><span class="n">set_ce_time</span><span class="p">(</span><span class="n">total_time</span><span class="p">)</span>
+	<span class="n">level</span><span class="p">.</span><span class="n">set_ce_amplitude</span><span class="p">(</span><span class="n">amplitude</span><span class="p">)</span>
+	<span class="n">level</span><span class="p">.</span><span class="n">set_ce_period_number</span><span class="p">(</span><span class="n">period_number</span><span class="p">)</span>
+	<span class="n">level</span><span class="p">.</span><span class="n">set_ce_power</span><span class="p">(</span><span class="n">power</span><span class="p">)</span>
+	<span class="n">level</span><span class="p">.</span><span class="n">add_ce</span><span class="p">()</span>
+<span class="k">end</span>
+</pre></div>
+<p><b>relation_registry</b>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="k">function</span> <span class="nc">relation_registry</span><span class="p">.</span><span class="nf">get_goodwill</span><span class="p">(</span><span class="n">who_id</span><span class="p">,</span> <span class="n">to_whom_id</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">GetGoodwill</span><span class="p">(</span><span class="n">who_id</span><span class="p">,</span> <span class="n">to_whom_id</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="k">function</span> <span class="nc">relation_registry</span><span class="p">.</span><span class="nf">set_goodwill</span><span class="p">(</span><span class="n">who_id</span><span class="p">,</span> <span class="n">to_whom_id</span><span class="p">,</span> <span class="n">goodwill</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">db</span><span class="p">.</span><span class="n">actor</span><span class="p">:</span><span class="n">set_goodwill_ex</span><span class="p">(</span><span class="n">who_id</span><span class="p">,</span> <span class="n">to_whom_id</span><span class="p">,</span> <span class="n">goodwill</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="k">function</span> <span class="nc">relation_registry</span><span class="p">.</span><span class="nf">change_goodwill</span><span class="p">(</span><span class="n">who_id</span><span class="p">,</span> <span class="n">to_whom_id</span><span class="p">,</span> <span class="n">goodwill_change</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">db</span><span class="p">.</span><span class="n">actor</span><span class="p">:</span><span class="n">change_goodwill_ex</span><span class="p">(</span><span class="n">who_id</span><span class="p">,</span> <span class="n">to_whom_id</span><span class="p">,</span> <span class="n">goodwill_change</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+<p><b>ray_pick</b><br>
+Флаги трассировки <a href="https://xray-engine.org/index.php?title=X-Ray_extensions#rq_target">#rq_target</a>
+</p>
+<div class="mw-highlight mw-content-ltr" dir="ltr"><pre><span class="c1">-- устанавливает базовые параметры трассировки</span>
+<span class="k">function</span> <span class="nc">ray_pick</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">dir</span><span class="p">,</span> <span class="n">range</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+	<span class="n">ray_pick</span><span class="p">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+	<span class="n">ray_pick</span><span class="p">.</span><span class="n">set_direction</span><span class="p">(</span><span class="n">dir</span><span class="p">)</span>
+	<span class="n">ray_pick</span><span class="p">.</span><span class="n">set_range</span><span class="p">(</span><span class="n">range</span><span class="p">)</span>
+	<span class="n">ray_pick</span><span class="p">.</span><span class="n">set_flags</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
+	<span class="n">ray_pick</span><span class="p">.</span><span class="n">set_ignore_object</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="c1">-- устанавливает стартовую точку трассировки</span>
+<span class="k">function</span> <span class="nc">ray_pick</span><span class="p">.</span><span class="nf">set_position</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+	<span class="n">db</span><span class="p">.</span><span class="n">actor</span><span class="p">:</span><span class="n">set_vector_global_arg_2</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="c1">-- устанавливает направление трассировки</span>
+<span class="k">function</span> <span class="nc">ray_pick</span><span class="p">.</span><span class="nf">set_direction</span><span class="p">(</span><span class="n">dir</span><span class="p">)</span>
+	<span class="n">db</span><span class="p">.</span><span class="n">actor</span><span class="p">:</span><span class="n">set_vector_global_arg_1</span><span class="p">(</span><span class="n">dir</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="c1">-- устанавливает диапазон трассировки</span>
+<span class="k">function</span> <span class="nc">ray_pick</span><span class="p">.</span><span class="nf">set_range</span><span class="p">(</span><span class="n">range</span><span class="p">)</span>
+	<span class="n">set_float_args_12</span><span class="p">(</span><span class="n">range</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="c1">-- устанавливает флаги трассировки (rq_target)</span>
+<span class="k">function</span> <span class="nc">ray_pick</span><span class="p">.</span><span class="nf">set_flags</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
+	<span class="n">set_int_arg1</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="c1">-- устанавливает игнорируемый игровой объект для трассировки</span>
+<span class="k">function</span> <span class="nc">ray_pick</span><span class="p">.</span><span class="nf">set_ignore_object</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+	<span class="n">db</span><span class="p">.</span><span class="n">actor</span><span class="p">:</span><span class="n">set_object_arg_1</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="c1">-- выполняет запрос на трассировку и возвращает true, если она была успешна</span>
+<span class="k">function</span> <span class="nc">ray_pick</span><span class="p">.</span><span class="nf">check</span><span class="p">()</span>
+	<span class="k">return</span> <span class="n">level</span><span class="p">.</span><span class="n">perform_ray_pick_query</span><span class="p">()</span>
+<span class="k">end</span>
+
+<span class="c1">-- если трассировка была успешна, возвращает дистанцию до точки, иначе возвращает ранее заданный диапазон трассировки</span>
+<span class="k">function</span> <span class="nc">ray_pick</span><span class="p">.</span><span class="nf">get_distance</span><span class="p">()</span>
+	<span class="k">return</span> <span class="n">level</span><span class="p">.</span><span class="n">get_ray_pick_dist</span><span class="p">()</span>	
+<span class="k">end</span>
+
+<span class="c1">-- если трассировка была успешна, возвращает игровой объект</span>
+<span class="k">function</span> <span class="nc">ray_pick</span><span class="p">.</span><span class="nf">get_object</span><span class="p">()</span>
+	<span class="k">return</span> <span class="n">level</span><span class="p">.</span><span class="n">get_ray_pick_obj</span><span class="p">()</span>
+<span class="k">end</span>
+
+<span class="c1">-- если луч пересек игровой объект, то возвращает номер кости, иначе возвращает номер полигона статической геометрии (при неудачной трассировке возвращает -1)</span>
+<span class="k">function</span> <span class="nc">ray_pick</span><span class="p">.</span><span class="nf">get_element</span><span class="p">()</span>
+	<span class="k">return</span> <span class="n">level</span><span class="p">.</span><span class="n">get_ray_pick_element</span><span class="p">()</span>
+<span class="k">end</span>
+</pre></div>
+<hr>
+<p>Автор: <b>RayTwitty (aka Shadows)</b>
+</p>
+<!-- 
+NewPP limit report
+Cached time: 20170512181607
+Cache expiry: 86400
+Dynamic content: false
+CPU time usage: 0.166 seconds
+Real time usage: 3.444 seconds
+Preprocessor visited node count: 391/1000000
+Preprocessor generated node count: 1173/1000000
+Post‐expand include size: 210/2097152 bytes
+Template argument size: 64/2097152 bytes
+Highest expansion depth: 4/40
+Expensive parser function count: 0/100
+-->
+
+<!-- 
+Transclusion expansion time report (%,ms,calls,template)
+100.00%  236.568      1 - -total
+  4.00%    9.463      3 - Шаблон:Якорь
+-->
+
+<!-- Saved in parser cache with key u3159193_wiki-mw_:pcache:idhash:91-0!*!*!!ru!*!* and timestamp 20170512181603 and revision id 267
+ -->
+</div>					<div class="printfooter">
+						Источник — «<a dir="ltr" href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;oldid=267">https://xray-engine.org/index.php?title=X-Ray_extensions&amp;oldid=267</a>»					</div>
+				<div id="catlinks" class="catlinks" data-mw="interface"><div id="mw-normal-catlinks" class="mw-normal-catlinks"><a href="https://xray-engine.org/index.php?title=%D0%A1%D0%BB%D1%83%D0%B6%D0%B5%D0%B1%D0%BD%D0%B0%D1%8F:%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D0%B8" title="Служебная:Категории">Категория</a>: <ul><li><a href="https://xray-engine.org/index.php?title=%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D1%8F:%D0%A0%D0%B5%D0%B4%D0%B0%D0%BA%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_%D0%B4%D0%B2%D0%B8%D0%B6%D0%BA%D0%B0&amp;action=edit&amp;redlink=1" class="new" title="Категория:Редактирование движка (страница не существует)">Редактирование движка</a></li></ul></div></div>				<div class="visualClear"></div>
+							</div>
+		</div>
+		<div id="mw-navigation">
+			<h2>Навигация</h2>
+
+			<div id="mw-head">
+									<div id="p-personal" role="navigation" class="" aria-labelledby="p-personal-label">
+						<h3 id="p-personal-label">Персональные инструменты</h3>
+						<ul>
+							<li id="pt-anonuserpage">Вы не представились системе</li><li id="pt-anontalk"><a href="https://xray-engine.org/index.php?title=%D0%A1%D0%BB%D1%83%D0%B6%D0%B5%D0%B1%D0%BD%D0%B0%D1%8F:%D0%9C%D0%BE%D1%91_%D0%BE%D0%B1%D1%81%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5" title="Страница обсуждений для моего IP [alt-shift-n]" accesskey="n">Обсуждение</a></li><li id="pt-anoncontribs"><a href="https://xray-engine.org/index.php?title=%D0%A1%D0%BB%D1%83%D0%B6%D0%B5%D0%B1%D0%BD%D0%B0%D1%8F:%D0%9C%D0%BE%D0%B9_%D0%B2%D0%BA%D0%BB%D0%B0%D0%B4" title="Список правок, сделанных с этого IP-адреса [alt-shift-y]" accesskey="y">Вклад</a></li><li id="pt-createaccount"><a href="https://xray-engine.org/index.php?title=%D0%A1%D0%BB%D1%83%D0%B6%D0%B5%D0%B1%D0%BD%D0%B0%D1%8F:%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D1%82%D1%8C_%D1%83%D1%87%D1%91%D1%82%D0%BD%D1%83%D1%8E_%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D1%8C&amp;returnto=X-Ray+extensions" title="Мы предлагаем вам создать учётную запись и войти в систему, хотя это и не обязательно.">Создать учётную запись</a></li><li id="pt-login"><a href="https://xray-engine.org/index.php?title=%D0%A1%D0%BB%D1%83%D0%B6%D0%B5%D0%B1%D0%BD%D0%B0%D1%8F:%D0%92%D1%85%D0%BE%D0%B4&amp;returnto=X-Ray+extensions" title="Здесь можно зарегистрироваться в системе, но это необязательно. [alt-shift-o]" accesskey="o">Войти</a></li>						</ul>
+					</div>
+									<div id="left-navigation">
+										<div id="p-namespaces" role="navigation" class="vectorTabs" aria-labelledby="p-namespaces-label">
+						<h3 id="p-namespaces-label">Пространства имён</h3>
+						<ul>
+															<li id="ca-nstab-main" class="selected"><span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions" title="Просмотр основной страницы [alt-shift-c]" accesskey="c">Статья</a></span></li>
+															<li id="ca-talk" class="new"><span><a href="https://xray-engine.org/index.php?title=%D0%9E%D0%B1%D1%81%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5:X-Ray_extensions&amp;action=edit&amp;redlink=1" title="Обсуждение основной страницы [alt-shift-t]" accesskey="t" rel="discussion">Обсуждение</a></span></li>
+													</ul>
+					</div>
+										<div id="p-variants" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-variants-label">
+												<h3 id="p-variants-label" tabindex="0" data-vivaldi-spatnav-clickable="1">
+							<span>Варианты</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#" tabindex="-1"></a>
+						</h3>
+
+						<div class="menu">
+							<ul>
+															</ul>
+						</div>
+					</div>
+									</div>
+				<div id="right-navigation">
+										<div id="p-views" role="navigation" class="vectorTabs" aria-labelledby="p-views-label">
+						<h3 id="p-views-label">Просмотры</h3>
+						<ul>
+															<li id="ca-view" class="selected"><span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions">Читать</a></span></li>
+															<li id="ca-edit"><span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=edit" title="Редактировать данную страницу [alt-shift-e]" accesskey="e">Править</a></span></li>
+															<li id="ca-history" class="collapsible"><span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=history" title="Журнал изменений страницы [alt-shift-h]" accesskey="h">История</a></span></li>
+													</ul>
+					</div>
+										<div id="p-cactions" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-cactions-label">
+						<h3 id="p-cactions-label" tabindex="0" data-vivaldi-spatnav-clickable="1"><span>Ещё</span><a href="https://xray-engine.org/index.php?title=X-Ray_extensions#" tabindex="-1"></a></h3>
+
+						<div class="menu">
+							<ul>
+															</ul>
+						</div>
+					</div>
+										<div id="p-search" role="search">
+						<h3>
+							<label for="searchInput">Поиск</label>
+						</h3>
+
+						<form action="https://xray-engine.org/index.php" id="searchform">
+							<div id="simpleSearch">
+							<input type="search" name="search" placeholder="Поиск" title="Искать в xrWiki [alt-shift-f]" accesskey="f" id="searchInput" tabindex="1" autocomplete="off"><input type="hidden" value="Служебная:Поиск" name="title"><input type="submit" name="go" value="Перейти" title="Перейти к странице, имеющей в точности такое название" id="searchButton" class="searchButton">							</div>
+						</form>
+					</div>
+									</div>
+			</div>
+			<div id="mw-panel">
+				<div id="p-logo" role="banner"><a class="mw-wiki-logo" href="https://xray-engine.org/index.php?title=%D0%97%D0%B0%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F_%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0" title="Перейти на заглавную страницу"></a></div>
+						<div class="portal" role="navigation" id="p-navigation" aria-labelledby="p-navigation-label">
+			<h3 id="p-navigation-label">Навигация</h3>
+
+			<div class="body">
+									<ul>
+						<li id="n-mainpage-description"><a href="https://xray-engine.org/index.php?title=%D0%97%D0%B0%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F_%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0" title="Перейти на заглавную страницу [alt-shift-z]" accesskey="z">Заглавная страница</a></li><li id="n-.D0.9D.D0.B0.D1.88-.D1.84.D0.BE.D1.80.D1.83.D0.BC"><a href="https://forum.xray-engine.org/" rel="nofollow" target="_blank">Наш форум</a></li><li id="n-.D0.A4.D0.BE.D1.80.D1.83.D0.BC-XiaNi"><a href="https://xiani.xray-engine.org/" rel="nofollow" target="_blank">Форум XiaNi</a></li><li id="n-.D0.A1.D1.82.D0.B0.D0.BB.D0.BA.D0.B5.D1.80.D0.B8.D0.BD"><a href="http://stalkerin.gameru.net/" rel="nofollow" target="_blank">Сталкерин</a></li><li id="n-.D0.A4.D0.B0.D0.B9.D0.BB.D1.8B"><a href="http://files.xray-engine.org/" rel="nofollow" target="_blank">Файлы</a></li><li id="n-.D0.92.D1.81.D0.B5-.D1.81.D1.82.D1.80.D0.B0.D0.BD.D0.B8.D1.86.D1.8B"><a href="https://xray-engine.org/index.php?title=%D0%A1%D0%BB%D1%83%D0%B6%D0%B5%D0%B1%D0%BD%D0%B0%D1%8F:%D0%92%D1%81%D0%B5_%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D1%8B">Все страницы</a></li><li id="n-recentchanges"><a href="https://xray-engine.org/index.php?title=%D0%A1%D0%BB%D1%83%D0%B6%D0%B5%D0%B1%D0%BD%D0%B0%D1%8F:%D0%A1%D0%B2%D0%B5%D0%B6%D0%B8%D0%B5_%D0%BF%D1%80%D0%B0%D0%B2%D0%BA%D0%B8" title="Список последних изменений [alt-shift-r]" accesskey="r">Свежие правки</a></li><li id="n-.D0.A1.D0.BE.D0.B7.D0.B4.D0.B0.D1.82.D1.8C-.D1.81.D1.82.D0.B0.D1.82.D1.8C.D1.8E"><a href="https://xray-engine.org/index.php?title=%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D1%82%D1%8C_%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D1%83">Создать статью</a></li><li id="n-help"><a href="https://www.mediawiki.org/wiki/Help:Contents/ru" target="_blank" title="Место, где можно получить справку">Справка</a></li>					</ul>
+							</div>
+		</div>
+			<div class="portal" role="navigation" id="p-tb" aria-labelledby="p-tb-label">
+			<h3 id="p-tb-label">Инструменты</h3>
+
+			<div class="body">
+									<ul>
+						<li id="t-whatlinkshere"><a href="https://xray-engine.org/index.php?title=%D0%A1%D0%BB%D1%83%D0%B6%D0%B5%D0%B1%D0%BD%D0%B0%D1%8F:%D0%A1%D1%81%D1%8B%D0%BB%D0%BA%D0%B8_%D1%81%D1%8E%D0%B4%D0%B0/X-Ray_extensions" title="Список всех страниц, ссылающихся на данную [alt-shift-j]" accesskey="j">Ссылки сюда</a></li><li id="t-recentchangeslinked"><a href="https://xray-engine.org/index.php?title=%D0%A1%D0%BB%D1%83%D0%B6%D0%B5%D0%B1%D0%BD%D0%B0%D1%8F:%D0%A1%D0%B2%D1%8F%D0%B7%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5_%D0%BF%D1%80%D0%B0%D0%B2%D0%BA%D0%B8/X-Ray_extensions" title="Последние изменения в страницах, на которые ссылается эта страница [alt-shift-k]" accesskey="k">Связанные правки</a></li><li id="t-specialpages"><a href="https://xray-engine.org/index.php?title=%D0%A1%D0%BB%D1%83%D0%B6%D0%B5%D0%B1%D0%BD%D0%B0%D1%8F:%D0%A1%D0%BF%D0%B5%D1%86%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D1%8B" title="Список служебных страниц [alt-shift-q]" accesskey="q">Спецстраницы</a></li><li id="t-print"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;printable=yes" rel="alternate" title="Версия этой страницы для печати [alt-shift-p]" accesskey="p">Версия для печати</a></li><li id="t-permalink"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;oldid=267" title="Постоянная ссылка на эту версию страницы">Постоянная ссылка</a></li><li id="t-info"><a href="https://xray-engine.org/index.php?title=X-Ray_extensions&amp;action=info" title="Подробнее об этой странице">Сведения о&nbsp;странице</a></li>					</ul>
+							</div>
+		</div>
+				</div>
+		</div>
+		<div id="footer" role="contentinfo">
+							<ul id="footer-info">
+											<li id="footer-info-lastmod"> Страница изменена 14 сентября 2016 в 22:30.</li>
+											<li id="footer-info-copyright">Содержимое доступно по лицензии <a href="https://xray-engine.org/index.php?title=License" title="License">GNU Free Documentation License 1.3 или более поздняя</a> (если не указано иное).</li>
+									</ul>
+							<ul id="footer-places">
+											<li id="footer-places-about"><a href="https://xray-engine.org/index.php?title=xrWiki:%D0%9E%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5" title="xrWiki:Описание">Описание xrWiki</a></li>
+									</ul>
+										<ul id="footer-icons" class="noprint">
+											<li id="footer-copyrightico">
+							<a href="http://www.gnu.org/copyleft/fdl.html"><img src="./X-Ray extensions — xrWiki_files/gnu-fdl.png" alt="GNU Free Documentation License 1.3 или более поздняя" width="88" height="31"></a>						</li>
+											<li id="footer-poweredbyico">
+							<a href="https://www.mediawiki.org/"><img src="./X-Ray extensions — xrWiki_files/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" srcset="/resources/assets/poweredby_mediawiki_132x47.png 1.5x, /resources/assets/poweredby_mediawiki_176x62.png 2x" width="88" height="31"></a>						</li>
+									</ul>
+						<div style="clear:both"></div>
+		</div>
+		<script>(window.RLQ=window.RLQ||[]).push(function(){mw.loader.state({"user":"ready","user.groups":"ready"});mw.loader.load(["mediawiki.toc","mediawiki.action.view.postEdit","site","mediawiki.user","mediawiki.hidpi","mediawiki.page.ready","mediawiki.searchSuggest"]);});</script><script>(window.RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":114});});</script>
+	
+
+<div class="suggestions" style="display: none; font-size: 13px;"><div class="suggestions-results"></div><div class="suggestions-special"></div></div></body></html>
