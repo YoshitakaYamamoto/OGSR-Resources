@@ -1,38 +1,9 @@
 
 function attach(sm)
--------------------------------------------------------------------------------
-	sm:subscribe({ signal = "on_create_cell_item", fun = this.recolor_slot_item })	
-	sm:subscribe({ signal = "on_trade_open", fun = this.on_ui_open })
-	sm:subscribe({ signal = "on_trade_hide", fun = this.on_ui_hide })
-	sm:subscribe({ signal = "on_body_open", fun = this.on_ui_open })
-	sm:subscribe({ signal = "on_body_hide", fun = this.on_ui_hide })
--------------------------------------------------------------------------------
 	sm:subscribe({ signal = "on_first_update", fun = this.on_first_update })
 -------------------------------------------------------------------------------
 	sm:subscribe({signal = "on_item_to_slot", fun = this.check_remove_gasmask}) --ХЗ, в какой скрипт это перенести. Пусть тут будет, что-ли.
 end
-
-----------------------------------------------------------------------------------------------------
-local recolor_items = false
-
--- Кастомная заливка предметов в слотах, как в старых билдах. Взято из аддона Naxac'a
-function recolor_slot_item(item)
-	if not recolor_items then return end
-	if db.actor:is_in_slot(item) or db.actor:is_on_belt(item) then
-		local _st = CUIFrameWindow():GetTitleStatic()
-		if _st then _st:SetColor(GetARGB( 255, 0, 255, 0 )) end
-	end
-end
-
-function on_ui_open()
-	recolor_items = true
-	db.actor:invalidate_inventory()
-end
-
-function on_ui_hide()
-	recolor_items = false
-end
-----------------------------------------------------------------------------------------------------
 
 
 function on_first_update()

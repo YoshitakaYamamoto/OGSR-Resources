@@ -100,5 +100,6 @@ addons = {
 	"smart_monster_parts",
 	"bar_territory_logic",
 	"xr_kamp",
-	"inventory", --должен быть предпоследним!
+	"ogse_trade_precondition",
+	"inventory", --должен быть последним!
 }
