@@ -148,9 +148,10 @@ local dik_key_to_name = {
 }
 
 function dik_to_name(dik)
-	local name = dik_key_to_name[dik]
-    ASSERT( name, "dik_to_name not found: %s", dik or "nil" )
-	return name
+	--local name = dik_key_to_name[dik]
+    --ASSERT( name, "dik_to_name not found: %s", dik or "nil" )
+	--return name
+	return dik_key_to_name[dik] or ""
 end
 
 function bind_to_keys( bind, return_names ) --Если второй аргумент == true, то функция возвратит имена клавиш. В противном случае возвратит коды.

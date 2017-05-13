@@ -16,7 +16,7 @@ function on_first_update()
     if outfit:condition() ~= cond then
       log3( "!![%s]: unexpected outfit condition: %s < %s", script_name(), outfit:condition(), cond )
     end
-    dsh.set_condition( outfit, cond )
+    outfit:set_condition( cond )
     ogse.delete_var( script_name() .. ".condition" )
   end
 end
