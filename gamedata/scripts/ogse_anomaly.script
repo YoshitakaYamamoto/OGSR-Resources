@@ -482,12 +482,9 @@ end
 function on_anomaly_spawn(obj)
 	if is_not_anomaly(alife():object(obj:id())) then return end --НЕ аномалии не учитываем. Они сюда и не должны попадать, но на всякий случай.
 	--
-	local pk = get_netpk(obj, 1)
-	ASSERT( pk:isOk(), "can't read netpacket of %s", obj:name() )
-	local data = pk:get()
-    local rads = data.shapes:getRadius()
+	--log3("[%s(%s)] obj:get_shape_radius(): [%s]", script_name(), obj:name(), obj:get_shape_radius())
 	--
-	anom_list[obj:id()] = { pos = obj:position(), clsid = obj:clsid(), radius = rads, section = obj:section() }
+	anom_list[obj:id()] = { pos = obj:position(), clsid = obj:clsid(), radius = obj:get_shape_radius(), section = obj:section() }
 	--log3("--[%s] Anomaly registered: [%s]", script_name(), obj:name())
 end
 

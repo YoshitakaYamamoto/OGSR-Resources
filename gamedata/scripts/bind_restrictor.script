@@ -69,12 +69,8 @@ function restrictor_binder:net_spawn( data )
       [ "self"   ] = self,
     }
     self.sm:subscribe( self.subscribed )
-	--
-	local pk = get_netpk(self.object, 1)
-	ASSERT( pk:isOk(), "can't read netpacket of %s", self.object:name() )
-	local data = pk:get()
-    self.radius = data.shapes:getRadius() --Для точного рассчёта расстояния до рестрикторов.
-	--
+	--log3("[%s(%s)] self.object:get_shape_radius(): [%s]", script_name(), self.object:name(), self.object:get_shape_radius())
+    self.radius = self.object:get_shape_radius() --Для точного рассчёта расстояния до рестрикторов.
   --else
 	--log3("!!Restrictor NOT subscribed to update: [%s], logic is empty!", self.object:name())    
   end
