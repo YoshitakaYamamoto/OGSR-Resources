@@ -7,7 +7,8 @@
 --- Настройки схемы
 -----------------------------------------------------------------------
 local monsters_too = false --Включить монстрам обход аномалий?
-local freq = 1000 --Как часто выполнять апдейт обхода аномалий (в мс)
+freq = 1000 --Как часто выполнять апдейт обхода аномалий (в мс)
+local detect_radius = 30
 
 local added_restrictions = {}
 last_position = {}
@@ -118,7 +119,7 @@ function cleanup( obj )
 		if table.getn(restrs) > 0 then
 			--log3("[ANOMALY EVADER] REMOVING IN RESTRICTIONS FOR [%s]: %s", obj:name(), restrs)
 			local s = table.concat( restrs, "," )
-			ASSERT( s:len() < 4096, "too long: %s", s:len() )
+			ASSERT( s:len() < 3072, "too long: %s", s:len() )
 			obj:remove_restrictions( "", s )
 		end
 	end
@@ -127,12 +128,10 @@ function cleanup( obj )
 end
 
 function update_norm(npc)
-  ogse_signals.get_mgr():reschedule( freq )
-
   local curr_pos = npc:position()
   local prev_pos = last_position[ npc:id() ]
   if prev_pos then
-    if prev_pos:distance_to( curr_pos ) < 15 then --ранее было 20
+    if prev_pos:distance_to( curr_pos ) < detect_radius / 2 then
       return
     else
       last_position[ npc:id() ] = curr_pos
@@ -142,7 +141,7 @@ function update_norm(npc)
   end
 
   local restr = {}
-  for a, b in pairs(ogse_anomaly.get_all_nearest_anomalies_by_point_in_radius( npc:position(), 30 )) do
+  for a, b in pairs(ogse_anomaly.get_all_nearest_anomalies_by_point_in_radius( npc:position(), detect_radius )) do
     local obj = level.object_by_id( a )
     if obj then
       local ignore = false
@@ -166,25 +165,50 @@ function update_norm(npc)
       table.insert( del, k ) -- удалить старый
     end
   end
-  if table.getn( del ) > 0 then
+  if #del > 0 then
     for _, k in ipairs( del ) do
       added_restrictions[ npc:id() ][ k ] = nil
     end
     --log3("[ANOMALY EVADER] REMOVING IN RESTRICTIONS FOR [%s]: %s", npc:name(), del)
     local s = table.concat( del, "," )
-    ASSERT( s:len() < 4096, "too long: %s", s:len() )
+    ASSERT( s:len() < 3072, "too long: %s", s:len() )
     npc:remove_restrictions( "", s )
   end
 
   local add = {}
   for k, _ in pairs( restr ) do
     table.insert( add, k ) -- добавить новый
-    added_restrictions[ npc:id() ][ k ] = true
   end
-  if table.getn( add ) > 0 then
-    --log3("[ANOMALY EVADER] ADDING IN RESTRICTIONS FOR [%s]: %s", npc:name(), add)
+  if #add > 0 then
     local s = table.concat( add, "," )
-    ASSERT( s:len() < 4096, "too long: %s", s:len() )
-    npc:add_restrictions( "", s )
-   end
+    if npc:in_restrictions():len() + 1 + s:len() < 3072 then
+      --log3("[ANOMALY EVADER] ADDING IN RESTRICTIONS FOR [%s]: %s", npc:name(), add)
+      npc:add_restrictions( "", s )
+      for _, k in ipairs( add ) do
+        added_restrictions[ npc:id() ][ k ] = true
+      end
+      ogse_signals.get_mgr():reschedule( freq )
+    else
+      log3(
+        "!![%s]: %s: in_restrictions is too long: %s, %s",
+        script_name(), npc:name(), npc:in_restrictions():len(), s:len()
+      )
+      log3(
+        "~~[%s]: %s: in_restrictions() = %s",
+        script_name(), npc:name(), npc:in_restrictions()
+      )
+      log3(
+        "~~[%s]: change detect radius: %s -> %s",
+        script_name(), detect_radius, detect_radius * 0.75
+      )
+      detect_radius = detect_radius * 0.75
+      log3(
+        "~~[%s]: change detect freq:   %s -> %s",
+        script_name(), freq, freq * 0.75
+      )
+      freq = freq * 0.75
+    end
+  else
+    ogse_signals.get_mgr():reschedule( freq )
+  end
 end
