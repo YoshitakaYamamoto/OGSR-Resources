@@ -77,8 +77,6 @@ local surge_db = {
 <имя инфопорции стадии> = {
 	on_info = { -- действия, выполняемые один раз в момент начала соответствующей стадии
 		стандартный набор действий включает в себя:
-		Flag2 = 1/0,
-		Dead2 = 1/0,
 		call# = <имя файла>.<имя функции>, -- # - целое число от 1 и выше
 		pp_eff# = {"<имя файла постпроцесса>.ppe", <id>, true/false},
 		cam_eff# = {"<имя файла анимации камеры>.anm", <id>, true/false},
@@ -139,51 +137,59 @@ function surge_db_init()
 			call1 = function()
 				set_info_preblow() --Инфо предвыброса
 				news_main_new.vubros_msg() --Новость о выбросе
-			end,
+			end
 		},
 		on_info_deferred = {
 			if_surface = {
-				call1 = soundtrack.preblow, -- глухой звук ветра
-			},
-		},
+				call1 = soundtrack.preblow -- глухой звук ветра
+			}
+		}
 	}
 	surge_db.surge_process_stage_02 = {
 		on_info = {
 			call1 = this.set_info_preblow_to_blow,
 			if_surface = {
-				Flag2 = 1,
+				call2 = function() is_surge_started = true end
 			}
 		},
 		on_info_deferred = {
 			if_surface = {
-				call1 = soundtrack.attention_everyone, -- сирена
+				call1 = soundtrack.attention_everyone -- сирена
 			}
 		},
 		on_reinit = {
-			if_surface = {Flag2 = 1},
-		},
+			if_surface = {
+				call1 = function() is_surge_started = true end
+			}
+		}
 	}
 	surge_db.surge_process_stage_03 = {
 		on_info = {
 			call1 = this.set_info_blow,
 			if_surface = {
-				Flag2 = 1,
-			},
+				call1 = function() is_surge_started = true end
+			}
 		},
 		on_info_deferred = {
 			if_surface = {
-				call1 = soundtrack.surge_begin, -- глухой звук ветра (ещё раз?)
-			},
+				call1 = soundtrack.surge_begin -- глухой звук ветра (ещё раз?)
+			}
 		},
 		on_reinit = {
-			if_surface = {Flag2 = 1},
-		},
+			if_surface = {
+				call1 = function() is_surge_started = true end
+			}
+		}
 	}
 	surge_db.surge_process_stage_04 = {-- первые визуальные признаки выброса
 		on_info = {
 			call1 = ogse_anomaly.blow_flags, -- нужно делать без вариантов независимо от подземки
-			if_surface = {Flag2 = 1,},
-			if_underground = {Flag2 = 0,},
+			if_surface = {
+				call1 = function() is_surge_started = true end
+			},
+			if_underground = {
+				call1 = function() is_surge_started = false end
+			}
 		},
 		on_info_deferred = {
 			if_surface = {
@@ -197,9 +203,13 @@ function surge_db_init()
 		},
 		on_reinit = {
 			call1 = ogse_anomaly.blow_flags, -- Поднимаем флаги выброса для локаций
-			if_surface = {Flag2 = 1},
-			if_underground = {Flag2 = 0},
-		},
+			if_surface = {
+				call1 = function() is_surge_started = true end
+			},
+			if_underground = {
+				call1 = function() is_surge_started = false end
+			}
+		}
 	}
 	surge_db.surge_process_stage_05 = { --3. Проигрываем промежуточные эффекты
 		on_info = {
@@ -207,8 +217,12 @@ function surge_db_init()
 				news_main_data.on_disconnect_vbs() --Выдаем сообщение о дисконнекте
 				set_no_net_signal()
 			end,
-			if_surface = {Flag2 = 1,},
-			if_underground = {Flag2 = 0,},
+			if_surface = {
+				call2 = function() is_surge_started = true end
+			},
+			if_underground = {
+				call2 = function() is_surge_started = false end
+			}
 		},
 		on_info_deferred = {
 			if_surface = {
@@ -219,43 +233,59 @@ function surge_db_init()
 			},
 		},
 		on_reinit = {
-			if_surface = {Flag2 = 1},
-			if_underground = {Flag2 = 0},
-		},
+			if_surface = {
+				call1 = function() is_surge_started = true end
+			},
+			if_underground = {
+				call1 = function() is_surge_started = false end
+			}
+		}
 	}
 	surge_db.surge_process_stage_06 = {-- 4. Спустя период затишья начинаем выброс
 		on_info = {
-			if_surface = {Flag2 = 1,},
-			if_underground = {Flag2 = 0,},
+			if_surface = {
+				call1 = function() is_surge_started = true end
+			},
+			if_underground = {
+				call1 = function() is_surge_started = false end
+			}
 		},
 		on_info_deferred = {
 			if_surface = {
 				call1 = soundtrack.surge_wave_2, -- хитрое гудение
 				snd1 = [[anomaly\blowout]], -- раскаты грома с сиренами
 			},
-			call1 = function()
-				soundtrack.strange_sounds() --Рандомные звуки: гудение, шум воздуха и пр.
-				soundtrack.earthquake_sound() --Низкий глухой шум воздуха с раскатами грома в фоне
-			end,
+			--call1 = function() --KRodin: выключил, достаточно того что выше.
+			--	soundtrack.strange_sounds() --Рандомные звуки: гудение, шум воздуха и пр.
+			--	soundtrack.earthquake_sound() --Низкий глухой шум воздуха с раскатами грома в фоне
+			--end,
 			pp_eff1 = {"vibros.ppe", 1974, false},  -- разовое двоение картинки с покраснением, выбелением, выцветанием картинки в конце
 			cam_eff1 = {"camera_effects\\earthquake.anm", 1974, true}, -- землетрясение
 		},
 		on_reinit = {
-			if_surface = {Flag2 = 1},
-			if_underground = {Flag2 = 0},
-		},
+			if_surface = {
+				call1 = function() is_surge_started = true end
+			},
+			if_underground = {
+				call1 = function() is_surge_started = false end
+			}
+		}
 	}
 	surge_db.surge_process_stage_07 = {-- 5. Начинаем расколбас
 		on_info = {
 			call1 = this.deadly_blowout, -- addon by KamikaZze
 			if_surface = {
-				call2 = ogse.kill_crow,
-				Flag2 = 1, 
-				Dead2 = 1,
+				call2 = function()
+					ogse.kill_crow()
+					is_surge_raskolbas = true
+					is_surge_started = true
+				end
 			},
 			if_underground = {
-				Flag2 = 0, 
-				Dead2 = 0
+				call2 = function()
+					is_surge_started = false
+					is_surge_raskolbas = false
+				end,
 			},
 		},
 		on_info_deferred = {
@@ -267,28 +297,42 @@ function surge_db_init()
 			},
 			if_surface = {
 				call1 = soundtrack.surge_wave_3, -- долгое, низкое гудение
-				pp_eff1 = {"yantar_underground_psi.ppe", 2010, false}, -- кратковременное раздвоение в глазах
+				pp_eff1 = {"yantar_underground_psi.ppe", 2010, false} -- кратковременное раздвоение в глазах
 			},
 			if_underground = {
 				pp_eff1 = {"escape.ppe", 1974, false}, -- короткое покраснение картинки
-				call1 = soundtrack.play_ambient, -- шум ветра
-			},
+				call1 = soundtrack.play_ambient -- шум ветра
+			}
 		},
 		on_reinit = {
-			if_surface = {Flag2 = 1, Dead2 = 1},
-			if_underground = {Flag2 = 0, Dead2 = 0},
-		},
+			if_surface = {
+				call1 = function()
+					is_surge_started = true
+					is_surge_raskolbas = true
+				end
+			},
+			if_underground = {
+				call1 = function()
+					is_surge_started = false
+					is_surge_raskolbas = false
+				end
+			}
+		}
 	}
 	surge_db.surge_process_stage_08 = {
 		on_info = {
 			if_surface = {
-				Flag2 = 1, 
-				Dead2 = 1,				
+				call1 = function()
+					is_surge_started = true
+					is_surge_raskolbas = true
+				end
 			},
 			if_underground = {
-				Flag2 = 0, 
-				Dead2 = 0				
-			},
+				call1 = function()
+					is_surge_started = false
+					is_surge_raskolbas = false
+				end
+			}
 		},
 		on_info_deferred = {
 			cam_eff_rem1 = 1974,
@@ -317,51 +361,75 @@ function surge_db_init()
 			},
 		},
 		on_reinit = {
-			if_surface = {Flag2 = 1, Dead2 = 1},
-			if_underground = {Flag2 = 0, Dead2 = 0},
-		},
+			if_surface = {
+				call1 = function()
+					is_surge_started = true
+					is_surge_raskolbas = true
+				end
+			},
+			if_underground = {
+				call1 = function()
+					is_surge_started = false
+					is_surge_raskolbas = false
+				end
+			}
+		}
 	}
 	surge_db.surge_process_stage_09 = {
 		on_info = {
 			if_surface = {
-				Flag2 = 1, 
-				Dead2 = 1,				
+				call1 = function()
+					is_surge_started = true
+					is_surge_raskolbas = true
+				end
 			},
 			if_underground = {
-				Flag2 = 0, 
-				Dead2 = 0				
-			},
+				call1 = function()
+					is_surge_started = false
+					is_surge_raskolbas = false
+				end
+			}
 		},
 		on_info_deferred = {
 			cam_eff_rem1 = 1974,
 			if_surface = {
-				call1 = soundtrack.surge_rumble, -- шум ветра с отдалёнными раскатами грома
+				call1 = soundtrack.surge_rumble -- шум ветра с отдалёнными раскатами грома
 			},
 			if_underground = {
 				rnd = {
 					{
 						call1 = soundtrack.rock_sound, -- камешки сыпятся
-						pp_eff1 = {"yantar_underground_psi.ppe", 1974, false}, -- лёгкое короткое двоение с расплыванием
+						pp_eff1 = {"yantar_underground_psi.ppe", 1974, false} -- лёгкое короткое двоение с расплыванием
 					},
 					{
 						call1 = soundtrack.earthquake_sound,
-						pp_eff1 = {"total_recall.ppe", 1974, false},
+						pp_eff1 = {"total_recall.ppe", 1974, false}
 					},
 					{
 						call1 = soundtrack.earthquake_sound,
 						pp_eff1 = {"agr_u_fade.ppe", 1974, false},
-						pp_eff2 = {"total_recall.ppe", 1986, false},
+						pp_eff2 = {"total_recall.ppe", 1986, false}
 					},
 					{
 						-- тут тишина
-					},
-				},
-			},
+					}
+				}
+			}
 		},
 		on_reinit = {
-			if_surface = {Flag2 = 1, Dead2 = 1},
-			if_underground = {Flag2 = 0, Dead2 = 0},
-		},
+			if_surface = {
+				call1 = function()
+					is_surge_started = true
+					is_surge_raskolbas = true
+				end
+			},
+			if_underground = {
+				call1 = function()
+					is_surge_started = false
+					is_surge_raskolbas = false
+				end
+			}
+		}
 	}
 	surge_db.surge_process_stage_10 = surge_db.surge_process_stage_09
 	surge_db.surge_process_stage_11 = surge_db.surge_process_stage_09
@@ -369,68 +437,78 @@ function surge_db_init()
 	surge_db.surge_process_stage_13 = {-- 6. Выброс близится к концу
 		on_info = {
 			if_surface = {
-				Flag2 = 1, 
-				Dead2 = 1,				
+				call1 = function()
+					is_surge_started = true
+					is_surge_raskolbas = true
+				end
 			},
 			if_underground = {
-				Flag2 = 0, 
-				Dead2 = 0,				
-			},
+				call1 = function()
+					is_surge_started = false
+					is_surge_raskolbas = false
+				end
+			}
 		},
 		on_info_deferred = {
 			if_surface = {
-				call1 = soundtrack.surge_outro, -- опять шум воздуха/ветра
+				call1 = soundtrack.surge_outro -- опять шум воздуха/ветра
 			},
 			if_underground = {
-				call1 = soundtrack.play_ambient,
-			},
+				call1 = soundtrack.play_ambient
+			}
 		},
 		on_reinit = {
-			if_surface = {Flag2 = 1, Dead2 = 1},
-			if_underground = {Flag2 = 0, Dead2 = 0},
-		},
+			if_surface = {
+				call1 = function()
+					is_surge_started = true
+					is_surge_raskolbas = true
+				end
+			},
+			if_underground = {
+				call1 = function()
+					is_surge_started = false
+					is_surge_raskolbas = false
+				end
+			}
+		}
 	}
 	surge_db.surge_process_stage_14 = {-- 7. Завершаем выброс, устанавливаем время следующего
 		on_info = {
-			if_surface = {
-				Flag2 = 0, 
-				Dead2 = 0,					
-			},
-			if_underground = {
-				Flag2 = 0, 
-				Dead2 = 0,					
-			},
-			call1 = function()
+			call1 = function() --!!!KRodin: НЕ ИЗМЕНЯТЬ ОЧЕРЁДНОСТЬ!!!
 				set_first_blow()
 				on_surge_end() --Cюда скинул всё, что неудобно вызывать в простой форме
-			end,
-			Dead2 = 0, 
-			Flag2 = 0,
+				--
+				dsh.timeout( ogse_anomaly_evader.freq * 5, function() --KRodin: сделано для того, чтобы схема ogsm_hideout отпускала сталкеров только после того, как ogse_anomaly_evader установит им рестрикшены заспавненых после выброса аномалий.
+					--log3("--[%s] Surge end!", script_name())
+					is_surge_raskolbas = false
+					is_surge_started = false
+				end )
+			end
 		},
 		on_info_deferred = {
 			if_surface = {
-				pp_eff1 = {"teleport.ppe", 2009, false}, -- всё полностью белеет, потом обратно
+				pp_eff1 = {"teleport.ppe", 2009, false} -- всё полностью белеет, потом обратно
 			},
 			if_underground = {
-				pp_eff1 = {"escape.ppe", 2009, false},
+				pp_eff1 = {"escape.ppe", 2009, false}
 			},
 			if_not_safe = {
 				cam_eff1 = {"camera_effects\\shell_shock.anm", 1974, false}, -- короткая, затухающая встряска
-				call1 = soundtrack.actor_breath_sound, -- дыхота
+				call1 = soundtrack.actor_breath_sound -- дыхота
 			},
 			pp_eff1 = {"yantar_underground_psi.ppe", 2010, false},
-			snd1 = [[ambient\earthquake]],
-		},
+			snd1 = [[ambient\earthquake]]
+		}
 	}
 	surge_db.surge_process_stage_15 = {-- 6. Выброс близится к концу
 		on_info = {
 			if_surface = {
-				call1 = ogse.spawn_crow,
+				call1 = ogse.spawn_crow
 			},
-			call1 = this.surge_final,
+			call1 = this.surge_final
 		},
 		on_info_deferred = {
-		},
+		}
 	}	
 end
 
@@ -488,10 +566,6 @@ function parse_and_process_action_item(key, item)
 	elseif key:sub(1, 3) == "snd" then
 		local snd_obj = xr_sound.get_safe_sound_object(item)
 		snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
-	elseif key == "Dead2" then
-		is_surge_raskolbas = item > 0
-	elseif key == "Flag2" then
-		is_surge_started = item > 0
 	else
 		abort("[ogse_surge_mgr.parse_and_process_action_item] unknown action '%s'", key)
 	end
@@ -610,12 +684,11 @@ end
 function on_get_info(npc, info_id)
 	local action_item = surge_db[info_id]
 	if action_item then
-		surge_log("surge stage: %s", tostring(info_id))
 		deferred_actions = action_item -- запрашиваем выполнение отложенных действий
 		run_blowout_timer()
 		local info_action = action_item.on_info
 		if info_action then
-			--log1("!!SURGE_DEBUG: info["..tostring(info_id).."]")
+			--log3("[%s] surge stage: [%s]", script_name(), info_id)
 			parse_and_process_surge_stage(info_action)
 		end
 	end
