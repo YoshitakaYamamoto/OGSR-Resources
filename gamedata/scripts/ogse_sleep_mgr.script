@@ -263,9 +263,6 @@ function on_spawn()
 	
 	sleep_supressed = remained_sleep_suppression_time() > 0
 	update_sleep_effects(true)
-	if not sleeping_now then  -- если не спит
-		update_sleep_effects()
-	end
 end
 
 function on_save()
@@ -369,119 +366,60 @@ function is_af_mopheus_on_belt()
 	return false
 end
 
-local suprises = {
-	["l01_escape"] = {
-		"dog_normal",
-		"boar_normal",
-		"flesh_strong",
-		"zombie_normal",
-		"esc_bandit_respawn_1",
-		"esc_bandit_respawn_2"},
-	["l02_garbage"] = {
-		"dog_normal", 
-		"boar_normal", 
-		"flesh_strong", 
-		"gar_bandit_respawn_1", 
-		"gar_bandit_respawn_2"},
-	["l03_agroprom"] = {
-		"dog_normal", 
-		"boar_normal", 
-		"pseudodog_normal", 
-		"agr_soldier_regular", 
-		"agr_soldier_veteran"},
-	-- ["l03u_agr_underground"] = {
-		-- "bloodsucker_weak", 
-		-- "bloodsucker_normal", 
-		-- "bloodsucker_strong", 
-		-- "agr_bandit_respawn_1", 
-		-- "agr_bandit_respawn_2"},
-	["l04_darkvalley"] = {
-		"bloodsucker_normal", 
-		"burer_weak", 
-		"burer_strong", 
-		"gar_bandit_respawn_1", 
-		"gar_bandit_respawn_2"},
-	["l06_rostok"] = {
-		"bloodsucker_normal", 
-		"ros_killer_respawn_1", 
-		"ros_killer_respawn_2", 
-		"gar_bandit_respawn_2"},
-	["l08_yantar"] = {
-		"snork_weak", 
-		"snork_normal", 
-		"rad_zombied_respawn_1", 
-		"rad_zombied_respawn_2"},
-	["l07_military"] = {
-		"dog_normal", 
-		"boar_normal", 
-		"rad_zombied_respawn_1", 
-		"rad_zombied_respawn_2", 
-		"mil_killer_respawn_3"},
-	["l10_radar"] = {
-		"zombie_strong", 
-		"zombie_immortal", 
-		"rad_zombied_respawn_1", 
-		"rad_zombied_respawn_2", 
-		"pseudodog_strong", 
-		"psy_dog", 
-		"snork_strong"},
-	["l11_pripyat"] = { 
-		"zombie_strong", 
-		"zombie_immortal", 
-		"rad_zombied_respawn_1", 
-		"rad_zombied_respawn_2", 
-		"pseudodog_strong", 
-		"psy_dog", 
-		"snork_strong"},
-	["l12_stancia"] = {
-		"zombie_strong", 
-		"zombie_immortal", 
-		"rad_zombied_respawn_1", 
-		"rad_zombied_respawn_2", 
-		"pseudodog_strong", 
-		"psy_dog", 
-		"snork_strong"},
-	["l12_stancia_2"] = { 
-		"zombie_strong", 
-		"zombie_immortal", 
-		"rad_zombied_respawn_1", 
-		"rad_zombied_respawn_2", 
-		"pseudodog_strong", 
-		"psy_dog", 
-		"snork_strong"},
-	["k01_darkscape_ogse"] = { 
-		"bloodsucker_normal", 
-		"pseudodog_strong", 
-		"burer_strong", 
-		"gar_bandit_respawn_1", 
-		"gar_bandit_respawn_2"},
-	["l09_deadcity_ogse"] = { 
-		"bloodsucker_normal", 
-		"pseudodog_strong", 
-		"m_controller_normal", 
-		"m_controller_old",
-		"m_controller_old_fat",
-		"city_zombied_respawn_1", 
-		"city_zombied_respawn_2"},
-	["l13_generators_ogse"] = { 
-		"snork_strong", 
-		"pseudodog_strong", 
-		"rad_zombied_respawn_1", 
-		"rad_zombied_respawn_2"},
-	["l22_marsh"] = { 
-		"bloodsucker_normal", 
-		"pseudodog_strong", 
-		"snork_strong", 
-		"psy_dog"}
-}
--- вызывается по окончанию сна
-function surprise() -- Сюрприз!!!!
-	if suprises[level.name()] then
-		local section_table = suprises[level.name()]
-		dsh.create_free_mob(
-			section_table[math.random(table.getn(section_table))],
-			db.actor:position():add(vector():set(math.random(-2,2), 1, 0)),
-			db.actor:level_vertex_id(),
-			db.actor:game_vertex_id())
-	end
+--Пусть переносятся существующие мутанты на локации, от одного до
+--четырех. Будет выбрана случайная позиция на расстоянии от 10 до 25
+--метров, не попадающая в укрытие.
+function surprise()
+  local monsters = {}
+  for id, is_npc in pairs( db.creature ) do
+    if not is_npc then
+      local obj = level.object_by_id( id )
+      if
+        obj and obj:alive() and obj:relation( db.actor ) == game_object.enemy
+        and not string.find( obj:section(), "rat_", 1, true )
+      then
+        table.insert( monsters, obj )
+      end
+    end
+  end
+  local actor_pos = db.actor:position()
+  table.sort(
+    monsters,
+    function( a, b )
+      return a:position():distance_to( actor_pos ) < b:position():distance_to( actor_pos )
+    end
+  )
+  local lname = level.name()
+  local lvx   = ogse.level_vertexes[ lname ]
+  local lvids = {}
+  for new_lv = 1, lvx do
+    local pos  = level.vertex_position( new_lv )
+    local dist = actor_pos:distance_to( pos )
+    if
+      dist > 5 and dist < 25
+      and not ogse_anomaly.bad_zone( pos )
+    then
+      table.insert( lvids, new_lv )
+    end
+  end
+  local need_cnt = math.min( #monsters, 4 )
+  if #lvids > need_cnt then
+    for i = 1, need_cnt do
+      local obj  = monsters[ i ]
+      local sobj = alife():object( obj:id() )
+      if sobj then
+        ogse.reset_npc_logic( obj )
+        xr_gulag.resetJob( obj )
+        smart_terrain.unregister_npc( sobj )
+        sobj:brain():can_choose_alife_tasks( false )
+        local lv  = lvids[ math.random( #lvids ) ]
+        local pos = level.vertex_position( lv )
+        obj:set_custom_panic_threshold( 0 )
+        obj:set_fov( 360 )
+        alife():teleport_object(
+          "", pos, lv, db.actor:game_vertex_id(), sobj.id
+        )
+      end
+    end
+  end
 end
