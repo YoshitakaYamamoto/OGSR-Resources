@@ -564,6 +564,7 @@ _r_uCTime = function(pk,ver)
 		if tbl[1] == 255 then --/ and bit_ver ~= 1 | CS&SCoP
 			return nil --/>
 		elseif not pk:r_eof() then
+			tbl[1] = tbl[1] + 2000
 			for i=2,6 do
 				table.insert( tbl, pk:r_u8() ) --/< M,D,h,m,s
 			end
@@ -2169,7 +2170,8 @@ function net_se_turret_mgun:__init(obj,mode)
 		net_cse_alife_helicopter(nil, mode)
 	}
 	self.st_props = {
-		{ name = 'health', type = 'f32', default = 1.0 }
+		{ name = 'health', type = 'f32', default = 1.0 },
+		{ name = 'direction', type = 'f32v3', default = vector():set(0, 0, 0) } --KRodin: добавлено в OGSE
 	}
 	self.up_props = {}
 end
@@ -2748,7 +2750,7 @@ function net_se_zone_anom:__init(obj,mode)
 	}
 	self.st_props = {
 		--{ name = 'last_spawn_time_present', type = 'u8',   default = 0 },
-		{ name = 'last_spawn_time', type = 'bCTime', default = 0 }
+		--{ name = 'last_spawn_time', type = 'bCTime', default = 0 } --В ОГСЕ этого бреда больше нет
 	}
 	self.up_props = {}
 end
