@@ -765,7 +765,7 @@ function update()
   --ogse_signals.get_mgr():reschedule( 1000 )
   for k, v in pairs( grenades ) do
     local sobj = alife():object( k )
-    if sobj then
+    if sobj and sobj.parent_id == 65535 then
       if time_global() > v then
         local obj = level.object_by_id( k )
         if obj then
@@ -818,15 +818,18 @@ end
 
 function check_enemy(npc,be)
 	return npc:alive() and be and (
-		be:is_stalker() or
-		be:is_actor() or 
-		be:clsid() == clsid.bloodsucker_s or
-		be:clsid() == clsid.burer_s or
-		be:clsid() == clsid.controller_s or
-		be:clsid() == clsid.poltergeist_s or
-		be:clsid() == clsid.gigant_s or
-		be:clsid() == clsid.zombie_s
-		) and be:alive() and npc:see(be) and be:position():distance_to(level.vertex_position(be:level_vertex_id()))<2 --из-за глюков движка кидать будем только в объекты, недалеко от аи сетки
+		be:is_stalker()
+		or be:is_actor()
+		or be:clsid() == clsid.bloodsucker_s
+		or be:clsid() == clsid.burer_s
+		or be:clsid() == clsid.chimera_s
+		or be:clsid() == clsid.controller_s
+		or be:clsid() == clsid.fracture_s
+		or be:clsid() == clsid.gigant_s
+		or be:clsid() == clsid.poltergeist_s
+		or be:clsid() == clsid.snork_s
+		or be:clsid() == clsid.zombie_s
+	) and be:alive() and npc:see(be) and be:position():distance_to(level.vertex_position(be:level_vertex_id()))<2 --из-за глюков движка кидать будем только в объекты, недалеко от аи сетки
 end
 
 function npc_update( npc )
