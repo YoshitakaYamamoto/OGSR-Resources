@@ -539,6 +539,7 @@ end
 function CKampManager:checkNpcAbility( npc )
   local npc_id = npc:id()
   if not self.npc[ npc_id ] then return end
+  local has_listeners = self.population_comed > 1
   if
     npc:character_community() ~= "monolith"
     and npc:character_community() ~= "zombied"
@@ -582,7 +583,7 @@ function CKampManager:checkNpcAbility( npc )
         states[ "kurit" ] = false
       end
       -- играть на гармошке
-      if npc:object( "harmonica_a" ) then
+      if has_listeners and npc:object( "harmonica_a" ) then
         states[ "play_harmonica" ] = true
         states[ "wait_harmonica" ] = true
         self.kamp_states[ "pre_harmonica"  ] = true
@@ -616,7 +617,7 @@ function CKampManager:checkNpcAbility( npc )
       states[ "use_pda" ] = false
     end
     -- играть на гитаре
-    if npc:object( "guitar_a" ) then
+    if has_listeners and npc:object( "guitar_a" ) then
       states[ "play_guitar" ] = true
       states[ "wait_guitar" ] = true
       self.kamp_states[ "pre_guitar"  ] = true
@@ -630,7 +631,7 @@ function CKampManager:checkNpcAbility( npc )
       self.kamp_states[ "post_guitar" ] = false
     end
     -- анекдоты
-    if self.population_comed > 1 then
+    if has_listeners then
       self.kamp_states[ "pre_joke"  ] = true
       self.kamp_states[ "joke"      ] = true
       self.kamp_states[ "post_joke" ] = true
@@ -642,7 +643,7 @@ function CKampManager:checkNpcAbility( npc )
   end
 
   -- Если чувак знает истории, надо добавить их к лагерю
-  if self.population_comed > 1 and db.story_by_id[ npc:id() ] ~= nil then
+  if has_listeners and db.story_by_id[ npc:id() ] ~= nil then
     self.kamp_states[ "story"      ] = true
     self.kamp_states[ "post_story" ] = true
   else
