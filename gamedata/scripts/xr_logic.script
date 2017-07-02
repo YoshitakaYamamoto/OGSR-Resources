@@ -117,6 +117,7 @@ function generic_scheme_overrides(npc)
 --	gulag_name - имя гулага, если скрипт включается гулагом, а не биндером
 --]]
 function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_name)
+	--log3( "xr_logic.configure_schemes: [%s]: ini_filename = [%s], section_logic = [%s], gulag_name = [%s]", npc:name(), tostring(ini_filename), tostring(section_logic), tostring(gulag_name) )
 	local npc_id = npc:id()
 	local st     = db.storage[npc_id]
 	
@@ -1159,7 +1160,7 @@ function pstor_load_all(obj, reader)
 end
 
 
-local st_loaded_keys = { --KRodin: НЕ МЕНЯТЬ ОЧЕРЁДНОСТЬ!
+local st_loaded_keys = {
   [ "ini_filename"   ] = "loaded_ini_filename",
   [ "section_logic"  ] = "loaded_section_logic",
   [ "active_section" ] = "loaded_active_section",
@@ -1177,6 +1178,10 @@ end
 function get_st_value( st, k )
   return st[ k ]
 end
+
+local save_obj_keys = {
+  "ini_filename", "section_logic", "active_section", "gulag_name"
+}
 
 function save_obj( obj, packet, loaded )
   -- log3(
@@ -1205,7 +1210,7 @@ function save_obj( obj, packet, loaded )
   end
 --]=]
 
-  for k, _ in pairs( st_loaded_keys ) do
+  for _, k in ipairs( save_obj_keys ) do
     local v = get_st( st, k )
     -- log3( "xr_logic.save_obj: %s = %s", k, v )
     packet:w_stringZ( v or "" )
