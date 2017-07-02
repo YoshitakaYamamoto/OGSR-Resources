@@ -24,14 +24,8 @@ end
 function se_car:on_unregister() --Вызывается не только при удалении объекта, но и при выходе из игры.
 	--log3("--[%s] Called on_unregister for [%s]", script_name(), self:name())
 	cse_alife_car.on_unregister( self )
-	--Удаляем данные багажника
-	local prefix = "dsh_rukzak."..self.id
-    ogse.delete_var( prefix .. ".all_types" )
-	ogse.delete_var( prefix .. ".conds"     )
-	ogse.delete_var( prefix .. ".counts"    )
-	ogse.delete_var( prefix .. ".infos"     )
-	ogse.delete_var( prefix .. ".sections"  )
-	ogse.delete_var( prefix .. ".types"     )
+	--
+	dsh_rukzak.delete_rukzak_data( self.id ) --Удаляем данные багажника
 end
 
 --****************************************************

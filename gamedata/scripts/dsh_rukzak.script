@@ -182,15 +182,19 @@ function save_rukzak( id, data )
       prefix .. ".types",     game_types, "array_template", { "u8"     }
     )
   else
-    ogse.delete_var( prefix .. ".all_types" )
-	ogse.delete_var( prefix .. ".conds"     )
-	ogse.delete_var( prefix .. ".counts"    )
-	ogse.delete_var( prefix .. ".infos"     )
-	ogse.delete_var( prefix .. ".sections"  )
-	ogse.delete_var( prefix .. ".types"     )
+    delete_rukzak_data( id )
   end
 end
 
+function delete_rukzak_data( id ) --вызывается ещё и из se_car:on_unregister()
+  local prefix = "dsh_rukzak." .. id
+  ogse.delete_var( prefix .. ".all_types" )
+  ogse.delete_var( prefix .. ".conds"     )
+  ogse.delete_var( prefix .. ".counts"    )
+  ogse.delete_var( prefix .. ".infos"     )
+  ogse.delete_var( prefix .. ".sections"  )
+  ogse.delete_var( prefix .. ".types"     )
+end
 
 function get_item_info( obj )
   local sect = obj:section()
