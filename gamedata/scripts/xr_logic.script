@@ -1158,42 +1158,65 @@ function pstor_load_all(obj, reader)
 	end
 end
 
-function save_obj(obj, packet)
-	local npc_id = obj:id()
-	local st = db.storage[npc_id]
 
-	if st.ini_filename then
-		packet:w_stringZ(st.ini_filename)
-	else
-		packet:w_stringZ("")
-	end
+local st_loaded_keys = { --KRodin: НЕ МЕНЯТЬ ОЧЕРЁДНОСТЬ!
+  [ "ini_filename"   ] = "loaded_ini_filename",
+  [ "section_logic"  ] = "loaded_section_logic",
+  [ "active_section" ] = "loaded_active_section",
+  [ "gulag_name"     ] = "loaded_gulag_name",
+}
 
-	if st.section_logic then
-		packet:w_stringZ(st.section_logic)
-	else
-		packet:w_stringZ("")
-	end
-
-	if st.active_section then
-		packet:w_stringZ(st.active_section)
-	else
-		packet:w_stringZ("")
-	end
-
-	if st.gulag_name then
-		packet:w_stringZ(st.gulag_name)
-	else
-		packet:w_stringZ("")
-	end
-
-	save_logic(obj, packet)
-
-	if st.active_scheme then
-		issue_event(obj, db.storage[npc_id][st.active_scheme], "save")
-	end
-
-	pstor_save_all(obj, packet)
+function get_st_loaded_value( st, k )
+  ASSERT(
+    st_loaded_keys[ k ],
+    "[%s]: '%s' not found in st_loaded_keys", script_name(), tostring( k )
+  )
+  return st[ st_loaded_keys[ k ] ]
 end
+
+function get_st_value( st, k )
+  return st[ k ]
+end
+
+function save_obj( obj, packet, loaded )
+  -- log3(
+  --   "xr_logic.save_obj: obj:name() = '%s', loaded = %s",
+  --   obj:name(), tostring( loaded )
+  -- )
+  local npc_id = obj:id()
+  local st     = db.storage[ npc_id ]
+  local get_st = loaded and this.get_st_loaded_value or this.get_st_value
+
+--[=[ --KRodin: В ОГСЕ это, вроде бы, не нужно.
+  -- сообщение по побившейся логике физобъектов и вертолетов
+  local s_ini  = obj:spawn_ini()
+  if
+    ( not get_st( st, "ini_filename" ) )
+    and s_ini and logic_not_empty( obj, s_ini )
+  then
+    if
+      obj:clsid() == clsid.script_phys or obj:clsid() == clsid.script_heli
+    then
+      abort(
+        "У объекта %s повисла логика. Удалите созданное только что сохранение и переиграйте с предыдущего.",
+        obj:name()
+      )
+    end
+  end
+--]=]
+
+  for k, _ in pairs( st_loaded_keys ) do
+    local v = get_st( st, k )
+    -- log3( "xr_logic.save_obj: %s = %s", k, v )
+    packet:w_stringZ( v or "" )
+  end
+  save_logic( obj, packet )
+  if st.active_scheme then
+    issue_event( obj, db.storage[ npc_id ][ st.active_scheme ], "save" )
+  end
+  pstor_save_all( obj, packet )
+end
+
 
 function get_object_logic_file_name(id)
 	if not id then return "" end
@@ -1217,7 +1240,7 @@ function load_obj(obj, reader)
 	if ini_filename == "" then
 		config = get_object_logic_file_name(npc_id)
 		if config ~= "" and config ~= "nil" then
-			log1("!!WARNING! object ["..obj:name().."] can't load logic properly, using alternate way. File=["..tostring(config).."]")
+			log3( "!!WARNING! object [%s] can't load logic properly, using alternate way. File=[%s]", obj:name(), tostring(config) )
 			emergency_reload[obj:name()] = true
 		end
 		ini_filename = nil

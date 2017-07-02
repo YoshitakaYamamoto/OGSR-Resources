@@ -307,7 +307,7 @@ function light_binder:save(packet)
 	db.saving_obj = self.object
 
 	-- сохраняем состояние, если есть что сохранять
-	if self.has_light_config then
+	if self.has_light_config and self.initialized then
 		xr_logic.pstor_store(self.object, "is_on", self.is_on)
 		xr_logic.pstor_store(self.object, "is_broken", self.is_broken)
 		if self.repair_time then
@@ -322,7 +322,7 @@ function light_binder:save(packet)
 		xr_logic.pstor_store(self.object, "target_pitch",  self.object:get_go_float(504))
 	end
 	--
-	xr_logic.save_obj(self.object, packet)
+	xr_logic.save_obj(self.object, packet, not self.initialized)
 
 	db.saving_obj = nil
 end
