@@ -1,8 +1,10 @@
+;Дизертир на Агропроме
+
 [logic]
-;combat_ignore = combat_ignore
 meet = meet
 active = walker
 on_death = death
+combat_ignore = combat_ignore
 
 [death]
 on_info = %+agr_dezerter_died%
@@ -12,6 +14,7 @@ meet = meet
 path_walk = agr_ratcatcher_walk_way
 path_look = agr_ratcatcher_way_look
 danger = danger_condition
+combat_ignore_cond = {=dist_to_enemy_ge(10)}
 
 [danger_condition]
 ignore_distance = 0
@@ -24,8 +27,6 @@ victim_wpn     =	15| actor
 use            =	true
 use_wpn        =	true
 meet_dialog    =	agr_ratcatcher_start
-
-;[combat_ignore]
 
 [spawn]
 agr_nii_security_plan_flash
