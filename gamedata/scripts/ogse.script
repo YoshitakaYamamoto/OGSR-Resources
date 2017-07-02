@@ -1361,9 +1361,10 @@ function kill_offline_npc(obj)
 	if not obj then return end
 	ASSERT( IsStalker(obj) or IsMonster(obj), "" )
 
-	local pk = get_netpk(obj, 2)
+	local pk = get_netpk(obj)
 	ASSERT( pk:isOk(), "can't read netpacket of %s", obj:name() )
 	local data = pk:get()
+	data.health = 0
 	data.upd.health = 0
 	pk:set(data)
 	obj.offline_dead = 1

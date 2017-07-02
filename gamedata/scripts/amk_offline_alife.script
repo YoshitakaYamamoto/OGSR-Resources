@@ -1531,9 +1531,10 @@ function set_npc_health(obj, health)
 	
 		write_log("SET_HEALTH "..obj:name().." "..health)
 		
-		local pk = get_netpk(obj, 2)
+		local pk = get_netpk(obj)
 		ASSERT( pk:isOk(), "can't read netpacket of %s", obj:name() )
 		local data = pk:get()
+		data.health = health
 		data.upd.health = health
 		pk:set(data)
 

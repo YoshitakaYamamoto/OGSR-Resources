@@ -3144,9 +3144,10 @@ end
 function search_diggers_in_x16()
 	if db.actor:object("pda_gribnik") and db.actor:object("pda_leshyi") then
 		local sobj = ogse.spawn_object(spawn_db.ros_dogger_gaz)
-		local pk = get_netpk(sobj, 2)
+		local pk = get_netpk(sobj)
 		ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
 		local tbl = pk:get()
+		tbl.health = 0.27
 		tbl.upd.health = 0.27
 		pk:set(tbl)
 		return true
