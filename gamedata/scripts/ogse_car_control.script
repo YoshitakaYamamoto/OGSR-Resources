@@ -120,8 +120,15 @@ function on_attach_vehicle(obj) --Только что залезли в машину
 		--log3("~~[%s] god_mode is: [%s]", script_name(), get_con_bool("g_god"))
 		cmd("g_god on")
 	end
-	show_car_hud(obj, in_btr)
-
+	--
+	--KRodin: при переходе с локации на локацию внутри бтра, худ не всегда показывается. ХЗ, в чём причина...
+	--На ближайшем апдейте вроде срабатывает. Попробуем такой костыль:
+	if device().precache_frame > 1 then
+		dsh.exec_on_update( function() this.show_car_hud( obj, in_btr ) end )
+	else
+		show_car_hud(obj, in_btr)
+	end
+	--
 	subscribe()
 end
 
@@ -152,7 +159,7 @@ function on_use_vehicle(obj)
 end
 
 
-function on_spawn(sactor)
+function on_spawn()
 	sim = alife()
 	local bg = get_hud():AddCustomStatic("btr_hud_background", true):wnd() -- подложка для окна худа БТР
 	bg:SetWidth(0)
@@ -163,6 +170,7 @@ function on_spawn(sactor)
 	btr_hud_wnd = btr_hud() -- если ещё не создали, то создать
 	ASSERT(btr_hud_wnd, "ogse_car_control.on_spawn: btr_hud_wnd == nil") -- были проблемы при создании
 	car_hud_wnd = car_hud()
+	ASSERT(car_hud_wnd, "ogse_car_control.on_spawn: car_hud_wnd == nil") -- на всякий случай
 	alt_hud_bg = CUIWindow()
 	alt_hud_bg:Init(0,0,1024,768)
 	alt_hud_bg:Show(true)
@@ -172,7 +180,6 @@ function on_spawn(sactor)
 		local log_dir = getFS():update_path("$logs$", "car_log.txt")
 		car_log = io.open(log_dir, "a+")
 	end
-	
 	-- debug --
 end
 
@@ -190,23 +197,30 @@ function on_finalize()
 	car_hud_wnd = nil
 	get_hud():RemoveDialogToRender(alt_hud_bg)
 	alt_hud_bg = nil
+	if get_hud():GetCustomStatic("btr_hud_background") then
+		get_hud():RemoveCustomStatic("btr_hud_background")
+	end
 	if car_log then car_log:close() end
 end
 
 function transfer_btr_hud_to_static()
 	detach_from_all()
-	local bg = get_hud():AddCustomStatic("btr_hud_background", true):wnd()
+	local bg = get_hud():GetCustomStatic("btr_hud_background") or get_hud():AddCustomStatic("btr_hud_background", true)
+	bg = bg:wnd()
 	bg:AttachChild(btr_hud_wnd)
 	bg:AttachChild(car_hud_wnd)
+	btr_hud_wnd.emty:Show(false)
 	ogse_signals.get_mgr():call("on_hud_show")
 end
 
 function transfer_btr_hud_to_alt()
 	detach_from_all()
-	local bg = get_hud():AddCustomStatic("btr_hud_background", true):wnd()
+	local bg = get_hud():GetCustomStatic("btr_hud_background") or get_hud():AddCustomStatic("btr_hud_background", true)
+	bg = bg:wnd()
 	bg:AttachChild(car_hud_wnd)
 	alt_hud_bg:AttachChild(btr_hud_wnd)
 	btr_hud_wnd:Show(true)
+	btr_hud_wnd.emty:Show(true)
 	ogse_signals.get_mgr():call("on_hud_show")
 end
 
@@ -548,10 +562,8 @@ function on_info(npc, info_id)
 	if in_btr then
 		if info_id == "ui_pda" or info_id == "ui_inventory" then
 			transfer_btr_hud_to_alt()
-			btr_hud_wnd.emty:Show(true)
 		elseif info_id == "ui_pda_hide" or info_id == "ui_inventory_hide" then
 			transfer_btr_hud_to_static()
-			btr_hud_wnd.emty:Show(false)
 		end
 	end
 end
@@ -598,7 +610,7 @@ function car_hud:__init() super()
 	self.fuel_level = xml:InitStatic("car_fuel_back:fuel_level", self.bg)
 	self.max_width = self.fuel_level:GetWidth()
 	self:Show(true)
-	self.self = self
+	self.self = self --KRodin: ???
 end
 		
 class "btr_hud" (CUIScriptWnd)
@@ -827,7 +839,8 @@ function update_car_states(car)
 end
 function show_car_hud(car, btr)
 	detach_from_all()
-	local bg = get_hud():AddCustomStatic("btr_hud_background", true):wnd() -- подложка для окна худа БТР
+	local bg = get_hud():GetCustomStatic("btr_hud_background") or get_hud():AddCustomStatic("btr_hud_background", true) -- подложка для окна худа БТР
+	bg = bg:wnd()
 	if btr then
 		bg:AttachChild(btr_hud_wnd) -- поместить окно на подложку
 		db.actor:set_camera_fov(fov_vol)
