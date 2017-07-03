@@ -488,12 +488,14 @@ function actor_binder:use_vehicle(obj)
 	self.am:call("on_use_vehicle", obj, sobj)
 end
 ----------------------------------------------------------------------------------------------------------------------
-function actor_binder:detach_vehicle(obj)
+function actor_binder:detach_vehicle(obj) --KRodin: криво работает, поэтому более не используется. См. ogse_car_control.script
+--[=[
 	if not obj then return end
 	local sobj = alife():object( obj:id() )
 	if not sobj then return end
 
 	self.am:call("on_detach_vehicle", obj, sobj)
+--]=]
 end
 ----------------------------------------------------------------------------------------------------------------------
 

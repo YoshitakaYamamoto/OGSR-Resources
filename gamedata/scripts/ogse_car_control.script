@@ -132,7 +132,7 @@ function on_attach_vehicle(obj) --Только что залезли в машину
 	subscribe()
 end
 
-function on_detach_vehicle(obj) --Только что вылезли из машины
+function on_detach_vehicle() --Только что вылезли из машины
 	SetDetailsMinRadius(0.0) -- вертаем траву обратно
 	fix_camera_limits = false --Оно тут зачем?
 	bind_stalker.restore_weapon()
@@ -802,12 +802,15 @@ function update_car_hud()
 		--
 		local new_width = (car:get_fuel() / car:get_fuel_tank()) * car_hud_wnd.max_width
 		car_hud_wnd.fuel_level:SetWidth(new_width)
-	end
-	if in_btr then
-		update_btr_targets(car)
-		update_car_gun_direction(car)
-		update_btr_hud(car)
-		update_fire_status(car)
+		--
+		if in_btr then
+			update_btr_targets(car)
+			update_car_gun_direction(car)
+			update_btr_hud(car)
+			update_fire_status(car)
+		end
+	else --KRodin: каллбек on_detach_vehicle временами работает криво, поэтому сделаем так:
+		ogse_signals.get_mgr():call("on_detach_vehicle")
 	end
 end
 
