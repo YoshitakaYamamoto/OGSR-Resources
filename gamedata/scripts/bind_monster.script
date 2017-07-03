@@ -172,9 +172,7 @@ function generic_object_binder:death_callback(victim, who)
 
 	self:clear_callbacks()
 
-	if who and string.find(who:name(), "vehicle_btr") then
-		who = db.actor
-	end
+	--log3("!!![%s][%s] killed from [%s]!!!", script_name(), self.object:name(), who:name())
 
 	if self.object:name() == "secret_villager" then
 		db.actor:give_info_portion("secret_villager_dead")
@@ -213,17 +211,26 @@ function generic_object_binder:death_callback(victim, who)
 end
 
 function generic_object_binder:before_hit_callback(p_s_hit, p_ignore_flags)
-	local last_hit_data = read_hit_data( p_s_hit )
---log3("--[%s] Called before_hit_callback for [%s]: %s, %s, %s", script_name(), self.object:name(), last_hit_data, p_s_hit, p_ignore_flags)
-	self.am:call( "on_monster_before_hit", self.object, last_hit_data, p_s_hit, p_ignore_flags, self )
+	self.last_hit_data = read_hit_data(p_s_hit)
+--log3("--[%s] Called before_hit_callback for [%s]: %s, %s, %s", script_name(), self.object:name(), self.last_hit_data, p_s_hit, p_ignore_flags)
+	if self.last_hit_data ~= 0 then
+		local obj = level.object_by_id(self.last_hit_data.who_id)
+		if obj then -- если есть виновник хита
+			if
+				self.last_hit_data.who_id == bind_statpkm.pkm_captured -- если это турель
+				or ( ogse_car_control.current_car and ogse_car_control.current_car:id() == self.last_hit_data.who_id ) -- если это БТР, в котором сидит актор
+			then -- то надо заменить на реального виновника, т.е. ГГ
+				write_memory_int(db.actor:cast_game_object(), p_s_hit, hit_offset.who)
+				write_memory_int16(db.actor:id(), p_s_hit, hit_offset.whoID)
+			end
+		end
+	end
+
+	self.am:call( "on_monster_before_hit", self.object, self.last_hit_data, p_s_hit, p_ignore_flags, self )
 end
 
 function generic_object_binder:hit_callback(obj, amount, local_direction, who, bone_index)
 --log3("--[%s] Called hit_callback for [%s]. Who: [%s], amount: [%s]", script_name(), self.object:name(), who:name(), amount)
-	if who and string.find(who:name(), "vehicle_btr") then
-		who = db.actor
-	end	
-
 	if self.st.hit then
 		xr_logic.issue_event(self.object, self.st.hit, "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end

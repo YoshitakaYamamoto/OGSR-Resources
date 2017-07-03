@@ -690,21 +690,12 @@ end
 
 function hit_by_actor(actor, npc)
 	local t = db.storage[npc:id()].hit
-	local hit_by_actor = (t ~= nil and (t.who == actor:id() or 
-	(ogse_car_control.current_car and t.who == ogse_car_control.current_car) 
-	or (bind_statpkm.pkm_captured and t.who == bind_statpkm.pkm_captured)))
-	printf("_bp: hit_by_actor: %s", if_then_else(hit_by_actor, "true", "false"))
-	return hit_by_actor
+	return t and t.who == actor:id()
 end
 
 function killed_by_actor(actor, npc)
 	local t = db.storage[npc:id()].death
-	local killed_by_actor = t ~= nil and 
-	(t.killer == actor:id() or 
-	(ogse_car_control.current_car and t.killer == ogse_car_control.current_car) 
-	or (bind_statpkm.pkm_captured and t.killer == bind_statpkm.pkm_captured))
-	printf("_bp: killed_by_actor: %s", if_then_else(killed_by_actor, "true", "false"))
-	return killed_by_actor
+	return t and t.killer == actor:id()
 end
 
 function actor_has_weapon (actor, npc)

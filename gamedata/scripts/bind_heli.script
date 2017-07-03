@@ -216,8 +216,6 @@ end
 
 ------------------------------ callbacks ---------------------------------
 function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
-
-
 	local health_loss = self.st.combat.lasthealth - self.heliObject:GetfHealth()
 	if tonumber(hit_type) == 8 then -- пулевое повреждение с нужным импульсом ( импульс вместо бронебойности, спасибо разрабам)
 		if tonumber(impulse) >= 1 then
@@ -228,13 +226,13 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 	end
 
 	self.heliObject:SetfHealth(self.st.combat.lasthealth)
-	printf( "heli_binder: hit callback")
-	
-	if ogse_car_control.current_car and ogse_car_control.in_btr then
-		if enemy_id == ogse_car_control.current_car:id() then
-			enemy_id = db.actor:id()
-		end
-	end	
+
+	if
+		( enemy_id and enemy_id == bind_statpkm.pkm_captured ) -- если это турель
+		or ( ogse_car_control.current_car and enemy_id == ogse_car_control.current_car:id() ) -- если это БТР, в котором сидит актор
+	then -- то надо заменить на реального виновника, т.е. ГГ
+		enemy_id = db.actor:id()
+	end
 
 	local enemy = level.object_by_id( enemy_id )
 	-- если обидчик актЄр или сталкер, то сделать его своим врагом

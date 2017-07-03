@@ -508,17 +508,18 @@ function motivator_binder:before_hit_callback(p_s_hit, p_ignore_flags)
 	if self.last_hit_data ~= 0 then
 		local obj = level.object_by_id(self.last_hit_data.who_id)
 		if obj then -- если есть виновник хита
-			local obj_id = obj:id()
-			if obj_id == bind_statpkm.pkm_captured then -- если это турель
-				-- то надо заменить на реального виновника, т.е. ГГ
+			if
+				self.last_hit_data.who_id == bind_statpkm.pkm_captured -- если это турель
+				or ( ogse_car_control.current_car and ogse_car_control.current_car:id() == self.last_hit_data.who_id ) -- если это БТР, в котором сидит актор
+			then -- то надо заменить на реального виновника, т.е. ГГ
 				write_memory_int(db.actor:cast_game_object(), p_s_hit, hit_offset.who)
 				write_memory_int16(db.actor:id(), p_s_hit, hit_offset.whoID)
 			elseif --Проверяем условия игнорирования урона от дружественного огня
 				obj:is_stalker()
-				and obj_id ~= self.object:id() --если не сам себя
+				and self.last_hit_data.who_id ~= self.object:id() --если не сам себя
 				and self.object:relation( obj ) ~= game_object.enemy
 				and obj:relation( self.object ) ~= game_object.enemy
-				--and not xr_companion.is_companion(obj_id)
+				--and not xr_companion.is_companion(self.last_hit_data.who_id)
 			then
 				write_memory_int(1, p_ignore_flags) --Подстрелил друг, игнорируем
 			end
@@ -534,10 +535,6 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 		xr_sound.set_sound(self.object, nil)
 		stop_play_sound(self.object)
 	end
-
-	if who and string.find(who:name(), "vehicle_btr") then
-		who = db.actor
-	end	
 
 	if self.object:alive() then
 		local chk_dist = self.object:position():distance_to(who:position())
@@ -592,10 +589,7 @@ function motivator_binder:death_callback(victim, who)
 	self.updaters = {}
 	self.object:set_tip_text_default()
 
-	if ogse_car_control.current_car and who:id() == ogse_car_control.current_car:id() then
-		who = db.actor
-		ogse_car_control.btr_kill(self.object)
-	end
+	--log3("!!![%s][%s] killed from [%s]!!!", script_name(), self.object:name(), who:name())
 
 	ogse_hitfx.npc_on_death(self.object, who)
 
@@ -777,11 +771,14 @@ function motivator_binder:load(reader)
 end
 
 function motivator_binder:hear_callback(obj, who, sound_type, sound_position, sound_power)
-	if xr_companion.is_companion(self.object:id()) then return end	
+	if xr_companion.is_companion(self.object:id()) then return end
 
-	if who and string.find(who:name(), "vehicle_btr") then
+	if
+		who:id() == bind_statpkm.pkm_captured -- если это турель
+		or ( ogse_car_control.current_car and ogse_car_control.current_car:id() == who:id() ) -- если это БТР, в котором сидит актор
+	then -- то надо заменить на реального виновника, т.е. ГГ
 		who = db.actor
-	end		
+	end
 
 	local snd_timer = time_global()
 	if not snd_check_timer[self.object:id()] then

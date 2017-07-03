@@ -1321,21 +1321,6 @@ function resolve_target(target)
 	return descript
 end
 
-function btr_kill(victim)
-	relation_registry.set_community_goodwill(victim:character_community(), db.actor:id(), -50)
-	if victim:relation(db.actor) == game_object.neutral then
-		db.actor:change_character_reputation(-25)
-	elseif victim:relation(db.actor) == game_object.friend then
-		db.actor:change_character_reputation(-50)
-	end
-	for k, v in pairs(db.creature) do
-		local obj = level.object_by_id(k)
-		if obj and v == true and obj:character_community() == victim:character_community() and obj:position():distance_to(victim:position()) < 30 then
-			obj:set_relation(game_object.enemy, db.actor)
-		end	
-	end
-end
-
 function play_contact_sound()
 	local snd_obj = xr_sound.get_safe_sound_object(snd_new_target)
 	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
