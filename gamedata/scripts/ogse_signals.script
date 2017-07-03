@@ -444,11 +444,11 @@ function signals_mgr:call( signal_name, ... )
   end
   --
   if work_time > work_time_limit then
-    log3( "!![%s]: signal [%s] is too slow: [%s]", script_name(), signal_name, work_time )
+    log3( "!![%s]: signal [%s] is too slow: [%.2f s.]", script_name(), signal_name, work_time / 1e+6 )
     for i=1, #times do
       local t = times[i]
       if t.time > work_time_limit then
-        log3( "!!  slot: %s[%s], time: [%s]", t.script_name, t.line, t.time )
+        log3( "!!  slot: %s[%s], time: [%.2f s.]", t.script_name, t.line, t.time / 1e+6 )
       end
     end
   end
