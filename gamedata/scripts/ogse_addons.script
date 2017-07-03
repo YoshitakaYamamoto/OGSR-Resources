@@ -32,18 +32,24 @@ function get_available_actions_for_slot(addon_sec, slot_num)
 	if wpn then -- проверяем, что вообще есть куда устанавливать
 		local wpn_section = wpn:section()
 		-- проверяем, что аддон подходит для этого ствола
-		if is_addon_removable(wpn_section, get_addon_type(addon_sec)) and get_converted_wpn_section(wpn_section, addon_sec) then
+		local addon_type = get_addon_type(addon_sec)
+		local new_wpn_sect = get_converted_wpn_section(wpn_section, addon_sec)
+		if
+			is_addon_removable(wpn_section, addon_type)
+			and new_wpn_sect
+			and not ( is_addon_installed(wpn, addon_type) and new_wpn_sect == wpn_section and get_string(wpn_section, flag2name_param[addon_type]) == addon_sec ) --KRodin: запретим повторную установку аддона на ствол, на котором такой же аддон уже установлен
+		then
 			-- не должно быть ситуации когда в конфиге ствола есть данные по установке аддона 
 			-- и при этом в стволе прописано, что аддона такого типа нет вообще 
 			-- или ствол имеет несъёмный аддон этого же типа.
 			-- То и другое не имеет смысла и должно быть исключено конфигами
 			-- проверяем, если вообще нет аддона
-			--[[ASSERT(not no_such_addon(wpn_section, get_addon_type(addon_sec)),
+			--[[ASSERT(not no_such_addon(wpn_section, addon_type),
 				string.format("get_available_actions_for_slot: Addon '%s' has switching config in weapon's section '%s', \nbut this weapon has no addon of this type.",
 				addon_sec,
 				wpn_section))
 			-- если несъёмный
-			ASSERT(is_addon_removable(wpn_section, get_addon_type(addon_sec)),
+			ASSERT(is_addon_removable(wpn_section, addon_type),
 				string.format("get_available_actions_for_slot: Addon '%s' has switching config in weapon's section '%s', \nbut this weapon has a permanent addon of this type.",
 				addon_sec,
 				wpn_section))
@@ -70,7 +76,9 @@ end
 function always_fake_item(section)
 	return get_bool(section, "always_fake", false)
 end
--- секции аддонов без конвертации
+
+--[=[
+секции аддонов без конвертации
 local monitored_addon_sections = {
 	["wpn_addon_grip"] = true,
 	["wpn_addon_grip_fake"] = true,
@@ -78,7 +86,8 @@ local monitored_addon_sections = {
 	["wpn_addon_scope_mount_fake"] = true,
 	["fake_wpn_addon_mtk83"] = true,
 	["fake_wpn_addon_mtk83_fake"] = true,
-}
+}--]=]
+
 -- колбек на использование инвентарного предмета
 function on_use(obj, sobj)
 	--if sobj == nil then return end
