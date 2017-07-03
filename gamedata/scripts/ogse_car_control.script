@@ -108,6 +108,12 @@ function on_attach_vehicle(obj) --Только что залезли в машину
 		end
 	end
 	--
+	--Выключим фонарик актора
+	local actor_torch = db.actor:item_in_slot(9)
+	if actor_torch and actor_torch:is_torch() and actor_torch:is_torch_enabled() then
+		actor_torch:switch_torch(false)
+	end
+	--
 	SetDetailsMinRadius(2.0) -- убираем траву из под ног
 	setup_car_camera(obj)
 	bind_stalker.hide_weapon()
