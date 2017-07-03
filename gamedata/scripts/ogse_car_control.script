@@ -277,6 +277,7 @@ end
 
 local periscope_faile_fx_intensity     = 200                         -- интенсивность налагаемого эффекта визуального шума при выбросе (0-255)
 
+local current_btr_fov
 local btr_fov_max_value               = fov_vol + 40  -- максимально допустимый для зумма БТР FOV (ZOOM-)
 local btr_fov_min_value               = fov_vol - 70  -- минимально допустимый для зумма БТР FOV (ZOOM+)
 local btr_fov_different               = 5                           -- изменение FOV за один щелчок оборота колёсика мыши
@@ -308,12 +309,12 @@ local last_target = {}				-- последняя цель, [id] = last_time
 	-- vis = видим или нет
 -- }
 
-local periscope_modes             = {manual = 1, target_select = 2, auto = 3,}
-local periscope_mode              = periscope_modes.manual
+local periscope_modes             = { manual = 1, target_select = 2, auto = 3 }
+local periscope_mode
 local car_health                  = 0.0
 local car_critically_damaged      = false
 local auto_fire_operable          = true   -- флаг исправности автоматического режима
-local recognition_target_mode     = true   -- флаг распознавания цели
+local recognition_target_mode -- флаг распознавания цели
 local recognition_target_operable = true   -- флаг исправности распознавания цели
 
 function is_manual_mode()
@@ -538,6 +539,7 @@ function on_key_up(key, bind)
 			--target_select_mode = false
 		elseif key == 339 then -- управление зуммом
 			db.actor:set_camera_fov(fov_vol)
+			current_btr_fov = fov_vol
 		end
 	end
 end
@@ -555,6 +557,7 @@ function on_wheel(vol)
 			return
 		end
 		act:set_camera_fov(new_fov)
+		current_btr_fov = new_fov
 	end
 end
 
@@ -784,12 +787,20 @@ function on_save()
 	elseif ogse.var_exists( "god_mode_in_btr" ) then
 		ogse.delete_var( "god_mode_in_btr" )
 	end
+	--
+	ogse.save_var( script_name()..".periscope_mode", periscope_mode, "u8" ) --Сохраняем режим стрельбы
+	ogse.save_var( script_name()..".recognition_target_mode", recognition_target_mode, "bool" ) --Сохраняем режим автораспознавания
+	ogse.save_var( script_name()..".current_btr_fov", current_btr_fov, "float" ) --Сохраняем fov
 end
 
 function on_load()
 	if not ogse.var_exists( "god_mode_in_btr" ) then
 		cmd("g_god off")
 	end
+	--
+	periscope_mode = ogse.load_var( script_name()..".periscope_mode", periscope_modes.manual, "u8") --Загружаем режим стрельбы
+	recognition_target_mode = ogse.load_var( script_name()..".recognition_target_mode", true, "bool") --Загружаем режим автораспознавания
+	current_btr_fov = ogse.load_var( script_name()..".current_btr_fov", fov_vol, "float") --Загружаем fov
 end
 
 
@@ -852,7 +863,7 @@ function show_car_hud(car, btr)
 	bg = bg:wnd()
 	if btr then
 		bg:AttachChild(btr_hud_wnd) -- поместить окно на подложку
-		db.actor:set_camera_fov(fov_vol)
+		db.actor:set_camera_fov(current_btr_fov)
 		current_target_id = nil
 
 		ogse_signals.get_mgr():call("on_sit_down_in_btr")
@@ -865,7 +876,6 @@ function hide_car_hud(btr)
 	if btr then
 		db.actor:set_camera_fov(fov_vol)
 		current_target_id = nil
-		db.actor:set_camera_fov(fov_vol)
 
 		ogse_signals.get_mgr():call("on_exit_from_btr")
 	end

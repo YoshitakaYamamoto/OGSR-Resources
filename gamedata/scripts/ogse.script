@@ -15,7 +15,7 @@ function attach(sm)
 end
 
 game_time_factor = get_float("alife", "time_factor")
-local fov_vol = sys_ini:r_s32("options","fov_volume")
+local fov_vol = get_u32("options", "fov_volume")
 local max_alarm_fov_vol = sys_ini:r_s32("options","max_fov_volume")
 local min_alarm_fov_vol = sys_ini:r_s32("options","min_fov_volume")
 local ammo_on_belt = sys_ini:r_s32("options","ammunition_on_belt")
@@ -1320,18 +1320,8 @@ function on_actor_first_update()
 		end
 	end
 
-	-- Установка FOV
-	db.actor:set_camera_fov(fov_vol)
-
 	-- позволим актору выйти через тот же выход на Агро, что он пришел
 	agroprom_tasks.check_enter()
-
-	-- заебал уже этот фонарь
-	local torch = db.actor:item_in_slot(9)
-	if torch then
-		torch:switch_torch(not torch:is_torch_enabled())
-		torch:switch_torch(not torch:is_torch_enabled())
-	end
 
 --[[ --Патроны на поясе --KRodin: выключено
 	if ammo_on_belt == 1 then
