@@ -1392,6 +1392,7 @@ function update_target_marker()
 	btr_hud_wnd.hud_target:SetTextST(string.format("%.1f", dist))
 	--
 	local x,y,z = get_screen_coords(get_aiming_point_for_target(target.obj))
+	--log3( "--get_screen_coords: [%s, %s, %s]", x, y, z )
 	btr_hud_wnd.hud_target:Show(z > 0)
 	btr_hud_wnd.hud_target:SetWndPos(x - 32, y - 32)
 end
@@ -1430,7 +1431,7 @@ function get_screen_coords(point)
 
     local x = 512 + dev.cam_right:dotproduct(ppp) * scr_dist / dp * (1024/scr_w)
     local y = 384 - dev.cam_top:dotproduct(ppp)   * scr_dist / dp * (768/scr_h)
-    return x, y, scr_dist
+    return x, y, dp
 end
 
 
