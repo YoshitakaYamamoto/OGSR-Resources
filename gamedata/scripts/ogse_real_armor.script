@@ -3,14 +3,13 @@
 ----- по визуалу непися, OGSE мод,
 ----- автор KamikaZze
 -------------------------------------------
+local cached = {} --таблица вида { [visual_name] = [section] }
 
 function vis_to_armor(npc)
-local section
-
-	if npc then
-		local vis = table.remove( string.explode( "\\", npc:get_visual_name() ) )
-
-		if vis then
+	local vis = table.remove( string.explode( "\\", npc:get_visual_name() ) )
+	if not cached[ vis ] then
+			local section = "nil"
+			--
 			if npc:character_community()=="bandit" then
 				-- bandits
 				if string.find(vis,"stalker_bandit_") then section = "novice_outfit" end
@@ -66,8 +65,12 @@ local section
 				if string.find(vis,"stalker_neytral_nauchniy") then section = "protection_outfit" end 
 			end
 			if string.find(vis, "exo") and not string.find(vis,"stalker_mo_exo") then section = "exo1" end
-		end
+			--
+			cached[ vis ] = section
 	end
 
-	return section
+	if cached[ vis ] ~= "nil" then
+		return cached[ vis ]
+	end
+	return nil
 end
