@@ -235,8 +235,7 @@ function validate_enemy_object( enemy )
 end
 
 ----------------------------------------------------------------------
-function action(obj, ...) --Как выяснилось, оно таки используется. По крайней мере, в mob_walker.script и mob_camp.script
-	--log3("!!Called action() from: %s", debug.traceback())
+function action(obj, ...) --Пример использования можно увидеть в ogse_hitfx. Ещё используется в mob_walker.script и mob_camp.script, может ещё где-то.
 	local args = {...}
 	local act = entity_action()
 	for i=1, #args do

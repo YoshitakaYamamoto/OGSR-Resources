@@ -591,8 +591,6 @@ function motivator_binder:death_callback(victim, who)
 
 	--log3("!!![%s][%s] killed from [%s]!!!", script_name(), self.object:name(), who:name())
 
-	ogse_hitfx.npc_on_death(self.object, who)
-
 	if self.st.death then
 		xr_logic.issue_event(self.object, self.st.death, "death_callback", self.object, who)
 	end

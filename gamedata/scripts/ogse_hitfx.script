@@ -1,3 +1,9 @@
+
+function attach(sm)
+	sm:subscribe({ signal = "on_npc_death", fun = this.npc_on_death })
+	sm:subscribe({ signal = "on_monster_death", fun = this.npc_on_death })
+end
+
 local effect_for_wpn = {
 	["grenade_f1"] = "hit_fx\\hit_expl",
 	["grenade_rgd5"] = "hit_fx\\hit_expl",
@@ -52,27 +58,57 @@ local effect_for_wpn = {
 	["wpn_awm"] = "hit_fx\\hit_pblow",
 }
 
+local cached = {} --таблица вида { [wpn_section] = [effect] }
 function get_effect_for_curr_weapon(sect)
 	local eff = effect_for_wpn[sect]
-	if not eff then
+	if eff then return eff end
+	--
+	eff = "nil"
+	if not cached[ sect ] then
 		for k,v in pairs(effect_for_wpn) do
 			if string.find(sect, k) then
 				eff = v
 				break
 			end
 		end
+		cached[ sect ] = eff
 	end
-	return v
+	if cached[ sect ] ~= "nil" then
+		return cached[ sect ]
+	else
+		log3( "!![%s] Can't find effect for wpn [%s]", script_name(), sect )
+	end
 end
 
 function npc_on_death(victim, who)
-	if not who:alive() then return end
-	local cur_weapon = who:active_item()
-	if cur_weapon then
-		local cur_weapon_sec = cur_weapon:section()
-		local victim_pos = victim:position()
-		if get_effect_for_curr_weapon(cur_weapon_sec) then
-			action(victim,particle(get_effect_for_curr_weapon(cur_weapon_sec),"bip01_head", particle_params(vector():set(0, 0, 0.3),vector():set(0, 0, 0),vector():set(1, 0, 0)), false),cond(cond.time_end, 1000))
+	local binder = victim:binded_object()
+	if not binder.last_hit_data then return end
+	local hd       = binder.last_hit_data
+	local hit_type = hd.hit_type
+	ASSERT( hit_type, "hit_type not found" )
+	if not ( hit_type == hit.fire_wound or hit_type == hit.explosion ) then
+	  return
+  	end
+	--
+	local effect
+	--
+	if ( who:is_actor() and ( bind_statpkm.pkm_captured or ogse_car_control.in_btr ) ) or who:is_helicopter() or who:is_car() then
+		effect = "hit_fx\\hit_pblow"
+	else
+		if not ( hd.weapon_id or hd.who_id ) then return end
+		local wpn = level.object_by_id( hd.weapon_id or hd.who_id )
+		if wpn then
+			effect = get_effect_for_curr_weapon(wpn:section())
 		end
+	end
+	--
+	if effect then
+		action(
+			victim,
+			particle(effect, "bip01_head", particle_params( vector():set(0, 0, 0.3), vector():set(0, 0, 0), vector():set(1, 0, 0) ), false),
+			cond(cond.time_end, 1000)
+		)
+	else
+		log3( "!![%s] Can't find effect for [%s]", script_name(), who:name() )
 	end
 end
