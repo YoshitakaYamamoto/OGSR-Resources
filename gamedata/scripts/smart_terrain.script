@@ -173,7 +173,6 @@ end
 
 function se_smart_terrain:initialize_if_needed()
 	if not self.initialized then
-		--sim_statistic.update()
 
 		self:get_se_objs()
 
@@ -215,7 +214,6 @@ function se_smart_terrain:get_se_objs()
   for id, v in pairs( self.npc_info ) do
     local obj = sim:object( id )
     if obj then
-	  --sim_statistic.add( obj )
       self:fill_npc_info( obj, v )
     else
       log2(
@@ -611,8 +609,6 @@ function se_smart_terrain:register_npc( obj )
 
 	self.gulag:addObject( obj.id ) -- таки добавили объект
 
-	--sim_statistic.add( obj )
-
 	self.gulag:update() -- обновили
 
 --	log3( "[smart_terrain %s] added %s to gulag type=%s", self:name(), obj:name(), self.gparams.type )
@@ -645,18 +641,6 @@ function se_smart_terrain:unregister_npc( obj )
 	self.npc_info[obj.id] = nil
 
 	obj:clear_smart_terrain()
-
-	--sim_statistic.remove( obj )
-
---'	if sim_statistic.show_stalker_spot == true and obj:alive() then
---'		local community, rank = sim_statistic.getNpcType(obj)
---'		local spot = "alife_presentation_monstr"
---'		if IsStalker(obj) then
---'			spot = "alife_presentation_"..community
---'		end
---'		local str = obj:name().." "..self:name().."\\n".."<<removed>>"
---'		level.map_change_spot_hint(obj.id, spot, str)		
---'	end
 
 --	log3( "[smart_terrain %s] removed %s from gulag type=%s, strn_id=%s", self:name(), obj:name() or "<<<nil>>>", self.gparams.type, obj:smart_terrain_id())
 end
@@ -727,19 +711,6 @@ function se_smart_terrain:task( obj )
 		return CALifeSmartTerrainTask("simulation_default_path")
 	end
 
---'	log3("SEETING TASK PATH %s = %s", obj:name(), path_name)
-	--' Пробуем проапдейтить типс чувака на карте
---'	if sim_statistic.show_stalker_spot == true and obj:alive() then
---'		local community, rank = sim_statistic.getNpcType(obj)
---'		local spot = "alife_presentation_monstr"
---'		if IsStalker(obj) then
---'			spot = "alife_presentation_"..community
---'		end
---'		local str = obj:name().." "..self:name().."\\n"..path_name
-
---'		level.map_change_spot_hint(obj.id, spot, str)		
---'	end
-
 	return CALifeSmartTerrainTask( path_name )
 end
 
@@ -749,54 +720,11 @@ function se_smart_terrain:is_gulag_available()
 	if self.gparams.cond then
 		-- то используем их
 		local bb = xr_logic.pick_section_from_condlist( db.actor_proxy, self, self.gparams.cond ) ~= nil
-		--self:show_smart_debug_spot(bb)
 		return bb
 	else -- если специальных условий нет
-		--self:show_smart_debug_spot(true)
 		return true -- то значит всегда можно работать
 	end
 end
-
---[=[
-function se_smart_terrain:show_smart_debug_spot(avail)
-	if sim_statistic.show_smart_spot == true then
-		--' Показать отметку
-		local str = self:name().." ("..tostring(self.gulag.state)..")\\n".."pop = "..tostring(self.gulag:get_population()).."("..tostring(self.gulag.capacity_non_exclusive)..":"..tostring(self.gulag.capacity)..") comed = "..tostring(self.gulag:get_population_comed())
-
-		if self.debug_avail ~= avail then
-			if self.debug_avail == true then
-				level_tasks.remove_location_by_id(self.id, "alife_presentation_smart_on")
-			elseif self.debug_avail == false then
-				level_tasks.remove_location_by_id(self.id, "alife_presentation_smart_off")
-			end
-			if avail == true then
-				level.map_add_object_spot(self.id, "alife_presentation_smart_on", str)
-			else
-				level.map_add_object_spot(self.id, "alife_presentation_smart_off", str)
-			end
-			self.debug_avail = avail
-		else
-			if avail == true then
-				level.map_change_spot_hint(self.id, "alife_presentation_smart_on", str)
-			else
-				level.map_change_spot_hint(self.id, "alife_presentation_smart_off", str)
-			end
-		end
-		 self.spot_showed = true
-	else
-		--' Убрать отметку
-		if self.spot_showed == nil then
-			return
-		end
-		self.spot_showed = nil
-		if self.debug_avail == true then
-			level_tasks.remove_location_by_id(self.id, "alife_presentation_smart_on")
-		else
-			level_tasks.remove_location_by_id(self.id, "alife_presentation_smart_off")
-		end		
-	end
-end
---]=]
 
 -- в гулаг поступил первый персонаж и он начинает работать
 -- название в целом запутывает! Это не создание, а скорее активация гулага
@@ -832,7 +760,6 @@ function se_smart_terrain:remove_gulag( disable )
 	self.gulag_working = false
 
 	self.gulag.capacity_non_exclusive = self.gulag.capacity_non_exclusive - self.exclusives
---'	self:show_smart_debug_spot(false)
 end
 
 -- заполняет таблицу monster_classes
@@ -908,8 +835,6 @@ function se_smart_terrain:register_if_needed()
 	if self.gulag_working then
 		self.gulag:initialize()
 	end
-
-	--sim_statistic.reinit()
 
 	-- Регистрация в таскменеджере
 	task_manager.get_random_task():register_target(self)

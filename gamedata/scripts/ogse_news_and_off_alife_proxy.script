@@ -1,29 +1,16 @@
---|Чтобы при отключении в настройках динамических новостей или оффлайн алайфа, они не вызывались вообще. Оптимизация!
---|И ещё, теперь новости о смерти сталкеров будут приходить только при включенном оффлайн-алайфе. Так правильнее, на мой взгляд.
---|KRodin © 2016
+--|Чтобы при отключении в настройках динамических новостей, они не вызывались вообще.
 
 local random_news = sys_ini:r_s32("options","random_news")
-local random_death_news_delta = sys_ini:r_s32("options","random_news_delta")
 local spawn_message_flag = sys_ini:r_s32("options","spawn_message_flag")
-local offline_alife_enabled = sys_ini:r_bool("options","offline_alife")
 
 function attach(sm)
 	if random_news == 1 then
-		if offline_alife_enabled then
-			sm:subscribe({ signal = "on_spawn",		fun = this.on_spawn_amk_news })
-			sm:subscribe({ signal = "on_update",	fun = this.on_update_amk_news, queued = true })
-			sm:subscribe({ signal = "on_npc_death",	fun = this.on_npc_death })
-		end
 		sm:subscribe({ signal = "on_spawn",		fun = this.on_spawn })
 		sm:subscribe({ signal = "on_update",	fun = this.on_update, queued = true })
 		sm:subscribe({ signal = "on_after_blowout",	fun = this.on_after_blowout })
 		if spawn_message_flag > 0 then
 			sm:subscribe({ signal = "on_monster_spawn",	fun = this.on_monster_spawn })
 		end
-	end
-	if offline_alife_enabled then
-		sm:subscribe({ signal = "on_spawn",		fun = this.on_spawn_offline_alife })
-		sm:subscribe({ signal = "on_update",	fun = this.on_update_offline_alife, queued = true })
 	end
 end
 
@@ -42,29 +29,4 @@ end
 function on_after_blowout()
 	news_main_data.on_connect_vbs() -- выдаем сообщение о коннекте
 	news_main_new.vubros_out_msg() -- сообщение о завершении выброса
-end
------------------------------------------------------------------
-function on_spawn_amk_news()
-	news_amk_core.init()
-end
-
-function on_update_amk_news()
-	ogse_signals.get_mgr():reschedule(random_death_news_delta * 4000)
-	news_amk_core.check_news()
-end
-
-function on_npc_death(victim, who)
-	news_amk_core.on_death(victim, who) -- скажем о смерти
-	death_news.on_death(victim, who) -- и прокомментируем её
-end
-------------------------------------------------------------------
-function on_spawn_offline_alife()
-	amk_offline_alife.init()
-	amk_offline_alife.update_npc_tables()
-	amk_offline_alife.update_trade()
-end
-
-function on_update_offline_alife()
-	ogse_signals.get_mgr():reschedule(math.random(20000, 30000))
-	amk_offline_alife.update()
 end
