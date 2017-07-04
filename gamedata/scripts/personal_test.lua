@@ -32,9 +32,11 @@ end
 dsh_respawn.cleanup_respawners()
 ]]-----------------------------------------------------------
 
+--[=[
 local arts_str = "Art1,art2,arti3,ARTEF4"
 log3("arts_str = %s", arts_str)
 local cd = base64.enc( arts_str )
 log3("cd after enc = %s", cd)
 local arts_str2 = base64.dec( cd )
 log3("cd after dec = %s", arts_str2)
+--]=]

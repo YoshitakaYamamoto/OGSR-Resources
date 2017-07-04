@@ -8,6 +8,12 @@ local bar_exceptions = {
    [story_ids.izgoy_first_patient] = true,
    [story_ids.izgoy_second_patient] = true
 }
+local military_online_npc = {
+	[story_ids.Mil_Lukash]     = true, -- Лукаш
+	[story_ids.Mil_Miser]      = true, -- Скряга
+	[story_ids.Mil_Master_Max] = true, -- Макс
+	[story_ids.Mil_Cook]       = true, -- повар
+}
 local function cannot_be_offline(npc)
 	if alife():level_id() == 7 then
 		local story = 4294967296
@@ -36,12 +42,6 @@ local function cannot_be_offline(npc)
 	end
 	return false
 end
-local military_online_npc = {
-	[story_ids.Mil_Lukash]     = true, -- Лукаш
-	[story_ids.Mil_Miser]      = true, -- Скряга
-	[story_ids.Mil_Master_Max] = true, -- Макс
-	[story_ids.Mil_Cook]       = true, -- повар
-}
 
 class "se_stalker"	(cse_alife_human_stalker)
 function se_stalker:__init (section) super (section)

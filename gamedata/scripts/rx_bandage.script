@@ -85,7 +85,7 @@ function evaluator_bandage:evaluate()
 			ogse_debug.add_active_eval( self.object, script_name(), "bandage_2" )			
 			return true
 		end
-	else
+	--else
 --		self.st.action = nil
 	end
 	return false

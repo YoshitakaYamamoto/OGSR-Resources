@@ -1,6 +1,6 @@
 
 function attach( sm ) -- для менеджера сигналов
-  sm:subscribe({ signal = "on_spawn",   fun = this.on_spawn   })
+  sm:subscribe({ signal = "on_spawn", fun = this.on_spawn })
 end
 
 -- читаем глобальные параметры эффектов здоровья

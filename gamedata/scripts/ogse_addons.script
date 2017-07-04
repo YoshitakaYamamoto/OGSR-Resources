@@ -15,6 +15,26 @@ function attach(sm)
 	sm:subscribe({signal = "on_inventory_hide", fun = this.on_inventory_hide})
 end
 
+-- флаги аддонов
+local addons_flags = ogse_wpn_utils.addons_flags
+
+flag2status_param = {
+	[1]  = "scope_status",
+	[2]  = "grenade_launcher_status",
+	[4]  = "silencer_status",
+	[8]  = "grip_status",
+	[16] = "magazine_status",
+	[32] = "scope_mount_status",
+}
+flag2name_param = {
+	[1]  = "scope_name",
+	[2]  = "grenade_launcher_name",
+	[4]  = "silencer_name",
+	[8]  = "grip_name",
+	[16] = "magazine_name",
+	[32] = "scope_mount_name",
+}
+
 local sim = alife()
 
 function on_spawn() -- при появлении актора проинитить используемые в будущем глобальные переменные
@@ -68,7 +88,7 @@ function get_available_actions_for_slot(addon_sec, slot_num)
 	--log1(string.format("a=%x",available_actions:get()))
 	return available_actions
 end
---[[local]] monitored_addon_classes = {
+local monitored_addon_classes = {
 	[clsid.wpn_grenade_launcher] = true,
 	[clsid.wpn_scope]            = true,
 	[clsid.wpn_scope_s]          = true,
@@ -149,26 +169,6 @@ function convert_addon_to_slot(saddon, slot_number)
 	if wpn then db.actor:move_to_ruck(wpn) end -- освобождаем слот
 	convert_addon_to_shg(saddon) -- конвертируем аддон, появившийся ствол займёт пустой слот
 end
-
--- флаги аддонов
-local addons_flags = ogse_wpn_utils.addons_flags
-
-flag2status_param = {
-	[1]  = "scope_status",
-	[2]  = "grenade_launcher_status",
-	[4]  = "silencer_status",
-	[8]  = "grip_status",
-	[16] = "magazine_status",
-	[32] = "scope_mount_status",
-}
-flag2name_param = {
-	[1]  = "scope_name",
-	[2]  = "grenade_launcher_name",
-	[4]  = "silencer_name",
-	[8]  = "grip_name",
-	[16] = "magazine_name",
-	[32] = "scope_mount_name",
-}
 
 function is_scope(section)
 	return (sys_ini:r_clsid(section, "class") == clsid.wpn_scope_s) -- "WP_SCOPE"
@@ -1070,7 +1070,7 @@ end
 function wait_for_deleted_objects_to_disappear(idss)
 	ids = idss
 	level.disable_input()
-	level.add_call(wfdotd_condition,wfdotd_action)
+	dsh.wait_condition(wfdotd_condition, wfdotd_action)
 end
 -----------------------------------------------------------
 

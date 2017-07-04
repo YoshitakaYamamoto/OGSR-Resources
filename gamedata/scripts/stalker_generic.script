@@ -88,16 +88,15 @@ function reset_show_spot(npc, scheme, st, section)
 		return
 	end
 
-	local obj  = sim:object(npc:id())
+	local sobj  = sim:object(npc:id())
 
-	if obj then
+	if sobj then
 		if spot == "false" then
 			-- пр€чем
-			obj:visible_for_map(false)
+			sobj:visible_for_map(false)
 		else
 			-- ставим
-			obj:visible_for_map(true)
+			sobj:visible_for_map(true)
 		end
 	end
 end
-
