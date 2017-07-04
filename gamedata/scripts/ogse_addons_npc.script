@@ -6,20 +6,16 @@
 local addons_flags = ogse_wpn_utils.addons_flags
 
 -- Установка аддона методом пересоздания объекта ствола
-local function install_remove_addon(cur_weapon, fake_addon, real_addon_section, new_wpn_section, npc) --взято из модуля ogse_addons
-	if get_u32(real_addon_section, "is_shotgun") == 1 then -- при обнаружении такой ситуации у НПС, просто выходим. НПС не используют подствольный дробовик
-		return false
-	end
-	ASSERT(cur_weapon, "install_remove_addon: 'cur_weapon' is a nil reference. Check logic of your code.")
+local function install_remove_addon(cur_weapon, fake_addon, real_addon_section, installed_addon_flag, new_wpn_section, npc) --взято из модуля ogse_addons
 	local s_cur_weapon = alife():object(cur_weapon:id())
+	if not s_cur_weapon then return false end --на всякий случай
+	--
 	local pk = get_netpk(s_cur_weapon, 1)
 	ASSERT( pk:isOk(), "can't read netpacket of %s", s_cur_weapon:name() )
 	local cur_weapon_data = pk:get()
 	--
 	local removed_addon_flags = 0
-	local installed_addon_flag = 0
 	--
-	installed_addon_flag = ogse_addons.get_addon_type(real_addon_section) --получаем флаг устанавливаемого аддона.
 	if bit_and(cur_weapon_data.addon_flags, installed_addon_flag) ~= 0 then
 		removed_addon_flags = installed_addon_flag
 	elseif installed_addon_flag == addons_flags.grip and bit_and(cur_weapon_data.addon_flags, addons_flags.gl) ~= 0 then
@@ -68,86 +64,32 @@ local function process(npc)
 			wpn_table[obj] = obj:section()
 		else
 			local addon_type = ogse_addons.get_addon_type(obj:section())
-			if addon_type ~= 0 then --Заносим в таблицу все реальные аддоны в инвентаре НПС
-				addon_table[obj] = addon_type
+			if addon_type ~= 0 then --Заносим в таблицу все аддоны в инвентаре НПС
+				addon_table[obj:id()] = addon_type
 			end
-	--[=[else --Поддержка фейковых аддонов. Отключена, т.к. в инвентарь НПС они вряд ли попадут, т.к. при закрытии инвентаря актора фейковые аддоны конвертируются в реальные системой ogse_addons.
-			local real_addon_sect = ogse_addons.get_real_addon_section(obj) -- секция реального аддона для фейкового
-			if not real_addon_section then return end -- если её нет, значит это не аддон
-			if -- если аддон не входит в число управляемых данным менеджером
-				not ogse_addons.monitored_addon_classes[get_class(real_addon_sect)]
-				and not ogse_addons.always_fake_item(obj:section())
-			then
-				return
-			end
-
-			addon_table[obj] = real_addon_sect--]=]
 		end
 	end )
 	--
-	if not next(addon_table) then return end --Аддонов в инвентаре нет - выходим.
-	--
-	local function try_install_addon(wpn_obj, wpn_sect, need_addon_type) --Функция для поиска подходящего аддона для ствола из списка аддонов, находящихся в инвентаре.
-		for addon_obj, addon_type in pairs(addon_table) do
-			if need_addon_type == addon_type then
-				local new_wpn_section = ogse_addons.get_converted_wpn_section(wpn_sect, addon_obj:section()) -- получаем секцию сконвертированного ствола
-				if new_wpn_section then
-					--log3("--[%s.try_install_addon] new wpn section for wpn [%s] and addon [%s] : %s", script_name(), wpn_obj:name(), addon_obj:section(), new_wpn_section)
-					return install_remove_addon(wpn_obj, addon_obj, addon_obj:section(), new_wpn_section, npc)
-				end
-			end
-		end
-		return false
-	end
-	--
 	for wpn_obj, wpn_sect in pairs(wpn_table) do --Перебираем все стволы в инвентаре НПС.
-		local continue = false
-		if not continue and get_u32(wpn_sect, "magazine_status", 0) == 2 then --Проверяем, можно ли установить магазин
-			if not ogse_wpn_utils.get_magazine_flag( wpn_obj ) then --не установлен
-				if try_install_addon(wpn_obj, wpn_sect, 16) then
-					--При успешной установке аддона - переходим к следующему стволу, т.к. wpn_obj удалился и дальше с ним что-то делать не имеет смысла.
-					continue = true --goto continue --Очень жаль, что в этом луа нету оператора goto, тут он как раз бы пригодился.
+		for addon_id, addon_type in pairs(addon_table) do
+			local addon_obj = level.object_by_id( addon_id )
+			local addon_sect = addon_obj:section()
+			local new_wpn_section = ogse_addons.get_converted_wpn_section(wpn_sect, addon_sect) -- получаем секцию сконвертированного ствола
+			if
+				get_u32(addon_sect, "is_shotgun") ~= 1 --Аддон не является подствольным дробовиком
+				and ogse_addons.is_addon_removable(wpn_sect, addon_type) --Ствол поддерживает установку аддонов данного типа
+				and new_wpn_section
+				and not ogse_addons.is_addon_installed( wpn_obj, addon_type ) --Такой аддон на стволе ещё не установлен
+			then
+				--log3("--[%s] new wpn section for wpn [%s] and addon [%s] : %s", script_name(), wpn_obj:name(), addon_sect, new_wpn_section)
+				if install_remove_addon(wpn_obj, addon_obj, addon_sect, addon_type, new_wpn_section, npc) then --Если удалось установить аддон
+					--log3("--[%s.%s] Installed addon [%s] on weapon [%s]", script_name(), npc:name(), addon_sect, wpn_sect)
+					addon_table[addon_id] = nil --удаляем из таблицы, т.к этого аддона больше не существует
+					break --переходим к следующему стволу
 				end
 			end
 		end
-		if not continue and ogse_wpn_utils.get_grenade_launcher_status( wpn_obj ) == 2 then --Проверяем, можно ли установить гранатомёт
-			if not ogse_wpn_utils.get_grenade_launcher_flag( wpn_obj ) then
-				if try_install_addon(wpn_obj, wpn_sect, 2) then
-					continue = true --goto continue
-				end
-			end
-		end
-		if not continue and ogse_wpn_utils.get_scope_status( wpn_obj ) == 2 then --Проверяем, можно ли установить прицел
-			if not ogse_wpn_utils.get_scope_flag( wpn_obj ) then
-				if try_install_addon(wpn_obj, wpn_sect, 1) then
-					continue = true --goto continue
-				end
-			end
-		end
-		if not continue and get_u32(wpn_sect, "scope_mount_status", 0) == 2 then --Проверяем, можно ли установить планку для прицела
-			if not ogse_wpn_utils.get_scope_mount_flag( wpn_obj ) then
-				if try_install_addon(wpn_obj, wpn_sect, 32) then
-					continue = true --goto continue
-				end
-			end
-		end
-		if not continue and get_u32(wpn_sect, "grip_status", 0) == 2 then --Проверяем, можно ли установить рукоятку/или какую-то подобную штуку
-			if not ogse_wpn_utils.get_grip_flag( wpn_obj ) then
-				if try_install_addon(wpn_obj, wpn_sect, 8) then
-					continue = true --goto continue
-				end
-			end
-		end
-		if not continue and ogse_wpn_utils.get_silencer_status( wpn_obj ) == 2 then --Проверяем, можно ли установить глушитель
-			if not ogse_wpn_utils.get_silencer_flag( wpn_obj ) then
-				if try_install_addon(wpn_obj, wpn_sect, 4) then
-					continue = true --goto continue
-				end
-			end
-		end
-		--::continue::
 	end
-	--
 end
 
 
@@ -186,18 +128,6 @@ function on_take( npc, obj ) --Если непись подобрал ствол
 	if obj:is_weapon_magazined() or ogse_addons.get_addon_type(obj:section()) ~= 0 then
 		--log3("[%s]: [%s] take [%s]", script_name(), npc:name(), obj:name())
 		need_update_tbl[npc:id()] = true
-	--[=[else --Поддержка фейковых аддонов. Отключена, т.к. в инвентарь НПС они вряд ли попадут, т.к. при закрытии инвентаря актора фейковые аддоны конвертируются в реальные системой ogse_addons.
-		local real_addon_sect = ogse_addons.get_real_addon_section(obj) -- секция реального аддона для фейкового
-		if not real_addon_section then return end -- если её нет, значит это не аддон
-		if -- если аддон не входит в число управляемых данным менеджером
-			not ogse_addons.monitored_addon_classes[get_class(real_addon_sect)]
-			and not ogse_addons.always_fake_item(obj:section())
-		then
-			return
-		end
-
-		log3("[%s]: [%s] take fake addon [%s]", script_name(), npc:name(), obj:name())
-		need_update_tbl[npc:id()] = true--]=]
 	end
 end
 
