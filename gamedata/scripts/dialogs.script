@@ -847,6 +847,10 @@ function companion_start_following(npc, actor)
 		if sobj then
 			sobj:brain():can_choose_alife_tasks( false )
 		end
+
+		sobj:visible_for_map(true) --на всякий случай
+		npc:restore_max_ignore_monster_distance() --на всякий случай
+		npc:restore_ignore_monster_threshold() --на всякий случай
 	end	
 end
 

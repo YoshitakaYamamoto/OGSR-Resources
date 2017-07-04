@@ -745,8 +745,10 @@ function check_in_car()
 							-- вывели
 							s_npc.force_offline = true
 							if not icon then
-								level_tasks.remove_location_by_id(id, "alife_presentation_companion")
-								level_tasks.add_location_by_id(car:id(), "alife_presentation_companion", game.translate_string("it_is_your_companion_text"))
+								s_npc:visible_for_map(false)
+								if level.map_has_object_spot( car:id(), "alife_presentation_companion" ) ~= 1 then
+									level_tasks.add_location_by_id( car:id(), "alife_presentation_companion", game.translate_string("it_is_your_companion_text") )
+								end
 								save_var_companion(id,"last_car",car:id())
 								save_var_companion(id,"in_car","true")
 							end
@@ -773,8 +775,10 @@ function check_in_car()
 					s_npc.position = pos					
 					s_npc.force_offline = nil
 					if last_car ~= 0 then
-						level_tasks.remove_location_by_id(last_car, "alife_presentation_companion")
-						level_tasks.add_location_by_id(id, "alife_presentation_companion", game.translate_string("it_is_your_companion_text"))
+						if level.map_has_object_spot( last_car, "alife_presentation_companion" ) == 1 then
+							level_tasks.remove_location_by_id( last_car, "alife_presentation_companion" )
+						end
+						s_npc:visible_for_map(true)
 						save_var_companion(id,"in_car","false")
 					end
 					save_var_companion(id,"last_car",nil)
@@ -1301,6 +1305,7 @@ function evaluator_need_companion:evaluate()
 		return false
 	end
 	if post_work[self.object:id()] then
+		ogse_debug.add_active_eval( self.object, script_name(), "need_companion_post_work" )
 		return true
 	end
 	if self.st.enabled == true then
