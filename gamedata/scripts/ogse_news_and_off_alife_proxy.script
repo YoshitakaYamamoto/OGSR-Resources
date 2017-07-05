@@ -1,25 +1,17 @@
 --|Чтобы при отключении в настройках динамических новостей, они не вызывались вообще.
 
-local random_news = sys_ini:r_s32("options","random_news")
-local spawn_message_flag = sys_ini:r_s32("options","spawn_message_flag")
+local random_news = 1 --get_u32("options", "random_news", 1)
 
 function attach(sm)
 	if random_news == 1 then
 		sm:subscribe({ signal = "on_spawn",		fun = this.on_spawn })
 		sm:subscribe({ signal = "on_update",	fun = this.on_update, queued = true })
 		sm:subscribe({ signal = "on_after_blowout",	fun = this.on_after_blowout })
-		if spawn_message_flag > 0 then
-			sm:subscribe({ signal = "on_monster_spawn",	fun = this.on_monster_spawn })
-		end
 	end
 end
 
 function on_spawn()
 	news_main_data.message_filter()
-end
-
-function on_monster_spawn(obj)
-	news_main_spawn.on_spawn(obj)
 end
 
 function on_update()

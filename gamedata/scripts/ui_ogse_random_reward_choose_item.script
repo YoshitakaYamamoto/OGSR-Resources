@@ -198,7 +198,8 @@ end
 function choose_item:OnKeyboard(dik, keyboard_action)
 	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
-		if dik == DIK_keys.DIK_ESCAPE then
+		local bind = dik_to_bind(dik)
+		if bind == key_bindings.kQUIT then
 			self:take_money_as_reward_no_quit()
 		end
 	end
