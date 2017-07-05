@@ -160,7 +160,6 @@ function CRandomTask:__init()
 		curr_task_info.time				= utils.cfg_get_number(sys_ini, id, "time", nil, false)
 
 		curr_task_info.idle_time		= utils.cfg_get_number(sys_ini, id, "idle_time", nil, false, 24*60*60) --' ¬рем€ между выдачами задани€ (в игровых секундах)
-		curr_task_info.prior			= utils.cfg_get_number(sys_ini, id, "prior", nil, false, 0) --' ѕриоритет квеста, выдаютс€ доступные квесты с наименьшим приоритетом
 	
 		if sys_ini:line_exist(id, "init_condition") then
 			curr_task_info.init_condition = xr_logic.parse_condlist(db.actor, "task_manager", "init_condition", sys_ini:r_string(id, "init_condition"))
@@ -169,8 +168,6 @@ function CRandomTask:__init()
 		local sss = utils.cfg_get_string(sys_ini, id, "reward_item", nil, false, "")
 		if sss ~= nil then
 			curr_task_info.reward_item = parse_names(sss) 
-		else
-			curr_task_info.reward_item = sss
 		end
 		curr_task_info.reward_money = utils.cfg_get_number(sys_ini, id, "reward_money", nil, false)		
 	
@@ -209,6 +206,7 @@ function CRandomTask:__init()
 	self.task_id_by_type = {}
 	self.task_id_by_parent = {}
 	self.task_id_by_yes_phrase_id = {}
+	self.task_id_by_desc_phrase_id = {}
 	self.task_id_by_init_phrase_id = {}
 	self.active_task_by_type = {}
 	self.task_id_self_inited = {}
@@ -227,6 +225,8 @@ function CRandomTask:__init()
 
 		--' ѕо id фразы согласи€ на квест
 		self.task_id_by_yes_phrase_id[tostring(v.yes_phrase_id)] = k
+		--
+		self.task_id_by_desc_phrase_id[v.desc_phrase_id] = k
 		--' ѕо id фразы выдачи квеста.
 		self.task_id_by_init_phrase_id[tostring(v.init_phrase_id)] = k
 		--' ѕо самовыдаваемости
@@ -489,9 +489,10 @@ function CRandomTask:action_give_task(actor, npc, p1, p2)
 	end
 	db.actor:give_task(task,time,false)
 
-	--' дизаблим все остальные задани€ данного типа, так как игрок не может одновременно обладать двум€ задани€ми одного типа.
 	self.task_info[self.task_id_by_yes_phrase_id[p2]].status = "selected"
 	self.active_task_by_type[task_desc.complex_type] = self.task_id_by_yes_phrase_id[p2]
+	--
+	--' дизаблим все остальные задани€ данного типа, так как игрок не может одновременно обладать двум€ задани€ми одного типа.
 	for k,v in pairs(self.task_info) do
 		if v.complex_type == task_desc.complex_type then
 			v.enabled = false
@@ -509,9 +510,10 @@ end
 function CRandomTask:action_refuse_task(actor, npc, p1, p2)
 	local task_desc = self.task_info[self.task_id_by_yes_phrase_id[p2]]
 
-	--' ƒелаем доступными все задани€ данного типа
 	self.task_info[self.task_id_by_yes_phrase_id[p2]].status = "refused"
 	self.task_info[self.active_task_by_type[task_desc.complex_type]].selected_target = nil
+	--
+	--' ƒелаем доступными все задани€ данного типа
 	for k,v in pairs(self.task_info) do
 		if v.complex_type == task_desc.complex_type then
 			v.enabled = true
@@ -627,17 +629,7 @@ function CRandomTask:task_callback(p1, p2, state)
 		return
 	end
 
-	if state == task.completed then
-		self.task_info[self.active_task_by_type[p1]].status = "normal"
-		--' восстановление других заданий данного типа
-		for k,v in pairs(self.task_info) do
-			if v.complex_type == self.task_info[self.active_task_by_type[p1]].complex_type then
-				v.enabled = true
-			end
-		end
-		self.active_task_by_type[p1] = nil	
-
-	elseif state == task.fail then
+	if state == task.completed or state == task.fail then
 		self.task_info[self.active_task_by_type[p1]].status = "normal"
 
 		--' восстановление других заданий данного типа
@@ -662,41 +654,14 @@ end
 --' ѕроверка доступен ли текущий таск дл€ выдачи
 function CRandomTask:task_avail(actor, npc, p1, p2, p3, calculate)
 	local task_desc = self.task_info[self.task_id_by_init_phrase_id[p3]]
-	--' ≈сли calculate == true то нужно провер€ть check_task_props, инача просто вернуть значени€.
+
 	if calculate == "reset" then		
-		self.current_parent_type_prior = {}
 		return
-	elseif calculate == true then
+	elseif calculate == true then --≈сли calculate == true то нужно провер€ть check_task_props, инача просто вернуть значени€.
 		self:check_task_props(self.task_id_by_init_phrase_id[p3])
-
-		local t = task_desc.enabled and task_desc.enabled_props and task_desc.init_condition == nil
-
-		--' ”станавливать обрезани€ по приоритетам тут.
-		if t == true and (self.current_parent_type_prior[task_desc.complex_type] == nil or
-		   self.current_parent_type_prior[task_desc.complex_type] > task_desc.prior )
-		then
-			self.current_parent_type_prior[task_desc.complex_type] = task_desc.prior
-		end
-
-		return t
 	end
 
---'	printf("@@@prior %s -> %s [%s]", task_desc.complex_type, task_desc.prior, tostring(calculate))
---'	print_table(self.current_parent_type_prior)
-
-	--«акомментировано, чтобы показывалс€ сразу весь список поручений.
-	---if self.current_parent_type_prior[task_desc.complex_type] ~= nil and
-	--   self.current_parent_type_prior[task_desc.complex_type] < task_desc.prior then
-	--	return false
-	--end
-
---'	printf("@@@avail %s", tostring(self.task_id_by_init_phrase_id[p3]))
---'	printf("@@@enabled %s", tostring(self.task_info[self.task_id_by_init_phrase_id[p3]].enabled))
---'	printf("@@@enabled_props %s", tostring(self.task_info[self.task_id_by_init_phrase_id[p3]].enabled_props))
-	
-	return task_desc.enabled and 
-		   task_desc.enabled_props and
-		   task_desc.init_condition == nil
+	return task_desc.enabled and task_desc.enabled_props and task_desc.init_condition == nil
 end
 --' ѕроверка свойств таска
 function CRandomTask:check_task_props(task_id)
@@ -850,7 +815,9 @@ function CRandomTask:init_task_dialog(dlg, parent)
 		phrase_script:AddPrecondition("task_manager.precondition_task_avail")
 
 		phr = dlg:AddPhrase(self.task_info[v].text, tostring(self.task_info[v].desc_phrase_id), tostring(self.task_info[v].init_phrase_id), -10000)
-		
+		phrase_script = phr:GetPhraseScript()
+		phrase_script:AddAction("task_manager.show_reward")
+
 		phr = dlg:AddPhrase("tm_seek_job_yes", tostring(self.task_info[v].yes_phrase_id), tostring(self.task_info[v].desc_phrase_id), -10000)
 		phrase_script = phr:GetPhraseScript()
 		phrase_script:AddAction("task_manager.action_give_task")
@@ -1185,4 +1152,33 @@ function load()
 end
 function clear_task_manager()
 	random_task = nil
+end
+
+function show_reward(actor, npc, p1, p2)
+	local task_details = random_task.task_info[random_task.task_id_by_desc_phrase_id[p2]]
+	if task_details == nil then return end
+	if not task_details.reward_item and not task_details.reward_money then return end
+	--
+	local rt = ogse_random_task_reward.random_task_reward( task_details.parent, random_task.task_id_by_desc_phrase_id[p2] )
+	if rt.random_task_reward_accept == 1 and rt.difficult_list[random_task.task_id_by_desc_phrase_id[p2]] then
+		return
+	end
+	--
+	db.actor:give_talk_message("я тебе за это дам вот что:", "ui\\icon_guider", Frect():set(0,0,1,1), "misc_answer_item")
+	--
+	if task_details.reward_item then
+		local rwd = {}
+		for _, sect in ipairs(task_details.reward_item) do
+			rwd[sect] = not rwd[sect] and 1 or rwd[sect] + 1
+		end
+		local item_texture, item_rect = get_texture_info("ui_iconsTotal_find_item")
+		for sect, num in pairs(rwd) do
+			db.actor:give_talk_message( ( num > 1 and num .. " x " or "" ) .. game.translate_string( get_string( sect, "inv_name" ) ), item_texture, item_rect, "iconed_trade_info" )
+		end
+	end
+	--
+	if task_details.reward_money then 
+		local money_texture, money_rect = get_texture_info("ui_iconsTotal_found_money")
+		db.actor:give_talk_message(task_details.reward_money .. " RU", money_texture, money_rect, "iconed_trade_info")
+	end
 end
