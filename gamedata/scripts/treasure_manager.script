@@ -3,6 +3,7 @@ function attach( sm )
 	sm:subscribe({ signal = "on_ph_obj_use", fun = this.on_treasure_use })
 	sm:subscribe({ signal = "on_save", fun = this.save })
 	sm:subscribe({ signal = "on_load", fun = this.load })
+	sm:subscribe({ signal = "on_finalize", fun = this.clear_treasure_manager })
 end
 
 function on_treasure_use( obj ) --Теперь метка тайника снимается после его открытия, а не после забирания оттуда вещей

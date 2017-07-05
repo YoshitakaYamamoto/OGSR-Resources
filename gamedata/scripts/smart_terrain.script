@@ -835,9 +835,6 @@ function se_smart_terrain:register_if_needed()
 	if self.gulag_working then
 		self.gulag:initialize()
 	end
-
-	-- Регистрация в таскменеджере
-	task_manager.get_random_task():register_target(self)
 end
 
 

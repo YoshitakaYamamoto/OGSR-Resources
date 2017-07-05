@@ -9,6 +9,7 @@ function attach( sm )
 	sm:subscribe({ signal = "on_task", fun = this.on_task })
 	sm:subscribe({ signal = "on_save", fun = this.save })
 	sm:subscribe({ signal = "on_load", fun = this.load })
+	sm:subscribe({ signal = "on_finalize", fun = this.clear_task_manager })
 end
 
 function on_task(_task, _objective, _state)
@@ -95,6 +96,7 @@ local hirers={
 class "CRandomTask"
 function CRandomTask:__init()
 	self.sm = ogse_signals.get_mgr()
+	self.sm:subscribe({ signal = "on_first_update", self = self, fun = self.on_first_update })
 	--' На конструкторе вычитываем LTX и создаем заготовки квестов.
 	self.task_phrase_id = 100
 
@@ -444,11 +446,13 @@ function CRandomTask:action_give_task(actor, npc, p1, p2)
 		--printf("selected = %s", tostring(self.task_info[self.task_id_by_yes_phrase_id[p2]].selected_target))
 		--print_table(task_desc.target_objects)
 	end
-
+	--
+	ASSERT( task_desc.selected_target and alife():object(task_desc.selected_target), "" )
+	--
 	if task_desc.type == "eliminate_lager" then
 		objective:set_map_hint(task_desc.text)
 		objective:set_map_location("eliminate_lager_location")
-		objective:set_object_id(task_desc.selected_target)
+		objective:set_object_id(task_desc.selected_target) -- вроде как id целевого объекта, определяет координаты метки.
 	elseif task_desc.type == "defend_lager" then
 		objective:set_map_hint(task_desc.text)
 		objective:set_map_location("defend_lager_location")
@@ -568,17 +572,7 @@ function CRandomTask:task_complete(p1, p2)
 				self.task_info[self.active_task_by_type[p1]].status = "refused"
 				return true						
 			end
-		elseif string.find(p1, "artefact") ~= nil then
-			if db.actor:object(sel_task.target) ~= nil then
-				self.task_info[self.active_task_by_type[p1]].status = "completed"
-				return true
-			end
-		elseif string.find(p1, "monster_part") ~= nil then
-			if db.actor:object(sel_task.target) ~= nil then
-				self.task_info[self.active_task_by_type[p1]].status = "completed"
-				return true
-			end
-		elseif string.find(p1, "find_item") ~= nil then
+		elseif string.find(p1, "artefact") or string.find(p1, "monster_part") or string.find(p1, "find_item") then
 			if db.actor:object(sel_task.target) ~= nil then
 				self.task_info[self.active_task_by_type[p1]].status = "completed"
 				return true
@@ -758,53 +752,61 @@ function CRandomTask:check_task_props(task_id)
 		self.task_info[task_id].enabled_props = false
 		return
 	elseif self.task_info[task_id].type == "kill_stalker" then
-		if self.task_info[task_id].target_objects == nil then
-			self.task_info[task_id].enabled_props = false
-			return
-		end
-		for k,v in pairs(self.task_info[task_id].target_objects) do
-			local obj = alife():object(v)
-
-			if obj ~= nil and
-			   obj:alive() == true 
-			then
+		local sim = alife()
+		for i = 1, 65534 do --KRodin: лучше немного тормозов тут, чем регистрация 100500 объектов из se_* при каждой загрузке сейва
+			local sobj = sim:object(i)
+			if sobj and sobj:clsid() == clsid.script_stalker and sobj:alive() and sobj:profile_name() == self.task_info[task_id].target then
+				if not self.task_info[task_id].target_objects then self.task_info[task_id].target_objects = {} end
+				table.insert(self.task_info[task_id].target_objects, sobj.id)
 				self.task_info[task_id].enabled_props = true
 				return
-			else
-				table.remove(self.task_info[task_id].target_objects, k)
 			end
 		end
 		self.task_info[task_id].enabled_props = false
 		return
 	elseif self.task_info[task_id].type == "find_item" then
-		if self.task_info[task_id].target_objects == nil or table.getn(self.task_info[task_id].target_objects) == 0 then
-			self.task_info[task_id].enabled_props = false
-			return
-		end
-		for k,v in pairs(self.task_info[task_id].target_objects) do
-			local obj = alife():object(v)
-			if obj ~= nil then
-				--' Нужно игнорировать предметы, которые находяться у вендоров.
-				if obj.parent_id ~= nil then
+		local sim = alife()
+		for i = 1, 65534 do --KRodin: лучше немного тормозов тут, чем регистрация 100500 объектов из se_* при каждой загрузке сейва
+			local sobj = sim:object(i)
+			if sobj and sobj:section_name() == self.task_info[task_id].target then
+				--Нужно игнорировать предметы, которые находяться у вендоров.
+				local ignore = false
+				if sobj.parent_id then
 					for kk,vv in pairs(parent_by_story) do
-						local parent = alife():story_object(kk)
-						if parent ~= nil and obj.parent_id == parent.id then
-							--' Игнорим предмет
-							self.task_info[task_id].enabled_props = false
-							return							
+						local parent = sim:story_object(kk)
+						if parent and sobj.parent_id == parent.id then
+							ignore = true
 						end
 					end
 				end
-
-				self.task_info[task_id].enabled_props = true
-				return
-			end	
-			self.task_info[task_id].enabled_props = false
-			return
+				--
+				if not ignore then
+					if not self.task_info[task_id].target_objects then self.task_info[task_id].target_objects = {} end
+					table.insert(self.task_info[task_id].target_objects, sobj.id)
+					self.task_info[task_id].enabled_props = true
+					return
+				end
+			end
 		end
+--KRodin: добавил поддержку волшебных рюкзаков
+		for _, k in ipairs( ogse_unist.get_all_names() ) do
+			local id = string.match( k, "^dsh_rukzak%.([^.]+)%.sections$" )
+			if id then
+				id = tonumber( id )
+				if dsh_rukzak.is_item_in_rukzak(id, self.task_info[task_id].target) then
+					if not self.task_info[task_id].target_objects then self.task_info[task_id].target_objects = {} end
+					table.insert(self.task_info[task_id].target_objects, id)
+					self.task_info[task_id].enabled_props = true
+					return
+				end
+			end
+		end
+--
+		self.task_info[task_id].enabled_props = false
+		return
 	else
 		self.task_info[task_id].enabled_props = true
-		return		
+		return	
 	end
 end
 --' Проверяем можем ли мы сейчас выдать какой либо самоинициализующийся таск
@@ -1004,73 +1006,14 @@ function CRandomTask:init_reward_dialog(dlg, parent)
 
 end
 
---' Регистрация целей для квестов.
-function CRandomTask:register_target(obj)
-	if IsStalker(obj) then
-		--' Возможно регистрируется цель для квеста "убить сталкера"
-		if not obj.alive or not obj:alive() then return end --KRodin: нет смысла начинать перебор таблицы, если непись мёртв.
-		local profile = obj:profile_name()
-		for k,v in pairs(self.task_id_by_type["kill_stalker"]) do	
-			if profile == self.task_info[v].target then
+function CRandomTask:on_first_update()
+	for _, type in ipairs({"eliminate_lager", "defend_lager"}) do
+		for k,v in pairs(self.task_id_by_type[type]) do
+			local name = self.task_info[v].target
+			local sobj = name and alife():object(name)
+			if sobj and sobj:clsid() == clsid.smart_terrain then
 				if not self.task_info[v].target_objects then self.task_info[v].target_objects = {} end
-				table.insert(self.task_info[v].target_objects, obj.id)
-				return --Дальше цикл продолжать бессмысленно.
-			end
-		end
-	elseif obj:clsid() == clsid.smart_terrain then
-		--' Возможно регистрируется цель для квеста "вынести лагерь"
-		local name = obj:name()
-		for k,v in pairs(self.task_id_by_type["eliminate_lager"]) do
-			if name == self.task_info[v].target then
-				if not self.task_info[v].target_objects then self.task_info[v].target_objects = {} end
-				table.insert(self.task_info[v].target_objects, obj.id)
-				return
-			end
-		end
-		--' Либо регистрируется цель для квеста "защитить лагерь"
-		for k,v in pairs(self.task_id_by_type["defend_lager"]) do
-			if name == self.task_info[v].target then
-				--' Проверка что в кастом дате указано от кого защищать
-				if not self.task_info[v].target_objects then self.task_info[v].target_objects = {} end
-				table.insert(self.task_info[v].target_objects, obj.id)
-				return
-			end
-		end
-	else
-		--' Возможно регистрируется цель для квеста "найти предмет"
-		local sect = obj:section_name()
-		for k,v in pairs(self.task_id_by_type["find_item"]) do
-			if sect == self.task_info[v].target then
-				if not self.task_info[v].target_objects then self.task_info[v].target_objects = {} end
-				table.insert(self.task_info[v].target_objects, obj.id)
-				return
-			end				
-		end
-	end
-end
-
---' ОТРегистрация целей для квестов.
-function CRandomTask:unregister_target(obj)
-	if IsStalker(obj) then
-		--' Возможно регистрируется цель для квеста "убить сталкера"
-		for k,v in pairs(self.task_id_by_type["kill_stalker"]) do	
-			if self.task_info[v].target_objects then
-				for kk,vv in pairs(self.task_info[v].target_objects) do
-					if vv == obj.id then
-						table.remove(self.task_info[v].target_objects, vv)
-					end
-				end			
-			end
-		end
-	else
-		--' Возможно регистрируется цель для квеста "найти предмет"
-		for k,v in pairs(self.task_id_by_type["find_item"]) do
-			if self.task_info[v].target_objects then
-				for kk,vv in pairs(self.task_info[v].target_objects) do
-					if vv == obj.id then
-						table.remove(self.task_info[v].target_objects, vv)
-					end
-				end			
+				table.insert(self.task_info[v].target_objects, sobj.id)
 			end
 		end
 	end
@@ -1241,5 +1184,5 @@ function load()
 	get_random_task():load()
 end
 function clear_task_manager()
-	random_task	 = nil
+	random_task = nil
 end
