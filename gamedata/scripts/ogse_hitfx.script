@@ -97,9 +97,9 @@ function npc_on_death(victim, who)
 	else
 		if not ( hd.weapon_id or hd.who_id ) then return end
 		local wpn = level.object_by_id( hd.weapon_id or hd.who_id )
-		if wpn then
-			effect = get_effect_for_curr_weapon(wpn:section())
-		end
+		if not wpn or not wpn:is_weapon() or not wpn:is_grenade() then return end
+		effect = get_effect_for_curr_weapon(wpn:section())
+		if not effect then return end
 	end
 	--
 	if effect then

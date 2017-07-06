@@ -681,7 +681,6 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 					--log3("~~[%s.get_lists] Removed in restriction [%s] from [%s]", script_name(), anom_id, npc_sobj:name())
 				end
 			end
---[=[ --KRodin: Вроде бы это не нужно.
 			for _, anom_id in pairs(data.dynamic_out_restrictions) do --Может это и не нужно, но пусть на всякий случай будет.
 				if del_anoms_tbl[anom_id] then
 					log3("~~[%s.get_lists] Removing out restriction [%s] from [%s]", script_name(), anom_id, npc_sobj:name())
@@ -689,7 +688,6 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 					log3("~~[%s.get_lists] Removed out restriction [%s] from [%s]", script_name(), anom_id, npc_sobj:name())
 				end
 			end
---]=]
 		end
 		for anom_id, anom_sobj in pairs(del_anoms_tbl) do --Удаляем аномалии
 			--log3("~~[%s.get_lists] Releasing anom [%s]", script_name(), anom_sobj:name())

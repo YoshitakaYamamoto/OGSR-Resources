@@ -339,7 +339,7 @@ end
 -- здесь реализуем часть иммунитетов. 
 -- Ещё часть реализуется в событии "on_before_use", поскольку не все эффекты проходят через хит. 
 local last_t = 0
-function on_actor_before_hit(hit_data, p_s_hit, p_ignore_flags)
+function on_actor_before_hit(obj, hit_data, p_s_hit, p_ignore_flags)
 	local t = time_global()
 	--log3("on_actor_before_hit: %s", (t - last_t))
 	last_t = t

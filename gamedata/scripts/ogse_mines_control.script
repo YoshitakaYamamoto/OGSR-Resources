@@ -1,0 +1,16 @@
+--Удалитель мин, после их взрыва
+
+function attach(sm)
+	sm:subscribe({ signal = "on_actor_before_hit",		fun = this.on_before_hit })
+	sm:subscribe({ signal = "on_npc_before_hit",		fun = this.on_before_hit })
+	sm:subscribe({ signal = "on_monster_before_hit",	fun = this.on_before_hit })
+end
+
+function on_before_hit( obj, hd )
+	if not ( hd.weapon_id or hd.who_id ) then return end
+	--
+	local who = level.object_by_id( hd.weapon_id or hd.who_id )
+	if who and who:section() == "zone_mine_field" then
+		checker_minefield.release_restrictor(who:id()) --Если делать :disable_anomaly, на месте мины появляется свечение. Поэтому сразу удаляем.
+	end
+end

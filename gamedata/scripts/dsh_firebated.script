@@ -17,9 +17,6 @@ function on_death( obj, who )
     local weapon = who:active_item()
     if not weapon then return end
     if weapon:section() == "wpn_flame" then
-      if string.find( obj:section(), "zomb" ) and obj.health < 0.2 then
-        obj:kill( obj )
-      end
       dsh_particles.play_particle(
         obj, {
           obj      = obj,

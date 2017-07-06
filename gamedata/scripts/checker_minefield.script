@@ -95,12 +95,11 @@ function delete_restrs()
 				local data = pk:get()
 				for _, anom_id in pairs(data.dynamic_in_restrictions) do
 					if to_delete_restrs[anom_id] then
-						log3("~~[%s] Removing in restriction [%s] from [%s]", script_name(), anom_id, sobj:name())
+						--log3("~~[%s] Removing in restriction [%s] from [%s]", script_name(), anom_id, sobj:name())
 						sim:remove_in_restriction(sobj, anom_id)
-						log3("~~[%s] Removed in restriction [%s] from [%s]", script_name(), anom_id, sobj:name())
+						--log3("~~[%s] Removed in restriction [%s] from [%s]", script_name(), anom_id, sobj:name())
 					end
 				end
---[=[ --KRodin: Вроде бы это не нужно.
 				for _, anom_id in pairs(data.dynamic_out_restrictions) do --Может это и не нужно, но пусть на всякий случай будет.
 					if to_delete_restrs[anom_id] then
 						log3("~~[%s.get_lists] Removing out restriction [%s] from [%s]", script_name(), anom_id, sobj:name())
@@ -108,7 +107,6 @@ function delete_restrs()
 						log3("~~[%s.get_lists] Removed out restriction [%s] from [%s]", script_name(), anom_id, sobj:name())
 					end
 				end
---]=]
 			end
 		end
 	end
