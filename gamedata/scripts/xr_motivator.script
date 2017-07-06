@@ -192,10 +192,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 				stop_play_sound(self)
 				self:set_mental_state(anim.danger)
 				self:set_sight(look.point,sound_position)
-				--self:make_object_visible_somewhen(who)	
-				--if xr_companion.is_companion(self:id()) then --Нет смысла проверять, т.к. эта функция для компаньонов не вызывается
-				--	xr_combat_companion.process_enemy(self, who)				
-				--end			
+				--self:make_object_visible_somewhen(who)
 			end
 		elseif ( who:is_stalker() or who:is_actor() ) and self:relation(who) ~= game_object.enemy then
 			if snd_t == "ATTCK" or
@@ -348,7 +345,7 @@ function motivator_binder:net_spawn(sobject)
 		if s_obj.offline_dead == 0 then
 			if s_obj.m_story_id ~= 4294967296 and self.treasure_processed then --Вечные трупы будут удаляться только после того как их обыщет актор.
 				log3("--[%s] Added trup to delete: [%s]", script_name(), s_obj:name())
-				s_obj.offline_dead = 1
+				s_obj.offline_dead = game.time()+(1*24*60*60*1000)
 			end
 		end
 --]=]
@@ -417,26 +414,7 @@ function motivator_binder:net_spawn(sobject)
 		manager:add_evaluator(ogsm_hideout.property_inhide, property_evaluator_const(false))
 	end
 
-	--// xr_companion
-	if xr_companion.is_companion(self.object:id()) then
-		local gulag = xr_gulag.get_npc_gulag(self.object)
-		if gulag then
-			gulag:free_obj(self.object:id())
-		end		
-		if db.actor then
-			local new_str = game.translate_string("companion_signal1")
-			new_str = new_str.." "
-			new_str = new_str..self.object:character_name()
-			new_str = new_str.." "
-			new_str = new_str..game.translate_string("companion_signal2")
-			db.actor:give_game_news(new_str, "ui\\ui_iconsTotal", Frect():set(0,235,83,47), 0, 15000)
-		end
-		sobject:smart_terrain_task_deactivate()
-		xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_stalker, false )	-- сделано, чтобы сбросить активную секцию у напарника
-	else
-		xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_stalker, self.loaded )
-	end
-	--// xr_companion	
+	xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_stalker, self.loaded )
 
 	self.am:call( "on_npc_spawn", self.object, self )
 	db.net_spawning_obj = nil
@@ -608,17 +586,6 @@ function motivator_binder:death_callback(victim, who)
 	self:clear_callbacks()
 
 	xr_statistic.addKillCount(who, self.object) --Добавление опыта за убийство
-
-	local community = self.object:character_community()
-	if not (
-		community == "zombied"
-		or community == "monolith"
-		or community == "arena_enemy"
-		or string.find(self.object:name(), "aem_")
-	)
-	then
-		actor_stats.remove_from_ranking(self.object:id())
-	end
 
 	self.am:call("on_npc_death", self.object, who)
 end

@@ -198,7 +198,8 @@ end
 function se_stalker:on_before_register()
 	ogse_signals.get_mgr():call( "se_stalker_on_before_register", self )
 	self:fill_exclusives()
-	if self.has_none_true then
+	xr_companion.is_companion_se(self)
+	if self.has_none_true or xr_companion.is_companion(self.id) then
 		self:brain():can_choose_alife_tasks( false )
 	end
 end
@@ -211,23 +212,15 @@ local forbidden_comms = {
 function se_stalker:on_register()
 	cse_alife_human_stalker.on_register( self )
 
-	xr_companion.is_companion_se(self)
-
-	if actor_stats.add_to_ranking ~= nil then
-		if not forbidden_comms[self:community()] then
-			actor_stats.add_to_ranking(self.id)
-		end
-	end
-
-	if xr_companion.is_companion(self.id) then
-		--' Не брать задания алайфа
-		self:brain():can_choose_alife_tasks(false)
+	if not forbidden_comms[self:community()] then
+		actor_stats.add_to_ranking(self.id)
 	end
 
 	if
-		self:alive()
-		and self:smart_terrain_id() == 65535
+		self:smart_terrain_id() == 65535
+		and self:alive()
 		and not self.has_none_true
+		and not xr_companion.is_companion(self.id)
 	then
 		self:brain():update()
 	end
@@ -250,10 +243,8 @@ function se_stalker:on_unregister()
 
 	smart_terrain.unregister_npc(self)
 
-	if actor_stats.remove_from_ranking ~= nil then
-		if not forbidden_comms[self:community()] then
-			actor_stats.remove_from_ranking(self.id)
-		end
+	if not forbidden_comms[self:community()] then
+		actor_stats.remove_from_ranking(self.id)
 	end
 end
 --------------------

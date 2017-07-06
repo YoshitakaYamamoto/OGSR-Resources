@@ -1461,17 +1461,12 @@ function setup_gulag_and_logic_on_spawn( obj, st, sobject, stype, loaded )
 		end		
 
 		if strn_id ~= 65535 then
-
 			local need_setup_logic       = strn.gulag.Object_begin_job[obj:id()] and not loaded
 			local need_setup_restrictors = strn.gulag.Object_begin_job[obj:id()]
 
 			strn:initialize_if_needed()
 
 			strn.gulag:object_setup_online( obj:id(), obj, need_setup_logic, need_setup_restrictors )
-			
-			if xr_companion.is_companion(obj:id()) then
-				need_setup_logic = false
-			end			
 
 			if not need_setup_logic then
 				xr_logic.initialize_obj( obj, st, loaded, db.actor, stype)

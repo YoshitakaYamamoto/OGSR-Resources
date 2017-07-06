@@ -815,9 +815,14 @@ function companion_start_following(npc, actor)
 	local npc_com = xr_companion.community_by_actor(actor_comm)
 	
 	if st and st_c then
-
+		--
 		xr_companion.reset_npc_logic(npc)
 		xr_gulag.resetJob(npc)
+		local sobj = alife():object(npc:id())
+		ASSERT(sobj, "")
+		smart_terrain.unregister_npc( sobj )
+		sobj:brain():can_choose_alife_tasks( false )
+		--
 		xr_companion.number_of_companions = xr_companion.number_of_companions + 1
 		xr_companion.companions[npc:id()] = "companion"
 		
@@ -843,11 +848,6 @@ function companion_start_following(npc, actor)
 		npc:remove_all_restrictions() --Удалять все рестрикшены необходимо именно здесь!
 		ogse_anomaly_evader.last_position[ npc:id() ] = nil --Сразу же переустанавливаем рестрикшены обхода аномалий
 
-		local sobj = alife():object(npc:id())
-		if sobj then
-			sobj:brain():can_choose_alife_tasks( false )
-		end
-
 		sobj:visible_for_map(true) --на всякий случай
 		npc:restore_max_ignore_monster_distance() --на всякий случай
 		npc:restore_ignore_monster_threshold() --на всякий случай
@@ -860,13 +860,12 @@ function companion_stop_following(npc, actor)
 -- его изначальное коммунити. Дернем его из
 -- визуала непися.
 ---------------------------------------------
-	xr_companion.post_work[npc:id()]	= true
+	xr_companion.post_work[npc:id()] = true
 	db.storage[npc:id()].companion.enabled = false
 	xr_companion.number_of_companions = xr_companion.number_of_companions - 1
-	-- local comm = xr_companion.real_community(npc)
-	
+
 	xr_companion.save_var_companion(npc:id(), "is_companion", 0)
-	
+
 	local comm = xr_companion.load_var_companion(npc:id(), "orig_community", nil)
 	local relation = xr_companion.load_var_companion(npc:id(), "friendship_status", nil)
 	
@@ -877,7 +876,6 @@ function companion_stop_following(npc, actor)
 	trade_manager.trade_init(npc, "misc\\trade_generic.ltx")	
 	level_tasks.remove_location_by_id(npc:id(), "alife_presentation_companion")
 	xr_companion.companions[npc:id()] = nil
-	xr_gulag.resetJob(npc)
 
 	xr_companion.unsubscribe(npc:id())
 
@@ -894,11 +892,10 @@ function quest_companion_stop_following(npc, actor)
 -- его изначальное коммунити. Дернем его из
 -- визуала непися.
 ---------------------------------------------
-	xr_companion.post_work[npc:id()]	= true
+	xr_companion.post_work[npc:id()] = true
 	db.storage[npc:id()].companion.enabled = false
 	xr_companion.number_of_companions = xr_companion.number_of_companions - 1
-	-- local comm = xr_companion.real_community(npc)
-	
+
 	xr_companion.save_var_companion(npc:id(), "is_companion", 0)
 	
 	local relation = xr_companion.load_var_companion(npc:id(), "friendship_status", nil)
@@ -908,7 +905,6 @@ function quest_companion_stop_following(npc, actor)
 	trade_manager.trade_init(npc, "misc\\trade_generic.ltx")	
 	level_tasks.remove_location_by_id(npc:id(), "alife_presentation_companion")
 	xr_companion.companions[npc:id()] = nil
-	xr_gulag.resetJob(npc)
 
 	xr_companion.unsubscribe(npc:id())
 

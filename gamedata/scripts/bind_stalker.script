@@ -45,9 +45,7 @@ function actor_binder:net_spawn(data)
 	set_extensions_flags(15)
 	level.enable_input()
 
-	if actor_stats.add_to_ranking ~= nil then
-		actor_stats.add_to_ranking(self.object:id())
-	end
+	actor_stats.add_to_ranking(self.object:id())
 
 ------------KD: установка настроек графики------------
 	-- шмапы
@@ -85,9 +83,7 @@ end
 function actor_binder:net_destroy()
 --log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 
-	if(actor_stats.remove_from_ranking~=nil)then
-		actor_stats.remove_from_ranking(self.object:id())
-	end
+	actor_stats.remove_from_ranking(self.object:id())
 
 	set_extensions_flags(0)
 

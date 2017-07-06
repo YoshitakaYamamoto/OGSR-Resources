@@ -396,10 +396,6 @@ function se_smart_terrain:smart_terrain_accepts_obj( obj, obj_agreement )
 		return false
 	end
 
-	if xr_companion.is_companion(obj.id) then -- это компаньон, нечего ему в смарте делать
-		return false
-	end	
-
 	-- в любом случае, если хочет идти только в этот, или если готов без условий и при этом гулаг не заполнен полностью
 	if obj_agreement == agreed_exclusive or 
 		self.gulag:get_non_exclusive_population() < self.gulag.capacity_non_exclusive
@@ -449,11 +445,6 @@ agreed           - согласен идти в этот на неэкслюзивной основе
 -- вариант: any=condlist
 
 function se_smart_terrain:obj_accepts_smart_terrain( obj )
-
-	if xr_companion.is_companion(obj.id) then -- это компаньон, нечего ему в смарте делать
-		return disagreed
-	end	
-
 	if obj.smart_terrain_conditions then -- если вообще есть какие-то специальные условия насчёт смартов
 		-- перебираем все варианты условий из секции непися
 		-- TODO: зачем перебирать условия для всех смартов, если можно по ключу выбрать только
@@ -500,11 +491,6 @@ function se_smart_terrain:enabled(obj)
 --		log3("[smart_terrain %s] DISABLED obj=%s (self.disabled)", self:name(), obj:name())
 		return false
 	end
-	--// xr_companion
-	if xr_companion.is_companion(obj.id) then
-		return false
-	end	
-	--// xr_companion	
 
 	-- если всё это делаем в первый раз
 	self:register_if_needed() -- проинитим ...вообще-то это должно с гарантией происходить при создании смарта движком,
@@ -530,9 +516,6 @@ end
 -- на основе это функции принимается решение для непися (не смарта), т.е. здесь непись выбирает себе смарт
 -- для какого смарта число больше, туда и пойдёт
 function se_smart_terrain:suitable( obj )
-	if xr_companion.is_companion(obj.id) then -- это компаньон, нечего ему в смарте делать
-		return 0
-	end		
 	--' Повысить подходящесть эксклюзивного смарттеррейна
 	if self:obj_accepts_smart_terrain(obj) == agreed_exclusive then -- некрасиво, уже ведь проверяли, а фунция некислая
 		-- TODO: оптимизировать
@@ -693,14 +676,6 @@ end
 -- задание в оффлайне заключается попросту топать к смарту, где непись 
 -- выйдет в онлайн и будет подхвачен уже логикой гулага
 function se_smart_terrain:task( obj )
-
-	--// xr_companion
-		if xr_companion.is_companion(obj.id) then -- и как он здесь оказался?
-			self:unregister_npc(obj)
-			return CALifeSmartTerrainTask("simulation_default_path")
-		end
-	--// xr_companion
-  
   	local path_name = self.gulag:get_obj_job_path_name( obj.id )
 	if not path_name then
 		log1("!!WARNING: NO PATH ["..obj.id.."] ["..obj:name().."] ["..self:name().."] PATH ["..tostring(path_name).."]")
