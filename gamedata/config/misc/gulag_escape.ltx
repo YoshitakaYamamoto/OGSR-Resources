@@ -202,27 +202,17 @@ path_walk = alarm2_walk
 
 
 [logic@esc_blockpost_nardyman]
-active = walker@esc_blockpost_nardyman_final
+active = walker@esc_blockpost_nardyman
 
 [walker@esc_blockpost_nardyman]
 path_walk = nardyman_walk
 path_look = nardyman_look
-on_info = {+master_quest_release_colonel} walker@esc_blockpost_nardyman
 meet = meet@esc_blockpost_nardyman
-
-[walker@esc_blockpost_nardyman_final]
-path_walk = final_talk_colonel_walk
-path_look = final_talk_colonel_look
-meet = meet@esc_blockpost_nardyman1
-on_info = {+master_quest_release_colonel} walker@esc_blockpost_nardyman
 
 [meet@esc_blockpost_nardyman]
 use = true
 use_wpn = false
 
-[meet@esc_blockpost_nardyman1]
-use = true
-use_wpn = true
 ;-----------------------------------------------------------------------------
 ;------------------------------  ESCAPE SPECNAZ  -----------------------------
 ;-----------------------------------------------------------------------------
