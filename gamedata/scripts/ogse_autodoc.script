@@ -17,7 +17,7 @@ function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_item_to_belt", fun = this.on_to_belt})
 	sm:subscribe({signal = "on_item_to_ruck", fun = this.on_to_ruck})
 	sm:subscribe({signal = "on_drop", fun = this.on_to_ruck})
-	sm:subscribe({signal = "on_load", fun = this.get_autodoc_states})
+	sm:subscribe({signal = "on_spawn", fun = this.get_autodoc_states})
 	sm:subscribe({signal = "on_save", fun = this.save_autodoc_states})
 end
 

@@ -22,7 +22,6 @@ function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_info",     fun = this.on_info})
 	sm:subscribe({signal = "on_car_death", fun = this.on_car_death})
 	sm:subscribe({signal = "on_save", 	  fun = this.on_save})
-	sm:subscribe({signal = "on_load", 	  fun = this.on_load})
 	sm:subscribe({signal = "on_attach_vehicle", fun = this.on_attach_vehicle})
 	sm:subscribe({signal = "on_use_vehicle", fun = this.on_use_vehicle})
 	sm:subscribe({signal = "on_detach_vehicle", fun = this.on_detach_vehicle})
@@ -52,7 +51,12 @@ local alt_hud_bg
 local fov_vol = sys_ini:r_s32("options","fov_volume")
 local min_alarm_fov_vol = sys_ini:r_s32("options","min_fov_volume")
 local max_alarm_fov_vol = sys_ini:r_s32("options","max_fov_volume")
-
+--
+local current_btr_fov
+local periscope_modes             = { manual = 1, target_select = 2, auto = 3 }
+local periscope_mode
+local recognition_target_mode -- флаг распознавания цели
+--
 local car_log
 local debug_output = false
 
@@ -187,7 +191,29 @@ function on_spawn()
 		car_log = io.open(log_dir, "a+")
 	end
 	-- debug --
+	--
+	if not ogse.var_exists( "god_mode_in_btr" ) then
+		cmd("g_god off")
+	end
+	--
+	periscope_mode = ogse.load_var( script_name()..".periscope_mode", periscope_modes.manual, "u8") --Загружаем режим стрельбы
+	recognition_target_mode = ogse.load_var( script_name()..".recognition_target_mode", true, "bool") --Загружаем режим автораспознавания
+	current_btr_fov = ogse.load_var( script_name()..".current_btr_fov", fov_vol, "float") --Загружаем fov
 end
+
+
+function on_save()
+	if in_btr then
+		ogse.save_var( "god_mode_in_btr", true, "bool" )
+	elseif ogse.var_exists( "god_mode_in_btr" ) then
+		ogse.delete_var( "god_mode_in_btr" )
+	end
+	--
+	ogse.save_var( script_name()..".periscope_mode", periscope_mode, "u8" ) --Сохраняем режим стрельбы
+	ogse.save_var( script_name()..".recognition_target_mode", recognition_target_mode, "bool" ) --Сохраняем режим автораспознавания
+	ogse.save_var( script_name()..".current_btr_fov", current_btr_fov, "float" ) --Сохраняем fov
+end
+
 
 function detach_from_all()
 	car_hud_wnd:DetachFromParent()
@@ -277,7 +303,6 @@ end
 
 local periscope_faile_fx_intensity     = 200                         -- интенсивность налагаемого эффекта визуального шума при выбросе (0-255)
 
-local current_btr_fov
 local btr_fov_max_value               = fov_vol + 40  -- максимально допустимый для зумма БТР FOV (ZOOM-)
 local btr_fov_min_value               = fov_vol - 70  -- минимально допустимый для зумма БТР FOV (ZOOM+)
 local btr_fov_different               = 5                           -- изменение FOV за один щелчок оборота колёсика мыши
@@ -309,12 +334,9 @@ local last_target = {}				-- последняя цель, [id] = last_time
 	-- vis = видим или нет
 -- }
 
-local periscope_modes             = { manual = 1, target_select = 2, auto = 3 }
-local periscope_mode
 local car_health                  = 0.0
 local car_critically_damaged      = false
 local auto_fire_operable          = true   -- флаг исправности автоматического режима
-local recognition_target_mode -- флаг распознавания цели
 local recognition_target_operable = true   -- флаг исправности распознавания цели
 
 function is_manual_mode()
@@ -778,29 +800,6 @@ function on_first_update()
 	if db.actor:has_info("no_net_signal") then
 		surge = true
 	end
-end
-
-
-function on_save()
-	if in_btr then
-		ogse.save_var( "god_mode_in_btr", true, "bool" )
-	elseif ogse.var_exists( "god_mode_in_btr" ) then
-		ogse.delete_var( "god_mode_in_btr" )
-	end
-	--
-	ogse.save_var( script_name()..".periscope_mode", periscope_mode, "u8" ) --Сохраняем режим стрельбы
-	ogse.save_var( script_name()..".recognition_target_mode", recognition_target_mode, "bool" ) --Сохраняем режим автораспознавания
-	ogse.save_var( script_name()..".current_btr_fov", current_btr_fov, "float" ) --Сохраняем fov
-end
-
-function on_load()
-	if not ogse.var_exists( "god_mode_in_btr" ) then
-		cmd("g_god off")
-	end
-	--
-	periscope_mode = ogse.load_var( script_name()..".periscope_mode", periscope_modes.manual, "u8") --Загружаем режим стрельбы
-	recognition_target_mode = ogse.load_var( script_name()..".recognition_target_mode", true, "bool") --Загружаем режим автораспознавания
-	current_btr_fov = ogse.load_var( script_name()..".current_btr_fov", fov_vol, "float") --Загружаем fov
 end
 
 
