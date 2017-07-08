@@ -220,7 +220,7 @@ function on_timer_hel1()
 		local npc = level.object_by_id(v)
 		if npc then
 			deadman[npc:id()] = nil
-			checker_minefield.add_to_delete(npc:id())
+			--checker_minefield.add_to_delete(npc:id()) --А зачем вообще их удалять?
 		end		
 	end	
 end
