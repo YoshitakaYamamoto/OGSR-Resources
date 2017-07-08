@@ -666,7 +666,8 @@ function check_following(npc, actor)
 	elseif actor_rank >= 600 and actor_rank < 900 then actor_rank_level = 3
 	elseif actor_rank >= 900 then actor_rank_level = 4 end	
 	
-	if not st 
+	if not st
+	or xr_logic.logic_not_empty( npc, xr_logic.get_customdata_or_ini_file( npc, "<customdata>" ) ) --Сталкерам, которые под логикой, запрещено быть напарниками.
 	or ogse.is_quest_npc(npc)
 	or string.find(profile, "sniper")
 	or string.find(profile, "leader")
