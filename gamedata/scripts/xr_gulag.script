@@ -411,7 +411,7 @@ function gulag:object_setup_offline( obj_id, was_online )
 
 	if not was_online then
 		local obj = level.object_by_id( obj_id )
-		if obj ~= nil then
+		if obj then
 			self:object_setup_online( obj_id, obj, true )
 		end
 	end
@@ -1436,46 +1436,34 @@ end
 -- установить логику и сообщить смарту, что объект перешЄл в онлайн.
 -- вызываетс€ из net_spawn() объектов
 function setup_gulag_and_logic_on_spawn( obj, st, sobject, stype, loaded )
-	local sim = alife()
-	if sim then
-		local strn_id
-
-		if sobject.smart_terrain_id then
-			strn_id = sobject:smart_terrain_id()
-		else
-			strn_id = 65535
+	local sobj = alife():object(obj:id()) --KRodin: именно это использовать, а не sobject!!!
+	ASSERT(sobj, "")
+	local strn_id = sobj.smart_terrain_id and sobj:smart_terrain_id() or 65535
+	local strn = alife():object( strn_id )
+	--
+	if strn_id == 65535 then --у моба нет смарта - значит нет смысла с ним дальше что-то делать
+		if not sobj.has_none_true then
+			log3( "!![%s] smart_terrain not found in [%s]", script_name(), obj:name() )
 		end
-		
-		if strn_id == 0 then strn_id = 65535 end
-		
-		local strn                   = sim:object( strn_id )
-		
-		if not strn then
-			--log1("!!ERROR: XR_GULAG cannot find SOBJ ["..tostring(strn_id).."] for obj ["..sobject:name().."]")
-			strn_id = 65535
-			-- KD: попробуем перезагрузить логику гулага потер€шкам
-			loaded = false
-		elseif not strn.gulag then	
-			log1("!!ERROR: XR_GULAG cannot find SOBJ GULAG ["..tostring(strn:name()).."] for obj ["..sobject:name().."]")
-			strn_id = 65535
-		end		
-
-		if strn_id ~= 65535 then
-			local need_setup_logic       = strn.gulag.Object_begin_job[obj:id()] and not loaded
-			local need_setup_restrictors = strn.gulag.Object_begin_job[obj:id()]
-
-			strn:initialize_if_needed()
-
-			strn.gulag:object_setup_online( obj:id(), obj, need_setup_logic, need_setup_restrictors )
-
-			if not need_setup_logic then
-				xr_logic.initialize_obj( obj, st, loaded, db.actor, stype)
-			end
-		else
-			xr_logic.initialize_obj( obj, st, loaded, db.actor, stype )
-		end
-	else
-		xr_logic.initialize_obj(obj, st, loaded, db.actor, stype)
+		xr_logic.initialize_obj( obj, st, loaded, db.actor, stype )
+		return
+	elseif not strn then
+		abort( "SMART WIH ID [%s] NOT FOUND !", strn_id )
+	elseif strn:clsid() ~= clsid.smart_terrain then
+		abort( "IS NOT SMART [%s] !", strn:name() )
+	elseif not strn.gulag then
+		abort( "GULAG NOT FOUND IN SMART [%s] !", strn:name() )
+	end
+	--
+	local need_setup_logic = strn.gulag.Object_begin_job[obj:id()] and ( not loaded or st.loaded_gulag_name ~= strn.gulag.name )
+	local need_setup_restrictors = strn.gulag.Object_begin_job[obj:id()]
+	--
+	strn:initialize_if_needed()
+	--
+	strn.gulag:object_setup_online( obj:id(), obj, need_setup_logic, need_setup_restrictors )
+	--
+	if not need_setup_logic then
+		xr_logic.initialize_obj( obj, st, loaded, db.actor, stype)
 	end
 end
 
