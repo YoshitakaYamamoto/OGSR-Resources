@@ -6,11 +6,7 @@
 -- Trader
 -----------------------------------------------------------------------------------------------------
 function all_stalker_gulags(w)
-	local gulag = xr_gulag.get_gulag_by_name(w)
-	if (gulag) then 
-		if gulag:npc_is_enemy_to_anybody(db.actor) then return true end
-	end
-	return false
+	return xr_gulag.isGulagEnemy( w, db.actor )
 end
 
 function factions_repair_checkstalker_r(trader, actor)
@@ -62,27 +58,6 @@ function factions_repair_checkstalker(first_speaker, second_speaker)
 		db.actor:give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 	end
 --	printf("factions_repair_checkstalker") --/#~#
-end
-
-function factions_repair_setstalker_r(trader, actor)
-	local howmuch = 20000
-	--local gulag = xr_gulag.get_gulag_by_name ("esc_lager")
-	--if (gulag) then
-		--if gulag:npc_is_enemy_to_anybody(db.actor) and db.actor:money() >= 20000 then
-		if db.actor:money() >= howmuch then
-			local chkgoodwill = relation_registry.community_goodwill("stalker", db.actor:id())
-			xr_gulag.setGulagRelation ("esc_lager",         game_object.neutral, db.actor)
-			xr_gulag.setGulagRelation ("bar_dolg_general",  game_object.neutral, db.actor)
-			xr_gulag.setGulagRelation ("bar_dolg_bunker",   game_object.neutral, db.actor)
-			xr_gulag.setGulagRelation ("bar_visitors",      game_object.neutral, db.actor)
-			xr_gulag.setGulagRelation ("bar_dolg_veterans", game_object.neutral, db.actor)
-			xr_gulag.setGulagRelation ("bar_zastava_2",     game_object.neutral, db.actor)
-			xr_gulag.setGulagRelation ("bar_zastava",       game_object.neutral, db.actor)
-			relation_registry.set_community_goodwill ("stalker", db.actor:id(), 0)
-			dialogs.relocate_money(actor, howmuch, "out")
---			printf("Отношения_со_сталкерами_восстановлены") --/#~#
-		end
-	--end
 end
 
 ---

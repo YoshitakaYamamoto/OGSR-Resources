@@ -656,12 +656,12 @@ function is_zaz_enable()
 end
 
 function esc_kvest_sdelka_with_mils_make_kuznecov_neutral()
-	xr_gulag.setGulagPersonalGoodwill("esc_bridge", 600, db.actor)
+	xr_gulag.setGulagNeutral("esc_bridge", db.actor)
 	db.actor:disable_info_portion("esc_bridge_pass_fire")
 end
 
 function make_esc_bridge_enemy()
-	xr_gulag.setGulagPersonalGoodwill("esc_bridge", 0, db.actor)
+	xr_gulag.setGulagEnemy("esc_bridge", db.actor)
 end
 
 function enable_kvest_sdelka_with_mils(first_speaker, second_speaker)

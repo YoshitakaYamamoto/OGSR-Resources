@@ -20,8 +20,8 @@ end
 function actor_binder:__finalize()
 	self.am:call("on_finalize", obj)
 	--
-	log3("[bind_stalker] actor_binder finalize %s", debug.traceback()) --пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ get_hud(),
-	--пїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ:
+	log3("[bind_stalker] actor_binder finalize %s", debug.traceback()) --Возможно, это позволит увидеть повисшие функции, типа get_hud(),
+	--из-за которых происходит вылет при загрузке любого сейва после зависа:
 	-- 0023:002E46B6 xrLUA_GSC.dll, luabind::detail::stack_content_by_name()
 	-- 0023:002E4A54 xrLUA_GSC.dll, luabind::detail::stack_content_by_name()
 	-- 0023:002E4B5C xrLUA_GSC.dll, luabind::weak_ref::~weak_ref()
@@ -38,8 +38,6 @@ function actor_binder:net_spawn(data)
 	level.set_snd_volume( 1 )
 
 	self.object:set_camera_fov( get_u32( "options", "fov_volume", 65 ) ) -- Установка FOV
-
-	--xr_gulag.make_restrictors_registry() --KRodin: убрал эти манипуляции с рестрикшенами.
 
 	db.add_actor(self.object)
 

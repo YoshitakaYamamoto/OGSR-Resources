@@ -1618,52 +1618,6 @@ function reputation_up_20(stalker, player)
 end
 
 
---[=[
-function fix_restrictors(npc)
-	if not npc then return end
-
-	local t = parse_names(npc:in_restrictions())
-
-	local pk
-	local sObj = alife():object(npc:id())
-	if sObj then
-		pk = get_netpk(sObj, 1)
-	end
-
-	for k, v in pairs(t) do
-		if not xr_gulag.valid_restrictors[v] then
-			npc:remove_restrictions("", v)
-			log1("[OGSE] Invalid in restriction ["..v.."] for ["..npc:name().."], removed")
-		else	
-			if pk then
-				ASSERT( pk:isOk(), "can't read netpacket of %s", sObj:name() )
-				local data = pk:get()
-				local base_out_restr = data.base_out_restrictors
-				if base_out_restr ~= "" then
-					for base in string.gmatch(base_out_restr, "[^,]+") do
-						--log1("[OGSE] NPC "..npc:name().." RESTRICTOR "..base)
-						if v == base then
-							log1("[OGSE] IN Restriction ["..v.."] changed to OUT for ["..npc:name().."], according spawn")
-							npc:remove_restrictions("", v)
-							npc:add_restrictions(v, "")
-						end
-					end
-				end
-			end
-		end
-	end
-
-	t = parse_names(npc:out_restrictions())
-	
-	for k, v in pairs(t) do
-		if not xr_gulag.valid_restrictors[v] then
-			npc:remove_restrictions(v, "")
-			log1("[OGSE] Invalid out restriction ["..v.."] for ["..npc:name().."], removed")
-		end
-	end	
-end
---]=]
-
 function get_lvids_count(lname)
 	local fs = getFS()
 	if not fs:exist("$game_levels$", lname.."\\level.ai") then

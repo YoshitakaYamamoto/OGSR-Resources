@@ -1339,8 +1339,8 @@ function master_dying()
 
 	master_dead:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
 	level.add_pp_effector("deadcity_wake_old1.ppe", 2008, false)
-	xr_gulag.setGulagRelation ("deadcity_bar", game_object.friend, db.actor)
-	xr_gulag.setGulagPersonalGoodwill("deadcity_bar", 1000, db.actor)	
+
+	xr_gulag.setGulagFriend("deadcity_bar", db.actor)
 
 	if has_alife_info("actor_set_zombied") then
 		tasks_functor.make_actor_normal()
@@ -1509,8 +1509,7 @@ function reward_actor(first_speaker, second_speaker) --Выдача награды и завершен
 		tasks_functor.make_actor_normal()
 	end
 
-	xr_gulag.setGulagRelation("esc_blokpost", game_object.neutral, db.actor)
-	xr_gulag.setGulagPersonalGoodwill("esc_blokpost", 500, db.actor)
+	xr_gulag.setGulagNeutral("esc_blokpost", db.actor)
 
 	dialogs.relocate_item_section(second_speaker, "mil_transponder", "in")
 	dialogs.relocate_item_section(second_speaker, "military_outfit", "in") --лучше тут экзу выдавать, наверно

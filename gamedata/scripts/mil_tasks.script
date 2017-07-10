@@ -85,12 +85,8 @@ function fail_rg6_task (task_id, subtask)
     return false   
 end
 
-function is_actor_enemy_freedom ()
-    local gulag = xr_gulag.get_gulag_by_name("mil_freedom")
-    if gulag == nil or gulag:npc_is_enemy_to_anybody(db.actor) == false then
-       return false
-    end    
-    return true
+function is_actor_enemy_freedom()
+	return xr_gulag.isGulagEnemy( "mil_freedom", db.actor )
 end
 
 function lukash_job_fail (task_id, subtask)
@@ -179,12 +175,8 @@ function dolg_job_fail2 (task_id, subtask)
     return this.is_actor_enemy_dolg ()
 end
 
-function is_actor_enemy_dolg ()
-    local gulag = xr_gulag.get_gulag_by_name ("mil_dolg")
-    if gulag == nil or gulag:npc_is_enemy_to_anybody (db.actor) == false then
-       return false
-    end    
-    return true
+function is_actor_enemy_dolg()
+	return xr_gulag.isGulagEnemy( "mil_dolg", db.actor )
 end
 
 function bloodsuckers_dead (task_id, subtask)

@@ -146,13 +146,8 @@ function petruha_talk()
 	end
 end
 
-function is_actor_enemy_lager ()
-    local gulag = xr_gulag.get_gulag_by_name ("esc_lager")
-    if has_alife_info("esc_fanat_die") then return true end
-	if gulag == nil or gulag:npc_is_enemy_to_anybody (db.actor) == false then
-       return false
-    end    
-    return true
+function is_actor_enemy_lager()
+	return has_alife_info("esc_fanat_die") or xr_gulag.isGulagEnemy( "esc_lager", db.actor )
 end
 
 function process_info_portion(info_id)

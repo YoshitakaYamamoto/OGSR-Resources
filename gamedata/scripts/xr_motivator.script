@@ -286,7 +286,6 @@ function motivator_binder:net_spawn(sobject)
 	db.net_spawning_obj = self.object
 
 --log3("~~[%s] Start net_spawn [%s]", script_name(), self.object and self.object:name() or "nil")
-	--ogse.fix_restrictors(self.object)
 
 	if not object_binder.net_spawn(self, sobject) then db.net_spawning_obj = nil return false end
 
@@ -320,7 +319,7 @@ function motivator_binder:net_spawn(sobject)
 	self:subscribe_updaters()
 
     --«агрузка историй дл€ лагер€.
-	if self.loaded == false then
+	if self.loaded == false then --KRodin: а зачем это?
 		local char_ini = self.object:spawn_ini() or dsh.cached_ini_file("scripts\\dummy.ltx")
 		xr_info.loadInfo(self.object, char_ini)
 	end

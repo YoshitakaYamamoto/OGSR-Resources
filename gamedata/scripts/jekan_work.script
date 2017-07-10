@@ -4077,22 +4077,6 @@ function volk_atp_cheat_reward()
 	news_manager.send_tip(db.actor, "volk_atp_money_in", nil, "money", 6000, nil)
 end
 
-function set_atp_gulag_neutral()
-	local gulag = xr_gulag.get_gulag_by_name ("esc_fabrika_bandit")
-	if (gulag) then
-		gulag:set_relation1(game_object.neutral, db.actor)
-		-- gulag:set_goodwill(5000, db.actor)
-	end
-end
-
-function set_atp_gulag_enemy()
-	local gulag = xr_gulag.get_gulag_by_name ("esc_fabrika_bandit")
-	if (gulag) then
-		gulag:set_relation1(game_object.enemy, db.actor)
-		-- gulag:set_goodwill(5000, db.actor)
-	end
-end
-
 ----------------------------------------------------------------------------------------------------
 
 function test_stalker_spawn()

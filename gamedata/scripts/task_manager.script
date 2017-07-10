@@ -547,10 +547,8 @@ function CRandomTask:task_complete(p1, p2)
 	if p2 == 1 then
 		if string.find(p1, "eliminate_lager") ~= nil then
 			local oo = alife():object(sel_task.selected_target)
-			--log1("TARGET "..tostring(sel_task.selected_target).." POP "..tostring(oo.gulag:really_alive_pop()))
 			-- KD (26.12.2016): неправильно по сути считать общее население смарта. Надо проверять тех, кто был назначен на работу и пришел на нее
 			if oo and oo.gulag:get_population_comed() == 0 then
---			if oo and oo.gulag:really_alive_pop() == 0 then
 				self.task_info[self.active_task_by_type[p1]].status = "completed"
 				if self.task_info[self.active_task_by_type[p1]].info then
 					db.actor:give_info_portion(self.task_info[self.active_task_by_type[p1]].info)

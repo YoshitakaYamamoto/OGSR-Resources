@@ -1123,7 +1123,7 @@ function pri_followers_can_hear(actor, npc)
 
     return not has_alife_info("pri_followers_start") or           
            gulag ~= nil and gulag:get_population() > 0 and
-           not gulag:npc_is_enemy_to_anybody(actor)
+           not xr_gulag.isGulagEnemy( 823, actor )
 end
 
 function pri_monolith_combat_ignore(actor, npc)
@@ -1712,19 +1712,18 @@ function npc_has_item(actor, npc, p)
 	return p[1] ~= nil and npc:object( p[1] ) ~= nil
 end
 
-function dist_to_friendly_npc_le(actor, npc, p)
-    local d = p[2]
-	local gulag = xr_gulag.get_gulag_by_name(p[1])
-	if (gulag) then
-		for npc_id, is_npc in pairs(db.creature) do
-			if is_npc then
-				local npc_chk = level.object_by_id(npc_id)
-				if npc_chk and npc_chk:alive() then
-					if not gulag:npc_is_enemy_of_stalkers(npc_chk) then
-						if npc:position():distance_to_sqr(npc_chk:position()) <= d * d and not npc_chk:is_actor() then
-							return true
-						end					
-					end	
+
+--Вот эта функция отвечает за автоматическое открывание двери в бар МГ перед сталкерами, не вражескими по отношению к населению бара
+function dist_to_friendly_npc_le(_, door, tbl)
+	local gulag_name, dist = tbl[1], tbl[2] * tbl[2]
+	for npc_id, is_npc in pairs( db.creature ) do
+		if is_npc then
+			local npc_chk = level.object_by_id( npc_id )
+			if npc_chk and npc_chk:alive() and not npc_chk:is_actor() then
+				if door:position():distance_to_sqr( npc_chk:position() ) <= dist then
+					if not xr_gulag.isGulagEnemy( gulag_name, npc_chk ) then
+						return true
+					end
 				end
 			end
 		end

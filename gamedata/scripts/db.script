@@ -13,7 +13,6 @@ cars                = {}
 camp_storage        = {} --TODO: вынести в mob_camp.
 story_by_id	        = {}
 trader              = nil --TODO: Вынести в mob_trader
---info_restr          = {} --После тестов надо удалить
 creature            = {} -- true - человек, false - животное (исключая торговца)
 artefacts			= {} --TODO: вынести в bind_artefact.
 

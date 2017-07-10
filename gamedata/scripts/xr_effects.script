@@ -1444,13 +1444,10 @@ end
 function mil_emeny_nearest (actor, npc)
     if actor == nil or actor:alive () == false then
        return
-    end    
+    end
 
-    local gulag = xr_gulag.get_gulag_by_name ("mil_freedom")
-    if gulag == nil then return end
-
-    if gulag:npc_is_enemy_to_anybody(actor) then
-       actor:give_info_portion ("mil_enemy_nearest")
+	if xr_gulag.isGulagEnemy( "mil_freedom", actor ) then
+       actor:give_info_portion("mil_enemy_nearest")
     end
 end
 

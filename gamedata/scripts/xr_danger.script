@@ -372,15 +372,6 @@ function evaluator_danger:evaluate()
 	
 	write_log("!!XR_DANGER_20 [%s]", self.object:name())
 
-	-- Отсеиваем по информационным рестрикторам
-	--if xr_gulag.is_info_restricted(self.object:id(), best_danger:position()) then
-		-- printf("DANGER [%s]->[%s] [FALSE] info restrictor", self.object:name(), best_danger_name)
-	--	write_log("!!XR_DANGER_RESTRICT [%s]", self.object:name())
-	--	return false
-	--end
-
-	--write_log("!!XR_DANGER_21 [%s]", self.object:name())
-
 	-- Отсеиваем тяжелораненых
 	if xr_wounded.is_heavy_wounded_by_id(self.object:id()) then
 		write_log("!!XR_DANGER_WOUNDED [%s]", self.object:name())
