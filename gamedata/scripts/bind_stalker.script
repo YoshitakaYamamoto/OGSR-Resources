@@ -19,6 +19,12 @@ function actor_binder:__init(obj) super(obj)
 end
 function actor_binder:__finalize()
 	self.am:call("on_finalize", obj)
+	--
+	log3("[bind_stalker] actor_binder finalize %s", debug.traceback()) --��������, ��� �������� ������� �������� �������, ���� get_hud(),
+	--��-�� ������� ���������� ����� ��� �������� ������ ����� ����� ������:
+	-- 0023:002E46B6 xrLUA_GSC.dll, luabind::detail::stack_content_by_name()
+	-- 0023:002E4A54 xrLUA_GSC.dll, luabind::detail::stack_content_by_name()
+	-- 0023:002E4B5C xrLUA_GSC.dll, luabind::weak_ref::~weak_ref()
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:net_spawn(data)
