@@ -520,12 +520,14 @@ function abort(fmt, ...)
 	log3(fmt, ...)
 	cmd("flush")
 
-	local hud = get_hud()
-	local critical = hud:GetCustomStatic("btr_critical")
-	if not critical then
-		hud:AddCustomStatic("btr_critical", true)
-		critical = hud:GetCustomStatic("btr_critical"):wnd()
-		critical:SetText(crash_text)
+	if ogse.check_game() then
+		local hud = get_hud()
+		local critical = hud:GetCustomStatic("btr_critical")
+		if not critical then
+			hud:AddCustomStatic("btr_critical", true)
+			critical = hud:GetCustomStatic("btr_critical"):wnd()
+			critical:SetText(crash_text)
+		end
 	end
 
 	if crash_counter == 0 then
