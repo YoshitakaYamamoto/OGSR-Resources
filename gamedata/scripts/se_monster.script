@@ -167,6 +167,9 @@ end
 function se_monster:on_before_register()
 	ogse_signals.get_mgr():call( "se_monster_on_before_register", self )
 	self:fill_exclusives()
+	if not self.has_none_true then
+		self.has_none_true = not self:alive()
+	end
 	if self.has_none_true then
 		self:brain():can_choose_alife_tasks( false )
 	end
