@@ -138,13 +138,14 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 
 	local snd_t = recognize_sound(sound_type)
 
+--[=[
 	local blow = hit()
 	blow.power = 0.001
 	blow.impulse = 1
 	blow.draftsman = who
 	blow.type = hit.wound
 	blow.direction = utils.vector_copy_by_val(self:position()):sub(who:position())
-
+--]=]
 	-- Если тип задан проверим реакцию на него
 	if snd_t and snd_t ~= "NIL" and not self:best_enemy() then
 		if ( who:is_stalker() or who:is_actor() ) and self:relation(who) == game_object.enemy and self:binded_object():enemy_callback( self, who ) then
@@ -224,7 +225,7 @@ function check_sound(self, who, sound_type, sound_position, sound_power)
 				self:set_mental_state(anim.danger)
 				--self:make_object_visible_somewhen(who)
 			elseif snd_t == "MST_attack" then
-				self:hit(blow)
+				--self:hit(blow) --KRodin: убрал хит и тут, посмотрим
 				stop_play_sound(self)
 				self:set_sight(look.point,sound_position)
 				self:set_mental_state(anim.danger)
@@ -247,12 +248,11 @@ function motivator_binder:__init (obj) super(obj)
 end
 
 function motivator_binder:extrapolate_callback(cur_pt)
-    if not self.object then return false end
 	if self.st.active_section then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "extrapolate_callback")
 		self.st.move_mgr:extrapolate_callback(self.object)
 	end
-
+	--
 	if patrol(self.object:patrol()):flags(cur_pt):get() == 0 then
 		return true
 	end
@@ -260,13 +260,9 @@ function motivator_binder:extrapolate_callback(cur_pt)
 end
 
 function motivator_binder:reinit()
-    if not self.object then return end
 --log3("~~[%s] Start reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 
     object_binder.reinit(self)
-
---КОЛЛБЕКИ ЗДЕСЬ СТАВИТЬ НЕЛЬЗЯ! Здесь еще неизвестна активная схема.
---Ставьте коллбеки в методе net_spawn в отмеченном комментарием месте.
 
     db.storage[self.object:id()] = {  followers = {} }
     self.st = db.storage[self.object:id()]
@@ -280,7 +276,6 @@ function motivator_binder:reinit()
 --log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
-local debug_flag = false
 function motivator_binder:net_spawn(sobject)
 	ASSERT( db.net_spawning_obj == nil, "found net_spawning_obj = %s", db.net_spawning_obj and db.net_spawning_obj:name() or "" )
 	db.net_spawning_obj = self.object
@@ -290,44 +285,12 @@ function motivator_binder:net_spawn(sobject)
 	if not object_binder.net_spawn(self, sobject) then db.net_spawning_obj = nil return false end
 
 	db.add_obj(self.object)
-
-	if not self.loaded then
-		self.loaded = xr_logic.load_logic_online(self.object)
-		local st = self.st
-		st.loaded_ini_filename = st.ini_filename
-		st.loaded_section_logic = st.section_logic
-		st.loaded_active_section = st.active_section
-		st.loaded_gulag_name = st.gulag_name
-	end
-
--------------------------------[Все CALLBACK-и ставить здесь]---------------------------------------
-	self.object:set_patrol_extrapolate_callback(self.extrapolate_callback, self)
-	self.object:set_callback(callback.hit, self.hit_callback, self)
-	self.object:set_callback(callback.death, self.death_callback, self)
+	--
 	self.object:set_callback(callback.use_object, self.use_callback, self)
-	self.object:set_callback(callback_ex.entity_alive_before_hit, self.before_hit_callback, self)
-	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)	
-	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
-	if not ogse.is_quest_npc(self.object) then
-		self.object:set_callback(callback.sound, self.hear_callback, self)
-	end
-	self.object:set_enemy_callback( self.enemy_callback, self )
-----------------------------------------------------------------------------------------------------
-	
-	self.am:call( "on_npc_before_spawn", self.object, self )
-
+	--
 	self:subscribe_updaters()
-
-    --Загрузка историй для лагеря.
-	if self.loaded == false then --KRodin: а зачем это?
-		local char_ini = self.object:spawn_ini() or dsh.cached_ini_file("scripts\\dummy.ltx")
-		xr_info.loadInfo(self.object, char_ini)
-	end
-
+	--
 	if not self.object:alive() then
-		if xr_companion.is_companion(self.object:id()) then
-			xr_companion.save_var_companion(self.object:id(), "is_companion", 0)
-		end
 		--' Наносим небольшой импульс вперед.
 		local h = hit()
 		h.draftsman = self.object
@@ -349,45 +312,32 @@ function motivator_binder:net_spawn(sobject)
 		end
 --]=]
 		if s_obj.offline_dead == 1 then
-			if debug_flag then
-				log1("--ВНИМАНИЕ! Обнаружен погибший в оффлайне! Объект: ИД: "..self.object:id().." ИМЯ:"..self.object:name().." Будет произведена обработка лута и постановка объекта на удаление!")					
-				db.actor:give_game_news(game.translate_string("bind_monster_debug1")..self.object:id()..game.translate_string("bind_monster_debug2")..self.object:name()..game.translate_string("bind_monster_debug3"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
-			end
-
-			if self.st.death then
-				xr_logic.issue_event(self.object, self.st.death, "death_callback", self.object, self.object)
-			end
-
-			if self.st.active_section then
-				xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", self.object, self.object)
-			end
-
-			sr_territory.issue_event(self.object, "death_callback", self.object, self.object)
-
-			self:clear_callbacks()
-
 			self.object:iterate_inventory(death_manager.keep_item)
-
 			s_obj.offline_dead = game.time()+(1*24*60*60*1000)
 		elseif s_obj.offline_dead > 1 and s_obj.offline_dead <= game.time() then
 			if not death_manager.offline_dead_quest_check(self.object) then
-				if debug_flag then
-					log1("--ВНИМАНИЕ! Обнаружен уже обработанный погибший в оффлайне! Объект: ИД: "..self.object:id().." ИМЯ:"..self.object:name().." Будет произведено удаление объекта!")
-					db.actor:give_game_news(game.translate_string("bind_monster_debug21")..self.object:id()..game.translate_string("bind_monster_debug2")..self.object:name()..game.translate_string("bind_monster_debug22"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
-				end
 				checker_minefield.add_to_delete(self.object:id())
 			end
 		end
 
-		--self.am:call( "on_npc_spawn", self.object, self )
 		db.net_spawning_obj = nil
 		return true
 	end
-
+	--
+	self.object:set_patrol_extrapolate_callback(self.extrapolate_callback, self)
+	self.object:set_callback(callback.hit, self.hit_callback, self)
+	self.object:set_callback(callback.death, self.death_callback, self)
+	self.object:set_callback(callback_ex.entity_alive_before_hit, self.before_hit_callback, self)
+	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)	
+	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
+	if not ogse.is_quest_npc(self.object) then
+		self.object:set_callback(callback.sound, self.hear_callback, self)
+	end
+	self.object:set_enemy_callback( self.enemy_callback, self )
+	--
 	local manager = self.object:motivation_action_manager()
 	manager:remove_evaluator(stalker_ids.property_anomaly)
 	manager:add_evaluator(stalker_ids.property_anomaly, property_evaluator_const(false))
-
 	if xr_combat_companion then
 		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(xr_combat_companion.prop_combat, property_evaluator_const(false))
@@ -405,17 +355,34 @@ function motivator_binder:net_spawn(sobject)
 		manager:add_evaluator(xrs_grenade.prop_fire, property_evaluator_const(false))
 		manager:add_evaluator(xrs_grenade.prop_grenade, property_evaluator_const(false))
 	end
-
 	if ogsm_hideout then
 		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(ogsm_hideout.property_blowout, property_evaluator_const(false))
 		manager:add_evaluator(ogsm_hideout.property_hideout_lost, property_evaluator_const(false))
 		manager:add_evaluator(ogsm_hideout.property_inhide, property_evaluator_const(false))
 	end
-
+	--
+	if not self.loaded then --Нужно для того, чтоб логика сохранялась/загружалась при перебросе непися в оффлайн/онлайн. В этом случае метод load() не вызывается.
+		self.loaded = xr_logic.load_logic_online(self.object)
+		local st = self.st
+		st.loaded_ini_filename = st.ini_filename
+		st.loaded_section_logic = st.section_logic
+		st.loaded_active_section = st.active_section
+		st.loaded_gulag_name = st.gulag_name
+	end
+	--
+	self.am:call( "on_npc_before_spawn", self.object, self ) --тут происходит загрузка озвучки
+	--
+	--Загрузка историй для лагеря.
+	if not self.loaded then --KRodin: а зачем это?
+		local char_ini = self.object:spawn_ini() or dsh.cached_ini_file("scripts\\dummy.ltx")
+		xr_info.loadInfo(self.object, char_ini) --Надо поглядеть, что там
+	end
+	--
 	xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_stalker, self.loaded )
-
+	--
 	self.am:call( "on_npc_spawn", self.object, self )
+	--
 	db.net_spawning_obj = nil
 	return true
 end
@@ -679,8 +646,6 @@ function motivator_binder:save(packet)
 	ASSERT( db.saving_obj == nil, "found saving_obj = %s", db.saving_obj and db.saving_obj:name() or "" )
 	db.saving_obj = self.object
 
-	xr_logic.pstor_store(self.object, "anom_invis", get_anomaly_invisibility(self.object))
-
 	xr_logic.pstor_store(self.object, "is_invulnerable", self.object:invulnerable())
 
 	object_binder.save(self, packet)
@@ -725,9 +690,6 @@ function motivator_binder:load(reader)
 	dialog_manager.load(self.object, reader, self.npc_script_version)
 
 	trade_manager.load(self.object, reader)
-
-	local anom_invis = xr_logic.pstor_retrieve(self.object, "anom_invis", false)
-	set_anomaly_invisibility(self.object, anom_invis)
 
 	local is_invulnerable = xr_logic.pstor_retrieve(self.object, "is_invulnerable", false)
 	self.object:invulnerable(is_invulnerable)

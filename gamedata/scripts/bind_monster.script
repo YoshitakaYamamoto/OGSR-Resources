@@ -31,16 +31,9 @@ function generic_object_binder:reinit()
 
 	db.storage[self.object:id()] = {}
 	self.st = db.storage[self.object:id()]
-
-	self.object:set_callback(callback.patrol_path_in_point, self.waypoint_callback, self)
-	self.object:set_callback(callback.hit, self.hit_callback, self)
-	self.object:set_callback(callback.death, self.death_callback, self)
-	--self.object:set_callback(callback.use_object, self.use_callback, self)
-	self.object:set_callback(callback_ex.entity_alive_before_hit, self.before_hit_callback, self)
 --log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
-local debug_flag = false
 function generic_object_binder:net_spawn(sobject)
 	ASSERT( db.net_spawning_obj == nil, "found net_spawning_obj = %s", db.net_spawning_obj and db.net_spawning_obj:name() or "" )
 	db.net_spawning_obj = self.object
@@ -49,14 +42,12 @@ function generic_object_binder:net_spawn(sobject)
 
 	if not object_binder.net_spawn(self, sobject) then db.net_spawning_obj = nil return false end
 
-	self:subscribe_updaters()
-
 	db.add_obj(self.object)
-
-	self.object:set_enemy_callback( self.enemy_callback, self )
-
-	xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_mobile, self.loaded )
-
+	--
+	self:subscribe_updaters()
+	--
+	--self.object:set_callback(callback.use_object, self.use_callback, self)
+	--
 	if not self.object:alive() then
 		--' Наносим небольшой импульс вперед.
 		local h = hit()
@@ -70,35 +61,23 @@ function generic_object_binder:net_spawn(sobject)
 
 		local s_obj = alife():object(self.object:id())
 		if s_obj.offline_dead == 1 then
-			if debug_flag then
-				log1("--ВНИМАНИЕ! Обнаружен погибший в оффлайне! Объект: ИД: "..self.object:id().." ИМЯ:"..self.object:name().." Будет произведена обработка лута и постановка объекта на удаление!")		
-				db.actor:give_game_news(game.translate_string("bind_monster_debug1")..self.object:id()..game.translate_string("bind_monster_debug2")..self.object:name()..game.translate_string("bind_monster_debug3"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
-			end
-
-			if self.st and self.st.mob_death then
-				xr_logic.issue_event(self.object, self.st.mob_death, "death_callback", self.object, self.object)
-			end
-
-			if self.st and self.st.active_section then
-				xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", self.object, self.object)
-			end
-
-			self:clear_callbacks()
-
 			s_obj.offline_dead = game.time()+(1*24*60*60*1000)
 		elseif s_obj.offline_dead > 1 and s_obj.offline_dead <= game.time() then
-			if debug_flag then
-				log1("--ВНИМАНИЕ! Обнаружен уже обработанный погибший в оффлайне! Объект: ИД: "..self.object:id().." ИМЯ:"..self.object:name().." Будет произведено удаление объекта!")			
-				db.actor:give_game_news(game.translate_string("bind_monster_debug21")..self.object:id()..game.translate_string("bind_monster_debug2")..self.object:name()..game.translate_string("bind_monster_debug22"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
-			end
-
 			checker_minefield.add_to_delete(self.object:id())
 		end
 
 		db.net_spawning_obj = nil
 		return true
 	end
-
+	--
+	self.object:set_callback(callback.patrol_path_in_point, self.waypoint_callback, self)
+	self.object:set_callback(callback.hit, self.hit_callback, self)
+	self.object:set_callback(callback.death, self.death_callback, self)
+	self.object:set_callback(callback_ex.entity_alive_before_hit, self.before_hit_callback, self)
+	self.object:set_enemy_callback( self.enemy_callback, self )
+	--
+	xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_mobile, self.loaded )
+	--
 	self.am:call( "on_monster_spawn", self.object, self )
 	db.net_spawning_obj = nil
 	return true
@@ -194,18 +173,6 @@ function generic_object_binder:death_callback(victim, who)
 	end
 
 	smart_terrain.on_death( self.object:id() )
-
-	--' Наносим небольшой импульс вперед.
-	local h = hit()
-	h.draftsman = self.object
-	h.type = hit.fire_wound
-	--if db.actor ~= nil then -- добавлено KamikaZze  с целью отладки 25/02/2009
-		h.direction = db.actor:position():sub(self.object:position())
-	--end
-	h:bone("pelvis")
-	h.power = 1
-	h.impulse = 10
-	self.object:hit(h)
 
 	self.am:call( "on_monster_death", self.object, who )
 end
