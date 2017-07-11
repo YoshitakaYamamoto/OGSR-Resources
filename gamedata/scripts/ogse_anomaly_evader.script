@@ -15,14 +15,6 @@ last_position = {}
 
 
 local excluded_npc = { --Запретные профили/имена/story_id
-	--["bar_ecolog_professor"] = true, --Круглов
-	["dik_the_drifter"] = true,
-	["zona_brother1"] = true,
-	["zona_brother2"] = true,
-	--["val_escort_captive"] = true,
-	--["val_escort_nap1"] = true,
-	["bandit_trader"] =	true,
-	["bandit_trader_spawn"]	= true,		
 }
 local excluded_sect = { --Запретные аномалии
 	["burning_fuzz"] = true,
@@ -30,9 +22,6 @@ local excluded_sect = { --Запретные аномалии
 }
 local excluded_comms = { --Запретные коммунити
 	["zombied"] = true,
-	["trader"] = true,
-	["gunsmith"] = true,
-	["guider"] = true,
 }
 local excluded_locations = { --Запретные локации
 	--["l03u_agr_underground"] = true,
@@ -70,9 +59,10 @@ function can_evade(npc)
 end
 
 function on_monster_spawn( obj, binder )
-  added_restrictions[ obj:id() ] = {}
-
   if not can_evade(obj) then return end
+  --
+  added_restrictions[ obj:id() ] = {}
+  --
   local s = {
     [ "signal" ] = "on_monster_update." .. obj:id(),
     [ "fun"    ] = this.update_norm,
@@ -83,9 +73,14 @@ function on_monster_spawn( obj, binder )
 end
 
 function on_npc_spawn( obj, binder )
-  added_restrictions[ obj:id() ] = {}
-
   if not can_evade(obj) then return end
+  --
+  added_restrictions[ obj:id() ] = {}
+  --
+  if obj:relation( db.actor ) ~= game_object.enemy then
+    set_anomaly_invisibility( obj, true )
+  end
+  --
   local s = {
     [ "signal" ] = "on_npc_update." .. obj:id(),
     [ "fun"    ] = this.update_norm,
@@ -125,6 +120,9 @@ function cleanup( obj )
 	end
 	added_restrictions[nid] = nil
 	last_position[nid]      = nil
+	if get_anomaly_invisibility( obj ) then
+      set_anomaly_invisibility( obj, false )
+    end
 end
 
 function update_norm(npc)

@@ -60,17 +60,9 @@ end
 
 
 function set_zona_bro1_invulnerable()
-	local npc = level_object_by_sid(story_ids.zona_brother1)
-	if npc ~= nil and npc:alive() == true then
-		set_anomaly_invisibility(npc, true)
-	end
 end
 
 function set_zona_bro2_invulnerable()
-	local npc = level_object_by_sid(story_ids.zona_brother2)
-	if npc ~= nil and npc:alive() == true then
-		set_anomaly_invisibility(npc, true)
-	end
 end
 
 function companion_goodbye()  --  посылаем напарника в вольное плавание
@@ -157,10 +149,6 @@ function spawn_ds_nalet_band_8()
 end
 
 function set_ds_bloha_invulnerable()
-	local npc = level_object_by_sid(story_ids.ds_nalet_band_8)
-	if npc ~= nil and npc:alive() == true then
-		set_anomaly_invisibility(npc, true)
-	end
 end
 
 -- Спавним бандитов на хуторке ---------------------------------------------------------------------
@@ -192,10 +180,6 @@ function spawn_ds_hunter()
 end
 
 function set_ds_hunter_invulnerable()
-	local npc = level_object_by_sid(story_ids.ds_hunter)
-	if npc ~= nil and npc:alive() == true then
-		set_anomaly_invisibility(npc, true)
-	end
 end
 
 -- Спавним тайное братство -------------------------------------------------------------------------
@@ -205,10 +189,6 @@ function spawn_bratstvo_lider()
 end
 
 function set_bratstvo_lider_invulnerable()
-	local npc = level_object_by_sid(story_ids.bratstvo_lider)
-	if npc ~= nil and npc:alive() == true then
-		set_anomaly_invisibility(npc, true)
-	end
 end
 
 function spawn_bratstvo_orujeinik()
@@ -216,10 +196,6 @@ function spawn_bratstvo_orujeinik()
 end
 
 function set_bratstvo_orujeinik_invulnerable()
-	local npc = level_object_by_sid(story_ids.bratstvo_orujeinik)
-	if npc ~= nil and npc:alive() == true then
-		set_anomaly_invisibility(npc, true)
-	end
 end
 
 function spawn_bratstvo_vrach()
@@ -227,10 +203,6 @@ function spawn_bratstvo_vrach()
 end
 
 function set_bratstvo_vrach_invulnerable()
-	local npc = level_object_by_sid(story_ids.bratstvo_vrach)
-	if npc ~= nil and npc:alive() == true then
-		set_anomaly_invisibility(npc, true)
-	end
 end
 
 function spawn_bratstvo_cleaner()
@@ -238,10 +210,6 @@ function spawn_bratstvo_cleaner()
 end
 
 function set_bratstvo_cleaner_invulnerable()
-	local npc = level_object_by_sid(story_ids.bratstvo_cleaner)
-	if npc ~= nil and npc:alive() == true then
-		set_anomaly_invisibility(npc, true)
-	end
 end
 
 -- Лекарь и Бывалый в подвальчике ------------------------------------------------------------------
@@ -1991,10 +1959,6 @@ end
 -- Воскрешение Бродяги Дика ------------------------------------------------------------------------
 
 function set_drifter_invulnerable()
-	local npc = level_object_by_sid(story_ids.dik_the_drifter)
-	if npc then
-		set_anomaly_invisibility(npc, true)
-	end
 end
 
 function respawn_drifter()
@@ -3755,21 +3719,9 @@ function set_captive_band_friend()
 end
 
 function set_nap_invulnerable()
---[=[
-	local npc = level_object_by_sid(story_ids.val_escort_nap1)
-	if npc:alive() then
-		set_anomaly_invisibility(npc, true)
-	end
---]=]
 end
 
 function set_captive_invulnerable()
---[=[
-	local npc = level_object_by_sid(story_ids.val_escort_captive)
-	if npc:alive() then
-		set_anomaly_invisibility(npc, true)
-	end
---]=]
 end
 
 -- Радист на Янтаре --------------------------------------------------------------------------------
@@ -4483,10 +4435,6 @@ function spawn_caravan_loader()
 end
 
 function set_caravan_loader_invulnerable()
-	local npc = level_object_by_sid(story_ids.caravan_loader)
-	if npc ~= nil and npc:alive() == true then
-		set_anomaly_invisibility(npc, true)
-	end
 end
 
 
