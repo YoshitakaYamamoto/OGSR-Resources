@@ -1277,6 +1277,21 @@ function load_obj(obj, reader)
 end
 
 function get_customdata_or_ini_file(npc, filename)
+  local dsh_sect = "dsh.xr_logic.get_customdata_or_ini_file"
+  if sys_ini:section_exist( dsh_sect ) then
+    local npc_sect
+    if type( npc.id ) == "function" then
+      npc_sect = npc:section()
+    else
+      npc_sect = npc:section_name()
+    end
+    local ini_fname = get_string( dsh_sect, npc_sect )
+    if not ini_fname then
+      ini_fname = get_string( dsh_sect, npc:name() )
+    end
+    if ini_fname then return dsh.cached_ini_file( ini_fname ) end
+  end
+  --
 	if filename == "<customdata>" then
 		return npc:spawn_ini() or dsh.cached_ini_file("scripts\\dummy.ltx")
 	elseif string.find( filename, "*" ) == 1 then --динамический ltx
@@ -1302,8 +1317,19 @@ function initialize_obj(obj, st, loaded, actor, stype)
 		local ini_filename = st.loaded_ini_filename
 		if ini_filename then
 			local ini = get_customdata_or_ini_file(obj, ini_filename)
-			ini = xr_logic.configure_schemes(obj, ini, ini_filename, stype, st.loaded_section_logic, st.loaded_gulag_name)
-			xr_logic.activate_by_section(obj, ini, st.loaded_active_section, true)
+			if not ini:section_exist( st.loaded_section_logic ) and st.loaded_gulag_name then --Костыль, чтобы не требовалась НИ при изменении логики гулагов
+				log3("!![%s.initialize_obj] object [%s] unable to find gulag logic section [%s] Reloading logic...", script_name(), obj:name(), st.loaded_section_logic)
+				ogse.reset_npc_logic(obj)
+				xr_gulag.resetJob(obj)
+				local sobj = alife():object(obj:id())
+				ASSERT(sobj, "")
+				smart_terrain.unregister_npc( sobj )
+				sobj:brain():update()
+				return
+			else
+				ini = xr_logic.configure_schemes(obj, ini, ini_filename, stype, st.loaded_section_logic, st.loaded_gulag_name)
+				xr_logic.activate_by_section(obj, ini, st.loaded_active_section, true)
+			end
 		end
 	end
 end
