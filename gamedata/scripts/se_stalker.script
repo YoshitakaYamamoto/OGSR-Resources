@@ -1,47 +1,3 @@
-local bar_exceptions = {
-   [4294967296] = true,
-   [story_ids.second_neutral] = true,
-   [story_ids.bar_kulg_agent] = true,
-   [story_ids.bar_sergant_jivoderov] = true,
-   [story_ids.izgoy_lider] = true,
-   [story_ids.izgoy_pomoshnik] = true,
-   [story_ids.izgoy_first_patient] = true,
-   [story_ids.izgoy_second_patient] = true
-}
-local military_online_npc = {
-	[story_ids.Mil_Lukash]     = true, -- Лукаш
-	[story_ids.Mil_Miser]      = true, -- Скряга
-	[story_ids.Mil_Master_Max] = true, -- Макс
-	[story_ids.Mil_Cook]       = true, -- повар
-}
-local function cannot_be_offline(npc)
-	if alife():level_id() == 7 then
-		local story = 4294967296
-		if npc then
-			if npc.m_story_id ~= nil then
-				story = npc.m_story_id
-			else
-				story = npc:story_id()
-			end
-		end
-		return not bar_exceptions[story]
-	elseif alife():level_id() == 1 then
-		local profile = npc:profile_name()
-		if profile == "esc_wolf" or 
-		   profile == "esc_shustryi"
-		then
-			return true
-		end
-	elseif alife():level_id() == 11 then
-		if military_online_npc[npc.m_story_id] then return true end
-		local profile = npc:profile_name()
-		if profile == "mil_Svoboda_engineer" -- для Шурупа нет story_id, надо бы добавить
-		then
-			return true
-		end
-	end
-	return false
-end
 
 class "se_stalker"	(cse_alife_human_stalker)
 function se_stalker:__init (section) super (section)
@@ -94,14 +50,10 @@ function se_stalker:can_switch_offline ()
 	if self.force_offline then
 		can_be_offline = true
 	else	
-		if cannot_be_offline(self) then
-			can_be_offline = false
-		else	
-			if self:get_job_online() ~= nil then
-				can_be_offline = not self:get_job_online()
-			else
-				can_be_offline = cse_alife_human_stalker.can_switch_offline (self)
-			end
+		if self:get_job_online() ~= nil then
+			can_be_offline = not self:get_job_online()
+		else
+			can_be_offline = cse_alife_human_stalker.can_switch_offline (self)
 		end
 	end
 	if
@@ -121,9 +73,6 @@ function se_stalker:can_switch_online ()
 	if xr_companion.is_companion(self.id) and (db.actor and db.actor:position():distance_to(self.position) < 150) then
 		return true
 	end		
-	if cannot_be_offline(self) then
-		return true
-	end
 
 	if self:get_job_online() ~= nil then
 		return self:get_job_online()
@@ -133,9 +82,9 @@ function se_stalker:can_switch_online ()
 		return cse_alife_human_stalker.can_switch_online(self)
 	end
     
-    if db.actor and not db.actor:alive() then
+	if db.actor and not db.actor:alive() then --?
 		return self.online
-    end
+	end
     
 	if self.online == false then
 	    return (xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil) and cse_alife_human_stalker.can_switch_online(self)
