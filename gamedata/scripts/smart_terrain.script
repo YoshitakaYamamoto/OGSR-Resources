@@ -363,10 +363,10 @@ function se_smart_terrain:read_params()
 	--
 	self:dsh_override_params()
 	--
-	self.accepted_communities = {}
 	if self.communities then
 		local t = parse_names( self.communities )
 		for i, v in ipairs( t ) do
+			if not self.accepted_communities then self.accepted_communities = {} end
 			self.accepted_communities[v] = true
 		end
 	end
@@ -446,7 +446,7 @@ function se_smart_terrain:smart_terrain_accepts_obj( obj, obj_agreement )
 		end
 		--
 		--Если в кастомдате смарта есть перечень допустимых группировок и непись не попадает в эту группировку
-		if not self.accepted_communities[community] then
+		if self.accepted_communities and not self.accepted_communities[community] then
 			return false
 		end
 		--
@@ -463,7 +463,7 @@ function se_smart_terrain:smart_terrain_accepts_obj( obj, obj_agreement )
 		end
 		--
 		--Если непись не эксклюзивный, проверяем, не враждебен ли он тем, кто уже есть в смарте. Если враждебен - не принимаем.
-		if is_stalker and obj_agreement ~= agreed_exclusive then
+		if is_stalker and self.accepted_communities and obj_agreement ~= agreed_exclusive then
 			if xr_gulag.isGulagEnemy( self.gulag.name, obj ) then
 				--log3( "~~[%s] gulag [%s] is enemy for [%s]", script_name(), self.gulag.name, obj:name() )
 				return false
@@ -1021,28 +1021,37 @@ end
 -- https://github.com/dsh2dsh/op2ogse/commit/d95b91610c4b346ab7cc08ef17e1c3a7ba9ed9fc
 function read_smart_terrain_conditions( self )
   local ini = self.ini
-  if ini then
-    if
-      ( not ini:section_exist( smart_section ) )
-      and ini:section_exist( "logic" )
-    then
-      local cfg = get_string( "logic", "cfg", nil, ini )
-      if cfg then
-		log3("~~[smart_terrain %s]: Smart section not found in spawn_ini(). Will be used logic file: [%s]", self:name(), cfg)
-        ini = dsh.cached_ini_file( cfg )
+  local sect = smart_section
+  local dsh_sect = "dsh.se_stalker." .. self:name() .. ".smart_terrains"
+  --
+  if sys_ini:section_exist( dsh_sect ) then
+    ini  = sys_ini
+    sect = dsh_sect
+  else
+    if ini then
+      if
+        ( not ini:section_exist( sect ) )
+        and ini:section_exist( "logic" )
+      then
+        local cfg = get_string( "logic", "cfg", nil, ini )
+        if cfg then
+		  log3("~~[smart_terrain %s]: Smart section not found in spawn_ini(). Will be used logic file: [%s]", self:name(), cfg)
+          ini = dsh.cached_ini_file( cfg )
+        end
       end
     end
   end
-  if ini and ini:section_exist( smart_section ) then
+  --
+  if ini and ini:section_exist( sect ) then
     local has_none_true = false
     local conds = {}
     local accepts = false
-    local n = ini:line_count( smart_section )
+    local n = ini:line_count( sect )
     if n > 0 then
       for i = 0, n - 1 do
-        local result, field, str = ini:r_line( smart_section, i, "", "" )
+        local result, field, str = ini:r_line( sect, i, "", "" )
         conds[ field ] = xr_logic.parse_condlist(
-          self, smart_section, field, str
+          self, sect, field, str
         )
 		if field == "none" and str == "true" then
           has_none_true = true

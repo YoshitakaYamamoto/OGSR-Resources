@@ -152,8 +152,8 @@ function gulag:dsh_get_gulag_switches( ini, sect )
   if can_raid then
     local sect = "dsh.gulag.override." .. self.name
     if sys_ini:section_exist( sect ) then
-      switch_0 = get_string( sect, "switch_0", "" )
-      switch_1 = get_string( sect, "switch_1", "" )
+      switch_0 = get_string( sect, "switch_0", switch_0 )
+      switch_1 = get_string( sect, "switch_1", switch_1 )
     end
   else
     switch_0 = "true"
