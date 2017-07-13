@@ -2364,9 +2364,7 @@ function oso_init_dialod ()
 	-- db.actor:run_talk_dialog(oso)
 end
 
-function add_in_restrictor(actor, npc, p)
-	log1("[XR EFFECTS] ADDING IN RESTRICTION "..p[1].." FOR "..npc:name())
-	npc:add_restrictions("", p[1])
+function add_in_restrictor(actor, npc, p) --Более не использовать!
 end
 
 function add_out_restrictor(actor, npc, p)
