@@ -88,7 +88,7 @@ function evaluator_shoot:evaluate()
 				end
 		   end
 		end
-		ogse_debug.add_active_eval( self.object, script_name(), "shoot" )
+		ogse_debug.add_active_eval( self.object, script_name(), "shoot_hh" )
 		return true
 	end
 

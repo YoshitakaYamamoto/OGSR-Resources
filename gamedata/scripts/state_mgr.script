@@ -115,8 +115,12 @@ function evaluator_state_mgr_idle_alife:evaluate()
 			if self.st.alife == true then 
 				ogse_debug.add_active_eval( self.object, script_name(), "idle_alife" )
 				return true 
-			end		
-			return t
+			end
+			if t == true then
+				ogse_debug.add_active_eval( self.object, script_name(), "idle_alife_2" )
+				return true
+			end
+			return false
 		else
 			return false
 		end
@@ -264,7 +268,6 @@ function eva_state_mgr_locked:evaluate()
 	local test_dirlock = self.st.planner:initialized() and self.st.planner:evaluator(self.st.properties["direction_turning"]):evaluate()
 
 	if output == true then
-		
 		if test_animstatelock == true then
 			ogse_debug.add_active_eval( self.object, script_name(), "lk_animst" )
 		end
@@ -273,10 +276,10 @@ function eva_state_mgr_locked:evaluate()
 		end
 		if test_dirlock == true then
 			ogse_debug.add_active_eval( self.object, script_name(), "lk_dir" )
-		end		
-
+		end
+		return true
 	end
-	return output
+	return false
 end
 
 --' Идловый экшн менеджера

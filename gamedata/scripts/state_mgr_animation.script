@@ -24,10 +24,11 @@ function eva_state_mgr_animation:evaluate()
 		write_log_3(self.object, "~~STMGR: animation false")
 		return false
 	end
-	-- if state_lib.states[self.st.target_state].animation == self.st.animation:state() then
-		-- ogse_debug.add_active_anim( self.object, "anim" )
-	-- end
-	return state_lib.states[self.st.target_state].animation == self.st.animation:state()
+	if state_lib.states[self.st.target_state].animation == self.st.animation:state() then
+		ogse_debug.add_active_anim( self.object, "anim" )
+		return true
+	end
+	return false
 end
 --' нужно ли нам отыгрывать извращенную анимацию
 class "eva_state_mgr_animation_play" (property_evaluator)
@@ -37,8 +38,9 @@ end
 function eva_state_mgr_animation_play:evaluate()
 	if state_lib.states[self.st.target_state].animation ~= nil then
 		ogse_debug.add_active_anim( self.object, string.format( "anim_play[%s]", tostring( state_lib.states[self.st.target_state].animation ) ) )
+		return true
 	end
-	return state_lib.states[self.st.target_state].animation ~= nil
+	return false
 end
 --' Отыгрываем ли мы сейчас извращенную анимацию
 class "eva_state_mgr_animation_play_now" (property_evaluator)
@@ -70,10 +72,11 @@ function eva_state_mgr_animation_none_now:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_animation_none_now:evaluate()
-	-- if self.st.animation:state() == nil then
-		-- ogse_debug.add_active_anim( self.object, "anim_none_now" )
-	-- end		
-	return self.st.animation:state() == nil
+	if self.st.animation:state() == nil then
+		ogse_debug.add_active_anim( self.object, "anim_none_now" )
+		return true
+	end		
+	return false
 end
 --' нужен ли схеме экстренный ресет
 class "eva_state_mgr_animation_reset" (property_evaluator)

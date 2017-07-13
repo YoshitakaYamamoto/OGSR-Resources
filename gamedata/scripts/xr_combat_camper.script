@@ -22,8 +22,9 @@ end
 function evaluator_combat_camper:evaluate()
 	if db.storage[self.object:id()].script_combat_type == "camper" then
 		ogse_debug.add_active_eval( self.object, script_name(), "camper_enabled" )
+		return true
 	end
-	return db.storage[self.object:id()].script_combat_type == "camper"
+	return false
 end
 
 --------------------------------------------------------------------------------------------------------------

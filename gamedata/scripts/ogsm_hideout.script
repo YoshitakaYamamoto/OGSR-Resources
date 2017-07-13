@@ -206,6 +206,7 @@ function evaluator_blowout:evaluate()
 	
 	if self.st.blowout == true then
 		ogse_debug.add_active_eval( self.object, script_name(), "blowout" )
+		return true
 	else
 		if not has_alife_info("blowout") and 
 		not has_alife_info("pre_blowout") and 
@@ -213,7 +214,7 @@ function evaluator_blowout:evaluate()
 			locked_vertexes = {}
 		end
 	end
-	return self.st.blowout == true
+	return false
 end
 
 -- Создаем эвалуатор - проверяем, потерял ли непись укрытие
@@ -243,8 +244,9 @@ function evaluator_hideout:evaluate()
 	end
 	if self.st.hideout_lost == true then
 		ogse_debug.add_active_eval( self.object, script_name(), "hideout" )
+		return true
 	end	
-	return self.st.hideout_lost == true
+	return false
 end
 
 -- Создаем эвалуатор - проверяем, сидит ли уже непись в укрытии
@@ -281,8 +283,9 @@ function evaluator_inhide:evaluate()
 	end
 	if self.st.inhide == true then
 		ogse_debug.add_active_eval( self.object, script_name(), "inhide" )
+		return true
 	end
-	return self.st.inhide == true
+	return false
 end 
 
 

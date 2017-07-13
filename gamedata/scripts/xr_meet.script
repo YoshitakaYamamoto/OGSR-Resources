@@ -54,14 +54,12 @@ function evaluator_contact:evaluate()
 		-- конец вставки
 		if tostring(self.a.meet_manager.state) ~= "nil"  then
 			ogse_debug.add_active_eval( self.object, script_name(), "contact" )
+			return true
 		end
-		
-		return tostring(self.a.meet_manager.state) ~= "nil" 
-		else
 		return false
-		
+	else
+		return false
 	end
-
 end
 
 -- “аблица запрещени€ попугаев

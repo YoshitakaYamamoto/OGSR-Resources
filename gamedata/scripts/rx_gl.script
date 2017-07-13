@@ -367,10 +367,11 @@ function evaluator_reload_gl:evaluate()
 		self.dif = nil
 	else
 		self.dif = true
-		if self.evn and self.evn == true then
+		if self.evn == true then
 			ogse_debug.add_active_eval( self.object, script_name(), "reload_gl" )
+			return true
 		end
-		return self.evn
+		return false
 	end
 	if self.wait < time_global() and check_ammo(npc) then
 		local in_cover = rx_utils.npc_in_cover(npc)
@@ -385,10 +386,11 @@ function evaluator_reload_gl:evaluate()
 	else
 		self.evn = false
 	end
-	if self.evn and self.evn == true then
-		ogse_debug.add_active_eval( self.object, script_name(), "reload_gl" )
+	if self.evn == true then
+		ogse_debug.add_active_eval( self.object, script_name(), "reload_gl_2" )
+		return true
 	end	
-	return self.evn
+	return false
 end
 function evaluator_reload_gl:hit_callback(amount)
 	self.wait = time_global()+amount*10000
