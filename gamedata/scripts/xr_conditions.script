@@ -1590,26 +1590,6 @@ end
 
 ---------------------------------------------------------------ARENA_EXTENSION_MOD------------------------------------------------------------------
 
-
-
-function is_shustriy_in_atp(actor, npc)
-	local npc = level_object_by_sid(004)
-	if not npc then
-		return false
-	end
-	return utils.npc_in_zone(npc, db.zone_by_name["esc_fabrika_bandit_space_restrictor"])
-end
-
-function is_shustriy_in_lager(actor, npc)
-	local npc = level_object_by_sid(004)
-	if not npc then
-		return false
-	end
-	return utils.npc_in_zone(npc, db.zone_by_name["esc_lager_guard_kill_zone"])
-end
-
-
-
 function is_yan_soldier_dead()
 	local sold = alife():story_object(story_ids.yan_soldier)
 	if sold then

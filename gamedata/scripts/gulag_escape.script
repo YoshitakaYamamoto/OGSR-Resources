@@ -403,26 +403,17 @@ if type == "esc_specnaz" then
 		-- }
 		-- table.insert(sj, t)
 
-
-		-- Шустрый
-		t = { section = "logic@esc_lager_shustryi",
+		t = { section = "logic@esc_lager_sleeper4",
 			idle = 0,
 			prior = 16, state = {0,1},
-            			online = true,
-			in_rest = "", out_rest = "",
-			predicate = function(obj_info)
-        					return obj_info.profile_name == "esc_shustryi"
-						end
+			in_rest = "", out_rest = "esc_lager_guard_kill_zone"
 		}
 		table.insert(sj, t)
+
 		t = { section = "logic@esc_lager_kamp1",
 			idle = 0,
 			prior = 16, state = {2},
-            online = true,
-			in_rest = "", out_rest = "",
-			predicate = function(obj_info)
-        					return obj_info.profile_name == "esc_shustryi"
-						end
+			in_rest = "", out_rest = "esc_lager_guard_kill_zone"
 		}
 		table.insert(sj, t)
 		
@@ -546,10 +537,7 @@ if type == "esc_specnaz" then
 		t = { section = "logic@esc_lager_defend10",
 			idle = 0,
 			prior = 16, state = {2},
-			in_rest = "", out_rest = "esc_lager_guard_kill_zone",
-			predicate = function(obj_info)
-        					return obj_info.name == "esc_vagon_wounded"
-						end
+			in_rest = "", out_rest = "esc_lager_guard_kill_zone"
 		}
 		table.insert(sj, t)
 		t = { section = "logic@esc_lager_defend11",
