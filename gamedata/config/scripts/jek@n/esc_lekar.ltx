@@ -1,9 +1,8 @@
-[smart_terrains]
-none = true
 
 [logic]
 active = walker@start
 on_death = death
+combat_ignore = combat_ignore
 
 [walker@start]
 path_walk = lekar_point1
@@ -48,21 +47,20 @@ path_look = first_neutral_point
 def_state_campering = sit
 radius = 1
 anim = sit
-; meet = no_meet
 combat_ignore_cond = always
 on_info = {+spawn_bridge_lekar} walker@elevator %=make_invulnerable%
 
 [walker@elevator]
 path_walk = bridge_lekar_walk
 path_look = bridge_lekar_look
-combat_ignore_cond = always
-on_info = {+lekar_give_info} walker@elevator2 %=unmake_invulnerable%
+combat_ignore_cond = {=dist_to_enemy_ge(20)}
+on_info = {+lekar_give_info} walker@elevator2
 
 [walker@elevator2]
 path_walk = bridge_lekar_walk
 path_look = bridge_lekar_look
-combat_ignore_cond = always
-on_timer = 40000 | camper@podval2
+combat_ignore_cond = {=dist_to_enemy_ge(20)}
+on_timer = 40000 | camper@podval2 %=unmake_invulnerable%
 
 [camper@podval2]
 path_walk = lekar_point
@@ -71,15 +69,12 @@ def_state_moving = sprint
 radius = 1
 anim = sit
 meet = no_meet
-combat_ignore_cond = always
+on_timer = 1000 | kamp@house
+combat_ignore_cond = {=dist_to_enemy_ge(30)}
 
-[danger_condition]
-ignore_distance = 0
-
-[combat_ignore]
-combat_ignore = always
+[kamp@house]
+center_point = esc_teterev_kamp_center
+combat_ignore_cond = {=dist_to_enemy_ge(40)}
 
 [death]
 on_info = %+lekar_dead% 
-
-
