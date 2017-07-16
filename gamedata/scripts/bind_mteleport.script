@@ -29,8 +29,8 @@ local teleport_binders = {}	-- Список телепортов, нужнен �
 function delete_teleports_with_section(section)
 	for _, id in ipairs(teleport_binders) do
 		local sobj = alife():object(id)
-		if string.find(sobj:section_name(), section) then
-			checker_minefield.release_restrictor(id)
+		if sobj and string.find(sobj:section_name(), section) then
+			alife():release(sobj, true)
 		end
 	end
 end

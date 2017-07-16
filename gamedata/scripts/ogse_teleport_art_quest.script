@@ -448,7 +448,14 @@ function delete_dead_zone()
 	local dead_zone_id = ogse.var_exists("dead_zone_id") and ogse.load_var("dead_zone_id") or false
 	if dead_zone_id then
 		for _, id in pairs(dead_zone_id) do
-			checker_minefield.release_restrictor(id)
+			local sobj = alife():object(id)
+			if sobj then
+				if IsAnomaly(sobj) and not ogse_anomaly.is_not_anomaly(sobj) then --С аномалиями разберется менеджер аномалий.
+					ogse_anomaly.set_anomaly_mode(id, "anom_off")
+				else
+					alife():release(sobj, true)
+				end
+			end
 		end
 	end
 	ogse.delete_var("dead_zone_id")
@@ -508,7 +515,14 @@ function spawn_case_with_art()
 	local table_id = ogse.var_exists("ogse_teleport_art_id") and ogse.load_var("ogse_teleport_art_id") or false
 	if table_id then
 		for _, id in pairs(table_id) do
-			checker_minefield.release_restrictor(id)
+			local sobj = alife():object(id)
+			if sobj then
+				if IsAnomaly(sobj) and not ogse_anomaly.is_not_anomaly(sobj) then --С аномалиями разберется менеджер аномалий.
+					ogse_anomaly.set_anomaly_mode(id, "anom_off")
+				else
+					alife():release(sobj, true)
+				end
+			end
 		end
 	else write_log("table_id not found!")
 	end

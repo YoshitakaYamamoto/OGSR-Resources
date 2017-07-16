@@ -760,9 +760,9 @@ end
 -- Удаление левел-чейнджера в Саркофаг
 -- Deleting LC to Sarcofag.
 function disable_sar_entrance()
-	local obj = alife():story_object(story_ids.lc_aes_to_sar)
-	if obj then
-		alife():release(obj, true)
+	local sobj = alife():story_object(story_ids.lc_aes_to_sar)
+	if sobj then
+		alife():release(sobj, true)
 	end
 --[[	for i=1,65535 do
 		local obj = alife():object(i)
@@ -1021,7 +1021,6 @@ function check_gorkom_books()
 			alife():release(se_obj, true)
 			if monster then
 				monster:kill(monster)
-				checker_minefield.add_to_delete(monster:id())
 			end			
 		end
 		local dist = safe:position():distance_to( db.actor:position() )

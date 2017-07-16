@@ -157,7 +157,7 @@ function bloodsucker_attack( obj )
 	if not enemy or not enemy:is_actor() or not obj:see( enemy ) then return end
 	local dist = obj:position():distance_to( enemy:position() )
 	local attack_dist = 3
-	ogse_signals.get_mgr():reschedule( ( dist < attack_dist and 1000 ) or ( dist < obj:range() and 2000 ) or 5000 )
+	ogse_signals.get_mgr():reschedule( ( dist < attack_dist and 1500 ) or ( dist < obj:range() and 2000 ) or 5000 )
 	if dist > attack_dist then return end
 
 	local h = hit()
@@ -260,7 +260,7 @@ function psy_burer_attack( obj )
 		level.add_pp_effector("dead_zone.ppe", 1002, true)
 -----------------------------
 		local zh = hit()
-		zh.draftsman = db.actor
+		zh.draftsman = obj
 		zh.type = hit.telepatic
 		zh.direction = obj:position():sub(db.actor:position())
 		zh:bone("pelvis")
@@ -293,7 +293,7 @@ function electro_himera_attack( obj )
 		if chimera_sound and not chimera_sound:playing() then
 			chimera_sound:play_at_pos(obj, posit, 0)
 			local zh = hit()
-			zh.draftsman = enemy
+			zh.draftsman = obj
 			zh.type = hit.shock
 			zh.direction = posit:sub(enemy:position())
 			zh:bone("pelvis")
@@ -524,7 +524,7 @@ function blow_zombie(p_obj)
 		zh:bone("pelvis")
 		zh.power = 3
 		zh.impulse = 5
-		zh.draftsman = enemy
+		zh.draftsman = p_obj
 		zh.direction = p_obj:position():sub(enemy:position())
 		enemy:hit(zh)
 	end
@@ -534,7 +534,13 @@ function blow_zombie(p_obj)
 		hand_spawned_flag = true
 	end
 
-	checker_minefield.add_to_delete(p_obj:id())
+	local id = p_obj:id()
+	dsh.exec_on_update( function()
+		local sobj = alife():object(id)
+		if sobj then
+			alife():release(sobj, true)
+		end
+	end )
 end
 
 --************************************Квестовые функции, перенесено из ogsm_mutants.script**********************************

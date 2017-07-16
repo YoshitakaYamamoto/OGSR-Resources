@@ -613,8 +613,6 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 	lvids_forbidden = { [db.actor:level_vertex_id()] = true }
 	position_forbidden = { db.actor:position() }
 
-	local del_anoms_tbl = {}
-	local npc_tbl = {}
 	local lname = level.name()
 	local sim = alife()
 	for i = 1, 65534 do
@@ -639,7 +637,7 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 					end
 				else --Безопасно удалять аномалии можно только находясь на другой локации.
 					if status == "anom_off" then
-						del_anoms_tbl[i] = sobj
+						sim:release(sobj, true)
 					end
 				end
 			elseif isLc(sobj) then
@@ -657,42 +655,11 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 					table.insert( position_forbidden, sobj.position )
 				end
 			else --Не создавать аномалии там, где вообще хоть что-нибудь есть. Не важно, сталкер это или физический объект и тд.
-				if IsStalker( sobj ) or IsMonster( sobj ) then
-					npc_tbl[i] = sobj
-				end
 				if sobj_lname == lname then
 					lvids_forbidden[ sobj.m_level_vertex_id ] = true
 					table.insert( position_forbidden, sobj.position )
 				end
 			end
-		end
-	end
-
-	if next(del_anoms_tbl) then --таблица не пуста
-		for npc_id, npc_sobj in pairs(npc_tbl) do --Снимаем рестрикшены удаляемых аномалий. Без этого 100% будут движковые вылеты.
-			local pk = get_netpk(npc_sobj, 1)
-			ASSERT( pk:isOk(), "can't read netpacket of %s", npc_sobj:name() )
-
-			local data = pk:get()
-			for _, anom_id in pairs(data.dynamic_in_restrictions) do
-				if del_anoms_tbl[anom_id] then
-					--log3("~~[%s.get_lists] Removing in restriction [%s] from [%s]", script_name(), anom_id, npc_sobj:name())
-					sim:remove_in_restriction(npc_sobj, anom_id)
-					--log3("~~[%s.get_lists] Removed in restriction [%s] from [%s]", script_name(), anom_id, npc_sobj:name())
-				end
-			end
-			for _, anom_id in pairs(data.dynamic_out_restrictions) do --Может это и не нужно, но пусть на всякий случай будет.
-				if del_anoms_tbl[anom_id] then
-					log3("~~[%s.get_lists] Removing out restriction [%s] from [%s]", script_name(), anom_id, npc_sobj:name())
-					sim:remove_out_restriction(npc_sobj, anom_id)
-					log3("~~[%s.get_lists] Removed out restriction [%s] from [%s]", script_name(), anom_id, npc_sobj:name())
-				end
-			end
-		end
-		for anom_id, anom_sobj in pairs(del_anoms_tbl) do --Удаляем аномалии
-			--log3("~~[%s.get_lists] Releasing anom [%s]", script_name(), anom_sobj:name())
-			sim:release(anom_sobj, true)
-			--log3("--[%s.get_lists] anom released!", script_name())
 		end
 	end
 

@@ -13,7 +13,10 @@ function osoznanie_decline(npc, actor)
 	for k, v in pairs(db.creature) do
 		local obj = level.object_by_id(k)
 		if v == false and obj and obj:alive() and string.find( obj:section(), "poltergeist") then
-			checker_minefield.add_to_delete(obj:id())
+			local sobj = alife():object(k)
+			if sobj then
+				alife():release(sobj, true)
+			end
 		end	
 	end
 

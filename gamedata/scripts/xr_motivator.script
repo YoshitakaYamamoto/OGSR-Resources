@@ -316,7 +316,7 @@ function motivator_binder:net_spawn(sobject)
 			s_obj.offline_dead = game.time()+(1*24*60*60*1000)
 		elseif s_obj.offline_dead > 1 and s_obj.offline_dead <= game.time() then
 			if not death_manager.offline_dead_quest_check(self.object) then
-				checker_minefield.add_to_delete(self.object:id())
+				alife():release(s_obj, true)
 			end
 		end
 

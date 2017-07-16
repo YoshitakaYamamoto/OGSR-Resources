@@ -2435,7 +2435,7 @@ end
 function release_zapravka_port()
 	local sobj = alife():object( "ds_zapravka_port" )
 	if sobj then
-		checker_minefield.release_restrictor(sobj.id)
+		alife():release(sobj, true)
 	end
 end
 
@@ -2914,13 +2914,17 @@ end
 
 
 function release_tower_porog_restr()
-	local obj = alife():story_object(story_ids.tower_porog)
-	alife():release(obj , true)
+	local sobj = alife():story_object(story_ids.tower_porog)
+	if sobj then
+		alife():release(sobj, true)
+	end
 end
 
 function release_tower_barier_restr()
-	local obj = alife():story_object(story_ids.tower_barier)
-	alife():release(obj , true)
+	local sobj = alife():story_object(story_ids.tower_barier)
+	if sobj then
+		alife():release(sobj, true)
+	end
 end
 
 
@@ -3073,7 +3077,7 @@ end
 function release_cheb_birthplace()
     local sobj = alife():story_object(story_ids.cheb_birth_restrictor)
     if sobj then
-		checker_minefield.release_restrictor(sobj.id)
+		alife():release(sobj, true)
     end
 end
 
@@ -3482,7 +3486,7 @@ end
 function strange_zone1particle_delete()
     local sobj = alife():story_object(story_ids.strange_zone_1_particle)
     if sobj then
-		checker_minefield.release_restrictor(sobj.id)
+		alife():release(sobj, true)
     end
 end
 

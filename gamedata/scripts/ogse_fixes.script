@@ -60,7 +60,6 @@ function fix_gar_boars_territory2_logic() --Исправление кривой 
 	ogse.save_var("gar_boars_territory2_fix", true)
 end
 
-
 function lc_question_add() --Переход "Припять - ЧАЭС" задаёт вопрос о смене уровня. Взято из аддона Naxac'а
 	local sobj = alife():object("exit_to_stancia_01")
 	if sobj then
@@ -129,7 +128,7 @@ function del_buggy_objects() --Удаление из игры глючных о�
 		local sobj = alife():object( n )
 		if sobj then
 			log3( "~~[%s]: found [%s], removing...", script_name(), sobj:name() )
-			checker_minefield.release_restrictor(sobj.id) --безопасное удаление
+			alife():release(sobj, true)
 		end
 	end
 end

@@ -11,6 +11,12 @@ function on_before_hit( obj, hd )
 	--
 	local who = level.object_by_id( hd.weapon_id or hd.who_id )
 	if who and who:section() == "zone_mine_field" then
-		checker_minefield.release_restrictor(who:id()) --Если делать :disable_anomaly, на месте мины появляется свечение. Поэтому сразу удаляем.
+		local id = who:id()
+		dsh.exec_on_update( function()
+			local sobj = alife():object(id)
+			if sobj then
+				alife():release(sobj, true)
+			end
+		end )
 	end
 end

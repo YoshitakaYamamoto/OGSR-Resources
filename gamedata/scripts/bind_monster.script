@@ -63,7 +63,7 @@ function generic_object_binder:net_spawn(sobject)
 		if s_obj.offline_dead == 1 then
 			s_obj.offline_dead = game.time()+(1*24*60*60*1000)
 		elseif s_obj.offline_dead > 1 and s_obj.offline_dead <= game.time() then
-			checker_minefield.add_to_delete(self.object:id())
+			alife():release(s_obj, true)
 		end
 
 		db.net_spawning_obj = nil

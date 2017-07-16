@@ -420,7 +420,7 @@ function release_respawner_by_name( name ) --Удаление респавнер
   active[ name ] = nil
   local sobj = alife():object( name )
   if sobj then
-    alife:release( sobj )
+    alife():release(sobj, true)
   end
   all_spawn_respawners[ name ] = nil
   log3("!!Released respawner with name: %s", name)

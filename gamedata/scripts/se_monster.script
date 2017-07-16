@@ -176,8 +176,19 @@ function se_monster:on_before_register()
 end
 --------------------
 function se_monster:on_register()
+	local pk = get_netpk( self, 1 )
+	if pk:isOk() then
+		local data = pk:get()
+		local has_restrs = #data.dynamic_in_restrictions > 0 or #data.dynamic_out_restrictions > 0
+		if has_restrs then
+			data.dynamic_in_restrictions = {}
+			data.dynamic_out_restrictions = {}
+			pk:set( data )
+		end
+	end
+	--
 	cse_alife_monster_base.on_register( self )
-
+	--
 	alife():set_interactive( self, true )
 end
 --------------------

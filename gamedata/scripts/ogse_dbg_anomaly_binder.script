@@ -44,6 +44,7 @@ function anomaly_binder:subscribe()
 			[ "signal" ] = "on_update",
 			[ "fun"    ] = self.get_rad_intensity,
 			[ "self"   ] = self,
+			[ "script_name" ] = "anomaly_binder.get_rad_intensity." .. self.object:name(),
 		}
 		self.sm:subscribe( self.subscribed )
 		subscribed_anoms[self.object:id()] = true

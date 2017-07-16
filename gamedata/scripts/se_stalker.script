@@ -162,6 +162,18 @@ local forbidden_comms = {
 	["arena_enemy"] = true
 }
 function se_stalker:on_register()
+	local pk = get_netpk( self, 1 )
+	if pk:isOk() then
+		local data = pk:get()
+		self._charname = data.character_name -- получаем имя персонажа для быстрого доступа в дальнейшем
+		local has_restrs = #data.dynamic_in_restrictions > 0 or #data.dynamic_out_restrictions > 0
+		if has_restrs then
+			data.dynamic_in_restrictions = {}
+			data.dynamic_out_restrictions = {}
+			pk:set( data )
+		end
+	end
+	--
 	cse_alife_human_stalker.on_register( self )
 
 	if not forbidden_comms[self:community()] then
@@ -171,12 +183,6 @@ function se_stalker:on_register()
 	if not self.has_none_true and self:smart_terrain_id() == 65535 then
 		self:brain():update()
 	end
-
-	-- получаем имя персонажа для быстрого доступа в дальнейшем
-	local pk = get_netpk(self, 1)
-	ASSERT( pk:isOk(), "can't read netpacket of %s", self:name() )
-	local data = pk:get()
-	self._charname = data.character_name
 
 	alife():set_interactive( self, true )
 end

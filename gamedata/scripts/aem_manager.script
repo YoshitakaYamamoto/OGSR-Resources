@@ -855,7 +855,7 @@ function CArenaext:reinit()
 		if section == "aem_sound" or section == "aem_timer" then
 			local sobj = alife():object(name)
 			if sobj then
-				sim:release(sobj, true)
+				alife():release(sobj, true)
 			end
 		end
 	end

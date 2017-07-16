@@ -159,9 +159,9 @@ function go_offline_kill_timer:condition()
    return (not level.object_by_id(self.npc_id)) -- ждём исчезновения клиентского объекта
 end
 function go_offline_kill_timer:action()
-   local s_npc = alife():object(self.npc_id)
-   if s_npc then
-      alife():release(s_npc, true)
+   local sobj = alife():object(self.npc_id)
+   if sobj then
+      alife():release(sobj, true)
    --else
       --send_tip("Something wrong!") -- такое возможно при удалении объекта
    end
@@ -1053,20 +1053,6 @@ function remove_item(item_to_remove)
 	return false
 end
 
--- Удаляем объект из игры по имени
-function remove_item_by_name(item_to_remove)
-	if item_to_remove then
-		local sobj = alife():object(item_to_remove)
-		if sobj then
-			alife():release(sobj, true)
-			return true
-		else
-			return false
-		end
-	end
-	return false
-end
-
 --/Удаление итемов из инвентаря ГГ
 function remove_inv_items_by_section(sec, items_to_remove)
 	local items_removed = 0
@@ -1495,8 +1481,15 @@ function kill_crow()
 				hit.type = hit.strike
 			crow:hit(hit)
 
-			ogse_st_mgr.start_gtimer(nil, math.random(150, 300), "checker_minefield.add_to_delete", k)
+			ogse_st_mgr.start_gtimer(nil, math.random(150, 300), "ogse.release_crow", k)
 		end
+	end
+end
+
+function release_crow(id)
+	local sobj = alife():object(id)
+	if sobj then
+		alife():release(sobj, true)
 	end
 end
 

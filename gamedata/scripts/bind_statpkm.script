@@ -218,7 +218,14 @@ function pkm_binder:check_health()
 	if not self.alive then
 		self.heli:ClearEnemy()
 		self.heli:Die()
-		ogse_st_mgr.start_gtimer(nil, math.random(150, 300), "checker_minefield.add_to_delete", self.object:id())
+		ogse_st_mgr.start_gtimer(nil, math.random(150, 300), script_name()..".release_pkm", self.object:id())
+	end
+end
+
+function release_pkm(id)
+	local sobj = alife():object(id)
+	if sobj then
+		alife():release(sobj, true)
 	end
 end
 
