@@ -373,6 +373,12 @@ function motivator_binder:net_spawn(sobject)
 	--
 	self.am:call( "on_npc_before_spawn", self.object, self ) --тут происходит загрузка озвучки
 	--
+	--«агрузка историй дл€ лагер€.
+	if not self.loaded then --KRodin: а зачем это?
+		local char_ini = self.object:spawn_ini() or dsh.cached_ini_file("scripts\\dummy.ltx")
+		xr_info.loadInfo(self.object, char_ini) --Ќадо погл€деть, что там
+	end
+	--
 	xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_stalker, self.loaded )
 	--
 	self.am:call( "on_npc_spawn", self.object, self )
@@ -468,7 +474,7 @@ function motivator_binder:before_hit_callback(p_s_hit, p_ignore_flags)
 end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
-	if not amount or amount < 0.05 then return end --¬ыстрелы в воздух и хиты непон€тного происхождени€ не учитывать! --TODO: ¬сЄ таки разобратьс€ с происхождением хитов, и убрать это, наверное.
+	if not amount or amount < 0.05 then return end --¬ыстрелы в воздух и хиты непон€тного происхождени€ не учитывать!
 --log3("!!Called hit callback: obj: [%s], amount: [%s], local_direction: [%s], who: [%s], bone_index: [%s]", self.object:name() or "nil", amount or "nil", local_direction or "nil", who:name() or "nil", bone_index or "nil")
 
 	if amount < 0.3 and xr_companion.is_companion(self.object:id()) then --«ачем оно нужно? “ипа напарник прекращает говорить когда слышит выстрелы где-то?

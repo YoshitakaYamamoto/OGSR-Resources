@@ -710,8 +710,8 @@ function CKampManager:addNpc( npc )
     }
   end
   if db.story_by_id[ npc:id() ] == nil then
-    xr_info.loadInfo( npc, npc:spawn_ini(), true )
-    xr_info.loadInfo( npc, dsh.cached_ini_file( "scripts\\stories.ltx" ) )
+    local char_ini1 = dsh.cached_ini_file( "scripts\\stories.ltx" )
+    xr_info.loadInfo( npc, char_ini1 )
   end
   self.population     = self.population + 1
   self.seats_assigned = false
