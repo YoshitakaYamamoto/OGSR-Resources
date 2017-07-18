@@ -175,7 +175,7 @@ function do_not_touch(item)
 	end
 
 	local section = item:section()
-	return bad_items[section] or get_bool(section, "quest_item", false)
+	return bad_items[section] or get_bool(section, "quest_item", false) or death_manager.always_keep_item[section] == true
 end
 
 function max_weight(npc)
@@ -332,13 +332,12 @@ function checkCorpse(obj)
 		end
 		local cnt = 0
 		obj:iterate_inventory(function (dummy, item)
-			local section = item:section()
-			if bad_items[section] or get_bool(section, "quest_item", false) then
+			if not do_not_touch(item) then
 				cnt = cnt + 1
 			end
 		end, nil)
 		corpse_checked[obj:id()] = cnt > 0
-		return corpse_checked[obj:id()]
+		return cnt > 0
 	end
 	return false
 end

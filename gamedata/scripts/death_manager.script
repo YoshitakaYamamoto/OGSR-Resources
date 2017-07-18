@@ -107,7 +107,7 @@ local mul_by_level = {}
 local count_by_level = {}
 
 --' Предметы, которые нельзя удалять (квестовые например)
-local always_keep_item = {}
+always_keep_item = {}
 
 --' Предметы, которые нельзя сильно портить
 rare_item = {}
