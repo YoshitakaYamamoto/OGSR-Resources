@@ -60,10 +60,16 @@ function generic_object_binder:net_spawn(sobject)
 		self.object:hit(h)	
 
 		local s_obj = alife():object(self.object:id())
-		if s_obj.offline_dead == 1 then
+		if s_obj.offline_dead == 0 then
+			--log3("--[%s] Added trup to delete: [%s]", script_name(), s_obj:name())
+			s_obj.offline_dead = game.time()+(1*24*60*60*1000)
+		elseif s_obj.offline_dead == 1 then
 			s_obj.offline_dead = game.time()+(1*24*60*60*1000)
 		elseif s_obj.offline_dead > 1 and s_obj.offline_dead <= game.time() then
-			alife():release(s_obj, true)
+			if self.object:position():distance_to( db.actor:position() ) > alife():switch_distance() / 2 then --Удаляем только вдалеке от актора
+				--log3("--[%s] Released trup: [%s]", script_name(), s_obj:name())
+				alife():release(s_obj, true)
+			end
 		end
 
 		db.net_spawning_obj = nil

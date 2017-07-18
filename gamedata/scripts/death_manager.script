@@ -247,7 +247,7 @@ end
 function keep_offline_item(npc, item)
 	if not item or not alife():object(item:id()) then return end
     local section = item:section()
-    if always_keep_item[section] == true then
+    if always_keep_item[section] == true or get_bool(section, "quest_item", false) then
         quest_needed[npc:id()] = true
     end
 end
@@ -256,8 +256,8 @@ function create_release_item(npc)
 	--log3("~~Called create_release_item() for [%s]", npc:name())
 	--' Спрашиваем у серверного объекта генерились ли предметы
 	local se_obj = alife():object(npc:id())
-	if not se_obj or se_obj.death_dropped > 0 then return end
-	se_obj.death_dropped = 1
+	if not se_obj or se_obj.death_dropped then return end
+	se_obj.death_dropped = true
 	--log3("--Creating release_items for [%s]", npc:name())
 
 	--// xr_companion

@@ -43,18 +43,8 @@ function se_monster:get_ini()
 		   end
 
 		   if self.min_distance == nil then
-		      if sys_ini ~= nil and sys_ini:line_exist ("alife", "switch_distance") == true then
-		         self.min_distance = sys_ini:r_u32 ("alife", "switch_distance") - 50
-		         if self.min_distance == nil then
-		            self.min_distance = 150
-		         else
-		            if self.min_distance <= 50 then
-		               abort ("SE_MONSTER - SWITCH DISTANCE IS TOO SMALL !!!")
-		            end
-		         end
-		      else
-		         self.min_distance = 150
-		      end
+		      self.min_distance = alife():switch_distance() - 50
+		      ASSERT(self.min_distance > 50, "SE_MONSTER - SWITCH DISTANCE IS TOO SMALL!!!")
 		   end
 		end
 	end

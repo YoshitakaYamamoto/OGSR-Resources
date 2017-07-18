@@ -3,6 +3,7 @@ function attach( sm )
 	sm:subscribe({ signal = "on_ph_obj_use", fun = this.on_treasure_use })
 	sm:subscribe({ signal = "on_save", fun = this.save })
 	sm:subscribe({ signal = "on_load", fun = this.load })
+	sm:subscribe({ signal = "on_npc_use", fun = this.on_npc_use })
 	sm:subscribe({ signal = "on_finalize", fun = this.clear_treasure_manager })
 end
 
@@ -12,6 +13,15 @@ function on_treasure_use( obj ) --Теперь метка тайника сни�
 	end
 end
 
+function on_npc_use( obj )
+	if obj:alive() then return end
+	--
+	local sobj = alife():object( obj:id() )
+	if not sobj.treasure_processed then
+		get_treasure_manager():use( obj )
+		sobj.treasure_processed = true
+	end
+end
 
 local treasure_manager = nil
 
