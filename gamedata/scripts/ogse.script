@@ -1306,9 +1306,6 @@ function on_actor_first_update()
 		end
 	end
 
-	-- позволим актору выйти через тот же выход на Агро, что он пришел
-	agroprom_tasks.check_enter()
-
 --[[ --Патроны на поясе --KRodin: выключено
 	if ammo_on_belt == 1 then
 		cmd("g_ammunition_on_belt on")
