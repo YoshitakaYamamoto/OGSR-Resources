@@ -285,6 +285,11 @@ function motivator_binder:net_spawn(sobject)
 
 	db.add_obj(self.object)
 	--
+	if not self.loaded then --Загрузка историй для лагеря и не только. Там же выдаются инфопорции из кастомдаты. Делается походу при первом спавне каждого НПС. Нужно это делать для всех, и мертвых, и живых.
+		local char_ini = self.object:spawn_ini() or dsh.cached_ini_file("scripts\\dummy.ltx")
+		xr_info.loadInfo(self.object, char_ini)
+	end
+	--
 	self.object:set_callback(callback.use_object, self.use_callback, self)
 	--
 	self:subscribe_updaters()
@@ -371,11 +376,6 @@ function motivator_binder:net_spawn(sobject)
 	end
 	--
 	self.am:call( "on_npc_before_spawn", self.object, self ) --тут происходит загрузка озвучки
-	--
-	if not self.loaded then --Загрузка историй для лагеря и не только. Там же выдаются инфопорции из кастомдаты. Делается походу при первом спавне каждого НПС.
-		local char_ini = self.object:spawn_ini() or dsh.cached_ini_file("scripts\\dummy.ltx")
-		xr_info.loadInfo(self.object, char_ini)
-	end
 	--
 	xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_stalker, self.loaded )
 	--
