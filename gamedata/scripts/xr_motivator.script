@@ -102,7 +102,7 @@ function silent_level()
 end
 
 function check_sound(self, who, sound_type, sound_position, sound_power)
-	if not self or not who or not sound_type or not sound_position or not sound_power then
+	if not ( self and who and alife():object( who:id() ) and sound_type and sound_position and sound_power ) then
 		return
 	end
 
@@ -472,23 +472,34 @@ function motivator_binder:before_hit_callback(p_s_hit, p_ignore_flags)
 end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
-	if not amount or amount < 0.05 then return end --Выстрелы в воздух и хиты непонятного происхождения не учитывать!
---log3("!!Called hit callback: obj: [%s], amount: [%s], local_direction: [%s], who: [%s], bone_index: [%s]", self.object:name() or "nil", amount or "nil", local_direction or "nil", who:name() or "nil", bone_index or "nil")
+	--log3("!!Called hit callback: obj: [%s], amount: [%s], local_direction: [%s], who: [%s], bone_index: [%s]", self.object:name() or "nil", amount or "nil", local_direction or "nil", who:name() or "nil", bone_index or "nil")
 
+	local chk_dist = self.object:position():distance_to(who:position())
+	local range = self.object:range()
+	if chk_dist > range then
+		self.object:set_range(chk_dist*1.1)
+	end
+	--self.object:make_object_visible_somewhen(who:cast_game_object())	-- в движке баг в этой функции, поэтому надо кастить к "движковому" клиентскому объекту
+	--
+	local warn_timer = time_global()
+	if not ogse.is_quest_npc(self.object) and not xr_companion.is_companion(self.object:id()) then
+		if not warn_check_timer[self.object:id()] then
+			warn_check_timer[self.object:id()] = warn_timer + math.random(1000, 2000) 
+		else
+			if warn_check_timer[self.object:id()] < warn_timer then
+				look_to_shot(self.object, who)
+				warn_check_timer[self.object:id()] = warn_timer + math.random(1000, 2000)
+			end
+		end
+	end
+	--
 	if amount < 0.3 and xr_companion.is_companion(self.object:id()) then --Зачем оно нужно? Типа напарник прекращает говорить когда слышит выстрелы где-то?
 		xr_sound.set_sound(self.object, nil)
 		stop_play_sound(self.object)
 	end
-
-	if self.object:alive() then
-		local chk_dist = self.object:position():distance_to(who:position())
-		local range = self.object:range()
-		if chk_dist > range then
-			self.object:set_range(chk_dist*1.1)
-		end
---		self.object:make_object_visible_somewhen(who:cast_game_object())	-- в движке баг в этой функции, поэтому надо кастить к "движковому" клиентскому объекту
-	end
-
+	--
+	if amount == 0 or bone_index == 0 then return end --Далее не учитываем выстрелы в воздух.
+	--
 	-- FIXME: коллбеки неплохо было бы регистрировать в общем storage, а не посхемно...
 	-- просто всегда ставить их при включении схемы и снимать при отключении.
 	if self.st.active_section then
@@ -510,18 +521,6 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	sr_territory.issue_event(self.object, "hit_callback", self.object, amount, local_direction, who, bone_index)
 
 	xr_wounded.hit_callback(self.object:id())
-
-	local warn_timer = time_global()
-	if not ogse.is_quest_npc(self.object) and not xr_companion.is_companion(self.object:id()) then
-		if not warn_check_timer[self.object:id()] then
-			warn_check_timer[self.object:id()] = warn_timer + math.random(1000, 2000) 
-		else
-			if warn_check_timer[self.object:id()] < warn_timer then
-				look_to_shot(self.object, who)
-				warn_check_timer[self.object:id()] = warn_timer + math.random(1000, 2000)
-			end
-		end
-	end
 
 	self.am:call( "on_npc_hit", self.object, amount, local_direction, who, bone_index )
 end
