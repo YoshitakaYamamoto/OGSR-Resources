@@ -199,10 +199,17 @@ end
 --Аномальный щит бюрера
 function on_monster_before_hit(obj, hit_data, p_s_hit, p_ignore_flags, binder )
   if obj:clsid() ~= clsid.burer_s then return end
-  if hit_data.hit_type == hit.fire_wound or hit_data.hit_type == hit.explosion then --Учитываем только хиты от стрелкового оружия и взрывов
-	if not hit_data.dir_x or not hit_data.dir_y or not hit_data.dir_z then return end --Оно почему-то есть не всегда. Ну и ладно, пусть будет типа рандомно. То работает, то нет.
+  if hit_data.hit_type == hit.fire_wound then --Учитываем только хиты от стрелкового оружия
 	local obj_dir = obj:direction()
-	local hit_dir = vector():set(hit_data.dir_x, hit_data.dir_y, hit_data.dir_z) --Точное направление хита.
+    local hit_dir
+	if hit_data.dir_x and hit_data.dir_y and hit_data.dir_z then --Оно почему-то есть не всегда.
+		hit_dir = vector():set(hit_data.dir_x, hit_data.dir_y, hit_data.dir_z) --Точное направление хита.
+	else
+		if not hit_data.who_id then return end
+		local who = level.object_by_id( hit_data.who_id )
+		if not who then return end
+		hit_dir = who:direction()
+	end
 	if obj_dir:dotproduct(hit_dir) < -0.6 then
 		local particle_start = particles_object("anomaly2\\burer_shield_01")
 		local pos = obj:bone_position("bip01_head")
