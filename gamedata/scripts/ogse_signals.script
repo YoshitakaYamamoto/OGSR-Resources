@@ -134,7 +134,7 @@ function signals_mgr:__init( name, modules_list, scan_for_autoattaching_modules 
     function()
       for i=1, #self.slots_in_process do
         local slot = self.slots_in_process[ i ]
-        log3( "!![%s]: signal on top [%s]: [%s]. Hanget slot: %s[%s]", script_name(), i, slot.signal, slot.script_name, slot.line )
+        log3( "!![%s]: signal on top [%s]: [%s]. Hanget slot: [%s.%s]", script_name(), i, slot.signal, slot.script_name, slot.line )
       end
       abort( "!!Signals manager [%s] crushed! One of the calls hung! See stack dump for details!", self.mgr_name )
     end
@@ -193,13 +193,13 @@ function signals_mgr:subscribe( slot_to_subscribe )
   local d = debug.getinfo(slot_to_subscribe.fun)
   ASSERT(d, "")
   if not slot_to_subscribe.script_name then
-    slot_to_subscribe.script_name = d.short_src
+    slot_to_subscribe.script_name = d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1')
   end
   if not slot_to_subscribe.line then
     slot_to_subscribe.line = d.linedefined --Номер строки скрипта, на которой расположена функция
   end
   if slot_to_subscribe.queued then
-    ASSERT(self.signals[ signal ].time_limited, "Signal [%s] is not time_limited! It is forbidden to use 'queued' for slot %s[%s]!", signal, slot_to_subscribe.script_name, slot_to_subscribe.line) --НЕ УДАЛЯТЬ!
+    ASSERT(self.signals[ signal ].time_limited, "Signal [%s] is not time_limited! It is forbidden to use 'queued' for slot [%s.%s]!", signal, slot_to_subscribe.script_name, slot_to_subscribe.line) --НЕ УДАЛЯТЬ!
     slot_to_subscribe.timeout = 0
     table.insert( self.signals[ signal ].queue, slot_to_subscribe )
   else
@@ -274,7 +274,7 @@ function signals_mgr:process_unsubscribe( uns_slot )
   for i=1, #check_slots do
     local slot = check_slots[i]
     if slots_equal( slot, uns_slot ) then
-      --log3( "--[%s] Unsubscribe slot %s[%s]: queue = [%s], signal = [%s]", script_name(), slot.script_name, slot.line, qn, slot.signal )
+      --log3( "--[%s] Unsubscribe slot [%s.%s]: queue = [%s], signal = [%s]", script_name(), slot.script_name, slot.line, qn, slot.signal )
       --На всякий случай. Чтобы точно не было проблем при повторном подписывании слота
       slot.unsubscribed = nil
       slot.timeout = nil
@@ -350,7 +350,7 @@ function signals_mgr:call( signal_name, ... )
       end
       --
       if slot.timeout then --Если задали таймаут, переносим слот в scheduled очередь
-        ASSERT(slots.time_limited, "!![%s] Found not time_limited slot with timeout: %s[%s]", signal_name, slot.script_name, slot.line) --НЕ УДАЛЯТЬ!
+        ASSERT(slots.time_limited, "!![%s] Found not time_limited slot with timeout: [%s.%s]", signal_name, slot.script_name, slot.line) --НЕ УДАЛЯТЬ!
         slots.reschedule_scheduled = true
         slot.scheduled = true --Проверяется при отписывании.
         table.insert( slots.scheduled, slot )
@@ -358,7 +358,7 @@ function signals_mgr:call( signal_name, ... )
       end
       --
       if result == true then --Если вызванный слот вернул true, цикл прерываем.
-        log3( "~~[%s] Call [%s] is interrupted from slot %s[%s]", script_name(), signal_name, slot.script_name, slot.line )
+        --log3( "~~[%s] Call [%s] is interrupted from slot [%s.%s]", script_name(), signal_name, slot.script_name, slot.line )
         break
       end
     end
@@ -448,7 +448,7 @@ function signals_mgr:call( signal_name, ... )
     for i=1, #times do
       local t = times[i]
       if t.time > work_time_limit then
-        log3( "!!  slot: %s[%s], time: [%.2f s.]", t.script_name, t.line, t.time / 1e+6 )
+        log3( "!!  slot: [%s.%s], time: [%.2f s.]", t.script_name, t.line, t.time / 1e+6 )
       end
     end
   end
@@ -467,7 +467,7 @@ function signals_mgr:process_call(slot, work_time, times, ...)
   for i=1, #args do
     args_s = args_s.."%s,"
   end
-  log3("--[signals_mgr:process_call] Calling slot: %s[%s]("..args_s..")", slot.script_name, slot.line, unpack(args))
+  log3("--[signals_mgr:process_call] Calling slot: [%s.%s]("..args_s..")", slot.script_name, slot.line, unpack(args))
 --]=]
   if slot.self then
     result = slot.fun( slot.self, ... )
@@ -506,7 +506,7 @@ function signals_mgr:rechange_scheduled_time( check_slot, new_timeout )
   --
   local slot, qn = self:is_already_subscribed( check_slot ) --Сделано потому что нам точно неизвестно, что именно check_slot - ссылка на слот, или его копия. Быдлокодеры ведь могут и копию сюда передать.
   ASSERT(slot, "[signals_mgr:rechange_scheduled_time] SLOT ISN'T SUBSCRIBED!")
-  --log3("--[%s] Changing new timeout for slot %s[%s]: [%s], old timeout: [%s], queue_name: [%s]", script_name(), slot.script_name, slot.line, time_global() + new_timeout, slot.timeout, qn)
+  --log3("--[%s] Changing new timeout for slot [%s.%s]: [%s], old timeout: [%s], queue_name: [%s]", script_name(), slot.script_name, slot.line, time_global() + new_timeout, slot.timeout, qn)
   slot.timeout = time_global() + new_timeout
   if qn == "queue" then
     slots.reschedule_queue = true
