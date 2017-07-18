@@ -4,6 +4,8 @@
 [dsh.gulag.raid]
 esc2_most = false ;Сталкеры под мостом не должны атаковать сталкеров на АТП
 esc2_st_fabric = false ;Сталкеры на АТП не должны нападать на сталкеров под мостом
+gar_smart_graveyard = false ;Сталкеры на кладбище техники не атакуют обитателей лагеря gar_smart_stalkers_1
+gar_smart_stalkers_1 = false ;Обитатели лагеря за кладбищем техники не нападают на бандитов у перехода на агропром
 
 ; Замена логики уже заспауненых неписей
 [dsh.xr_logic.get_customdata_or_ini_file]
@@ -16,12 +18,11 @@ none = true ;Не брать Шустрого в смарты
 ;================================================================
 [dsh.gulag.override.esc2_st_fabric]
 communities = stalker, dolg ;Бандиты больше не будут приходить на АТП.
-capacity = 10 ;11
+capacity = 10
 [dsh.xr_kamp.esc2_st_fabric_kamp_2] ;Сталкеров на АТП пересадил на второй этаж
 level_vertex_id = 405548
 ;================================================================
 [dsh.gulag.override.esc2_most]
-communities = stalker, dolg
 capacity = 5
 ;================================================================
 [dsh.gulag.override.esc_assault]
@@ -39,6 +40,48 @@ cond = {-esc_kvest_know_do_mils_near_anomaly_2_complete} ;Смарт военн�
 ;================================================================
 [dsh.gulag.override.gar_dram] ;бандиты и Юрик на Свалке
 cond = {-gar_dm_novice_change_st}
+;
+;================================================================
+[dsh.gulag.override.gar_smart_graveyard] ;Сталкеры на кладбище техники, в т.ч. Бес.
+capacity = 10 ;7
+communities = stalker, freedom
+cond = {+gar_hellcar_dialog_end}, {+gar_hellcar_death} ;Не будем этот смарт закрывать.
+;================================================================
+[dsh.se_stalker.gar_hellcar.smart_terrains] ;Бес теперь останется на кладбище техники, и никуда оттуда не уйдёт.
+gar_hellcar_group = {-gar_hellcar_dialog_end -gar_hellcar_death}
+gar_smart_graveyard = {+gar_hellcar_dialog_end}
+;================================================================
+[dsh.se_stalker.gar_hellcar_group_1.smart_terrains] ;Команда Беса теперь останется на кладбище техники, и никуда оттуда не уйдёт.
+gar_hellcar_group = {-gar_hellcar_dialog_end -gar_hellcar_death}
+gar_smart_graveyard = {+gar_hellcar_dialog_end}, {+gar_hellcar_death}
+;================================================================
+[dsh.se_stalker.gar_hellcar_group_2.smart_terrains] ;Команда Беса теперь останется на кладбище техники, и никуда оттуда не уйдёт.
+gar_hellcar_group = {-gar_hellcar_dialog_end -gar_hellcar_death}
+gar_smart_graveyard = {+gar_hellcar_dialog_end}, {+gar_hellcar_death}
+;================================================================
+;
+[dsh.gulag.override.gar_smart_garage] ;Сталкеры в ангаре. На них периодически нападают бандиты.
+capacity = 12; 6
+communities = stalker, freedom
+;================================================================
+[dsh.se_stalker.gar_seryi.smart_terrains] ;Серый теперь останется в ангаре
+gar_angar = {-garbage_meetstalker_done -garbage_meetstalker_die}
+gar_smart_garage = {+garbage_meetstalker_done}
+;================================================================
+[dsh.se_stalker.gar_seryi_drug2.smart_terrains] ;Команда Серого теперь останется в ангаре
+gar_angar = {-garbage_meetstalker_done -garbage_meetstalker_die}
+gar_smart_garage = {+garbage_meetstalker_done}, {+garbage_meetstalker_die}
+;================================================================
+[dsh.se_stalker.gar_seryi_drug3.smart_terrains] ;Команда Серого теперь останется в ангаре
+gar_angar = {-garbage_meetstalker_done -garbage_meetstalker_die}
+gar_smart_garage = {+garbage_meetstalker_done}, {+garbage_meetstalker_die}
+;================================================================
+;
+[dsh.gulag.override.gar_smart_stalkers_1] ;Лагерь за кладбищем техники
+communities = killer, bandit, military, stalker, freedom ;Пусть сюда кто угодно приходит.
+;================================================================
+[dsh.gulag.override.gar_smart_bandit_large_lager] ;бандиты, периодически нападающие на ангар
+capacity = 11; 8
 ;================================================================
 ; костер на посту Долга
 [dsh.xr_kamp.gar_dolg_blokpost_kamp_point]

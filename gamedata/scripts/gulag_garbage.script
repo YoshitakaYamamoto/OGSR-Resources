@@ -424,7 +424,11 @@ function load_job(sj, gname, type, squad, groups)
 			prior = 3, state = {0},
 			in_rest = "", out_rest = "",
 			predicate = function(obj_info) 
-								return obj_info.profile_name == "val_escort_nap1"
+								if obj_info.profile_name == "val_escort_nap1" then
+									return true
+								end
+								local sobj = alife():story_object(story_ids.val_escort_nap1)
+								return not sobj or not sobj:alive()
 							end
 		}
 		table.insert(sj, t)
@@ -433,7 +437,11 @@ function load_job(sj, gname, type, squad, groups)
 			prior = 3, state = {0},
 			in_rest = "", out_rest = "",
 			predicate = function(obj_info) 
-								return obj_info.profile_name == "val_escort_captive"
+								if obj_info.profile_name == "val_escort_captive" then
+									return true
+								end
+								local sobj = alife():story_object(story_ids.val_escort_captive)
+								return not sobj or not sobj:alive()
 							end
 		}
 		table.insert(sj, t)
@@ -442,7 +450,11 @@ function load_job(sj, gname, type, squad, groups)
 			prior = 3, state = {0},
 			in_rest = "", out_rest = "",
 			predicate = function(obj_info) 
-								return obj_info.profile_name == "val_dolg_prisoner"
+								if obj_info.profile_name == "val_dolg_prisoner" then
+									return true
+								end
+								local sobj = alife():story_object(story_ids.val_prisoner)
+								return not sobj or not sobj:alive()
 							end
 		}
 		table.insert(sj, t)
