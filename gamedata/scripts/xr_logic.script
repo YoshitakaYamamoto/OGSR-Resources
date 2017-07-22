@@ -1289,7 +1289,12 @@ function get_customdata_or_ini_file(npc, filename)
     if not ini_fname then
       ini_fname = get_string( dsh_sect, npc:name() )
     end
-    if ini_fname then return dsh.cached_ini_file( ini_fname ) end
+    if ini_fname then
+      local new_ini = dsh.cached_ini_file( ini_fname )
+      if logic_not_empty(npc, new_ini) then --!KRodin: если логика вышла в nil, еЄ не используем! ¬едь в этом случае персонаж уже может находитьс€ под логикой какого-нибудь гулага.
+        return new_ini
+      end
+    end
   end
   --
 	if filename == "<customdata>" then
@@ -1336,9 +1341,10 @@ end
 
 -- у объекта есть "непуста€" логика
 function logic_not_empty(npc, ini)
-	return ini:section_exist("logic") and (
-		ini:line_exist("logic", "cfg") or (ini:line_exist("logic", "active") and ini:r_string("logic", "active") ~= "nil")
-	)
+	if ini:section_exist("logic") and ini:line_exist("logic", "cfg") then
+		ini = dsh.cached_ini_file( get_string("logic", "cfg", "scripts\\dummy.ltx", ini) )
+	end
+	return determine_section_to_activate(npc, ini, "logic", db.actor) ~= "nil"
 end
 
 function save_logic_online(obj)

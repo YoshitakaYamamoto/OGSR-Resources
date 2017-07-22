@@ -2,28 +2,30 @@
 
 ; Разрешить/запретить постоянные нападения одних гулагов на другие.
 [dsh.gulag.raid]
-esc2_most = false ;Сталкеры под мостом не должны атаковать сталкеров на АТП
-esc2_st_fabric = false ;Сталкеры на АТП не должны нападать на сталкеров под мостом
 gar_smart_graveyard = false ;Сталкеры на кладбище техники не атакуют обитателей лагеря gar_smart_stalkers_1
 gar_smart_stalkers_1 = false ;Обитатели лагеря за кладбищем техники не нападают на бандитов у перехода на агропром
 
 ; Замена логики уже заспауненых неписей
 [dsh.xr_logic.get_customdata_or_ini_file]
-esc_shustryi = KRodin\logic\esc_shustryi.ltx ;Переделал кривую логику Шустрого. Пусть он после освобождения остаётся на АТП, бандитов там больше не будет.
+esc_shustryi = KRodin\logic\esc_shustryi.ltx ;Теперь до освобождения Шустрый будет под этой логикой.
 
 ;*************************************[Кордон]*************************************
 ;================================================================
 [dsh.se_stalker.esc_shustryi.smart_terrains]
-none = true ;Не брать Шустрого в смарты
+esc_lager = {+tutorial_wounded_give_info} ;После освобождения Шустрый пойдёт в ДН
 ;================================================================
 [dsh.gulag.override.esc2_st_fabric]
-communities = stalker, dolg ;Бандиты больше не будут приходить на АТП.
+communities = bandit, stalker, dolg
 capacity = 10
+switch_0 = {=is_day}, {=gulag_empty(esc2_most)}, {!gulag_community_pop(esc2_st_fabric:bandit:6)}
+switch_1 = {=gulag_community_pop(esc2_st_fabric:bandit:6) !gulag_empty(esc2_most) !is_day}
 [dsh.xr_kamp.esc2_st_fabric_kamp_2] ;Сталкеров на АТП пересадил на второй этаж
 level_vertex_id = 405548
 ;================================================================
 [dsh.gulag.override.esc2_most]
 capacity = 5
+switch_0 = {!is_day}, {!gulag_population_comed_ge(esc2_most:5)}, {!gulag_community_pop(esc2_st_fabric:bandit:1)}
+switch_1 = {=is_day =gulag_population_comed_ge(esc2_most:5) =gulag_community_pop(esc2_st_fabric:bandit:1)}
 ;================================================================
 [dsh.gulag.override.esc_assault]
 cond = {-esc_kill_bandits_quest_done} ;Смарт Петрухи с компанией закроется после их ухода

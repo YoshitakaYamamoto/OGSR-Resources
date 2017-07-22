@@ -1,7 +1,7 @@
 ;Шустрый
 
 [logic]
-active = camper@esc_lager_prisoner
+active = {-tutorial_wounded_give_info} camper@esc_lager_prisoner, nil
 combat_ignore = combat_ignore
 on_death = death
 
@@ -13,7 +13,7 @@ path_walk = esc_lager_prisoner_walk
 path_look = esc_lager_prisoner_look
 combat_ignore_cond = always
 def_state_campering = prisoner
-on_info = {+tutorial_wounded_give_info} kamp@shustryi %+shustriy_in_lager%, {=esc_bandits_die} remark@esc_lager_help, {+atp_prisoner_freedom} remark@esc_shustryi_wait
+on_info = {=esc_bandits_die} remark@esc_lager_help, {+atp_prisoner_freedom} remark@esc_shustryi_wait
 meet = no_meet
 danger = danger_condition@shustryi
 
@@ -53,11 +53,7 @@ target = actor
 meet = meet@friend
 danger = danger_condition@shustryi
 combat_ignore_cond = always
-on_info = {+tutorial_wounded_give_info =dist_to_actor_ge(10)} kamp@shustryi %+shustriy_in_lager%
+on_info = {+tutorial_wounded_give_info} nil
 
 [danger_condition@shustryi]
 ignore_distance = 0
-
-[kamp@shustryi]
-center_point = esc2_st_fabric_kamp_2
-combat_ignore_cond = {=dist_to_enemy_ge(40)}
