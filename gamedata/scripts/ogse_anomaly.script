@@ -699,6 +699,28 @@ function add_anom(levelname) --вызывается из anom_update() и сиг
 	end
 end
 
+function spawn_anomaly( section, pos, lv, gv, shape )
+	local sobj = alife():create( section, pos, lv, gv )
+	ASSERT( sobj, "Can't generate_anomaly [%s], [%s], [%s], [%s]", section or "nil", pos or "nil", lv or "nil", gv or "nil")
+    local pk = get_netpk( sobj, 1 )
+    ASSERT( ( pk and pk:isOk() ), "can't read netpacket of %s", sobj:name() )
+    local data = pk:get()
+    if shape.shtype == 0 then
+      data.shapes:addSphere(
+        shape.radius, vector():set( unpack( shape.center ) )
+      )
+    else
+      data.shapes:addBox(
+        vector():set( unpack( shape.v1 ) ),
+        vector():set( unpack( shape.v2 ) ),
+        vector():set( unpack( shape.v3 ) ),
+        vector():set( unpack( shape.offset ) )
+      )
+    end
+    pk:set( data )
+	return sobj
+end
+
 --Создаёт набор аномалий на уровне
 function generate_anoms(lname)
 	if not get_lists_inited then
@@ -711,22 +733,10 @@ function generate_anoms(lname)
 	for i=1, rnd do
 		local pos, new_lv, new_gv = anomaly_position_choice(lname)
 		local section, shape = anomaly_section_choice(lname)
-		local sobj = alife():create(section, pos, new_lv, new_gv)
-		ASSERT(sobj, "Can't generate_anomaly [%s], [%s], [%s], [%s]", section or "nil", pos or "nil", new_lv or "nil", new_gv or "nil")
-		local pk = get_netpk(sobj, 1)
-		ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
-		local data = pk:get()
-		if shape.shtype == 0 then --/ sphere
-			data.shapes:addSphere(shape.radius * get_float(section, "effective_radius", 1), vector():set(unpack(shape.center)))
-		else --/ box
-			data.shapes:addBox(
-				vector():set(unpack(shape.v1)), 
-				vector():set(unpack(shape.v2)), 
-				vector():set(unpack(shape.v3)), 
-				vector():set(unpack(shape.offset))
-			)
+		if shape.radius then
+			shape.radius = shape.radius * get_float(section, "effective_radius", 1)
 		end
-		pk:set(data)
+		spawn_anomaly( section, pos, new_lv, new_gv, shape )
 		--log3("--[%s] Generated anomaly [%s] on level [%s]", script_name(), section, lname)
 
 		lvids_forbidden[new_lv] = true

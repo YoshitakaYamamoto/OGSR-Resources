@@ -1348,6 +1348,21 @@ function master_dying()
 	if level_tasks.is_map_spot_present(story_ids.mg_barman, "green_location") then
 		level_tasks.remove_location_by_sid(story_ids.mg_barman, "green_location") --Удаляем метку с бара в МГ
 	end
+	--
+	--Релизим респавнеры зомбаков в МГ, больше они не нужны.
+	local del_respawners = { "deadcity_zombied_respawn_1", "deadcity_zombied_respawn_2" }
+	for _, name in pairs(del_respawners) do
+		local sobj = alife():object( name )
+		if sobj then
+			dsh_respawn.release_respawner_by_name( name )
+		end
+	end
+	--Телепортируем респавнер контроллёров в место их обитания. В прежнем месте будет лагерь сталкеров.
+	local contr_respawner = alife():object( "deadcity_contoler_respawn_1" )
+	ASSERT(contr_respawner, "")
+	local contr_smart     = alife():object( "deadcity_contr_3" )
+	ASSERT(contr_smart, "")
+	alife():teleport_object( "", contr_smart.position, contr_smart.m_level_vertex_id, contr_smart.m_game_vertex_id, contr_respawner.id )
 end
 
 
