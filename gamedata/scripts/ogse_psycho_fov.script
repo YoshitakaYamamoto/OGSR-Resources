@@ -42,7 +42,7 @@ function fov_end()
 end
 
 
-local fov_vol = sys_ini:r_s32("options","fov_volume")
+local fov_vol = get_u32( "options", "fov_volume", 65 )
 local max_alarm_fov_vol = 90
 local min_alarm_fov_vol = 30
 
@@ -81,7 +81,6 @@ function on_actor_update()
 		end
 		play_sounds()
 	else
-		unsubscribe() --отписываемся от менеджера сигналов
 		if up_or_down ~= nil then
 			local current_fov = db.actor:get_camera_fov()
 			if current_fov < fov_vol then
@@ -91,6 +90,7 @@ function on_actor_update()
 				current_fov = current_fov - 1
 				db.actor:set_camera_fov(current_fov)					
 			elseif current_fov == fov_vol then	
+				unsubscribe() --отписываемся от менеджера сигналов
 				up_or_down = nil
 			end
 		end	
