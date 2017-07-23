@@ -435,15 +435,10 @@ function se_smart_terrain:smart_terrain_accepts_obj( obj, obj_agreement )
 		return false
 	end
 
+	local is_exclusive = obj_agreement == agreed_exclusive
 	-- в любом случае, если хочет идти только в этот, или если готов без условий и при этом гулаг не заполнен полностью
-	if obj_agreement == agreed_exclusive or self.gulag:get_non_exclusive_population() < self.gulag.capacity_non_exclusive then
+	if is_exclusive or self.gulag:get_non_exclusive_population() < self.gulag.capacity_non_exclusive then
 		local community, is_stalker = self:get_obj_community( obj )
-		--
-		--Фантомов не принимаем никуда --KRodin: Интересно, как они сюда могут попасть? У них же серверного объекта вроде бы нету
-		if not community then 
-			log3( "!![%s] Community not found in [%s]", script_name(), obj:name() )
-			return false
-		end
 		--
 		--Если в кастомдате смарта есть перечень допустимых группировок и непись не попадает в эту группировку
 		if self.accepted_communities and not self.accepted_communities[community] then
@@ -463,14 +458,14 @@ function se_smart_terrain:smart_terrain_accepts_obj( obj, obj_agreement )
 		end
 		--
 		--Если непись не эксклюзивный, проверяем, не враждебен ли он тем, кто уже есть в смарте. Если враждебен - не принимаем.
-		if is_stalker and self.accepted_communities and obj_agreement ~= agreed_exclusive then
+		if is_stalker and not is_exclusive then
 			if xr_gulag.isGulagEnemy( self.gulag.name, obj ) then
 				--log3( "~~[%s] gulag [%s] is enemy for [%s]", script_name(), self.gulag.name, obj:name() )
 				return false
 			end
 		end
 		-- если есть работа
-		return self.gulag:is_there_any_suitable_job( self:fill_npc_info( obj ), obj_agreement == agreed_exclusive )
+		return self.gulag:is_there_any_suitable_job( self:fill_npc_info( obj ), is_exclusive )
 	end
 	return false -- если не эксклюзив для этого смарта и места нет, то не подходит
 end
