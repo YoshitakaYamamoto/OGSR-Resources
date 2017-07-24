@@ -176,15 +176,17 @@ function evaluator_blowout:evaluate()
 	
 	if nonehide_npc[self.object:name()] 
 	or xr_companion.is_companion(self.object:id())
-	or ogse_hideouts.check_not_need_hide(self.object)
 	then
 		return false
 	end
 		
-	if not self.object:best_enemy() and 
-	   (ogse_surge_mgr.is_surge_started or scared[self.object:id()] == true) and not ogse_surge_mgr.is_surge_raskolbas and 
-	   not (level.name()=="l11_pripyat" and self.object:character_community() == "monolith") and
-	   not ogse_hideouts.npc_inside_safe_zone(self.object) then
+	if
+	   not self.object:best_enemy()
+	   and (ogse_surge_mgr.is_surge_started or scared[self.object:id()] == true)
+	   and not ogse_surge_mgr.is_surge_raskolbas
+	   and not (level.name()=="l11_pripyat" and self.object:character_community() == "monolith")
+	   and not ogse_hideouts.npc_inside_safe_zone(self.object)
+	then
 		if debug_flag then log1("!!BLOW_UNSAFE "..self.object:name()) end
 		self.st.blowout = true
 	else
@@ -230,7 +232,6 @@ function evaluator_hideout:evaluate()
 
 	if nonehide_npc[self.object:name()] 
 	or xr_companion.is_companion(self.object:id()) 
-	or ogse_hideouts.check_not_need_hide(self.object)	
 	then
 		return false
 	end
@@ -262,7 +263,6 @@ function evaluator_inhide:evaluate()
 
 	if nonehide_npc[self.object:name()] 
 	or xr_companion.is_companion(self.object:id()) 
-	or ogse_hideouts.check_not_need_hide(self.object)	
 	then	
 		return false
 	end

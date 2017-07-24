@@ -52,19 +52,48 @@ function get_nearest_hide(npc)
 	local hideout_list = {}
 	for _, id in pairs(restr_list_on_curr_level) do
 		local obj = level.object_by_id(id)
-		local community, radius = get_community_hide(obj)
-		if obj and string.find(community, npc:character_community()) then
-			local npc_pos = npc:position()
-			local hide_pos = obj:position()
-			local distance = npc_pos:distance_to(hide_pos)
-			local hide = {obj = obj, rad = radius, dist = distance}
-			table.insert(hideout_list, hide)
+		if obj then
+			local community, radius = get_community_hide(obj)
+			if radius then
+				local dist = npc:position():distance_to(obj:position())
+				local hide = {obj = obj, rad = radius, dist = dist, community = community or false}
+				table.insert(hideout_list, hide)
+			end
 		end
 	end
+	--
 	table.sort(hideout_list, function(a,b) return a.dist < b.dist end)
-	local nearest_hide = hideout_list[1]
+	--
+	local nearest_hide
+	for i=1, #hideout_list do
+		local hide = hideout_list[i]
+		if hide.community and string.find( hide.community, npc:character_community() ) then
+			nearest_hide = hideout_list[i]
+			break
+		end
+	end
+	--
+	if not nearest_hide then nearest_hide = hideout_list[1] end
+	--
 	return nearest_hide
 end
+
+
+function get_community_hide(obj) --Считываем параметры укрытия
+	local community, radius
+	local ini = obj:spawn_ini()
+	if ini:section_exist( "parameters" ) then
+		community = get_string("parameters", "community", nil, ini)
+		radius = get_float("parameters", "radius", nil, ini)
+	end
+	--
+	if not radius and type(obj.id) == "function" then
+		radius = obj:get_shape_radius()
+	end
+	--
+	return community, radius
+end
+
 
 -- Получаем текущее укрытие для непися
 function get_current_hide(npc) --Вызывается из таскс_функтора
@@ -75,32 +104,6 @@ function get_current_hide(npc) --Вызывается из таскс_функт
 		end
 	end
 	return "none"
-end
-
-local hideouts_data = {} --Кэш настроек укрытий, чтобы не дёргать постоянно нет-пакет
-function get_community_hide(obj) --Считываем параметры укрытия
-	if not obj then return "none" end
-
-	local id = obj:name()
-	if hideouts_data[id] then
-		--log3("[%s.get_community_hide] parameters of [%s]: %s, %s", script_name(), obj:name(), hideouts_data[id]())
-		return hideouts_data[id]()
-	end
-
-	local ini = obj:spawn_ini()
-	if not ini or not ini:section_exist( "parameters" ) then
-		hideouts_data[id] = function() return "none" end
-		return "none"
-	end
-	local community = get_string("parameters", "community", nil, ini)
-	local radius = get_float("parameters", "radius", nil, ini)
-	if not community or not radius then
-		hideouts_data[id] = function() return "none" end
-		return "none"
-	end
-
-	hideouts_data[id] = function() return community, radius end
-	return community, radius
 end
 
 
@@ -151,40 +154,18 @@ function update_shelter_icon()
 end
 
 
--- Нужно ли нам прятаться вообще и нервничать
-function check_not_need_hide(obj)
-	if obj and obj:alive() then
-		for _, id in pairs(restr_list_on_curr_level) do
-			local zone = level.object_by_id(id)
-			if zone and zone:inside(obj:position()) then
-				local community, radius = get_community_hide(zone)
-				if string.find(community, "fake") then
-					return true
-				end
-			end
-		end
-	end
-	return false
-end
-
 -- Проверка нахождения непися в безопасной зоне
 function npc_inside_safe_zone(obj)
-	local location = level.name()
+	if isIndoor( level.name() ) then return true end
 
-	if isIndoor(location) then
+	if ogse_car_control.in_btr and obj:is_actor() then
 		return true
 	end
 
-	if obj and obj:alive() then	
-		if ogse_car_control.in_btr and obj:is_actor() then
+	for _, id in pairs(restr_list_on_curr_level) do
+		local zone = level.object_by_id(id)
+		if zone and zone:inside(obj:position()) then
 			return true
-		end
-	
-		for _, id in pairs(restr_list_on_curr_level) do
-			local zone = level.object_by_id(id)
-			if zone and zone:inside(obj:position()) then
-				return true
-			end
 		end
 	end
 	return false
