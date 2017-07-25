@@ -400,8 +400,8 @@ end
 
 -- коллбек на нажатие клавиши
 function on_key_down(key, bind)
-	if not db.actor or not db.actor:alive() then return end -- нет актора - нечего делать
 	if level.main_input_receiver() then return end
+
 	if not current_car then -- действия, имеющие смысл только при нахождении снаружи машины
 		if bind == 56 then -- Заправка транспорта
 			local car = car_which_gastank_we_looking_at()
@@ -463,6 +463,7 @@ function on_key_down(key, bind)
 	elseif bind == key_bindings.kWPN_FIRE then -- начать стрелять (обычно левая крысо-кнопка)
 		if is_auto_fire_mode() then -- если мы сейчас стреляли автоматически
 			periscope_mode = periscope_modes.manual -- то переходим в полуавтоматический режим
+			current_target_id = nil
 		end
 		if not actor_has_control_module() then
 			play_error_sound()
@@ -470,14 +471,14 @@ function on_key_down(key, bind)
 		end		
 		switch_firing(current_car, true)
 	elseif bind == key_bindings.kWPN_ZOOM then -- переключение целей явным указанием (обычно правая крысо-кнопка)
-		if is_manual_mode() or surge then -- работает в полуавтоматическом или автоматическом режимах и не работает во время выброса
+		if not is_target_select_mode() or surge then -- работает в полуавтоматическом режиме и не работает во время выброса
 			play_error_sound() -- пшик
 			return
 		end
 		if not actor_has_control_module() then
 			play_error_sound()
 			return		
-		end		
+		end
 		local new_target_id = find_target_at_sight()
 		if new_target_id then
 			play_contact_sound()
@@ -485,7 +486,7 @@ function on_key_down(key, bind)
 			current_target_id = new_target_id
 		end
 	elseif bind == key_bindings.kR_LOOKOUT then -- управление распознаванием
-		if is_manual_mode() or surge then -- работает в полуавтоматическом или автоматическом режимах и не работает во время выброса
+		if not is_target_select_mode() or surge then -- работает в полуавтоматическом режиме и не работает во время выброса
 			play_error_sound() -- пшик
 			return
 		end
@@ -994,22 +995,7 @@ function update_btr_hud(car)
 	--------------------------------------------------------------------------------------------
 	-- маркер цели
 	update_target_marker()
-	do return end
 	--------------------------------------------------------------------------------------------
-	-- текущая цель
-	if current_target_id then
-		local tget = level.object_by_id(current_target_id)
-		if tget then
-			local tget_dist = tget:position():distance_to(db.actor:position())
-			if tget_dist > target_max_range or tget_dist < target_min_range then
-				tget = nil
-				current_target_id = nil
-			end
-		else
-			current_target_id = nil
-		end
-	end
-	
 end
 
 function is_enemy(object)
