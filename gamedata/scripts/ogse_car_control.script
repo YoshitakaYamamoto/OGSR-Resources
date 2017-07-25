@@ -53,7 +53,7 @@ local min_alarm_fov_vol = sys_ini:r_s32("options","min_fov_volume")
 local max_alarm_fov_vol = sys_ini:r_s32("options","max_fov_volume")
 --
 local current_btr_fov
-local periscope_modes             = { manual = 1, target_select = 2, auto = 3 }
+local periscope_modes = { manual = 1, target_select = 2, auto = 3 }
 local periscope_mode
 local recognition_target_mode -- флаг распознавания цели
 --
@@ -1252,11 +1252,15 @@ function update_btr_targets(car)
 	reprioritize_targets(car)
 	
 	if primary_target then
-		current_target_id = primary_target
-	else	
-		current_target_id = nil
+		local target_obj = level.object_by_id(primary_target)
+		if can_be_target(target_obj) then
+			current_target_id = primary_target
+			return
+		end
 	end
-
+	--
+	primary_target = nil
+	current_target_id = nil
 end
 
 function update_fire_status(car)
