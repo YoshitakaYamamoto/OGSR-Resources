@@ -176,6 +176,7 @@ function evaluator_blowout:evaluate()
 	
 	if nonehide_npc[self.object:name()] 
 	or xr_companion.is_companion(self.object:id())
+	or ogse_hideouts.npc_inside_safe_zone(self.object)
 	then
 		return false
 	end
@@ -232,6 +233,7 @@ function evaluator_hideout:evaluate()
 
 	if nonehide_npc[self.object:name()] 
 	or xr_companion.is_companion(self.object:id()) 
+	or ogse_hideouts.npc_inside_safe_zone(self.object)
 	then
 		return false
 	end
@@ -263,6 +265,7 @@ function evaluator_inhide:evaluate()
 
 	if nonehide_npc[self.object:name()] 
 	or xr_companion.is_companion(self.object:id()) 
+	or ogse_hideouts.npc_inside_safe_zone(self.object)
 	then	
 		return false
 	end

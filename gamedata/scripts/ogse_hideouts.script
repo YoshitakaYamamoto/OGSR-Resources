@@ -73,6 +73,7 @@ function get_nearest_hide(npc)
 		end
 	end
 	--
+	--log3( "[%s] hideout list for [%s]: %s", script_name(), npc:name(), hideout_list )
 	if not nearest_hide then nearest_hide = hideout_list[1] end
 	--
 	return nearest_hide
