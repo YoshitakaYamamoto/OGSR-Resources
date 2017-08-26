@@ -157,24 +157,6 @@ function get_pos( center, dist, allow_sector )
   return found
 end
 
---clones table (metatables are cloned too), userdatas are not cloned
-local function table_clone(object)
-    local lookup_table = {}
-    local function _copy(object)
-        if type(object) ~= "table" then
-            return object
-        elseif lookup_table[object] then
-            return lookup_table[object]
-        end
-        local new_table = {}
-        lookup_table[object] = new_table
-        for index, value in pairs(object) do
-            new_table[_copy(index)] = _copy(value)
-        end
-        return setmetatable(new_table, _copy( getmetatable(object)) )
-    end
-    return _copy(object)
-end
 
 class "CKampManager"
 function CKampManager:__init( name, level_vertex_id, scheme, min_radius, src_kamp )
@@ -188,8 +170,8 @@ function CKampManager:__init( name, level_vertex_id, scheme, min_radius, src_kam
   self.kamp_state  = "idle"
   self.avail_state = xr_kamp_data.avail_state
   self.avail_sound = xr_kamp_data.avail_sound
-  self.timeout     = table_clone( xr_kamp_data.timeout )
-  self.kamp_states = table_clone( xr_kamp_data.kamp_states )
+  self.timeout     = table.copy( xr_kamp_data.timeout )
+  self.kamp_states = table.copy( xr_kamp_data.kamp_states )
   self.trans_kamp  = xr_kamp_data.trans_kamp
   -- Хранилище для режиссера лагеря. Режиссерем является сталкер,
   -- затеявший необычное поведение.

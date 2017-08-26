@@ -10,12 +10,7 @@ if SetLog then SetLog(getFS():update_path("$logs$", "_ogse.log")) end
 if init_external_libs then init_external_libs() end
 
 package.cpath = package.cpath..";"..getFS():update_path("$fs_root$", "bin\\extensions").."\\?.dll"
-local rez, msg = pcall(require, "ogse")
-if not not rez then
-	log1("--Loaded: [ogse.dll]")
-else
-	log1("!!Error: "..msg)
-end
+xpcall(function() require("ogse") end, log1)
 
 if set_static_rescale_factor then set_static_rescale_factor(device().height / device().width / 0.75) end
 
@@ -37,12 +32,68 @@ if not string.trim then
 	string.trim = function(s) return s:gsub('^%s*(.-)%s*$', '%1') end
 end
 --==============================================================================================
-
+-- Взято из аддона Naxac'a
+local to_ptrn = {
+	[' '] = '%s',
+	['.'] = '%.',
+	['%'] = '%%',
+	['*'] = '%*',
+	['-'] = '%-'
+}
+string.explode = function ( div,		-- разделитель
+							str,		-- строка
+							clear )		-- обрезать ли пробелы по краям строк (false/true)
+	local ret = {}
+	div = to_ptrn[div] or div
+	for s in str:gmatch("([^"..div.."]+)") do
+		ret[#ret+1] = (clear and s:trim() or s)
+	end
+	return ret
+end
+--==============================================================================================
+-- поверхностное (простое) клонирование таблицы: 
+-- создаётся копия таблицы и копии всех элементов без их клонирования,
+-- т.е. для ссылочных типов обе таблицы будут содержать ссылки на одни и те же данные
+-- метатаблицы не копируются
+function table.clone_simple(tbl)
+	local res = {}
+	for k,v in pairs(tbl) do
+		res[k] = v
+	end
+	return res
+end
+--==============================================================================================
+function table.copy(tbl) --Возвращает копию таблицы.
+	local mt = getmetatable(tbl)
+	local res = {}
+	for k, v in pairs(tbl) do
+		if type(k) == "table" then
+			k = table.copy(k, simple)
+		end
+		if type(v) == "table" then
+			v = table.copy(v, simple)
+		end
+		res[k] = v
+	end
+	setmetatable(res, mt)
+	return res
+end
+--=================================[CUIScriptWnd Extension]=====================================
+-- Вызов обычный, как и в AddCallback, но после последнего аргумента можно передавать множество дополнительных
+function CUIScriptWnd:Connect(name, event, func, obj, ...) --KRodin: fixed!
+	local args = {...}
+	if obj then
+		self:AddCallback( name, event, function(OBJECT) func(OBJECT, unpack(args)) end, obj )
+	else
+		self:AddCallback( name, event, function() func(unpack(args)) end )
+	end
+end
+--==============================================================================================
 if not luaXML_loaded then
-	dofile(getFS():update_path("$game_data$","scripts\\_luaxml.script"))
+	xpcall( function() dofile(getFS():update_path("$game_scripts$", "_luaxml.lua")) end, log1)
 	--log1("--luaXML loaded!")
 end
-
+--==============================================================================================
 -- жуткая затычка для проблемы с большими целыми числами при сложении в Lua
 -- родное сложение начинает округлять и терять часть суммы, а функция sum_args
 -- при тривиальном использовании в ряде случаев отсекает аргументы со значения 0x80000000
@@ -62,7 +113,7 @@ function sum_args_ex(base, offs)
 	--log2("~~lua + : %x", base + offs) --и этот результат - отличаются. При переезде на исходники надо будет городить функцию в движке, или попробовать использовать ffi
 	return res
 end
-
+--==============================================================================================
 --Некоторые недостающие DIK_keys:
 DIK_keys["DIK_MOUSE1"] = 337
 DIK_keys["DIK_MOUSE2"] = 338
@@ -94,26 +145,7 @@ key_bindings["kUSE_BANDAGE"] = 73
 key_bindings["kUSE_MEDKIT"] = 74
 key_bindings["kQUICK_SAVE"] = 75
 key_bindings["kQUICK_LOAD"] = 76
-
--- Взято из аддона Naxac'a
-local to_ptrn = {
-	[' '] = '%s',
-	['.'] = '%.',
-	['%'] = '%%',
-	['*'] = '%*',
-	['-'] = '%-'
-}
-string.explode = function ( div,		-- разделитель
-							str,		-- строка
-							clear )		-- обрезать ли пробелы по краям строк (false/true)
-	local ret = {}
-	div = to_ptrn[div] or div
-	for s in str:gmatch("([^"..div.."]+)") do
-		ret[#ret+1] = (clear and s:trim() or s)
-	end
-	return ret
-end
-
+--==============================================================================================
 local _advance_game_time = level.advance_game_time
 level.advance_game_time = function(game_ms) --KRodin: универсальная функция для перевода часов. Вынесена из менеджера сна.
 	_advance_game_time(game_ms) --Прокручивает игровое время вперед на заданное кол-во ИГРОВЫХ миллисекунд.
@@ -132,7 +164,7 @@ level.advance_game_time = function(game_ms) --KRodin: универсальная
 	-- http://www.amk-team.ru/forum/topic/10538-x-ray-extensions/page-50#entry975972
 	set_ignore_game_state_update()
 end
-
+--==============================================================================================
 log1("--Initializing X-Ray Extensions - end")
 --******************************************** Инициализация расширений движка закончена ********************************************
 
@@ -170,17 +202,6 @@ function toBoolean(val)
     return not not val
 end
 
--- CUIScriptWnd Extension ----------------------------------------
-local function connect_action(func, ...)
-    local arg = {...}
-    return  function (obj) func(obj, unpack(arg)) end
-end
-
--- Что бы не оборачивать в функцию для передачи аргументов.
--- Вызов обычный, как и в AddCallback, но после последнего аргумента можно передавать множество дополнительных
-function CUIScriptWnd:Connect(name, event, func, obj, ...)
-    self:AddCallback(name, event, connect_action(func, ...), obj)
-end
 ------------------------------------------------------------------
 -- путь к динамическому XML файлу
 DYN_XML_SAVE_PATH = getFS():update_path('$game_config$', 'ui\\')..'ui_dynamic.xml'
@@ -1352,17 +1373,7 @@ function get_anomaly_invisibility(npc)
 	local fl = npc:get_actor_relation_flags()
 	return fl:test(anomaly_invisibility_flag)
 end
--- поверхностное (простое) клонирование таблицы: 
---  создаётся копия таблицы и копии всех элементов без их клонирования,
---  т.е. для ссылочных типов обе таблицы будут содержать ссылки на одни и те же данные
---  метатаблицы не копируются
-function table.clone_simple(tbl)
-	local res = {}
-	for k,v in pairs(tbl) do
-		res[k] = v
-	end
-	return res
-end
+
 
 function get_day_time_sec(t)
 	local y,m,d,h,min,s,ms = t:get()

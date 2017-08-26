@@ -214,6 +214,8 @@ end
 
 function generic_object_binder:hit_callback(obj, amount, local_direction, who, bone_index)
 --log3("--[%s] Called hit_callback for [%s]. Who: [%s], amount: [%s]", script_name(), self.object:name(), who:name(), amount)
+	if amount == 0 or bone_index == 0 then return end --Не учитываем выстрелы в воздух. Причину описал в мотиваторе.
+	--
 	if self.st.hit then
 		xr_logic.issue_event(self.object, self.st.hit, "hit_callback", self.object, amount, local_direction, who, bone_index)
 	end
