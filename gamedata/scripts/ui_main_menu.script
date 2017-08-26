@@ -339,29 +339,6 @@ function main_menu:Dispatch(cmd, param)  --virtual function
 	return true
 end]]
 
-local point_count = 0
-
-function main_menu:main_cheat_f3()
-	-- Выдадим сообщение о нашем местоположении
-	utils2.show_coordinates()
-end
-
---// Метод описан и открыт Malandrinus'om. 
-function main_menu:personal_test()
-	local res, err = pcall( function()
-		local chunk, err = dofile(getFS():update_path("$game_scripts$", "personal_test.lua"))
-		if err then log1("!!"..err) end
-	end )
-	log1(res and "~~Succesfull personal_test Execution!" or "~~"..err)
-end
-
-function main_menu:test_spawn()
-	local chunk, err = dofile(getFS():update_path("$game_scripts$", "test_spawn.lua"))
-	if err then
-		log3("cannot execute spawn script: %s", err)
-	end
-end
-
 function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
 	local bind = dik_to_bind(dik)
@@ -373,37 +350,23 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 -------------------<< CoP style load mod
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 		if dik == DIK_keys.DIK_ESCAPE then
-			if level.present() and (db.actor ~= nil) and db.actor:alive() then
+			if level.present() and db.actor and db.actor:alive() then
 				ogse_rebind_key.unbind_key()
 				cmd("main_menu", "off")
 			end
-		end
-		
------------------------------------------------------------
-		if dik == DIK_keys.DIK_N then
-			self.personal_test()
-		end
------------------------------------------------------------
---------------------Тестовый спавн---------------------
-		if dik == DIK_keys.DIK_S then
-			self:test_spawn()
-			cmd("main_menu", 0)
-		end
--------------------------------------------------------
-----------------Показать текущие координаты----------------
-		if dik == DIK_keys.DIK_F3 then
-			self:main_cheat_f3()
-		end
------------------------------------------------------------
---------------------------SDATA----------------------------
-		if dik == DIK_keys.DIK_P then
+		elseif dik == DIK_keys.DIK_N then --personal_test
+			xpcall( function() dofile(getFS():update_path("$game_scripts$", "personal_test.lua")) end, log3)
+		elseif dik == DIK_keys.DIK_S then --Тестовый спавн
+			xpcall( function() dofile(getFS():update_path("$game_scripts$", "test_spawn.lua")) end, log3)
+		elseif dik == DIK_keys.DIK_F3 then --Показать текущие координаты
+			utils2.show_coordinates()
+		elseif dik == DIK_keys.DIK_P then --SDATA
 			if not _sdata.GlobalEnable then
 				_sdata.subscribe()
 			else
 				_sdata.unsubscribe()
 			end
 		end
------------------------------------------------------------
 	end
 	return true
 end
