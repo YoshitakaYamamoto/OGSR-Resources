@@ -402,15 +402,14 @@ function state_manager:__init(npc)
 	self.subanim = 0
 	self.need_reweapon = false
 
-	self.sm = ogse_signals.get_mgr()
 	if npc:alive() then
-		local s = {
+		self.sm = ogse_signals.get_mgr()
+		self.subscribed = {
 			[ "signal" ] = "on_npc_update." .. self.npc:id(),
 			[ "fun"    ] = self.update,
 			[ "self"   ] = self,
 		}
-		self.sm:subscribe( s )
-		self.subscribed = s
+		self.sm:subscribe( self.subscribed )
 	end
 end
 

@@ -23,20 +23,6 @@ function anomaly_binder:__init(obj) super(obj)
 	self.sm = ogse_signals.get_mgr()
 end
 
-function anomaly_binder:unsubscribe()
-	if self.subscribed then
-		local id = self.object:id()
-		--
-		self.sm:unsubscribe( self.subscribed )
-		self.subscribed = nil
-		subscribed_anoms[id] = false
-		--log3("--Anom [%s] UNsubscribed from update", self.object:name())
-		--
-		if radzone_deeps[id] then
-			radzone_deeps[id] = nil
-		end
-	end
-end
 
 function anomaly_binder:subscribe()
 	if not self.subscribed then
@@ -51,6 +37,21 @@ function anomaly_binder:subscribe()
 		--log3("--Anom [%s] subscribed on update", self.object:name())
 	end
 end
+
+function anomaly_binder:unsubscribe()
+	if self.subscribed then
+		self.sm:unsubscribe( self.subscribed )
+		self.subscribed = nil
+		local id = self.object:id()
+		subscribed_anoms[id] = false
+		--log3("--Anom [%s] UNsubscribed from update", self.object:name())
+		--
+		if radzone_deeps[id] then
+			radzone_deeps[id] = nil
+		end
+	end
+end
+
 
 function anomaly_binder:net_spawn(data)
 	if not object_binder.net_spawn( self, data ) then

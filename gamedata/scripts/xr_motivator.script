@@ -12,7 +12,8 @@ net_spawn
 local warn_check_timer = {}
 local snd_check_timer = {}
 
-function look_to_shot(object, who)
+--[=[ --KRodin: выключено.
+local function look_to_shot(object, who)
 	if object and who then
 		if ( object:is_stalker() or object:is_actor() ) and object:alive() and not xr_wounded.is_wounded(object)
 			and who:alive() and (( ( who:is_stalker() or who:is_actor() ) and object:relation(who) ~= game_object.friend) or who:is_monster())
@@ -30,8 +31,9 @@ function look_to_shot(object, who)
 		end
 	end
 end
+--]=]
 
-function recognize_sound(sound_type)
+local function recognize_sound(sound_type)
 	-- Выясняем тип звука
 	local sn_t = "NIL"
 	
@@ -97,11 +99,11 @@ local sil_levels_tbl = {
 	["l12_stancia_2"] = true,
 }
 
-function silent_level()
+local function silent_level()
 	return sil_levels_tbl[level.name()]
 end
 
-function check_sound(self, who, sound_type, sound_position, sound_power)
+local function check_sound(self, who, sound_type, sound_position, sound_power)
 	if not ( self and who and alife():object( who:id() ) and sound_type and sound_position and sound_power ) then
 		return
 	end
@@ -385,6 +387,7 @@ function motivator_binder:net_spawn(sobject)
 	return true
 end
 
+
 function motivator_binder:subscribe_updaters()
   local s_name = "on_npc_update." .. self.object:id()
   if self.object:alive() then
@@ -410,6 +413,15 @@ function motivator_binder:subscribe_updaters()
   end
 end
 
+function motivator_binder:unsubscribe_updaters()
+  for _, s in ipairs( self.updaters ) do
+    self.am:unsubscribe( s )
+	s = nil
+  end
+  self.updaters = nil
+end
+
+
 function motivator_binder:net_destroy()
 --log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 	xr_logic.save_logic_online(self.object)
@@ -427,6 +439,7 @@ function motivator_binder:net_destroy()
 	self.object:set_callback(callback.use_object, nil)
 
 	self.am:call( "on_npc_net_destroy", self.object, self )
+	self:unsubscribe_updaters()
 	self.am:cleanup_signal_subs( "on_npc_update." .. self.object:id() )
 
 	object_binder.net_destroy(self)
@@ -500,7 +513,16 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 		stop_play_sound(self.object)
 	end
 	--
-	if amount == 0 or bone_index == 0 then return end --Далее не учитываем выстрелы в воздух.
+	if amount == 0 or bone_index == 0 then return end --Далее не учитываем выстрелы в воздух. Причина:
+--[=[
+	https://github.com/dsh2dsh/op2ogse/commit/cca8d619581116be44e48a54dfab8039b39a96db
+	Я делал все это в предположении, что перед любым hit_callback
+	вызывается before_hit_callback, а если был вызван hit_callback, значит
+	100% перед ним был вызван before_hit. Всегда. Но это не так. Если было
+	указано игнорирование хита, как в случае дружественного огня, то
+	hit_callback вызван не будет. Если движок нанесет хит для привлечения
+	внимания, с power == 0, то before_hit не будет вызван.
+--]=]
 	--
 	-- FIXME: коллбеки неплохо было бы регистрировать в общем storage, а не посхемно...
 	-- просто всегда ставить их при включении схемы и снимать при отключении.

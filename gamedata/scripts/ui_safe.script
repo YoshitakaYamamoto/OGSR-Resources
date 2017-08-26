@@ -154,6 +154,7 @@ end
 -- отписать апдейт
 function ui_safe:unBind()
     ogse_signals.get_mgr():unsubscribe(self.sm_update)
+	self.sm_update = nil
 end
 
 function ui_safe:onUpdate()

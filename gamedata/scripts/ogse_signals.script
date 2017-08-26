@@ -62,6 +62,7 @@ local slot_desc = {signal = "signal_name", self = obj, fun = obj.method_to_call}
 ogse_signals.get_mgr():subscribe(slot_desc) -- подписали в высокоприоритетную очередь
 --...
 ogse_signals.get_mgr():unsubscribe(slot_desc) -- отписали
+slot_desc = nil --Вот это важно! Отпускаем объект self (находящийся в таблице slot_desc) для сборщика мусора.
 
 -----===< Менеджер сигналов поддерживает постановку обработчика на паузу: >===-----
 Очередь обработчиков сортируется таким образом, что бы сначала были

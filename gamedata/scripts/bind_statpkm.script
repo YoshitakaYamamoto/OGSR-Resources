@@ -158,6 +158,8 @@ function turret_control:action()
 	-- отписываемся от сигналов клавиш
 	ogse_signals.get_mgr():unsubscribe(self.key_down_desc)
 	ogse_signals.get_mgr():unsubscribe(self.key_up_desc)
+	self.key_down_desc = nil
+	self.key_up_desc = nil
 	-- возвращаем актора в исходное состояние
 	bind_stalker.restore_weapon()
 	-- возвращаем турель в исходное состояние

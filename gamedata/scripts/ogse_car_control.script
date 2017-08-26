@@ -223,9 +223,7 @@ end
 function on_finalize()
 	detach_from_all()
 	
-	btr_hud_wnd.self = nil
 	btr_hud_wnd = nil
-	car_hud_wnd.self = nil
 	car_hud_wnd = nil
 	get_hud():RemoveDialogToRender(alt_hud_bg)
 	alt_hud_bg = nil
@@ -642,7 +640,6 @@ function car_hud:__init() super()
 	self.fuel_level = xml:InitStatic("car_fuel_back:fuel_level", self.bg)
 	self.max_width = self.fuel_level:GetWidth()
 	self:Show(true)
-	self.self = self --KRodin: ???
 end
 		
 class "btr_hud" (CUIScriptWnd)
@@ -670,7 +667,6 @@ function btr_hud:__init() super()
 	self.emty:Show(false)
 	self.frame            = xml:InitStatic("main:frame_static", self)
 	self:Show(true)
-	self.self = self
 end
 function btr_hud:enable_noise(enable)
 	self.noise:Show(enable)

@@ -153,6 +153,8 @@ function car_binder:net_destroy()
 	if self.subscribed then --Проверка, прошел ли хоть один апдейт и успели ли мы подписаться на сигналы
 		self.sm:unsubscribe(self._open_trunk_door_desc)
 		self.sm:unsubscribe(self._open_engine_door_desc)
+		self._open_trunk_door_desc = nil
+		self._open_engine_door_desc = nil
 	end
 
 	db.del_car(self.object)

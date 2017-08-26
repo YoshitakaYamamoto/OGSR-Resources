@@ -470,6 +470,7 @@ end
 -- останов таймера
 function savable_timer:stop()
   self.sm:unsubscribe( self._cond_slot_desc )
+  self._cond_slot_desc = nil --KRodin: необходимо! Отпускаем объект для сборщика мусора
   registry[ self.id ] = nil
 end
 
@@ -539,7 +540,7 @@ end
 function delayed_fun_start:stop()
   if self._game_termination_time then
     self.sm:unsubscribe(self.after_time_change_signal)
-    self.after_time_change_signal = nil
+    self.after_time_change_signal = nil --KRodin: необходимо! отпускаем объект для сборщика мусора
   end
 
   savable_timer.stop(self)
@@ -661,6 +662,7 @@ function visual_timer:start(...)
 end
 function visual_timer:stop()
 	self.sm:unsubscribe(self.on_hud_show_desc)
+	self.on_hud_show_desc = nil --KRodin: необходимо! Отпускаем объект для сборщика мусора.
 	local hud = get_hud()
 	hud:RemoveCustomStatic("hud_timer_2")
 	hud:RemoveCustomStatic("hud_timer_text_2")

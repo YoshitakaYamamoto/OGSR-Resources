@@ -286,6 +286,7 @@ end
 function musicbox_base:unBind()
     if self.actionTrack ~= 0 then return end
     ogse_signals.get_mgr():unsubscribe(self.sm_update)
+	self.sm_update = nil
 end
 
 function musicbox_base:onUpdate()
