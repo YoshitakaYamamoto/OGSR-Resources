@@ -16,7 +16,11 @@ function evaluator_combat_zombied:__init( name, glob_storage ) super ( nil, name
 end
 
 function evaluator_combat_zombied:evaluate()
-	return self.gst.script_combat_type == "zombied"
+	if self.gst.script_combat_type == "zombied" then
+		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_combat_zombied" )
+		return true
+	end
+	return false
 end
 
 --------------------------------------------------------------------------------------------------------------

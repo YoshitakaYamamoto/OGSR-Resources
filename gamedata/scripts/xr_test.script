@@ -12,7 +12,11 @@ function evaluator_need_test:__init(storage) super()
 end
 
 function evaluator_need_test:evaluate()
-    return xr_logic.is_active(self.object, self.st)
+    if xr_logic.is_active(self.object, self.st) then
+		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_need_test" )
+		return true
+	end
+	return false
 end
 
 ----------------------------------------------------------------------------------------------------------------------

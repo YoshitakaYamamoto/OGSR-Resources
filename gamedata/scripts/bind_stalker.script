@@ -313,6 +313,11 @@ function actor_binder:on_item_take(obj)
 		return
 	end
 
+	if obj:is_artefact() and not has_alife_info("tutorial_artefact_gain") then
+		game.start_tutorial("part_19_activation")
+		self.object:give_info_portion("tutorial_artefact_gain")
+	end
+
     level_tasks.proceed()
 
 	self.am:call("on_take", obj, sobj)
@@ -363,7 +368,7 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 local update_was_never_called = true
 function actor_binder:update(delta)
-	self.am:call("on_update", delta)	
+	self.am:call("on_update", delta)
 
 	if update_was_never_called then
 		-- заебал уже этот фонарь

@@ -329,7 +329,7 @@ function signals_mgr:call( signal_name, ... )
     for i=1, #self.slots_in_process do --Перебираем незавершенные вызовы, если они есть
       local slot = self.slots_in_process[i]
       if slot.signal == signal_name then --Если название текущего сигнала совпадает с именем сигнала одного из незавершенных слотов
-        log3("~~[%s] The same running signals [%s] are detected! Slots_in_process: %s %s", script_name(), signal_name, self.slots_in_process, debug.traceback())
+        --log3("~~[%s] The same running signals [%s] are detected! Slots_in_process: %s %s", script_name(), signal_name, self.slots_in_process, debug.traceback())
         local args = {...} --Без этого не получилось сделать
         table.insert(self.after_call_callback, function() self:call(signal_name, unpack(args)) end) --Переносим вызов сигнала на момент, когда незавершенных вызовов не будет.
         return --Выходим, больше здесь делать нечего.

@@ -15,7 +15,11 @@ function evaluator_rest:__init (name, storage) super (nil, name)
 end
 ----------------------
 function evaluator_rest:evaluate ()
-  	return xr_logic.is_active (self.object, self.st)
+  	if xr_logic.is_active(self.object, self.st) then
+		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_pos" )
+		return true
+	end
+	return false
 end
 ----------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +33,11 @@ function evaluator_food:__init (name, storage) super (nil, name)
 end
 ----------------------
 function evaluator_food:evaluate ()
-    return this.is_food_present (self.object)
+    if this.is_food_present(self.object) then
+		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_food" )
+		return true
+	end
+	return false
 end
 ----------------------------------------------------------------------------------------------------------------------
 
@@ -42,7 +50,11 @@ function evaluator_pos:__init (name, storage) super (nil, name)
 end
 ----------------------
 function evaluator_pos:evaluate ()
-    return self.st.on_position
+    if self.st.on_position then
+		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_pos" )
+		return true
+	end
+	return false
 end
 ----------------------------------------------------------------------------------------------------------------------
 

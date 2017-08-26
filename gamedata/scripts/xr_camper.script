@@ -22,11 +22,16 @@ end
 function evaluator_end:evaluate()
 	--// xr_companion
 	if xr_companion.is_companion(self.object:id()) then
+		ogse_debug.add_active_eval( self.object, script_name(), "evaluator_end_1" )
 		return true
 	end	
 	--// xr_companion
 
-	return not xr_logic.is_active(self.object, self.a)
+	if not xr_logic.is_active(self.object, self.a) then
+		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_end_2" )
+		return true
+	end
+	return false
 end
 
 --' Обычный комбат или кемперский
@@ -36,7 +41,9 @@ function evaluator_close_combat:__init(name, storage) super (nil, name)
 	self.close_combat = false
 end
 function evaluator_close_combat:evaluate()
+	return false
 
+--[==[
 	if xrs_battle_ai then
 		return false
 	end
@@ -86,6 +93,7 @@ function evaluator_close_combat:evaluate()
 		ogse_debug.add_active_eval( self.object, script_name(), "close_combat_3" )
 	end
 	return self.close_combat
+--]==]
 end
 
 ----------------------------------------------------------------------------------------------------------------------

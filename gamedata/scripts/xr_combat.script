@@ -51,16 +51,28 @@ function evaluator_check_combat:evaluate()
 			if not xr_logic.try_switch_to_another_section(self.object, self.st, actor) then
 				-- взять из overrides, иначе из секции on_combat
 				if overrides and overrides.combat_type then
-					return set_combat_type( self.object, actor, overrides )
+					if set_combat_type( self.object, actor, overrides ) then
+						--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_check_combat_1" )
+						return true
+					end
+					return false
 				else
 --					db.storage[self.object:id()].script_combat_type = nil
 --					return false
-					return self.st.combat_type ~= nil and set_combat_type( self.object, actor, self.st )
+					if self.st.combat_type ~= nil and set_combat_type( self.object, actor, self.st ) then
+						--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_check_combat_2" )
+						return true
+					end
+					return false
 				end
 			end
 		else
 			-- если нет активной секции, то тип боя взять из секции on_combat
-			return self.st.combat_type ~= nil and set_combat_type( self.object, actor, self.st )
+			if self.st.combat_type ~= nil and set_combat_type( self.object, actor, self.st ) then
+				--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_check_combat_3" )
+				return true
+			end
+			return false
 		end
 	end
 
@@ -76,7 +88,11 @@ function evaluator_enemy:__init(name) super (nil, name)
 end
 
 function evaluator_enemy:evaluate()
-	return self.object:best_enemy() ~= nil
+	if self.object:best_enemy() ~= nil then
+		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_enemy" )
+		return true
+	end
+	return false
 end
 
 ----------------------------------------------------------------------------------------------------------------------

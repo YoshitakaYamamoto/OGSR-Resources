@@ -17,7 +17,11 @@ function evaluator_need_walker:evaluate()
 		return false
 	end	
 	--// xr_companion
-  	return xr_logic.is_active(self.object, self.st)
+  	if xr_logic.is_active(self.object, self.st) then
+		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_need_walker" )
+		return true
+	end
+	return false
 end
 
 ----------------------------------------------------------------------------------------------------------------------

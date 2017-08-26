@@ -1,17 +1,7 @@
 -- ZRP - опция показывает точность первого выстрела, а не комбинированную из разных параметров.
 local show_single_fire_accuracy = true
 
---проверим, чтобы возвращаемое значение не выходило за пределы допустимого
-function normalize(val)
---100 - максимум (полная полоска), 0 - минимум.
-	if val > 100 then
-		val = 100
-	elseif val < 1 then
-		val  = 1
-	end
-	
-	return val
-end
+local normalize = function(num) return math.clamp(num, 1, 100) end
 
 
 function read_if_exist(ltx, section, value, default)

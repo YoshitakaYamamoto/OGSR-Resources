@@ -150,7 +150,7 @@ function random_treasure:generate_treasure_reward()
 			self.item_data[self.treasure_placement][self.treasure_id] = working_table
 		end	
 		
-		log3("[%s] Saving self.item_data: %s", script_name(), self.item_data)
+		--log3("[%s] Saving self.item_data: %s", script_name(), self.item_data)
 		ogse.save_var("random_treasure_item_data", self.item_data, "table") -- сохраняем данные в табличку
 	else
 		self.current_reward = nil  -- Ничего менять не надо, поэтому в treasure_manager'е подхватим nil и выставим дефолтный тайник

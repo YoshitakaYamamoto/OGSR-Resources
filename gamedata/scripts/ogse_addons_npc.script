@@ -63,7 +63,7 @@ local function process(npc)
 		if obj:is_weapon_magazined() then --Заносим в таблицу все стволы в инвентаре НПС
 			wpn_table[obj] = obj:section()
 		else
-			local addon_type = ogse_addons.get_addon_type(obj:section())
+			local addon_type = ogse_addons.get_addon_type(obj:section()) --KRodin: странно, был вылет из за того, что повис метод :section(). Надо подумать, что с этим делать.
 			if addon_type ~= 0 then --Заносим в таблицу все аддоны в инвентаре НПС
 				addon_table[obj:id()] = addon_type
 			end

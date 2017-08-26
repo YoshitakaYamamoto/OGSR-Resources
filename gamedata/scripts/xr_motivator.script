@@ -447,11 +447,11 @@ end
 function motivator_binder:before_hit_callback(p_s_hit, p_ignore_flags)
 	self.last_hit_data = read_hit_data(p_s_hit)
 --log3("--[%s] Called before_hit_callback for [%s]: %s, %s, %s", script_name(), self.object:name(), self.last_hit_data, p_s_hit, p_ignore_flags)
-	if self.last_hit_data ~= 0 then
+	if self.last_hit_data ~= 0 and self.last_hit_data.who_id then
 		local obj = level.object_by_id(self.last_hit_data.who_id)
 		if obj then -- если есть виновник хита
 			if
-				self.last_hit_data.who_id == bind_statpkm.pkm_captured -- если это турель
+				( bind_statpkm.pkm_captured and self.last_hit_data.who_id == bind_statpkm.pkm_captured ) -- если это турель
 				or ( ogse_car_control.current_car and ogse_car_control.current_car:id() == self.last_hit_data.who_id ) -- если это БТР, в котором сидит актор
 			then -- то надо заменить на реального виновника, т.е. ГГ
 				write_memory_int(db.actor:cast_game_object(), p_s_hit, hit_offset.who)
@@ -481,6 +481,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	end
 	--self.object:make_object_visible_somewhen(who:cast_game_object())	-- в движке баг в этой функции, поэтому надо кастить к "движковому" клиентскому объекту
 	--
+--[=[ --Хрень. Выключаю.
 	local warn_timer = time_global()
 	if not ogse.is_quest_npc(self.object) and not xr_companion.is_companion(self.object:id()) then
 		if not warn_check_timer[self.object:id()] then
@@ -492,6 +493,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 			end
 		end
 	end
+--]=]
 	--
 	if amount < 0.3 and xr_companion.is_companion(self.object:id()) then --Зачем оно нужно? Типа напарник прекращает говорить когда слышит выстрелы где-то?
 		xr_sound.set_sound(self.object, nil)

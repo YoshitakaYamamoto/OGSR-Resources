@@ -4,6 +4,7 @@ function attach(sm)
 end
 
 local ammo = {}
+local update_planned = false
 
 --------
 -- вызывается при добавлении в инвентарь ГГ любых патрон
@@ -27,7 +28,10 @@ function on_take(obj, s_obj)
 	if not ammo[section].repack then
 		if get_ammo_size(obj) < ammo[section].box then
 			ammo[section].repack = true
-			dsh.exec_on_update( this.on_update )
+			if not update_planned then
+				dsh.exec_on_update( this.on_update )
+				update_planned = true
+			end
 		end
 	end
 	return true --Вроде бы патроны более в on_take нигде не нужны, можно закончить цепочку вызовов.
@@ -62,7 +66,7 @@ function on_update() --Поиск в инвентаре неполных пач�
 				local id = v.remove_ids[i]
 				local sobj = alife():object(id)
 				if sobj then
-					alife():release(s_obj)
+					alife():release(sobj)
 				end
 			end
 			--log3("--[%s] Create ammo! Section: [%s], size: [%s]", script_name(), k, v.size)
@@ -73,4 +77,6 @@ function on_update() --Поиск в инвентаре неполных пач�
 	for k, v in pairs(ammo) do
 		if v.repack then ammo[k].repack = false end
 	end
+
+	update_planned = false
 end

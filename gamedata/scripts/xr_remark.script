@@ -19,7 +19,11 @@ function evaluator_need_remark:__init(storage, name) super(nil, name)
     self.st = storage
 end
 function evaluator_need_remark:evaluate()
-    return xr_logic.is_active(self.object, self.st)
+    if xr_logic.is_active(self.object, self.st) then
+		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_need_remark" )
+		return true
+	end
+	return false
 end
 
 ----------------------------------------------------------------------------------------------------------------------

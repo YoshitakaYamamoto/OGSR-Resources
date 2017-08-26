@@ -107,8 +107,6 @@ function evaluator_wound:evaluate()
 		--	npc:remove_restrictions("bar_arena_restrictor","")
 		--end
 		return true
-	else
-		return false
 	end	
 	return false
 end    
@@ -123,7 +121,11 @@ function evaluator_can_fight:evaluate ()
 	return true
   end
 
-    return xr_logic.pstor_retrieve(self.object, "wounded_fight") ~= "false"
+  if xr_logic.pstor_retrieve(self.object, "wounded_fight") ~= "false" then
+    --ogse_debug.add_active_eval( self.object, script_name(), "evaluator_can_fight" )
+    return true
+  end
+  return false
 end
 
 ----------------------------------------------------------------------------------------------------------------------

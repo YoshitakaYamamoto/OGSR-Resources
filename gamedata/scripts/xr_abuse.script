@@ -68,8 +68,8 @@ function CAbuseManager:update()
 	end
 	self.last_update = time_global()
 
-	--printf("*ABUSE* %s [%s]", self.npc:name(), self.abuse_value)
 	if self:abused() then
+		ogse_debug.add_active_eval( self.npc, script_name(), "xr_abuse" )
 		return true
 	end
 	

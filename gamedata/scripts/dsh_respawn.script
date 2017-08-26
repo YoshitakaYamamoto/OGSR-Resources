@@ -423,7 +423,7 @@ function release_respawner_by_name( name ) --Удаление респавнер
     alife():release(sobj, true)
   end
   all_spawn_respawners[ name ] = nil
-  log3("!!Released respawner with name: %s", name)
+  --log3("!!Released respawner with name: %s", name)
 end
 
 
