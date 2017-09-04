@@ -1,0 +1,85 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+-- KRodin (c) 2017
+-- Эта тулза сканирует все скрипты в папке gamedata\\scripts и ищет _потенциально_ неиспользуемые.
+
+local excluded_scripts = { --Скрипты, вызываемые из движка
+	["_g"] = true,
+	["class_registrator"] = true,
+	["game_registrator"] = true,
+	["ui_wpn_params"] = true,
+}
+
+local script_storage --Таблица с именами всех скриптов. Формат: ["имя_скрипта"] = "полный путь до него"
+local scrips_to_delete --Таблица с именами скриптов, которые потенциально могут быть мусором (не вызываются из других скриптов)
+
+local function file_exists(name) --Более нормального способа проверить существование файла, в lua вроде бы нет.
+	local f = io.open(name, "r")
+	if f then
+		f:close()
+		return true
+	end
+	return false
+end
+
+local function init() --Составляет таблицу с именами всех скриптов в папке и путями до них
+	script_storage, scrips_to_delete = {}, {}
+	--
+	local flist = getFS():file_list_open_ex( "$game_scripts$", FS.FS_ListFiles + FS.FS_ClampExt, "*.script" )
+	for i = 0, flist:Size() - 1 do
+		local file  = flist:GetAt( i )
+		local name_short = file:NameShort()
+		if name_short ~= script_name() then --самого себя не учитываем.
+			local fname = name_short..".script"
+			local full_path = getFS():update_path("$game_scripts$", fname)
+			if file_exists(full_path) then --Если файл находится в папке со скриптами, а не в .db*
+				script_storage[name_short] = full_path
+			end
+		end
+	end
+end
+
+local function process()
+	local found_musor = false
+	for script_name, _ in pairs(script_storage) do
+		if not excluded_scripts[script_name] then --Исключения не обрабатываем
+			local continue = false
+			for check_script, script_full_path in pairs(script_storage) do
+				if check_script ~= script_name then --самого себя не проверяем
+					for line in io.lines(script_full_path) do --Перебираем все строки скрипта check_script в поисках обращения к script_name.
+						--if line:find(script_name) then --так будет много пропусков.
+						if
+							line:find(script_name..".", 1, true)
+							or line:find(script_name.."[", 1, true)
+							or line:find("'"..script_name.."'", 1, true)
+							or line:find('"'..script_name..'"', 1, true)
+							or line:--[[trim():]]find(script_name..',', 1, true)
+							or line:trim():find(','..script_name, 1, true)
+						then
+							continue = true
+							break
+						end
+					end
+				end
+				if continue then break end
+			end
+			--
+			if not continue then
+				script_storage[script_name] = nil
+				scrips_to_delete[script_name] = true
+				found_musor = true
+			end
+		end
+	end
+	return found_musor
+end
+
+
+function garbage_collect()
+	if not script_storage then init() end --если надо, инициализируемся
+	--
+	while process() do end --Цикл выполняется пока process() возвращает true
+	--
+	log3("Potential garbage scripts: %s", scrips_to_delete) --Отчитываемся, какой мусор нашли
+	--
+	script_storage, scrips_to_delete = nil, nil
+end
