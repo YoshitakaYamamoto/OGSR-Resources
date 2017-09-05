@@ -29,18 +29,19 @@ function on_take(obj, s_obj)
 		if get_ammo_size(obj) < ammo[section].box then
 			ammo[section].repack = true
 			if not update_planned then
-				dsh.exec_on_update( this.on_update )
+				dsh.wait_condition(
+					function() return not level.main_input_receiver() end,
+					this.on_update
+				)
 				update_planned = true
 			end
 		end
 	end
-	return true --Вроде бы патроны более в on_take нигде не нужны, можно закончить цепочку вызовов.
+	--return true --Вроде бы патроны более в on_take нигде не нужны, можно закончить цепочку вызовов.
 end
 
 
 function on_update() --Поиск в инвентаре неполных пачек и их переупаковка
-	if level.main_input_receiver() then return end
-
 	local repack_tbl = {}
 	db.actor:inventory_for_each(function(obj, npc)
 		if npc:is_in_ruck(obj) then
