@@ -1235,7 +1235,7 @@ function update_btr_targets(car)
 	
 	if primary_target then
 		local target_obj = level.object_by_id(primary_target)
-		if can_be_target(target_obj) then
+		if target_obj and can_be_target(target_obj) then
 			current_target_id = primary_target
 			return
 		end
@@ -1246,7 +1246,6 @@ function update_btr_targets(car)
 end
 
 function update_fire_status(car)
-
 	if not in_btr then return false end
 	if not (is_auto_fire_mode() and auto_fire_operable) or not actor_has_control_module() then return false end
 	local script_car = car:get_car()
@@ -1254,12 +1253,14 @@ function update_fire_status(car)
 	if current_target_id then
 		-- стреляем
 		local tget = level.object_by_id(current_target_id)
-		switch_firing(car, (script_car:IsObjectVisible(tget) or tget:see(db.actor)))
-	else	
-		-- прекращаем
-		switch_firing(car, false)
-	end	
+		if tget then
+			switch_firing(car, (script_car:IsObjectVisible(tget) or tget:see(db.actor)))
+			return
+		end
+	end
 
+	-- прекращаем
+	switch_firing(car, false)
 end
 
 -- Возвращает угол между проекциями векторов vec1 и vec2 на горизонтальную плоскость
