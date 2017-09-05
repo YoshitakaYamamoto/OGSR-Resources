@@ -25,6 +25,12 @@ local dot_size = 3 --Размер точки (чем больше - тем то�
 --local biomap_sweep
 -------------------------------------
 local dots = {}
+local function cleanup_dots()
+	for _, dot in pairs(dots) do
+		dot:hide()
+	end
+	dots = {}
+end
 local koef_x = 0
 local koef_x_old = 0
 local a,s,c,b,xa = 0,0,1,0,0
@@ -211,54 +217,47 @@ function dot:__init(o, clsid, color)
 	self.st:SetStretchTexture(true)
 	get_hud():GetCustomStatic("biomap"):wnd():AttachChild(self.st)
 	self.st:SetAutoDelete(true)
-	self.cnt = 0
 	self.st:SetWndPos(d * koef_x - 1,d)
 	self.st:SetColor(GetARGB(self.a, unpack(self.color)))
+	--log1("--dot init")
+end
+function dot:__finalize()
+	--log1("~~dot finalize")
 end
 
-function dot:draw(dir, obj_alive) --Нарисовать точку
-	if self.cnt > 0 then
-		self.cnt = self.cnt - 1
-		return
-	end
-	
-	local z = dir:magnitude()/ max_dist
-	if z<=1 then
-		if self.alive and not obj_alive then
-			self.alive = false
-			--if biomap_sweep_enabled then
-			--	self.color = {127,127,127}
-			--else
-				self.st:SetColor(GetARGB(self.a,127,127,127))
-			--end
-		end
-		local vx,vz = dir.x/max_dist * screen_max_dist , -dir.z/max_dist * screen_max_dist
-		local x,y = vx * c - vz * s , vx * s + vz * c
-		self.st:SetWndPos( (x + d)*koef_x - 1, y + d)
-		if self.o_id == 0 then self.cnt = 100000 return end
-		-------- угасание точек -------
+function dot:draw(dir, obj_alive) --Нарисовать точку	
+	if self.alive and not obj_alive then
+		self.alive = false
 		--if biomap_sweep_enabled then
-		--	local u = math.atan2(y, x) * (180 / math.pi) + 180
-		--	if (xa > u and xa-u or u-xa) < 1.5 then
-		--		self.a = 255 
-		--		if sound_enabled and self.alive and not snd_contact:playing() then
-		--			snd_contact.volume = 0.2
-		--			snd_contact:play_at_pos(db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
-		--		end
-		--	elseif self.a > 2 then
-		--		self.a = self.a - 2
-		--	end
-		--	self.st:SetColor(GetARGB(self.a, unpack(self.color)))
+		--	self.color = {127,127,127}
+		--else
+			self.st:SetColor(GetARGB(self.a,127,127,127))
 		--end
-		---------------------------------
-	else
-		self.cnt = math.ceil(math.random(30,50)*z*z)
-		self:hide()
 	end
+	local vx,vz = dir.x/max_dist * screen_max_dist, -dir.z/max_dist * screen_max_dist
+	local x,y = vx * c - vz * s , vx * s + vz * c
+	self.st:SetWndPos( (x + d)*koef_x - 1, y + d)
+	-------- угасание точек -------
+	--if biomap_sweep_enabled then
+	--	local u = math.atan2(y, x) * (180 / math.pi) + 180
+	--	if (xa > u and xa-u or u-xa) < 1.5 then
+	--		self.a = 255 
+	--		if sound_enabled and self.alive and not snd_contact:playing() then
+	--			snd_contact.volume = 0.2
+	--			snd_contact:play_at_pos(db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
+	--		end
+	--	elseif self.a > 2 then
+	--		self.a = self.a - 2
+	--	end
+	--	self.st:SetColor(GetARGB(self.a, unpack(self.color)))
+	--end
+	---------------------------------
 end
 
 function dot:hide() --Скрыть точку
-	self.st:SetWndPos(1024,0)
+	get_hud():GetCustomStatic("biomap"):wnd():DetachChild(self.st)
+	self.st = nil
+	dots[self.o_id] = nil
 end
 
 
@@ -271,12 +270,12 @@ function update()
 	koef_x = (dev.height/dev.width) / (768/1024)
 	if koef_x ~= koef_x_old then
 		koef_x_old = koef_x
+		cleanup_dots()
 		hud:RemoveCustomStatic("biomap")
 		--if biomap_sweep_enabled then
 		--	hud:RemoveCustomStatic("biomap_sweep")
 		--	biomap_sweep = nil
 		--end
-		dots = {}
 	end
 
 	if not hud:GetCustomStatic("biomap") then
@@ -325,9 +324,12 @@ function update()
 			local clsid = o:clsid()
 			local color = need_show_by_sect[clsid] --Если в таблице есть цвет для этого класса - можно показать объект на биорадаре.
 			if dots[id] or color then
-				local d = dots[id] or dot(o, clsid, color)
-				visible_objects[id] = true
-				d:draw(o:position():sub(db.actor:position()), o:alive())
+				local dir = o:position():sub(db.actor:position())
+				if ( dir:magnitude() / max_dist ) <= 1 then
+					local d = dots[id] or dot(o, clsid, color)
+					visible_objects[id] = true
+					d:draw(dir, o:alive())
+				end
 			end
 		end
 	end
@@ -335,7 +337,6 @@ function update()
 		if not visible_objects[id] then
 			--log3("~~[%s] hide dot for object with id: [%s]", script_name(), id)
 			dots[id]:hide()
-			dots[id] = nil
 		end
 	end
 end
@@ -343,7 +344,7 @@ end
 function bioradar_hide() --Убирает радар с экрана
 	local hud = get_hud()
 	if hud:GetCustomStatic("biomap") then
-		dots = {}
+		cleanup_dots()
 		hud:RemoveCustomStatic("biomap")
 		--if biomap_sweep_enabled then
 		--	hud:RemoveCustomStatic("biomap_sweep")
