@@ -13,12 +13,13 @@ function on_spawn()
 	lc_question_add() --С НИ перенести на событие начала игры и всё, больше никогда не вызывать.
 	fix_gar_boars_territory2_logic() --тоже самое.
 	fix_yan_st_stalker3_kamp_1() --тоже самое
+	fix_mg_smarts() --тоже самое
 end
 
 function on_first_update()
 	aem_fix() --Удалить по окончании игры! С НИ ЭТО НЕ НУЖНО!
 	--
-	fix_respawners() --Снести с НИ
+	fix_mg_respawners() --Снести с НИ
 end
 
 
@@ -32,10 +33,10 @@ function fix_yan_st_stalker3_kamp_1()
   ogse.save_var("fix_yan_st_stalker3_kamp_1", true)
 end
 
-function fix_respawners()
-	if has_alife_info("master_quest_finished") then
+function fix_mg_respawners()
+	if has_alife_info("master_quest_soup_ready") then
 		--Релизим респавнеры зомбаков в МГ, больше они не нужны.
-		local del_respawners = { "deadcity_zombied_respawn_1", "deadcity_zombied_respawn_2" }
+		local del_respawners = { "deadcity_zombied_respawn_1", "deadcity_zombied_respawn_2", "deadcity_contoler_respawn_1" }
 		for _, name in pairs(del_respawners) do
 			local sobj = alife():object( name )
 			if sobj then
@@ -43,14 +44,16 @@ function fix_respawners()
 				log3( "--[ogse_fixes] Released respawner [%s]", name )
 			end
 		end
-		--
-		local contr_respawner = alife():object( "deadcity_contoler_respawn_1" )
-		ASSERT(contr_respawner, "")
-		local contr_smart     = alife():object( "deadcity_contr_3" )
-		ASSERT(contr_smart, "")
-		--Телепортируем респавнер контроллёров в место их обитания. В прежнем месте теперь будет лагерь сталкеров.
-		alife():teleport_object( "", contr_smart.position, contr_smart.m_level_vertex_id, contr_smart.m_game_vertex_id, contr_respawner.id )
-		log3( "--[ogse_fixes] [%s] teleported to position of smart [%s]", contr_respawner:name(), contr_smart:name() )
+	end
+end
+
+function fix_mg_smarts()
+	if has_alife_info("master_quest_soup_ready") and not ogse.var_exists("fix_mg_smarts") then
+		for i=1, 6 do
+			local smart = alife():object("deadcity_zombies_"..i)
+			smart:remove_gulag()
+		end
+		ogse.save_var("fix_mg_smarts", true)
 	end
 end
 
@@ -174,10 +177,10 @@ function del_buggy_objects() --Удаление из игры глючных о�
 end
 
 function del_buggy_mapspots() --Удаление глючных меток с карты.
-	if has_alife_info("agr_find_gunslinger_cache_final")
-	and level_tasks.is_map_spot_present(story_ids.agr_zaz, "green_location") then
-		level_tasks.remove_location_by_sid(story_ids.agr_zaz, "green_location") --Глючная метка "Выбраться из подземелья" на Агро.
-	end
+	--if has_alife_info("agr_find_gunslinger_cache_final")
+	--and level_tasks.is_map_spot_present(story_ids.agr_zaz, "green_location") then
+	--	level_tasks.remove_location_by_sid(story_ids.agr_zaz, "green_location") --Глючная метка "Выбраться из подземелья" на Агро.
+	--end
 	if has_alife_info("gar_free_pass")
 	and level_tasks.is_map_spot_present(115, "green_location") then
 		level_tasks.remove_location_by_sid(115, "green_location") --Вечная метка на Прапора на свалке

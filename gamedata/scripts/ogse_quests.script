@@ -1275,6 +1275,25 @@ function blow_bidon_bomb()
 			abort("Deadcity master quest - cannot find the bomb!")
 		end	
 	end
+	--
+	if db.actor:has_info("master_quest_soup_ready") then
+		--Релизим респавнеры зомбаков в МГ, больше они не нужны.
+		local del_respawners = { "deadcity_zombied_respawn_1", "deadcity_zombied_respawn_2", "deadcity_contoler_respawn_1" }
+		for _, name in pairs(del_respawners) do
+			local sobj = alife():object( name )
+			if sobj then
+				dsh_respawn.release_respawner_by_name( name )
+			end
+		end
+		--Перезапускаем гулаги зомбаков в МГ, чтобы в них начали приходить сталкеры.
+		for i=1, 6 do
+			local smart = alife():object("deadcity_zombies_"..i)
+			smart:remove_gulag()
+		end
+		--
+		ogse.save_var("fix_mg_smarts", true) --УДАЛИТЬ С НИ!!!!!!
+		--
+	end
 end
 
 local master_dead = xr_sound.get_safe_sound_object([[ambient\x16\x16_brain_death]])
@@ -1332,10 +1351,6 @@ function master_dying()
 		end
 	end
 
-	ogse_water_restrictor.stop_all_effects()
-
-	bind_stalker.restore_weapon()
-
 	master_dead:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
 	level.add_pp_effector("deadcity_wake_old1.ppe", 2008, false)
 
@@ -1348,21 +1363,6 @@ function master_dying()
 	if level_tasks.is_map_spot_present(story_ids.mg_barman, "green_location") then
 		level_tasks.remove_location_by_sid(story_ids.mg_barman, "green_location") --Удаляем метку с бара в МГ
 	end
-	--
-	--Релизим респавнеры зомбаков в МГ, больше они не нужны.
-	local del_respawners = { "deadcity_zombied_respawn_1", "deadcity_zombied_respawn_2" }
-	for _, name in pairs(del_respawners) do
-		local sobj = alife():object( name )
-		if sobj then
-			dsh_respawn.release_respawner_by_name( name )
-		end
-	end
-	--Телепортируем респавнер контроллёров в место их обитания. В прежнем месте будет лагерь сталкеров.
-	local contr_respawner = alife():object( "deadcity_contoler_respawn_1" )
-	ASSERT(contr_respawner, "")
-	local contr_smart     = alife():object( "deadcity_contr_3" )
-	ASSERT(contr_smart, "")
-	alife():teleport_object( "", contr_smart.position, contr_smart.m_level_vertex_id, contr_smart.m_game_vertex_id, contr_respawner.id )
 end
 
 

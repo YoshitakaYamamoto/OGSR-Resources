@@ -107,3 +107,45 @@ level_vertex_id = 10815 ;10491 ;KRodin: fixed
 ;================================================================
 ;**********************************************************************************
 ;
+;****************************************[МГ]****************************************
+;================================================================
+[dsh.gulag.override.deadcity_contr_2] ;Контроллёры в первом здании справа при въезде в МГ с Янтаря
+cond = {-master_quest_soup_ready} ;После уничтожения Хозяина, смарт закрываем
+;================================================================
+[dsh.gulag.override.cit_kanaliz1] ;Снорки в левой части МГ
+cond = {-master_quest_soup_ready} ;После уничтожения Хозяина, смарт закрываем
+;================================================================
+[dsh.gulag.override.deadcity_zombies_3] ;Центральное здание МГ
+capacity = 13; 10
+[dsh.xr_kamp.deadcity_zombies_3_kamp_1] ;Костёр на первом этаже
+lv_switch_cond = {+master_quest_soup_ready}
+level_vertex_id = 426915
+[dsh.xr_kamp.deadcity_zombies_3_kamp_4] ;Первый костёр на втором этаже
+lv_switch_cond = {+master_quest_soup_ready}
+level_vertex_id = 412178
+[dsh.xr_kamp.deadcity_zombies_3_kamp_5] ;Второй костёр на втором этаже
+lv_switch_cond = {+master_quest_soup_ready}
+level_vertex_id = 424418
+;================================================================
+[dsh.xr_kamp.deadcity_zombies_5_kamp_1] ;Костёр за первым зданием справа в МГ.
+lv_switch_cond = {+master_quest_soup_ready}
+level_vertex_id = 555291
+;================================================================
+[dsh.xr_kamp.deadcity_zombies_1_kamp_1] ;Костёр за домиком, в левой части МГ
+lv_switch_cond = {+master_quest_soup_ready}
+level_vertex_id = 227212
+;================================================================
+[dsh.xr_kamp.deadcity_zombies_2_kamp_3] ;Костёр в пустом помещении типа гаража, в левой части МГ
+lv_switch_cond = {+master_quest_soup_ready}
+level_vertex_id = 253243
+;================================================================
+[dsh.xr_kamp.deadcity_zombies_4_kamp_2] ;Костёр рядом с 5-этажкой возле забора, перед мостом
+lv_switch_cond = {+master_quest_soup_ready}
+level_vertex_id = 532074
+;================================================================
+[dsh.xr_kamp.deadcity_zombies_6_kamp_4] ;Костёр в деревне напротив бара
+lv_switch_cond = {+master_quest_soup_ready}
+level_vertex_id = 138961
+;================================================================
+;************************************************************************************
+;

@@ -241,9 +241,6 @@ function teleport_actor_randomly_from_lair_deadcity()
 		times_teleported_away = times_teleported_away + 1
 		ogse.save_var("times_teleported_away", times_teleported_away, "number")
 
-		ogse_water_restrictor.stop_all_effects()
-		bind_stalker.restore_weapon()
-
 		time_period = time_global() + period
 	end
 end
@@ -266,8 +263,6 @@ function teleport_actor_randomly_deadcity_in_lair()
 		
 		times_teleported_in = times_teleported_in + 1
 		ogse.save_var("times_teleported_in", times_teleported_in, "number")	
-
-		bind_stalker.hide_weapon()
 		
 		time_period = time_global() + period
 	end
@@ -286,8 +281,6 @@ function teleport_actor_final_point_lair()
 		local dir = look:point(0):sub(point:point(0))
 		db.actor:set_actor_direction(-dir:getH())
 		db.actor:give_info_portion("master_quest_teleported_final")
-		
-		bind_stalker.hide_weapon()
 	end
 end
 

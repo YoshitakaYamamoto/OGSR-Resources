@@ -63,7 +63,7 @@ local time_submerged = 0
 local o2_amount = 100
 
 function on_actor_conditions_update( ext )
-	if next(underwater) == nil then return end --≈сли актор не под водой - ничего не делать
+	if not next(underwater) then return end --≈сли актор не под водой - ничего не делать
 
 	ext.sprint_factor	= ext.sprint_factor - (sprint_factor - (sprint_factor * water_coeff))
 	ext.jump_speed		= ext.jump_speed - (jump_speed - (jump_speed * 0.01))
@@ -98,17 +98,17 @@ function fx_start(id)
 			hud:AddCustomStatic("oxygen_hud", true)
 			info = hud:GetCustomStatic("oxygen_hud"):wnd()
 			if breather then
-				info:SetText(game.translate_string("o2_level_breather").." "..string.format("%4.2f",tostring(o2_amount)).."%")
+				info:SetText(game.translate_string("o2_level_breather").." "..string.format("%4.2f", o2_amount).."%")
 			else
-				info:SetText(game.translate_string("o2_level").." "..string.format("%4.2f",tostring(o2_amount)).."%")
+				info:SetText(game.translate_string("o2_level").." "..string.format("%4.2f", o2_amount).."%")
 			end
 		else
 			if breather then
 				info = hud:GetCustomStatic("oxygen_hud"):wnd()
-				info:SetText(game.translate_string("o2_level_breather").." "..string.format("%4.2f",tostring(o2_amount)).."%")
+				info:SetText(game.translate_string("o2_level_breather").." "..string.format("%4.2f", o2_amount).."%")
 			else
 				info = hud:GetCustomStatic("oxygen_hud"):wnd()
-				info:SetText(game.translate_string("o2_level").." "..string.format("%4.2f",tostring(o2_amount)).."%")
+				info:SetText(game.translate_string("o2_level").." "..string.format("%4.2f", o2_amount).."%")
 			end
 		end
 		if snd_dive and not snd_dive:playing() then
@@ -169,17 +169,17 @@ function fx_play(id)
 				hud:AddCustomStatic("oxygen_hud", true)
 				info = hud:GetCustomStatic("oxygen_hud"):wnd()
 				if breather then
-					info:SetText(game.translate_string("o2_level_breather").." "..string.format("%4.2f",tostring(o2_amount)).."%")
+					info:SetText(game.translate_string("o2_level_breather").." "..string.format("%4.2f", o2_amount).."%")
 				else
-					info:SetText(game.translate_string("o2_level").." "..string.format("%4.2f",tostring(o2_amount)).."%")
+					info:SetText(game.translate_string("o2_level").." "..string.format("%4.2f", o2_amount).."%")
 				end
 			else
 				if breather then
 					info = hud:GetCustomStatic("oxygen_hud"):wnd()
-					info:SetText(game.translate_string("o2_level_breather").." "..string.format("%4.2f",tostring(o2_amount)).."%")
+					info:SetText(game.translate_string("o2_level_breather").." "..string.format("%4.2f", o2_amount).."%")
 				else
 					info = hud:GetCustomStatic("oxygen_hud"):wnd()
-					info:SetText(game.translate_string("o2_level").." "..string.format("%4.2f",tostring(o2_amount)).."%")
+					info:SetText(game.translate_string("o2_level").." "..string.format("%4.2f", o2_amount).."%")
 				end
 			end
 		end
@@ -228,13 +228,5 @@ function fx_stop(id)
 
 		bind_stalker.restore_weapon()
 		underwater[id] = nil
-	end
-end
-
-function stop_all_effects()
-	for k, v in pairs(underwater) do
-		if v == true then
-			fx_stop(k)
-		end	
 	end
 end
