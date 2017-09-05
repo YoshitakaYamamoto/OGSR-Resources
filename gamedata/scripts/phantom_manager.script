@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 class "PhantomManager"
 function PhantomManager:__init()
 	self.phantom_count = 0

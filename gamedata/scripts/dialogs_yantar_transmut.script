@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 -- Трансмуты у Сахарова
 function trader_transmut_precond(trader, actor)
 return true

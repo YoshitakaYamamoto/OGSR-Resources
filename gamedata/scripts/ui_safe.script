@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 
 local WIDTH_FACTOR  = get_static_rescale_factor() -- коэффициент сжати€ на выбранном разрешении
 local BASE_HEIGHT   = 720                 -- высота окна сейфа !!! Ёто базовый размер !!! »змен€€ его,

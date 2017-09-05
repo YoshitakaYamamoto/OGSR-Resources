@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 class "opt_gameplay" (CUIWindow)
 
 function opt_gameplay:__init() super()

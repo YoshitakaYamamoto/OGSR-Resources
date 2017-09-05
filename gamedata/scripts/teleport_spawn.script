@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 
 function barman_pivo_timer_action()
 	ogse_st_mgr.delayed_fun_start("barman_pivo_timer")

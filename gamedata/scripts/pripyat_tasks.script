@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 function proceed()
     -- nv 071008 don't process if not in pripyat
     if level.name() ~= "l11_pripyat" then return end

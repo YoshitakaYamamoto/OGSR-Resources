@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 function init(obj)
    obj:bind_object(grenka_binder(obj))
 end

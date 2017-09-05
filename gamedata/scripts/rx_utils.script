@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 --------------------------------------ini---------------------------------------
 function read_from_ini(ini,sec,lin,def,typ)
 	if not ini then

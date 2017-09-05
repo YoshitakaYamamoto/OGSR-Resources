@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 function proceed()
 	if level.name() ~= "l01_escape" then return end
     local actor = db.actor

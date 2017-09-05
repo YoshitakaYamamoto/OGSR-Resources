@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 class "action_process_hit"
 
 function action_process_hit:__init(obj, storage)

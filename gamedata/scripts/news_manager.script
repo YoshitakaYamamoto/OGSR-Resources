@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 -- за счЄт отложенной загрузки звуков экономитс€ примерно 4.5 ћб пам€ти.
 local news_showtime = sys_ini:r_s32("options","news_showtime") -- стандартное врем€ показа сообщени€
 local snds = {

@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 function proceed()
 	-- nv 071008 some optimization
 	if has_alife_info("agr_krot_band_start") then return end

@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 
 function is_food_present (npc)
     if npc:object ("bread") ~= nil or npc:object ("kolbasa") ~= nil or npc:object ("vodka") ~= nil then

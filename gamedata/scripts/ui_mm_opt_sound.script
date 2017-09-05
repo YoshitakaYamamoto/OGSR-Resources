@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 class "opt_sound" (CUIWindow)
 
 function opt_sound:__init() super()

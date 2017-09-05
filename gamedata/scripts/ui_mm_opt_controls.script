@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 class "opt_controls" (CUIWindow)
 
 function opt_controls:__init() super()

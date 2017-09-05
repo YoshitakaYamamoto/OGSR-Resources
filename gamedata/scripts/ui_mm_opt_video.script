@@ -1,3 +1,5 @@
+-- -*- mode: lua; coding: windows-1251-dos -*-
+
 class "opt_video" (CUIWindow)
 
 function opt_video:__init() super()
