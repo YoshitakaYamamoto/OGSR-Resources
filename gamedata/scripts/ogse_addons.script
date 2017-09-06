@@ -612,9 +612,11 @@ end
 -- потом активизировать с помощью level.start_stop_menu
 -- контрол исчезает при нажатии ESC или любой из кнопок отмены
 -- при нажатии на установку контрол скрывается и выполняется действие по установке аддона
+local adc_wnd
 class "addon_control" (CUIScriptWnd)
 
 function addon_control:__init(slot_1_actions, slot_2_actions, sfake_addon) super()
+	adc_wnd = self
 	self.sfake_addon = sfake_addon
 	
 	self.xml = CScriptXmlInit()
@@ -622,15 +624,18 @@ function addon_control:__init(slot_1_actions, slot_2_actions, sfake_addon) super
 	self.xml:InitWindow("main", 0, self)
 	--
 	self.slot_buttons = {}
-	self:setup_slot_buttons(1, slot_1_actions, self.install_to_slot1, self.take_to_slot1, self.close)
-	self:setup_slot_buttons(2, slot_2_actions, self.install_to_slot2, self.take_to_slot2, self.close)
-	
-	self.dlg = self
+	self:setup_slot_buttons(1, slot_1_actions, self.install_to_slot, self.take_to_slot, self.close)
+	self:setup_slot_buttons(2, slot_2_actions, self.install_to_slot, self.take_to_slot, self.close)
+	--log1("--addon_control:__init")
 end
-function addon_control:create_button(template, action)
+function addon_control:__finalize()
+	--log1("~~addon_control:__finalize")
+end
+
+function addon_control:create_button(template, action, slot)
 	local btn = self.xml:Init3tButton(template, self)
 	self:Register(btn,template)
-	self:AddCallback(template, ui_events.BUTTON_CLICKED, action, self)
+	self:Connect(template, ui_events.BUTTON_CLICKED, action, nil, slot)
 	return btn
 end
 
@@ -640,43 +645,33 @@ function addon_control:setup_slot_buttons(slot, available_actions, install_fun, 
 	self.slot_buttons[slot] = btns
 	local take_available = available_actions:test(slot_actions.take)
 	if available_actions:test(slot_actions.install) then
-		btns.a = self:create_button("main:slot"..slot..":btn_1", install_fun)
+		btns.a = self:create_button("main:slot"..slot..":btn_1", install_fun, slot)
 		if take_available then
-			btns.t = self:create_button("main:slot"..slot..":btn_2", take_fun)
+			btns.t = self:create_button("main:slot"..slot..":btn_2", take_fun, slot)
 		end
 	elseif take_available then
-		btns.t = self:create_button("main:slot"..slot..":btn_1", take_fun)
+		btns.t = self:create_button("main:slot"..slot..":btn_1", take_fun, slot)
 		btns.t:SetTextST("st_ogse_addons_take_addon")
 	end
 end
 
 function addon_control:close()
-	level.start_stop_menu(self, false)
-	self.dlg = nil -- отпускаем объект для сборщика мусора
+	level.start_stop_menu(adc_wnd, false)
+	adc_wnd = nil -- отпускаем объект для сборщика мусора
 end
 
-function addon_control:take_to_slot1()
-	convert_addon_to_slot(self.sfake_addon, 1)
-	self:close()
+function addon_control:take_to_slot(slot)
+	convert_addon_to_slot(adc_wnd.sfake_addon, slot)
+	adc_wnd:close()
 end
 
-function addon_control:install_to_slot1()
-	local wpn = db.actor:item_in_slot(1)
-	ASSERT(wpn, "addon_control:btn_a1_action: slot 1 is empty!")
-	install_remove_addon(wpn, self.sfake_addon)
-	self:close()
+function addon_control:install_to_slot(slot)
+	local wpn = db.actor:item_in_slot(slot)
+	ASSERT(wpn, "addon_control:btn_a1_action: slot "..slot.." is empty!")
+	install_remove_addon(wpn, adc_wnd.sfake_addon)
+	adc_wnd:close()
 end
 
-function addon_control:take_to_slot2()
-	convert_addon_to_slot(self.sfake_addon, 2)
-	self:close()
-end
-function addon_control:install_to_slot2()
-	local wpn = db.actor:item_in_slot(2)
-	ASSERT(wpn, "addon_control:btn_a2_action: slot 2 is empty!")
-	install_remove_addon(wpn, self.sfake_addon)
-	self:close()
-end
 function addon_control:OnKeyboard(dik, key_act) CUIScriptWnd.OnKeyboard(self,dik,key_act)
 	if key_act == ui_events.WINDOW_KEY_PRESSED and dik == DIK_keys.DIK_ESCAPE then
 		self:close()
@@ -920,12 +915,10 @@ end
 class "detach_addon_ctrl" (CUIScriptWnd)
 
 function detach_addon_ctrl:__init() super()
-	--log1("detach_addon_ctrl:__init - 1")
 	self.xml = CScriptXmlInit()
 	self.xml:ParseFile("ui_ogse_addon_control.xml")
 	self.xml:InitWindow("main", 0, self)
 	--
-	--log1("detach_addon_ctrl:__init - 2")
 	self.btns = {}
 	for slot=1,2 do
 		local slot_btns = {}
@@ -967,9 +960,12 @@ function detach_addon_ctrl:__init() super()
 	end
 
 	self:Show(true) -- без этого не увидим
-	--self.dlg = self
-	--log1("detach_addon_ctrl:__init - exit")
+	--log1("--detach_addon_ctrl:__init")
 end
+function detach_addon_ctrl:__finalize()
+	--log1("~~detach_addon_ctrl:__finalize")
+end
+
 function detach_addon_ctrl:Update()
 	for slot=1,2 do
 		local item = db.actor:item_in_slot(slot)
@@ -989,9 +985,6 @@ function detach_addon_ctrl:Update()
 	end
 	CUIScriptWnd.Update(self)
 end
---function detach_addon_ctrl:__finalize()
-	--log1("detach_addon_ctrl:__finalize")
---end
 
 -- Открытие/закрытие инвентаря
 local detach_grip_ctrl_wnd = detach_addon_ctrl()

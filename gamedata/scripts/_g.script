@@ -82,11 +82,7 @@ end
 -- Вызов обычный, как и в AddCallback, но после последнего аргумента можно передавать множество дополнительных
 function CUIScriptWnd:Connect(name, event, func, obj, ...) --KRodin: fixed!
 	local args = {...}
-	if obj then
-		self:AddCallback( name, event, function(OBJECT) func(OBJECT, unpack(args)) end, obj )
-	else
-		self:AddCallback( name, event, function() func(unpack(args)) end )
-	end
+	return self:AddCallback( name, event, function(...) func(..., unpack(args)) end, obj )
 end
 --==============================================================================================
 if not luaXML_loaded then
