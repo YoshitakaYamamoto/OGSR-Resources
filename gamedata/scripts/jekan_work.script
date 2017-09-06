@@ -2901,6 +2901,7 @@ function tower_box_smoke()
 	local fx_particle = "explosions\\group_items\\expl_car_smoke01"
 	fx_particle = particles_object(fx_particle)
 	fx_particle:play_at_pos(pos)
+	tasks_functor.delete_when_offline(box:id()):start()
 end
 
 function tower_box_try()
