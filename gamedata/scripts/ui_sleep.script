@@ -1,8 +1,9 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
+local sleep_wnd
 class "sleep" (CUIScriptWnd)
-
 function sleep:__init() super()
+	sleep_wnd = self
 	local xml = CScriptXmlInit()
 	xml:ParseFile("ui_sleep_dialog_wnd.xml")
 	xml:InitWindow("main", 0, self)
@@ -37,15 +38,16 @@ function sleep:__init() super()
 			local btn = xml:Init3tButton("main:sleep_btn", self)
 			btn:SetWndPos(215 + t*24, 298)
 			self:Register(btn,"sleep_btn_"..i)
-			local sleep_fun_str = "local args = {...}; ogse_sleep_mgr.begin_sleep("..t.."); args[1]:on_quit();"
-			local sleep_fun, msg = loadstring(sleep_fun_str)
-			self["sleep"..i] = sleep_fun
-			self:AddCallback("sleep_btn_"..i, ui_events.BUTTON_CLICKED, sleep_fun, self)
+			self:Connect( "sleep_btn_"..i, ui_events.BUTTON_CLICKED, self.on_hour_btn_click, nil, t )
 		end
 	end
 	self:Register(xml:Init3tButton("main:caption_1", self),"caption_1")
 	self:Register(xml:Init3tButton("main:btn_cancel", self),"btn_cancel")
-	self:AddCallback("btn_cancel", 	ui_events.BUTTON_CLICKED, self.cancel, self)
+	self:AddCallback("btn_cancel", 	ui_events.BUTTON_CLICKED, self.on_quit)
+	--log1("--sleep:__init()")
+end
+function sleep:__finalize()
+	--log1("~~sleep:__finalize()")
 end
 
 function sleep:OnKeyboard(dik, keyboard_action)
@@ -58,10 +60,12 @@ function sleep:OnKeyboard(dik, keyboard_action)
 	return true
 end
 
-function sleep:on_quit()
-	self:GetHolder():start_stop_menu(self,true)
+function sleep:on_hour_btn_click( h )
+	ogse_sleep_mgr.begin_sleep( h )
+	sleep_wnd:on_quit()
 end
 
-function sleep:cancel()
-	self:on_quit()
+function sleep:on_quit()
+	sleep_wnd:GetHolder():start_stop_menu(sleep_wnd, true)
+	sleep_wnd = nil
 end
