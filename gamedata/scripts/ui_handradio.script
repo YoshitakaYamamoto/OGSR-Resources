@@ -40,21 +40,22 @@ end
 
 
 function open_radio_dialog()
-	local spwn = handradio(get_hud())
+	local spwn = handradio()
 	level.start_stop_menu(spwn,true)	
 end
 
+local radio_wnd
 class "handradio" (CUIScriptWnd)
-function handradio:__init(owner) super()
-	self.dlg = self
-	self.owner = owner
+function handradio:__init() super()
+	radio_wnd = self
 	self:InitControls()
 	self:InitCallBacks()
 	self:SetWindowName("handradio")
+	--log1("--handradio:__init()")
 end
-
-
-function handradio:__finalize() end
+function handradio:__finalize()
+	--log1("~~handradio:__finalize()")
+end
 
 
 function handradio:InitControls()
@@ -107,12 +108,12 @@ end
 
 function handradio:InitCallBacks()
 	-- тут интерактивные элементы, при определенном действии выполняется заданная ф-ия
-	self:AddCallback("btn_1", ui_events.BUTTON_CLICKED, self.listen, self)
-	self:AddCallback("btn_2", ui_events.BUTTON_CLICKED, self.call_friend, self)
-	self:AddCallback("btn_3", ui_events.BUTTON_CLICKED, self.stay_friend, self)
-	self:AddCallback("btn_4", ui_events.BUTTON_CLICKED, self.hide_friend, self)
+	self:AddCallback("btn_1", ui_events.BUTTON_CLICKED, self.listen)
+	self:AddCallback("btn_2", ui_events.BUTTON_CLICKED, self.call_friend)
+	self:AddCallback("btn_3", ui_events.BUTTON_CLICKED, self.stay_friend)
+	self:AddCallback("btn_4", ui_events.BUTTON_CLICKED, self.hide_friend)
 	
-	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_quit, self)
+	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_quit)
 end
 
 
@@ -197,9 +198,7 @@ function handradio:listen()
 		end
 		--]=]
 	end
-	spawn_radio_if_used()
-	self:GetHolder():start_stop_menu (self,true)
-	self.dlg = nil
+	radio_wnd:on_quit()
 end
 
 function handradio:call_friend()
@@ -214,9 +213,7 @@ function handradio:call_friend()
 			end
 		end
 	end
-	spawn_radio_if_used()
-	self:GetHolder():start_stop_menu (self,true)
-	self.dlg = nil
+	radio_wnd:on_quit()
 end
 
 function handradio:stay_friend()
@@ -231,9 +228,7 @@ function handradio:stay_friend()
 			end
 		end
 	end
-	spawn_radio_if_used()	
-	self:GetHolder():start_stop_menu (self,true)
-	self.dlg = nil
+	radio_wnd:on_quit()
 end
 
 function handradio:hide_friend()
@@ -248,15 +243,13 @@ function handradio:hide_friend()
 			end
 		end
 	end
-	spawn_radio_if_used()	
-	self:GetHolder():start_stop_menu(self,true)
-	self.dlg = nil
+	radio_wnd:on_quit()
 end
 
 function handradio:on_quit()
 	spawn_radio_if_used()
-	self:GetHolder():start_stop_menu (self,true)
-	self.dlg = nil
+	radio_wnd:GetHolder():start_stop_menu(radio_wnd, true)
+	radio_wnd = nil
 end
 
 function start_muten_radio_effect(sound_length, delay)
