@@ -7,75 +7,44 @@
 --
 -- Copyright 2004 GSC Game World
 
-
-function main()
-	super_dlg = ui_numpad.numpad()
-	level.start_stop_menu(super_dlg,true)
-end
-
+local numpad_wnd
 class "numpad" (CUIScriptWnd)
-
 function numpad:__init(owner) super()
+	numpad_wnd = self
 	self.owner = owner
-	self:InitControls()
-	self:InitCallBacks()
+	self:Init_window()
+	--log1("--numpad:__init()")
 end
-
 function numpad:__finalize()
-
+	--log1("~~numpad:__finalize()")
 end
 
-function numpad:InitControls()
-
+function numpad:Init_window()
 	self:Init(342,199,339,369)			  
     local xml = CScriptXmlInit()
     xml:ParseFile("ui_numpad_wnd.xml")
-	
-	local t;
      
 	xml:InitStatic("background", self)
-	t = xml:InitStatic("edit_box", self)
+	local t = xml:InitStatic("edit_box", self)
 	t:SetWindowName("edit_window")
-	self:Register(xml:Init3tButton("btn_0", self),"btn_0")
-	self:Register(xml:Init3tButton("btn_1", self),"btn_1")
-	self:Register(xml:Init3tButton("btn_2", self),"btn_2")
-	self:Register(xml:Init3tButton("btn_3", self),"btn_3")
-	self:Register(xml:Init3tButton("btn_4", self),"btn_4")
-	self:Register(xml:Init3tButton("btn_5", self),"btn_5")
-	self:Register(xml:Init3tButton("btn_6", self),"btn_6")
-	self:Register(xml:Init3tButton("btn_7", self),"btn_7")
-	self:Register(xml:Init3tButton("btn_8", self),"btn_8")
-	self:Register(xml:Init3tButton("btn_9", self),"btn_9")	
-	
+	--
+	for n = 0, 9 do
+		self:Register( xml:Init3tButton("btn_"..n, self), "btn_"..n )	
+		self:Connect("btn_"..n, ui_events.BUTTON_CLICKED, self.AddNumber, nil, n)
+	end
+	--	
 	self:Register(xml:Init3tButton("btn_c",			self),	"btn_c")
+	self:AddCallback("btn_c", ui_events.BUTTON_CLICKED, self.OnButton_c_clicked)
 	self:Register(xml:Init3tButton("btn_backspase",	self),	"btn_backspase")
+	self:AddCallback("btn_backspase", ui_events.BUTTON_CLICKED, self.OnButton_backspace_clicked)
 	self:Register(xml:Init3tButton("btn_enter",		self),	"btn_enter")
+	self:AddCallback("btn_enter", ui_events.BUTTON_CLICKED, self.OnButton_OK_clicked)
 	self:Register(xml:Init3tButton("btn_cancel",	self),	"btn_cancel")
-end
-
-
-function numpad:InitCallBacks()
-	-- new game
-	self:AddCallback("btn_enter",	ui_events.BUTTON_CLICKED,	self.OnButton_OK_clicked,		self)
-	self:AddCallback("btn_cancel",	ui_events.BUTTON_CLICKED,	self.OnButton_CANCEL_clicked,	self)
-	
-	self:AddCallback("btn_0",		ui_events.BUTTON_CLICKED,	self.OnButton_0_clicked,		self)
-	self:AddCallback("btn_1",		ui_events.BUTTON_CLICKED,	self.OnButton_1_clicked,		self)
-	self:AddCallback("btn_2",		ui_events.BUTTON_CLICKED,	self.OnButton_2_clicked,		self)
-	self:AddCallback("btn_3",		ui_events.BUTTON_CLICKED,	self.OnButton_3_clicked,		self)
-	self:AddCallback("btn_4",		ui_events.BUTTON_CLICKED,	self.OnButton_4_clicked,		self)
-	self:AddCallback("btn_5",		ui_events.BUTTON_CLICKED,	self.OnButton_5_clicked,		self)
-	self:AddCallback("btn_6",		ui_events.BUTTON_CLICKED,	self.OnButton_6_clicked,		self)
-	self:AddCallback("btn_7",		ui_events.BUTTON_CLICKED,	self.OnButton_7_clicked,		self)
-	self:AddCallback("btn_8",		ui_events.BUTTON_CLICKED,	self.OnButton_8_clicked,		self)
-	self:AddCallback("btn_9",		ui_events.BUTTON_CLICKED,	self.OnButton_9_clicked,		self)
-	
-	self:AddCallback("btn_c",			ui_events.BUTTON_CLICKED,	self.OnButton_c_clicked,			self)
-	self:AddCallback("btn_backspase",	ui_events.BUTTON_CLICKED,	self.OnButton_backspace_clicked,	self)
+	self:AddCallback("btn_cancel", ui_events.BUTTON_CLICKED, self.OnButton_CANCEL_clicked)	
 end
 
 function numpad:AddNumber(number)
-	local edit_window = self:GetStatic("edit_window")
+	local edit_window = numpad_wnd:GetStatic("edit_window")
 	local text = edit_window:GetText()
 	
 	if text == nil then
@@ -91,9 +60,8 @@ function numpad:AddNumber(number)
 	edit_window:SetText(text)
 end
 
-
 function numpad:OnButton_backspace_clicked()
-	local edit_window = self:GetStatic("edit_window")
+	local edit_window = numpad_wnd:GetStatic("edit_window")
 	local text = edit_window:GetText()
 	
 	if text == nil then
@@ -109,60 +77,20 @@ function numpad:OnButton_backspace_clicked()
 end
 
 function numpad:OnButton_c_clicked()
-	local edit_window = self:GetStatic("edit_window")	
+	local edit_window = numpad_wnd:GetStatic("edit_window")	
 	edit_window:SetText("")
 end
 
-function numpad:OnButton_0_clicked()
-	self:AddNumber(0)
-end
-
-function numpad:OnButton_1_clicked()
-	self:AddNumber(1)
-end
-
-function numpad:OnButton_2_clicked()
-	self:AddNumber(2)
-end
-
-function numpad:OnButton_3_clicked()
-	self:AddNumber(3)
-end
-
-function numpad:OnButton_4_clicked()
-	self:AddNumber(4)
-end
-
-function numpad:OnButton_5_clicked()
-	self:AddNumber(5)
-end
-
-function numpad:OnButton_6_clicked()
-	self:AddNumber(6)
-end
-
-function numpad:OnButton_7_clicked()
-	self:AddNumber(7)
-end
-
-function numpad:OnButton_8_clicked()
-	self:AddNumber(8)
-end
-
-function numpad:OnButton_9_clicked()
-	self:AddNumber(9)
-end
-
 function numpad:OnButton_CANCEL_clicked()
-	self.owner:OnNumberReceive("")
-	self:GetHolder():start_stop_menu(self, true)
+	numpad_wnd.owner:OnNumberReceive("")
+	numpad_wnd:quit()
 end
 
 function numpad:OnButton_OK_clicked()
-	self:GetHolder():start_stop_menu(self, true)
-	local edit_window = self:GetStatic("edit_window")
+	local edit_window = numpad_wnd:GetStatic("edit_window")
 	local text = edit_window:GetText()
-	self.owner:OnNumberReceive(text)
+	numpad_wnd.owner:OnNumberReceive(text)
+	numpad_wnd:quit()
 end
 
 function numpad:OnKeyboard(dik, keyboard_action)  --virtual function
@@ -170,10 +98,8 @@ function numpad:OnKeyboard(dik, keyboard_action)  --virtual function
 	
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 		if dik == DIK_keys.DIK_ESCAPE then
-			self:GetHolder():start_stop_menu(self,true)
-		end
-		
-		if dik == DIK_keys.DIK_0 or dik == DIK_keys.DIK_NUMPAD0 then
+			self:quit()
+		elseif dik == DIK_keys.DIK_0 or dik == DIK_keys.DIK_NUMPAD0 then
 			self:AddNumber(0)
 		elseif dik == DIK_keys.DIK_1 or dik == DIK_keys.DIK_NUMPAD1 then
 			self:AddNumber(1)
@@ -205,3 +131,7 @@ function numpad:OnKeyboard(dik, keyboard_action)  --virtual function
 	return true
 end
 
+function numpad:quit()
+	self:GetHolder():start_stop_menu(self, true)
+	numpad_wnd = nil
+end
