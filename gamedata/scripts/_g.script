@@ -51,6 +51,44 @@ string.explode = function ( div,		-- разделитель
 	return ret
 end
 --==============================================================================================
+-- Форматирование текста по ширине
+-- http://www.amk-team.ru/forum/topic/13216-sborochnyy-ceh/?do=findComment&comment=959286
+function string.width(str, width, return_table, indent, paragrapf)
+    indent    = indent    or 0
+    paragrapf = paragrapf or 0
+    width     = (width or 80) - indent
+    
+    local i = string.rep(' ', indent)
+    local t = {}
+    local line = string.rep(' ', paragrapf)
+    
+    for exp, word in str:gmatch('(%s-(%S+))') do
+        if line == '' and #t ~= 0 then
+            exp = word
+        end
+
+        local l_len = #line
+        local len = l_len + #exp
+        
+        if len > width then
+            t[#t+1], line = line, word
+        else
+            line = line .. exp
+            if l_len == width then
+                t[#t+1], line = line, ''
+            end
+        end
+    end
+
+    t[#t+1] = line
+
+	if return_table then
+		return t
+	else
+		return i .. table.concat(t, '\n' .. i)
+	end
+end
+--==============================================================================================
 -- поверхностное (простое) клонирование таблицы: 
 -- создаётся копия таблицы и копии всех элементов без их клонирования,
 -- т.е. для ссылочных типов обе таблицы будут содержать ссылки на одни и те же данные
@@ -80,10 +118,11 @@ function table.copy(tbl) --Возвращает копию таблицы.
 end
 --=================================[CUIScriptWnd Extension]=====================================
 -- Вызов обычный, как и в AddCallback, но после последнего аргумента можно передавать множество дополнительных.
--- KRodin: из-за особенностей этого метода, у функции func, если она не является членом класса, первый аргумент не должен использоваться!
-function CUIScriptWnd:Connect(name, event, func, obj, ...)
+-- KRodin: из-за особенностей этого метода, у функции func, если она не является членом класса, первый аргумент не должен использоваться, например:
+-- local function func(_, ...) end
+function CUIScriptWnd:Connect(name, event, func, ...)
 	local args = {...}
-	return self:AddCallback( name, event, function(...) func(..., unpack(args)) end, obj )
+	return self:AddCallback( name, event, function() func(unpack(args)) end )
 end
 --==============================================================================================
 if not luaXML_loaded then
