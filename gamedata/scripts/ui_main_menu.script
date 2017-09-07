@@ -24,28 +24,22 @@ local sound_volume_eff,sound_volume_music = 0,0
 local mod_ver = sys_ini:r_string_wq("mod_ver", "mod_ver") 
 
 class "main_menu" (CUIScriptWnd)
-
 function main_menu:__init() super()
 	self.mbox_mode = 0
 	self:InitControls()
 	self:InitCallBacks()
+	--log1("--main_menu:__init()")
 end
-
 function main_menu:__finalize()
+	--log1("~~main_menu:__finalize()")
 end
 
 local screen_aspect_ratio = 1.34
 
 function main_menu:InitBackground(xml)
-	local night
-	if level and level.present() then
-		local htime = level.get_time_hours()
-		night = htime <= 5 or htime >= 20
-	else
-		local real_hour = os and tonumber(os.date("%H", os.time())) or 0
-		night = real_hour and (real_hour <= 8 or real_hour >= 20)
-	end		
-	self.bg_st = self.bg_st or xml:InitStatic("back_movie", self)
+	local time = level.present() and level.get_time_hours() or tonumber(os.date("%H", os.time()))
+	local night = time <= 8 or time >= 20
+	self.bg_st = xml:InitStatic("back_movie", self)
 	self.bg_st:InitTexture(night and "ui\\ui_mm_night_back" or "ui\\ui_mm_main_back")
 	local tex_orig_w = screen_aspect_ratio * 1024 * 0.5625
 	local tex_orig_x_offs = (1024 - tex_orig_w) / 2
@@ -53,47 +47,17 @@ function main_menu:InitBackground(xml)
 end
 
 function main_menu:InitControls()
-
 	local screen = device()
-	local scr_width = screen.width
-	local scr_height = screen.height
-	
-	if scr_width > 0 and scr_height > 0 then
-		screen_aspect_ratio = scr_width / scr_height
-	end	
-	
+	screen_aspect_ratio = screen.width / screen.height
+
 	self:Init(0,0,1024,768)	
 
     self.xml = CScriptXmlInit()
     self.xml:ParseFile("ui_mm_main.xml")
-	
-	--[[local flist = getFS():file_list_open_ex("$game_saves$",bit_or(bit_or(FS.FS_ListFiles,FS.FS_RootOnly), FS.FS_ClampExt) , "*.sav")
-	local f_cnt = flist:Size()
-	local con = get_console()
-	local y,m,d,h,min,sec,ms = nil,nil,nil,nil,nil,nil,nil
-	
-	flist:Sort(5)
-	
-	if f_cnt > 0 then
-		local file = flist:GetAt(0)
-		local sg = CSavedGameWrapper(file:NameFull())
-		
-		y,m,d,h,min,sec,ms = sg:game_time():get()
-		
-		-- local level_name = sg:level_name()
-		-- con:execute("level_name="..level_name)
-		-- local level_id = sg:level_id()
-		-- con:execute("level_id="..level_id)
-		-- local actor_health = sg:actor_health()
-		-- con:execute("actor_health="..actor_health)
-	end	
-	--]]
+
 	self:InitBackground(self.xml)
 	---------------------------------------------------------------
 	if level.present() and not press_any_key_on_start then
-		--log1("cop style - main_menu:InitControls")
-		--level.hide_indicators()
-
 		self.start_btn = self.xml:InitStatic("txt_press_any_key", self)
         return
 	end
@@ -109,26 +73,12 @@ function main_menu:InitControls()
 	local mm = _G.main_menu.get_main_menu()
 	_ver:SetText("S.T.A.L.K.E.R. v" .. mm:GetGSVer())
 	ogse_ver:SetText("OGS Evolution "..mod_ver)
----------------------->> CoP style load mod
-	--[[if level.present() and not press_any_key_on_start then
-		log1("cop style - main_menu:InitControls")
-		--level.hide_indicators()
-
-		self.start_btn = self.xml:InitStatic("txt_press_any_key", self)
-        self:Show(false)
-	end]]
----------------------<< CoP style load mod
 end
 
 function main_menu:Update()
 	CUIScriptWnd.Update(self)
 	local screen = device()
-	local scr_width = screen.width
-	local scr_height = screen.height
-	local new_ar = screen_aspect_ratio
-	if scr_width > 0 and scr_height > 0 then
-		new_ar = scr_width / scr_height
-	end	
+	local new_ar = screen.width / screen.height
 	if new_ar ~= screen_aspect_ratio then
 		screen_aspect_ratio = new_ar
 		self:InitBackground(self.xml)
@@ -146,15 +96,12 @@ function main_menu:InitCallBacks()
 	self:AddCallback("btn_stalker",		ui_events.BUTTON_CLICKED,				self.OnButton_new_stalker_game,		self)
 	self:AddCallback("btn_veteran",		ui_events.BUTTON_CLICKED,				self.OnButton_new_veteran_game,		self)
 	self:AddCallback("btn_master",		ui_events.BUTTON_CLICKED,				self.OnButton_new_master_game,		self)
-	self:AddCallback("btn_spawn",		ui_events.BUTTON_CLICKED,				self.OnButton_load_spawn,			self)
 	-- options																											
 	self:AddCallback("btn_options",     ui_events.BUTTON_CLICKED,				self.OnButton_options_clicked,		self)
 	-- load																												
 	self:AddCallback("btn_load",        ui_events.BUTTON_CLICKED,				self.OnButton_load_clicked,			self)
 	-- save																												
 	self:AddCallback("btn_save",		ui_events.BUTTON_CLICKED,				self.OnButton_save_clicked,			self)
-	-- multiplayer																										
-	--self:AddCallback("btn_multiplayer", ui_events.BUTTON_CLICKED,				self.OnButton_multiplayer_clicked,	self)
 	-- quit																												
 	self:AddCallback("btn_quit",		ui_events.BUTTON_CLICKED,				self.OnButton_quit_clicked,			self)
 	self:AddCallback("btn_quit_to_mm",	ui_events.BUTTON_CLICKED,				self.OnButton_disconnect_clicked,	self)
@@ -178,11 +125,9 @@ function main_menu:OnMsgCancel()
 end
 
 function main_menu:OnMsgYes()
-	
 	if 	self.mbox_mode == 1 then
 		self:LoadLastSave()	
 	end
-
 	self.mbox_mode = 0
 end
 
@@ -191,24 +136,22 @@ function main_menu:OnMsgNo()
 end
 
 function main_menu:LoadLastSave()
-	cmd("main_menu", "off")
+	self:close_menu()
 	cmd("load_last_save")
 end
 
 function main_menu:OnButton_last_save()
-	if (alife() == nil) then
-		self:LoadLastSave	();
+	if not alife() then
+		self:LoadLastSave()
 		return
 	end
-	
-	self.mbox_mode			= 1
-	self.message_box:Init	("message_box_confirm_load_save")
+
+	self.mbox_mode = 1
+	self.message_box:Init("message_box_confirm_load_save")
 	self:GetHolder():start_stop_menu(self.message_box, true)
 end
 
 function main_menu:OnButton_credits_clicked()
---	local console = get_console()
---	console:execute("main_menu off")
 	game.start_tutorial("credits_seq")
 end
 
@@ -217,15 +160,9 @@ function main_menu:OnButton_quit_clicked()
 	self:GetHolder():start_stop_menu(self.message_box, true)
 end
 
-
 function main_menu:OnButton_disconnect_clicked()
 	self.message_box:Init("message_box_quit_game")
-	
-	if (level.game_id() ~= 1) then		
-		self.message_box:SetText("ui_mm_disconnect_message")	-- MultiPlayer
-	else
-		self.message_box:SetText("ui_mm_quit_game_message")		-- SinglePlayer
-	end
+	self.message_box:SetText("ui_mm_quit_game_message")
 	self:GetHolder():start_stop_menu(self.message_box, true)
 end
 
@@ -239,7 +176,7 @@ end
 
 function main_menu:OnButton_return_game()
 	ogse_rebind_key.unbind_key()
-	cmd("main_menu", "off")
+	self:close_menu()
 end
 
 function main_menu:OnButton_new_novice_game()
@@ -263,110 +200,77 @@ function main_menu:OnButton_new_master_game()
 end
 
 function main_menu:StartGame()
-	if (alife() ~= nil) then
+	if alife() then
 		cmd("disconnect")	
 	end
-	
 	cmd("start", "server(all/single/alife/new)", "client(localhost)")
-	cmd("main_menu", "off")
-end
-
-function main_menu:OnButton_load_spawn()
-	if self.spawn_dlg == nil then
-		self.spawn_dlg = ui_spawn_dialog.spawn_dialog()
-		self.spawn_dlg.owner = self
-	end
-	
-	self:GetHolder():start_stop_menu(self.spawn_dlg, true)
-	self:GetHolder():start_stop_menu(self, true) --new
-	self:Show(false)
+	self:close_menu()
 end
 
 function main_menu:OnButton_save_clicked()
-	if self.save_dlg == nil then
+	if not self.save_dlg then
 		self.save_dlg = ui_save_dialog.save_dialog()
 		self.save_dlg.owner = self
 	end
-	
+
 	self:GetHolder():start_stop_menu(self.save_dlg, true)
-	self:GetHolder():start_stop_menu(self, true) --new
+	--self:GetHolder():start_stop_menu(self, true) --new
 	self:Show(false)
 end
 
 function main_menu:OnButton_options_clicked()
-	if self.opt_dlg == nil then
+	if not self.opt_dlg then
 		self.opt_dlg = ui_mm_opt_main.options_dialog()
 		self.opt_dlg.owner = self
 	end
 	ogse_rebind_key.rebind_key()
 	self.opt_dlg:UpdateControls()
 	self:GetHolder():start_stop_menu(self.opt_dlg, true)
-	self:GetHolder():start_stop_menu(self, true) --new
+	--self:GetHolder():start_stop_menu(self, true) --new
 	self:Show(false)
 end
 
 function main_menu:OnButton_load_clicked()
-	if self.load_dlg ==nil then
+	if not self.load_dlg then
 		self.load_dlg = ui_load_dialog.load_dialog()
 		self.load_dlg.owner = self
 	end
 	
 	self:GetHolder():start_stop_menu(self.load_dlg, true)
-	self:GetHolder():start_stop_menu(self, true) --new
+	--self:GetHolder():start_stop_menu(self, true) --new
 	self:Show(false)
 end
-
---[[function main_menu:OnButton_multiplayer_clicked()
-	if self.mp_dlg ==nil then
-		self.mp_dlg = ui_mp_main.mp_main()
-		self.mp_dlg.owner = self
-	end
-	self.mp_dlg:UpdateControls()
-	self:GetHolder():start_stop_menu(self.mp_dlg, true)
-	self:GetHolder():start_stop_menu(self, true) --new
-	self:Show(false)
-	
---	self.mp_dlg:OnBtn_Refresh()
-	
-	local console			= get_console()
-	console:execute			("check_for_updates 0")
-	
-	self.mp_dlg:OnRadio_NetChanged()
-end
-
-function main_menu:Dispatch(cmd, param)  --virtual function
-	if cmd == 2 then
-		self:OnButton_multiplayer_clicked()
-	end
-	return true
-end]]
 
 function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
 	local bind = dik_to_bind(dik)
 ------------------->> CoP style load mod
 	if self.start_btn and dik ~= DIK_keys.DIK_GRAVE then
-		self.OnButton_return_game()
+		self:OnButton_return_game()
 		return true
 	end
 -------------------<< CoP style load mod
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 		if dik == DIK_keys.DIK_ESCAPE then
-			if level.present() and db.actor and db.actor:alive() then
+			if ogse.check_game() then
 				ogse_rebind_key.unbind_key()
-				cmd("main_menu", "off")
+				self:close_menu()
 			end
 		elseif dik == DIK_keys.DIK_N then --personal_test
 			xpcall( function() dofile(getFS():update_path("$game_scripts$", "personal_test.lua")) end, log3)
 		elseif dik == DIK_keys.DIK_S then --Тестовый спавн
 			xpcall( function() dofile(getFS():update_path("$game_scripts$", "test_spawn.lua")) end, log3)
 		elseif dik == DIK_keys.DIK_F3 then --Показать текущие координаты
-			utils2.show_coordinates()
+			if ogse.check_game() then
+				utils2.show_coordinates()
+			end
 		elseif dik == DIK_keys.DIK_P then --SDATA
-			if not _sdata.GlobalEnable then
-				_sdata.subscribe()
-			else
-				_sdata.unsubscribe()
+			if ogse.check_game() then
+				if not _sdata.GlobalEnable then
+					_sdata.subscribe()
+				else
+					_sdata.unsubscribe()
+				end
 			end
 		end
 	end
@@ -393,7 +297,6 @@ end
 function hide_start_screen:action()
 	get_console():hide()
 	press_any_key_on_start = true
-	--level.show_indicators()
 	cmd("snd_volume_eff", sound_volume_eff) 
 	cmd("snd_volume_music", sound_volume_music)
 	sound_volume_eff,sound_volume_music = nil,nil
@@ -414,3 +317,12 @@ function start()
 end
 --------------------<< CoP style load mod
 
+function main_menu:close_menu() --KRodin: закрывать меню только этой функцией!!! Здесь куски меню отпускаются для сборщика мусора! Предотвращение адовых утечек памяти!
+	ui_load_dialog.load_wnd = nil
+	self.load_dlg = nil
+	ui_save_dialog.save_wnd = nil
+	self.save_dlg = nil
+	ui_mm_opt_main.opt_wnd = nil
+	self.opt_dlg = nil
+	cmd("main_menu", "off")
+end

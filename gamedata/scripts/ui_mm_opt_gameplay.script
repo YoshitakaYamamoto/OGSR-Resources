@@ -1,16 +1,12 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
 class "opt_gameplay" (CUIWindow)
-
 function opt_gameplay:__init() super()
 end
-
 function opt_gameplay:__finalize()
-
 end
 
-function opt_gameplay:InitControls(x, y, xml, handler)
-
+function opt_gameplay:InitControls(x, y, xml)
 	self:Init(x,y, 738, 416)
 	self:SetAutoDelete(true)
 	
@@ -24,5 +20,4 @@ function opt_gameplay:InitControls(x, y, xml, handler)
 	xml:InitCheck("tab_gameplay:check_show_weapon", 	self)
 	xml:InitCheck("tab_gameplay:check_dist", 			self)
 	xml:InitComboBox("tab_gameplay:list_difficulty",	self)
-
 end

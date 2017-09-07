@@ -1,6 +1,5 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
-	
 local hint_captions = {
 	["default"] = "hint_string1",
 	--["cam_inert"] = "video_settings_name_1",
@@ -120,14 +119,10 @@ local hint_strings = {
 }
 
 class "opt_video_adv" (CUIScriptWnd)
-
 function opt_video_adv:__init() super()
-	self.dlg = self	
 	self.restart_flags = {}
 end
-
 function opt_video_adv:__finalize()
-
 end
 
 function only_1_mode(ctrl, _id)
@@ -232,6 +227,7 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 		local need_restart = t[3]
 		local update_fun_ind = t[4]
 		local ctrl_init_fun = control_init_funs[ctr_type]
+
 		local function set_hints()
 			ui_mm_opt_main.hint_name:SetText(game.translate_string(hint_captions[opt]))
 			ui_mm_opt_main.hint_caption:SetText(game.translate_string(hint_strings[opt]))
@@ -243,22 +239,22 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 			if self.restart_flags[opt] == false then
 				self.restart_flags[opt] = true
 				self.message_box:Init			("message_box_restart_game")
-				handler:GetHolder():start_stop_menu(self.message_box,true)
+				ui_mm_opt_main.opt_wnd:GetHolder():start_stop_menu(self.message_box,true)
 			end
 		end
 
 		local _st = xml:InitStatic("video_adv:templ_item", self.scroll_v)
 		xml:InitStatic("video_adv:cap_"..opt, _st)
 		local ctl = xml[ctrl_init_fun](xml, "video_adv:"..ctr_type.."_"..opt, _st)
-		self.dlg:Register(_st, "video_adv_cap_"..opt)
-		self.dlg:AddCallback("video_adv_cap_"..opt, ui_events.STATIC_FOCUS_RECEIVED, set_hints, self.dlg)	
+		self:Register(_st, "video_adv_cap_"..opt)
+		self:AddCallback("video_adv_cap_"..opt, ui_events.STATIC_FOCUS_RECEIVED, set_hints)	
 			
 		if need_restart == 1 then
-			self.dlg:Register(ctl, "video_adv:"..ctr_type.."_"..opt)
+			self:Register(ctl, "video_adv:"..ctr_type.."_"..opt)
 			if ctr_type == "list" then
-				self.dlg:AddCallback("video_adv:"..ctr_type.."_"..opt, ui_events.LIST_ITEM_SELECT, check_need_restart, self.dlg)
+				self:AddCallback("video_adv:"..ctr_type.."_"..opt, ui_events.LIST_ITEM_SELECT, check_need_restart)
 			else
-				self.dlg:AddCallback("video_adv:"..ctr_type.."_"..opt, ui_events.BUTTON_CLICKED, check_need_restart, self.dlg)
+				self:AddCallback("video_adv:"..ctr_type.."_"..opt, ui_events.BUTTON_CLICKED, check_need_restart)
 			end
 		end
 		
