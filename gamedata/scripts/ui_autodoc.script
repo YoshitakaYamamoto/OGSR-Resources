@@ -17,14 +17,19 @@ function open_autodoc_ui()
 	level.start_stop_menu(spwn,true)
 end
 
+local autodoc_wnd
 class "autodoc" (CUIScriptWnd)
-
 function autodoc:__init() super()
+	autodoc_wnd = self
 	self.ui_bars = {}
 
 	self:InitLuaXml()
 	self:InitControls()
 	self:InitCallBacks()
+	--log1("--autodoc:__init()")
+end
+function autodoc:__finalize()
+	--log1("~~autodoc:__finalize()")
 end
 
 function autodoc:InitLuaXml()
@@ -157,7 +162,7 @@ function autodoc:InitLuaXml()
             local bar_full_texture = bar_full:append('texture')
             bar_full_texture[1] = "ui_ad_bar_full1"
     -- Save XML ------------------------------
-    luaxml:save(getFS():update_path('$game_config$', 'ui\\')..'ui_dynamic.xml')
+    luaxml:save(DYN_XML_SAVE_PATH)
 end
 
 
@@ -201,12 +206,14 @@ function autodoc:InitControls()
 	end
 end
 
-function autodoc:InitCallBacks()
-	-- тут интерактивные элементы, при определенном действии выполняется заданная ф-ия
-	self:AddCallback("btn_main", ui_events.BUTTON_CLICKED, self.switch_ad, self)
-	self:AddCallback("btn_h", ui_events.BUTTON_CLICKED, self.switch_h, self)
-	self:AddCallback("btn_s", ui_events.BUTTON_CLICKED, self.switch_s, self)
-	self:AddCallback("btn_r", ui_events.BUTTON_CLICKED, self.switch_r, self)
+function autodoc:InitCallBacks() --Тут интерактивные элементы, при определенном действии выполняется заданная ф-ия
+	local function switch(_, v) --KRodin: из-за особенностей метода :Сonnect, у функций, не являющихся членами класса, первый аргумент не должен использоваться!
+		ogse_autodoc.switch_on[v] = not ogse_autodoc.switch_on[v]
+	end
+	self:Connect("btn_main", ui_events.BUTTON_CLICKED, switch, nil, "ad")
+	self:Connect("btn_h",    ui_events.BUTTON_CLICKED, switch, nil, "h")
+	self:Connect("btn_s",    ui_events.BUTTON_CLICKED, switch, nil, "s")
+	self:Connect("btn_r",    ui_events.BUTTON_CLICKED, switch, nil, "r")
 end
 
 function autodoc:Update()
@@ -237,21 +244,10 @@ function autodoc:Update()
 	--log3("r: %f", ogse_autodoc.charges.r)
 end
 
-function autodoc:switch_ad()
-	ogse_autodoc.switch_on.ad = not ogse_autodoc.switch_on.ad
-end
-function autodoc:switch_h()
-	ogse_autodoc.switch_on.h = not ogse_autodoc.switch_on.h
-end
-function autodoc:switch_s()
-	ogse_autodoc.switch_on.s = not ogse_autodoc.switch_on.s
-end
-function autodoc:switch_r()
-	ogse_autodoc.switch_on.r = not ogse_autodoc.switch_on.r
-end
 function autodoc:on_quit()
 	ogse_autodoc.save_autodoc_states()
 	self:GetHolder():start_stop_menu(self,true)
+	autodoc_wnd = nil
 end
 
 function autodoc:OnKeyboard(dik, keyboard_action)
@@ -262,16 +258,12 @@ function autodoc:OnKeyboard(dik, keyboard_action)
 			self:on_quit()-- на выход повесим Esc
 		elseif dik == DIK_keys.DIK_NUMPAD7 then
 			ogse_autodoc.switch_on.ad = not ogse_autodoc.switch_on.ad
-			--self:switch_ad()
 		elseif dik == DIK_keys.DIK_NUMPAD9 then
 			ogse_autodoc.switch_on.h = not ogse_autodoc.switch_on.h
-			--self:switch_h()
 		elseif dik == DIK_keys.DIK_NUMPAD6 then
 			ogse_autodoc.switch_on.s = not ogse_autodoc.switch_on.s
-			--self:switch_s()
 		elseif dik == DIK_keys.DIK_NUMPAD3 then
 			ogse_autodoc.switch_on.r = not ogse_autodoc.switch_on.r
-			--self:switch_r()
 		end
 	end
 	return true
