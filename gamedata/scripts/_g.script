@@ -9,7 +9,7 @@ if SetLog then SetLog(getFS():update_path("$logs$", "_ogse.log")) end
 
 if init_external_libs then init_external_libs() end
 
-package.cpath = package.cpath..";"..getFS():update_path("$fs_root$", "bin\\extensions").."\\?.dll"
+package.cpath = package.cpath..";"..getFS():update_path("$fs_root$", "bin\\extensions\\?.dll")
 xpcall(function() require("ogse") end, log1)
 
 if set_static_rescale_factor then set_static_rescale_factor(device().height / device().width / 0.75) end
@@ -106,10 +106,10 @@ function table.copy(tbl) --Возвращает копию таблицы.
 	local res = {}
 	for k, v in pairs(tbl) do
 		if type(k) == "table" then
-			k = table.copy(k, simple)
+			k = table.copy(k)
 		end
 		if type(v) == "table" then
-			v = table.copy(v, simple)
+			v = table.copy(v)
 		end
 		res[k] = v
 	end
@@ -124,11 +124,9 @@ function CUIScriptWnd:Connect(name, event, func, ...)
 	local args = {...}
 	return self:AddCallback( name, event, function() func(unpack(args)) end )
 end
---==============================================================================================
-if not luaXML_loaded then
-	xpcall( function() dofile(getFS():update_path("$game_scripts$", "_luaxml.lua")) end, log1)
-	--log1("--luaXML loaded!")
-end
+--=======================================[LuaXML]===============================================
+xpcall(function() dofile(getFS():update_path("$game_scripts$", "_luaxml.lua")) end, log1)
+DYN_XML_SAVE_PATH = getFS():update_path('$game_config$', 'ui\\ui_dynamic.xml') --Путь к динамическому XML файлу
 --==============================================================================================
 -- жуткая затычка для проблемы с большими целыми числами при сложении в Lua
 -- родное сложение начинает округлять и терять часть суммы, а функция sum_args
@@ -206,7 +204,6 @@ log1("--Initializing X-Ray Extensions - end")
 
 -- FIX Nazgool ------------------------------------------------------------------
 -- Возможно подобные функции уже где-то и есть, но я пока не нашёл.
-
 -- Проверки
 function isTable   (obj) return type(obj) == 'table'    end
 function isBoolean (obj) return type(obj) == 'boolean'  end
@@ -237,12 +234,7 @@ end
 function toBoolean(val)
     return not not val
 end
-
-------------------------------------------------------------------
--- путь к динамическому XML файлу
-DYN_XML_SAVE_PATH = getFS():update_path('$game_config$', 'ui\\')..'ui_dynamic.xml'
-
--- END FIX  Nazgool --------------------------------------------------------------
+-- END FIX  Nazgool -------------------------------------------------------------
 
 ----------------------------------------------------------------------
 schemes = {} -- соответствие схем модулям
@@ -335,13 +327,6 @@ end
 -------------------------------------------------------------------------------------------------------
 --Отличается от split_comma_separated_list тем, что кроме запятых обрабатывает ещё и пробелы.
 function parse_names( s )
---[=[
-	local t = {}
-	for name in s:gmatch("[^,%s]+" ) do
-		table.insert( t, name )
-	end
-    return t
---]=]
 	return string.explode(",", s, true)
 end
 
@@ -967,14 +952,6 @@ end
 
 -- делит строку в виде "aaa,bbb,ccc" на строки "aaa", "bbb", "ccc" и возвращает их в виде массива
 function split_comma_separated_list(s)
---[=[
-	local res = {}
-	for v in string.gmatch(s, "[^,]+") do
-		table.insert(res, v)
-	end
-	--log3("split_comma_separated_list called: [%s], res: %s", s, res)
-	return res
---]=]
 	return string.explode(",", s)
 end
 
