@@ -1,24 +1,24 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
-
 -- https://github.com/dsh2dsh/op2ogse/blob/master/gamedata/scripts/dsh_wpn_slots.script
+
+local function get_slot_coords( ... ) --KRodin: пусть скрипт читает настройки слотов самостоятельно
+	local inv_xml = xml.xr_load("$game_config$", "ui\\inventory_new"..(is_16_9_mode() and "_16" or "")..".xml")
+	ASSERT(inv_xml, "")
+	local slot_params = inv_xml:find( ... )
+	return { tonumber(slot_params.x), tonumber(slot_params.y), tonumber(slot_params.width), tonumber(slot_params.height) }
+end
 
 local slots = {
   [ 1 ] = {
-    [ "coords"     ] = {
-      [ "std"  ] = { 710, 410, 270, 60 }, --Квадратный экран
-      [ "wide" ] = { 710, 402, 270, 72 }, --Широкий экран
-    },
+    [ "coords"     ] = get_slot_coords( "dragdrop_pistol" ),
     [ "orig_slots" ] = {
       [ 1 ] = true,
       [ 2 ] = true,
     },
   },
   [ 2 ] = {
-    [ "coords"     ] = {
-      [ "std"  ] = { 710, 510, 270, 60 },
-      [ "wide" ] = { 710, 502, 270, 72 },
-    },
+    [ "coords"     ] = get_slot_coords( "dragdrop_automatic" ),
     [ "orig_slots" ] = {
       [ 1 ] = true,
       [ 2 ] = true,
@@ -192,9 +192,8 @@ end
 
 
 function get_slot_by_xy( x, y )
-  local k = is_16_9_mode() and "wide" or "std"
   for n, v in pairs( slots ) do
-    local sx, sy, sw, sh = unpack( v.coords[ k ] )
+    local sx, sy, sw, sh = unpack( v.coords )
     if x > sx and x < sx + sw and y > sy and y < sy + sh then
       return n
     end
