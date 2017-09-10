@@ -337,7 +337,7 @@ end
 function gulag:save_common( packet )
 	packet:w_u8( self.casualities )
 	packet:w_u8( self.state )
-	utils.w_CTime( packet, self.stateBegin or smart_terrain.CTime_0 )
+	utils.w_CTime( packet, self.stateBegin or game.CTime() )
 
 	packet:w_u8(self.population)
 	packet:w_u8(self.population_comed)
