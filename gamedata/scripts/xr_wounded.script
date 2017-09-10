@@ -228,7 +228,6 @@ function action_wounded:execute ()
       emerg = {animation_nout = true}
     end
 	xrs_medic.wounded[self.object:id()]=true
-	xrs_medic.turn_off[self.object:id()] = time_global() + 30000
 	
 	if not wound_manager_state or wound_manager_state == "nil" then
 		wound_manager_state = "wounded"

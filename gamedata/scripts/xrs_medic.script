@@ -87,7 +87,6 @@ mk_types={
 }
 
 wounded = {}
-turn_off = {}
 has_medic = {}
 friends_r = 50
 neutral_r = 30
@@ -171,8 +170,6 @@ function evaluator_medic:evaluate()
 		return true
 	end
 end
-
-turn_off = {}
 
 ----------------------------------------------------------------------------------------------------------------------
 -- ACTIONS
