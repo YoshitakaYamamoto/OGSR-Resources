@@ -2554,6 +2554,14 @@ function ui_bun_comp:quit_ui_bun_comp()
 	comp_wnd:GetHolder():start_stop_menu(comp_wnd, true)
 	comp_wnd = nil
 end
+function ui_bun_comp:OnKeyboard(dik, keyboard_action) --не тестил
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE  then
+			comp_wnd = nil
+		end
+	end
+end
 
 function ui_bun_comp_show()
 	if not has_alife_info("rad_kvest_dobrozhelatel_password_enter") then

@@ -28,13 +28,13 @@ function on_storyline_start() --Спавн пластинок
 end
 
 
-musicbox_mem = {}
-music_dir    = 'characters_voice\\scenario\\mbox\\'
-logo_dir     = 'ui\\mbox\\'
-translate    = game.translate_string
-WIDTH_FACTOR = get_static_rescale_factor()
+local musicbox_mem = {}
+local music_dir    = 'characters_voice\\scenario\\mbox\\'
+local logo_dir     = 'ui\\mbox\\'
+local translate    = game.translate_string
+local WIDTH_FACTOR = get_static_rescale_factor()
 
-plates = {
+local plates = {
     plastinka_1 = {
         title  = translate("plastinka_1_name"),
         logo   = 'mbox_logo_1'  ,
@@ -537,21 +537,21 @@ function musicbox_base:InitApp()
     self.btn_exit:SetText(translate("mbox_sys_btn_exit_text"))
     self.btn_exit:SetTextColor(255, 204, 51, 51)
     self:Register(self.btn_exit,'btn_exit')
-    self:Connect('btn_exit', ui_events.BUTTON_CLICKED, self.onExit , self)
+    self:AddCallback('btn_exit', ui_events.BUTTON_CLICKED, self.onExit , self)
     
     self.btn_stop = self.cxml:InitButton('btn_sys', self.bg_static)
     self.btn_stop:SetWndPos(345 * WIDTH_FACTOR, 520)
     self.btn_stop:SetText(translate("mbox_sys_btn_stop_text"))
     self.btn_stop:SetTextColor(255, 204, 102, 0)
     self:Register(self.btn_stop, 'btn_stop')
-    self:Connect('btn_stop', ui_events.BUTTON_CLICKED, self.onStop , self)
+    self:AddCallback('btn_stop', ui_events.BUTTON_CLICKED, self.onStop , self)
     
     self.btn_play_all = self.cxml:InitButton('btn_sys', self.bg_static)
     self.btn_play_all:SetWndPos(595 * WIDTH_FACTOR, 520)
     self.btn_play_all:SetText(translate("mbox_sys_btn_play_all_text"))
     self.btn_play_all:SetTextColor(255, 51, 153, 51)
     self:Register(self.btn_play_all, 'btn_play_all')
-    self:Connect('btn_play_all', ui_events.BUTTON_CLICKED, self.onPlayAll , self)
+    self:AddCallback('btn_play_all', ui_events.BUTTON_CLICKED, self.onPlayAll , self)
 end
 
 function musicbox_base:OnPlateButtonClicked(i)
@@ -726,6 +726,7 @@ function musicbox_base:onExit()
 end
 
 function musicbox_base:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
     if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
         if dik == DIK_keys.DIK_ESCAPE then
             self.isClosed = true

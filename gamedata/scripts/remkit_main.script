@@ -198,13 +198,13 @@ function remkit:InitControls()
 end
 
 function remkit:InitCallBacks()
-	local function rep_item(_, slot)
+	local function rep_item(slot)
 		rep_slot = slot
 		remkit_wnd:cheat_main()
 	end
-	self:Connect( "btn_1", ui_events.BUTTON_CLICKED, rep_item, nil, 1 ) --ремонт ствола в первом слоте
-	self:Connect( "btn_2", ui_events.BUTTON_CLICKED, rep_item, nil, 2 ) --ремонт ствола во втором слоте
-	self:Connect( "btn_3", ui_events.BUTTON_CLICKED, rep_item, nil, 6 ) --ремонт брони
+	self:Connect( "btn_1", ui_events.BUTTON_CLICKED, rep_item, 1 ) --ремонт ствола в первом слоте
+	self:Connect( "btn_2", ui_events.BUTTON_CLICKED, rep_item, 2 ) --ремонт ствола во втором слоте
+	self:Connect( "btn_3", ui_events.BUTTON_CLICKED, rep_item, 6 ) --ремонт брони
 	--
 	self:AddCallback("btn_4", ui_events.BUTTON_CLICKED, self.rep_trans)
 	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_quit) --кнопка выхода

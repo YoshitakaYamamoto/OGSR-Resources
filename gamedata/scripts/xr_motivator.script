@@ -576,6 +576,8 @@ function motivator_binder:death_callback(victim, who)
 
 	xr_statistic.addKillCount(who, self.object) --Добавление опыта за убийство
 
+	self.st.move_mgr = nil
+
 	self.am:call("on_npc_death", self.object, who)
 end
 

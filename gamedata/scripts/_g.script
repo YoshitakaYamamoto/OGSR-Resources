@@ -118,8 +118,6 @@ function table.copy(tbl) --Возвращает копию таблицы.
 end
 --=================================[CUIScriptWnd Extension]=====================================
 -- Вызов обычный, как и в AddCallback, но после последнего аргумента можно передавать множество дополнительных.
--- KRodin: из-за особенностей этого метода, у функции func, если она не является членом класса, первый аргумент не должен использоваться, например:
--- local function func(_, ...) end
 function CUIScriptWnd:Connect(name, event, func, ...)
 	local args = {...}
 	return self:AddCallback( name, event, function() func(unpack(args)) end )
