@@ -110,6 +110,7 @@ function evaluator_medic:__init(name, storage) super (nil, name)
 end
 function evaluator_medic:evaluate()
 	if not self.object:alive() then
+		--log3("~~Found dead npc in evaluator: [%s]", self.object:name())
 		return false
 	end
 

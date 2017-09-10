@@ -577,6 +577,9 @@ function motivator_binder:death_callback(victim, who)
 	xr_statistic.addKillCount(who, self.object) --Добавление опыта за убийство
 
 	self.st.move_mgr = nil
+	
+	--Пока выключено, т.к сразу после этого виснет sheduler непися. Надо разбираться, в чём там проблема. На новом движке уже, конечно.
+	--self.object:motivation_action_manager():clear() --KRodin: мёртвых нет смысла проверять эвалуаторами
 
 	self.am:call("on_npc_death", self.object, who)
 end
