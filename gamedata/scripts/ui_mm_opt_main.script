@@ -192,9 +192,7 @@ function options_dialog:OnBtnAccept()
 	--opt_wnd:GetHolder():start_stop_menu	(opt_wnd.owner, true) --new(show main window)
 	opt_wnd:GetHolder():start_stop_menu	(opt_wnd,true)
 	opt_wnd.owner:Show						(true)
-	ogse_rebind_key.save_keys() -- сохраняем переназначаемые клавиши, чтобы иметь возможность их после восстановить
 	cmd("cfg_save") -- сохраняем файл настроек на диск
-	set_static_rescale_factor(device().height / device().width / 0.75)
 end
 
 function options_dialog:OnBtnCancel()

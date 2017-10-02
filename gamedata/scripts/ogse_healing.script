@@ -124,7 +124,7 @@ end
 -----------------------------------------------------------------------
 
 function on_actor_spawn()
-	db.actor.max_power = ogse.load_var("actor_max_power", 1.0) - db.actor.max_power	
+	db.actor.max_power = ogse.load_var("actor_max_power", 1.0)
 	
 	if ogse.var_exists("next_detoxication_time") then
 		next_update_time = ogse.load_var("next_detoxication_time", 0)
@@ -511,7 +511,7 @@ function on_before_use_item(obj, sobj)
 			local rad_prot = get_combined_radiation_protection()
 			if rad_prot < 0.999 then
 				local scaled_effect = item_effects.radiation * rad_prot
-				obj:set_inventory_item_float(nil, scaled_effect, inventory_item_offsets.radiation_influence)
+				obj:set_radiation_influence(scaled_effect)
 			end
 		end
 		return false -- даём возможность для дальнейшей обработки объекта
@@ -554,6 +554,12 @@ end
 function on_actor_update()
 	local current_time = game.get_game_time()
 	apply_vodka_effect(current_time)
+
+	local rad_prot = get_combined_radiation_protection()
+	if rad_prot < 0.999 then
+		db.actor:set_additional_radiation_protection(rad_prot)
+	end
+	db.actor:set_additional_telepatic_protection(get_combined_psy_protection())
 end
 
 local imm_names = {"rad_immunity", "rad_food_immunity", "psy_immunity"}
@@ -657,7 +663,7 @@ function dix_timer:save(t, template)
 	return template
 end
 function dix_timer:action() -- обнуляем все иммунитеты, связанные с этим таймером
-	db.actor.max_power = self.normal_max_power - db.actor.max_power
+	db.actor.max_power = self.normal_max_power --[[ - db.actor.max_power]] -- KD: в движке SET
 	health_effect_timer_ex.action(self)
 	--log1("DEBUG!! Medicine [DIX] STOP!")
 	--self:stop()

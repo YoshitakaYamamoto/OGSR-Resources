@@ -221,7 +221,7 @@ function action_launch_grenade:execute()
 		--printf("launch[%s]:stage 0",npc:character_name())
 		local s = alife():create("gl_test_shell_"..self.shell,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 		self.test_shell = s.id
-		level.client_spawn_manager():add(s.id, -1, mark_grenade_non_pickable)
+		--level.client_spawn_manager():add(s.id, -1, mark_grenade_non_pickable)
 		self.stage = 1
 	elseif self.stage == 1 then -- запуск
 		--printf("launch[%s]:stage 1",npc:character_name())
@@ -278,7 +278,7 @@ function action_launch_grenade:execute()
 --				table.insert(test_mem[self.lvid],{pos = npc:position(),trg = self.target_point,str = self.str_pos,lps = self.launch_pos,typ = self.type})
 				local s = alife():create("gl_fake_missile_"..self.shell,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 				self.fake_missile = s.id
-				level.client_spawn_manager():add(s.id, -1, mark_grenade_non_pickable)
+				--level.client_spawn_manager():add(s.id, -1, mark_grenade_non_pickable)
 				self.stage = 4
 			else
 				--printf("launch[%s]:stage 3:not cv",npc:character_name())
@@ -557,7 +557,7 @@ end
 function check_weapon(wpn)
 	if wpn == nil or alife():object(wpn:id()) == nil then return false end
 	local sec = wpn:section()
-	if rx_utils.item_is_fa(wpn) and gl_sets.forbiddens.weapons[sec] ~= true then
+	if rx_utils.is_weapon(wpn) and gl_sets.forbiddens.weapons[sec] ~= true then
 		if ogse_addons.is_grenade_launcher_installed(wpn) then
 			if not gl_sets.weapons[sec] then
 				local particles = read_from_ini(nil,sec,"grenade_flame_particles","weapons\\generic_weapon01",2)

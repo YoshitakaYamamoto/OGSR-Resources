@@ -32,7 +32,7 @@ local musicbox_mem = {}
 local music_dir    = 'characters_voice\\scenario\\mbox\\'
 local logo_dir     = 'ui\\mbox\\'
 local translate    = game.translate_string
-local WIDTH_FACTOR = get_static_rescale_factor()
+local WIDTH_FACTOR = device().height / device().width / 0.75
 
 local plates = {
     plastinka_1 = {

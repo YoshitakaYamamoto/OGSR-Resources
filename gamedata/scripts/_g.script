@@ -3,16 +3,10 @@
 log1("--LUA version: ["..(jit.version or _VERSION).."]")
 log1("--...Initializing X-Ray Extensions - start...")
 
-if RvP then RvP() end
-
-if SetLog then SetLog(getFS():update_path("$logs$", "_ogse.log")) end
-
-if init_external_libs then init_external_libs() end
-
-package.cpath = package.cpath..";"..getFS():update_path("$fs_root$", "bin\\extensions\\?.dll")
-xpcall(function() require("ogse") end, log1)
-
-if set_static_rescale_factor then set_static_rescale_factor(device().height / device().width / 0.75) end
+--KRodin: надо убрать при  переходе на LuaJIT 2+
+if string.gmatch(jit.version, "LuaJIT 1.") then
+	require("jit.opt").start(2)
+end
 
 math.randomseed(os.time())
 
@@ -126,26 +120,7 @@ end
 xpcall(function() dofile(getFS():update_path("$game_scripts$", "_luaxml.lua")) end, log1)
 DYN_XML_SAVE_PATH = getFS():update_path('$game_config$', 'ui\\ui_dynamic.xml') --Путь к динамическому XML файлу
 --==============================================================================================
--- жуткая затычка для проблемы с большими целыми числами при сложении в Lua
--- родное сложение начинает округлять и терять часть суммы, а функция sum_args
--- при тривиальном использовании в ряде случаев отсекает аргументы со значения 0x80000000
--- здесь сделано так, что этот эффект не происходит. Функция очень медленная,
--- использовать только в связке с функцией получения значения по абсолютному адресу
--- и по возможности вообще избегать.
-function sum_args_ex(base, offs)
-	local base_s = string.format("%08x", base)
-	local b1_s = base_s:sub(1,4)
-	--log1(b1_s)
-	local b2_s = base_s:sub(5,8)
-	--log1(b2_s)
-	local b1 = tonumber(b1_s, 16)
-	local b2 = tonumber(b2_s, 16)
-	local res = sum_args(bit.lshift(b1, 16), sum_args(b2, offs)) --KRodin: думал, что res = первое значение, а второе вообще не используется. Но как оказалось, res = сумма этих двух значений. Я и не знал, что так можно делать.
-	--log2("~~sum_args_ex: %s, %x, %x", base_s, offs, res) --Действительно, этот результат
-	--log2("~~lua + : %x", base + offs) --и этот результат - отличаются. При переезде на исходники надо будет городить функцию в движке, или попробовать использовать ffi
-	return res
-end
---==============================================================================================
+--KRodin: TODO: Добавить в движок!
 --Некоторые недостающие DIK_keys:
 DIK_keys["DIK_MOUSE1"] = 337
 DIK_keys["DIK_MOUSE2"] = 338
@@ -194,7 +169,7 @@ level.advance_game_time = function(game_ms) --KRodin: универсальная
 	--Для установки этого разового игнора и предназначена эта функция.
 	--Вполне допускаю, хотя уже и не помню точно, что вместе с актором пропускается обновление чего-то ещё.
 	-- http://www.amk-team.ru/forum/topic/10538-x-ray-extensions/page-50#entry975972
-	set_ignore_game_state_update()
+	level.set_ignore_game_state_update()
 end
 --==============================================================================================
 log1("--Initializing X-Ray Extensions - end")
@@ -806,9 +781,9 @@ end
 -------------------------------------------------------------------------------
 --                            Добавлено в OGSE                               --
 -------------------------------------------------------------------------------
-function ASSERT(cond, msg, ...)
+function ASSERT(cond, ...)
 	if not cond then
-		abort(msg, ...)
+		abort(...)
 	end
 end
 
@@ -1035,9 +1010,13 @@ function get_vector2(section, param, def_val, ini_file)
 	ASSERT(ini:section_exist(section), "get_vector2: section '"..section.."' doesn't exist")
 	if ini:line_exist(section, param) then
 		local pos = get_names(section, param, ini)
-		return tonumber(pos[1]), tonumber(pos[2])
+		return vector2():set(tonumber(pos[1]), tonumber(pos[2]))
 	else
-		return def_val and unpack(def_val)
+		if def_val then
+			return def_val
+		else
+			return vector2():set(0,0)
+		end
 	end
 end
 
@@ -1209,14 +1188,13 @@ function print_matrix(name, m)
 end
 function time2string(time, fmt, order)
 	ASSERT(time, "[_g.time2string] 'time' is a nil reference")
-	local a,b = time:get_value()
 	if not fmt then
-		return time:timeToString(game.CTime.TimeToMilisecs).." "..time:dateToString(game.CTime.DateToDay)..string.format(" [%04x %04x]", a,b)
+		return time:timeToString(game.CTime.TimeToMilisecs).." "..time:dateToString(game.CTime.DateToDay)
 	else
 		local y,m,d,h,min,s,ms = time:get()
-		local args = {y=y,m=m,d=d,h=h,min=min,s=s,ms=ms,a=a,b=b}
+		local args = {y=y,m=m,d=d,h=h,min=min,s=s,ms=ms}
 		if order then
-			args = {args[order[1]], args[order[2]], args[order[3]], args[order[4]], args[order[5]], args[order[6]], args[order[7]], args[order[8]], args[order[9]]}
+			args = {args[order[1]], args[order[2]], args[order[3]], args[order[4]], args[order[5]], args[order[6]], args[order[7]]}
 		end
 		return fmt:format(unpack(args))
 	end
@@ -1282,96 +1260,10 @@ end
 ----------------------------------------------------------------------
 -- Работа с актором
 ----------------------------------------------------------------------
--- константы для функций get_actor_flags и set_actor_flags
-actor_flags = {
-	invincible     =  1,
-	invisible      =  2, -- useless
-	always_run     =  4,
-	unlimited_ammo =  8,
-	run_backward   = 16,
-	autopickup     = 32,
-	psp            = 64, -- вид от третьего лица
-}
-function set_actor_invincible(invincible)
-	local flags = get_actor_flags()
-	local mask = actor_flags.invincible
-	set_actor_flags(invincible and bit_or(flags, mask) or bit_and(flags, bit_not(mask)))
-end
-
--- получение некоторых значений с плавающей запятой
--- параметры бега
-function get_walk_accel()         return db.actor:get_actor_float(1440) end
-function get_jump_speed()         return db.actor:get_actor_float(1444) end
-function get_run_factor()         return db.actor:get_actor_float(1448) end
-function get_run_back_factor()    return db.actor:get_actor_float(1452) end
-function get_walk_back_factor()   return db.actor:get_actor_float(1456) end
-function get_crouch_factor()      return db.actor:get_actor_float(1460) end
-function get_climb_factor()       return db.actor:get_actor_float(1464) end
-function get_sprint_factor()      return db.actor:get_actor_float(1468) end
-function get_walk_strafe_factor() return db.actor:get_actor_float(1472) end
-function get_run_strafe_factor()  return db.actor:get_actor_float(1476) end
--- параметры стрельбы
-function get_disp_base()          return db.actor:get_actor_float(1484) end -- в радианах
-function get_disp_aim()           return db.actor:get_actor_float(1488) end -- в радианах
-function get_disp_vel_factor()    return db.actor:get_actor_float(1492) end
-function get_disp_accel_factor()  return db.actor:get_actor_float(1496) end
-function get_disp_crouch_factor() return db.actor:get_actor_float(1500) end
-function get_disp_crouch_no_accel_factor()  return db.actor:get_actor_float(1504) end
 -- получение некоторых целых и логических значений
 -- режим прицеливания
-function zoom_mode() return bit_and(db.actor:get_actor_int(nil, 1480), 1) ~= 0 end -- возвращает true/false
+function zoom_mode() return db.actor:zoom_mode() end -- возвращает true/false
 
--- установка некоторых значений
--- параметры бега
-function set_sprint_factor(v)      db.actor:set_actor_float(nil, v, 1468) end
-function set_jump_speed(v)         db.actor:set_actor_float(nil, v, 1444) end
-function set_walk_accel(v)         db.actor:set_actor_float(nil, v, 1440) end
-function set_run_factor(v)         db.actor:set_actor_float(nil, v, 1448) end
-function set_run_back_factor(v)    db.actor:set_actor_float(nil, v, 1452) end
-function set_walk_back_factor(v)   db.actor:set_actor_float(nil, v, 1456) end
-function set_crouch_factor(v)      db.actor:set_actor_float(nil, v, 1460) end
-function set_climb_factor(v)       db.actor:set_actor_float(nil, v, 1464) end
-function set_walk_strafe_factor(v) db.actor:set_actor_float(nil, v, 1472) end
-function set_run_strafe_factor(v)  db.actor:set_actor_float(nil, v, 1476) end
--- параметры стрельбы
-function set_disp_base(v)          db.actor:set_actor_float(nil, v, 1484) end -- в радианах
-
-function set_jump_power( v ) db.actor:set_actor_condition_float( nil, v, 276 ) end
-
-function set_stand_power( v ) db.actor:set_actor_condition_float( nil, v, 280 ) end -- скорость восстановления выносливости
-
-local body_states = { -- флажки состояния тела актора
-[1]		= "fwd",
-[2]		= "back",
-[4]		= "l_strafe",
-[8]		= "r_strafe",
-[16]	= "crouch",
-[32]	= "accel",
-[64]	= "turn",
-[128]	= "jump",
-[256]	= "fall",
-[512]	= "landing",
-[1024]	= "landing2",
-[2048]	= "climb",
-[4096]	= "sprint",
-[8192]	= "l_lookout",
-[16384]	= "r_lookout"
-}
--- получения флагов состояния тела актора
-function actor_body_state()
-	local body_state = body_states[db.actor:get_actor_int(nil, 1432)]
-	if body_state ~= nil then
-		return body_state
-	else
-		return ""
-	end
-end
--- установка флагов состояния тела актора
-function set_actor_body_state(flags_to_set, value)
-	local current_flags = db.actor:get_actor_int(nil, 1432)
-	local new_flags = value and bit_or(current_flags, flags_to_set) or bit_and(current_flags, bit_not(flags_to_set))
-	db.actor:set_actor_int(1432, new_flags)
-end
 local anomaly_invisibility_flag = tonumber("80000000", 16)
 -- установка невидимости сталкера со стороны аномалий
 function set_anomaly_invisibility(npc, vis)
@@ -1379,6 +1271,7 @@ function set_anomaly_invisibility(npc, vis)
 	fl:set(anomaly_invisibility_flag, vis)
 	npc:set_actor_relation_flags(fl)
 end
+
 -- получение статуса невидимости сталкера со стороны аномалий
 function get_anomaly_invisibility(npc)
 	local fl = npc:get_actor_relation_flags()
@@ -1397,85 +1290,6 @@ function get_game_day_time_h()
 	local y,m,d,h,min,sec,ms = gt:get()
 	return math.fmod(h + min/60.0 + (sec + 0.001*ms)/3600.0, 24.0)
 end
-
-function relation_registry.get_goodwill(who_id, to_whom_id)
-	return GetGoodwill(who_id, to_whom_id)
-end
-
-function relation_registry.set_goodwill(who_id, to_whom_id, goodwill)
-	ASSERT(db.actor, "relation_registry.set_goodwill: cannot call function")
-	return db.actor:set_goodwill_ex(who_id, to_whom_id, goodwill)
-end
-
-function relation_registry.change_goodwill(who_id, to_whom_id, goodwill_change)
-	ASSERT(db.actor, "relation_registry.change_goodwill: cannot call function")
-	return db.actor:change_goodwill_ex(who_id, to_whom_id, goodwill_change)
-end
-
--- флаги трассировки
-rq_target = {
-	rqtNone,
-	rqtObject   = 1,
-	rqtStatic   = 2,
-	rqtShape    = 4,
-	rqtObstacle = 8,
-	rqtBoth     = 3, -- rqtObject + rqtStatic
-	rqtDyn      = 13, -- rqtObject + rqtShape + rqtObstacle
-}
-
-ray_pick = {}
--- устанавливает базовые параметры трассировки
-function ray_pick.init(pos_from, dir, range, flags, ignore_obj)
-	ray_pick.set_pos(pos_from)
-	ray_pick.set_dir(dir)
-	ray_pick.set_range(range)
-	ray_pick.set_flags(flags)
-	ray_pick.set_object_to_ignore(ignore_obj)
-end
-
--- устанавливает стартовую точку трассировки
-function ray_pick.set_pos(pos)
-	--print_vector("pos", pos)
-	db.actor:set_vector_global_arg_2(pos)
-end
--- устанавливает направление трассировки
-function ray_pick.set_dir(dir)
-	--print_vector("dir", dir)
-	db.actor:set_vector_global_arg_1(dir)
-end
--- устанавливает диапазон трассировки
-function ray_pick.set_range(range)
-	--log2("range: %7.2f", range)
-	set_float_args_12(range, 0)
-end
--- устанавливает флаги трассировки (rq_target)
-function ray_pick.set_flags(flags)
-	--log2("flags: %x", flags)
-	set_int_arg1(flags)
-end
--- устанавливает игнорируемый игровой объект для трассировки
-function ray_pick.set_object_to_ignore(obj)
-	db.actor:set_object_arg_1(obj)
-end
--- выполняет запрос на трассировку и возвращает true, если она была успешна
-function ray_pick.check()
-	return level.perform_ray_pick_query()
-end
-
--- если трассировка была успешна, возвращает дистанцию до точки, иначе возвращает ранее заданный диапазон трассировки
-function ray_pick.get_dist()
-	return level.get_ray_pick_dist()	
-end
-
--- если трассировка была успешна, возвращает игровой объект
-function ray_pick.get_obj()
-	return level.get_ray_pick_obj()
-end
--- если луч пересек игровой объект, то возвращает номер кости, иначе возвращает номер полигона статической геометрии (при неудачной трассировке возвращает -1)
-function ray_pick.get_element()
-	return level.get_ray_pick_element()
-end
-
 
 function is_16_9_mode()
 	local dev = device()
@@ -1527,50 +1341,6 @@ hit_offset = {
   SenderID          = 66, -- 2, unsigned int
 }
 
--- коды дополнительных колбеков
-callback_ex = {
-	["on_key_press"]				= 123,
-	["on_key_release"]				= 124,
-	["on_key_hold"]					= 125,
-	["on_mouse_wheel"]				= 126,
-	["on_mouse_move"]				= 127,
-
-	["on_belt"]						= 130,
-	["on_ruck"]						= 131,
-	["on_slot"]						= 132,
-	["on_select_item"]				= 133,
-	["on_create_cell_item"]			= 136,
-
-	["attach_vehicle"]				= 137,
-	["use_vehicle"]					= 138,
-	["detach_vehicle"]				= 139,
-
-	["on_after_save"]				= 140,
-
-	["on_goodwill_change"]			= 145,
-	["on_release_npc"]				= 146,
-
-	["on_inv_box_put_item"]			= 151,
-	["entity_alive_before_hit"]		= 152,
-	["dbg_gg_distance_failed"]		= 153,
-	["update_addons_visibility"]	= 154,
-	["update_hud_addons_visibility"]= 155,
-	["on_before_use_item"]			= 156;
-	["on_hud_animation_end"]		= 157,
-	["init_addons"]					= 158,
-
-	["pda_contact"]					= 180,
-}
-
-inventory_item_offsets = {
-	["health_influence"]	= 220,
-	["power_influence"]		= 224,
-	["satiety_influence"]	= 228,
-	["radiation_influence"]	= 232,
-	["power_max_influence"]	= 236,
-	["wound_heal"]			= 240,
-	["alcohol_influence"]	= 688,
-}
 -- обнуление всех эффектов съедаемого предмета
 -- изменённые значения в сейве не сохраняются
 -- функция предназначена в основном для использования в событии предиспользования,
@@ -1583,12 +1353,7 @@ inventory_item_offsets = {
 -- "послеиспользование", когда эффекты предмета уже применены)
 function zero_all_item_effects(item)
 	ASSERT(item:is_eatable_item(), "")
-	for param, offset in pairs(inventory_item_offsets) do
-		-- параметр влияния алкоголя годится только для объекта-бутылки
-		if param ~= "alcohol_influence" or item:is_bottle_item() then
-			item:set_inventory_item_float(nil, 0.0, offset)
-		end
-	end
+	item:zero_effects()
 end
 -- набор констант для использования в колбеках на использование и предиспользование инвентарных предметов
 -- константы сигналят, что надо делать с предметом после его обработки: 
@@ -1650,7 +1415,7 @@ function file_exists(name)
 	return false
 end
 
-
+--[==[
 -- Управление торгуемостью и группировкой предметов в инвентаре
 ii_flags = {
 	drop_manual         = 1,
@@ -1743,123 +1508,25 @@ function reset_actor_items_tradability()
 		set_item_default_tradability(db.actor:object(i)) 
 	end
 end
-
+--]==]
 
 -- возвращает колличество патрон в пачке
--- http://www.amk-team.ru/forum/index.php?showtopic=10538&p=713968
 function get_ammo_size(obj)
-	return obj:get_go_int16( "", 476 )
+	return obj:get_current_ammo()
 end
 --Задать кол-во патронов в пачке
-function set_ammo_size(item, size)
-	item:set_go_int16(476, size)
+function set_ammo_size(obj, size) --KRodin: пока так, но надо бы сделать в движке.
+	local pk = get_netpk( obj, 2 )
+	ASSERT( ( pk and pk:isOk() ), "can't read netpacket of %s", obj:name() )
+	local data = pk:get()
+	ASSERT( data.upd and data.upd.ammo_left, "ammo_left not found in [%s]", obj:name() )
+	data.upd.ammo_left = size
+	pk:set(data)
 end
 
 
-function get_inv_item_slot( obj )
-	return obj:get_inventory_item_int( nil, 156 )
+function get_inv_item_slot( obj ) --KRodin: пока пусть просто возвращает слот из конфигов.
+	return get_u32(obj:section(), "slot")
 end
-function set_inv_item_slot( obj, slot )
-	obj:set_inventory_item_int( 156, slot )
-end
-
-
--- http://www.amk-team.ru/forum/index.php?showtopic=6185&p=945289
-weapon_states = {
-  idle      = 0,
-  fire      = 1,
-  fire2     = 2,
-  reload    = 3,
-  showing   = 4,
-  hiding    = 5,
-  hidden    = 6,
-  misfire   = 7,
-  mag_empty = 8,
-  switch    = 9
-}
---[[ --Пример использования:
-local state = db.actor:active_item():get_hud_item_state()
-if state == weapon_states.reload then
-...
-end
---]]
-
-
--- http://www.amk-team.ru/forum/topic/10538-x-ray-extensions/?p=1002890
-function normal_triangle( element ) -- возвращает нормаль треугольника, аргументом передавать элемент геометрии (который можно получить, например, функцией level.get_target_element() или ray_pick.get_element())
-  local n = vector()
-  local a = level.get_tri_vertex1( element ) --возвращает первую вершину статического треугольника.
-  local b = level.get_tri_vertex2( element ) --возвращает вторую вершину статического треугольника.
-  local c = level.get_tri_vertex3( element ) --возвращает третью вершину статического треугольника.
-  n.x = ( ( b.z - a.z ) * ( c.y - a.y ) ) - ( ( b.y - a.y ) * ( c.z -a.z ) )
-  n.y = ( ( b.x - a.x ) * ( c.z - a.z ) ) - ( ( b.z - a.z ) * ( c.x -a.x ) )
-  n.z = ( ( b.y - a.y ) * ( c.x - a.x ) ) - ( ( b.x - a.x ) * ( c.y -a.y ) )
-  return n:normalize()
-end
-
-
---[=[
-От Malandrinus отсюда: http://www.amk-team.ru/forum/topic/10538-x-ray-extensions/?p=1006978
-
-Проиграть произвольную анимацию худовой модели:
-
-db.actor:set_hud_animation_channel(2)
-db.actor:set_use_hud_animation_callback(true)
-db.actor:set_hud_animation_callback_param(12345)
-wpn:play_hud_animation("reload", true)
-
-Колбек на окончание анимации вызывается для актора, код колбека 157.
-В колбек передаётся один целый аргумент - то число, которое было установлено
-вызовом db.actor:set_hud_animation_callback_param(<целое число>).
-Так можно в колбеке различать, какая именно анимация закончилась.
-
-uint<remaining_time> get_hud_animation_remaining_time() - возвращает время в миллисекундах, оставшееся до окончания текущей анимации.
-int<length> get_hud_animation_length(string<anim_name>) - оставшееся время до окончания НЕ зацикленной анимации, меняется в реальном времени. Т.е. в начале, например твоей перезарядки метод вернет 2541, а в конце 0 (анимация закончена). Для зацикленных анимаций, НЕимеющих флаг Stop At End (idle, sprint и т.п.), всегда возвращает 0, т.к. они не имеют конца.
-bool<is_cyclic> is_cyclic_hud_animation() - возвратит true, если текущая анимация зациклена.
-bool<has_anim> has_hud_animation(string<anim_name>) - возвратит true, если анимация есть в модели.
---]=]
-
---[=[
-http://www.amk-team.ru/forum/topic/10538-x-ray-extensions/?p=701404
-Вот пример получения/записи значений для объекта актора.
-
-db.actor:set_actor_shared_str("test", 1392)
-local sss = {
-    1392,
-    1396,
-    1400,
-    1404,
-    1408,
-    1412,
-}
-for _, s1 in ipairs(sss) do
-    set_int_arg0(s1)
-    local s = db.actor:get_actor_shared_str()
-    log1(""..s1.." "..s)
-end
---]=]
-
-
--- возвращает имя кости по ее индексу
--- http://xray-engine.org/index.php?title=X-Ray_extensions
-function get_bone_name_by_id( obj, bone_id )
-  set_int_arg0( bone_id )
-  return obj:get_bone_name()
-end
-
-
--- возвращает level_vertex_id по позиции на уровне
-function level.vertex_id_by_pos( position )
-  db.actor:set_vector_global_arg_1( position )
-  return level.vertex_id( position )
-end
-
-
--- запускает эффектор шатания камеры с заданными параметрами
-function level.add_cam_effector3( total_time, amplitude, period_number, power )
-  level.set_ce_time( total_time )
-  level.set_ce_amplitude( amplitude )
-  level.set_ce_period_number( period_number )
-  level.set_ce_power( power )
-  level.add_ce()
+function set_inv_item_slot( obj, slot ) --KRodin: пока так, просто не надо тут никаких действий.
 end

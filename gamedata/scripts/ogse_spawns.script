@@ -8,7 +8,7 @@ end
 
 function sidr_guard_spawn()
 	local sobj = ogse.spawn_object(spawn_db.sidr_guard_2)
-    alife():assign_story_id(nil, nil, sobj.id, story_ids.sidr_guard)
+    alife():assign_story_id(sobj.id, story_ids.sidr_guard)
 end
 
 -- спавним кровососа в тайнике Стрелка после нахождения флешки

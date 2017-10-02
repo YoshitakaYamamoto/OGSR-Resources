@@ -418,9 +418,7 @@ function surprise()
         local pos = level.vertex_position( lv )
         obj:set_custom_panic_threshold( 0 )
         obj:set_fov( 360 )
-        alife():teleport_object(
-          "", pos, lv, db.actor:game_vertex_id(), sobj.id
-        )
+        alife():teleport_object(sobj.id, pos, lv, db.actor:game_vertex_id())
       end
     end
   end

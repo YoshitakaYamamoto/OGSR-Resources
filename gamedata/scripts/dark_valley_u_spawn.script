@@ -67,7 +67,7 @@ function dead_stalker( actor, npc )
 	--local obj = alife():create("dead_stalker",vector():set(22.29, -10.06, -26.11),5211 ,1139)
 --SPAWN_V2
 	local obj = ogse.spawn_object(spawn_db.dead_stalker)
-	alife():assign_story_id(nil, nil, obj.id, story_ids.x18_death_stalker)
+	alife():assign_story_id(obj.id, story_ids.x18_death_stalker)
 end
 ---------------Copyright_Quest_2009-------------------
 --------------Edited_by_stalbar_2009------------------

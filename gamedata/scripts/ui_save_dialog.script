@@ -218,9 +218,9 @@ function save_dialog:OnKeyboard( dik, keyboard_action )
     elseif dik == DIK_keys.DIK_LSHIFT and GetLAlt() then
       local lang = get_input_language()
       if lang == 0 then
-        set_input_language( 1 )
+        set_input_language( true )
       else
-        set_input_language( 0 )
+        set_input_language( false )
       end
     elseif dik == DIK_keys.DIK_ESCAPE then
       self:OnButton_cancel_clicked()

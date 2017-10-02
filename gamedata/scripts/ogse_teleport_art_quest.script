@@ -161,7 +161,7 @@ function af_teleport_trap_binder:update(delta)
 	
 	if restrictor then
 		if not restrictor:inside(self.object:position()) and not db.actor:object(self.object:section()) then
-			alife():teleport_object("", teleport_art_restrictor_position, teleport_art_restrictor_lvid, teleport_art_restrictor_gvid, self.id_table.art)
+			alife():teleport_object(self.id_table.art, teleport_art_restrictor_position, teleport_art_restrictor_lvid, teleport_art_restrictor_gvid)
 		end
 	end
 	

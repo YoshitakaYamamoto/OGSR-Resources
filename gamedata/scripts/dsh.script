@@ -132,7 +132,7 @@ function cached_ini_file( fname )
 end
 
 
---Можно использовать эту функцию, если по каким-то причинам недоступен метод use_ai_locations( false ) у серверного объекта
+--Можно использовать эту функцию, если по каким-то причинам недоступен метод alife():use_ai_locations(sobj, false)
 function clear_used_ai_locations( sobj )
   local pk = get_netpk( sobj, 1 )
   ASSERT( ( pk and pk:isOk() ), "can't read netpacket of %s", sobj:name() )

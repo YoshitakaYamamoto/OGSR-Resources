@@ -288,11 +288,11 @@ function evaluator_love_napalm_smell:evaluate()
 			self.a.test_grenades={}
 			local t
 			t = alife():create(get_grenade(self.a.grenade):section().."_test", npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id())
-			level.client_spawn_manager():add(t.id, -1, mark_grenade_non_pickable)
+			--level.client_spawn_manager():add(t.id, -1, mark_grenade_non_pickable)
 			test_grenades[t.id]=timeout+5000
 			self.a.test_grenades.hi=t.id
 			t = alife():create(get_grenade(self.a.grenade):section().."_test", npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id())
-			level.client_spawn_manager():add(t.id, -1, mark_grenade_non_pickable)
+			--level.client_spawn_manager():add(t.id, -1, mark_grenade_non_pickable)
 			test_grenades[t.id]=timeout+5000
 			run_grenade_timer()
 			self.a.test_grenades.lo=t.id
@@ -778,7 +778,7 @@ function update()
           )
           level.client_spawn_manager():add(
             a.id, -1, function( id, obj )
-              mark_grenade_non_pickable( id, obj )
+              --mark_grenade_non_pickable( id, obj )
               obj:explode( 0 )
             end
           )

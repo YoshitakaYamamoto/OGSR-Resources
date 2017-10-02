@@ -329,7 +329,7 @@ function get_wpn_parameters(wpn, swpn_, sec_)
 	ASSERT(swpn, "get_shg_parameters: swpn")
 	local shg = {}
 	local rif = {}
-	local cur_t, cur_n = ogse_wpn_utils.get_active_ammo_type(wpn), wpn:get_ammo_in_magazine()
+	local cur_t, cur_n = wpn:get_ammo_type(), wpn:get_ammo_in_magazine()
 	local ammo_sections = get_names(section, "ammo_class") -- получаем список секций патронов
 	local cur_s, cur_c = ammo_sections[cur_t+1], wpn:condition()
 	local cd_t,cd_n,cd_s,cd_c = get_shg_params_from_cd(swpn) -- получаем данные из кастомдаты текущего ствола
@@ -498,8 +498,8 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 			modified_params.ammo_elapsed = 0
 		else -- обычный ствол в обычном режиме
 			-- то гранаты - это скрытый боеприпас
-			ammo_type = ogse_wpn_utils.get_hidden_ammo_type(cur_weapon)
-			ammo_num = ogse_wpn_utils.get_ammo_elapsed2(cur_weapon)
+			ammo_type = cur_weapon:get_underbarrel_ammo_type()
+			ammo_num = cur_weapon:get_underbarrel_num_types()
 		end
 		aux_spawn_ammo_by_type(cur_weapon_sect, ammo_type, ammo_num, true)
 	end
@@ -509,8 +509,8 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 		local ammo_type, ammo_num
 		if cur_weapon:is_weapon_gl() and ogse_wpn_utils.get_gl_mode(cur_weapon) then
 			-- пули - вторичный БП
-			ammo_type = ogse_wpn_utils.get_hidden_ammo_type(cur_weapon)
-			ammo_num  = ogse_wpn_utils.get_ammo_elapsed2(cur_weapon)
+			ammo_type = cur_weapon:get_underbarrel_ammo_type()
+			ammo_num  = cur_weapon:get_underbarrel_num_types()
 		else -- наоборот
 			ammo_type, ammo_num = cur_weapon_data.ammo_type, cur_weapon_data.ammo_elapsed
 		end
@@ -552,8 +552,8 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 					local ammo_type, ammo_num --, gren_type, gren_num
 					if cur_weapon:is_weapon_gl() and ogse_wpn_utils.get_gl_mode(cur_weapon) then
 						-- гранаты - первичный БП
-						ammo_type = ogse_wpn_utils.get_hidden_ammo_type(cur_weapon)
-						ammo_num  = ogse_wpn_utils.get_ammo_elapsed2(cur_weapon)
+						ammo_type = cur_weapon:get_underbarrel_ammo_type()
+						ammo_num  = cur_weapon:get_underbarrel_num_types()
 					else
 						-- наоборот
 						ammo_type, ammo_num = cur_weapon_data.ammo_type, cur_weapon_data.ammo_elapsed

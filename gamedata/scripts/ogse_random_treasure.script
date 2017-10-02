@@ -264,7 +264,7 @@ function random_treasure:get_mas(sec1, sec2)
 	local num = nil
 		
 	if sys_ini:r_string(sec1,sec2) then 
-		for num in string.gfind(list,"([%w_%-.\\]+)%p*") do 
+		for num in string.gmatch(list,"([%w_%-.\\]+)%p*") do 
 			if not (self.current_template == "arts" or self.current_template == "weapons" or self.current_template == "outfits" or self.current_template == "devices") then table.insert(tbl, num) 
 			else if self:include_item_in_treasure_items(num) == false then table.insert(tbl, num) end -- проверяем присуствие предметов в прошлых тайниках
 			end
@@ -272,7 +272,7 @@ function random_treasure:get_mas(sec1, sec2)
 		if #tbl < 1 then
 			-- Восстановим все позиции, ибо нужно обновить список
 			self:restore_items_in_treasure_items()
-			for num in string.gfind(list,"([%w_%-.\\]+)%p*") do table.insert(tbl, num) end
+			for num in string.gmatch(list,"([%w_%-.\\]+)%p*") do table.insert(tbl, num) end
 		end
 	end 
 

@@ -76,3 +76,8 @@ end
 
 
 --__scripts_cleanup.garbage_collect()
+--__scripts_header_add.add_header()
+
+--log3("sections: %s", _collect_sections.main())
+
+--collectgarbage('collect')

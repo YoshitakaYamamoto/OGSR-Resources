@@ -510,9 +510,8 @@ local function weapon_iterator( mgr, cut, npc, item )
 	write_log("~~RX_WMGR_ITERATE_3")
 	local id = item:id()
 	local npc_id = npc:id()
-	local srv_item = alife():object(id)
 	write_log("~~RX_WMGR_ITERATE_4")
-	if rx_utils.item_is_fa(item) then
+	if rx_utils.is_weapon(item) then
 		write_log("~~RX_WMGR_ITERATE_5")
 		local sec = item:section()
 		local cnd = item:condition()

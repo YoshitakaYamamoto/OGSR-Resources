@@ -37,8 +37,8 @@ local addon_templates = {
 		section_param = "scope",
 		params = {
 			use_texture = function(addon_sect) return not get_bool(addon_sect, "force_remove_texture") end,
-			offset      = function(addon_sect) return get_numbers(addon_sect, "zoom_offset") end,
-			rotation    = function(addon_sect) return get_numbers(addon_sect, "zoom_rotation") end,
+			offset      = function(addon_sect) return get_vector(addon_sect, "zoom_offset") end,
+			rotation    = function(addon_sect) return get_vector2(addon_sect, "zoom_rotation") end,
 			bones       = aux_read_bones,
 			bones_hide  = aux_read_bones_hide,
 		},
@@ -46,8 +46,8 @@ local addon_templates = {
 		extra_actions = function(obj, desc)
 			local force_use_tex = desc.hud_attached and not desc.use_texture
 			ogse_wpn_utils.set_forced_notex_scope(obj, force_use_tex)
-			ogse_wpn_utils.set_hud_offset(obj, desc.hud_attached and desc.offset or desc.default_hud_offset)
-			ogse_wpn_utils.set_hud_rotate(obj, desc.hud_attached and desc.rotation or desc.default_hud_rotate)
+			obj:set_hud_offset(desc.hud_attached and desc.offset or desc.default_hud_offset)
+			obj:set_hud_rotate(desc.hud_attached and desc.rotation or desc.default_hud_rotate)
 		end,
 	},
 	{
@@ -149,38 +149,35 @@ function wpn_binder:__init (obj) super(obj)
 	local sd = self.addon_descriptors.scope_desc
 	if sd then
 		local hud_section = get_string(obj_section, "hud")
-		sd.default_hud_offset = get_numbers(hud_section, "zoom_offset")
+		sd.default_hud_offset = get_vector(hud_section, "zoom_offset")
 		local def_zrx = get_float(hud_section, "zoom_rotate_x")
 		local def_zry = get_float(hud_section, "zoom_rotate_y")
-		sd.default_hud_rotate = {def_zrx, def_zry}
+		sd.default_hud_rotate = vector2():set(def_zrx, def_zry)
 		--sd.ironsight_desc = {}
 	end
 end
 ----------------------------------------------------------------------------------------------------------------------
 function wpn_binder:reinit()
-	self.object:set_callback(callback_ex.init_addons, self.init_addons, self)
-	self.object:set_callback(callback_ex.update_hud_addons_visibility, self.update_hud_addons_visibility, self)
-	self.object:set_callback(callback_ex.update_addons_visibility, self.update_addons_visibility, self)
+	self.object:set_callback(callback.on_addon_init, self.init_addons, self)
+	self.object:set_callback(callback.update_hud_addons_visibility, self.update_hud_addons_visibility, self)
+	--self.object:set_callback(callback.update_addons_visibility, self.update_addons_visibility, self) --KRodin:—ƒ≈À¿“‹ ¬ ƒ¬»∆ ≈!!!
 	--self:dbg_log("wpn_binder:reinit")
 end
 ----------------------------------------------------------------------------------------------------------------------
-function wpn_binder:init_addons(a,b)
-	--log3("[wpn_binder:init_addons][%s] arg1: [%s], arg2: [%s]", self.object:name(), a, b)
-	if a == 1 and self.object:is_weapon_gl() then
-		--log1("skip")
-		return
+function wpn_binder:init_addons(a)
+	if a == 2 or not self.object:is_weapon_gl() then
+		if self.extra_addon_flags ~= 0 then
+			ogse_wpn_utils.set_extra_addon_flags(self.object, self.extra_addon_flags)
+		end
+		--log3("wpn_binder:init_addons - %d", a)
+		for des_name,desc in pairs(self.addon_descriptors) do
+			if desc.extra_actions then desc.extra_actions(self.object, desc) end
+		end
+		if self.is_binoc then
+			ogse_wpn_utils.set_binoc_rt_zoom_factor(self.object, self.scope_zoom_factor)
+		end
+		ogse_wpn_utils.activate_visibility_updates(self.object, true)
 	end
-	if self.extra_addon_flags ~= 0 then
-		ogse_wpn_utils.set_extra_addon_flags(self.object, self.extra_addon_flags)
-	end
-	--log3("wpn_binder:ini_addons - %d, %d", a,b)
-	for des_name,desc in pairs(self.addon_descriptors) do
-		if desc.extra_actions then desc.extra_actions(self.object, desc) end
-	end
-	if self.is_binoc then
-		ogse_wpn_utils.set_binoc_rt_zoom_factor(self.object, self.scope_zoom_factor)
-	end
-	ogse_wpn_utils.activate_visibility_updates(self.object, true)
 end
 
 function wpn_binder:net_spawn(data)
@@ -190,9 +187,9 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 function wpn_binder:net_destroy()
 	--self:dbg_log("wpn_binder:net_destroy")
-	self.object:set_callback(callback_ex.update_hud_addons_visibility, nil)
-	self.object:set_callback(callback_ex.update_addons_visibility, nil)
-	self.object:set_callback(callback_ex.init_addons, nil)
+	self.object:set_callback(callback.update_hud_addons_visibility, nil)
+	self.object:set_callback(callback.on_addon_init, nil)
+	--self.object:set_callback(callback.update_addons_visibility, nil) --KRodin: —ƒ≈À¿“‹ ¬ ƒ¬»∆ ≈!!!
 end
 
 function wpn_binder:set_hud_bones_visibility(bones_list, vis)
@@ -213,8 +210,7 @@ function wpn_binder:set_bones_visibility(bones_list, vis)
 	end
 end
 
-function wpn_binder:update_addons_visibility(arg1, arg2)
-	--log3("[wpn_binder:update_addons_visibility][%s] arg1: [%s], arg2: [%s]", self.object:name(), arg1, arg2)
+function wpn_binder:update_addons_visibility()
 	--self:dbg_log("wpn_binder:update_addons_visibility")
 	if not self.wm_initialized then
 		--self:dbg_log("wpn_binder:update_addons_visibility - the very first")
@@ -225,6 +221,7 @@ function wpn_binder:update_addons_visibility(arg1, arg2)
 	for des_name,desc in pairs(self.addon_descriptors) do	
 		--self:dbg_log("wpn_binder:update_addons_visibility - set addons")
 		local addon_attached = desc.addon_attached_fun(self.object)
+		--log1("[wpn_binder] "..self.object:name().." "..des_name.." "..tostring(addon_attached))
 		if desc.wm_attached ~= addon_attached then
 			desc.wm_attached = addon_attached
 			desc.set_cntr = self.change_safe_cntr
@@ -240,7 +237,7 @@ function wpn_binder:update_addons_visibility(arg1, arg2)
 	end
 end
 
-function wpn_binder:update_hud_addons_visibility(arg1, arg2)
+function wpn_binder:update_hud_addons_visibility()
 	--log1("wpn_binder:update_hud_addons_visibility")
 	--self:dbg_log("wpn_binder:update_hud_addons_visibility")
 	

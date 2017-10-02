@@ -190,14 +190,14 @@ local function check_sound(self, who, sound_type, sound_position, sound_power)
 					end
 					self:set_sight(look.point,sound_position)
 					self:set_mental_state(anim.danger)
-					--self:make_object_visible_somewhen(who)
+					self:make_object_visible_somewhen(who)
 				end
 			elseif snd_t == "WPN_shoot" then
 				-- self:hit(blow) -- попробуем без хита прямого, поглядим что будет
 				stop_play_sound(self)
 				self:set_mental_state(anim.danger)
 				self:set_sight(look.point,sound_position)
-				--self:make_object_visible_somewhen(who)
+				self:make_object_visible_somewhen(who)
 			end
 		elseif ( who:is_stalker() or who:is_actor() ) and self:relation(who) ~= game_object.enemy then
 			if snd_t == "ATTCK" or
@@ -227,13 +227,13 @@ local function check_sound(self, who, sound_type, sound_position, sound_power)
 			if snd_t == "MST_step" or snd_t == "MST_talk" then
 				self:set_sight(look.point,sound_position)
 				self:set_mental_state(anim.danger)
-				--self:make_object_visible_somewhen(who)
+				self:make_object_visible_somewhen(who)
 			elseif snd_t == "MST_attack" then
 				--self:hit(blow) --KRodin: убрал хит и тут, посмотрим
 				stop_play_sound(self)
 				self:set_sight(look.point,sound_position)
 				self:set_mental_state(anim.danger)
-				--self:make_object_visible_somewhen(who)
+				self:make_object_visible_somewhen(who)
 			end
 		end
 	end
@@ -335,7 +335,7 @@ function motivator_binder:net_spawn(sobject)
 	self.object:set_patrol_extrapolate_callback(self.extrapolate_callback, self)
 	self.object:set_callback(callback.hit, self.hit_callback, self)
 	self.object:set_callback(callback.death, self.death_callback, self)
-	self.object:set_callback(callback_ex.entity_alive_before_hit, self.before_hit_callback, self)
+	--self.object:set_callback(callback_ex.entity_alive_before_hit, self.before_hit_callback, self)
 	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)	
 	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
 	if not ogse.is_quest_npc(self.object) then
@@ -454,7 +454,7 @@ function motivator_binder:clear_callbacks()
 	self.object:set_callback(callback.death, nil)
 	self.object:set_callback(callback.on_item_drop, nil)
 	self.object:set_callback(callback.on_item_take, nil)
-	self.object:set_callback(callback_ex.entity_alive_before_hit, nil)
+	--self.object:set_callback(callback_ex.entity_alive_before_hit, nil)
 	self.object:set_callback(callback.sound, nil)
 	self.object:set_enemy_callback()
 end
@@ -494,7 +494,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	if chk_dist > range then
 		self.object:set_range(chk_dist*1.1)
 	end
-	--self.object:make_object_visible_somewhen(who:cast_game_object())	-- в движке баг в этой функции, поэтому надо кастить к "движковому" клиентскому объекту
+	self.object:make_object_visible_somewhen(who:cast_game_object())
 	--
 --[=[ --Хрень. Выключаю.
 	local warn_timer = time_global()

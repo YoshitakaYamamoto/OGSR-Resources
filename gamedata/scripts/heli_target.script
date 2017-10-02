@@ -121,7 +121,9 @@ function get_target_priority(obj)
 	if obj:is_monster() then
 		prior = 1
 	elseif ( obj:is_stalker() or obj:is_actor() ) then -- максимум - 5
-		local wpn = obj:item_in_slot(obj:active_slot())
+		local act_slot = obj:active_slot()
+		if act_slot ~= 255 then
+		local wpn = obj:item_in_slot(act_slot)
 		if wpn then
 			local ammo, fm
 			if sys_ini:line_exist(wpn:section(), "ammo_class") then
@@ -155,6 +157,7 @@ function get_target_priority(obj)
 					prior = prior + 1 -- автоматическое оружие - приоритет цели выше на 1
 				end
 			end
+		end
 		end
 	elseif string.find(obj:name(),"btr") then
 		prior = 6

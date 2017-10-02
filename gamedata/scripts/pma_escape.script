@@ -368,14 +368,17 @@ function show_heli_scene()
 						local dist_from_self_to_actor = npc:position():distance_to(db.actor:position())
 						if npc:alive() then
 							-- получим текущее оружие
-							local act_item = npc:item_in_slot(npc:active_slot())
+							local act_slot = npc:active_slot()
+							if act_slot ~= 255 then
+							local act_item = npc:item_in_slot(act_slot)
 							if act_item and string.find(act_item:section(), "bm16") then
 								local s_obj = alife():object(act_item:id())
 								if s_obj then
 									alife():release(s_obj, true)
 								end
 								timeout = time_global() + 1000
-								ogse.set_npc_relation(npc, heli, "enemy")
+								-- Вертолеты не входят в поддерживаемые объекты для отношений
+--								ogse.set_npc_relation(npc, heli, "enemy")
 								local blow = hit()
 								blow.direction = vector():set(0,0,0)
 								blow.impulse = 0.1
@@ -385,7 +388,8 @@ function show_heli_scene()
 								npc:hit(blow)							
 								return
 							end
-							
+							end
+
 							local bw = rx_utils.get_weapon(npc)
 							
 							if timeout > time_global() then

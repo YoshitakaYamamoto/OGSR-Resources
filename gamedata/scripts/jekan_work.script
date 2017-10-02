@@ -1539,34 +1539,34 @@ end
 
 function spawn_dar_merk_guard_1()
 	ogse.spawn_object(spawn_db.dar_merk_guard_1)
-    -- relation_registry.set_goodwill(sobj.id, db.actor:id(), 3000)
+    -- relation_registry.set_personal_goodwill(sobj.id, db.actor:id(), 3000)
 end
 
 function spawn_dar_merk_guard_2()
 	ogse.spawn_object(spawn_db.dar_merk_guard_2)
-    -- relation_registry.set_goodwill(sobj.id, db.actor:id(), 3000)
+    -- relation_registry.set_personal_goodwill(sobj.id, db.actor:id(), 3000)
 end
 
 function set_merc_company_neutral(actor, npc)
   local sobj1 = alife():story_object(story_ids.dar_merk_lider)
-  relation_registry.set_goodwill(sobj1.id, db.actor:id(), 300)
+  relation_registry.set_personal_goodwill(sobj1.id, db.actor:id(), 300)
   local sobj2 = alife():story_object(story_ids.dar_merk_bomber)
-  relation_registry.set_goodwill(sobj2.id, db.actor:id(), 300)
+  relation_registry.set_personal_goodwill(sobj2.id, db.actor:id(), 300)
   local sobj3 = alife():story_object(story_ids.dar_merk_guard_1)
-  relation_registry.set_goodwill(sobj3.id, db.actor:id(), 300)
+  relation_registry.set_personal_goodwill(sobj3.id, db.actor:id(), 300)
   local sobj4 = alife():story_object(story_ids.dar_merk_guard_2)
-  relation_registry.set_goodwill(sobj4.id, db.actor:id(), 300)
+  relation_registry.set_personal_goodwill(sobj4.id, db.actor:id(), 300)
 end
 
 function set_merc_company_enemy(actor, npc)
   local sobj1 = alife():story_object(story_ids.dar_merk_lider)
-  relation_registry.set_goodwill(sobj1.id, db.actor:id(), -3000)
+  relation_registry.set_personal_goodwill(sobj1.id, db.actor:id(), -3000)
   local sobj2 = alife():story_object(story_ids.dar_merk_bomber)
-  relation_registry.set_goodwill(sobj2.id, db.actor:id(), -3000)
+  relation_registry.set_personal_goodwill(sobj2.id, db.actor:id(), -3000)
   local sobj3 = alife():story_object(story_ids.dar_merk_guard_1)
-  relation_registry.set_goodwill(sobj3.id, db.actor:id(), -3000)
+  relation_registry.set_personal_goodwill(sobj3.id, db.actor:id(), -3000)
   local sobj4 = alife():story_object(story_ids.dar_merk_guard_2)
-  relation_registry.set_goodwill(sobj4.id, db.actor:id(), -3000)
+  relation_registry.set_personal_goodwill(sobj4.id, db.actor:id(), -3000)
 end
 
 function spawn_dar_officer()
@@ -1574,7 +1574,7 @@ function spawn_dar_officer()
 	local pos = uaz:position()
 	local sim = alife()
 	local sobj = sim:create("dar_officer", vector():set(pos.x+2, pos.y, pos.z+2), uaz:level_vertex_id(), uaz:game_vertex_id())
-	sim:assign_story_id(nil, nil, sobj.id, story_ids.dar_officer)
+	sim:assign_story_id(sobj.id, story_ids.dar_officer)
 end
 
 
@@ -2046,7 +2046,7 @@ function spawn_dik_the_monster()
 	local pos = npc:position()
    	local sim = alife()
     local sobj = sim:create("brodyaga_dik", vector():set(pos.x, pos.y, pos.z), npc:level_vertex_id(), npc:game_vertex_id())
-	sim:assign_story_id(nil, nil, sobj.id, story_ids.dik_the_monster)
+	sim:assign_story_id(sobj.id, story_ids.dik_the_monster)
 end
 
 
@@ -2711,7 +2711,7 @@ function respawn_human_pervert()
 	local fx_particle3 = "explosions\\old\\expl_08_flame"
 	local sim = alife()
 	local sobj = sim:create("human_pervert", vector():set(pos.x, pos.y, pos.z), izlom:level_vertex_id(), izlom:game_vertex_id())
-	sim:assign_story_id(nil, nil, sobj.id, story_ids.human_pervert)
+	sim:assign_story_id(sobj.id, story_ids.human_pervert)
 	fx_particle1 = particles_object(fx_particle1)
 	fx_particle2 = particles_object(fx_particle2)
 	fx_particle3 = particles_object(fx_particle3)
@@ -2731,7 +2731,7 @@ function respawn_izlom_pervert()
 	local fx_particle3 = "explosions\\old\\expl_08_flame"
 	local sim = alife()
 	local sobj = sim:create("izlom_pervert", vector():set(pos.x, pos.y, pos.z), human:level_vertex_id(), human:game_vertex_id())
-	sim:assign_story_id(nil, nil, sobj.id, story_ids.izlom_pervert)
+	sim:assign_story_id(sobj.id, story_ids.izlom_pervert)
 	for i = 1, 7 do
 		alife():create("m_crow", vector():set(pos.x, pos.y, pos.z), human:level_vertex_id(), human:game_vertex_id())
 	end
@@ -2784,7 +2784,7 @@ function respawn_girl_pervert()
 	local fx_particle3 = "anomaly2\\bold_sarkofag_blast"
 	local sim = alife()
 	local sobj = sim:create("girl_pervert", vector():set(pos.x, pos.y, pos.z), cat:level_vertex_id(), cat:game_vertex_id())
-	sim:assign_story_id(nil, nil, sobj.id, story_ids.girl_pervert)
+	sim:assign_story_id(sobj.id, story_ids.girl_pervert)
 	fx_particle1 = particles_object(fx_particle1)
 	fx_particle2 = particles_object(fx_particle2)
 	fx_particle3 = particles_object(fx_particle3)
@@ -2803,7 +2803,7 @@ function respawn_cat_queen()
 	local fx_particle3 = "anomaly2\\bold_sarkofag_blast"
 	local sim = alife()
 	local sobj = sim:create("cat_queen", vector():set(pos.x, pos.y, pos.z), girl:level_vertex_id(), girl:game_vertex_id())
-	sim:assign_story_id(nil, nil, sobj.id, story_ids.cat_queen)
+	sim:assign_story_id(sobj.id, story_ids.cat_queen)
 	fx_particle1 = particles_object(fx_particle1)
 	fx_particle2 = particles_object(fx_particle2)
 	fx_particle3 = particles_object(fx_particle3)
@@ -3189,9 +3189,6 @@ function give_cheb_deadcity_msg()
 --	local kolya = ogse.spawn_object(spawn_db.stalker_kolya)
 --	ogse.kill_offline_npc(kolya)
 	local sKolya = alife():story_object(story_ids.stalker_kolya)
-	if not sKolya then
-		sKolya = alife():create(11268)
-	end
 	level_tasks.add_location_by_sid(story_ids.stalker_kolya, "crlc_big", "find_kolya")
 	ogse.spawn_item_in_inv("af_kolya", sKolya)
 end
@@ -3297,7 +3294,7 @@ function yan_sold_paralyze_actor()
 		local pos = sold:position()
 		pos.z = pos.z + 1
 		pos.x = pos.x + 1
-		alife():teleport_object("", pos, sold:level_vertex_id(), sold:game_vertex_id(), gen:id())
+		alife():teleport_object(gen:id(), pos, sold:level_vertex_id(), sold:game_vertex_id())
 	end
 	db.actor:give_info_portion("yan_sold_actor_paralyzed")
 	local s_pos = sold:position()
@@ -3554,7 +3551,7 @@ function spawn_fake_art1()
 	local pos = db.actor:position()
 	local n = math.random(-3,3)
 	local sobj = sim:create("fake_art1", vector():set(pos.x+n, pos.y+3, pos.z-n), db.actor:level_vertex_id(), db.actor:game_vertex_id())
-	sim:assign_story_id(nil, nil, sobj.id, story_ids.fake_art1)
+	sim:assign_story_id(sobj.id, story_ids.fake_art1)
 	ogse.start_timer("art1",5)
 	ogse.start_timer("art1a",0,5)
 	-- mark_fakeart1()
@@ -3570,7 +3567,7 @@ function spawn_fake_art2()
 	local pos = db.actor:position()
 	local n = math.random(-3,3)
 	local sobj = sim:create("fake_art2", vector():set(pos.x+n, pos.y+3, pos.z-n), db.actor:level_vertex_id(), db.actor:game_vertex_id())
-	sim:assign_story_id(nil, nil, sobj.id, story_ids.fake_art2)
+	sim:assign_story_id(sobj.id, story_ids.fake_art2)
 	ogse.start_timer("art2",5)
 	ogse.start_timer("art2a",0,5)
 	-- mark_fakeart2()
@@ -3586,7 +3583,7 @@ function spawn_fake_art3()
 	local pos = db.actor:position()
 	local n = math.random(-3,3)
 	local sobj = sim:create("fake_art3", vector():set(pos.x+n, pos.y+3, pos.z-n), db.actor:level_vertex_id(), db.actor:game_vertex_id())
-	sim:assign_story_id(nil, nil, sobj.id, story_ids.fake_art3)
+	sim:assign_story_id(sobj.id, story_ids.fake_art3)
 	ogse.start_timer("art3",5)
 	ogse.start_timer("art3a",0,5)
 	-- mark_fakeart3()
@@ -3780,7 +3777,7 @@ function sold_beforetravel_port1()
 	local sold = alife():story_object(story_ids.yan_soldier)
 	if sold ~= nil and sold:alive() == true then
 		local p = spawn_db.sold_beforetravel_port1
-		alife():teleport_object("_", vector():set(unpack(p.pos)), p.lvid, p.gvid, sold.id)
+		alife():teleport_object(sold.id, vector():set(unpack(p.pos)), p.lvid, p.gvid)
 		db.actor:set_actor_position(vector():set(43.79,-11.87,-271.30))
 	end
 end
@@ -4082,7 +4079,7 @@ end
 function spawn_magnit_part()
 	local sim = alife()
 	local sobj = sim:create("af_magnit_part2", db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
-	sim:assign_story_id(nil, nil, sobj.id, story_ids.magnit_part)
+	sim:assign_story_id(sobj.id, story_ids.magnit_part)
 end
 
 function delete_magnit_part()
@@ -4132,7 +4129,7 @@ function spawn_krovos_unic_body()
 	local obj = level_object_by_sid(story_ids.bloodsucker_unic)
 	local pos = obj:position()
 	local sobj = sim:create("bloodsucker_unic", vector():set(pos.x, pos.y, pos.z), obj:level_vertex_id(), obj:game_vertex_id())
-	sim:assign_story_id(nil, nil, sobj.id, story_ids.bloodsucker_unic_body)
+	sim:assign_story_id(sobj.id, story_ids.bloodsucker_unic_body)
 	ogse.kill_offline_npc(sobj)
     local s_sobj = alife():story_object(story_ids.bloodsucker_unic)
     if s_sobj then
@@ -4228,7 +4225,7 @@ function spawn_pseudodog_unic_body()
 	local obj = level_object_by_sid(story_ids.pseudodog_unic)
 	local pos = obj:position()
 	local sobj = sim:create("pseudodog_unic", vector():set(pos.x, pos.y, pos.z), obj:level_vertex_id(), obj:game_vertex_id())
-	sim:assign_story_id(nil, nil, sobj.id, story_ids.pseudodog_unic_body)
+	sim:assign_story_id(sobj.id, story_ids.pseudodog_unic_body)
 	ogse.kill_offline_npc(sobj)
     local s_sobj = alife():story_object(story_ids.pseudodog_unic)
     if s_sobj then

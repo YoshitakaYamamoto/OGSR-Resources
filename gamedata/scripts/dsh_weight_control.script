@@ -10,7 +10,7 @@
 ВСЕГДА возвращают дефолтные значения из конфигов.
 
 Здесь сделано так, что переносимый вес костюма в движке обнуляется,
-пересчитывается и устанавливается функциями set_actor_max_weight() и set_actor_max_walk_weight().
+пересчитывается и устанавливается методами set_max_weight() и set_max_walk_weight().
 --]=]
 
 function attach( sm )
@@ -80,7 +80,7 @@ function set_weight_parameters()
   if outfit then
     --local cond   = outfit:condition() --От состояния костюма может зависить его переносимый вес. Отключено.
     local params = get_outfit_params( outfit:section() )
-    db.actor:set_actor_max_weight(
+    db.actor:set_max_weight(
       def_max_weight --Дефолтный вес из конфига инвентаря
         --+ inventory.on_belt_restore_speed( "additional_inventory_weight2" ) -- + Вес, прибавляемый артефактами на поясе. Отключено.
         --+ ext.actor_max_weight
@@ -89,7 +89,7 @@ function set_weight_parameters()
               --+ ext.additional_inventory_weight2
           ) --* cond
     )
-    db.actor:set_actor_max_walk_weight(
+    db.actor:set_max_walk_weight(
       def_max_walk_weight
         --+ inventory.on_belt_restore_speed( "additional_inventory_weight" )
         --+ ext.actor_max_walk_weight
@@ -101,8 +101,8 @@ function set_weight_parameters()
     set_outfit_additional_inventory_weight( outfit,  0 )
     set_outfit_additional_inventory_weight2( outfit, 0 )
   else --Если добавлю артефакты с увелечением переносимого веса, учесть их здесь
-    db.actor:set_actor_max_weight( def_max_weight --[=[+ ext.actor_max_weight]=] )
-    db.actor:set_actor_max_walk_weight(
+    db.actor:set_max_weight( def_max_weight --[=[+ ext.actor_max_weight]=] )
+    db.actor:set_max_walk_weight(
       def_max_walk_weight --+ ext.additional_inventory_weight
     )
   end

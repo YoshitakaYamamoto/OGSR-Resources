@@ -72,6 +72,7 @@ function main_menu:InitControls()
 	local ogse_ver = self.xml:InitStatic("ogsm_version",self)
 	local mm = _G.main_menu.get_main_menu()
 	_ver:SetText("S.T.A.L.K.E.R. v" .. mm:GetGSVer())
+	mod_ver = string.gsub(mod_ver, "%_", " ")
 	ogse_ver:SetText("OGS Evolution "..mod_ver)
 end
 
@@ -175,7 +176,6 @@ function main_menu:OnMessageQuitWin()
 end
 
 function main_menu:OnButton_return_game()
-	ogse_rebind_key.unbind_key()
 	self:close_menu()
 end
 
@@ -223,7 +223,6 @@ function main_menu:OnButton_options_clicked()
 		self.opt_dlg = ui_mm_opt_main.options_dialog()
 		self.opt_dlg.owner = self
 	end
-	ogse_rebind_key.rebind_key()
 	self.opt_dlg:UpdateControls()
 	self:GetHolder():start_stop_menu(self.opt_dlg, true)
 	--self:GetHolder():start_stop_menu(self, true) --new
@@ -253,7 +252,6 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 		if dik == DIK_keys.DIK_ESCAPE then
 			if ogse.check_game() then
-				ogse_rebind_key.unbind_key()
 				self:close_menu()
 			end
 		elseif dik == DIK_keys.DIK_N then --personal_test

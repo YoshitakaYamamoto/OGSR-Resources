@@ -2222,7 +2222,7 @@ end
 
 -- Прибор из башни, бьющий по мозгам ------------------------------------------------------------------------------------------------------------------------------------------
 
-local WIDTH_FACTOR = get_static_rescale_factor()
+local WIDTH_FACTOR = device().height / device().width / 0.75
 local tb_wnd
 
 class "tower_box" (CUIScriptWnd)

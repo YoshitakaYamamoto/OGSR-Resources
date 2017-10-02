@@ -62,11 +62,13 @@ local function get_item_cond_effect( item )
 		ef.sprint_factor_dif		= get_float( exo_section, "sprint_koef_dif", 0 )
 		ef.run_factor_dif			= get_float( exo_section, "run_coef_dif", 0 )
 		ef.run_back_factor_dif		= get_float( exo_section, "run_back_coef_dif", 0 )
+		ef.exo_factor				= get_float( exo_section, "exo_factor", 1 )
 	else
 		ef.jump_speed_dif			= 0
 		ef.sprint_factor_dif		= 0
 		ef.run_factor_dif			= 0
 		ef.run_back_factor_dif		= 0
+		ef.exo_factor				= 0
 	end
 --------------------------------------------
     cached_item_cond_effects[ section ] = ef
@@ -87,6 +89,7 @@ local ext = {
 	[ "walk_accel" ]		= 0,
 	[ "run_factor" ]		= 0,
 	[ "run_back_factor" ]	= 0,
+	[ "exo_factor" ]		= 0,
 }
 function on_update()
   if not db.actor:alive() then return end
@@ -141,6 +144,7 @@ function on_update()
   local summary_sprint_factor				= sprint_koef + ext.sprint_factor
   local summary_run_factor					= run_coef + ext.run_factor
   local summary_run_back_factor				= run_back_coef + ext.run_back_factor
+  local summary_exo_factor					= ext.exo_factor
   local cur_jump_power						= def_jump_power
   local cur_walk_accel						= (walk_accel - min_walk_accel) + ext.walk_accel
   local new_cam_inert						= 0
@@ -158,6 +162,7 @@ function on_update()
 	  summary_sprint_factor				= summary_sprint_factor + ef.sprint_factor_dif
 	  summary_run_factor				= summary_run_factor + ef.run_factor_dif
 	  summary_run_back_factor			= summary_run_back_factor + ef.run_back_factor_dif
+	  summary_exo_factor				= summary_exo_factor + ef.exo_factor
     end
   end
 
@@ -176,7 +181,7 @@ function on_update()
   --TODO: учесть потерю сил и здоровья от недосыпа
   act.satiety = summary_satiety_effect * dt
   -- ограничиваем снизу. TODO: может учесть это в самом движке
-  if act.satiety < 0 then act:set_actor_condition_float( nil, 0.0, 256 ) end
+  --if act.satiety < 0 then act:set_actor_condition_float( nil, 0.0, 256 ) end --KD: там теперь клампится
 
   act.health = summary_health_effect * dt
 
@@ -202,11 +207,13 @@ function on_update()
   end
 ]]
 
-  set_sprint_factor( summary_sprint_factor )
+  ----set_sprint_factor( summary_sprint_factor ) --Используется в модуле рестрикторов воды, кроме эффектов от экзы.
 
-  set_run_factor(summary_run_factor)
+  ----set_run_factor(summary_run_factor)
 
-  set_run_back_factor(summary_run_back_factor)
+  ----set_run_back_factor(summary_run_back_factor)
+
+  db.actor.exo_factor = summary_exo_factor > 0 and summary_exo_factor or 1
 
   if act.satiety < light_hunger_limit then
     cur_walk_accel = cur_walk_accel * ( act.satiety / light_hunger_limit )
@@ -219,11 +226,11 @@ function on_update()
     local power_inert = 1 - act.power / 0.7
     if power_inert > new_cam_inert then new_cam_inert = power_inert end
   end
-  set_walk_accel( min_walk_accel + cur_walk_accel )
+  db.actor.walk_accel = min_walk_accel + cur_walk_accel
   if cur_walk_accel < 1 then
-    set_jump_speed( 0 )
+    db.actor.jump_speed = 0
   else
-    set_jump_speed( summary_jump_speed )
+    db.actor.jump_speed = summary_jump_speed
   end
 
   if act.satiety < light_hunger_limit then
@@ -240,8 +247,8 @@ function on_update()
       if health_inert > new_cam_inert then new_cam_inert = health_inert end
     end
   end
-  set_jump_power( cur_jump_power )
-  set_stand_power( cur_stand_power )
+  ----set_jump_power( cur_jump_power )
+  ----set_stand_power( cur_stand_power )
 
   if new_cam_inert > 0 then
 	local min_cam_inert = math.max( 0.3, cam_inert + 0.1 )

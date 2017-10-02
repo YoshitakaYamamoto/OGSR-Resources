@@ -211,7 +211,7 @@ function action_facer:execute()
 		local spos,tpos = npc:bone_position("bip01_neck"),target:bone_position("bip01_neck")
 		local ysub = spos.y - tpos.y
 		local cls,bone = target:clsid()
-		if cls == clsid.script_stalker or rx_utils.is_actor(nil,cls) then
+		if IsStalker(nil, cls) then
 			if ysub > 1.5 then
 			elseif ysub > -0.3 then
 				bone = "bip01_head"
@@ -242,7 +242,7 @@ function action_facer:execute()
 				power = power*vals.k_stalker
 			elseif IsMonster(nil,cls) then
 				power = power*vals.k_mutant
-			elseif rx_utils.is_actor(nil,cls) then
+			elseif IsActor(nil,cls) then
 				power = power*vals.k_actor
 			end
 			if npc:relation(target) ~= game_object.enemy then
@@ -262,7 +262,7 @@ function action_facer:execute()
 			if math.random() < hi.power*2 then
 				local item,slot = target:active_item(),target:active_slot()
 				if item and (slot == 2 or slot == 1) then
-					if rx_utils.is_actor(nil,cls) then
+					if IsActor(nil,cls) then
 						target:drop_item(item)
 					else
 						target:set_item(object.drop,item)
@@ -276,7 +276,7 @@ function action_facer:execute()
 				hi.impulse = hi.impulse+math.random(100)
 				printf("facer[%s]:crit!",npc:character_name())
 			end
-			if rx_utils.is_actor(nil,cls) then
+			if IsActor(nil,cls) then
 				if weapon and xrs_battle_ai.knife_scheme[npc:id()] then
 					local snd_name = knife_pain[math.random(1,14)]
 					local snd_obj = xr_sound.get_safe_sound_object(snd_name)

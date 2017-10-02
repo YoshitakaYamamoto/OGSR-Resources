@@ -455,7 +455,7 @@ function reset_generic_schemes_on_scheme_switch(npc, scheme, section)
 		mob_panic.reset_panic(npc, scheme, st, section)
 
 	elseif st.stype == modules.stype_item then
-		local is_light = npc:get_hanging_lamp() or npc:is_projector()
+		local is_light = npc:is_lamp() or npc:is_projector()
 		if not is_light then
 			npc:set_callback(callback.use_object, nil)
 		end
@@ -703,7 +703,7 @@ end
 
 function parse_func_params(str)
 	local lst = {}
-	for par in string.gfind(str, "%s*([^:]+)%s*") do
+	for par in string.gmatch(str, "%s*([^:]+)%s*") do
 		table.insert(lst, tonumber(par) or par)
 	end
 	return lst
@@ -730,7 +730,7 @@ end
 function parse_infop(rslt, str, is_check)
 	if str then
 		local infop_n = 1
-		for s in string.gfind(str, "%s*([%-%+%~%=%!][^%-%+%~%=%!%s]+)%s*") do
+		for s in string.gmatch(str, "%s*([%-%+%~%=%!][^%-%+%~%=%!%s]+)%s*") do
 			local sign = string.sub(s, 1, 1)
 			local infop_name = string.sub(s, 2)
 			local params = nil
@@ -793,7 +793,7 @@ function parse_condlist(npc, section, field, src)
 	--printf("_bp: src = %s", src)
 
 	local n = 1
-	for fld in string.gfind(src, "%s*([^,]+)%s*") do
+	for fld in string.gmatch(src, "%s*([^,]+)%s*") do
 		-- Здесь fld это набор infoportions в {} и имя секции, на которую переключиться.
 		lst[n] = {}
 		--printf("_bp: iter %d: fld = %s", n, fld)

@@ -128,7 +128,7 @@ function create_items(obj, section, number, rnd)
 			while number > num_in_box or number > 0 do
 				local sammo = alife():create_ammo(section, position, obj:level_vertex_id(), obj:game_vertex_id(), 65535, num_in_box)
 				local _sammo = alife():object(sammo.id)
-				_sammo:use_ai_locations(false)
+				alife():use_ai_locations(_sammo, false)
 				number = number - num_in_box
 			end
 		end
@@ -138,7 +138,7 @@ function create_items(obj, section, number, rnd)
             if math.random() <= rnd then
 				local sitem = alife():create(section, position, obj:level_vertex_id(), obj:game_vertex_id())
 				local _sitem = alife():object(sitem.id)
-				_sitem:use_ai_locations(false)
+				alife():use_ai_locations(_sitem, false)
 			end
         end
     end    
@@ -191,6 +191,6 @@ function create_obligatory_items(obj, item , count)
 				obj:level_vertex_id(),	
 				obj:game_vertex_id())
 		local sitem = alife():object(sitem.id)
-		sitem:use_ai_locations(false)
+		alife():use_ai_locations(sitem, false)
 	end
 end

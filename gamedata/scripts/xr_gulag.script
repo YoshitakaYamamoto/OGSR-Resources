@@ -1227,7 +1227,7 @@ end
 --Задать отношение персонажей смарта к указанному персонажу по его id. Должно работать и в оффлайне.
 function gulag:set_personal_goodwill( goodwill, target_obj_id )
 	for obj_id, _ in pairs( self.Object ) do
-		relation_registry.set_goodwill( obj_id, target_obj_id, goodwill )
+		relation_registry.set_personal_goodwill( obj_id, target_obj_id, goodwill )
 	end
 end
 

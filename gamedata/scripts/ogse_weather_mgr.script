@@ -1319,6 +1319,11 @@ local function get_weather_cycle(section)
 	end
 	return t
 end
+-- расчет exec_time для точки
+local function calc_exec_time(point_data)
+	local y,m,d,h,min,sec,ms = point_data.time:get()
+	return (h * 3600.0 + min * 60.0 + sec + ms / 1000.0) -- или может быть point_data.data.time_orig
+end
 -- задать параметры границы фрейма и вернуть в виде специальной таблицы
 local function compile_frame_point(point_data)
 	local y,m,d,h,min,sec,ms = point_data.time:get()
@@ -1333,12 +1338,15 @@ end
 local function setup_frame(p1, p2)
 	ogse_surge_mgr.surge_log("setup_frame: %s - %s", p1.data.section, p2.data.section)
 	ASSERT("ogse_script_weather" == level.get_weather(), "")
-	
-	local t1 = compile_frame_point(p1)
-	local t2 = compile_frame_point(p2)
-	--log3("--[SetEnvDescData]: %s, %s", t1, t2)
 	--
-	SetEnvDescData(t1, t2)
+	--local t1 = compile_frame_point(p1)
+	--local t2 = compile_frame_point(p2)
+	--log3("--[SetEnvDescData]: %s, %s", t1, t2)
+	--SetEnvDescData(t1, t2)
+	--
+	-- KD: теперь не нужно читать параметры из скрипта, движок сам загрузит стандартной функцией. Надо дать ему времена запуска и имя секций для загрузки.
+	SetEnvDescData(p1.data.section, p2.data.section, calc_exec_time(p1), calc_exec_time(p2))
+	--
 	ogse_surge_mgr.surge_log("setup_frame - END")
 end
 

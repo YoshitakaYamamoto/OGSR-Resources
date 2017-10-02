@@ -403,10 +403,11 @@ function set_btr_fuel_empty() --при влезании в квестовый БТР установим топливо в
 	if not db.actor:has_info("btr_fuel_empty_set") then
 		local btr = level_object_by_sid(story_ids.dead_city_btr_real)
 		if btr then
-			local explode = btr:get_car():ExplodeTime()
-			btr:set_fuel(0)
-			btr:get_car():SetfHealth(0.5)
-			btr:get_car():SetExplodeTime(120000)
+			local car_btr = btr:get_car()
+			local explode = car_btr:ExplodeTime()
+			car_btr:SetFuel(0)
+			car_btr:SetfHealth(0.5)
+			car_btr:SetExplodeTime(120000)
 			db.actor:give_info_portion("btr_fuel_empty_set")
 		end	
 	end
@@ -485,7 +486,7 @@ end
 function set_zaz_empty()
 	local car = ogse_car_control.get_nearest_car_by_section("vehicle_zaz")
 	if car then
-		car:set_fuel(0)
+		car:get_car():SetFuel(0)
 	end
 end
 
@@ -799,7 +800,7 @@ end
 
 function spawn_black_dealer()
 	local black_dealer = ogse.spawn_object(spawn_db.pri_trader)
-	alife():assign_story_id(nil, nil, black_dealer.id, story_ids.pri_trader)
+	alife():assign_story_id(black_dealer.id, story_ids.pri_trader)
 end
 
 function total_recall_pripyat()
@@ -1607,7 +1608,7 @@ function on_npc_hit( obj, amount, local_direction, who, bone_index ) --Военные н
   local colonel = level_object_by_sid(story_ids.colonel_prohorov)
   if colonel and colonel:alive() then
 	dialogs.companion_stop_following(colonel, db.actor)
-	relation_registry.set_goodwill(colonel:id(), db.actor:id(), -3000) --делаем полковника врагом
+	relation_registry.set_personal_goodwill(colonel:id(), db.actor:id(), -3000) --делаем полковника врагом
 	colonel:set_character_community("military", 0, 0)
   end
 end

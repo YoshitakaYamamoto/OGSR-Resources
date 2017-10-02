@@ -38,7 +38,7 @@ function spawn_magic_rukzak( sect )
       real, pos, db.actor:level_vertex_id(), db.actor:game_vertex_id()
     )
 	local sobj = alife():object( new.id )
-    sobj:use_ai_locations( false )
+    alife():use_ai_locations(sobj, false)
 end
 
 
@@ -226,22 +226,22 @@ function get_wpn_info( wpn )
     )
   end
   if has_gl and ogse_wpn_utils.get_gl_mode( wpn ) then
-    local hidden_t = ogse_wpn_utils.get_hidden_ammo_type( wpn )
-    local hidden_n = ogse_wpn_utils.get_ammo_elapsed2( wpn )
+    local hidden_t = wpn:get_underbarrel_ammo_type()
+    local hidden_n = wpn:get_underbarrel_num_types()
     table.insert( info, hidden_t )
     table.insert( info, hidden_n )
-    local cur_t = ogse_wpn_utils.get_active_ammo_type( wpn )
+    local cur_t = wpn:get_ammo_type()
     table.insert( info, cur_t    )
     local cur_n = wpn:get_ammo_in_magazine()
     table.insert( info, cur_n    )
   else
-    local cur_t = ogse_wpn_utils.get_active_ammo_type( wpn )
+    local cur_t = wpn:get_ammo_type()
     table.insert( info, cur_t )
     local cur_n = wpn:get_ammo_in_magazine()
     table.insert( info, cur_n )
     if has_gl then
-      local hidden_t = ogse_wpn_utils.get_hidden_ammo_type( wpn )
-      local hidden_n = ogse_wpn_utils.get_ammo_elapsed2( wpn )
+      local hidden_t = wpn:get_underbarrel_ammo_type()
+      local hidden_n = wpn:get_underbarrel_num_types()
       table.insert( info, hidden_t )
       table.insert( info, hidden_n )
     else
@@ -1468,7 +1468,7 @@ end
 function create_rukzak( pos, lv, gv, items, mapspot, hint )
 	local ruck = alife():create( "dsh_treasure_item", pos, lv, gv )
 	local sobj = alife():object( ruck.id )
-    sobj:use_ai_locations( false )
+    alife():use_ai_locations(sobj, false)
 	--
 	local ruck_items = load_rukzak( ruck.id )
 	for sect, num in pairs( items ) do

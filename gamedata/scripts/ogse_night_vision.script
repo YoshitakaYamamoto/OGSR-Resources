@@ -132,8 +132,8 @@ function on_exit_from_btr() --Вылезли из БТР.
 	end
 end
 
-function call_pnv(key) --Действие при нажатии клавиши ПНВ
-	if key ~= ogse_rebind_key.get_key_preset_value("night_vision_key")
+function call_pnv(key, bind) --Действие при нажатии клавиши ПНВ
+	if bind ~= key_bindings.kNIGHT_VISION
 	or level.main_input_receiver()
 	or not db.actor:alive() then return end
 

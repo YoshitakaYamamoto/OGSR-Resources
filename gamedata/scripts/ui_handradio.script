@@ -30,7 +30,7 @@ end
 function on_key_down(key, bind)
 	if level.main_input_receiver() then return end
 
-	if key == ogse_rebind_key.get_key_preset_value("handradio_key") then
+	if bind == key_bindings.kUSE_RADIO then
 		if db.actor:object("hand_radio_f") then
 			open_radio_dialog()
 		end

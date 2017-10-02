@@ -7,7 +7,7 @@
 -------------------------------------------------------------------------------
 
 function attach(sm)
-	sm:subscribe({signal = "on_use",      fun = this.on_item_use})
+	sm:subscribe({signal = "on_use", fun = this.on_item_use})
 end
 
 local items = {
@@ -163,7 +163,7 @@ function play_timer:init(item_section)
 		local item = db.actor:active_item()
 		if item then
 			db.actor:move_to_ruck(item)
-			db.actor:move_to_slot(item)
+			db.actor:move_to_slot(item, true) -- no activate
 		end
 		self.deferred_play = true
 	else

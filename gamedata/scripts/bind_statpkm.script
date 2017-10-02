@@ -87,8 +87,7 @@ function activate_slot_after_wpn_restore:__init(slot_num)
 	self.slot_num = slot_num
 end
 function activate_slot_after_wpn_restore:condition()
-	-- Lua неправильно обрабатывает возвращаемое значение, приходитсЯ изворачиватьсЯ с проверкой строки
-	if bit.tohex(db.actor:active_slot()) == "80000000" then
+	if db.actor:active_slot() == 255 then
 		return false
 	end
 	db.actor:activate_slot(self.slot_num)

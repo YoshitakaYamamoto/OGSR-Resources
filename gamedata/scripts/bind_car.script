@@ -7,10 +7,28 @@ end
 class "car_binder" (object_binder)
 function car_binder:__init(obj) super(obj)
 	self.sm = ogse_signals.get_mgr()
+	self.is_lights_on = false
+	self.is_engine_on = false
+	self.first_update_called = false
 end
 
 function car_binder:reinit()
-	self.object:set_callback(callback.death, self.death_callback, self)
+	self.object:set_callback( callback.death, self.death_callback, self )
+	self.object:set_callback( callback.use_object, self.use_callback, self )
+end
+
+function car_binder:use_callback( obj, who )
+	if not obj then return end
+	local sobj = alife():object( obj:id() )
+	if not sobj then return end
+	--
+	if not who:is_actor() then return end
+	--
+	if ogse_car_control.get_actor_car() then
+		self.sm:call("on_attach_vehicle", obj, sobj)
+	else
+		self.sm:call("on_use_vehicle", obj, sobj)
+	end
 end
 
 function car_binder:load(reader)
@@ -18,6 +36,20 @@ function car_binder:load(reader)
 		return
 	end
 	self.start_fuel = reader:r_float()
+	if reader:r_elapsed() ~= 0 then
+		local light = reader:r_u8()
+		if light == 1 then
+			self.is_lights_on = true
+		else
+			self.is_lights_on = false
+		end
+		local engine = reader:r_u8()
+		if engine == 1 then
+			self.is_engine_on = true
+		else
+			self.is_engine_on = false
+		end
+	end
 end
 
 function car_binder:net_spawn()
@@ -79,7 +111,22 @@ function car_binder:update()
 			self.sm:subscribe(self._open_engine_door_desc)
 			self.subscribed = true
 		end
-		if self.start_fuel then self.object:set_fuel(self.start_fuel); self.start_fuel = nil end
+		--
+		local car = self.object:get_car()
+		if self.start_fuel then
+			car:SetFuel(self.start_fuel)
+			self.start_fuel = nil
+		end
+		--
+		if not self.first_update_called then
+			if self.is_lights_on then
+				car:SwitchLights()
+			end
+			if self.is_engine_on then
+				car:SwitchEngine()
+			end
+			self.first_update_called = true
+		end
 	end
 
 --[=[ --KRodin: выключил, не вижу в этом нужды.
@@ -101,8 +148,6 @@ function car_binder:update()
 end
 
 function car_binder:on_engine_open(car)
-	if self.object:id() ~= car:id() then return end --Обязательно, иначе будет вызываться для каждой машины в онлайне.
-
 	if self.engine_door_def then
 		if not self.engine_door_opened then
 			open_door(self.engine_door_def)
@@ -126,8 +171,6 @@ function wait_for_car_inventory_closed:action()
 end
 
 function car_binder:on_trunk_open(car)
-	if self.object:id() ~= car:id() then return end --Обязательно, иначе будет вызываться для каждой машины в онлайне.
-
 	if self.trunk_door_def then
 		open_door(self.trunk_door_def)
 		wait_for_car_inventory_closed(self):start()
@@ -135,7 +178,10 @@ function car_binder:on_trunk_open(car)
 end
 
 function car_binder:save(packet)
-   packet:w_float(self.object:get_fuel())
+	local car = self.object:get_car()
+	packet:w_float(car:GetFuel())
+	packet:w_u8(car:IsLightsOn())
+	packet:w_u8(car:IsEngineOn())
 end
 
 function car_binder:death_callback(victim, who)
@@ -150,7 +196,8 @@ function car_binder:death_callback(victim, who)
 end
 
 function car_binder:net_destroy()
-	self.object:set_callback(callback.death, nil)
+	self.object:set_callback( callback.death, nil )
+	self.object:set_callback( callback.use_object, nil )
 
 	if self.subscribed then --Проверка, прошел ли хоть один апдейт и успели ли мы подписаться на сигналы
 		self.sm:unsubscribe(self._open_trunk_door_desc)

@@ -606,7 +606,8 @@ function search_fuel_complete()
 		if sobj then
 			local obj = level.object_by_id(sobj.id)
 			ASSERT(obj, "zaz is not available now!")
-			return obj:get_fuel() > 0.01
+			local car = obj:get_car()
+			return car:GetFuel() > 0.01
 		end
 	end
 	return false
@@ -632,7 +633,7 @@ end
 function zaz_set_fuel_0()
 	local car = level_object_by_sid(story_ids.esc_zaz_in_novice_lager)
 	if car then
-		car:set_fuel(0)
+		car:get_car():SetFuel(0)
 	end
 end
 
@@ -1595,7 +1596,7 @@ end
 function captive_on_agr_mill_base_spawn_dolg_squad()
 	ogse.spawn_objects(spawn_db.captive_on_agr_mill_base_spawn_dolg_squad)
 	local commander_obj = ogse.spawn_object(spawn_db.captive_on_agr_mill_base_dolg_guard4)
-	alife():assign_story_id(nil, nil, commander_obj.id, story_ids.captive_on_agr_mill_base_dolg_commander)
+	alife():assign_story_id(commander_obj.id, story_ids.captive_on_agr_mill_base_dolg_commander)
 end
 
 -- Вызывается, когда отлетает вертолет
@@ -3365,7 +3366,7 @@ end
 
 function military_psycho_leave_companion()
 	dialogs.companion_stop_following(level_object_by_sid(story_ids.Mil_Crazy), db.actor)
-	alife():teleport_object("", vector():set(51.683,-11.698,-262.403), 65884, 1480, id_by_sid(story_ids.Mil_Crazy))
+	alife():teleport_object(id_by_sid(story_ids.Mil_Crazy), vector():set(51.683,-11.698,-262.403), 65884, 1480)
 	local npc = level_object_by_sid(story_ids.Mil_Crazy)
 	if npc then
 		local sobject = alife():object(npc:id())

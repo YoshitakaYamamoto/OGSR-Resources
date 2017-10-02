@@ -9,7 +9,7 @@
 -- зависит от: ogse_autodoc.script                                                                --
 ----------------------------------------------------------------------------------------------------
 local full_charges = sys_ini:r_s32("autodoctor", "ad_full_charges")	-- Макс. кол-во зарядов в подсистемах ИДЛК
-local WIDTH_FACTOR  = get_static_rescale_factor()
+local WIDTH_FACTOR  = device().height / device().width / 0.75
 
 function open_autodoc_ui()
 	local spwn = autodoc()

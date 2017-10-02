@@ -438,7 +438,7 @@ function evaluator_check_altcombat:evaluate()
 	local wm = rx_wmgr and rx_wmgr.get_wm(self.object)
 
 	local sl = self.object:active_slot()
-	if sl ~= 4294967295 and self.object:item_in_slot(sl) then
+	if sl ~= 255 and self.object:item_in_slot(sl) then
 		bw = self.object:item_in_slot(sl)
 	else
 		bw = (wm and wm:get_weapon()) or self.object:best_weapon()
@@ -594,7 +594,7 @@ function action_altcombat:execute()
 	local bw = nil
 	local wm = rx_wmgr and rx_wmgr.get_wm(npc)
 	local sl = npc:active_slot()
-	if sl ~= 4294967295 and npc:item_in_slot(sl) then
+	if sl ~= 255 and npc:item_in_slot(sl) then
 		bw = npc:item_in_slot(sl)
 	else
 		bw = (wm and wm:get_weapon()) or npc:best_weapon()
@@ -1481,11 +1481,11 @@ function hit_callback(  obj, amount, local_direction, who, bone_index )
 								end
 							end							
 						end
-						--obj:make_object_visible_somewhen(who)
+						obj:make_object_visible_somewhen(who)
 					else
 						enable_object(obj, who)
 						process_enemy(obj, who)
-						--obj:make_object_visible_somewhen(who)
+						obj:make_object_visible_somewhen(who)
 					end
 				elseif targets_list[npc:id()] and targets_list[npc:id()][who:id()] then
 					local enemy_record = targets_list[npc:id()][who:id()]
@@ -1511,7 +1511,7 @@ function hit_callback(  obj, amount, local_direction, who, bone_index )
 				if targets_list[npc:id()] and not targets_list[npc:id()][who:id()] then
 					enable_object(obj, who)
 					process_enemy(obj, who)
-					--obj:make_object_visible_somewhen(who)
+					obj:make_object_visible_somewhen(who)
 				elseif targets_list[npc:id()] and targets_list[npc:id()][who:id()] then
 					local enemy_record = targets_list[npc:id()][who:id()]
 					enemy_record.last_time_seen = time_global()
@@ -1522,7 +1522,7 @@ function hit_callback(  obj, amount, local_direction, who, bone_index )
 			if targets_list[npc:id()] and not targets_list[npc:id()][who:id()] then
 				enable_object(obj, who)
 				process_enemy(obj, who)
-				--obj:make_object_visible_somewhen(who)
+				obj:make_object_visible_somewhen(who)
 			elseif targets_list[npc:id()] and targets_list[npc:id()][who:id()] then
 				local enemy_record = targets_list[npc:id()][who:id()]
 				enemy_record.last_time_seen = time_global()
@@ -2256,7 +2256,7 @@ function get_max_weapon_range(npc)
 	-- служебная для проверки достанет ли оружие
 	if npc then
 		local a_sl = npc:active_slot()
-		if a_sl == 4294967295 then
+		if a_sl == 255 then
 			return 36.0
 		end
 		local act_item = npc:item_in_slot(a_sl)
@@ -2631,12 +2631,10 @@ function actor_see_raytrace(npc)
 	local dir_enemy = utils.vector_copy_by_val(be_pos):sub(npc_pos)
 	local aim_point = npc_pos:add(dir_enemy:normalize())
 		
-	ray_pick.init(aim_point, dir_enemy, (distance+1), rq_target.rqtBoth, db.actor)
-		
-	local res = ray_pick.check()
-	if res then
-		local dist = ray_pick.get_dist()
-		local obj = ray_pick.get_obj()
+	local dist = distance+1
+	local res = level.ray_query(aim_point, dir_enemy, dist, rq_target.rqtBoth, db.actor)
+	local obj = res.object
+	if obj then
 		if obj and obj:id() == npc:id() then
 			local tgt = ang > -dangerang and ang < dangerang
 			if tgt then
@@ -2785,21 +2783,14 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 			
 			write_log("--XRS_BATTLE_AI: WPNS_FIRE_2_RTC_4 %s : %s", npc:name(), enemy:id())
 			
-			ray_pick.init(aim_point, dir_enemy, (distance + 1--[[5 --зачем так много?]]), rq_target.rqtBoth, npc)
-			
-			write_log("--XRS_BATTLE_AI: WPNS_FIRE_2_RTC_5 %s : %s", npc:name(), enemy:id())
-	
-			local res = ray_pick.check()
+			local dist = distance+1
+			local res = level.ray_query(aim_point, dir_enemy, dist, rq_target.rqtBoth, npc)
+			local obj = res.object
 			
 			write_log("--XRS_BATTLE_AI: WPNS_FIRE_2_RTC_6 %s : %s", npc:name(), enemy:id())
 			
-			if res then
+			if obj then
 			
-				write_log("--XRS_BATTLE_AI: RAYTRACE PHASE_1 %s : %s", npc:name(), enemy:id())
-			
-				local dist = ray_pick.get_dist()
-				local obj = ray_pick.get_obj()
-				
 				write_log("--XRS_BATTLE_AI: RAYTRACE PHASE_2 %s : %s", npc:name(), enemy:id())
 				
 				local is_alive_mob = obj and ( obj:is_stalker() or obj:is_actor() or obj:is_monster() ) and obj:alive()
@@ -3319,7 +3310,7 @@ function select_position(npc, target, flag)
 	
 	local a_sl = npc:active_slot()
 	local bw = nil
-	if a_sl == 4294967295 or not npc:item_in_slot(a_sl) then
+	if a_sl == 255 or not npc:item_in_slot(a_sl) then
 		local wm = rx_wmgr and rx_wmgr.get_wm(npc)
 		bw = (wm and wm:get_weapon()) or npc:best_weapon()
 	else
@@ -3680,7 +3671,7 @@ function check_for_grenades(npc)
 						if npc:relation(best_danger:object()) == game_object.enemy then
 							enable_object(npc, best_danger:object())
 							process_enemy(npc, best_danger:object())
-							--npc:make_object_visible_somewhen(best_danger:object())
+							npc:make_object_visible_somewhen(best_danger:object())
 							xr_sound.set_sound(npc, "beware_grenade")
 						end
 					end
@@ -3792,7 +3783,7 @@ end
 
 function is_sniper(obj)
 	local active_slot = obj:active_slot()
-	if active_slot == 4294967295 then return false end
+	if active_slot == 255 then return false end
 	local active_item = obj:item_in_slot(active_slot)
 
 	return active_item and IsSniperRifle(active_item)

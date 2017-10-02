@@ -233,7 +233,7 @@ function evaluator_danger:evaluate()
 			if deadman_info then
 				local time_died, killer = 1, 1
 				local a = 0
-				for word in string.gfind(deadman_info, "%d+") do
+				for word in string.gmatch(deadman_info, "%d+") do
 					if a == 0 then
 						time_died = tonumber(word)
 					else	

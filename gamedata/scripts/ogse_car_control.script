@@ -45,7 +45,6 @@ function attach(sm) -- для менеджера сигналов
 	--sm:subscribe({signal = "on_car_net_destroy", fun = this.unregister_target})
 end
 
-local sim
 local btr_hud_wnd
 local car_hud_wnd
 local surge = false
@@ -123,8 +122,7 @@ function on_attach_vehicle(obj) --Только что залезли в машину
 	SetDetailsMinRadius(2.0) -- убираем траву из под ног
 	setup_car_camera(obj)
 	bind_stalker.hide_weapon()
-	db.actor:set_actor_int(1432, 0)
-	db.actor:set_actor_int(1428, 0)
+	db.actor:reset_state()
 	current_car = obj
 	in_btr = string.find(obj:section(), "btr") ~= nil
 	if in_btr then
@@ -161,18 +159,15 @@ end
 
 
 function on_use_vehicle(obj)
-	if not current_car then -- действия, имеющие смысл только при нахождении снаружи машины
-		if car_which_trunk_we_looking_at(obj) then
-			ogse_signals.get_mgr():call("on_car_trunk_open", obj)
-		elseif car_which_engine_door_we_looking_at(obj) then
-			ogse_signals.get_mgr():call("on_car_engine_open", obj)
-		end
+	if car_which_trunk_we_looking_at(obj) then
+		ogse_signals.get_mgr():call("on_car_trunk_open", obj)
+	elseif car_which_engine_door_we_looking_at(obj) then
+		ogse_signals.get_mgr():call("on_car_engine_open", obj)
 	end
 end
 
 
 function on_spawn()
-	sim = alife()
 	local bg = get_hud():AddCustomStatic("btr_hud_background", true):wnd() -- подложка для окна худа БТР
 	bg:SetWidth(0)
 	bg:SetColor(GetARGB(0,255,255,255))
@@ -403,7 +398,7 @@ function on_key_down(key, bind)
 	if level.main_input_receiver() then return end
 
 	if not current_car then -- действия, имеющие смысл только при нахождении снаружи машины
-		if bind == 56 then -- Заправка транспорта
+		if key == DIK_keys.DIK_DECIMAL then -- Заправка транспорта
 			local car = car_which_gastank_we_looking_at()
 			if car then
 				refuel(car)
@@ -414,15 +409,7 @@ function on_key_down(key, bind)
 	
 	if not in_btr then return end -- последующие действия имеют смысл только при нахождении внутри БТР
 	
-	--[[if bind == key_bindings.kCAM_ZOOM_OUT then
-		--if not level.main_input_receiver() then -- контроль худа
-		--	hud_disable = true
-		--end
-	elseif bind == key_bindings.kCAM_ZOOM_IN then
-		--if not level.main_input_receiver() then
-		--	hud_disable = false
-		--end
-	else]]if bind == key_bindings.kL_LOOKOUT then -- управление распознаванием
+	if bind == key_bindings.kL_LOOKOUT then -- управление распознаванием
 		if not recognition_target_operable then -- режим распознования сломался
 			play_error_sound()
 			return
@@ -560,7 +547,7 @@ function on_key_up(key, bind)
 			switch_firing(current_car, false)
 		elseif bind == key_bindings.kWPN_ZOOM then
 			--target_select_mode = false
-		elseif key == 339 then -- управление зуммом
+		elseif key == DIK_keys.MOUSE_3 then -- управление зуммом
 			db.actor:set_camera_fov(fov_vol)
 			current_btr_fov = fov_vol
 		end
@@ -603,15 +590,16 @@ end
 -------------------------------------------------------------------------------------------------------------
 -- функция заправки машины топливом
 -------------------------------------------------------------------------------------------------------------
-function refuel(car)
-	ASSERT(car, "refuel: car is a nil reference")
+function refuel(car_obj)
+	ASSERT(car_obj, "refuel: car is a nil reference")
 	local item = db.actor:object("explosive_mobiltank")
 	if not item then
 		ogse_screen_msg.show_message_trouble(game.translate_string("ogse_car_no_fuel_text"))
 		return
-	end			
-	local fuel = car:get_fuel()
-	local fuel_tank = car:get_fuel_tank()
+	end
+	local car = car_obj:get_car()
+	local fuel = car:GetFuel()
+	local fuel_tank = car:GetFuelTank()
 	if fuel_tank - fuel <= 10 then
 		ogse_screen_msg.show_message_trouble(game.translate_string("ogse_car_not_need_fuel_text"))
 		return 
@@ -620,12 +608,12 @@ function refuel(car)
 	if fuel > fuel_tank then
 		fuel = fuel_tank
 	end
-	car:set_fuel(fuel)
+	car:SetFuel(fuel)
 	ogse_screen_msg.show_message_use_item(item:section())
 	alife():release(alife():object(item:id()), true)
 
 --KRodin: Квестовая врезка перенесена сюда из апдейта биндера авто.
-	if string.find(car:name(), "esc_vehicle_zaz_in_novice_lager") then
+	if string.find(car_obj:name(), "esc_vehicle_zaz_in_novice_lager") then
 		-- условие завершения подзадачи на заправку запора
 		if db.actor:has_info("esc_kvest_sdelka_with_mils_start") and db.actor:dont_has_info("escape_kvest_with_military_zaz_fueled") then
 			db.actor:give_info_portion("escape_kvest_with_military_zaz_fueled")
@@ -764,33 +752,32 @@ function switch_firing(car, fire)
 end
 -- получить машину, в которой сидит ГГ
 function get_actor_car()
-	local holder_id = db.actor:get_actor_int16(nil, 1240)
-	local hldr = level.object_by_id(holder_id)
-	if hldr and hldr:is_car() then return hldr end
+	local holder = db.actor:get_holder()
+	if holder and holder:is_car() then return holder end
 	return nil
 end
 function setup_car_camera(car)
 	ASSERT(car, "setup_car_camera: 'car' parameter is a nil reference!")
 	local visual_ini = car:get_visual_ini()
-	if visual_ini:section_exist("car_camera") then
-		local lim_pitch_min, lim_pitch_max = get_vector2("car_camera", "lim_pitch", nil, visual_ini)
-		ASSERT(lim_pitch_min and lim_pitch_max and (lim_pitch_min < lim_pitch_max), "setup_car_camera: 'lim_pitch' is not defined properly for '%s'", car:section())
-		local lim_yaw_min, lim_yaw_max = get_vector2("car_camera", "lim_yaw", nil, visual_ini)
-		ASSERT(lim_yaw_min and lim_yaw_max and (lim_yaw_min < lim_yaw_max), "setup_car_camera: 'lim_yaw' is not defined properly for '%s'", car:section())
+	if visual_ini and visual_ini:section_exist("car_camera") then
+		local lim_pitch_min_max = get_vector2("car_camera", "lim_pitch", nil, visual_ini)
+		ASSERT(lim_pitch_min_max.x and lim_pitch_min_max.y and (lim_pitch_min_max.x < lim_pitch_min_max.y), "setup_car_camera: 'lim_pitch' is not defined properly for '%s'", car:section())
+		local lim_yaw_min_max = get_vector2("car_camera", "lim_yaw", nil, visual_ini)
+		ASSERT(lim_yaw_min_max.x and lim_yaw_min_max.y and (lim_yaw_min_max.x < lim_yaw_min_max.y), "setup_car_camera: 'lim_yaw' is not defined properly for '%s'", car:section())
 		local rot_speed = get_vector("car_camera", "rot_speed", nil, visual_ini)
 		ASSERT(rot_speed, "setup_car_camera: 'rot_speed' is not defined properly for '%s'", car:section())
 		--
-		local cam_cur_addr = car:get_car_int(nil, 1320)
-		car:set_memory_float(nil, lim_yaw_min, sum_args_ex(cam_cur_addr, 40))
-		car:set_memory_float(nil, lim_yaw_max, sum_args_ex(cam_cur_addr, 44))
-		car:set_memory_float(nil, lim_pitch_min, sum_args_ex(cam_cur_addr, 48))
-		car:set_memory_float(nil, lim_pitch_max, sum_args_ex(cam_cur_addr, 52))
-
-		car:set_memory_float(nil, rot_speed.x, sum_args_ex(cam_cur_addr, 64))
-		car:set_memory_float(nil, rot_speed.y, sum_args_ex(cam_cur_addr, 68))
-		car:set_memory_float(nil, rot_speed.z, sum_args_ex(cam_cur_addr, 72))
+		local car_cam = car:get_camera()
+		car_cam.lim_yaw = lim_yaw_min_max
+		car_cam.lim_pitch = lim_pitch_min_max
+		car_cam.rot_speed = rot_speed
 		fix_camera_limits = get_bool("car_camera", "fix_camera_limits", false, visual_ini)
 	end
+end
+
+
+function SetDetailsMinRadius(radius)
+	cmd("r2_no_details_radius "..radius)
 end
 
 function on_first_update()
@@ -807,15 +794,14 @@ function update_car_hud()
 	if car then -- обновляем состояние машины
 		update_car_states(car)
 		if fix_camera_limits then
-			local cam_cur_addr = car:get_car_int(nil, 1320)
-			local ang = car:get_memory_float(sum_args_ex(cam_cur_addr, 20))
-			if math.abs(ang) > 2*math.pi then
-				local ang2 = math.fmod(ang, 2*math.pi)
-				car:set_memory_float(nil, ang2, sum_args_ex(cam_cur_addr, 20))
+			local car_cam = car:get_camera()
+			if math.abs(car_cam.yaw) > 2*math.pi then
+				car_cam.yaw = math.fmod(car_cam.yaw, 2*math.pi)
 			end
 		end
 		--
-		local new_width = (car:get_fuel() / car:get_fuel_tank()) * car_hud_wnd.max_width
+		local e_car = car:get_car()
+		local new_width = (e_car:GetFuel() / e_car:GetFuelTank()) * car_hud_wnd.max_width
 		car_hud_wnd.fuel_level:SetWidth(new_width)
 		--
 		if in_btr then

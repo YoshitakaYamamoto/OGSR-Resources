@@ -37,7 +37,7 @@ function get_array_from_string(s)
 	local num = nil
 	local c = {}
 	if s then
-		for num in string.gfind(s,"([%w_%-.\\]+)%p*") do table.insert(c, num) end
+		for num in string.gmatch(s,"([%w_%-.\\]+)%p*") do table.insert(c, num) end
 	end
 	return c
 end

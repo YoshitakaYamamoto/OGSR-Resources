@@ -50,17 +50,8 @@ end
 
 local walk_accel		= get_float( "actor", "walk_accel" )
 local jump_speed		= get_float( "actor", "jump_speed" )
-local run_factor		= get_float( "actor", "run_coef" )
-local run_back_factor	= get_float( "actor", "run_back_coef" )
-local sprint_factor		= get_float( "actor", "sprint_koef" )
 
-local walk_back_factor	= get_float( "actor", "walk_back_coef" )
-local crouch_factor		= get_float( "actor", "crouch_coef" )
-local climb_factor		= get_float( "actor", "climb_coef" )
-local walk_strafe_factor --хз, откуда это значение берётся, в конфигах его нет, поэтому придётся брать из движка
-local run_strafe_factor --тоже самое
-
-local water_coeff = 0.6
+local water_coeff = 0.36
 local time_submerged = 0
 local o2_amount = 100
 
@@ -123,14 +114,14 @@ function fx_start(id)
 		if not breather then
 			cmd("r2_dof_control", "on")
 		end
-		walk_strafe_factor = get_walk_strafe_factor()
-		run_strafe_factor = get_run_strafe_factor()
+		----walk_strafe_factor = get_walk_strafe_factor()
+		----run_strafe_factor = get_run_strafe_factor()
 
-		set_walk_back_factor(walk_back_factor*water_coeff)
-		set_crouch_factor(crouch_factor*water_coeff)
-		set_climb_factor(climb_factor*water_coeff)
-		set_walk_strafe_factor(walk_strafe_factor*water_coeff)
-		set_run_strafe_factor(run_strafe_factor*water_coeff)
+		----set_walk_back_factor(walk_back_factor*water_coeff)
+		----set_crouch_factor(crouch_factor*water_coeff)
+		----set_climb_factor(climb_factor*water_coeff)
+		----set_walk_strafe_factor(walk_strafe_factor*water_coeff)
+		----set_run_strafe_factor(run_strafe_factor*water_coeff)
 
 		bind_stalker.hide_weapon()
 		underwater[id] = true
@@ -222,11 +213,11 @@ function fx_stop(id)
 		end
 		cmd("r2_dof_control", "off")
 
-		set_walk_back_factor(walk_back_factor)
-		set_crouch_factor(crouch_factor)
-		set_climb_factor(climb_factor)
-		set_walk_strafe_factor(walk_strafe_factor)
-		set_run_strafe_factor(run_strafe_factor)	
+		----set_walk_back_factor(walk_back_factor)
+		----set_crouch_factor(crouch_factor)
+		----set_climb_factor(climb_factor)
+		----set_walk_strafe_factor(walk_strafe_factor)
+		----set_run_strafe_factor(run_strafe_factor)	
 
 		bind_stalker.restore_weapon()
 		underwater[id] = nil

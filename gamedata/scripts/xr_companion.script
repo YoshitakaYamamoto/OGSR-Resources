@@ -708,7 +708,7 @@ function teleport_on_actor_level(npc_id, s_npc)
 		local pos = alife():actor().position
 		pos.x = pos.x + 5
 		pos.z = pos.z -- + 2
-		alife():teleport_object("_", pos, lvid, gvid, npc_id)
+		alife():teleport_object(npc_id, pos, lvid, gvid)
 	end
 end
 -----------------------------------------------------

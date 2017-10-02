@@ -8,7 +8,6 @@
 
 function attach(sm)
     sm:subscribe({signal = "on_storyline_start", fun = this.on_storyline_start})
-	sm:subscribe({signal = "on_first_update",	fun = this.on_actor_first_update})
 	sm:subscribe({signal = "on_update",			fun = this.show_time})
 	sm:subscribe({signal = "on_take",			fun = this.on_item_take})
 	sm:subscribe({signal = "after_time_change",	fun = this.after_time_change})
@@ -391,19 +390,21 @@ local quest_profiles = {
 
 --- Возвращает true если параметром передан квестовый непись
 function is_quest_npc(npc)
-	local story = 4294967296
-	if npc then
-		if npc.m_story_id then
-			story = npc.m_story_id
-		else
-			story = npc:story_id()
-		end
-		if story == 4294967296 then
-			if quest_profiles[npc:profile_name()] or quest_profiles[npc:name()] then
-				return true
-			end
+	if not npc then return false end
+	--
+	local story
+	if npc.m_story_id then
+		story = npc.m_story_id
+	else
+		story = npc:story_id()
+	end
+	log3("[OGSE] SID of [%s]: [%s]", npc:name(), story)
+	if story == 4294967296 then
+		if quest_profiles[npc:profile_name()] or quest_profiles[npc:name()] then
+			return true
 		end
 	end
+	--
 	return story ~= 4294967296
 end
 
@@ -1202,118 +1203,6 @@ function on_item_take(obj)
 	end
 end
 
-function make_guider_happy_again(obj_id, obj)
-	obj:set_character_community("ecolog", 0, 0)
-end
-
--- Запуск вызовов при первом апдейта актора
-function on_actor_first_update()
-	if db.actor:has_info("storyline_actor_start") then		
-		if db.actor:dont_has_info("OGSE_LIANA_PATCH_3_FIX") then
-			if level.name() ~= "l08u_brainlab" then
-				-- баг с лианами
-				local obj = alife():object("liana_00")
-				if obj then
-					alife():release(obj, true)
-				end
-				obj = alife():object("liana_01")
-				if obj then
-					alife():release(obj, true)
-				end
-				obj = alife():object("liana_02")
-				if obj then
-					alife():release(obj, true)
-				end
-				obj = alife():object("liana_03")
-				if obj then
-					alife():release(obj, true)
-				end
-				obj = alife():object("liana_04")
-				if obj then
-					alife():release(obj, true)
-				end
-				obj = alife():object("liana_05")
-				if obj then
-					alife():release(obj, true)
-				end
-				obj = alife():object("liana_06")
-				if obj then
-					alife():release(obj, true)
-				end
-				alife():create(5929)
-				alife():create(5930)
-				alife():create(5931)
-				alife():create(5932)
-				alife():create(5933)
-				alife():create(5934)
-				alife():create(5935)
-			end
-			db.actor:give_info_portion("OGSE_LIANA_PATCH_3_FIX")
-		end
-		if db.actor:dont_has_info("OGSE_KOLYA_PATCH_10_FIX") then
-			-- варианты: 
-			-- 1) Коля еще не заспавнен
-			-- 2) Коля заспавнен, есть, еще не найден
-			-- 3) Коля заспавнен, пропал, еще не найден
-			-- 4) Коля найден, квест закончен
-			if db.actor:dont_has_info("cheb_found_kolya") then
-			-- не вариант 4
-				-- в вариантах 1 и 3 надо всего лишь заспавнить колю и все
-				local kolya = alife():story_object(story_ids.stalker_kolya)
-				if kolya then
-				-- вариант 2. Удаляем колю, снимая с него метку
-					level_tasks.remove_location_by_sid(story_ids.stalker_kolya, "crlc_big")
-					alife():release(kolya)
-				end
-				alife():create(11268)
-				if db.actor:has_info("deadcity_first_enter") then
-					level_tasks.add_location_by_sid(story_ids.stalker_kolya, "crlc_big", "find_kolya")
-				end
-			end
-			
-			db.actor:give_info_portion("OGSE_KOLYA_PATCH_10_FIX")
-		end
-		if db.actor:dont_has_info("OGSE_PATCH_8_FIX") then
-			if db.actor:dont_has_info("dead_stalker_start_dialog_2") then
-				local obj = alife():story_object(story_ids.x18_death_stalker)
-				if obj then
-					alife():release(obj, true)
-					dark_valley_u_spawn.dead_stalker()
-				end
-			end
-			db.actor:give_info_portion("OGSE_PATCH_8_FIX")
-		end
-		if db.actor:dont_has_info("OGSE_PATCH_10_1_FIX") then
-			local guider = alife():object("yantar_guider")
-			if guider then
-				level.client_spawn_manager():add(guider.id, -1, make_guider_happy_again)
-			end
-			
-			local af_kolya
-			for i = 1,65535 do
-				local obj = alife():object(i)
-				if obj and obj:section_name() == "af_kolya" then
-					af_kolya = obj
-				end
-			end
-			if af_kolya then
-				alife():release(af_kolya, true)
-				if db.actor:has_info("cheb_found_kolya") and not db.actor:object("cheb") then
-					spawn_item_in_inv("af_kolya", alife():story_object(story_ids.stalker_kolya))
-				end
-			end
-			db.actor:give_info_portion("OGSE_PATCH_10_1_FIX")
-		end
-	end
-
---[[ --Патроны на поясе --KRodin: выключено
-	if ammo_on_belt == 1 then
-		cmd("g_ammunition_on_belt on")
-	else
-		cmd("g_ammunition_on_belt off")	
-	end
---]]
-end
 
 function on_storyline_start()
 	ogse_spawns.traders_spawn()
@@ -1415,12 +1304,12 @@ local function spawn_single_object_internal(res, spawn_item)
 		-- просто не бывает. В этих случаях всегда идёт вылет. Но пусть будет
 		ASSERT(sobj, "[spawn_single_object_internal] cannot create object, sec = '%s'", spawn_item.sec)
 		if spawn_item.use_ai_location == false or spawn_item.use_ai_location == "false" then
-			sobj:use_ai_locations(false)
+			alife():use_ai_locations(sobj, false)
 		elseif spawn_item.use_ai_location == true or spawn_item.use_ai_location == "true" then
-			sobj:use_ai_locations(true)
+			alife():use_ai_locations(sobj, true)
 		end
 		if spawn_item.sid then
-			sim:assign_story_id(nil, nil, sobj.id, spawn_item.sid)
+			sim:assign_story_id(sobj.id, spawn_item.sid)
 		end
 		if spawn_item.angle then
 			sobj.angle = vector():set(unpack(spawn_item.angle))

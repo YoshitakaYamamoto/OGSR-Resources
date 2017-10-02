@@ -53,54 +53,11 @@ function parse_list(ini,sec,val,convert)
 	return tmp
 end
 
---------------------------------------class---------------------------------------
-local weapon_classes_without_grenades = {
-		[clsid.wpn_ak74] 				= true,
-		[clsid.wpn_ak74_s] 				= true,
-		[clsid.wpn_bm16] 				= true,
-		[clsid.wpn_bm16_s] 				= true,
-		[clsid.wpn_fn2000] 				= true,
-		[clsid.wpn_fort]				= true,
-		[clsid.wpn_groza] 				= true,
-		[clsid.wpn_groza_s] 			= true,
-		[clsid.wpn_hpsa] 				= true,
-		[clsid.wpn_hpsa_s] 				= true,
-		[clsid.wpn_knife] 				= true,
-		[clsid.wpn_knife_s] 			= true,
-		[clsid.wpn_lr300] 				= true,
-		[clsid.wpn_lr300_s] 			= true,
-		[clsid.wpn_pm] 					= true,
-		[clsid.wpn_pm_s] 				= true,
-		[clsid.wpn_rg6] 				= true,
-		[clsid.wpn_rg6_s] 				= true,
-		[clsid.wpn_rpg7] 				= true,
-		[clsid.wpn_rpg7_s] 				= true,
-		[clsid.wpn_shotgun] 			= true,
-		[clsid.wpn_shotgun_s] 			= true,
-		[clsid.wpn_svd] 				= true,
-		[clsid.wpn_svd_s] 				= true,
-		[clsid.wpn_svu] 				= true,
-		[clsid.wpn_svu_s] 				= true,
-		[clsid.wpn_usp45] 				= true,
-		[clsid.wpn_usp45_s] 			= true,
-		[clsid.wpn_val] 				= true,
-		[clsid.wpn_val_s] 				= true,
-		[clsid.wpn_vintorez] 			= true,
-		[clsid.wpn_vintorez_s] 			= true
-}
 
-function item_is_fa(object, class_id)
-	local id = class_id or get_clsid(object)
-	return id and weapon_classes_without_grenades[id]
+function is_weapon(object)
+	return (object:is_weapon() and not object:is_binoculars())
 end
 
-actor_clsid = clsid.actor
-function is_actor(o,c)
-	if not c then
-		c = o and o:clsid()
-	end
-	return c == actor_clsid
-end
 
 --------------------------------------sch---------------------------------------
 function add_anim(npc,anim,move)
@@ -155,7 +112,7 @@ function npc_in_cover(npc)
 		end
 		for i,enemy in ipairs(enemies) do
 			local dist = npc:position():distance_to_sqr(enemy:position())
-			local seez = enemy:see(npc) or npc:see(enemy)
+			local seez = (enemy:alive() and enemy:see(npc)) or (npc:alive() and npc:see(enemy))
 			local cover = level.cover_in_direction(npc:level_vertex_id(),enemy:position():sub(npc:position()))
 			if dist < 25 
 			or seez 

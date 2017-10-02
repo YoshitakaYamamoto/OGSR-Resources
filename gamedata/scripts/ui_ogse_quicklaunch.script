@@ -17,13 +17,12 @@ local strings = {}
 local strings_all = {
 	[1] = {text = game.translate_string("quicklaunch_string1")},
 	[2] = {text = "----------------------------"},
-	[3] = {text = game.translate_string("quicklaunch_string2"), keybind = 73},
-	[4] = {text = game.translate_string("quicklaunch_string3"), keybind = 74},
-	[5] = {text = game.translate_string("quicklaunch_string4"), variable = "antirad_key"},
-	[6] = {text = game.translate_string("quicklaunch_string5"), variable = "energy_drink_key"},
-	[7] = {text = game.translate_string("quicklaunch_string6"), variable = "yod_key"},
-	[8] = {text = game.translate_string("quicklaunch_string7"), variable = "bipsizon_key"}
-	
+	[3] = {text = game.translate_string("quicklaunch_string2"), keybind = key_bindings.kUSE_BANDAGE},
+	[4] = {text = game.translate_string("quicklaunch_string3"), keybind = key_bindings.kUSE_MEDKIT},
+	[5] = {text = game.translate_string("quicklaunch_string4"), keybind = key_bindings.kUSE_ANTIRAD},
+	[6] = {text = game.translate_string("quicklaunch_string5"), keybind = key_bindings.kUSE_ENERGY_DRINK},
+	[7] = {text = game.translate_string("quicklaunch_string6"), keybind = key_bindings.kUSE_B190},
+	[8] = {text = game.translate_string("quicklaunch_string7"), keybind = key_bindings.kUSE_BIPSIZON}
 }
 local strings_btr = {
 	[1] = {text = game.translate_string("btr_control_string1")},
@@ -41,8 +40,9 @@ if ogse_car_control.need_companion_btr == true then
 end
 
 
-local keys_table = {
-	[ogse_rebind_key.get_key_preset_value("antirad_key")] = function()
+--[=[
+local binds_table = {
+	[key_bindings.kUSE_ANTIRAD] = function()
 		local item = db.actor:object("antirad")
 		if item then
 			db.actor:eat(item)
@@ -50,7 +50,7 @@ local keys_table = {
 		end
 		return true
 	end,
-	[ogse_rebind_key.get_key_preset_value("energy_drink_key")] = function()
+	[key_bindings.kUSE_ENERGY_DRINK] = function()
 		local item = db.actor:object("energy_drink")
 		if item then
 			db.actor:eat(item)
@@ -72,7 +72,7 @@ local keys_table = {
 		end			
 		return true
 	end,
-	[ogse_rebind_key.get_key_preset_value("bipsizon_key")] = function()
+	[key_bindings.kUSE_BIPSIZON] = function()
 		local item = db.actor:object("bipsizon")
 		if item then
 			db.actor:eat(item)
@@ -85,14 +85,15 @@ local keys_table = {
 		return true
 	end,
 }
+--]=]
 
 function chek_keys(key, bind)
 	if level.main_input_receiver() then return end
 
-	local fun = keys_table[key]
-	if fun then return fun() end
+	--local fun = binds_table[bind]
+	--if fun then return fun() end
 
-	if bind ~= 43 then return end --Хз, как этот бинд называется
+	if bind ~= 43 then return end --Хз, как этот бинд называется. Клавиша TAB, кароч.
 
     local hud = get_hud()
 	strings = ogse_car_control.in_btr and strings_btr or strings_all
@@ -104,9 +105,7 @@ function chek_keys(key, bind)
 			hud:AddCustomStatic(string_id, true)
 			quicklaunch = hud:GetCustomStatic(string_id):wnd()
 			local key_name =
-				strings[i].variable
-				and ogse_rebind_key.dik_to_name(ogse_rebind_key.get_key_preset_value(strings[i].variable)) .. " = "
-				or strings[i].keybind
+				strings[i].keybind
 				and ogse_rebind_key.dik_to_name(bind_to_dik(strings[i].keybind)) .. " = "
 				or ""
 			quicklaunch:SetText(key_name..strings[i].text)

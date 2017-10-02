@@ -16,9 +16,9 @@ function init(obj)
 	if not ini then return end
 	local has_light_config = ini:section_exist("light_config")
 	local has_logic = ini:section_exist("logic")
-	local has_fade_params = ini:section_exist("fade_params")
-	if has_light_config or has_logic or has_fade_params then
-		local new_binder = light_binder(obj, has_light_config, has_logic, has_fade_params)
+	--local has_fade_params = ini:section_exist("fade_params")
+	if has_light_config or has_logic --[[or has_fade_params]] then
+		local new_binder = light_binder(obj, has_light_config, has_logic--[[, has_fade_params]])
 		obj:bind_object(new_binder)
 	end
 end
@@ -26,12 +26,12 @@ end
 -------------------------------------------------------------------------------
 class "light_binder" (object_binder)
 -- MARKER: __init 
-function light_binder:__init(obj, has_light_config, has_logic, has_fade_params) super(obj)
+function light_binder:__init(obj, has_light_config, has_logic--[[, has_fade_params]]) super(obj)
 	self.initialized = false
 	self.loaded = false
 	self.has_light_config = has_light_config
 	self.has_logic = has_logic
-	self.has_fade_params = has_fade_params
+	--self.has_fade_params = has_fade_params
 end 
 -- MARKER: reload
 function light_binder:reload(section)
@@ -99,11 +99,11 @@ function light_binder:update(delta)
 			self.repair_interval = get_float("light_config", "repair_time", 3.0, self.light_config)
 			if self.object:is_projector() then
 				if self.light_config:line_exist("light_config", "angles") then
-					local yaw, pitch = get_vector2("light_config", "angles", nil, self.light_config)
-					ASSERT(yaw and pitch, "[light_binder:update] cannot read parameter 'angles' from section 'light_config' in file '%s' for object '%s'", 
+					local yaw_pitch = get_vector2("light_config", "angles", nil, self.light_config)
+					ASSERT(yaw_pitch, "[light_binder:update] cannot read parameter 'angles' from section 'light_config' in file '%s' for object '%s'", 
 						light_config_fname,
 						self.object:name())
-					self.angles = {yaw, pitch}
+					self.angles = {yaw_pitch.x, yaw_pitch.y}
 				elseif self.light_config:line_exist("light_config", "aimpoint") then
 					self.aimpoint = get_vector("light_config", "aimpoint", nil, self.light_config)
 					ASSERT(self.aimpoint, "[light_binder:update] cannot read parameter 'aimpoint' from section 'light_config' in file '%s' for object '%s'", 
@@ -133,7 +133,7 @@ function light_binder:update(delta)
 			end
 			--log1("light initialization complete: "..self.object:name())
 		end
-		if self.has_fade_params then
+		--[[if self.has_fade_params then
 			local ini = self.object:spawn_ini()
 			local lsf_speed = ini:r_float("fade_params", "speed");
 			local lsf_amount = ini:r_float("fade_params", "amount");
@@ -142,7 +142,7 @@ function light_binder:update(delta)
 			self.object:set_lsf_speed(lsf_speed)
 			self.object:set_lsf_amount(lsf_amount)
 			self.object:set_lsf_smap_jitter(lsf_jitter)
-		end
+		end]]
 		if self.object:is_projector() then
 			self:set_projector_angles(
 				xr_logic.pstor_retrieve(self.object, "current_yaw",   0.0),
@@ -224,10 +224,11 @@ function light_binder:update(delta)
 end
 function light_binder:set_projector_angles(current_yaw, current_pitch, target_yaw, target_pitch)
 	ASSERT(self.object:is_projector(), "")
-	self.object:set_go_float(nil, current_yaw  , 492)
-	self.object:set_go_float(nil, current_pitch, 496)
-	self.object:set_go_float(nil, target_yaw   , 500)
-	self.object:set_go_float(nil, target_pitch , 504)
+	local obj = self.object:get_projector()
+	obj.current_yaw = current_yaw
+	obj.current_pitch = current_pitch
+	obj.target_yaw = target_yaw
+	obj.target_pitch = target_pitch
 end
 function light_binder:particle_position()
 	local pos
@@ -244,17 +245,16 @@ function light_binder:on_switch(turn_on)
 	--log2("light_binder:on_switch: self.object=%s", type(self.object))
 	--log2("light_binder:on_switch: self.object:id()=%d", self.object:id())
 	--log3("light_binder:on_switch: name=%s, on=%s, broken=%s", self.object:name(), turn_on, tostring(self.is_broken))
-	local lamp = self.object:get_hanging_lamp()
-	if lamp then
+	if self.object:is_lamp() then
+		local lamp = self.object:get_hanging_lamp()
 		if self.is_on and not self.is_broken then
 			lamp:turn_on()
 		else
 			lamp:turn_off()
 		end
 	elseif self.object:is_projector() then
-		
 		if self.is_on and not self.is_broken then
-			self.object:projector_on()
+			self.object:projector_switch(true)
 			--local visual_ini = self.object:get_visual_ini()
 			--if visual_ini:section_exist("projector_definition") then
 			--	visual_ini:section_exist("projector_definition")
@@ -262,7 +262,7 @@ function light_binder:on_switch(turn_on)
 			self.object:set_bone_visible("bone_light", 1)
 			self.object:set_bone_visible("bone_cone", 1)
 		else
-			self.object:projector_off()
+			self.object:projector_switch(false)
 		end
 	end
 	--
@@ -318,10 +318,10 @@ function light_binder:save(packet)
 		end
 	end
 	if self.object:is_projector() then
-		xr_logic.pstor_store(self.object, "current_yaw",   self.object:get_go_float(492))
-		xr_logic.pstor_store(self.object, "current_pitch", self.object:get_go_float(496))
-		xr_logic.pstor_store(self.object, "target_yaw",    self.object:get_go_float(500))
-		xr_logic.pstor_store(self.object, "target_pitch",  self.object:get_go_float(504))
+		xr_logic.pstor_store(self.object, "current_yaw",   self.object.current_yaw)
+		xr_logic.pstor_store(self.object, "current_pitch", self.object.current_pitch)
+		xr_logic.pstor_store(self.object, "target_yaw",    self.object.target_yaw)
+		xr_logic.pstor_store(self.object, "target_pitch",  self.object.target_pitch)
 	end
 	--
 	xr_logic.save_obj(self.object, packet, not self.initialized)

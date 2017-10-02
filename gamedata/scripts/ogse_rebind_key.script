@@ -1,21 +1,8 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
---/ ogse_rebind_key.script /--
---/ Key intercept module /--
---/ OGS Evolution Team 2010 /--
---/ version 1.4 (04/08/2013)/--
-
---/ Модуль перехвата функционала клавиш /--
--- назначение модуля: отвязка движкового назначения клавиш во время игры, чтобы ненужные движковые 
--- действия не конфликтовали со скриптовыми, забинденными на эти же клавиши. При этом на время
--- работы меню клавиши биндятся обратно, чтобы можно было назначать и менять их с помощью
--- стиандартного диалога настроек клавиатуры.
-
 function attach( sm )
-	sm:subscribe({ signal = "on_first_update", fun = this.unbind_key })
 end
 
---********************************************************************************************************
 
 local dik_key_to_name = {
 	[ 11  ] = "k0",
@@ -171,71 +158,3 @@ function bind_to_keys( bind, return_names ) --Если второй аргуме
   end
   return t
 end
-
-local name_to_dik_key = {}
-for dik, name in pairs(dik_key_to_name) do
-	name_to_dik_key[name] = dik
-end
-function keyname_to_dik( kname )
-	local dik = name_to_dik_key[kname]
-    ASSERT( dik, "keyname_to_dik not found: %s", kname or "nil" )
-	return dik
-end
-
---********************************************************************************************************
-
-local intercept_key_table = {}
-
-function get_key_preset_value(key_name)
-	local key = intercept_key_table[key_name]
-	--log3("key= [%s]", key or "nil")
-	return key
-end
-
-function set_key_preset_value(key_name, value)
-	--log3("set_key_preset_value: [%s] = [%s]", key_name, value)
-	intercept_key_table[key_name] = value
-end
-
-local keys_list = {
-	{ogse_name = "night_vision_key", stor_name = "ogse_nv_bind",           real_bind_name = key_bindings.kNIGHT_VISION, cmd_name = "night_vision"},
-	{ogse_name = "antirad_key",      stor_name = "ogse_antirad_bind",      real_bind_name = key_bindings.kCAM_1       , cmd_name = "cam_1"},
-	{ogse_name = "energy_drink_key", stor_name = "ogse_energy_drink_bind", real_bind_name = key_bindings.kCAM_2       , cmd_name = "cam_2"},
-	{ogse_name = "yod_key",          stor_name = "ogse_yod_bind",          real_bind_name = key_bindings.kCAM_3       , cmd_name = "cam_3"},
-	{ogse_name = "bipsizon_key",     stor_name = "ogse_bipsizon_bind",     real_bind_name = key_bindings.kCAM_4       , cmd_name = "cam_4"},
-	{ogse_name = "handradio_key",    stor_name = "ogse_handradio_bind",    real_bind_name = key_bindings.kDROP        , cmd_name = "drop"},
-	{ogse_name = "quicksave_key",    stor_name = "ogse_quicksave_bind",    real_bind_name = key_bindings.kBUY         , cmd_name = "buy_menu"},
-}
-
-function save_keys()
-	--log1("ogse_rebind_key.save_keys")
-	for _,key_data in ipairs(keys_list) do
-		local key = bind_to_dik(key_data.real_bind_name)
-		cmd(key_data.stor_name, key)
-		set_key_preset_value(key_data.ogse_name, key)
-	end
-end
-
-function rebind_key()
-	--log1("ogse_rebind_key.rebind_key")
-	for _,key_data in ipairs(keys_list) do
-		local key = get_console():get_integer(key_data.stor_name)
-		local keyname = dik_key_to_name[key]
-		--log3("%s, %s, %s", key_data.stor_name, key, keyname or "nil")
-		if keyname then
-			cmd("bind",  key_data.cmd_name, keyname)
-			set_key_preset_value(key_data.ogse_name, key)
-		else
-			set_key_preset_value(key_data.ogse_name, 0)
-		end
-	end
-end
-
-function unbind_key()
-	--log1("ogse_rebind_key.unbind_key")
-	for _,key_data in ipairs(keys_list) do
-		cmd("unbind", key_data.cmd_name)
-	end
-end
-
-rebind_key()
