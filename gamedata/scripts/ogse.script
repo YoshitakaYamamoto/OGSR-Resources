@@ -398,14 +398,14 @@ function is_quest_npc(npc)
 	else
 		story = npc:story_id()
 	end
-	log3("[OGSE] SID of [%s]: [%s]", npc:name(), story)
-	if story == 4294967296 then
+	--log3("[OGSE] SID of [%s]: [%s]", npc:name(), story)
+	if story == 4294967295 then
 		if quest_profiles[npc:profile_name()] or quest_profiles[npc:name()] then
 			return true
 		end
 	end
 	--
-	return story ~= 4294967296
+	return story ~= 4294967295
 end
 
 -- телепортация NPC в пределах уровня
