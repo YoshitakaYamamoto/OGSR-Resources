@@ -787,8 +787,8 @@ function motivator_binder:on_item_take(obj)
 	if not sobj then return end
 
 	if obj:is_torch() then
-		if obj:is_torch_enabled() then
-			obj:switch_torch(false)
+		if obj:attachable_item_enabled() then --if obj:is_torch_enabled() then
+			obj:enable_attachable_item( false ) --obj:switch_torch(false)
 		end
 	elseif obj:is_weapon() then
 		ogse_wpn_utils.set_condition_shot_dec( obj, 0 ) --Для неписей износ оружия отключаем.

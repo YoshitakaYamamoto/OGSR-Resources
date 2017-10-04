@@ -111,9 +111,9 @@ function on_update()
   -- движковое(обнулять его нельзя, на нем основан показ свойств
   -- артефактов)
   local cur_satiety_v = satiety_v * ( 1 - math.min( act.health, act.power ) )
-  if act:is_actor_sprinting() or act:is_actor_climbing() then
-    cur_satiety_v = cur_satiety_v + satiety_v
-  end
+  --if act:is_actor_sprinting() or act:is_actor_climbing() then
+  --  cur_satiety_v = cur_satiety_v + satiety_v
+  --end
   if act.health < 1 then
     local belt_health_restore_speed = inventory.on_belt_restore_speed(
       "health_restore_speed"

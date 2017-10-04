@@ -3,11 +3,6 @@
 log1("--LUA version: ["..(jit.version or _VERSION).."]")
 log1("--...Initializing X-Ray Extensions - start...")
 
---KRodin: надо убрать при  переходе на LuaJIT 2+
-if string.gmatch(jit.version, "LuaJIT 1.") then
-	require("jit.opt").start(2)
-end
-
 math.randomseed(os.time())
 
 os.setlocale("", "ctype") --Включает поддержку русских букв в string.lower/upper. Такой костыль работает только в версиях LuaJIT ниже 2.0.
@@ -170,6 +165,33 @@ level.advance_game_time = function(game_ms) --KRodin: универсальная
 	--Вполне допускаю, хотя уже и не помню точно, что вместе с актором пропускается обновление чего-то ещё.
 	-- http://www.amk-team.ru/forum/topic/10538-x-ray-extensions/page-50#entry975972
 	level.set_ignore_game_state_update()
+end
+--==============================================================================================
+--KRodin: временные костыли, потом убрать и сделать в движке!
+game_object.get_visual_name = function(obj)
+	local packet = get_netpk(obj, 1)
+	ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
+	local my_table = packet:get()
+	return my_table.visual_name
+end
+game_object.get_shape_radius = function(obj)
+	local packet = get_netpk(obj, 1)
+	ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
+	local my_table = packet:get()
+	return my_table.shapes:getRadius()
+end
+game_object.get_inventory_weight = function(obj)
+	local total_weight = 0
+ 	obj:iterate_inventory(function(_, item)
+		if item then
+			total_weight = total_weight + item:get_weight()
+		end
+	end)
+	return total_weight
+end
+game_object.is_knife = function(obj)
+	local cls = obj:clsid()
+	return cls == clsid.wpn_knife or cls == clsid.wpn_knife_s
 end
 --==============================================================================================
 log1("--Initializing X-Ray Extensions - end")
