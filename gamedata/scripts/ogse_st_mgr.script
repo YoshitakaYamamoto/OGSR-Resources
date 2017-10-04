@@ -252,6 +252,7 @@ function on_save()
   for tclass, tlist in pairs( timers ) do
     local st, template = {}, { "string" }
     for i, timer in ipairs( tlist ) do
+      --log3("Saving timers. Class: %s, id: %s", tclass, timer.id)
       local t  = { timer.id }
       table.insert( st, t )
       local types = timer:_aux_save( t )
@@ -260,6 +261,8 @@ function on_save()
           table.insert( template, typ )
         end
       end
+	  --log3("template: %s", template)
+	  --log3("t: %s", t)
       ASSERT(
         #t == #template,
         "unexpected table size: got %s, expected %s",
@@ -453,7 +456,7 @@ end
 -- в отличие от "быстрых" таймеров приоритет по умолчанию - низкий
 function savable_timer:start( high_priority )
   self._start_time     = self._start_time or game.get_game_time()
-  self._high_priority  = high_priority
+  self._high_priority  = not not high_priority --KRodin: двойное отрицание для приведения к bool
   self._cond_slot_desc = {
     signal = "on_update",
     self   = self,
