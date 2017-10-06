@@ -393,6 +393,7 @@ _r_q8v8    = function(pk) return _r_chunk(pk,8,          'u8' ) end
 _r_q8v12   = function(pk) return _r_chunk(pk,3*4,        'u8' ) end
 _r_q8v16   = function(pk) return _r_chunk(pk,4*4,        'u8' ) end
 _r_u8v8    = function(pk) return _r_chunk(pk,8,          'u8' ) end
+_r_u16v8   = function(pk) return _r_chunk(pk,8,          'u16') end
 _r_l8u8v   = function(pk) return _r_chunk(pk,pk:r_u8 (), 'u8' ) end
 _r_l8u16v  = function(pk) return _r_chunk(pk,pk:r_u8 (), 'u16') end
 _r_l16u8v  = function(pk) return _r_chunk(pk,pk:r_u16(), 'u8' ) end
@@ -407,6 +408,7 @@ _w_q8v8    = _w_q8v
 _w_q8v12   = _w_q8v
 _w_q8v16   = _w_q8v
 _w_u8v8    = _w_q8v
+_w_u16v8   = function(pk,tbl) _w_chunk(pk,tbl,'u16') end
 _w_l8u8v   = function(pk,tbl) pk:w_u8 (#tbl) _w_chunk(pk,tbl,'u8' ) end
 _w_l8u16v  = function(pk,tbl) pk:w_u8 (#tbl) _w_chunk(pk,tbl,'u16') end
 _w_l16u8v  = function(pk,tbl) pk:w_u16(#tbl) _w_chunk(pk,tbl,'u8' ) end
@@ -1770,7 +1772,8 @@ function net_cse_ph_skeleton:__init(obj,mode)
 		{ name = 'source_id',      type = 'h16', default = -1 }
 	}
 	self.st_props_bones = { --/#+#
-		{ name = 'bones_mask',     type = 'u8v8',  default = {0,0,0,0,0,0,0,0} },
+		--{ name = 'bones_mask',     type = 'u8v8',  default = {0,0,0,0,0,0,0,0} }, --KRodin: По-моему, раньше тоже было не правильно. Тут должно быть четыре u16 вместо восьми u8.
+		{ name = 'bones_mask',     type = 'u16v8', default = {0,0,0,0,0,0,0,0} }, --KRodin: в новом движке формат изменился. Теперь тут восемь u16.
 		{ name = 'root_bone',      type = 'u16',   default = 0                 },
 		{ name = 'bbox_min',       type = 'f32v3', default = vector()          },
 		{ name = 'bbox_max',       type = 'f32v3', default = vector()          },
