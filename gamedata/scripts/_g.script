@@ -3,6 +3,11 @@
 log1("--LUA version: ["..(jit.version or _VERSION).."]")
 log1("--...Initializing X-Ray Extensions - start...")
 
+if jit.version_num < 20000 then
+	require("jit.opt").start(2)
+	log1("--Enabled LuaJIT optimization!")
+end
+
 math.randomseed(os.time())
 
 os.setlocale("", "ctype") --Включает поддержку русских букв в string.lower/upper. Такой костыль работает только в версиях LuaJIT ниже 2.0.
@@ -363,19 +368,19 @@ function get_clsid(npc)
 			if sobj then
 				return npc:clsid()
 			else
-				--log3(debug.traceback())
+				--log1(debug.traceback())
 				--log3("!!DEBUG_GETCLSID NO_SRVOBJ [%s, %s]", id, npc:name() )
 				return nil
 			end
 		elseif type(npc.id) == "number" then
 			return npc:clsid()
 		else
-			log3(debug.traceback())
+			log1(debug.traceback())
 			log1("!!DEBUG_GETCLSID GET_SOMETHING_STRANGE")
 			return nil
 		end
 	else
-		log3(debug.traceback())
+		log1(debug.traceback())
 		log1("!!DEBUG_GETCLSID DEAD_ON_ARRIVAL")
 		return nil
 	end
@@ -543,8 +548,6 @@ local msg_crash = {
 	[8] = game.translate_string("msg_crash_9_text"),
 	[9] = game.translate_string("msg_crash_1_text"),
 }
-
-local crash_counter = 0
 local crash_text = game.translate_string("msg_crash_text")
 
 -- Крешнуть игру (после вывода сообщения об ошибке в лог)
@@ -553,7 +556,7 @@ function abort(fmt, ...)
 		log1(msg_crash[i])
 	end
 
-	log3(debug.traceback())
+	log1(debug.traceback())
 	log3(fmt, ...)
 	cmd("flush")
 
@@ -567,23 +570,7 @@ function abort(fmt, ...)
 		end
 	end
 
-	if crash_counter == 0 then
-		crash_counter = crash_counter + 1	
-		fail(""..fmt)
-	elseif crash_counter == 1 then
-		crash_counter = crash_counter + 1
-		log1("ABORT: 1/crash")	
-		local crash
-		local ooops = 1/crash
-	elseif crash_counter == 2 then
-		crash_counter = crash_counter + 1
-		log1("ABORT: string.format")	
-		string.format("%s")		
-	else
-		crash_counter = crash_counter + 1
-		log1("get_console():execute quit")
-		cmd("quit")
-	end
+	fail(tostring(fmt))
 end
 
 --/ проверяет целую часть числа на нечётность
@@ -817,67 +804,67 @@ function dbg_sys_ini:__init()
 end
 function dbg_sys_ini:line_count(sec)
 	log3("dbg_sys_ini:line_count: %s", sec)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:line_count(sec)
 end
 function dbg_sys_ini:section_exist(sec)
 	log3("dbg_sys_ini:section_exist: %s", sec)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:section_exist(sec)
 end
 function dbg_sys_ini:line_exist(sec, param)
 	log3("dbg_sys_ini:line_exist: %s - %s", sec, param)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:line_exist(sec, param)
 end
 function dbg_sys_ini:r_bool(sec, param)
 	log3("dbg_sys_ini:r_bool: %s - %s", sec, param)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:r_bool(sec, param)
 end
 function dbg_sys_ini:r_float(sec, param)
 	log3("dbg_sys_ini:r_float: %s - %s", sec, param)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:r_float(sec, param)
 end
 function dbg_sys_ini:r_clsid(sec, param)
 	log3("dbg_sys_ini:r_clsid: %s - %s", sec, param)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:r_clsid(sec, param)
 end
 function dbg_sys_ini:r_s32(sec, param)
 	log3("dbg_sys_ini:r_s32: %s - %s", sec, param)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:r_s32(sec, param)
 end
 function dbg_sys_ini:r_u32(sec, param)
 	log3("dbg_sys_ini:r_u32: %s - %s", sec, param)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:r_u32(sec, param)
 end
 function dbg_sys_ini:r_vector(sec, param)
 	log3("dbg_sys_ini:r_vector: %s - %s", sec, param)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:r_vector(sec, param)
 end
 function dbg_sys_ini:r_string_wq(sec, param)
 	log3("dbg_sys_ini:r_string_wq: %s - %s", sec, param)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:r_string_wq(sec, param)
 end
 function dbg_sys_ini:r_string(sec, param)
 	log3("dbg_sys_ini:r_string: %s - %s", sec, param)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:r_string(sec, param)
 end
 function dbg_sys_ini:r_token(sec, param)
 	log3("dbg_sys_ini:r_token: %s - %s", sec, param)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:r_token(sec, param)
 end
 function dbg_sys_ini:r_line(sec, line_num)
 	log3("dbg_sys_ini:r_line: %s - %s", sec, line_num)
-	log3(debug.traceback())
+	log1(debug.traceback())
 	return orig_sys_ini:r_line(sec, line_num)
 end
 
@@ -1088,14 +1075,8 @@ local tostring_all_tbl = {
 						local end_res = ind and "\n"..ind.."}" or "\n}" --Конец
 						local def_ind = "  " --Отступ от начала строки
 						ind = ind and ind..def_ind or def_ind --Для каждой "таблицы внутри таблицы" отступ увеличивается в 2 раза
-						if isArray(table) then --Если это массив, обрабатываем только значения:
-							for i=1, #table do --Это актуально только для отслеживания nil-аргументов в таблицах. В будущем, при переезде на новый jit, это надо бы убрать.
-								res = res.."\n"..ind..tostring_all(table[i], ind)..","
-							end
-						else --Если НЕ массив, обрабатываем и ключи, и значения:
-							for k, v in pairs(table) do
-								res = res.."\n"..ind.."["..tostring_all(k, ind).."] = "..tostring_all(v, ind)..","
-							end
+						for k, v in pairs(table) do
+							res = res.."\n"..ind.."["..tostring_all(k, ind).."] = "..tostring_all(v, ind)..","
 						end
 						return res..end_res
 					end,
@@ -1108,7 +1089,7 @@ local tostring_all_tbl = {
 	["thread"] =	function() return "[[THREAD]]" end,
 }
 --Конвертирование чего угодно в строку. Использовать только для вывода в лог!
-function tostring_all(obj, ind) --ind - служебный аргумент для распечатки "таблиц в таблицах". НЕ ТРОГАТЬ ЕГО!!!
+function tostring_all(obj, ind) --ind - служебный аргумент для распечатки "таблиц в таблицах".
 	return tostring_all_tbl[type(obj)](obj, ind)
 end
 
@@ -1126,7 +1107,7 @@ local subs_tbl = { --Спец-символы цветов:
 --Параметры можно передавать ЛЮБОГО ТИПА! В строке формата они должны стоять как %s (потому, что будут сконвертированы в строки).
 function log3(fmt, ...)
 	local args = {...}
-	for i=1, #args do --Для корректной обработки nil-аргументов (циклы pairs и ipairs останавливаются на первом _значении_ nil)
+	for i=1, #args do
 		args[i] = tostring_all(args[i])
 	end
 	local res, msg = pcall(string.format, fmt, unpack(args))
@@ -1136,16 +1117,10 @@ function log3(fmt, ...)
 	if not res then --Если произошла ошибка
 		msg = "!!log3 failed: "..msg.."\n"..debug.traceback()
 	end
-	local subs = msg:sub(1, 1)
-	local color = subs_tbl[subs] and subs.." " or false
-	local not_first_line = false
-	for s in msg:gmatch("([^\n]+)") do --Разбиваем текст на разделённые строки. Нужно для того, чтобы избежать ограничения в 1024 символа, после которых log1 просто обрезает текст.
-		log1((not_first_line and color) and color..s or s) --Если надо, перед каждой строкой вставляем спец-символ цвета, чтобы цветными были все строки текста, а не только первая.
-		not_first_line = true
-	end
+	log1(msg)
 end
 -----------------------------------------------------------------------------------------
-log3("%s", debug.traceback()) --Помогает определить, из за чего в некоторых случаях перезагружается _G
+log1(debug.traceback()) --Помогает определить, из за чего в некоторых случаях перезагружается _G
 -----------------------------------------------------------------------------------------
 local logs_cach = {}
 --Функция создаёт новый лог-файл и выводит текст в него.

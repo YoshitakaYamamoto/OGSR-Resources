@@ -116,7 +116,7 @@ function actor_binder:net_destroy()
 	
 	self.object:set_callback(callback.death, nil)
 
-	self.object:set_callback(callback.dbg_gg_distance_failed, nil)
+	--self.object:set_callback(callback.dbg_gg_distance_failed, nil)
 
 	--self.object:set_callback(callback.entity_alive_before_hit, nil)
 	self.object:set_callback(callback.on_before_use_item, nil)
