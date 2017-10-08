@@ -42,7 +42,6 @@ local function process()
 	local found_musor = false
 	for script_name, _ in pairs(script_storage) do
 		if not excluded_scripts[script_name] then --Исключения не обрабатываем
-			local continue = false
 			for check_script, script_full_path in pairs(script_storage) do
 				if check_script ~= script_name then --самого себя не проверяем
 					for line in io.lines(script_full_path) do --Перебираем все строки скрипта check_script в поисках обращения к script_name.
@@ -55,19 +54,16 @@ local function process()
 							or line:--[[trim():]]find(script_name..',', 1, true)
 							or line:trim():find(','..script_name, 1, true)
 						then
-							continue = true
-							break
+							goto CONTINUE
 						end
 					end
 				end
-				if continue then break end
 			end
 			--
-			if not continue then
-				script_storage[script_name] = nil
-				scrips_to_delete[script_name] = true
-				found_musor = true
-			end
+			script_storage[script_name] = nil
+			scrips_to_delete[script_name] = true
+			found_musor = true
+			::CONTINUE::
 		end
 	end
 	return found_musor

@@ -16,7 +16,7 @@ actor_in_hideout = false --Находится ли актор в укрытии
 is_surge_started = false --Начался ли выброс
 is_surge_raskolbas = false --Находится ли выброс в смертельной стадии
 
-local debug_logging = get_console():get_bool("write_debug_log")
+local debug_logging = false
 local fsurgelog = nil
 
 local aux_counter = 0

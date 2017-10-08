@@ -977,7 +977,6 @@ end
 function CRandomTask:on_first_update()
 	for _, type in ipairs({"eliminate_lager", "defend_lager"}) do
 		for k,v in pairs(self.task_id_by_type[type]) do
-			local continue = false
 			local name = self.task_info[v].target
 			local sobj = name and alife():object(name)
 			if sobj and sobj:clsid() == clsid.smart_terrain then
@@ -985,13 +984,12 @@ function CRandomTask:on_first_update()
 					local sm_ini = sobj:spawn_ini()
 					self.task_info[v].defend_target = utils.cfg_get_number(sm_ini, "random_task", "defend_target", nil, true)
 					if not self.task_info[v].defend_target then
-						continue = true
+						goto CONTINUE
 					end
 				end
-				if not continue then
-					if not self.task_info[v].target_objects then self.task_info[v].target_objects = {} end
-					table.insert(self.task_info[v].target_objects, sobj.id)
-				end
+				if not self.task_info[v].target_objects then self.task_info[v].target_objects = {} end
+				table.insert(self.task_info[v].target_objects, sobj.id)
+				::CONTINUE::
 			end
 		end
 	end

@@ -108,7 +108,7 @@ function remove_all_marks_from_minimap()
 end
 
 
-local total_debug = get_con_bool("write_debug_log")
+local total_debug = false
 function write_log(str)
 	if total_debug then
 		log1(str)

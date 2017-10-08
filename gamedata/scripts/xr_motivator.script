@@ -494,7 +494,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	if chk_dist > range then
 		self.object:set_range(chk_dist*1.1)
 	end
-	self.object:make_object_visible_somewhen(who:cast_game_object())
+	self.object:make_object_visible_somewhen(who)
 	--
 --[=[ --Хрень. Выключаю.
 	local warn_timer = time_global()

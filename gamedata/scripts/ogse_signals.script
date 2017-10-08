@@ -107,7 +107,6 @@ function signals_mgr:__init( name, modules_list, scan_for_autoattaching_modules 
     for i = 0, flist:Size() - 1 do
       local file  = flist:GetAt( i )
       local fname = file:NameFull()
-      prefetch( fname )
       local module = _G[ fname ]
       if
         module and type( module ) == "table"
@@ -124,23 +123,10 @@ function signals_mgr:__init( name, modules_list, scan_for_autoattaching_modules 
     for i=1, #modules_list do
       local fname = modules_list[i]
       if not registered_modules[ fname ] then
-        prefetch( fname )
         self:subscribe_module( fname )
       end
     end
   end
-  --
-  level.add_call( --Контроль зависаний движковых функций/каллбеков.
-    function() return #self.slots_in_process > 0 end,
-    function()
-      for i=1, #self.slots_in_process do
-        local slot = self.slots_in_process[ i ]
-        log3( "!![%s]: signal on top [%s]: [%s]. Hanget slot: [%s.%s]", script_name(), i, slot.signal, slot.script_name, slot.line )
-      end
-      abort( "!!Signals manager [%s] crushed! One of the calls hung! See stack dump for details!", self.mgr_name )
-    end
-  )
-  --
   log3("--[%s] Init Signals Manager - end", script_name())
 end
 
@@ -192,7 +178,6 @@ function signals_mgr:subscribe( slot_to_subscribe )
   )
   self.signals[ signal ] = self.signals[ signal ] or self:make_empty_signal( signal )
   local d = debug.getinfo(slot_to_subscribe.fun)
-  ASSERT(d, "")
   if not slot_to_subscribe.script_name then
     slot_to_subscribe.script_name = d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1')
   end
@@ -299,10 +284,6 @@ end
 
 
 function signals_mgr:subscribe_module( module_name )
-  local name = getFS():update_path("$game_scripts$", module_name..".script")
-  local res, err = loadfile(name)
-  ASSERT(res, "[%s] module: [%s]\nerror: %s", script_name(), name, err)
-  --
   local module = _G[ module_name ]
   ASSERT(
     module,
@@ -365,7 +346,7 @@ function signals_mgr:call( signal_name, ... )
     end
   end
   --
-  if slots.time_limited then --scheduled и queued очереди только для всяких апдейтов подходят. Для остальных вызывать не имеет смысла.
+  if not slots.time_limited then goto EXIT end --scheduled и queued очереди только для всяких апдейтов подходят. Для остальных вызывать не имеет смысла.
   --
   for next_in_scheduled = 1, #slots.scheduled do --Выполнится для всех слотов (если наступило время их запуска) в таблице slots.scheduled
     local slot = slots.scheduled[ next_in_scheduled ]
@@ -380,7 +361,6 @@ function signals_mgr:call( signal_name, ... )
   --
   while #slots.queue > 0 do --Зпускает слоты в таблице slots.queue по одному за апдейт. Таймауты поддерживаются так же как и в scheduled очереди.
     local slot = slots.queue[ slots.next_in_queue ]
-	local continue = false
     --
     if slot.timeout > time_global() then
       if slots.next_in_queue > 1 then --Если это НЕ первый слот в очереди, попробуем пересортировать её (если надо) и запустить первый слот.
@@ -393,13 +373,13 @@ function signals_mgr:call( signal_name, ... )
             )
           end
         end
-        continue = true
+        goto CONTINUE
       else
 	    break
       end
 	end
     --
-	if not continue then
+	do
       if not slot.unsubscribed then
         slot.timeout = 0 --Нужно для проверки ниже, нужна ли пересортировка.
         work_time = self:process_call(slot, work_time, times, ...)
@@ -414,6 +394,7 @@ function signals_mgr:call( signal_name, ... )
       end
       break --Прерывать цикл здесь обязательно, иначе повиснет, вечный цикл же.
     end
+	::CONTINUE::
   end
   --
   if slots.reschedule_scheduled then
@@ -433,7 +414,7 @@ function signals_mgr:call( signal_name, ... )
     end
   end
   --
-  end
+  ::EXIT::
   --
   if #self.after_call_callback > 0 and #self.slots_in_process == 0 and not self.after_call_callback_locked then --Что-то делаем по факту завершения всех вызовов.
     self.after_call_callback_locked = true --НЕ ЗАКОММЕНТИРОВАТЬ НИ В КОЕМ СЛУЧАЕ!

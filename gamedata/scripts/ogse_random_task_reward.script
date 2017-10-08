@@ -65,7 +65,7 @@ function random_task_reward:get_trader_list()
 	local n = sys_ini:line_count("rndm_tsk_rwrd_trader_list")
 	
 	for i=0,n-1 do
-		result, id, value = sys_ini:r_line("rndm_tsk_rwrd_trader_list",i,"","")
+		result, id, value = sys_ini:r_line("rndm_tsk_rwrd_trader_list",i)
 		time_array[id] = true
 		--self:inc_cycle_count()
 	end
@@ -80,7 +80,7 @@ function random_task_reward:get_difficult_list()
 	local n = sys_ini:line_count("rndm_tsk_rwrd_difficult_list")
 	
 	for i=0,n-1 do
-		result, id, value = sys_ini:r_line("rndm_tsk_rwrd_difficult_list",i,"","")
+		result, id, value = sys_ini:r_line("rndm_tsk_rwrd_difficult_list",i)
 		time_array[id] = value
 		--self:inc_cycle_count()
 	end
@@ -107,7 +107,7 @@ function random_task_reward:get_eliminate_type()
 	local monster_lager = {}
 	local n = sys_ini:line_count("rndm_tsk_rwrd_monster_lair")
 	for i=0, n-1 do
-		local result, id, value = sys_ini:r_line("rndm_tsk_rwrd_monster_lair",i,"","")
+		local result, id, value = sys_ini:r_line("rndm_tsk_rwrd_monster_lair",i)
 		monster_lager[id] = true
 		--self:inc_cycle_count()
 	end
@@ -147,7 +147,7 @@ function random_task_reward:get_scheme_by_type()
 	local time_array = {}
 	
 	for i=0,n-1 do
-		result, id, value = sys_ini:r_line("rndm_tsk_rwrd_"..self.trader.."_"..self.task_info.type.."_"..self.task_info.difficult.."_scheme",i,"","")
+		result, id, value = sys_ini:r_line("rndm_tsk_rwrd_"..self.trader.."_"..self.task_info.type.."_"..self.task_info.difficult.."_scheme",i)
 		if math.random(100) <= tonumber(value) then table.insert(time_array, id) end
 		--self:inc_cycle_count()
 	end

@@ -96,7 +96,6 @@ function quick_timer:start( low_priority )
     self.termination_time = self.start_time + self.timeout
   end
   local d = debug.getinfo(2)
-  ASSERT(d, "")
   if not self.script_name then
     self.script_name = d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1')
   end

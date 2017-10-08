@@ -13,7 +13,6 @@ function timeout( delay, fun, ... )
   local tmout = timeout_timer( delay, fun, ... )
   --
   local d = debug.getinfo(2)
-  ASSERT(d, "")
   tmout.script_name = d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1')
   tmout.line = d.linedefined
   --
@@ -42,7 +41,6 @@ function wait_condition( ... )
   local tmout = condition_timer( ... )
   --
   local d = debug.getinfo(2)
-  ASSERT(d, "")
   tmout.script_name = d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1')
   tmout.line = d.linedefined
   --
@@ -67,7 +65,6 @@ function exec_on_update( ... )
   local tmout = exec_on_update_timer( ... )
   --
   local d = debug.getinfo(2)
-  ASSERT(d, "")
   tmout.script_name = d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1')
   tmout.line = d.linedefined
   --
