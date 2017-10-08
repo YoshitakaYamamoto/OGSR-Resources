@@ -1125,23 +1125,13 @@ function pstor_load_all(obj, reader)
 		db.storage[npc_id].pstor = pstor
 	end
 
-	if obj:is_actor() and ogse.var_exists( script_name() .. ".pstor_actor" ) then
+	if obj:is_actor() then
 		pstor = ogse.load_var( script_name() .. ".pstor_actor" )
 		--log3("[%s] Loaded actor pstor: %s", script_name(), pstor)
 	else
-		if obj:is_actor() then --”·‡Ú¸ Ò Õ»!!!
-			if ogse.var_exists( script_name() .. ".actor_pstor" ) then
-				reader = ogse.load_var( script_name() .. ".actor_pstor" )
-				ogse.delete_var( script_name() .. ".actor_pstor" )
-				--log3("[%s] Loaded old actor pstor: %s", script_name(), reader)
-			else
-				return
-			end
-		end
-
 		local ctr = reader:r_u32()
 
-		if ctr > 20 and not obj:is_actor() then --œÓ‚ÂÍÛ Ì‡ ‡ÍÚÓ‡ Û·‡Ú¸ Ò Õ»!!!
+		if ctr > 20 then
 			log3("!!Œ¡Õ¿–”∆≈Õ Œ¡⁄≈ “ — œŒ¬–≈∆ƒ≈ÕÕ€Ã PSTOR: [%s] ¡”ƒ≈“ œ–Œ»«¬≈ƒ≈Õ¿ œŒœ€“ ¿ ¬Œ——“¿ÕŒ¬À≈Õ»ﬂ", obj:name())
 			ctr = 20 		
 		end		
@@ -1227,33 +1217,12 @@ function save_obj( obj, packet, loaded )
 end
 
 
-function get_object_logic_file_name(id)
-	if not id then return "" end
-	local sobj = alife():object(id)
-	if sobj then
-		local ini = sobj:spawn_ini()
-		if ini and ini:section_exist( "logic" ) then
-			return get_string("logic", "cfg", "", ini)
-		end
-	end
-	return ""
-end
-
-local emergency_reload = {}
-
 function load_obj(obj, reader)
 	local npc_id = obj:id()
 	local st = db.storage[npc_id]
 	local ini_filename = reader:r_stringZ()
 	--log1("!!LOGIC_LOAD ["..obj:name().."] log=["..tostring(ini_filename).."]")
-	if ini_filename == "" then
-		config = get_object_logic_file_name(npc_id)
-		if config ~= "" and config ~= "nil" then
-			log3( "!!WARNING! object [%s] can't load logic properly, using alternate way. File=[%s]", obj:name(), tostring(config) )
-			emergency_reload[obj:name()] = true
-		end
-		ini_filename = nil
-	end
+	if ini_filename == "" then ini_filename = nil end
 
 	local section_logic = reader:r_stringZ()
 	--log1("!!LOGIC_LOAD_SECT ["..obj:name().."] log=["..tostring(section_logic).."]")
@@ -1310,10 +1279,6 @@ function get_customdata_or_ini_file(npc, filename)
 end
 
 function initialize_obj(obj, st, loaded, actor, stype)
-	if emergency_reload[obj:name()] then
-		loaded = false
-		emergency_reload[obj:name()] = nil
-	end
 	if not loaded then
 		local ini_filename = "<customdata>"
 		local ini = get_customdata_or_ini_file(obj, ini_filename)

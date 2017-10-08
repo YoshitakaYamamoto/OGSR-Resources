@@ -851,10 +851,6 @@ end
 ------------------------------------------------------------------------------------
 -- Special functions for Garbage
 ------------------------------------------------------------------------------------
-function gar_boars_nest2_dead() --TODO: Удалить с НИ!
-	return true
-end
-
 function gar_damaged_bandits(actor, npc)
 	if (gulag_population_active(actor, npc, {"gar_bandit_agr"}) <= 5) then
 		return true

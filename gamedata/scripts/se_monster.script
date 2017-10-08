@@ -20,9 +20,6 @@ function se_monster:__init (section) super (section)
 	-- nil      = смарту всё равно
 	self.job_online          = nil
 	self.job_online_condlist = nil
-
-	-- посещал ли сталкер хоть один smart_terrain
-	self.was_in_smart_terrain = false
 	
 	--' Флаг смерти в оффлайне
 	self.offline_dead = 0
@@ -126,11 +123,7 @@ function se_monster:STATE_Write(packet)
 		packet:w_stringZ(self.job_online_condlist)
 	end
 
-	packet:w_bool(self.was_in_smart_terrain)
-
-	--if self.id ~= 65535 then --Разве такое может быть?
-		packet:w_u32(self.offline_dead)
-	--end	
+	packet:w_u32(self.offline_dead)
 end
 --------------------
 function se_monster:STATE_Read(packet, size)
@@ -148,8 +141,6 @@ function se_monster:STATE_Read(packet, size)
 		self.job_online_condlist = packet:r_stringZ()
 		self.job_online = xr_logic.parse_condlist(nil, "se_monster:STATE_Read", "job_online", self.job_online_condlist)
 	end
-
-	self.was_in_smart_terrain = packet:r_bool()
 
 	--if self.id ~= 65535 then --Разве такое может быть?
 		self.offline_dead = packet:r_u32()

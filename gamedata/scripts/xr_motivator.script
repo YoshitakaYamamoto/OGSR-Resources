@@ -673,8 +673,6 @@ function motivator_binder:save(packet)
 
 	object_binder.save(self, packet)
 
-	packet:w_bool(false) --TODO: Убрать с НИ
-
 	xr_logic.save_obj(self.object, packet)
 
 	dialog_manager.save(self.object, packet)
@@ -704,8 +702,6 @@ function motivator_binder:load(reader)
 			return true
 		end
 	end
-
-	reader:r_bool() --TODO: Убрать с НИ
 
 	xr_logic.load_obj(self.object, reader)
 

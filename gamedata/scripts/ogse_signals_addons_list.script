@@ -17,7 +17,6 @@ addons = {
 	"ogse_qt",
 	"ogse_st_mgr",
 	"ogse_car_control",
-	--"ogse_grenade_switcher", --Вроде как исправлено в движке
 	"ogse_sleep_mgr",
 	"ogse_weather_mgr",
 	"ogse_surge_mgr",
@@ -53,13 +52,11 @@ addons = {
 	"remkit_main",
 	"bind_statpkm",
 	"dsh",
-	"dsh_restore_active_slot", --Должен быть перед dsh_wpn_slots !
-	--"dsh_wpn_slots", --Если и делать, то в движке.
+	"dsh_restore_active_slot",
 	"dsh_rukzak",
 	"dsh_particles",
 	"dsh_firebated",
 	"dsh_monster_attack",
-	--"dsh_ogse_relations",
 	"dsh_deadmans_table_proxy",
 	"dsh_respawn",
 	"dsh_weight_control",
@@ -99,7 +96,6 @@ addons = {
 	"smart_monster_parts",
 	"bar_territory_logic",
 	"xr_kamp",
-	--"ogse_trade_precondition",
 	"ogse_hitfx",
 	"inventory", --должен быть последним!
 }
