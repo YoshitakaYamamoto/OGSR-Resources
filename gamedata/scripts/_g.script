@@ -992,7 +992,7 @@ function get_section_keys_and_values( section, ini_file )
   ASSERT( ini:section_exist( section ), "get_section_keys: section '" .. section .. "' doesn't exist" )
   local t = {}
   for i = 0, ini:line_count( section ) - 1 do
-  local _, key, v = ini:r_line( section, i, "", "" )
+  local _, key, v = ini:r_line( section, i )
     t[ key ] = v
   end
   return t

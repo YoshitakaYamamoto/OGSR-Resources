@@ -79,7 +79,7 @@ function CTreasure:__init()
 	self.treasure_info = {} --Начальная установка
 
 	for i=0, n-1 do --Итерируемся по всем настройкам фраз
-		result, id, value = sys_ini:r_line("treasure_list",i,"","")
+		result, id, value = sys_ini:r_line("treasure_list",i)
 
 		self.treasure_info[id] = {}
 

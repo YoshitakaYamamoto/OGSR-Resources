@@ -221,7 +221,7 @@ function CArenaext:__init()
 	if ini:section_exist("arena_items") then
 		n = ini:line_count("arena_items")
 		for i=0,n-1 do
-			result, id, value = ini:r_line("arena_items",i,"",nil)
+			result, id, value = ini:r_line("arena_items",i)
 			--printf(" arena_items: '%s'", id)
 			self.arena_items[id] = true
 		end
@@ -232,7 +232,7 @@ function CArenaext:__init()
 	if ini:section_exist("remove_items") then
 		n = ini:line_count("remove_items")
 		for i=0,n-1 do
-			result, id, value = ini:r_line("remove_items",i,"",nil)
+			result, id, value = ini:r_line("remove_items",i)
 			--printf(" remove_items: '%s'", id)
 			self.remove_items[id] = true
 		end
@@ -243,7 +243,7 @@ function CArenaext:__init()
 	if ini:section_exist("keep_items") then
 		n = ini:line_count("keep_items")
 		for i=0,n-1 do
-			result, id, value = ini:r_line("keep_items",i,"",nil)
+			result, id, value = ini:r_line("keep_items",i)
 			--printf(" keep_items: '%s'", id)
 			self.keep_items[id] = true
 		end
@@ -256,7 +256,7 @@ function CArenaext:__init()
 	self.places = {}
 	n = ini:line_count("places")
 	for i=0,n-1 do
-		result, id, value = ini:r_line("places",i,"",nil)
+		result, id, value = ini:r_line("places",i)
 		--printf(" places: '%s'-'%s'", id, value)
 		self.places[id] = parse_place(value)
 	end
@@ -268,7 +268,7 @@ function CArenaext:__init()
 	self.teams = {}
 	n = ini:line_count("teams")
 	for i=0,n-1 do
-		result, id, value = ini:r_line("teams",i,"",nil)
+		result, id, value = ini:r_line("teams",i)
 		--printf(" teams: '%s'-'%s'", id, value)
 		self.teams[id] = load_team(ini, id)
 	end
@@ -659,7 +659,7 @@ function CArenaext:cleanup()
 	if ini:section_exist("info") then
 		n = ini:line_count("info")
 		for i=0,n-1 do
-			result, id, value = ini:r_line("info",i,"",nil)
+			result, id, value = ini:r_line("info",i)
 			table.insert(info, id)
 		end
 	end
@@ -675,7 +675,7 @@ function CArenaext:cleanup()
 	if ini:section_exist("pstor") then
 		n = ini:line_count("pstor")
 		for i=0,n-1 do
-			result, id, value = ini:r_line("pstor",i,"",nil)
+			result, id, value = ini:r_line("pstor",i)
 			table.insert(pstor, id)
 		end
 	end

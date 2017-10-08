@@ -865,7 +865,7 @@ function read_wm_modes(comm,rank,sect,npc)
 	local n = sys_ini:line_count("rx_wmgr_"..cm.priors)
 	if n > 0 then
 		for i = 0,n-1 do
-			local r, id, value = sys_ini:r_line("rx_wmgr_"..cm.priors,i,"","")
+			local r, id, value = sys_ini:r_line("rx_wmgr_"..cm.priors,i)
 			if not pr[id] then
 				pr[id] = tonumber(value)
 			end

@@ -112,7 +112,7 @@ function CRandomTask:__init()
 	self.task_info = {}
 	
 	for i=0,n-1 do
-		result, id, value	= sys_ini:r_line("list",i,"","")
+		result, id, value	= sys_ini:r_line("list",i)
 		
 		if not sys_ini:section_exist(id) then
 			abort("There is no section [%s] in task_manager.ltx", id)

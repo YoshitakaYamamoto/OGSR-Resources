@@ -63,7 +63,7 @@ function get_special_treasure()
 		a = {}
 		n = sys_ini:line_count(v)
 		for i=0,n-1 do
-			result, id, value = sys_ini:r_line(v,i,"","")
+			result, id, value = sys_ini:r_line(v,i)
 			a[i+1] = id
 		end
 		time_array[v] = a

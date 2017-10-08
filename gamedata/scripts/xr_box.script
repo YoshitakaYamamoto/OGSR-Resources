@@ -21,7 +21,7 @@ function configure()
 		    local n = sys_ini:line_count(v)
 		    local id, value = "", ""
 		    for i=0,n-1 do
-			    result, id, value = sys_ini:r_line(v,i,"","")
+			    result, id, value = sys_ini:r_line(v,i)
                 item_by_community[v][id] = tonumber(value)
 		    end
         end
@@ -37,14 +37,14 @@ function configure()
     local n = sys_ini:line_count(level_name)
 	local id, value = "", ""
 	for i=0,n-1 do
-		result, id, value = sys_ini:r_line(level_name,i,"","")
+		result, id, value = sys_ini:r_line(level_name,i)
         mul_by_level[id] = tonumber(value)
 	end        
 
     local item_count_section = "item_count_" .. level.get_game_difficulty()
     local n = sys_ini:line_count(item_count_section)
 	for i=0,n-1 do
-		result, id, value = sys_ini:r_line(item_count_section,i,"","")
+		result, id, value = sys_ini:r_line(item_count_section,i)
         --' Нужно распарсить value в два значения
         local t = parse_nums(value)
 		if t[1] == nil then
@@ -69,7 +69,7 @@ function configure()
     local n = sys_ini:line_count("ammo_sections")
 	local id, value = "", ""
 	for i=0,n-1 do
-		result, id, value	= sys_ini:r_line("ammo_sections",i,"","")
+		result, id, value	= sys_ini:r_line("ammo_sections",i)
         ammo_sections[id] = true
 	end
 end

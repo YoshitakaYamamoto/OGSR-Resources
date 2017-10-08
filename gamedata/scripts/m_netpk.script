@@ -357,7 +357,7 @@ _w_sz = function(pk,val) pk:w_stringZ(val) end
 _r_b8 = function(pk) return pk:r_bool() end --/#+# not in ACDC
 _w_b8 = function(pk,val) pk:w_bool(val) end --/#+# not in ACDC
 --/ vector
-_r_f32v3 = function(pk) return pk:r_vec3(vector()) end
+_r_f32v3 = function(pk) return pk:r_vec3() end
 _w_f32v3 = function(pk,val) pk:w_vec3(val) end
 --/ -------------------------
 --/ prop.type: variable chunk
@@ -532,9 +532,9 @@ _r_shape = function(pk)
 	for i=1, shapes_count do
 		local sh_type = pk:r_u8()
 		if sh_type == shape_type.sphere then
-			shp:add( shape(sh_type, pk:r_vec3(vector()), pk:r_float()) )
+			shp:add( shape(sh_type, pk:r_vec3(), pk:r_float()) )
 		else
-			shp:add( shape(sh_type, pk:r_vec3(vector()), pk:r_vec3(vector()), pk:r_vec3(vector()), pk:r_vec3(vector()) ) )
+			shp:add( shape(sh_type, pk:r_vec3(), pk:r_vec3(), pk:r_vec3(), pk:r_vec3() ) )
 		end
 	end
 	return shp --/>
@@ -744,8 +744,8 @@ _r_cvr_mgr = function(pk,ver)
 		local t = {}
 		local npc_id      = pk:r_u16()
 		t.cover_vertex_id = pk:r_u32()
-		t.cover_position  = pk:r_vec3(vector())
-		t.look_pos        = pk:r_vec3(vector())
+		t.cover_position  = pk:r_vec3()
+		t.look_pos        = pk:r_vec3()
 		t.is_smart_cover  = pk:r_bool()
 		tbl.cover_table[npc_id] = t
 	end
@@ -3210,7 +3210,7 @@ local function initialize()
 		local iBitMode = (db.is_dbg0 and bit_ver) or 15 --/ for debug
 		--/ читаем секцию общих соответствий 'script_clsid <==> cse_server_object_class' (строки!)
 		for i=0, ltx:line_count("clsid_to_class")-1 do
-			local result,idx,value = ltx:r_line("clsid_to_class",i,"","")
+			local result,idx,value = ltx:r_line("clsid_to_class",i)
 			local scr_clsid = idx and idx:match('%S+') --/ trim_w
 			if scr_clsid then
 				local t = {}

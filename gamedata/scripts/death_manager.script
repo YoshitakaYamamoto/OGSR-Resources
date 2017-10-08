@@ -173,7 +173,7 @@ function init_drop_settings()
 		    local n = sys_ini:line_count("death_gen_"..v)
 		    local id, value = "", ""
 		    for i=0,n-1 do
-			    result, id, value	= sys_ini:r_line("death_gen_"..v,i,"","")
+			    result, id, value	= sys_ini:r_line("death_gen_"..v,i)
                 item_by_community[v][id] = 100*tonumber(value)
 		    end
         end
@@ -189,14 +189,14 @@ function init_drop_settings()
     local n = sys_ini:line_count("death_gen_"..level_name)
 	local id, value = "", ""
 	for i=0,n-1 do
-		result, id, value	= sys_ini:r_line("death_gen_"..level_name,i,"","")
+		result, id, value	= sys_ini:r_line("death_gen_"..level_name,i)
         mul_by_level[id] = tonumber(value)
 	end
 
     local item_count_section = "item_count"
     local n = sys_ini:line_count("death_gen_"..item_count_section)
 	for i=0,n-1 do
-		result, id, value	= sys_ini:r_line("death_gen_"..item_count_section,i,"","")
+		result, id, value	= sys_ini:r_line("death_gen_"..item_count_section,i)
         --' Нужно распарсить value в два значения
         local t = parse_nums(value)
 		if t[1] == nil then
@@ -216,7 +216,7 @@ function init_drop_settings()
  	--' Предметы, которые нельзя удалять (квестовые например)
     local n = sys_ini:line_count("death_gen_keep_items")
 	for i=0,n-1 do
-		result, id, value	= sys_ini:r_line("death_gen_keep_items",i,"","")
+		result, id, value	= sys_ini:r_line("death_gen_keep_items",i)
         if value == "true" then
             always_keep_item[id] = true
         end
@@ -225,7 +225,7 @@ function init_drop_settings()
  	--' Предметы, которые нельзя сильно портить
     local n = sys_ini:line_count("death_gen_rare_items")
 	for i=0,n-1 do
-		result, id, value	= sys_ini:r_line("death_gen_rare_items",i,"","")
+		result, id, value	= sys_ini:r_line("death_gen_rare_items",i)
         if value == "true" then
             rare_item[id] = true
         end

@@ -34,7 +34,7 @@ function fill_phrase_table()
 	local category = ""
 	
 	for i=0,n-1 do
-		result, id, value	= sys_ini:r_line("dialog_list",i,"","")
+		result, id, value	= sys_ini:r_line("dialog_list",i)
 		
 		if not sys_ini:section_exist(id) then
 			abort("There is no section [%s] in dialog_manager.ltx", id)

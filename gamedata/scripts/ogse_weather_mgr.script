@@ -272,7 +272,7 @@ search_step:setHMS(0,0,1)
 
 local function read_cycle_points(cycle_section, points_table)
 	for line = 0, sys_ini:line_count(cycle_section) - 1 do
-		local res,time_str, sec = sys_ini:r_line(cycle_section, line, "", "")
+		local res,time_str, sec = sys_ini:r_line(cycle_section, line)
 		local point_data = {}
 		local h,m,s = time_str:match("^(%d%d):(%d%d):(%d%d)$")
 		ASSERT((h and m and s), "")
@@ -780,7 +780,7 @@ function DynamicForecast:__init(arg_weather_transitions) -- аргумент для экспери
     -- перебираем все циклы динамической погоды, прописанные в секции "weather_dynamic"
 	self.cycles_number = sys_ini:line_count("weather_dynamic")
     for i = 0, self.cycles_number - 1 do
-        local res, cycle_name, cycle_section = sys_ini:r_line("weather_dynamic", i, "", "")
+        local res, cycle_name, cycle_section = sys_ini:r_line("weather_dynamic", i)
 		--читаем все секции цикла
 		local cycle_points = {}
 		read_cycle_points(cycle_section, cycle_points)
@@ -997,7 +997,7 @@ function WeatherManager:__init()
 	local ini = game_ini()
 	local levels_number = ini:line_count("level_maps_single")
 	for i = 0, levels_number - 1 do
-		local res, lname = ini:r_line("level_maps_single", i, "", "")
+		local res, lname = ini:r_line("level_maps_single", i)
 		weather_by_level[lname] = get_string(lname, "weathers", "default", ini)
 	end
 
