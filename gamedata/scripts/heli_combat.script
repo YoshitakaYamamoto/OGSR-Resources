@@ -429,23 +429,19 @@ function heli_combat:load( packet )
 	
 	if self.initialized then
 		local t = time_global()
-		self.enemy_last_seen_pos  = vector()
-
 		self.enemy_id             = packet:r_s16()
 		self.enemy_last_seen_time = t - packet:r_u32()
 		self.can_forget_enemy     = packet:r_bool()
 		self.enemy_forgetable     = packet:r_bool()
-		packet:r_vec3( self.enemy_last_seen_pos )
+		self.enemy_last_seen_pos  = packet:r_vec3()
 
 		self.combat_type          = packet:r_u8()
 
 		if self.combat_type == combat_type_search then
-			self.center_pos           = vector()
-
 			self.change_dir_time      = packet:r_u32() + t
 			self.change_pos_time      = packet:r_u32() + t
 			self.flight_direction     = packet:r_bool()
-			packet:r_vec3( self.center_pos )
+			self.center_pos 		  = packet:r_vec3()
 
 		elseif self.combat_type == combat_type_flyby then
 			self.flyby_states_for_one_pass = packet:r_s16()
