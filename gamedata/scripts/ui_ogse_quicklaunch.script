@@ -40,60 +40,10 @@ if ogse_car_control.need_companion_btr == true then
 end
 
 
---[=[
-local binds_table = {
-	[key_bindings.kUSE_ANTIRAD] = function()
-		local item = db.actor:object("antirad")
-		if item then
-			db.actor:eat(item)
-			ogse_screen_msg.show_message_use_item(item:section())
-		end
-		return true
-	end,
-	[key_bindings.kUSE_ENERGY_DRINK] = function()
-		local item = db.actor:object("energy_drink")
-		if item then
-			db.actor:eat(item)
-			ogse_screen_msg.show_message_use_item(item:section())
-		else
-			item = db.actor:object("dix")
-			if item then
-				db.actor:eat(item)
-				ogse_screen_msg.show_message_use_item(item:section())
-			end
-		end				
-		return true
-	end,
-	[ogse_rebind_key.get_key_preset_value("yod_key")] = function()
-		local item = db.actor:object("yod")
-		if item then
-			db.actor:eat(item)
-			ogse_screen_msg.show_message_use_item(item:section())
-		end			
-		return true
-	end,
-	[key_bindings.kUSE_BIPSIZON] = function()
-		local item = db.actor:object("bipsizon")
-		if item then
-			db.actor:eat(item)
-			ogse_screen_msg.show_message_use_item(item:section())
-		end			
-		return true
-	end,
-	[ogse_rebind_key.get_key_preset_value("quicksave_key")] = function()
-		cmd("ogse_quick_save")
-		return true
-	end,
-}
---]=]
-
 function chek_keys(key, bind)
 	if level.main_input_receiver() then return end
-
-	--local fun = binds_table[bind]
-	--if fun then return fun() end
-
-	if bind ~= 43 then return end --Хз, как этот бинд называется. Клавиша TAB, кароч.
+	
+	if bind ~= key_bindings.kSCORES then return end
 
     local hud = get_hud()
 	strings = ogse_car_control.in_btr and strings_btr or strings_all
@@ -115,7 +65,7 @@ function chek_keys(key, bind)
 end
 
 function on_key_up(key, bind)
-	if bind ~= 43 then return end --Хз, как этот бинд называется
+	if bind ~= key_bindings.kSCORES then return end
 
 	local i = 1
     local hud = get_hud()
