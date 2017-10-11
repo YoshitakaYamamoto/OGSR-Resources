@@ -335,7 +335,7 @@ function motivator_binder:net_spawn(sobject)
 	self.object:set_patrol_extrapolate_callback(self.extrapolate_callback, self)
 	self.object:set_callback(callback.hit, self.hit_callback, self)
 	self.object:set_callback(callback.death, self.death_callback, self)
-	--self.object:set_callback(callback_ex.entity_alive_before_hit, self.before_hit_callback, self)
+	self.object:set_callback(callback.entity_alive_before_hit, self.before_hit_callback, self)
 	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)	
 	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
 	if not ogse.is_quest_npc(self.object) then
@@ -454,41 +454,39 @@ function motivator_binder:clear_callbacks()
 	self.object:set_callback(callback.death, nil)
 	self.object:set_callback(callback.on_item_drop, nil)
 	self.object:set_callback(callback.on_item_take, nil)
-	--self.object:set_callback(callback_ex.entity_alive_before_hit, nil)
+	self.object:set_callback(callback.entity_alive_before_hit, nil)
 	self.object:set_callback(callback.sound, nil)
 	self.object:set_enemy_callback()
 end
 
-function motivator_binder:before_hit_callback(p_s_hit, p_ignore_flags)
-	self.last_hit_data = read_hit_data(p_s_hit)
---log3("--[%s] Called before_hit_callback for [%s]: %s, %s, %s", script_name(), self.object:name(), self.last_hit_data, p_s_hit, p_ignore_flags)
-	if self.last_hit_data ~= 0 and self.last_hit_data.who_id then
-		local obj = level.object_by_id(self.last_hit_data.who_id)
+function motivator_binder:before_hit_callback(hit_data)
+--log3("--[%s] Called before_hit_callback for [%s]: %s", script_name(), self.object:name(), hit_data)
+--log3("--Hit_data: who: [%s], who_id: [%s], dir.x: [%s], hit_type: [%s], weapon_id: [%s]", hit_data.who and hit_data.who:name() or "NIL", hit_data.who_id, hit_data.dir.x, hit_data.hit_type, hit_data.weapon_id)
+	self.last_hit_data = hit_data
+	if hit_data.who_id then
+		local obj = hit_data.who
 		if obj then -- если есть виновник хита
 			if
-				( bind_statpkm.pkm_captured and self.last_hit_data.who_id == bind_statpkm.pkm_captured ) -- если это турель
-				or ( ogse_car_control.current_car and ogse_car_control.current_car:id() == self.last_hit_data.who_id ) -- если это БТР, в котором сидит актор
+				( bind_statpkm.pkm_captured and hit_data.who_id == bind_statpkm.pkm_captured ) -- если это турель
+				or ( ogse_car_control.current_car and ogse_car_control.current_car:id() == hit_data.who_id ) -- если это БТР, в котором сидит актор
 			then -- то надо заменить на реального виновника, т.е. ГГ
-				write_memory_int(db.actor:cast_game_object(), p_s_hit, hit_offset.who)
-				write_memory_int16(db.actor:id(), p_s_hit, hit_offset.whoID)
+				hit_data.who = db.actor
+				hit_data.who_id = db.actor:id()
 			elseif --Проверяем условия игнорирования урона от дружественного огня
 				obj:is_stalker()
-				and self.last_hit_data.who_id ~= self.object:id() --если не сам себя
+				and hit_data.who_id ~= self.object:id() --если не сам себя
 				and self.object:relation( obj ) ~= game_object.enemy
 				and obj:relation( self.object ) ~= game_object.enemy
-				--and not xr_companion.is_companion(self.last_hit_data.who_id)
 			then
-				write_memory_int(1, p_ignore_flags) --Подстрелил друг, игнорируем
+				hit_data.ignore_hit = true
 			end
 		end
 	end
 	--
-	self.am:call( "on_npc_before_hit", self.object, self.last_hit_data, p_s_hit, p_ignore_flags, self )
+	self.am:call( "on_npc_before_hit", self.object, hit_data, self )
 end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
-	--log3("!!Called hit callback: obj: [%s], amount: [%s], local_direction: [%s], who: [%s], bone_index: [%s]", self.object:name() or "nil", amount or "nil", local_direction or "nil", who:name() or "nil", bone_index or "nil")
-
 	local chk_dist = self.object:position():distance_to(who:position())
 	local range = self.object:range()
 	if chk_dist > range then
@@ -525,6 +523,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	hit_callback вызван не будет. Если движок нанесет хит для привлечения
 	внимания, с power == 0, то before_hit не будет вызван.
 --]=]
+--log3("~~[%s] Called hit callback: obj: [%s], amount: [%s], local_direction: [%s], who: [%s], bone_index: [%s]", script_name(), self.object:name() or "nil", amount or "nil", local_direction or "nil", who:name() or "nil", bone_index or "nil")
 	--
 	-- FIXME: коллбеки неплохо было бы регистрировать в общем storage, а не посхемно...
 	-- просто всегда ставить их при включении схемы и снимать при отключении.

@@ -341,7 +341,7 @@ end
 -- здесь реализуем часть иммунитетов. 
 -- Ещё часть реализуется в событии "on_before_use", поскольку не все эффекты проходят через хит. 
 local last_t = 0
-function on_actor_before_hit(obj, hit_data, p_s_hit, p_ignore_flags)
+function on_actor_before_hit(obj, hit_data)
 	local t = time_global()
 	--log3("on_actor_before_hit: %s", (t - last_t))
 	last_t = t
@@ -353,14 +353,14 @@ function on_actor_before_hit(obj, hit_data, p_s_hit, p_ignore_flags)
 		local rad_prot = get_combined_radiation_protection()
 		--log3("hit_data.power = %s, rad_prot = %s", hit_data.power, rad_prot)
 		if rad_prot < 0.999 then
-			write_memory_float(hit_data.power * rad_prot, p_s_hit, hit_offset.power)
+			hit_data.power = hit_data.power * rad_prot
 		end
 	elseif hit_type == hit.telepatic then
 		--log3("on_actor_before_hit: telepatic, who = %s", who and who:section() or "none")
 		local psy_prot = get_combined_psy_protection()
 		--log3("hit_data.power = %s, psy_prot = %s", hit_data.power, psy_prot)
 		--if psy_prot > 0 then
-			write_memory_float(hit_data.power * psy_prot, p_s_hit, hit_offset.power)
+			hit_data.power = hit_data.power * psy_prot
 		--end
 	end
 end

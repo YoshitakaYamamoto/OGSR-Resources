@@ -110,9 +110,7 @@ function actor_binder:net_destroy()
 	
 	self.object:set_callback(callback.death, nil)
 
-	--self.object:set_callback(callback.dbg_gg_distance_failed, nil)
-
-	--self.object:set_callback(callback.entity_alive_before_hit, nil)
+	self.object:set_callback(callback.entity_alive_before_hit, nil)
 	self.object:set_callback(callback.on_before_use_item, nil)
 
 	self.am:call("on_destroy")
@@ -155,7 +153,7 @@ function actor_binder:reinit()
 	--self.object:set_callback(callback.on_hud_animation_end, self.hud_animation_end, self) -- вызывается в конце проигрывания анимации худа (только если используем play_hud_animation)
 	--self.object:set_callback(callback.on_goodwill_change, self.on_goodwill_change, self)		-- изменение отношений
 	--
-	--self.object:set_callback(callback.entity_alive_before_hit, self.before_hit_callback, self)
+	self.object:set_callback(callback.entity_alive_before_hit, self.before_hit_callback, self)
 	self.object:set_callback(callback.on_before_use_item, self.before_use, self)
 
 	self.am:call("on_reinit")
@@ -329,13 +327,13 @@ function actor_binder:use_inventory_item(obj)
 	self.am:call("on_use", obj, sobj)
 end
 ----------------------------------------------------------------------------------------------------------------------
---[=[
-function actor_binder:before_hit_callback(p_s_hit, p_ignore_flags)
-	local hit_data = read_hit_data(p_s_hit)
---log3("--[%s] Called before_hit_callback for [%s]: %s, %s, %s", script_name(), self.object:name(), hit_data, p_s_hit, p_ignore_flags)
-	self.am:call("on_actor_before_hit", obj, hit_data, p_s_hit, p_ignore_flags, self)
+
+function actor_binder:before_hit_callback(hit_data)
+--log3("--[%s] Called before_hit_callback for [%s]: %s", script_name(), self.object:name(), hit_data)
+--log3("--Hit_data: who: [%s], who_id: [%s], dir.x: [%s], hit_type: [%s], weapon_id: [%s]", hit_data.who and hit_data.who:name() or "NIL", hit_data.who_id, hit_data.dir.x, hit_data.hit_type, hit_data.weapon_id)
+	self.am:call("on_actor_before_hit", self.object, hit_data, self)
 end
---]=]
+
 
 function actor_binder:actor_hit_callback(obj, amount, local_direction, who, bone_index)
 --log3("--[%s] Called hit_callback for [%s]. Who: [%s], amount: [%s]", script_name(), self.object:name(), who:name(), amount)

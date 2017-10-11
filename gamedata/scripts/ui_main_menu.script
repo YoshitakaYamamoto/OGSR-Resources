@@ -242,7 +242,6 @@ end
 
 function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
-	local bind = dik_to_bind(dik)
 ------------------->> CoP style load mod
 	if self.start_btn and dik ~= DIK_keys.DIK_GRAVE then
 		self:OnButton_return_game()

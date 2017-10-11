@@ -24,11 +24,13 @@ function car_binder:use_callback( obj, who )
 	--
 	if not who:is_actor() then return end
 	--
-	if ogse_car_control.get_actor_car() then
-		self.sm:call("on_attach_vehicle", obj, sobj)
-	else
-		self.sm:call("on_use_vehicle", obj, sobj)
-	end
+	dsh.exec_on_update(function()
+		if ogse_car_control.get_actor_car() then --KRodin: Если вызывать без таймаута - проверка всегда возвращает false.
+			self.sm:call("on_attach_vehicle", obj, sobj)
+		else
+			self.sm:call("on_use_vehicle", obj, sobj)
+		end
+	end )
 end
 
 function car_binder:load(reader)

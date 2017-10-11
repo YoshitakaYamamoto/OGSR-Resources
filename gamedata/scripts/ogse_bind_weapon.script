@@ -160,7 +160,7 @@ end
 function wpn_binder:reinit()
 	self.object:set_callback(callback.on_addon_init, self.init_addons, self)
 	self.object:set_callback(callback.update_hud_addons_visibility, self.update_hud_addons_visibility, self)
-	--self.object:set_callback(callback.update_addons_visibility, self.update_addons_visibility, self) --KRodin:ÑÄÅËÀÒÜ Â ÄÂÈÆÊÅ!!!
+	self.object:set_callback(callback.update_addons_visibility, self.update_addons_visibility, self)
 	--self:dbg_log("wpn_binder:reinit")
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ function wpn_binder:net_destroy()
 	--self:dbg_log("wpn_binder:net_destroy")
 	self.object:set_callback(callback.update_hud_addons_visibility, nil)
 	self.object:set_callback(callback.on_addon_init, nil)
-	--self.object:set_callback(callback.update_addons_visibility, nil) --KRodin: ÑÄÅËÀÒÜ Â ÄÂÈÆÊÅ!!!
+	self.object:set_callback(callback.update_addons_visibility, nil)
 end
 
 function wpn_binder:set_hud_bones_visibility(bones_list, vis)

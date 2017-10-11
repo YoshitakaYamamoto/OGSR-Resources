@@ -47,8 +47,7 @@ function chek_keys(key, bind)
 
     local hud = get_hud()
 	strings = ogse_car_control.in_btr and strings_btr or strings_all
-	local i = 1
-	while strings[i] do
+	for i=1, #strings do
 		local string_id = "quicklaunch_hint_"..i
 		local quicklaunch = hud:GetCustomStatic(string_id)
 		if not quicklaunch then
@@ -60,21 +59,18 @@ function chek_keys(key, bind)
 				or ""
 			quicklaunch:SetText(key_name..strings[i].text)
 		end
-		i = i + 1
 	end
 end
 
 function on_key_up(key, bind)
 	if bind ~= key_bindings.kSCORES then return end
 
-	local i = 1
     local hud = get_hud()
-	while strings[i] do
+	for i=1, #strings do
 		local string_id = "quicklaunch_hint_"..i
 		local quicklaunch = hud:GetCustomStatic(string_id)
 		if quicklaunch then
 			hud:RemoveCustomStatic(string_id)
 		end
-		i = i + 1
 	end
 end

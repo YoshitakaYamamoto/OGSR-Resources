@@ -289,17 +289,17 @@ function on_key_down(key, bind)
 		detector_hud_active = false
 	end
 ------------------------------------------------------------------------------------------------------
-	if key == DIK_keys.DIK_8 or wpn_binds[bind] then --Если нажали клавишу доставания чего-либо из слотов 1-8 (кроме 7, там доставать нечего)
+	if bind == key_bindings.kWPN_8 or wpn_binds[bind] then --Если нажали клавишу доставания чего-либо из слотов 1-8 (кроме 7, там доставать нечего)
 		if detector_hud_active then --Детектор в руках - значит убираем его
 			--write_log("!!Actor removes detector!")					
-			if key == DIK_keys.DIK_8 then
+			if bind == key_bindings.kWPN_8 then
 				db.actor:activate_slot(-1)
 			end
 			start_slot_change_timer(function() --Запускаем таймер на время убирания детектора.
 				set_hud_tip_clean() --Удаляем подсказку с худа
 			end)
 			return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
-		elseif key == DIK_keys.DIK_8 then --Детектора в руках нет - значит достанем его
+		elseif bind == key_bindings.kWPN_8 then --Детектора в руках нет - значит достанем его
 			--write_log("!!Actor takes detector!")
 			db.actor:activate_slot(8)
 			start_slot_change_timer(function() --Запускаем таймер на время доставания детектора.

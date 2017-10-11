@@ -114,10 +114,10 @@ function on_attach_vehicle(obj) --Только что залезли в машину
 	end
 	--
 	--Выключим фонарик актора
-	local actor_torch = db.actor:item_in_slot(9)
-	if actor_torch and actor_torch:is_torch() and actor_torch:is_torch_enabled() then
-		actor_torch:switch_torch(false)
-	end
+	--local actor_torch = db.actor:item_in_slot(9)
+	--if actor_torch and actor_torch:is_torch() and actor_torch:is_torch_enabled() then --TODO: Добавить в движок недостающее
+	--	actor_torch:switch_torch(false)
+	--end
 	--
 	SetDetailsMinRadius(2.0) -- убираем траву из под ног
 	setup_car_camera(obj)
@@ -398,7 +398,7 @@ function on_key_down(key, bind)
 	if level.main_input_receiver() then return end
 
 	if not current_car then -- действия, имеющие смысл только при нахождении снаружи машины
-		if key == DIK_keys.DIK_DECIMAL then -- Заправка транспорта
+		if bind == key_bindings.kEXT_1 then -- Заправка транспорта
 			local car = car_which_gastank_we_looking_at()
 			if car then
 				refuel(car)
@@ -781,6 +781,11 @@ function SetDetailsMinRadius(radius)
 end
 
 function on_first_update()
+	current_car = get_actor_car() --При спавне рано - всегда возвращает nil
+	if current_car then
+		this.on_attach_vehicle(current_car)
+	end
+
 	SetDetailsMinRadius(current_car and 2.0 or 0.0)
 
 	if db.actor:has_info("no_net_signal") then
