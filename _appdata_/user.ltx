@@ -8,25 +8,27 @@ bind up kUP
 bind down kDOWN
 bind jump kSPACE
 bind crouch kLCONTROL
-bind crouch_toggle kCAPITAL
-bind accel kLSHIFT
-bind sprint_toggle kX
+bind crouch_toggle kO
+bind accel kT
+bind sprint_toggle kLSHIFT
 bind forward kW
 bind back kS
 bind lstrafe kA
 bind rstrafe kD
 bind llookout kQ
 bind rlookout kE
-bind turn_engine kNUMPAD0
+bind turn_engine kB
 bind cam_zoom_in kADD
 bind cam_zoom_out kSUBTRACT
 bind torch kL
+bind night_vision kN
 bind wpn_1 k1
 bind wpn_2 k2
 bind wpn_3 k3
 bind wpn_4 k4
 bind wpn_5 k5
 bind wpn_6 k6
+bind wpn_8 k8
 bind artefact k7
 bind wpn_next kY
 bind wpn_fire mouse1
@@ -36,42 +38,47 @@ bind wpn_func kV
 bind wpn_firemode_prev k9
 bind wpn_firemode_next k0
 bind pause kPAUSE
+bind drop kG
 bind use kF
 bind scores kTAB
 bind chat kCOMMA
 bind chat_team kPERIOD
-bind screenshot kF12
+bind screenshot kSYSRQ
 bind quit kESCAPE
 bind console kGRAVE
 bind inventory kI
-bind skin_menu kO
+bind buy_menu kF11
 bind team_menu kU
 bind active_jobs kP
 bind map kM
-bind ext_1 kDECIMAL
+bind ext_1 kDELETE
 bind vote_begin kF5
 bind vote kF6
 bind vote_yes kF7
 bind vote_no kF8
 bind speech_menu_0 kC
 bind speech_menu_1 kZ
-bind use_bandage kRBRACKET
-bind use_medkit kLBRACKET
-bind quick_save kF6
-bind quick_load kF7
-cam_fov 65.
+bind use_bandage kF1
+bind use_medkit kF2
+bind use_b190 kF5
+bind use_bipsizon kF6
+bind use_antirad kF3
+bind use_energy_drink kF4
+bind use_radio kF7
+bind quick_load kF12
 cam_inert 0.
 cam_slide_inert 0.25
 cl_cod_pickup_mode 1
 cl_dynamiccrosshair on
+fov 65.
 g_always_run on
 g_autopickup off
 g_backrun off
 g_corpsenum 10
 g_eventdelay 0
-g_game_difficulty gd_master
+g_game_difficulty gd_novice
 g_god off
-g_unlimitedammo on
+g_unlimitedammo off
 hud_adjust_mode 0
 hud_adjust_value 0.
 hud_crosshair on
@@ -79,7 +86,7 @@ hud_crosshair_dist off
 hud_fov 0.45
 hud_info on
 hud_weapon on
-load_last_save 557
+load_last_save all
 mm_mm_net_srv_dedicated off
 mm_net_con_publicserver off
 mm_net_con_spectator 20
@@ -99,8 +106,6 @@ mm_net_use_battleye off
 mm_net_weather_rateofchange 1.
 mouse_invert off
 mouse_sens 0.12
-mouse_ui_sens 3.3
-mouse_wheel_slot_changing off
 net_cl_icurvesize 0
 net_cl_icurvetype 0
 net_cl_interpolation 0.
@@ -116,19 +121,11 @@ net_sv_gpmode 0
 net_sv_log_data off
 net_sv_pending_lim 2
 net_sv_update_rate 30
-ogse_antirad_bind 0
-ogse_bipsizon_bind 0
-ogse_energy_drink_bind 0
-ogse_handradio_bind 34
-ogse_nv_bind 49
-ogse_quicksave_bind 48
-ogse_yod_bind 0
 ph_frequency 100.00000
-ph_gravity 19.62
 ph_iterations 50
-ph_timefactor 1.
 r2_aa qt_high
 r2_aa_mode smaa
+r2_allow_r1_lights off
 r2_ao on
 r2_ao_intensity 0.4
 r2_blur_params 0.500000,5.000000,30.000000
@@ -165,6 +162,7 @@ r2_ls_squality 0.5
 r2_ls_ssm_kernel 0.7
 r2_mblur off
 r2_mblur_amount 0.5
+r2_no_details_radius 0.
 r2_parallax_h 0.02
 r2_puddles on
 r2_rain_drops on
@@ -191,7 +189,6 @@ r2_sun_details off
 r2_sun_focus on
 r2_sun_lumscale 1.
 r2_sun_lumscale_amb 1.5
-r2_sun_lumscale_hemi 1.
 r2_sun_near 36.
 r2_sun_near_border 1.
 r2_sun_tsm off
@@ -218,15 +215,16 @@ r__detail_radius 225
 r__geometry_lod 5.
 r__supersample 1
 r__tf_aniso 14
+r__wallmark_ttl 300.
 rs_c_brightness 1.
 rs_c_contrast 1.
 rs_c_gamma 1.
 rs_detail on
 rs_fullscreen on
 rs_refresh_60hz on
-rs_stats on
+rs_stats off
 rs_v_sync off
-rs_vis_distance 1.3
+rs_vis_distance 1.5
 snd_acceleration on
 snd_cache_size 32
 snd_efx on
@@ -278,4 +276,3 @@ sv_vote_time 1.
 sv_warm_up 0
 texture_lod 0
 vid_mode 1920x1080
-write_debug_log off
