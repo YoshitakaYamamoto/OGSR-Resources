@@ -7,7 +7,9 @@ if jit.version_num < 20000 then
 	log1("--Enabled LuaJIT optimization!")
 end
 --==============================================================================================
-FFI = require('ffi') --Делать только здесь и только один раз!
+if jit.version_num >= 20000 then
+	FFI = require('ffi') --Делать только здесь и только один раз!
+end
 --==============================================================================================
 --===================[string.lower и string.upper с поддержкой русских букв]====================
 --KRodin: Из-за setlocale могут возникать проблемы. В ОГСЕ, вроде бы, таких проблем нету.
@@ -32,17 +34,11 @@ end
 math.randomseed(os.time())
 --=================================[Функции из xrLuaFix]========================================
 --Срезать пробелы слева
-if not string.trim_l then
-	string.trim_l = function(s) return s:gsub("^%s+",'') end
-end
+string.trim_l = function(s) return s:gsub("^%s+", '') end
 --Срезать пробелы справа
-if not string.trim_r then
-	string.trim_r = function(s) return s:gsub("%s*$",'') end
-end
+string.trim_r = function(s) return s:gsub("%s*$", '') end
 --Срезать все пробелы слева и справа
-if not string.trim then
-	string.trim = function(s) return s:gsub('^%s*(.-)%s*$', '%1') end
-end
+string.trim   = function(s) return s:match( "^%s*(.*%S)" ) or "" end
 --==============================================================================================
 -- Взято из аддона Naxac'a
 local to_ptrn = {
@@ -56,8 +52,7 @@ string.explode = function ( div,		-- разделитель
 							str,		-- строка
 							clear )		-- обрезать ли пробелы по краям строк (false/true)
 	local ret = {}
-	div = to_ptrn[div] or div
-	for s in str:gmatch("([^"..div.."]+)") do
+	for s in str:gmatch("([^"..(to_ptrn[div] or div).."]+)") do
 		ret[#ret+1] = (clear and s:trim() or s)
 	end
 	return ret
@@ -65,7 +60,7 @@ end
 --==============================================================================================
 -- Форматирование текста по ширине
 -- http://www.amk-team.ru/forum/topic/13216-sborochnyy-ceh/?do=findComment&comment=959286
-function string.width(str, width, return_table, indent, paragrapf)
+string.width = function(str, width, return_table, indent, paragrapf)
     indent    = indent    or 0
     paragrapf = paragrapf or 0
     width     = (width or 80) - indent
@@ -138,39 +133,6 @@ end
 xpcall(function() dofile(getFS():update_path("$game_scripts$", "_luaxml.lua")) end, log1)
 DYN_XML_SAVE_PATH = getFS():update_path('$game_config$', 'ui\\ui_dynamic.xml') --Путь к динамическому XML файлу
 --==============================================================================================
---KRodin: TODO: Добавить в движок!
---Некоторые недостающие DIK_keys:
-DIK_keys["DIK_MOUSE1"] = 337
-DIK_keys["DIK_MOUSE2"] = 338
-DIK_keys["DIK_MOUSE3"] = 339
-DIK_keys["DIK_MOUSE4"] = 340
-DIK_keys["DIK_MOUSE5"] = 341
-DIK_keys["DIK_MOUSE6"] = 342
-DIK_keys["DIK_MOUSE7"] = 343
-DIK_keys["DIK_MOUSE8"] = 344
-
---Некоторые недостающие key_bindings:
-key_bindings["kSPRINT_TOGGLE"] = 8
-key_bindings["kENGINE"] = 15
-key_bindings["kARTEFACT"] = 30
-key_bindings["kWPN_FIREMODE_PREV"] = 38
-key_bindings["kWPN_FIREMODE_NEXT"] = 39
-key_bindings["kPAUSE"] = 40
-key_bindings["kCHAT_TEAM"] = 45
-key_bindings["kACTIVE_JOBS"] = 53
-key_bindings["kMAP"] = 54
-key_bindings["kCONTACTS"] = 55
-key_bindings["kVOTE_BEGIN"] = 57
-key_bindings["kVOTE"] = 58
-key_bindings["kVOTEYES"] = 59
-key_bindings["kVOTENO"] = 60
-key_bindings["kSPEECH_MENU_0"] = 63
-key_bindings["kSPEECH_MENU_1"] = 64
-key_bindings["kUSE_BANDAGE"] = 73
-key_bindings["kUSE_MEDKIT"] = 74
-key_bindings["kQUICK_SAVE"] = 75
-key_bindings["kQUICK_LOAD"] = 76
---==============================================================================================
 local _advance_game_time = level.advance_game_time
 level.advance_game_time = function(game_ms) --KRodin: универсальная функция для перевода часов. Вынесена из менеджера сна.
 	_advance_game_time(game_ms) --Прокручивает игровое время вперед на заданное кол-во ИГРОВЫХ миллисекунд.
@@ -190,31 +152,16 @@ level.advance_game_time = function(game_ms) --KRodin: универсальная
 	level.set_ignore_game_state_update()
 end
 --==============================================================================================
---KRodin: временные костыли, потом убрать и сделать в движке!
-game_object.get_visual_name = function(obj)
-	local packet = get_netpk(obj, 1)
-	ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
-	local my_table = packet:get()
-	return my_table.visual_name
+function get_ammo_size(obj) --Возвращает колличество патрон в пачке
+	return obj:get_current_ammo()
 end
-game_object.get_shape_radius = function(obj)
-	local packet = get_netpk(obj, 1)
-	ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
-	local my_table = packet:get()
-	return my_table.shapes:getRadius()
+function set_ammo_size(obj, size) --Задать кол-во патронов в пачке
+	obj:set_ammo_box_curr(size)
 end
-game_object.get_inventory_weight = function(obj)
-	local total_weight = 0
- 	obj:iterate_inventory(function(_, item)
-		if item then
-			total_weight = total_weight + item:get_weight()
-		end
-	end)
-	return total_weight
+function get_inv_item_slot( obj ) --KRodin: пока пусть просто возвращает слот из конфигов.
+	return get_u32(obj:section(), "slot")
 end
-game_object.is_knife = function(obj)
-	local cls = obj:clsid()
-	return cls == clsid.wpn_knife or cls == clsid.wpn_knife_s
+function set_inv_item_slot( obj, slot ) --KRodin: пока так, просто не надо тут никаких действий.
 end
 --==============================================================================================
 --******************************************** Инициализация расширений движка закончена ********************************************
@@ -1320,31 +1267,6 @@ function math.similar(a1, a2, tol)
 	return math.abs(a1 - a2) <= tol
 end
 
--- смещения полей в структуре SHit, т.е. параметры хита
-hit_offset = {
-  Time              = 0,  -- 4, insigned int
-  PACKET_TYPE       = 4,  -- 2, insigned short
-  DestID            = 6,  -- 2, insigned short
-  power             = 8,  -- 4, float 
-  dir_x             = 12, -- 4, float
-  dir_y             = 16, -- 4, float
-  dir_z             = 20, -- 4, float
-  who               = 24, -- 4, pointer
-  whoID             = 28, -- 2, insigned short
-  weaponID          = 30, -- 2, insigned short
-  boneID            = 32, -- 2, insigned short
-  -- 2 байта на выравнивание
-  p_in_bone_space_x = 36, -- 4, float
-  p_in_bone_space_y = 40, -- 4, float
-  p_in_bone_space_z = 44, -- 4, float
-  impulse           = 48, -- 4, float
-  hit_type          = 52, -- 4, unsigned int (ALife::EHitType)
-  ap                = 56, -- 4, float
-  aim_bullet        = 60, -- 1, bool
-  -- 3 байта на выравнивание
-  BulletID          = 64, -- 2, unsigned int
-  SenderID          = 66, -- 2, unsigned int
-}
 
 -- обнуление всех эффектов съедаемого предмета
 -- изменённые значения в сейве не сохраняются
@@ -1418,26 +1340,4 @@ function file_exists(name)
 		return true
 	end
 	return false
-end
-
-
--- возвращает колличество патрон в пачке
-function get_ammo_size(obj)
-	return obj:get_current_ammo()
-end
---Задать кол-во патронов в пачке
-function set_ammo_size(obj, size) --KRodin: пока так, но надо бы сделать в движке.
-	local pk = get_netpk( obj, 2 )
-	ASSERT( ( pk and pk:isOk() ), "can't read netpacket of %s", obj:name() )
-	local data = pk:get()
-	ASSERT( data.upd and data.upd.ammo_left, "ammo_left not found in [%s]", obj:name() )
-	data.upd.ammo_left = size
-	pk:set(data)
-end
-
-
-function get_inv_item_slot( obj ) --KRodin: пока пусть просто возвращает слот из конфигов.
-	return get_u32(obj:section(), "slot")
-end
-function set_inv_item_slot( obj, slot ) --KRodin: пока так, просто не надо тут никаких действий.
 end
