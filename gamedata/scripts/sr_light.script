@@ -110,7 +110,7 @@ function check_light(stalker)
 		local actor_torch = db.actor:item_in_slot(9)
 		if
 			xr_combat_companion.in_ambush(stalker)
-			or not (actor_torch and actor_torch:is_torch() and actor_torch:is_torch_enabled())
+			or not (actor_torch and actor_torch:is_torch() and get_torch_obj(actor_torch).on)
 		then
 			if torch then
 				torch:enable_attachable_item(false)	

@@ -114,10 +114,14 @@ function on_attach_vehicle(obj) --Только что залезли в машину
 	end
 	--
 	--Выключим фонарик актора
-	--local actor_torch = db.actor:item_in_slot(9)
-	--if actor_torch and actor_torch:is_torch() and actor_torch:is_torch_enabled() then --TODO: Добавить в движок недостающее
-	--	actor_torch:switch_torch(false)
-	--end
+	local actor_torch = db.actor:item_in_slot(9)
+	local t_obj
+	if actor_torch and actor_torch:is_torch() then
+		t_obj = get_torch_obj(actor_torch)
+	end
+	if t_obj and t_obj.on then
+		t_obj:enable(false)
+	end
 	--
 	SetDetailsMinRadius(2.0) -- убираем траву из под ног
 	setup_car_camera(obj)
@@ -222,8 +226,10 @@ function on_finalize()
 	
 	btr_hud_wnd = nil
 	car_hud_wnd = nil
-	get_hud():RemoveDialogToRender(alt_hud_bg)
-	alt_hud_bg = nil
+	if alt_hud_bg then
+		get_hud():RemoveDialogToRender(alt_hud_bg)
+		alt_hud_bg = nil
+	end
 	if get_hud():GetCustomStatic("btr_hud_background") then
 		get_hud():RemoveCustomStatic("btr_hud_background")
 	end

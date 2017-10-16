@@ -346,8 +346,10 @@ function turn_on_scope_sights_lighting() --Включаем подсветку �
 end
 
 function turn_off_scope_sights_lighting() --Выключаем подсветку прицела
-	get_hud():RemoveDialogToRender( highlight_wnd )
-	highlight_wnd = nil
+	if highlight_wnd then
+		get_hud():RemoveDialogToRender( highlight_wnd )
+		highlight_wnd = nil
+	end
 	turn_off_scope_color() --чтобы цветокоррекцию можно было включать и выключать вместе с подсветкой.
 end
 
