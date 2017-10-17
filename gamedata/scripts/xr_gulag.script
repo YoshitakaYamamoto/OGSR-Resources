@@ -1155,8 +1155,8 @@ end
 function gulag:free_obj_and_reinit( obj_id )
 	self:free_obj(obj_id)
 	local obj = self.Object[obj_id]
-	if obj and obj ~= true then
-		xr_logic.initialize_obj( obj, nil, false, db.actor, self:get_stype( obj_id ) )
+	if obj and obj ~= true and level.object_by_id(obj_id) then
+		xr_logic.initialize_obj( level.object_by_id(obj_id), nil, false, db.actor, self:get_stype( obj_id ) )
 	end
 end
 
