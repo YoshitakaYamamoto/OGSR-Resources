@@ -107,7 +107,9 @@ function exo_control:AttachToInventory(inventory_window)
 	inventory_window:AttachChild(self)
 end
 function exo_control:__finalize()
-	self.inv:DetachChild(self)
+--log1("exo_control:__finalize() - start")
+	--self.inv:DetachChild(self) --Вызывает странный и трудноотлаживаемый вылет при выходе из игры.
+--log1("exo_control:__finalize() - end")
 end
 function exo_control:btn_action()
 	detach_exo()

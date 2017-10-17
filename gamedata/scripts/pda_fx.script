@@ -24,7 +24,9 @@ function pda_control:AttachToPDA(pda_window)
 	pda_window:AttachChild(self)
 end
 function pda_control:__finalize()
-	self.pda:DetachChild(self)
+--log1("pda_control:__finalize() - start")
+	--self.pda:DetachChild(self) --Вызывает странный и трудноотлаживаемый вылет при выходе из игры.
+--log1("pda_control:__finalize() - end")
 end
 
 local pda_rec_wnd = pda_control()

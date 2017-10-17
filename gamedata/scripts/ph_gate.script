@@ -70,7 +70,6 @@ function action_gate:__init(obj, storage)
 end
 
 function action_gate:__finalize()
-	printf	("action_gate::~action_gate() called")
 end
 
 function action_gate:reset_scheme(loading)

@@ -20,7 +20,9 @@ function actor_binder:__init(obj) super(obj)
 	self.am:call("on_init", obj)
 end
 function actor_binder:__finalize()
+--log1("--actor_binder:__finalize() - start")
 	self.am:call("on_finalize", obj)
+--log1("--actor_binder:__finalize() - end")
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:net_spawn(data)
@@ -40,6 +42,8 @@ function actor_binder:net_spawn(data)
 	if not db.storage[self.object:id()].pstor then	--KRodin: из xr_logic почему-то не срабатывает, поэтому создаЄм pstor здесь.
 		db.storage[self.object:id()].pstor = {}
 	end
+
+	level.enable_input() --Ќ≈ ”ƒјЋя“№!
 
 	actor_stats.add_to_ranking(self.object:id())
 

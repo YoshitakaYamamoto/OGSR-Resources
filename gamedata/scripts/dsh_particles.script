@@ -144,7 +144,9 @@ function amk_particle:__init( params )
 end
 
 function amk_particle:__finalize()
-  self.particle:stop()
+--log1("amk_particle:__finalize() - start")
+  --self.particle:stop() --KRodin: а оно тут надо?
+--log1("amk_particle:__finalize() - end")
 end
 
 function amk_particle:start()
