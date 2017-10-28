@@ -1176,30 +1176,11 @@ function net_base:get()
 	local stpk,uppk = nil,nil
 	local stsz,upsz = 0,0
 	if bit_and(self._mode, 1) ~= 0 then
-		local function process_state_write()
-			stpk = net_packet()
-			stpk:w_begin(0) --/ installation in the package beginning (+2)
-			self.obj:STATE_Write(stpk)
-			stpk:r_seek(2) --/ installation of the beginning (+2) of reading
-			stsz = stpk:r_tell()
-		end
-		--KRodin: попытка заткнуть странный вылет при чтении нет-пакетов хранилищ. Вылетает не стабильно, реже чем через раз.
-		--Причём, проблема именно с хранилищами. Нет-пакеты других объектов читаются нормально.
-		--По логу видно, что в se_custom_storage:STATE_Write(...) метод packet:w_u8(...) бросает исключение.
-		--Такое ощущение, что пытаются записать в нет-пакет больше данных, чем он может вместить. Но это не точно.
-		--Как это исправить - понятия не имею.
-		--Похожая проблема описана тут: http://www.amk-team.ru/forum/topic/7450-spravochnik-po-funkciyam-i-klassam/?do=findComment&comment=789522
-		if self.obj:clsid() == clsid.custom_storage then
-			local res, err
-			repeat
-				res, err = pcall(process_state_write)
-				if not res then
-					log3("!![%s]: Can't read net_packet of storage [%s]: %s", script_name(), self.obj:name(), err)
-				end
-			until res
-		else
-			process_state_write()
-		end
+		stpk = net_packet()
+		stpk:w_begin(0) --/ installation in the package beginning (+2)
+		self.obj:STATE_Write(stpk)
+		stpk:r_seek(2) --/ installation of the beginning (+2) of reading
+		stsz = stpk:r_tell()
 	end
 	if bit_and(self._mode, 2) ~= 0 then
 		uppk = net_packet()

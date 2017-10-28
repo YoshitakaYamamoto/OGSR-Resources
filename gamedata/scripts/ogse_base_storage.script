@@ -69,7 +69,6 @@ local function create_storage_object(key)
 	local pk = get_netpk(st_obj, 1)
 	ASSERT( pk:isOk(), "can't read netpacket of [%s]", st_obj:name() )
 	local data = pk:get()
-	--log3("Data of [%s] : %s", st_obj:name(), data)
 	data.custom_data:setTable( { main = { key = key } } ) --"[main]\nkey = "..key
 	pk:set(data)
 	-- никогда не выйдет в онлайн
@@ -106,9 +105,7 @@ end]]
 -- Также заполняет все пространство до указанной позиции каким-либо значением, 
 -- в данном случае 123. В данном случае это неважно, поскольку эта область не используется.
 local function w_seek(packet, pos)
-	packet:w_begin(123) -- устанавливаем позицию чтения в начало. Точнее не в начало, 
-	ASSERT(pos >= 2, "position is ill")
-	ASSERT(packet:w_tell() <= pos, "position mismatch")
+	packet:w_begin() -- устанавливаем позицию чтения в начало. Точнее не в начало, 
 	while packet:w_tell() ~= pos do
 		packet:w_u8(123)
 	end
@@ -130,7 +127,6 @@ end
 -- получение пакета с данными, ранее сохранёнными в объекте
 function se_custom_storage:r_reset()
 	-- устанавливаем позицию чтения в начало наших данных
-	--log3("~~[se_custom_storage:r_reset] Zero pos is: [%s]", self.zero_pos)
 	self.st_packet:r_seek(self.zero_pos)
 	return self.st_packet -- возвращаем подготовленный для чтения пакет
 end
