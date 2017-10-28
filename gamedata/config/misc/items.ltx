@@ -1000,39 +1000,25 @@ cost			= 25000
 
 ;-----------<< Софт для биодетектора
 
-[amk_metka]:ammo_base
+;KRodin: нафига метка была сделана на классе патронов???
+[amk_metka]:identity_immunities
 GroupControlSection	= spawn_group
-discovery_dependency = 
+discovery_dependency	= 
 $spawn			= "devices\amk_metka" ; option for Level Editor
-class			= AMMO
-cform           = skeleton
+class			= II_ATTCH
+cform			= skeleton
 visual          = equipments\item_amk_gps.ogf
-description		= enc_amk_metka
-$prefetch 		= 64
-
-cost			= 2100
-
-box_size		= 1
-
+radius			= 1
 inv_name		= amk_metka
 inv_name_short	= amk_metka_s
+description		= enc_amk_metka
 inv_weight		= 0.05
-
+can_trade		= on
 inv_grid_width	= 1
 inv_grid_height	= 1
 inv_grid_x		= 10
 inv_grid_y		= 26
-
-k_dist			= 1
-k_disp			= 3
-k_hit			= 1.4
-k_impulse		= 1.2
-k_pierce		= 1.35
-impair			= 1.15
-buck_shot		= 1
-tracer			= off
-wm_size         = 0.05
-
+cost			= 2100
 
 ;-------------------------------------------------------
 ; Другое
