@@ -312,7 +312,7 @@ end
 
 local function add_storage()
   local st_count = st_count_item.value + 1
-  local st = base_single_storage( st_count, true )
+  local st = base_single_storage( st_count )
   ASSERT(
     st, "ogse_unist.add_storage: can't create new storage. count = [%s]", st_count
   )
@@ -412,7 +412,7 @@ end
 
 -- класс, инкапсулирущий одиночное хранилище
 class "base_single_storage"
-function base_single_storage:__init( num, first_use ) -- аргумент, номер объекта хранилища
+function base_single_storage:__init( num ) -- аргумент, номер объекта хранилища
   self.st_num = num
   self.st_id  = "ST_" .. storage_guid .. num
   self.st_obj = ogse_base_storage.get_storage( self.st_id )
@@ -427,11 +427,9 @@ function base_single_storage:__init( num, first_use ) -- аргумент, но�
     "base_single_storage:__init: netpacket free space is unexpectedly small"
   )
   self.data = {}
-  if not first_use then --если хранилище только что создали, не надо из него ничего пытаться прочитать.
-    while not r_packet:r_eof() do
-      local item = read_item_from_packet( r_packet )
-      self:add_item( item )
-    end
+  while not r_packet:r_eof() do
+    local item = read_item_from_packet( r_packet )
+    self:add_item( item )
   end
   self.end_pos = r_packet:r_tell()
   self:merge_data_to( storage )
