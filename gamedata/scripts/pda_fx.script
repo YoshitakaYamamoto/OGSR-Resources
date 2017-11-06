@@ -8,42 +8,49 @@
 --/ Модуль нерабочести PDA в выброс /--
 
 function attach(sm)
-	sm:subscribe({signal = "on_info",	fun = this.on_pda_info})
+	sm:subscribe({signal = "on_spawn", fun = this.on_spawn})
+	sm:subscribe({signal = "on_pda_open", fun = this.on_pda_open})
+	sm:subscribe({signal = "on_pda_hide", fun = this.on_pda_hide})
+	sm:subscribe({signal = "on_info", fun = this.on_pda_info})
 end
 
-class "pda_control" (CUIScriptWnd)
 
+class "pda_control" (CUIScriptWnd)
 function pda_control:__init() super()
 	local xml = CScriptXmlInit()
 	xml:ParseFile("pda.xml")
 	self.bgnd = xml:InitStatic("background_fault", self) 
-	self:Show(false)
+	self:Show( has_alife_info("no_net_signal") )
 end
 function pda_control:AttachToPDA(pda_window)
 	self.pda = pda_window
 	pda_window:AttachChild(self)
 end
-function pda_control:__finalize()
---log1("pda_control:__finalize() - start")
-	--self.pda:DetachChild(self) --Вызывает странный и трудноотлаживаемый вылет при выходе из игры.
---log1("pda_control:__finalize() - end")
+
+
+local pda_rec_wnd
+
+function on_spawn()
+	pda_rec_wnd = this.pda_control()
 end
 
-local pda_rec_wnd = pda_control()
+function on_pda_open()
+	if not pda_rec_wnd.pda then
+		pda_rec_wnd:AttachToPDA(level.main_input_receiver())
+	end
+end
+
+function on_pda_hide()
+	if pda_rec_wnd.pda then
+		pda_rec_wnd.pda:DetachChild(pda_rec_wnd)
+		pda_rec_wnd.pda = nil
+	end
+end
 
 function on_pda_info(npc, info_id)
-
-	if (info_id == "ui_pda" and db.actor:has_info("no_net_signal")) or info_id == "no_net_signal" and db.actor:has_info("ui_pda") then
-		if not pda_rec_wnd.pda then
-			pda_rec_wnd:AttachToPDA(level.main_input_receiver())
-		end
-		if pda_rec_wnd.pda then
-			pda_rec_wnd:Show(true)
-		end
-	elseif (info_id == "ui_pda" and db.actor:has_info("net_signal")) or info_id == "net_signal" and db.actor:has_info("ui_pda") then
-		if pda_rec_wnd.pda then
-			pda_rec_wnd:Show(false)
-		end
+	if info_id == "no_net_signal" then
+		pda_rec_wnd:Show(true)
+	elseif info_id == "net_signal" then
+		pda_rec_wnd:Show(false)
 	end
-
 end

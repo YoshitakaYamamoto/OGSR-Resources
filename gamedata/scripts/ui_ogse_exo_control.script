@@ -14,10 +14,11 @@ function attach(sm)
 	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.chek_button_accessibility })
 	sm:subscribe({ signal = "on_item_to_slot",	fun = this.chek_button_accessibility })
 	sm:subscribe({ signal = "on_inventory_open", fun = this.on_show })
+	sm:subscribe({ signal = "on_inventory_hide", fun = this.on_inventory_hide })
 	sm:subscribe({ signal = "on_use",			fun = this.use_exo })
 end
 
-
+local rec_wnd
 local exo_condition
 local outfit_condition
 
@@ -87,6 +88,8 @@ function save()
 end
 
 function load()
+	rec_wnd = exo_control() -- создаём один раз
+	--
 	exo_condition		= ogse.load_var_safe(script_name()..".exo_cond") or 1.0
 	outfit_condition	= ogse.load_var_safe(script_name()..".outfit_cond") or 1.0
 end
@@ -106,22 +109,24 @@ function exo_control:AttachToInventory(inventory_window)
 	self.inv = inventory_window
 	inventory_window:AttachChild(self)
 end
-function exo_control:__finalize()
---log1("exo_control:__finalize() - start")
-	--self.inv:DetachChild(self) --Вызывает странный и трудноотлаживаемый вылет при выходе из игры.
---log1("exo_control:__finalize() - end")
-end
+
 function exo_control:btn_action()
 	detach_exo()
 end
-
-local rec_wnd = exo_control() -- создаём один раз
 
 function on_show()
 	if not rec_wnd.inv then
 		rec_wnd:AttachToInventory(level.main_input_receiver())
 	end
+	--
 	chek_button_accessibility()
+end
+
+function on_inventory_hide()
+	if rec_wnd.inv then
+		rec_wnd.inv:DetachChild(rec_wnd)
+		rec_wnd.inv = nil
+	end
 end
 
 function can_detach_exo(outfit_sec)
