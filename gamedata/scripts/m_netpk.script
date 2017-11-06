@@ -1774,7 +1774,8 @@ function net_cse_ph_skeleton:__init(obj,mode)
 		{ name = 'root_bone',      type = 'u16',   default = 0                 },
 		{ name = 'bbox_min',       type = 'f32v3', default = vector()          },
 		{ name = 'bbox_max',       type = 'f32v3', default = vector()          },
-		{ name = 'bones_count',    type = 'u16',   default = 0                 } --/#~# changed name ('bone_count')
+		{ name = 'bones_count',    type = 'u16',   default = 0                 }, --/#~# changed name ('bone_count')
+		{ name = 'bones_mask_ex',  type = 'u8v8',  default = {0,0,0,0,0,0,0,0} }
 	}
 	self.st_props_bone = { --/#+#
 		{ name = 'ph_position',    type = 'q8v3',  default = {0,0,0},  },
@@ -1790,7 +1791,13 @@ function net_cse_ph_skeleton:_read_st_props(ret,pk)
 	--/ hooks 'bones'
 	if bit_and(ret.skeleton_flags, 4) ~= 0 then --/ check 'skeleton'
 		for _,prop in ipairs(self.st_props_bones) do --/ read 'bones'
-			if ret[prop.name] ~= 'bones_count' then
+			if prop.name == "bones_mask_ex" then
+				if ret.bones_count > 64 then
+					ret[ prop.name ] = this[ "_r_" .. prop.type ]( pk )
+				else
+					ret[ prop.name ] = table.copy( prop.default )
+				end
+			else
 				ret[prop.name] = this["_r_"..prop.type](pk)
 			end
 		end
@@ -1817,9 +1824,11 @@ function net_cse_ph_skeleton:_write_st_props(data,pk)
 		this["_w_"..prop.type](pk, data[prop.name] or prop.default or 0)
 	end
 	--/ hooks 'bones'
-	if bit_and(data.skeleton_flags, 4) ~= 0 and data.bones_count then --/ check 'bones'
+	if bit_and(data.skeleton_flags, 4) ~= 0 then --/ check 'bones'
 		for _,prop in ipairs(self.st_props_bones) do --/ write 'bones'
-			this["_w_"..prop.type](pk, data[prop.name] or prop.default or 0)
+			if prop.name ~= "bones_mask_ex" or data.bones_count > 64 then
+				this[ "_w_" .. prop.type ]( pk, data[ prop.name ] or prop.default or 0 )
+			end
 		end
 		if data.bones then --/ write 'bone' ...
 			for _,bone in ipairs(data.bones) do
