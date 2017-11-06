@@ -175,6 +175,14 @@ custom_data     = scripts\esc\esc_btr_unmove.ltx
 car_name        = esc_btr
 character_icon  = esc_vehicle_btr
 
+[trunk_box] ;Надо бы удалить с НИ
+GroupControlSection  = spawn_group
+discovery_dependency = 
+$spawn               = 
+class                = O_INVBOX
+cform                = skeleton
+visual               = physics\box\expl_dinamit.ogf
+
 ;==============================================================================
 ;= секции специальных предметов - карточки с изображениями машин для торговли =
 ;==============================================================================
@@ -571,3 +579,4 @@ inv_name_short  = key_Moskvich2
 description     = key_zaz968_rad_shur_desc
 inv_name        = key_Zaporozh_ush
 inv_name_short  = key_Zaporozh_ush
+

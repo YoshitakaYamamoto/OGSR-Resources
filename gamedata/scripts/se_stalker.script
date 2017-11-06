@@ -16,6 +16,9 @@ function se_stalker:__init (section) super (section)
 	self.job_online          = nil
 	self.job_online_condlist = nil
 
+	-- посещал ли сталкер хоть один smart_terrain
+	self.was_in_smart_terrain = false --TODO: Удалить с НИ. Не используется нигде.
+
 	self.death_dropped = false --Генерил ли персонаж выпадаемые предметы или нет.
 	self.treasure_processed = false --Обыскивался ли труп персонажа актором
 
@@ -107,6 +110,8 @@ function se_stalker:STATE_Write (packet)
 		packet:w_stringZ(self.job_online_condlist)
 	end
 
+	packet:w_bool(self.was_in_smart_terrain)
+
 	local flags = 0
 	if self.death_dropped then flags = bit_or(flags, 1) end
 	if self.treasure_processed then flags = bit_or(flags, 2) end
@@ -132,6 +137,8 @@ function se_stalker:STATE_Read (packet, size)
 		self.job_online_condlist = packet:r_stringZ()
 		self.job_online = xr_logic.parse_condlist(nil, "se_stalker:STATE_Read", "job_online", self.job_online_condlist)
 	end
+
+	self.was_in_smart_terrain = packet:r_bool()
 
 	local flags = packet:r_u8()
 	self.death_dropped = bit_and(flags, 1) ~= 0

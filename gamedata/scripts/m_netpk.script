@@ -2312,6 +2312,7 @@ function net_se_stalker:__init(obj,mode)
 	self.st_props = {
 		{ name = 'job_online',           type = 'u8', default = 2 ,     ver = 3 }, --/ SHoC&CS
 		{ name = 'job_online_condlist',  type = 'sz', default = '',     ver = 3 }, --/ SHoC&CS
+		{ name = 'was_in_smart_terrain', type = 'b8', default = false,  ver = 1 }, --/ SHoC --KRodin: fixed for OGSE
 		{ name = 'death_dropped',        type = 'u8', default = 0 ,     ver = 3 }, --/ SHoC&CS
 		--
 		{ name = 'offline_dead',         type = 'u32', default = 0,     ver = 1 }, --/ OGSE
@@ -2430,6 +2431,7 @@ function net_se_monster:__init(obj,mode)
 	self.st_props = {
 		{ name = 'job_online',           type = 'u8', default = 2 ,    ver = 3 }, --/ SHoC&CS
 		{ name = 'job_online_condlist',  type = 'sz', default = '',    ver = 3 }, --/ SHoC&CS
+		{ name = 'was_in_smart_terrain', type = 'b8', default = false, ver = 1 }, --/ SHoC --KRodin: fixed for OGSE
 		--
 		{ name = 'offline_dead',         type = 'u32', default = 0 ,   ver = 1 }, --/ OGSE
 		--

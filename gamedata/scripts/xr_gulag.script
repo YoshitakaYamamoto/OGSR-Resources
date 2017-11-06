@@ -216,6 +216,8 @@ function gulag:prepare_jobs()
 
 		job        = self.Job[jobN]
 
+		if not job then log3("!![xr_gulag.prepare_jobs] job not found") return end --Адский костыль!!!! Удалить с НИ!
+
 		write_log("!!DEBUG_GULAG_9 [%s] [%s] path [%s]", obj_id, job.section, job.path_name)
 		
 		job.object = obj_id
@@ -1121,8 +1123,16 @@ function gulag:free_obj( obj_id )
 		write_log("!!DEBUG_GULAG_FREE %s", obj_id)
 		
 		self.ObjectJob[obj_id] = nil
-
+		
+		--
+		if self.Job[jobN] then --АДСКИЙ КОСТЫЛЬ! УДАЛИТЬ С НИ!
+		--
 		self.Job[jobN].object  = nil
+		--
+		else --это тоже убрать!
+			log3("!![xr_gulag.gulag:free_obj] self.Job[jobN] not found!!!")
+		end
+		--
 
 		self.ObjectJobPathName[obj_id] = nil
 		

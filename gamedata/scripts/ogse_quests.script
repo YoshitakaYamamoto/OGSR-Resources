@@ -1293,6 +1293,9 @@ function blow_bidon_bomb()
 			local smart = alife():object("deadcity_zombies_"..i)
 			smart:remove_gulag()
 		end
+		--
+		ogse.save_var("fix_mg_smarts", true) --ÓÄÀËÈÒÜ Ñ ÍÈ!!!!!!
+		--
 	end
 end
 

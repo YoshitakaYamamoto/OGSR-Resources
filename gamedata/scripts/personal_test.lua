@@ -81,3 +81,12 @@ end
 --log3("sections: %s", _collect_sections.main())
 
 --collectgarbage('collect')
+
+--__scripts_syntax_check.process()
+
+--wpn_ak102_cmag100_stok_kobra28987
+
+local sobj = ogse.spawn_item_in_inv("wpn_ak102_cmag100_stok_kobra")
+level.client_spawn_manager():add( sobj.id, -1, function(id, obj)
+	--obj:set_bone_visible("slide", 0)
+end )

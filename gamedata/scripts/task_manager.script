@@ -276,6 +276,7 @@ end
 --' Загрузка
 function CRandomTask:load()
 	local tasks = ogse.load_var_safe( script_name() .. ".tasks" )
+	if not tasks then return self:load_old() end --Убрать с НИ!!!
 	--log3("[%s] Loaded tasks: %s", script_name(), tasks)
 	for _, t in ipairs( tasks ) do
 		local id = table.remove( t, 1 )
@@ -303,6 +304,42 @@ function CRandomTask:load()
 		local id = table.remove( t, 1 )
 		self.active_task_by_type[id] = table.remove( t, 1 )
 	end
+end
+function CRandomTask:load_old() --Убрать с НИ!!!
+	if not ogse.var_exists( script_name() .. ".task_info") then return end
+	local p = ogse.load_var( script_name() .. ".task_info")
+
+	--' Считаем количество записей
+	local i = p:r_u8()
+	for k = 1,i do
+		local id = p:r_stringZ()
+		self.task_info[id].enabled = p:r_bool()
+		self.task_info[id].enabled_props = p:r_bool()
+		self.task_info[id].status = p:r_stringZ()
+
+		local selected_target = p:r_u32()
+		if selected_target ~= 4294967295 then
+			self.task_info[id].selected_target = selected_target
+		end
+		self.task_info[id].last_task_time = utils.r_CTime(p)
+		
+		-- здесь адский баг. Активный selected_target может быть _только_ у выданнх квестов, в остальном случае там -1.
+		-- Тут проверяем активность таска. Параллельно правим еще в функции проверки завершенности таска на всякий случай.
+		if self.task_info[id].type == "defend_lager" and self.task_info[id].selected_target then     
+			local defend_object = alife():object(self.task_info[id].selected_target)                                  
+			local sm_ini = defend_object:spawn_ini()                                                                  
+			self.task_info[id].defend_target = utils.cfg_get_number(sm_ini, "random_task", "defend_target", nil, true)
+		end                                                                                                         
+	end
+	
+	--' Та же самая процедура с активными тасками
+	local i = p:r_u8()	
+	for k = 1,i do
+		local id = p:r_stringZ()
+		self.active_task_by_type[id] = p:r_stringZ()	
+	end
+
+	ogse.delete_var( script_name() .. ".task_info")
 end
 --' Генератор уникальных ID для фраз
 function CRandomTask:gen_phrase_id()

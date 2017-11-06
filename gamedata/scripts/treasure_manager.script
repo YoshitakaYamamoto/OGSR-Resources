@@ -226,6 +226,7 @@ end
 --Загрузка
 function CTreasure:load( p )
 	local treasures = ogse.load_var_safe( script_name() .. ".treasures" )
+	if not treasures then return self:load_old() end --Убрать с НИ.
 	--log3("[%s] loaded treasures: %s", script_name(), treasures)
 	for _, item in ipairs( treasures ) do
 		local id, active, done = unpack( item )
@@ -234,6 +235,19 @@ function CTreasure:load( p )
 		info.active = active
 		info.done   = done
 	end
+end
+
+function CTreasure:load_old() --Убрать с НИ.
+	if not ogse.var_exists( script_name() .. ".treasure_info") then return end
+	local p = ogse.load_var( script_name() .. ".treasure_info")
+
+	local t = p:r_u16()
+	for i = 1,t do
+		local k = self.treasure_by_target[p:r_u16()]
+		self.treasure_info[k].active = p:r_bool()
+		self.treasure_info[k].done = p:r_bool()
+	end
+	ogse.delete_var( script_name() .. ".treasure_info")
 end
 
 

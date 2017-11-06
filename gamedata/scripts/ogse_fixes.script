@@ -1,31 +1,98 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
-function attach(sm)
-	sm:subscribe({ signal = "on_storyline_start", fun = this.on_storyline_start })
-	sm:subscribe({ signal = "on_spawn", fun = this.on_spawn })
-end
 
-function on_storyline_start()
-	lc_question_add()
-	fix_gar_boars_territory2_logic()
-	--fix_yan_st_stalker3_kamp_1() --Не использую, т.к такие костры, как и все дин. объекты могут в какой-то момент воспарить в воздухе. Мне лень это фиксить.
+function attach(sm)
+	sm:subscribe({ signal = "on_spawn", fun = this.on_spawn })
+	sm:subscribe({ signal = "on_first_update", fun = this.on_first_update })
 end
 
 function on_spawn()
 	del_buggy_objects()
 	del_buggy_mapspots()
+	del_all_trunks() --Убрать с НИ.
+	fix_dsh_rukzak_storage() --Убрать с НИ.
+
+	lc_question_add() --С НИ перенести на событие начала игры и всё, больше никогда не вызывать.
+	fix_gar_boars_territory2_logic() --тоже самое.
+	--fix_yan_st_stalker3_kamp_1() --тоже самое
+	fix_mg_smarts() --тоже самое
+end
+
+function on_first_update()
+	aem_fix() --Удалить по окончании игры! С НИ ЭТО НЕ НУЖНО!
+	--
+	fix_mg_respawners() --Снести с НИ
 end
 
 
 function fix_yan_st_stalker3_kamp_1()
+  if ogse.var_exists("fix_yan_st_stalker3_kamp_1") then return end
   local p = patrol( "yan_st_stalker3_kamp_1" )
   dsh.create_campfire(
     p:point( 0 ), p:level_vertex_id( 0 ), p:game_vertex_id( 0 ),
     "objects\\koster_palki_nastil", 0.7
   )
+  ogse.save_var("fix_yan_st_stalker3_kamp_1", true)
 end
 
+function fix_mg_respawners()
+	if has_alife_info("master_quest_soup_ready") then
+		--Релизим респавнеры зомбаков в МГ, больше они не нужны.
+		local del_respawners = { "deadcity_zombied_respawn_1", "deadcity_zombied_respawn_2", "deadcity_contoler_respawn_1" }
+		for _, name in pairs(del_respawners) do
+			local sobj = alife():object( name )
+			if sobj then
+				dsh_respawn.release_respawner_by_name( name )
+				log3( "--[ogse_fixes] Released respawner [%s]", name )
+			end
+		end
+	end
+end
+
+function fix_mg_smarts()
+	if has_alife_info("master_quest_soup_ready") and not ogse.var_exists("fix_mg_smarts") then
+		for i=1, 6 do
+			local smart = alife():object("deadcity_zombies_"..i)
+			smart:remove_gulag()
+		end
+		ogse.save_var("fix_mg_smarts", true)
+	end
+end
+
+function fix_dsh_rukzak_storage( ver )
+  if ogse.var_exists("fix_dsh_rukzak_storage") then return end
+  for _, k in ipairs( ogse_unist.get_all_names() ) do
+    local id = string.match( k, "^dsh_rukzak%.([^.]+)%.sections$" )
+    if id then
+      id = tonumber( id )
+      local items = dsh_rukzak.load_rukzak( id )
+      log3(
+        "[%s]: change storage type of dsh_rukzak: %s",
+        script_name(), id
+      )
+      dsh_rukzak.save_rukzak( id, items )
+    end
+  end
+  ogse.save_var("fix_dsh_rukzak_storage", true)
+end
+
+function del_all_trunks()
+	if ogse.var_exists("TRUNK_FIX") then return end
+	for id = 1, 65534 do
+		local sobj = alife():object(id)
+		if sobj then
+			if sobj:section_name() == "trunk_box" then
+				log3( "~~[%s]: Found trunk [%s], removing...", script_name(), sobj:name() )
+				alife():release(sobj, true)
+			end
+		end
+	end
+	ogse.save_var("TRUNK_FIX", true)
+end
+
+
 function fix_gar_boars_territory2_logic() --Исправление кривой логики рестриктора на свалке. Ему вообще не нужна логика.
+	if ogse.var_exists("gar_boars_territory2_fix") then return end
 	local sobj = alife():object("gar_boars_territory2")
 	if sobj then
 		local packet = get_netpk(sobj, 1)
@@ -35,6 +102,7 @@ function fix_gar_boars_territory2_logic() --Исправление кривой 
 		packet:set(my_table)
 		log3( "--[%s]: Fixed logic in restrictor [%s]!", script_name(), sobj:name() )
 	end
+	ogse.save_var("gar_boars_territory2_fix", true)
 end
 
 function lc_question_add() --Переход "Припять - ЧАЭС" задаёт вопрос о смене уровня. Взято из аддона Naxac'а
@@ -48,6 +116,28 @@ function lc_question_add() --Переход "Припять - ЧАЭС" зада
 			pk:set(data)
 			log3( "~~[%s]: fixed ['exit_to_stancia_01']...", script_name() )
 		end
+	end
+end
+
+
+function aem_fix()
+	if not ogse.var_exists("AEM_FIX") then
+		for k, v in pairs( db.storage[db.actor:id()].pstor ) do
+			if string.find(k, "aem") then
+				if k == "aem_id" then
+					local sobj = alife():object(v)
+					if sobj then
+						log3( "~~[%s]: found [%s], removing...", script_name(), sobj:name() )
+						alife():release(sobj, true)
+					end
+				end
+				if db.storage[db.actor:id()].pstor[k] then
+					log3("~~[%s]: REMOVING FROM PSTOR: [%s]", script_name(), k)
+					db.storage[db.actor:id()].pstor[k] = nil
+				end
+			end
+		end
+		ogse.save_var("AEM_FIX", true)
 	end
 end
 
