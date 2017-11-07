@@ -188,16 +188,22 @@ function evaluator_love_napalm_smell:evaluate()
 		end
 			if not self.a.test_begun then
 				self.a.grenades_from_pos = npc:bone_position(grenade_bone)
-				if get_grenade(self.a.test_grenades.hi) then
-					npc:drop_item_and_teleport(get_grenade(self.a.test_grenades.hi), self.a.grenades_from_pos)
-				else	
+				--
+				local hi = get_grenade( self.a.test_grenades.hi )
+				if hi then
+					npc:drop_item_and_teleport( hi, self.a.grenades_from_pos )
+					mark_grenade_non_pickable( hi )
+				else
 					return false
 				end
-				if get_grenade(self.a.test_grenades.lo) then
-					npc:drop_item_and_teleport(get_grenade(self.a.test_grenades.lo), self.a.grenades_from_pos)
-				else	
+				local lo = get_grenade( self.a.test_grenades.lo )
+				if lo then
+					npc:drop_item_and_teleport( lo, self.a.grenades_from_pos )
+					mark_grenade_non_pickable( lo )
+				else
 					return false
 				end
+				--
 				self.a.test_begun = true
 				return false
 			end
@@ -288,11 +294,9 @@ function evaluator_love_napalm_smell:evaluate()
 			self.a.test_grenades={}
 			local t
 			t = alife():create(get_grenade(self.a.grenade):section().."_test", npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id())
-			--level.client_spawn_manager():add(t.id, -1, mark_grenade_non_pickable)
 			test_grenades[t.id]=timeout+5000
 			self.a.test_grenades.hi=t.id
 			t = alife():create(get_grenade(self.a.grenade):section().."_test", npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id())
-			--level.client_spawn_manager():add(t.id, -1, mark_grenade_non_pickable)
 			test_grenades[t.id]=timeout+5000
 			run_grenade_timer()
 			self.a.test_grenades.lo=t.id
@@ -778,7 +782,7 @@ function update()
           )
           level.client_spawn_manager():add(
             a.id, -1, function( id, obj )
-              --mark_grenade_non_pickable( id, obj )
+              mark_grenade_non_pickable( obj )
               obj:explode( 0 )
             end
           )

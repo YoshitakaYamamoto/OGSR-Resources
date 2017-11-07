@@ -50,8 +50,17 @@ end
 
 local walk_accel		= get_float( "actor", "walk_accel" )
 local jump_speed		= get_float( "actor", "jump_speed" )
+local run_factor		= get_float( "actor", "run_coef" )
+local run_back_factor	= get_float( "actor", "run_back_coef" )
+local sprint_factor		= get_float( "actor", "sprint_koef" )
 
-local water_coeff = 0.36
+local walk_back_factor	= get_float( "actor", "walk_back_coef" )
+local crouch_factor		= get_float( "actor", "crouch_coef" )
+local climb_factor		= get_float( "actor", "climb_coef" )
+local walk_strafe_factor
+local run_strafe_factor
+
+local water_coeff = 0.6
 local time_submerged = 0
 local o2_amount = 100
 
@@ -106,22 +115,22 @@ function fx_start(id)
 		end
 		if snd_dive and not snd_dive:playing() then
 			level.add_pp_effector("yantar_underground_psi.ppe", 5555, true)
-		--	level.add_pp_effector("nightvision_good.ppe", 3007, true)
-		--	level.set_pp_effector_factor(3007, 0.2)
 			snd_dive:play_at_pos (db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
 			snd_dive.volume = snd_fx_volume*snd_dive_subvolume
 		end
 		if not breather then
 			cmd("r2_dof_control", "on")
 		end
-		----walk_strafe_factor = get_walk_strafe_factor()
-		----run_strafe_factor = get_run_strafe_factor()
+		
+		local aobj = get_actor_obj()
+		walk_strafe_factor = aobj.walk_strafe_coef
+		run_strafe_factor = aobj.run_strafe_coef
 
-		----set_walk_back_factor(walk_back_factor*water_coeff)
-		----set_crouch_factor(crouch_factor*water_coeff)
-		----set_climb_factor(climb_factor*water_coeff)
-		----set_walk_strafe_factor(walk_strafe_factor*water_coeff)
-		----set_run_strafe_factor(run_strafe_factor*water_coeff)
+		aobj.walk_back_coef = walk_back_factor * water_coeff
+		aobj.crouch_coef = crouch_factor * water_coeff
+		aobj.climb_coef = climb_factor * water_coeff
+		aobj.walk_strafe_coef = walk_strafe_factor * water_coeff
+		aobj.run_strafe_coef = run_strafe_factor * water_coeff
 
 		bind_stalker.hide_weapon()
 		underwater[id] = true
@@ -207,17 +216,16 @@ function fx_stop(id)
 		end			
 		if snd_emersion then
 			level.remove_pp_effector(5555)
-		--	level.remove_pp_effector(3007)
 			snd_emersion:play_at_pos (db.actor, vector():set(0, 0, 0), 0, sound_object.s2d)
 			snd_emersion.volume = snd_fx_volume*snd_emersion_subvolume
 		end
 		cmd("r2_dof_control", "off")
 
-		----set_walk_back_factor(walk_back_factor)
-		----set_crouch_factor(crouch_factor)
-		----set_climb_factor(climb_factor)
-		----set_walk_strafe_factor(walk_strafe_factor)
-		----set_run_strafe_factor(run_strafe_factor)	
+		aobj.walk_back_coef = walk_back_factor
+		aobj.crouch_coef = crouch_factor
+		aobj.climb_coef = climb_factor
+		aobj.walk_strafe_coef = walk_strafe_factor
+		aobj.run_strafe_coef = run_strafe_factor
 
 		bind_stalker.restore_weapon()
 		underwater[id] = nil

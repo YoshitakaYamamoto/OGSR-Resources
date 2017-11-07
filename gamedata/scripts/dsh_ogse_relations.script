@@ -54,7 +54,7 @@ end
 function clear_personal_records( npc_id )
   local from_table = relation_table[ npc_id ]
   for _, id in ipairs( from_table ) do
-    db.actor:clear_personal_record( id, npc_id )
+    relation_registry.clear_personal_goodwill( id, npc_id )
 --    local sobj = alife():object( id )
 --    if sobj then
 --      log1(

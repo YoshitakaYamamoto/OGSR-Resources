@@ -130,7 +130,6 @@ function set_binoc_rt_zoom_factor(obj, value)
 	obj:set_binoc_zoom_factor(value)
 end
 
---TODO: Добавить метод в движок
 function set_condition_shot_dec( wpn, val )
-  --wpn:set_wpn_float( vector():set( 0, 0, 0 ), val, 1352 )
+  wpn:get_weapon().condition_shot_dec = val
 end

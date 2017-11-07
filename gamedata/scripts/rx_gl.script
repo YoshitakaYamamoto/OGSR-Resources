@@ -221,7 +221,6 @@ function action_launch_grenade:execute()
 		--printf("launch[%s]:stage 0",npc:character_name())
 		local s = alife():create("gl_test_shell_"..self.shell,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 		self.test_shell = s.id
-		--level.client_spawn_manager():add(s.id, -1, mark_grenade_non_pickable)
 		self.stage = 1
 	elseif self.stage == 1 then -- запуск
 		--printf("launch[%s]:stage 1",npc:character_name())
@@ -278,7 +277,6 @@ function action_launch_grenade:execute()
 --				table.insert(test_mem[self.lvid],{pos = npc:position(),trg = self.target_point,str = self.str_pos,lps = self.launch_pos,typ = self.type})
 				local s = alife():create("gl_fake_missile_"..self.shell,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 				self.fake_missile = s.id
-				--level.client_spawn_manager():add(s.id, -1, mark_grenade_non_pickable)
 				self.stage = 4
 			else
 				--printf("launch[%s]:stage 3:not cv",npc:character_name())
@@ -513,7 +511,11 @@ function launch(obj,target,typ)
 end
 
 function launch2( npc, id, target, pos, radius, typ, test )
-  npc:drop_item_and_teleport( level.object_by_id( id ), pos )
+  local obj = level.object_by_id( id )
+  ASSERT( obj, "[%s]: launch2: [%s] not found", script_name(), id )
+  npc:drop_item_and_teleport( obj, pos )
+  mark_grenade_non_pickable( obj )
+  --
   temp.fms[ id ] = {
     [ "cnt"    ] = 0,
     [ "launch" ] = true,

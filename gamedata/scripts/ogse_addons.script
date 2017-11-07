@@ -358,8 +358,8 @@ local function move_weapon_to_slot(sobj, slot, is_slot_active) --KRodin: Сделано
 		if tbl[2] then
 			db.actor:activate_slot( tbl[1] )
 		end
-		db.actor:invalidate_inventory()
-		update_inventory_window()
+		--db.actor:invalidate_inventory() --Вроде как теперь обновлять инвентарь не требуется.
+		--update_inventory_window()
     end, {slot, is_slot_active}
   )
 end

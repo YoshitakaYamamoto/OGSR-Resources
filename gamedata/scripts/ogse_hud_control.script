@@ -52,7 +52,7 @@ function check_sniper_timer:__init() super()
 	self.sm = ogse_signals.get_mgr()
 end
 function check_sniper_timer:condition() --Запускается на каждом апдейте, пока не вернёт true
-	if zoom_mode() then --Если актор смотрит в оптику
+	if db.actor:zoom_mode() then --Если актор смотрит в оптику
 		if self.show_indicators then
 			level.hide_indicators() --убираем худ
 			self.show_indicators = false

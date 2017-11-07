@@ -102,7 +102,7 @@
 -- local value = ogse.load_var(name, default_value [,type [,subtype]])
 -- тип, как необязательный параметр, указывается по тем же правилам, что и при сохранении.
 
-local STORAGE_DBG = true --Включает подробный отладочный вывод
+local STORAGE_DBG = false --Включает подробный отладочный вывод
 
 function attach(sm)
   sm:subscribe({signal = "on_load_before_all", fun = this.on_load})
