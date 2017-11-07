@@ -221,6 +221,7 @@ function fx_stop(id)
 		end
 		cmd("r2_dof_control", "off")
 
+		local aobj = get_actor_obj()
 		aobj.walk_back_coef = walk_back_factor
 		aobj.crouch_coef = crouch_factor
 		aobj.climb_coef = climb_factor
