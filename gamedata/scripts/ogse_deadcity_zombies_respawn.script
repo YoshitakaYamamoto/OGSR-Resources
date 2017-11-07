@@ -131,17 +131,14 @@ local subscribed = nil
 function on_first_update()
 	if level.name() ~= "l09_deadcity_ogse" or has_alife_info("master_quest_soup_ready") then return end
 
-	for id = 1, 65534 do --Да, тормозной вариант, но хз, как сделать без этого. db.creature же учитывает только онлайновых НПС, а нам нужны все на локации, в т.ч. в которые в оффлайне.
-		local npc = alife():object(id)
-		if npc then
-			local sect = npc:section_name()
-			if IsStalker(npc) and npc:alive() then
-				if object_level_name(npc) == "l09_deadcity_ogse" then
-					if npc:community() == "zombied" then	
-						if not ogse.is_quest_npc(npc) then
-							table.insert(deadcity_zombies, id)
-						end						
-					end
+	for id, npc in alife():objects() do --Да, тормозной вариант, но хз, как сделать без этого. db.creature же учитывает только онлайновых НПС, а нам нужны все на локации, в т.ч. в которые в оффлайне.
+		local sect = npc:section_name()
+		if IsStalker(npc) and npc:alive() then
+			if object_level_name(npc) == "l09_deadcity_ogse" then
+				if npc:community() == "zombied" then	
+					if not ogse.is_quest_npc(npc) then
+						table.insert(deadcity_zombies, id)
+					end						
 				end
 			end
 		end

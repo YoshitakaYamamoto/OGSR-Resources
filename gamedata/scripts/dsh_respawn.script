@@ -19,15 +19,12 @@ local all_spawned_obj = {} --Хэш id всех созданных объект�
 local active = {}
 
 function init() --Заносим все респавнеры из оллспавна в таблицу. Выполняется только один раз.
-	for i = 1, 65534 do
-		local sobj = alife():object(i)
-		if sobj then
-			if sobj:clsid() == clsid.respawn then
-				all_spawn_respawners[sobj:name()] = sobj.id --Добавили в таблицу
-				--Объект никогда не выйдет в онлайн
-				sobj:can_switch_online(false)
-				sobj:can_switch_offline(true)
-			end
+	for id, sobj in alife():objects() do
+		if sobj:clsid() == clsid.respawn then
+			all_spawn_respawners[sobj:name()] = id --Добавили в таблицу
+			--Объект никогда не выйдет в онлайн
+			sobj:can_switch_online(false)
+			sobj:can_switch_offline(true)
 		end
 	end
 end

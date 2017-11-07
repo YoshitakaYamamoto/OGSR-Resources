@@ -78,13 +78,10 @@ end
 
 function del_all_trunks()
 	if ogse.var_exists("TRUNK_FIX") then return end
-	for id = 1, 65534 do
-		local sobj = alife():object(id)
-		if sobj then
-			if sobj:section_name() == "trunk_box" then
-				log3( "~~[%s]: Found trunk [%s], removing...", script_name(), sobj:name() )
-				alife():release(sobj, true)
-			end
+	for id, sobj in alife():objects() do
+		if sobj:section_name() == "trunk_box" then
+			log3( "~~[%s]: Found trunk [%s], removing...", script_name(), sobj:name() )
+			alife():release(sobj, true)
 		end
 	end
 	ogse.save_var("TRUNK_FIX", true)

@@ -701,12 +701,9 @@ function CArenaext:cleanup()
 	end
 
 	-- удаление объектов
-	for id=1, 65534 do --Можно оставить, всё равно никогда не вызывается.
-		obj = sim:object(id)
-		if obj then
-			if string.find(obj:name(), "aem_") then
-				sim:release(obj)
-			end
+	for id, sobj in alife():objects() do --Можно оставить, всё равно никогда не вызывается.
+		if string.find(sobj:name(), "aem_") then
+			sim:release(sobj)
 		end
 	end
 	news_manager.send_tip(db.actor, "%c[25,240,25,25]АРЕНА-МОД УДАЛЁН", nil, nil, 30000)
@@ -2033,17 +2030,11 @@ end
 -- void clear_offline_box(number sid)
 -------
 function clear_offline_box(sid)
-	--printf("clear_offline_box(sid=%d)", sid)
-	local obj = sim:story_object(sid)
-	if obj then
-		local box = obj.id
-		local id
-		for id=1, 65534 do
-			obj = sim:object(id)
-			local sobj = alife():object(id)
-			if sobj and obj and obj.parent_id == box then
-				--printf("release(%s)", obj:name())
-				sim:release(obj, true)
+	local box = alife():story_object(sid)
+	if box then
+		for id, sobj in alife():objects() do
+			if sobj.parent_id == box.id then
+				alife():release(sobj, true)
 			end
 		end
 	end

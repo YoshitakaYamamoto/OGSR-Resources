@@ -713,11 +713,10 @@ function CRandomTask:check_task_props(task_id)
 		self.task_info[task_id].enabled_props = false
 	elseif self.task_info[task_id].type == "kill_stalker" then
 		local sim = alife()
-		for i = 1, 65534 do --KRodin: лучше немного тормозов тут, чем регистрация 100500 объектов из se_* при каждой загрузке сейва
-			local sobj = sim:object(i)
-			if sobj and sobj:clsid() == clsid.script_stalker and sobj:alive() and sobj:profile_name() == self.task_info[task_id].target then
+		for id, sobj in alife():objects() do --KRodin: лучше немного тормозов тут, чем регистрация 100500 объектов из se_* при каждой загрузке сейва
+			if sobj:clsid() == clsid.script_stalker and sobj:alive() and sobj:profile_name() == self.task_info[task_id].target then
 				if not self.task_info[task_id].target_objects then self.task_info[task_id].target_objects = {} end
-				table.insert(self.task_info[task_id].target_objects, sobj.id)
+				table.insert(self.task_info[task_id].target_objects, id)
 				self.task_info[task_id].enabled_props = true
 				return
 			end
@@ -725,9 +724,8 @@ function CRandomTask:check_task_props(task_id)
 		self.task_info[task_id].enabled_props = false
 	elseif self.task_info[task_id].type == "find_item" then
 		local sim = alife()
-		for i = 1, 65534 do --KRodin: лучше немного тормозов тут, чем регистрация 100500 объектов из se_* при каждой загрузке сейва
-			local sobj = sim:object(i)
-			if sobj and sobj:section_name() == self.task_info[task_id].target then
+		for id, sobj in alife():objects() do --KRodin: лучше немного тормозов тут, чем регистрация 100500 объектов из se_* при каждой загрузке сейва
+			if sobj:section_name() == self.task_info[task_id].target then
 				--Нужно игнорировать предметы, которые находяться у вендоров.
 				local ignore = false
 				if sobj.parent_id then
@@ -741,7 +739,7 @@ function CRandomTask:check_task_props(task_id)
 				--
 				if not ignore then
 					if not self.task_info[task_id].target_objects then self.task_info[task_id].target_objects = {} end
-					table.insert(self.task_info[task_id].target_objects, sobj.id)
+					table.insert(self.task_info[task_id].target_objects, id)
 					self.task_info[task_id].enabled_props = true
 					return
 				end

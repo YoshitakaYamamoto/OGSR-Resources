@@ -21,12 +21,9 @@ function init() --Получение списка всех укрытий
 		restrictor_list = ogse.load_var("restrictor_list")
 		--log3("LOAD RESTRICTORS HIDEOUTS! TBL: %s", restrictor_list)
 	else --В хранилище нету - значит придётся перебирать 65k объектов.
-		for i = 1, 65534 do
-			local sobj = alife():object(i)
-			if sobj then
-				if string.find(sobj:name(), "_hide_restrictor") then
-					table.insert(restrictor_list, sobj.id) --Добавляем в таблицу
-				end
+		for id, sobj in alife():objects() do
+			if string.find(sobj:name(), "_hide_restrictor") then
+				table.insert(restrictor_list, id) --Добавляем в таблицу
 			end
 		end
 		--log3("SCAN RESTRICTORS HIDEOUTS! TBL: %s", restrictor_list)

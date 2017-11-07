@@ -1356,8 +1356,8 @@ end
 
 function kill_crow()
 	local lname = level.name()
-	for k = 1, 65534 do
-		local crow = level.object_by_id(k)
+	for id, sobj in alife():objects() do
+		local crow = level.object_by_id(id)
 		if crow and crow:section() == "m_crow" and object_level_name(crow) == lname then
 			local hit = hit()
 				hit.direction = crow:direction()
@@ -1367,7 +1367,7 @@ function kill_crow()
 				hit.type = hit.strike
 			crow:hit(hit)
 
-			ogse_st_mgr.start_gtimer(nil, math.random(150, 300), "ogse.release_crow", k)
+			ogse_st_mgr.start_gtimer(nil, math.random(150, 300), "ogse.release_crow", id)
 		end
 	end
 end

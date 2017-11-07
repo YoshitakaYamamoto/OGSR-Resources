@@ -617,50 +617,47 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 
 	local lname = level.name()
 	local sim = alife()
-	for i = 1, 65534 do
-		local sobj = sim:object(i)
-		if sobj then
-			local sobj_lname = object_level_name( sobj )
-			if IsAnomaly(sobj) then
-				local status = get_anomaly_mode(sobj)
-				local forbidden_anom = is_not_anomaly(sobj) or is_exclusion_anomaly(sobj)
-				if status ~= "anom_off" then
-					if not forbidden_anom then
-						if not list_anom_id[sobj_lname] then
-							list_anom_id[sobj_lname] = {}
-						end
-						list_anom_id[sobj_lname][sobj.id] = sobj.id
+	for id, sobj in sim:objects() do
+		local sobj_lname = object_level_name( sobj )
+		if IsAnomaly(sobj) then
+			local status = get_anomaly_mode(sobj)
+			local forbidden_anom = is_not_anomaly(sobj) or is_exclusion_anomaly(sobj)
+			if status ~= "anom_off" then
+				if not forbidden_anom then
+					if not list_anom_id[sobj_lname] then
+						list_anom_id[sobj_lname] = {}
 					end
+					list_anom_id[sobj_lname][id] = id
 				end
-				if sobj_lname == lname then
-					if forbidden_anom then
-						lvids_forbidden[ sobj.m_level_vertex_id ] = true
-						table.insert( position_forbidden, sobj.position )
-					end
-				else --Безопасно удалять аномалии можно только находясь на другой локации.
-					if status == "anom_off" then
-						sim:release(sobj, true)
-					end
-				end
-			elseif isLc(sobj) then
-				--Учитываем точки входа на локациях.
-				local pk = get_netpk(sobj, 1)
-				ASSERT(pk:isOk(), "PK is not OK in [%s]", sobj:name())
-				local lc_params = pk:get()
-				if lc_params.dest_level_name == lname then
-					--log3("!!LC params of [%s]: %s", sobj:name(), lc_params)
-					lvids_forbidden[lc_params.dest_level_vertex_id] = true
-					table.insert(position_forbidden, lc_params.dest_position)
-				end
-				if sobj_lname == lname then --Учитываем точки ухода с локаций
+			end
+			if sobj_lname == lname then
+				if forbidden_anom then
 					lvids_forbidden[ sobj.m_level_vertex_id ] = true
 					table.insert( position_forbidden, sobj.position )
 				end
-			else --Не создавать аномалии там, где вообще хоть что-нибудь есть. Не важно, сталкер это или физический объект и тд.
-				if sobj_lname == lname then
-					lvids_forbidden[ sobj.m_level_vertex_id ] = true
-					table.insert( position_forbidden, sobj.position )
+			else --Безопасно удалять аномалии можно только находясь на другой локации.
+				if status == "anom_off" then
+					sim:release(sobj, true)
 				end
+			end
+		elseif isLc(sobj) then
+			--Учитываем точки входа на локациях.
+			local pk = get_netpk(sobj, 1)
+			ASSERT(pk:isOk(), "PK is not OK in [%s]", sobj:name())
+			local lc_params = pk:get()
+			if lc_params.dest_level_name == lname then
+				--log3("!!LC params of [%s]: %s", sobj:name(), lc_params)
+				lvids_forbidden[lc_params.dest_level_vertex_id] = true
+				table.insert(position_forbidden, lc_params.dest_position)
+			end
+			if sobj_lname == lname then --Учитываем точки ухода с локаций
+				lvids_forbidden[ sobj.m_level_vertex_id ] = true
+				table.insert( position_forbidden, sobj.position )
+			end
+		else --Не создавать аномалии там, где вообще хоть что-нибудь есть. Не важно, сталкер это или физический объект и тд.
+			if sobj_lname == lname then
+				lvids_forbidden[ sobj.m_level_vertex_id ] = true
+				table.insert( position_forbidden, sobj.position )
 			end
 		end
 	end

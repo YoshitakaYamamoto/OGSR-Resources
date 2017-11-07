@@ -106,22 +106,19 @@ local musor_sections = { --Секции всякого мусора, котор�
 }
 
 function remove_guns()
-local actor_level = level.name()
-	for a = 1, 65534 do
-		local obj = alife():object(a)
-		if obj then
-			local wpn_name = obj:name()
-			local wpn_sect = obj:section_name()
-			if	obj.parent_id == 65535
-				and not protected_objects[wpn_name]
-				and not protected_sections[wpn_sect]
-				and ( isWeapon(obj) or musor_sections[wpn_sect] )
-			then
-				local wpn_level = object_level_name(obj)
-				if wpn_level ~= actor_level or musor_sections[wpn_sect] then
-					--log3("!!!Clear_garbage!!! Deleting wpn: %s , Section: %s , level: %s", wpn_name, wpn_sect, wpn_level)
-					alife():release(obj,true)
-				end
+	local actor_level = level.name()
+	for id, sobj in alife():objects() do
+		local wpn_name = sobj:name()
+		local wpn_sect = sobj:section_name()
+		if	sobj.parent_id == 65535
+			and not protected_objects[wpn_name]
+			and not protected_sections[wpn_sect]
+			and ( isWeapon(sobj) or musor_sections[wpn_sect] )
+		then
+			local wpn_level = object_level_name(sobj)
+			if wpn_level ~= actor_level or musor_sections[wpn_sect] then
+				--log3("!!!Clear_garbage!!! Deleting wpn: %s , Section: %s , level: %s", wpn_name, wpn_sect, wpn_level)
+				alife():release(sobj,true)
 			end
 		end
 	end
