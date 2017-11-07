@@ -180,17 +180,6 @@ function actor_binder:actor_death_callback(victim, who)
 
 	self.am:call("on_actor_death", victim, who)
 end
-
-function actor_binder:debug_monster_follow_path(id, params)
-	local g0 = bit_and(params, 65535)
-	local g1 = bit.rshift(params, 16)
-
-	log3("id = [%s], g0 = [%s], g1 = [%s]", id, g0, g1)
-	local obj = alife():object(id)
-	if obj then
-		log3("actor_binder:debug_monster_follow_path: [%s]", obj:name())
-	end
-end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:take_item_from_box(box, item)
 	if not box or not item then return end
@@ -381,11 +370,11 @@ function actor_binder:on_key_hold(key, bind)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_wheel_rotation(vol)
-	self.am:call("on_wheel", vol-100000)
+	self.am:call("on_wheel", vol)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_mouse_move(velx, vely)
-	self.am:call("on_mouse_move", velx-100000, vely-100000)
+	self.am:call("on_mouse_move", velx, vely)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:item_to_belt(obj)
