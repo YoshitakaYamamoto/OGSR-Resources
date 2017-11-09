@@ -2745,12 +2745,13 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 		local time_aim = time_to_aim[npc_rank]
 		local type_of_fire = object.aim1
 
+		local be_pos = enemy:position()
+		local npc_pos = weapon:position()
+		local distance = npc_pos:distance_to( be_pos )
+		
 		write_log("--XRS_BATTLE_AI: RAYTRACE PREPARE %s : %s", npc:name(), enemy:id())
 
 		if use_raytrace then
-
-			local be_pos = enemy:position()
-			local npc_pos = weapon:position()
 
 			write_log("--XRS_BATTLE_AI: WPNS_FIRE_2_RTC_1 %s : %s", npc:name(), enemy:id())
 
@@ -2771,7 +2772,6 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 					be_pos = enemy:bone_position("bip01_head")
 				end
 			end
-			local distance = npc_pos:distance_to( be_pos )
 
 			write_log("--XRS_BATTLE_AI: WPNS_FIRE_2_RTC_2 %s : %s", npc:name(), enemy:id())
 			
