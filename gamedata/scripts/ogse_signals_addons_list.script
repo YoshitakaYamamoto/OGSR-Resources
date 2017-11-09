@@ -5,6 +5,10 @@ addons = {
 	"ogse_fixes", --должен быть самым первым.
 	"dunin_ammo", --должен быть первым для сигнала "on_take"
 	"death_manager", --должен быть после перепаковщика патронов!
+	"ogse_unist",
+	"ogse_qt",
+	"ogse_st_mgr",
+	"ogse_car_control",
 	"ogse_hideouts", --Должен быть перед менеджером аномалий!
 	"ogse_anomaly",
 	"ogse",
@@ -13,10 +17,6 @@ addons = {
 	"ogse_addons",
 	"ogse_addons_npc",
 	"ogse_bind_weapon",
-	"ogse_unist",
-	"ogse_qt",
-	"ogse_st_mgr",
-	"ogse_car_control",
 	"ogse_sleep_mgr",
 	"ogse_weather_mgr",
 	"ogse_surge_mgr",

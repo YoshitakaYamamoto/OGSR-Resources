@@ -16,7 +16,7 @@
 
 function attach(sm) -- для менеджера сигналов
 	sm:subscribe({signal = "on_spawn",    fun = this.on_spawn})
-	sm:subscribe({signal = "on_finalize", fun = this.on_finalize})
+	sm:subscribe({signal = "on_destroy", fun = this.on_destroy})
 	sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
 	sm:subscribe({signal = "on_key_up",   fun = this.on_key_up})
 	sm:subscribe({signal = "on_wheel",    fun = this.on_wheel})
@@ -57,6 +57,8 @@ local current_btr_fov
 local periscope_modes = { manual = 1, target_select = 2, auto = 3 }
 local periscope_mode
 local recognition_target_mode -- флаг распознавания цели
+local actor_torch_was_enabled = false
+
 --
 local car_log
 local debug_output = false
@@ -115,12 +117,12 @@ function on_attach_vehicle(obj) --Только что залезли в машину
 	--
 	--Выключим фонарик актора
 	local actor_torch = db.actor:item_in_slot(9)
-	local t_obj
 	if actor_torch and actor_torch:is_torch() then
-		t_obj = get_torch_obj(actor_torch)
-	end
-	if t_obj and t_obj.on then
-		t_obj:enable(false)
+		actor_torch = get_torch_obj(actor_torch)
+		if actor_torch.on then
+			actor_torch:enable(false)
+			actor_torch_was_enabled = true
+		end
 	end
 	--
 	SetDetailsMinRadius(2.0) -- убираем траву из под ног
@@ -135,13 +137,7 @@ function on_attach_vehicle(obj) --Только что залезли в машину
 		cmd("g_god on")
 	end
 	--
-	--KRodin: при переходе с локации на локацию внутри бтра, худ не всегда показывается. ХЗ, в чём причина...
-	--На ближайшем апдейте вроде срабатывает. Попробуем такой костыль:
-	if device().precache_frame > 1 then
-		dsh.exec_on_update( function() this.show_car_hud( obj, in_btr ) end )
-	else
-		show_car_hud(obj, in_btr)
-	end
+	show_car_hud()
 	--
 	subscribe()
 end
@@ -157,7 +153,19 @@ function on_detach_vehicle() --Только что вылезли из машины
 		in_btr = false
 		cmd("g_god off")
 	end
-
+	--
+	--Включим фонарик актора, если выключали
+	if actor_torch_was_enabled then
+		local actor_torch = db.actor:item_in_slot(9)
+		if actor_torch and actor_torch:is_torch() then
+			actor_torch = get_torch_obj(actor_torch)
+			if not actor_torch.on then
+				actor_torch:enable(true)
+				actor_torch_was_enabled = false
+			end
+		end
+	end
+	--
 	unsubscribe()
 end
 
@@ -176,30 +184,33 @@ function on_spawn()
 	bg:SetWidth(0)
 	bg:SetColor(GetARGB(0,255,255,255))
 	bg:SetWndRect(Frect():set(0,0,1024,768))
-
 	bg:Show(true)
-	btr_hud_wnd = btr_hud() -- если ещё не создали, то создать
-	ASSERT(btr_hud_wnd, "ogse_car_control.on_spawn: btr_hud_wnd == nil") -- были проблемы при создании
-	car_hud_wnd = car_hud()
-	ASSERT(car_hud_wnd, "ogse_car_control.on_spawn: car_hud_wnd == nil") -- на всякий случай
+	--
 	alt_hud_bg = CUIWindow()
 	alt_hud_bg:Init(0,0,1024,768)
 	alt_hud_bg:Show(true)
 	get_hud():AddDialogToRender(alt_hud_bg)
-	-- debug --
+	--
+	btr_hud_wnd = btr_hud() -- если ещё не создали, то создать
+	ASSERT(btr_hud_wnd, "ogse_car_control.on_spawn: btr_hud_wnd == nil") -- были проблемы при создании
+	bg:AttachChild(btr_hud_wnd)
+	--
+	car_hud_wnd = car_hud()
+	ASSERT(car_hud_wnd, "ogse_car_control.on_spawn: car_hud_wnd == nil") -- на всякий случай
+	bg:AttachChild(car_hud_wnd)
+	--
 	if debug_output then
 		local log_dir = getFS():update_path("$logs$", "car_log.txt")
 		car_log = io.open(log_dir, "a+")
-	end
-	-- debug --
-	--
-	if not ogse.var_exists( "god_mode_in_btr" ) then
-		cmd("g_god off")
 	end
 	--
 	periscope_mode = ogse.load_var( script_name()..".periscope_mode", periscope_modes.manual, "u8") --Загружаем режим стрельбы
 	recognition_target_mode = ogse.load_var( script_name()..".recognition_target_mode", true, "bool") --Загружаем режим автораспознавания
 	current_btr_fov = ogse.load_var( script_name()..".current_btr_fov", fov_vol, "float") --Загружаем fov
+	--
+	if not ogse.var_exists( "god_mode_in_btr" ) then
+		cmd("g_god off")
+	end
 end
 
 
@@ -215,15 +226,9 @@ function on_save()
 	ogse.save_var( script_name()..".current_btr_fov", current_btr_fov, "float" ) --Сохраняем fov
 end
 
-
-function detach_from_all()
+function on_destroy()
 	car_hud_wnd:DetachFromParent()
 	btr_hud_wnd:DetachFromParent()
-end
-
-function on_finalize()
-	detach_from_all()
-	
 	btr_hud_wnd = nil
 	car_hud_wnd = nil
 	if alt_hud_bg then
@@ -233,28 +238,35 @@ function on_finalize()
 	if get_hud():GetCustomStatic("btr_hud_background") then
 		get_hud():RemoveCustomStatic("btr_hud_background")
 	end
+	--
 	if car_log then car_log:close() end
 end
 
 function transfer_btr_hud_to_static()
-	detach_from_all()
-	local bg = get_hud():GetCustomStatic("btr_hud_background") or get_hud():AddCustomStatic("btr_hud_background", true)
-	bg = bg:wnd()
+	car_hud_wnd:DetachFromParent()
+	btr_hud_wnd:DetachFromParent()
+	--
+	local bg = get_hud():GetCustomStatic("btr_hud_background"):wnd()
 	bg:AttachChild(btr_hud_wnd)
-	bg:AttachChild(car_hud_wnd)
 	btr_hud_wnd.emty:Show(false)
-	ogse_signals.get_mgr():call("on_hud_show")
+	--
+	bg:AttachChild(car_hud_wnd)
+	car_hud_wnd:Show(true)
+	--
+	--ogse_signals.get_mgr():call("on_hud_show") --Вроде бы это более не нужно.
 end
 
 function transfer_btr_hud_to_alt()
-	detach_from_all()
-	local bg = get_hud():GetCustomStatic("btr_hud_background") or get_hud():AddCustomStatic("btr_hud_background", true)
-	bg = bg:wnd()
-	bg:AttachChild(car_hud_wnd)
+	car_hud_wnd:DetachFromParent()
+	btr_hud_wnd:DetachFromParent()
+	--
 	alt_hud_bg:AttachChild(btr_hud_wnd)
-	btr_hud_wnd:Show(true)
 	btr_hud_wnd.emty:Show(true)
-	ogse_signals.get_mgr():call("on_hud_show")
+	--
+	alt_hud_bg:AttachChild(car_hud_wnd)
+	car_hud_wnd:Show(false)
+	--
+	--ogse_signals.get_mgr():call("on_hud_show") --Вроде бы это более не нужно.
 end
 
 in_btr = false
@@ -635,7 +647,7 @@ function car_hud:__init() super()
 	self.bg = xml:InitStatic("car_fuel_back", self)
 	self.fuel_level = xml:InitStatic("car_fuel_back:fuel_level", self.bg)
 	self.max_width = self.fuel_level:GetWidth()
-	self:Show(true)
+	self:Show(false)
 end
 		
 class "btr_hud" (CUIScriptWnd)
@@ -662,7 +674,7 @@ function btr_hud:__init() super()
 	self.emty             = xml:InitStatic("main:off_bkgnd", self)
 	self.emty:Show(false)
 	self.frame            = xml:InitStatic("main:frame_static", self)
-	self:Show(true)
+	self:Show(false)
 end
 function btr_hud:enable_noise(enable)
 	self.noise:Show(enable)
@@ -852,23 +864,24 @@ function update_car_states(car)
 	recognition_target_operable = car_health >= recognition_target_broken_limit and not surge and actor_has_control_module()
 	car_critically_damaged      = car_health < general_broken_limit
 end
-function show_car_hud(car, btr)
-	detach_from_all()
-	local bg = get_hud():GetCustomStatic("btr_hud_background") or get_hud():AddCustomStatic("btr_hud_background", true) -- подложка для окна худа БТР
-	bg = bg:wnd()
-	if btr then
-		bg:AttachChild(btr_hud_wnd) -- поместить окно на подложку
+
+function show_car_hud()
+	if in_btr then
+		btr_hud_wnd:Show(true)
+		--
 		db.actor:set_camera_fov(current_btr_fov)
 		current_target_id = nil
-
+		--
 		ogse_signals.get_mgr():call("on_sit_down_in_btr")
 		ogse_signals.get_mgr():call("on_hud_show")
 	end
-	bg:AttachChild(car_hud_wnd) -- поместить окно на подложку
+	car_hud_wnd:Show(true)
 end
 function hide_car_hud(btr)
-	detach_from_all()
+	car_hud_wnd:Show(false)
 	if btr then
+		btr_hud_wnd:Show(false)
+		--
 		db.actor:set_camera_fov(fov_vol)
 		current_target_id = nil
 
