@@ -167,16 +167,12 @@ local forbidden_comms = {
 }
 function se_stalker:on_register()
 	local pk = get_netpk( self, 1 )
-	if pk:isOk() then
+	if pk:isOk() then --TODO: Заменить на движковый способ!
 		local data = pk:get()
 		self._charname = data.character_name -- получаем имя персонажа для быстрого доступа в дальнейшем
-		local has_restrs = #data.dynamic_in_restrictions > 0 or #data.dynamic_out_restrictions > 0
-		if has_restrs then
-			data.dynamic_in_restrictions = {}
-			data.dynamic_out_restrictions = {}
-			pk:set( data )
-		end
 	end
+	--
+	alife():remove_in_restrictions( self )
 	--
 	cse_alife_human_stalker.on_register( self )
 

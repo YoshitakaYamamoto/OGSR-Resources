@@ -300,6 +300,7 @@ function motivator_binder:net_spawn(sobject)
 	--
 	if not self.object:alive() then
 		--' Наносим небольшой импульс вперед.
+--[=[ -- KRodin: выключено, если будут повисания трупов в воздухе - включить.
 		local h = hit()
 		h.draftsman = self.object
 		h.type = hit.fire_wound
@@ -308,7 +309,7 @@ function motivator_binder:net_spawn(sobject)
 		h.power = 0.01
 		h.impulse = 1
 		self.object:hit(h)
-
+--]=]
 		local s_obj = alife():object(self.object:id())
 		if s_obj.offline_dead == 0 then
 			if s_obj.treasure_processed then --Вечные трупы будут удаляться только после того как их обыщет актор
@@ -347,24 +348,19 @@ function motivator_binder:net_spawn(sobject)
 	manager:remove_evaluator(stalker_ids.property_anomaly)
 	manager:add_evaluator(stalker_ids.property_anomaly, property_evaluator_const(false))
 	if xr_combat_companion then
-		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(xr_combat_companion.prop_combat, property_evaluator_const(false))
 	end
 	if xrs_battle_ai then
-		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(xrs_battle_ai.evid_altcombat, property_evaluator_const(false))	
 	end
 	if xr_companion then
-		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(xr_companion.property_need_companion, property_evaluator_const(false))
 	end
 	if xrs_grenade then
-		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(xrs_grenade.prop_fire, property_evaluator_const(false))
 		manager:add_evaluator(xrs_grenade.prop_grenade, property_evaluator_const(false))
 	end
 	if ogsm_hideout then
-		local manager = self.object:motivation_action_manager()
 		manager:add_evaluator(ogsm_hideout.property_blowout, property_evaluator_const(false))
 		manager:add_evaluator(ogsm_hideout.property_hideout_lost, property_evaluator_const(false))
 		manager:add_evaluator(ogsm_hideout.property_inhide, property_evaluator_const(false))

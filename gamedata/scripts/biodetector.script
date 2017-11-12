@@ -44,6 +44,7 @@ function attach(sm)
 	sm:subscribe({signal = "on_item_to_slot",	fun = this.on_item_to_slot})
 	sm:subscribe({signal = "on_item_to_ruck",	fun = this.on_item_to_ruck})
 	sm:subscribe({signal = "on_drop",			fun = this.on_item_to_ruck})
+	sm:subscribe({signal = "on_destroy",		fun = this.bioradar_hide})
 end
 
 local sm = ogse_signals.get_mgr()
@@ -68,6 +69,14 @@ end
 
 function on_item_to_slot(obj)
 	if obj:section() == "bioradar" then
+		local biomap_static = get_hud():AddCustomStatic("biomap", true):wnd()
+		biomap_static:SetWndPos(1024 - biomap_width*koef_x,0)
+		biomap_static:SetWidth(biomap_width*koef_x)
+		--if biomap_sweep_enabled then
+		--	biomap_sweep = get_hud():AddCustomStatic("biomap_sweep"):wnd()
+		--	biomap_sweep:Init(1024 - 2 - (biomap_width + biomap_sweep_width)*koef_x/2,-2 + (biomap_width - biomap_sweep_width)/2,biomap_sweep_width*koef_x,biomap_sweep_width)
+		--end
+		--
 		subscribe()
 	end
 end
@@ -257,7 +266,7 @@ function dot:draw(dir, obj_alive) --Нарисовать точку
 end
 
 function dot:hide() --Скрыть точку
-	get_hud():GetCustomStatic("biomap"):wnd():DetachChild(self.st)
+	self.st:DetachFromParent()
 	self.st = nil
 	dots[self.o_id] = nil
 end
@@ -278,16 +287,14 @@ function update()
 		--	hud:RemoveCustomStatic("biomap_sweep")
 		--	biomap_sweep = nil
 		--end
-	end
-
-	if not hud:GetCustomStatic("biomap") then
+		--
+		local biomap_static = hud:AddCustomStatic("biomap"):wnd()
+		biomap_static:SetWndPos(1024 - biomap_width*koef_x,0)
+		biomap_static:SetWidth(biomap_width*koef_x)
 		--if biomap_sweep_enabled then
 		--	biomap_sweep = hud:AddCustomStatic("biomap_sweep"):wnd()
 		--	biomap_sweep:Init(1024 - 2 - (biomap_width + biomap_sweep_width)*koef_x/2,-2 + (biomap_width - biomap_sweep_width)/2,biomap_sweep_width*koef_x,biomap_sweep_width)
 		--end
-		local biomap_static = hud:AddCustomStatic("biomap"):wnd()
-		biomap_static:SetWndPos(1024 - biomap_width*koef_x,0)
-		biomap_static:SetWidth(biomap_width*koef_x)
 	end
 
 	local sdir = dev.cam_dir
