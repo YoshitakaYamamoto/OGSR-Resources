@@ -176,7 +176,6 @@ function wpn_binder:init_addons(a)
 		if self.is_binoc then
 			ogse_wpn_utils.set_binoc_rt_zoom_factor(self.object, self.scope_zoom_factor)
 		end
-		ogse_wpn_utils.activate_visibility_updates(self.object, true)
 	end
 end
 

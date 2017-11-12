@@ -99,18 +99,6 @@ function set_forced_notex_scope(wpn, force_no_texture)
 		or  bit_and(flags, 127) -- снимаем флаажок
 	wpn:set_addon_flags(new_flags)
 end
-function get_visibility_updates_activated(wpn)
-	ASSERT(wpn:is_weapon(), "[get_visibility_updates_activated] not weapon object!")
-	return bit_and(wpn:get_addon_flags(), 64) ~= 0
-end
-function activate_visibility_updates(wpn, activate)
-	ASSERT(wpn:is_weapon(), "[activate_visibility_updates] not weapon object!")
-	local flags = wpn:get_addon_flags()
-	local new_flags = activate
-		and bit_or(flags, 64) -- ставим флажок
-		or  bit_and(flags, 191) -- снимаем флаажок
-	wpn:set_addon_flags(new_flags)
-end
 ----------------------------------------------------------------------------------------------------
 
 -- получение состояния прицеливания
