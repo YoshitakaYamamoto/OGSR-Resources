@@ -22,12 +22,12 @@ function on_monster_spawn( obj, binder )
     end
 
     if obj:clsid() == clsid.bloodsucker_s then
-      table.insert( subscribed, {
-        [ "signal" ] = s_name,
-        [ "fun"    ] = this.bloodsucker_attack,
-        [ "queued" ] = true,
-        [ "__unsubscribe_on_death" ] = true,
-      })
+      --table.insert( subscribed, { --Выключил, слишком сложно.
+      --  [ "signal" ] = s_name,
+      --  [ "fun"    ] = this.bloodsucker_attack,
+      --  [ "queued" ] = true,
+      --  [ "__unsubscribe_on_death" ] = true,
+      --})
     elseif obj:clsid() == clsid.burer_s then
 	  table.insert( subscribed, {
         [ "signal" ] = s_name,
@@ -204,7 +204,7 @@ function on_monster_before_hit(obj, hit_data, binder )
   --
   if hit_data.hit_type == hit.fire_wound then --Учитываем только хиты от стрелкового оружия
 	local obj_dir = obj:direction()
-	if obj_dir:dotproduct(hit_data.dir) < -0.6 then
+	if obj_dir:dotproduct(hit_data.dir) < -0.6 and math.random() > 0.15 then
 		local particle_start = particles_object("anomaly2\\burer_shield_01")
 		local pos = obj:bone_position("bip01_head")
 		pos:add(obj_dir:mul(1.0))
