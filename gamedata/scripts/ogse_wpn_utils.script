@@ -103,7 +103,7 @@ end
 
 -- получение состояния прицеливания
 function is_aiming_complete(wpn)
-	return wpn:get_zoom_factor() > 0.9
+	return wpn:get_weapon().zoom_rotation_factor >= 1
 end
 
 -- функции получения и установки текущего увеличения для бинокля
