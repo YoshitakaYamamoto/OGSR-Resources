@@ -1400,17 +1400,13 @@ function actor_rasstrel_travel()
 end
 
 function actor_disable_inventory()
-	-- закрываем инвентарь
-	local wnd = level.main_input_receiver()
+	local wnd = level.get_inventory_wnd()
 	if wnd then
-		wnd:GetHolder():start_stop_menu(wnd, true)
+		level.start_stop_menu(wnd, true)
 	end
 end
 
-function inventory_close_by_malandrinus() -- а это еще одна попытка закрыть инвентарь
-	local wnd = level.get_inventory_wnd()
-	wnd:Show(false)
-end
+inventory_close_by_malandrinus = this.actor_disable_inventory
 
 function actor_rasstrel_shans()
 	bind_stalker.restore_weapon()

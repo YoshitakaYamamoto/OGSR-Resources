@@ -63,7 +63,9 @@ function on_item_use(item)
 		create_stat_pkm_on_actor()
 		soundtrack.pkm_activate()
 		local wnd = level.get_inventory_wnd()
-		wnd:GetHolder():start_stop_menu(wnd, true)
+		if wnd then
+			level.start_stop_menu(wnd, true)
+		end
 		ogse.autohiding_msg("pkm_mounting", 5000)
 		turret_mount_delay(5000):start()
 		return true
