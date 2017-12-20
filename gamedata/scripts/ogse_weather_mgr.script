@@ -1351,9 +1351,6 @@ function WeatherManager:compile_frame_point( env_desc, point_data )
   --then
   --  env_desc:set_env_ambient( tab.env_ambient .. self.lvl_suffix, env )
   --end
-  local y, m, d, h, min, sec, ms = point_data.time:get()
-  local az, za = sun_pos.sunpos_table( h, min, sec )
-  env_desc.sun_dir:setHP( math.rad( za ), math.rad( az ) )
 end
 
 -- установить текущий погодный фрейм в движке
