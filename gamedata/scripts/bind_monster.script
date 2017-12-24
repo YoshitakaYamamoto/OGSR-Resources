@@ -198,7 +198,11 @@ end
 function generic_object_binder:before_hit_callback(hit_data)
 --log3("--[%s] Called before_hit_callback for [%s]: %s", script_name(), self.object:name(), hit_data)
 --log3("--Hit_data: who: [%s], who_id: [%s], dir.x: [%s], hit_type: [%s], weapon_id: [%s]", hit_data.who and hit_data.who:name() or "NIL", hit_data.who_id, hit_data.dir.x, hit_data.hit_type, hit_data.weapon_id)
-	self.last_hit_data = hit_data
+	if not self.last_hit_data then
+		self.last_hit_data = {}
+	end
+	dsh.copy_hit_data( hit_data, self.last_hit_data )
+	--
 	if hit_data.who then -- если есть виновник хита
 		if
 			hit_data.who_id == bind_statpkm.pkm_captured -- если это турель

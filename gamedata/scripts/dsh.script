@@ -223,3 +223,12 @@ function create_campfire( pos, lvid, gvid, vis, lamp_height )
   pk:set( data )
 end
 
+
+function copy_hit_data( hd, t )
+  for _, k in ipairs({
+    "power", "dir", "who_id", "weapon_id", "bone_id", "impulse", "hit_type",
+  }) do
+    t[ k ] = hd[ k ]
+  end
+  return t
+end
