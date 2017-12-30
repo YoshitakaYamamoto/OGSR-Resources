@@ -35,7 +35,7 @@ function se_stalker:get_ini()
 		self.ini_initialized = true
 
 		if self.ini:section_exist("spawner") then
-			self.spawner = xr_logic.parse_condlist(db.actor, "spawner", "cond", self.ini:r_string("spawner", "cond"))
+			self.spawner = xr_logic.parse_condlist(db.actor_proxy, "spawner", "cond", self.ini:r_string("spawner", "cond"))
 		end
 	end
 end
@@ -69,11 +69,11 @@ function se_stalker:can_switch_offline ()
 	return can_be_offline
 end
 --------------------
-function se_stalker:can_switch_online ()
+function se_stalker:can_switch_online()
 	if self.force_offline then
 		return false
 	end
-	if xr_companion.is_companion(self.id) and (db.actor and db.actor:position():distance_to(self.position) < 150) then
+	if xr_companion.is_companion(self.id) and (db.actor_proxy.online and db.actor:position():distance_to(self.position) < 150) then
 		return true
 	end		
 
@@ -85,14 +85,14 @@ function se_stalker:can_switch_online ()
 		return cse_alife_human_stalker.can_switch_online(self)
 	end
     
-	if db.actor and not db.actor:alive() then --?
+	if db.actor_proxy.online and not db.actor:alive() then --?
 		return self.online
 	end
     
 	if self.online == false then
-	    return (xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil) and cse_alife_human_stalker.can_switch_online(self)
+	    return (xr_logic.pick_section_from_condlist(db.actor_proxy, self, self.spawner) ~= nil) and cse_alife_human_stalker.can_switch_online(self)
     else
-        return xr_logic.pick_section_from_condlist(db.actor, self, self.spawner) ~= nil
+        return xr_logic.pick_section_from_condlist(db.actor_proxy, self, self.spawner) ~= nil
     end    	    
 end
 --------------------

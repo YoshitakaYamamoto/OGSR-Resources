@@ -46,7 +46,7 @@ function on_actor_init()
 	wm = WeatherManager() -- создание
 end
 
---local always_reset = true
+local always_reset = false
 
 -- если вторая граница фрейма с выбросом будет ближе пяти минут к моменту выброса,
 -- то притянуть её к этому моменту чтобы итоговый фрейм с выбросом был не меньше пяти минут
@@ -290,7 +290,7 @@ function build_cycle_data(cycle_section)
 	read_cycle_points(cycle_section, cycle_points) --читаем все секции цикла
 	-- первая точка ВСЕГДА должна быть в начале суток
 	-- движок этого не требует, но с этим дополнительным ограничением всё сильно упрощается
-	ASSERT(cycle_points[1].time == 0, "[WeatherManager:__init] cycle '%s' has first point at not zero time!", cycle_name) 
+	ASSERT(cycle_points[1].time == 0, "[WeatherManager:__init] cycle '%s' has first point at not zero time!", cycle_section) 
 	-- добавляем фейковую точку в конце суток для упрощения поиска
 	local last = table.clone_simple(cycle_points[1]) -- копия первой, 
 	last.time = 3600 * 24 -- кроме времени (ровно конец суток в секундах)
@@ -861,11 +861,7 @@ function DynamicForecast:append_forecast_point(day_start_time, frame_point_data,
 		self:reset_statistics() -- сбрасываем данные для алгоритма переключения
 	end
 	for cycle_name, cycle_data in pairs(self.cycles) do
-		if cycle_name == next_cycle then
-			cycle_data.skipped = 0
-		else
-			cycle_data.skipped = cycle_data.skipped + 1
-		end
+		cycle_data.skipped = cycle_data.skipped + 1
 	end
 	ogse_surge_mgr.surge_log("DynamicForecast:append_forecast_point - END")
 	return new_point

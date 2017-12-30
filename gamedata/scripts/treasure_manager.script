@@ -97,7 +97,7 @@ function CTreasure:__init()
 			abort("cant find 'items' in %s", id)
 		end
 
-		self.treasure_info[id].condlist = xr_logic.parse_condlist(db.actor, "treasure_manager", "condlist", utils.cfg_get_string(sys_ini, id, "condlist", nil, false, "", ""))
+		self.treasure_info[id].condlist = xr_logic.parse_condlist(db.actor_proxy, "treasure_manager", "condlist", utils.cfg_get_string(sys_ini, id, "condlist", nil, false, "", ""))
 
 		--' Отметим тайник как новый
 		self.treasure_info[id].active = false

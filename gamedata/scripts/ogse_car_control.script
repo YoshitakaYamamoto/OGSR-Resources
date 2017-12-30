@@ -147,7 +147,7 @@ function on_detach_vehicle() --Только что вылезли из машины
 	fix_camera_limits = false --Оно тут зачем?
 	bind_stalker.restore_weapon()
 	switch_firing(current_car, false)
-	current_car = nil
+	current_car = false
 	hide_car_hud(in_btr)
 	if in_btr then
 		in_btr = false
@@ -270,7 +270,7 @@ function transfer_btr_hud_to_alt()
 end
 
 in_btr = false
-current_car = nil
+current_car = false
 local current_target_id = nil
 local targets = {}
 
@@ -772,7 +772,7 @@ end
 function get_actor_car()
 	local holder = db.actor:get_holder()
 	if holder and holder:is_car() then return holder end
-	return nil
+	return false
 end
 function setup_car_camera(car)
 	ASSERT(car, "setup_car_camera: 'car' parameter is a nil reference!")

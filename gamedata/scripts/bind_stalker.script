@@ -21,7 +21,7 @@ function actor_binder:__init(obj) super(obj)
 end
 function actor_binder:__finalize()
 --log1("--actor_binder:__finalize() - start")
-	self.am:call("on_finalize", obj)
+	self.am:call("on_finalize")
 --log1("--actor_binder:__finalize() - end")
 end
 ----------------------------------------------------------------------------------------------------------------------

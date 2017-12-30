@@ -5,7 +5,7 @@ function attach( sm )
   sm:subscribe({ signal = "on_spawn", fun = this.on_spawn })
 end
 
-local actor = db.actor
+local actor = nil
 
 function on_spawn()
   actor = db.actor

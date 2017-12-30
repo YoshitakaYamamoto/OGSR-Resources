@@ -280,7 +280,7 @@ function se_smart_terrain:dsh_override_params()
     },
     [ "cond" ] = {
       [ "getter" ] = function( ... ) return get_string( ... ) end,
-      [ "setter" ] = function( cond )
+      [ "setter" ] = function( cond, sect )
         self.gparams.cond = xr_logic.parse_condlist( nil, sect, "cond", cond )
       end,
     },
@@ -307,7 +307,7 @@ function se_smart_terrain:dsh_override_params()
     for k, v in pairs( dsh_override_opts ) do
       if sys_ini:line_exist( sect, k ) then
         local value = v.getter( sect, k )
-        v.setter( value )
+        v.setter( value, sect )
       end
     end
   end

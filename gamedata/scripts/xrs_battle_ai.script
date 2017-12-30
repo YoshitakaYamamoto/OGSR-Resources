@@ -3001,7 +3001,7 @@ function set_transfer_state(npc, enemy)
 	write_log("!!XRS_BATTLE_AI: set_transfer_state end for %s", npc:name())
 end
 
-function add_deviation( npc, position )
+function add_deviation( npc, position ) --TODO: У dsh поправлено, можно перенести правку когда-нибудь - https://github.com/dsh2dsh/op2ogse/commit/22cea72fceaf37490d3c064def64f7527809a3cb
 --[=[--KRodin: Лично у меня оно работает неадекватно. Так что пока выключаю. Может что-то придумаю когда-нибудь.
   local npc_rank   = ranks.get_obj_rank_name( npc )
   local npc_comm   = npc:character_community()

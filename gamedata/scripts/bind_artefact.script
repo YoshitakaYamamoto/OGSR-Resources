@@ -15,7 +15,7 @@ end
 
 -- custom methods
 function artefact_binder:net_spawn(server_object)
-	if not object_binder.net_spawn(self, data) then
+	if not object_binder.net_spawn(self, server_object) then
 		return false
 	end
 	db.artefacts[self.object:id()] = self.object

@@ -12,7 +12,7 @@ end
 
 function loadStates(gname, type)
     for _, v in pairs(xr_gulag.level_gulags) do
-	    f = v.load_states(gname, type)
+	    local f = v.load_states(gname, type)
 	    if f then
 		    return f
 	    end

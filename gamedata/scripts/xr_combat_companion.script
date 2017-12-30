@@ -192,7 +192,6 @@ local use_raytrace = true
 ----------------------------------------------------------------------------------------------------
 -- —лужебные переменные
 ----------------------------------------------------------------------------------------------------
-current_companion = nil
 local last_reprioritize = nil 		-- врем€ последней реприоретизации
 local primary_target = nil 			-- кого окучивать будем, id
 local last_target = {}				-- последн€€ цель, [id] = last_time 
@@ -1686,7 +1685,6 @@ function enable_scheme(npc, ini)
 	if st then
 		if tostring(flag) == "1" then
 			st.enabled = true
-			current_companion = npc:id()
 			write_log("--XR_COMBAT_COMP: —хема боЄвки напарника включена дл€ %s", npc:name())
 		else
 			st.enabled = false

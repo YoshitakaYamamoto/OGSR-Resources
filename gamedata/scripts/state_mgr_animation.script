@@ -543,7 +543,6 @@ function animation:update()
 end
 -- Отыгрыш рандомной анимации
 function animation:play_rnd(state, must_play)
-	write_log_3(self.npc, "~~STMGR: try to add rnd animation [%s] for [%s]", tostring(state), tostring(rnd))
 	-- нельзя добавлять рандом во время лока схемы.
 	write_log_3(self.npc, "~~STMGR[%s] animation_play_rnd_1", self.npc:name())
 	-- Попробуем апдейтнуть оружие (чтобы вовремя началась стрельба)

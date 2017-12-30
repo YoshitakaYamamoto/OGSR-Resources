@@ -487,7 +487,7 @@ function gulag:update()
 	self:update_objs()
 	self:update_beginning_jobs()
 
-	if self.calculateStates ~= nil and db.actor then
+	if self.calculateStates ~= nil and db.actor_proxy.online then
 		self:changeState(self.calculateStates(self))
 	end
 

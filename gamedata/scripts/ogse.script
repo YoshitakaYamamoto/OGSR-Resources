@@ -1474,7 +1474,7 @@ function autohide_dlg_timer:__init(delay, dlg) super(delay)
 end
 function autohide_dlg_timer:taction()
 	if self.dlg and self.dlg:IsShown() then
-		level.start_stop_menu(self.dlg,true)
+		self.dlg:GetHolder():start_stop_menu(self.dlg, true)
 	end
 end
 

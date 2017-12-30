@@ -22,7 +22,7 @@ end]]
 
 --Мы в машине?
 function is_in_car()
-	return ogse_car_control.current_car ~= nil
+	return not not ogse_car_control.current_car
 end
 
 -- проверка, что актер жив

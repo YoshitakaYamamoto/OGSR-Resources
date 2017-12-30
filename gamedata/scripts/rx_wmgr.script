@@ -38,7 +38,7 @@ local update_time = time_global()
 local wms = {} -- запоминаем id
 local defsec = "default"
 local clslist = {
-	actor = rx_utils.actor_clsid,
+	actor = clsid.actor,
 	stalker = clsid.script_stalker,
 	dog = clsid.dog_s,
 	boar = clsid.boar_s,
@@ -515,7 +515,7 @@ local function weapon_iterator( mgr, cut, npc, item )
 		write_log("~~RX_WMGR_ITERATE_5")
 		local sec = item:section()
 		local cnd = item:condition()
-		if na or (wm_modes.forbiddens[sec] ~= true and cnd >= wm_modes.min_cond and mgr:have_ammo(item)) then
+		if wm_modes.forbiddens[sec] ~= true and cnd >= wm_modes.min_cond and mgr:have_ammo(item) then
 			write_log("~~RX_WMGR_ITERATE_6")
 			local check_companion = false
 			local check_companion_inv = true

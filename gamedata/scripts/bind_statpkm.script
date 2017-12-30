@@ -72,7 +72,7 @@ function on_item_use(item)
 	end
 end
 
-pkm_captured = nil
+pkm_captured = false
 
 -- таблица соответствий команд и слотов, которые ими активируютс€
 local activation_cmds = {
@@ -167,7 +167,7 @@ function turret_control:action()
 	-- возвращаем актора в исходное состояние
 	bind_stalker.restore_weapon()
 	-- возвращаем турель в исходное состояние
-	pkm_captured = nil
+	pkm_captured = false
 	self.turret:set_tip_text("tip_pkm_use")
 end
 

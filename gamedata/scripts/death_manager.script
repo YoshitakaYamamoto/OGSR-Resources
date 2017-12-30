@@ -157,10 +157,10 @@ end
 function set_weapon_drop_condition(item,npc)
 	if math.random(1,100) > 25 then item:unload_magazine() end
 	local l,h = low_damage_rar, high_damage_rar
-	if not rare_item[section] then
+	if not rare_item[item:section()] then
 		l,h = damage_boundaries(npc)
 	end
-	item:set_condition(math.random(l,h)/100.)
+	item:set_condition(math.random(l,h)/100)
 end
 
 function init_drop_settings()
