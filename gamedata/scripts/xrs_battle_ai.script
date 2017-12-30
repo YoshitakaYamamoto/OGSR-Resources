@@ -827,7 +827,7 @@ function action_altcombat:execute()
 			if is_close_range then
 				write_log("--XRS_BATTLE_AI: VARIANT_1_CC %s : %s", npc:name(), primary_target[npc:id()])
 				local enemy_cover = enemy_covered_value(npc, be)
-				if enemy_cover < 0.5 then
+				if enemy_cover > 0.3 then
 					write_log("--XRS_BATTLE_AI: VARIANT_1_CC_FIRE %s : %s", npc:name(), primary_target[npc:id()])
 					set_weapons_fire(npc, be, bw, false, npc_rank)
 				else	
@@ -891,7 +891,7 @@ function action_altcombat:execute()
 			if is_close_range then
 				write_log("--XRS_BATTLE_AI: VARIANT_2_CC %s : %s", npc:name(), primary_target[npc:id()])
 				local enemy_cover = enemy_covered_value(npc, be)
-				if enemy_cover < 0.5 then
+				if enemy_cover > 0.3 then
 					write_log("--XRS_BATTLE_AI: VARIANT_2_CC_FIRE %s : %s", npc:name(), primary_target[npc:id()])
 					set_weapons_fire(npc, be, bw, false, npc_rank)
 				else	
@@ -1113,7 +1113,7 @@ function action_altcombat:check_objects(bw, enemy)
 		self:check_single_object(o:object())
 	end
 
-	if enemy and bw then
+	if enemy and bw and IsRPG( bw ) then
 		for _, t in ipairs({ game_object.friend, game_object.neutral }) do
 			for k, v in pairs( self.objects[ t ] ) do
 				if self:check_npc_on_fire_line( v, bw, enemy ) then
@@ -1157,17 +1157,17 @@ function action_altcombat:check_npc_on_fire_line(obj, weapon, be)
 			return true
 		end
 	end
-	if be_dist > 5 then --and friend_dist < be_dist then -- убрано чтобы не стреляли не только когда непись между врагом но и за ним непосредственно
-		-- направления на врага и друга
-		--считаем попадает ли текущий солдат в сектор обстрела
-		local dir_aim = utils.vector_copy_by_val(be_pos):sub(npc_pos)
-		local dir_obj = utils.vector_copy_by_val(friend_pos):sub(npc_pos)
-		local x=dir_obj.x*dir_aim.x+dir_obj.z*dir_aim.z
-		local y=-dir_obj.z*dir_aim.x+dir_obj.x*dir_aim.z -- повернули систему координат
-		local angle=math.atan2(y,x) -- угол доворота от -180 до 180
-		local div=radius/friend_dist
-		if angle >= -div and angle <= div then return true end
-	end
+	--if be_dist > 5 then --and friend_dist < be_dist then -- убрано чтобы не стреляли не только когда непись между врагом но и за ним непосредственно
+	-- направления на врага и друга
+	--считаем попадает ли текущий солдат в сектор обстрела
+	--	local dir_aim = utils.vector_copy_by_val(be_pos):sub(npc_pos)
+	--	local dir_obj = utils.vector_copy_by_val(friend_pos):sub(npc_pos)
+	--	local x=dir_obj.x*dir_aim.x+dir_obj.z*dir_aim.z
+	--	local y=-dir_obj.z*dir_aim.x+dir_obj.x*dir_aim.z -- повернули систему координат
+	--	local angle=math.atan2(y,x) -- угол доворота от -180 до 180
+	--	local div=radius/friend_dist
+	--	if angle >= -div and angle <= div then return true end
+	--end
 
 	return false
 end
@@ -2620,47 +2620,43 @@ function actor_see(npc)
 end
 
 function actor_see_raytrace(npc)
-	write_log("--XRS_BATTLE_AI: ACTOR_SEE_RAYTRACE %s", npc:name())
-	
-	local dangerang = 1 -- арктангенс 45 град /npc:position():distance_to(db.actor:position())
-	local ang = horz_angle(device().cam_dir,npc:position():sub(device().cam_pos))	
-	
-	local be_pos = npc:bone_position("bip01_spine")
-	local npc_pos = device().cam_pos
-	local distance = npc_pos:distance_to(be_pos)
-	local dir_enemy = utils.vector_copy_by_val(be_pos):sub(npc_pos)
-	local aim_point = npc_pos:add(dir_enemy:normalize())
-		
-	local dist = distance+1
-	local res = level.ray_query(aim_point, dir_enemy, dist, rq_target.rqtBoth, db.actor)
-	local obj = res.object
-	if obj then
-		if obj and obj:id() == npc:id() then
-			local tgt = ang > -dangerang and ang < dangerang
-			if tgt then
-				write_log("--XRS_BATTLE_AI: ACTOR_SEE_RAYTRACE SUCCESS %s", npc:name())
-				return true
-			else
-				write_log("--XRS_BATTLE_AI: ACTOR_SEE_RAYTRACE OUT_OF_VIEWFIELD %s", npc:name())
-				return false
-			end
-		else
-			if obj then
-				write_log("--XRS_BATTLE_AI: ACTOR_SEE_RAYTRACE WRONG %s : %s %s", npc:name(), obj:id(), obj:name())
-				return false
-			else
-				if db.actor:see(npc) then
-					write_log("--XRS_BATTLE_AI: ACTOR_SEE_RAYTRACE FAIL BUT ACTOR SEE %s", npc:name())
-					return true
-				end
-				write_log("--XRS_BATTLE_AI: ACTOR_SEE_RAYTRACE FAIL %s", npc:name())
-				return false
-			end
-		end
-	else	
-		return false
-	end
-	return false
+  -- арктангенс 45 град /npc:position():distance_to(db.actor:position())
+  local dangerang = 1
+  local ang = horz_angle(
+    device().cam_dir, npc:position():sub( device().cam_pos )
+  )
+  local be_pos    = npc:bone_position( "bip01_spine" )
+  local npc_pos   = device().cam_pos
+  local distance  = npc_pos:distance_to( be_pos )
+  local dir_enemy = utils.vector_copy_by_val( be_pos ):sub( npc_pos )
+  local aim_point = npc_pos:add( dir_enemy:normalize() )
+  local rq = level.ray_query(
+    aim_point, dir_enemy, distance + 1, rq_target.rqtBoth, db.actor
+  )
+  if rq.result then
+    local dist = rq.range
+    local obj  = rq.object
+    if obj and obj:id() == npc:id() then
+      local tgt = ang > -dangerang and ang < dangerang
+      if tgt then
+        return true
+      else
+        return false
+      end
+    else
+      if obj then
+        return false
+      else
+        if db.actor:see( npc ) then
+          return true
+        end
+        return false
+      end
+    end
+  else
+    return false
+  end
+  return false
 end
 
 function get_target(npc)
@@ -2763,6 +2759,8 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 				else
 					be_pos = enemy:bone_position( "korpus1" )
 				end
+			elseif enemy:is_actor() then
+				be_pos = device().cam_pos
 			else
 				be_pos = enemy:bone_position("bip01_head")
 			end
@@ -2782,15 +2780,12 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 			
 			write_log("--XRS_BATTLE_AI: WPNS_FIRE_2_RTC_4 %s : %s", npc:name(), enemy:id())
 			
-			local dist = distance+1
-			local res = level.ray_query(aim_point, dir_enemy, dist, rq_target.rqtBoth, npc)
-			local obj = res.object
-			
-			write_log("--XRS_BATTLE_AI: WPNS_FIRE_2_RTC_6 %s : %s", npc:name(), enemy:id())
-			
-			if obj then
-			
-				write_log("--XRS_BATTLE_AI: RAYTRACE PHASE_2 %s : %s", npc:name(), enemy:id())
+			local dist = distance+1 --distance+5 ?
+			local rq = level.ray_query(aim_point, dir_enemy, dist, rq_target.rqtBoth, npc)
+
+			if rq.result then
+				local dist = rq.range
+				local obj  = rq.object
 				
 				local is_alive_mob = obj and ( obj:is_stalker() or obj:is_actor() or obj:is_monster() ) and obj:alive()
 				
@@ -2804,7 +2799,13 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 						--)
 						type_of_fire = object.aim1
 					else
-						if npc:see(enemy) and not in_hideout(npc) then
+						-- Хорошо бы здесь проверять пробиваемость материалов, что
+						-- бы непись не считал кусты препятствием и стрелял сквозь
+						-- них. Зачем здесь проверка in_hideout? Почему непись не
+						-- должен стрелять, если он находится на своей cover
+						-- точке? Наоборот же, он занял оборонительную позицию и
+						-- теперь может подавлять огнем.
+						if npc:see(enemy) --[[and not in_hideout(npc)]] then
 							--log3("--XRS_BATTLE_AI: RAYTRACE FAIL BUT SEE [%s] : [%s]", npc:name(), enemy:id())
 							type_of_fire = object.fire1
 						else
@@ -2818,8 +2819,9 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 					"!!XRS_BATTLE_AI: RAYTRACE CHECK DOESN RETURN RESULT: %s -> %s, distance = %s",
 					npc:name(), enemy:name(), distance
 				)
-				type_of_fire = object.aim1 --KRodin: наверное в таких случаях стрелять не надо.
-				--type_of_fire = object.fire1
+				-----type_of_fire = object.aim1 --KRodin: наверное в таких случаях стрелять не надо.
+				--KRodin: В новом движке такое довольно часто бывает, поэтому стреляем.
+				type_of_fire = object.fire1
 			end
 		else	
 			write_log("--XRS_BATTLE_AI: RAYTRACE SWITCHED OFF - FIRING AT WILL %s : %s", npc:name(), enemy:id())
@@ -2848,7 +2850,7 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 		
 		write_log("--XRS_BATTLE_AI: WPNS_FIRE_6 %s : %s", npc:name(), enemy:id())
 		
-		if not weapon_unstrapped or not_ready_states[anim] or (IsRPG(weapon) and (distance < 25 or enemy_cover > 0.4)) then
+		if not weapon_unstrapped or not_ready_states[anim] or (IsRPG(weapon) and (distance < 25 or enemy_cover < 0.3)) then
 			write_log("--XRS_BATTLE_AI: NPC NOT READY TO FIRE %s : %s", npc:name(), enemy:id())
 			type_of_fire = object.aim1
 		end
@@ -3100,8 +3102,17 @@ function set_combat_sight(npc, enemy, weapon)
 			end
 		end
 	end
-
-	local look_pos = enemy:bone_position( bone )
+	--
+	local look_pos
+	if bone == "eyelid_1" and enemy:is_actor() then
+		--Я исхожу из простого предположения, что глаз-глазом, но если игрок
+		--выглядывает из-за дерева, то его cam_pos уж точно уязвим. А где там
+		--этот глаз будет, да шут его знает.
+		look_pos = device().cam_pos
+	else
+		look_pos = enemy:bone_position( bone )
+	end
+	--
 	if use_deviation then
 		look_pos = add_deviation( npc, look_pos )
 	end
