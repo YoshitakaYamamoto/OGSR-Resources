@@ -26,9 +26,6 @@ function actor_binder:__finalize()
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:net_spawn(data)
-	ASSERT( db.net_spawning_obj == nil, "found net_spawning_obj = %s", db.net_spawning_obj and db.net_spawning_obj:name() or "" )
-	db.net_spawning_obj = self.object
-
 	cmd("r2_dof_control", "off")
 	cmd("unbind", "contacts") --Отключаем в PDA вкладку "Контакты"
 
@@ -76,7 +73,6 @@ function actor_binder:net_spawn(data)
 
 	self.am:call("on_spawn", data)
 
-	db.net_spawning_obj = nil
 	return true
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -410,24 +406,17 @@ function actor_binder:on_select_item( obj )
 end
 --]=]--------------------------------------------------------------------------------------------------------------------
 function actor_binder:save(packet)
-	ASSERT( db.saving_obj == nil, "found saving_obj = %s", db.saving_obj and db.saving_obj:name() or "" )
-	db.saving_obj = self.object
-
 	ogse.save_var("game_difficulty", level.get_game_difficulty(), "u8") --Сохраняем уровень сложности
 
 	xr_logic.pstor_save_all(self.object, packet)
 
 	self.am:call("on_save", packet)
 	self.am:call("on_save_after_all")
-
-	db.saving_obj = nil
 end 
 ----------------------------------------------------------------------------------------------------------------------
 local game_difficulty_by_num = {"gd_novice", "gd_stalker", "gd_veteran", "gd_master"}
 function actor_binder:load(reader)
 --log3("~~[%s] Start load [%s]", script_name(), self.object and self.object:name() or "nil")
-	ASSERT( db.loading_obj == nil, "found loading_obj = %s", db.loading_obj and db.loading_obj:name() or "" )
-	db.loading_obj = self.object
 
 	local game_difficulty = ogse.load_var("game_difficulty", 3) --Загружаем уровень сложности
 	cmd("g_game_difficulty", game_difficulty_by_num[game_difficulty + 1]) --и устанавливаем его.
@@ -436,7 +425,6 @@ function actor_binder:load(reader)
 
 	self.am:call("on_load", reader)
 
-	db.loading_obj = nil
 --log3("--[%s] End load [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 ----------------------------------------------------------------------------------------------------------------------

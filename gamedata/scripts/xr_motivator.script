@@ -280,12 +280,9 @@ function motivator_binder:reinit()
 end
 
 function motivator_binder:net_spawn(sobject)
-	ASSERT( db.net_spawning_obj == nil, "found net_spawning_obj = %s", db.net_spawning_obj and db.net_spawning_obj:name() or "" )
-	db.net_spawning_obj = self.object
-
 --log3("~~[%s] Start net_spawn [%s]", script_name(), self.object and self.object:name() or "nil")
 
-	if not object_binder.net_spawn(self, sobject) then db.net_spawning_obj = nil return false end
+	if not object_binder.net_spawn(self, sobject) then return false end
 
 	db.add_obj(self.object)
 	--
@@ -329,7 +326,6 @@ function motivator_binder:net_spawn(sobject)
 			end
 		end
 
-		db.net_spawning_obj = nil
 		return true
 	end
 	--
@@ -381,7 +377,6 @@ function motivator_binder:net_spawn(sobject)
 	--
 	self.am:call( "on_npc_spawn", self.object, self )
 	--
-	db.net_spawning_obj = nil
 	return true
 end
 
@@ -665,9 +660,6 @@ function motivator_binder:net_save_relevant()
 end
 
 function motivator_binder:save(packet)
-	ASSERT( db.saving_obj == nil, "found saving_obj = %s", db.saving_obj and db.saving_obj:name() or "" )
-	db.saving_obj = self.object
-
 	xr_logic.pstor_store(self.object, "is_invulnerable", self.object:invulnerable())
 
 	object_binder.save(self, packet)
@@ -679,14 +671,10 @@ function motivator_binder:save(packet)
 	dialog_manager.save(self.object, packet)
 
 	trade_manager.save(self.object, packet)
-
-	db.saving_obj = nil
 end
 
 function motivator_binder:load(reader)
 --log3("~~[%s] Start loading [%s]", script_name(), self.object and self.object:name() or "nil")
-	ASSERT( db.loading_obj == nil, "found loading_obj = %s", db.loading_obj and db.loading_obj:name() or "" )
-	db.loading_obj = self.object
 
 	self.loaded = true
 
@@ -699,7 +687,6 @@ function motivator_binder:load(reader)
 			log1("ERROR: CORRUPTED QUEST BODY FOUND! "..tostring(self.object:name()).." ID "..self.object:id().." PRO: "..self.object:profile_name())
 			db.actor:give_game_news(game.translate_string("xr_motivator_debug7")..self.object:character_name()..game.translate_string("xr_motivator_debug8")..self.object:id()..game.translate_string("xr_motivator_debug9")..self.object:profile_name()..game.translate_string("xr_motivator_debug10"), "ui\\ui_iconsTotal", Frect():set(498,47,83,47),7000, 20000)
 
-			db.loading_obj = nil
 			return true
 		end
 	end
@@ -715,8 +702,6 @@ function motivator_binder:load(reader)
 
 	local is_invulnerable = xr_logic.pstor_retrieve(self.object, "is_invulnerable", false)
 	self.object:invulnerable(is_invulnerable)
-
-	db.loading_obj = nil
 --log3("--[%s] End loading [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 

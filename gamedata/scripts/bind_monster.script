@@ -37,12 +37,9 @@ function generic_object_binder:reinit()
 end
 
 function generic_object_binder:net_spawn(sobject)
-	ASSERT( db.net_spawning_obj == nil, "found net_spawning_obj = %s", db.net_spawning_obj and db.net_spawning_obj:name() or "" )
-	db.net_spawning_obj = self.object
-
 --log3("~~[%s] Start net_spawn [%s]", script_name(), self.object and self.object:name() or "nil")
 
-	if not object_binder.net_spawn(self, sobject) then db.net_spawning_obj = nil return false end
+	if not object_binder.net_spawn(self, sobject) then return false end
 
 	db.add_obj(self.object)
 	--
@@ -73,8 +70,6 @@ function generic_object_binder:net_spawn(sobject)
 				alife():release(s_obj, true)
 			end
 		end
-
-		db.net_spawning_obj = nil
 		return true
 	end
 	--
@@ -87,7 +82,6 @@ function generic_object_binder:net_spawn(sobject)
 	xr_gulag.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_mobile, self.loaded )
 	--
 	self.am:call( "on_monster_spawn", self.object, self )
-	db.net_spawning_obj = nil
 	return true
 end
 
@@ -265,10 +259,7 @@ function generic_object_binder:net_save_relevant()
 end
 
 function generic_object_binder:save(packet)
-	ASSERT( db.saving_obj == nil, "found saving_obj = %s", db.saving_obj and db.saving_obj:name() or "" )
-	db.saving_obj = self.object
-
-	if string.find(self.object:name(), "crow_") then db.saving_obj = nil return false end
+	if string.find(self.object:name(), "crow_") then return false end
 
 	if self.object:clsid() ~= clsid.script_trader then
 		xr_logic.pstor_store(self.object, "is_invulnerable", self.object:invulnerable())
@@ -281,16 +272,12 @@ function generic_object_binder:save(packet)
 	if self.object:clsid() == clsid.script_trader then
 		trade_manager.save(self.object, packet)
 	end
-
-	db.saving_obj = nil
 end
 
 function generic_object_binder:load(reader)
 --log3("~~[%s] Start load [%s]", script_name(), self.object and self.object:name() or "nil")
-	ASSERT( db.loading_obj == nil, "found loading_obj = %s", db.loading_obj and db.loading_obj:name() or "" )
-	db.loading_obj = self.object
 
-	if string.find(self.object:name(), "crow_") then db.loading_obj = nil return false end
+	if string.find(self.object:name(), "crow_") then return false end
 
 	self.loaded = true
 
@@ -309,7 +296,6 @@ function generic_object_binder:load(reader)
 		self.object:invulnerable(is_invulnerable)
 	end
 
-	db.loading_obj = nil
 --log3("--[%s] End load [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 

@@ -165,22 +165,14 @@ function heli_binder:net_save_relevant()
 end
 
 function heli_binder:save( packet )
-	ASSERT( db.saving_obj == nil, "found saving_obj = %s", db.saving_obj and db.saving_obj:name() or "" )
-	db.saving_obj = self.object
-
 	object_binder.save( self, packet )
 
 	xr_logic.save_obj( self.object, packet, not self.initialized )
 
 	self.st.combat:save( packet )
-
-	db.saving_obj = nil
 end
 
 function heli_binder:load( packet )
-	ASSERT( db.loading_obj == nil, "found loading_obj = %s", db.loading_obj and db.loading_obj:name() or "" )
-	db.loading_obj = self.object
-
 	self.loaded = true
 
 	object_binder.load( self, packet )
@@ -188,8 +180,6 @@ function heli_binder:load( packet )
 	xr_logic.load_obj( self.object, packet )
 
 	self.st.combat:load( packet )
-
-	db.loading_obj = nil
 end
 
 function heli_binder:check_health()
