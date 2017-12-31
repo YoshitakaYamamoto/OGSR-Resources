@@ -43,8 +43,21 @@ end
 
 
 function on_rukzak_use( obj )
-  local rukzak = ui_rukzak( obj )
-  level.start_stop_menu( rukzak, true )
+  if obj:is_car() then
+    local rukzak = ui_rukzak( obj )
+    level.start_stop_menu( rukzak, true )
+  else
+    level.disable_input()
+    local snd = sound_object( "interface\\inv_open" )
+    snd:play( db.actor, 0, sound_object.s2d )
+    dsh.timeout(
+      snd:length(), function()
+        local rukzak = ui_rukzak( obj )
+        level.start_stop_menu( rukzak, true )
+        level.enable_input()
+      end
+    )
+  end
 end
 
 local override_game_types = {
@@ -1095,6 +1108,9 @@ function ui_rukzak:on_quit()
     save_rukzak( rkz_wnd.owner_id, rkz_wnd.items_other )
   end
   if rkz_wnd.weight_timer then rkz_wnd.weight_timer:stop() end
+  if not rkz_wnd.is_car then
+    sound_object( "interface\\inv_close" ):play( db.actor, 0, sound_object.s2d )
+  end
   rkz_wnd:GetHolder():start_stop_menu( rkz_wnd, true )
   rkz_wnd = nil --Отпускаем окно рюкзака для сборщика мусора. Все объекты, ему принадлежащие, удалятся автоматически.
 end
