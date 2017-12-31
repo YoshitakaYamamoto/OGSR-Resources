@@ -161,7 +161,7 @@ function CRandomTask:__init()
 		curr_task_info.idle_time		= utils.cfg_get_number(sys_ini, id, "idle_time", nil, false, 24*60*60) --' Время между выдачами задания (в игровых секундах)
 	
 		if sys_ini:line_exist(id, "init_condition") then
-			curr_task_info.init_condition = xr_logic.parse_condlist(db.actor, "task_manager", "init_condition", sys_ini:r_string(id, "init_condition"))
+			curr_task_info.init_condition = xr_logic.parse_condlist(db.actor_proxy, "task_manager", "init_condition", sys_ini:r_string(id, "init_condition"))
 		end
 
 		local sss = utils.cfg_get_string(sys_ini, id, "reward_item", nil, false, "")
@@ -179,9 +179,9 @@ function CRandomTask:__init()
 		curr_task_info.reward_relation		= parse_key_value(utils.cfg_get_string(sys_ini, id, "reward_relation", nil, false, ""))
 		
 		if sys_ini:line_exist(id, "condlist") then
-			curr_task_info.condlist			= xr_logic.parse_condlist(db.actor, "task_manager", "condlist", sys_ini:r_string(id, "condlist"))
+			curr_task_info.condlist			= xr_logic.parse_condlist(db.actor_proxy, "task_manager", "condlist", sys_ini:r_string(id, "condlist"))
 		else
-			curr_task_info.condlist			= xr_logic.parse_condlist(db.actor, "task_manager", "condlist", "true")
+			curr_task_info.condlist			= xr_logic.parse_condlist(db.actor_proxy, "task_manager", "condlist", "true")
 		end		
 	
 		curr_task_info.need_return			= utils.cfg_get_bool(sys_ini, id, "need_return", nil, false, true)
@@ -446,7 +446,9 @@ function CRandomTask:action_give_task(actor, npc, p1, p2)
 		--print_table(task_desc.target_objects)
 	end
 	--
-	ASSERT( task_desc.selected_target and alife():object(task_desc.selected_target), "" )
+	if task_desc.selected_target then
+		ASSERT( alife():object(task_desc.selected_target), "object with id [%s] not found!", task_desc.selected_target)
+	end
 	--
 	if task_desc.type == "eliminate_lager" then
 		objective:set_map_hint(task_desc.text)

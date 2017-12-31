@@ -78,7 +78,7 @@ local bSlotsData	= false	-- включение всей схемы показа состояния предметов в ак
 -- Имена гулагов, писать в кавычках, через запятую.
 -- Пример: local GulagsTbl = {"name1","name2","name3"}
 local GulagsTbl = {}
-
+local bGulags = false
 ----------------------------------------------------------------------------
 -- НАСТРОЙКИ АКТОР
 ----------------------------------------------------------------------------
@@ -395,7 +395,7 @@ function vis_int()
 	end
 
 	-- гулаги
-	if bGulags == true then
+	if bGulags then
 		local GlgCS = hud:GetCustomStatic("gul_debug")
 		if GlgCS == nil then
 			hud:AddCustomStatic("gul_debug",true)

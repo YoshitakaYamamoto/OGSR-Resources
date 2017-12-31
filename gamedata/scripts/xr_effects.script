@@ -3064,7 +3064,7 @@ local function trader_door_closed()
 	end
 end
 
-trader_door_storage = nil
+local trader_door_storage = nil
 
 function trader_door_closed2()
 	if not trader_door_storage then

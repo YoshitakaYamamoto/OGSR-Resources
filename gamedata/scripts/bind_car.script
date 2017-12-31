@@ -96,7 +96,7 @@ function car_binder:update()
 		self.ph_shell = self.object:get_physics_shell()
 		if self.ph_shell then
 			-- даём пинок, чтобы опустить на землю
-			hit_object(self.object, vector(), 0.001, db.actor, 0.0, hit.explosion)
+			self.ph_shell:apply_force( 0, -self.object:mass(), 0 )
 			-- закрываем багажник
 			self.trunk_door_def = read_door_definition(self.object, "trunk_door")
 			if self.trunk_door_def then

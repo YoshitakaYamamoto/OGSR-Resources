@@ -177,7 +177,7 @@ function greet_actor()
 end
 
 function esc_hit_heli_actor()
-	heli = level_object_by_sid(story_ids.esc_helicopter)
+	local heli = level_object_by_sid(story_ids.esc_helicopter)
 	local st = db.storage[heli:id()]
 	if heli then
 		st.combat.enemy_id = db.actor:id()
@@ -262,7 +262,7 @@ function esc_heli_combat()
 end
 
 function esc_heli_cancel()
-	heli = level.object_by_id(heli)
+	local heli = level.object_by_id(heli)
 	if heli then
 		local st = db.storage[heli:id()]
 		if st and st.combat and st.combat.enemy_id then

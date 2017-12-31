@@ -1031,7 +1031,6 @@ function init_give_dinamyte_to_mils_dlg_trunk(dlg)
 		phr11:GetPhraseScript():AddDisableInfo("esc_kvest_sdelka_with_mils_trunk_clear")
 		phr11:GetPhraseScript():AddGiveInfo("escape_kvest_with_military_give_din_to_mils")
 		phr11:GetPhraseScript():AddAction("tasks_functor.spawn_esc_spawn_box_in_car")
-    phr12 = dlg:AddPhrase("esc_kvest_sdelka_with_mils_give_dinamyte_trunk_12", "12", "0", -10000)
 end
 
 --/Нашли машину, теперь можно положить динамит
@@ -1041,8 +1040,6 @@ function init_give_dinamyte_to_mils_get_car_dlg(dlg)
 		--phr1:GetPhraseScript():AddPrecondition("tasks_functor.precond_give_yashik_to_actor")
 		phr1:GetPhraseScript():AddAction("tasks_functor.spawn_esc_spawn_box_in_car")
 		phr1:GetPhraseScript():AddGiveInfo("escape_kvest_with_military_give_din_to_mils")
-	phr2 = dlg:AddPhrase("esc_kvest_sdelka_with_mils_give_dinamyte_trunk_12", "2", "0", -10000)
-		--phr2:GetPhraseScript():AddPrecondition("tasks_functor.precond_give_yashik_to_actor")
 end
 --/Отдаем динамит военным
 function init_give_dinamyte_to_mils_dlg(dlg)
