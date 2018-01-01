@@ -314,12 +314,26 @@ function start()
 end
 --------------------<< CoP style load mod
 
-function main_menu:close_menu() --KRodin: закрывать меню только этой функцией!!! Здесь куски меню отпускаются для сборщика мусора! Предотвращение адовых утечек памяти!
-	ui_load_dialog.load_wnd = nil
-	self.load_dlg = nil
-	ui_save_dialog.save_wnd = nil
-	self.save_dlg = nil
-	ui_mm_opt_main.opt_wnd = nil
-	self.opt_dlg = nil
+--KRodin: закрывать меню только этой функцией!!! Здесь куски меню отпускаются для сборщика мусора! Предотвращение адовых утечек памяти!
+function main_menu:close_menu()
+	if self.load_dlg then
+		ui_load_dialog.load_wnd:GetListWnd("list_window"):RemoveAll()
+		self.load_dlg = nil
+		ui_load_dialog.load_wnd:DetachFromParent()
+		ui_load_dialog.load_wnd = nil
+	end
+	if self.save_dlg then
+		ui_save_dialog.save_wnd:GetListWnd("list_window"):RemoveAll()
+		self.save_dlg = nil
+		ui_save_dialog.save_wnd:DetachFromParent()
+		ui_save_dialog.save_wnd = nil
+	end
+	if self.opt_dlg then
+		self.opt_dlg = nil
+		ui_mm_opt_main.opt_wnd:DetachFromParent()
+		ui_mm_opt_main.opt_wnd = nil
+	end
+	self:DetachFromParent()
+	--
 	cmd("main_menu", "off")
 end
