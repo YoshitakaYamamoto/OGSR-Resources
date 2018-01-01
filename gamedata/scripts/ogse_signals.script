@@ -98,6 +98,7 @@ function signals_mgr:__init( name, modules_list, scan_for_autoattaching_modules 
   self.signals  = {}
   self.slots_in_process = {}
   self.after_call_callback = {}
+  self.slots_in_process_subscribe = {}
   --
   local registered_modules = {}
   if scan_for_autoattaching_modules then --Если включено автоподключение, ищем и регистрируем все автоподключаемые модули
@@ -193,7 +194,7 @@ function signals_mgr:subscribe( slot_to_subscribe )
       for i=1, #self.slots_in_process do
         local slot_i_p = self.slots_in_process[ i ]
         if slot_i_p.signal == signal then
-          table.insert(self.after_call_callback, function() table.insert( self.signals[ signal ].normal, 1, slot_to_subscribe ) end)
+          table.insert( self.slots_in_process_subscribe, { slot_to_subscribe, function() table.insert( self.signals[ signal ].normal, 1, slot_to_subscribe ) end } )
           return --больше здесь делать нечего.
         end
       end
@@ -219,10 +220,18 @@ end
 
 function signals_mgr:unsubscribe( slot_to_unsubscribe )
   local real_slot_to_unsubscribe = self:is_already_subscribed( slot_to_unsubscribe ) --Сделано потому что нам точно неизвестно, что именно slot_to_unsubscribe - ссылка на слот, или его копия. Быдлокодеры ведь могут и копию сюда передать.
-  ASSERT( real_slot_to_unsubscribe,
-    "signals_mgr:unsubscribe: can't unsubscribe slot from signal [%s], which is not previously subscribed",
-	slot_to_unsubscribe.signal or ""
-  )
+  if not real_slot_to_unsubscribe then
+    for i = #self.slots_in_process_subscribe, 1, -1 do --Бывает, что слот пытаются отписать, а он ещё подписаться не успел. Вот это затычка от этой проблемы.
+      if slots_equal( slot_to_unsubscribe, self.slots_in_process_subscribe[i][1] ) then
+        table.remove( self.slots_in_process_subscribe, i )
+        return
+      end
+    end
+    --
+    abort( "signals_mgr:unsubscribe: can't unsubscribe slot from signal [%s], which is not previously subscribed",
+      slot_to_unsubscribe.signal or ""
+    )
+  end
   ASSERT( not real_slot_to_unsubscribe.unsubscribed,
     "signals_mgr:unsubscribe: can't unsubscribe slot from signal [%s], because it is already in the process of unsubscribing",
 	slot_to_unsubscribe.signal or ""
@@ -416,13 +425,22 @@ function signals_mgr:call( signal_name, ... )
   --
   ::EXIT::
   --
-  if #self.after_call_callback > 0 and #self.slots_in_process == 0 and not self.after_call_callback_locked then --Что-то делаем по факту завершения всех вызовов.
-    self.after_call_callback_locked = true --НЕ ЗАКОММЕНТИРОВАТЬ НИ В КОЕМ СЛУЧАЕ!
-    for i=1, #self.after_call_callback do
-      self.after_call_callback[i]()
+  if #self.slots_in_process == 0 then
+    if #self.slots_in_process_subscribe > 0 then
+      for i=1, #self.slots_in_process_subscribe do
+        self.slots_in_process_subscribe[i][2]()
+      end
+      self.slots_in_process_subscribe = {}
     end
-    self.after_call_callback = {}
-    self.after_call_callback_locked = false
+    --
+    if #self.after_call_callback > 0 and not self.after_call_callback_locked then --Что-то делаем по факту завершения всех вызовов.
+      self.after_call_callback_locked = true --НЕ ЗАКОММЕНТИРОВАТЬ НИ В КОЕМ СЛУЧАЕ!
+      for i=1, #self.after_call_callback do
+        self.after_call_callback[i]()
+      end
+      self.after_call_callback = {}
+      self.after_call_callback_locked = false
+    end
   end
   --
   if work_time > work_time_limit then

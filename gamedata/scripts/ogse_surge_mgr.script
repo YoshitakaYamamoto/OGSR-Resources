@@ -634,6 +634,7 @@ function check_blowout_timer:condition()
 end
 
 function check_blowout_timer:action()
+  stop_vibros_effects()
   blowout_t = nil
 end
 
@@ -656,11 +657,7 @@ function check_blowout_timer:update()
 			stop_vibros_effects()
 		end
 	else
-		if not actor_in_hideout then
-			actor_in_hideout = true
-			is_surge_raskolbas = false
-			stop_vibros_effects()
-		end
+		stop_vibros_effects()
 	end
 end
 
@@ -729,7 +726,7 @@ function deadly_blowout()
 		local rnd = math.random()
 		
 		if zmb_probability > rnd then
-			dialogs.actor_set_zombied(actor, npc)		 
+			dialogs.actor_set_zombied()		 
 			level.add_pp_effector("deadcity_wake.ppe", 2008, false)
 		end
 		actor_was_hit = true
@@ -747,6 +744,7 @@ local surge_hit_db = {
 	l07_military   = {{power = 0.005,  type = hit.radiation}, {power = 0.0005, type = hit.shock}, },
 	l10_radar      = {{power = 0.008,  type = hit.radiation}, {power = 0.0007, type = hit.shock}, },
 	l11_pripyat    = {{power = 0.01,   type = hit.radiation}, {power = 0.001,  type = hit.shock}, },
+	l09_deadcity_ogse = {{power = 0.01,type = hit.radiation}, {power = 0.001,  type = hit.shock}, },
 }
 -- Нанесение хита актору в смертельной стадии выброса
 function hit_actor()
