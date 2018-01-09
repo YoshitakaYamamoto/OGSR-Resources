@@ -43,21 +43,12 @@ end
 
 
 function on_rukzak_use( obj )
-  if obj:is_car() then
-    local rukzak = ui_rukzak( obj )
-    level.start_stop_menu( rukzak, true )
-  else
-    level.disable_input()
+  if not obj:is_car() then
     local snd = sound_object( "interface\\inv_open" )
     snd:play( db.actor, 0, sound_object.s2d )
-    dsh.timeout(
-      snd:length(), function()
-        local rukzak = ui_rukzak( obj )
-        level.start_stop_menu( rukzak, true )
-        level.enable_input()
-      end
-    )
   end
+  local rukzak = ui_rukzak( obj )
+  level.start_stop_menu( rukzak, true )
 end
 
 local override_game_types = {
@@ -788,10 +779,9 @@ function ui_rukzak:InitControls()
   self.label_weight = xml:InitStatic( "main_dialog:label_weight", self.dialog )
   self:show_cur_weight()
 
-  self:Register(
-    xml:Init3tButton( "main_dialog:btn_quit", self.dialog ),
-   "btn_quit"
-  )
+  local btn_quit = xml:Init3tButton( "main_dialog:btn_quit", self.dialog )
+  btn_quit:SetAccelerator( bind_to_dik( key_bindings.kUSE ), 0 )
+  self:Register( btn_quit, "btn_quit" )
 
   self.tab = xml:InitTab( "main_dialog:tab", self.dialog )
   self:Register( self.tab, "tab" )
