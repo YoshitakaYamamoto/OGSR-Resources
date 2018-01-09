@@ -52,20 +52,25 @@ end
 function load_dialog:__finalize()
 	--log1("~~[ui_load_dialog.load_dialog.__finalize]")
 end
-
+ 
 function load_dialog:FillList()
-	local flist = getFS():file_list_open_ex("$game_saves$", bit_or( FS.FS_ListFiles, FS.FS_RootOnly ), "*.sav")
-	local f_cnt = flist:Size()
-
-	flist:Sort(FS.FS_sort_by_modif_down)
-
-	for	it=0, f_cnt-1 do
-		local file = flist:GetAt(it)
-		local fn_full = file:NameFull()
-		local file_name = fn_full:sub(0, fn_full:len() - 4)
-		local date_time = "[" .. file:ModifDigitOnly() .. "]"		
-		self:AddItemToList(file_name, date_time)
-	end
+  local t    = {}
+  local path = getFS():update_path( "$game_saves$", "" )
+  --
+  stdfs.directory_iterator( path, function( file ) -- C++17 FS
+    if file.extension == ".sav" then
+      table.insert( t, {
+        [ "name"      ] = file.short_filename,
+        [ "modif"     ] = file.last_write_time,
+        [ "modif_str" ] = file.last_write_time_string, --slow function...
+     })
+    end
+  end )
+  --
+  table.sort( t, function( a, b ) return b.modif < a.modif end )
+  for _, f in ipairs( t ) do
+    self:AddItemToList( f.name, f.modif_str )
+  end
 end
 
 function load_dialog:InitControls()
@@ -126,7 +131,7 @@ function delete_save_game(filename)
 
 	f:file_delete("$game_saves$",save_file)
 
-	if getFS():exist("$game_saves$", dds_file) then
+	if f:exist("$game_saves$", dds_file) then
 		f:file_delete("$game_saves$", dds_file)
 	end
 end
@@ -136,10 +141,7 @@ local function AddTimeDigit(dig)
 end
 
 local function file_data(fname)
-	local flist = getFS():file_list_open_ex("$game_saves$", bit_or(FS.FS_ListFiles,FS.FS_RootOnly), fname .. ".sav")
-	local f_cnt = flist:Size()
-	if f_cnt > 0 then
-		local file = flist:GetAt(0)
+	if getFS():exist("$game_saves$", fname..".sav") then
 		local sg = CSavedGameWrapper(fname)
 		local y,m,d,h,min,sec,ms = sg:game_time():get()
 		local date_time = AddTimeDigit(h)..":"..AddTimeDigit(min).." "..AddTimeDigit(m).."/"..AddTimeDigit(d).."/"..y
