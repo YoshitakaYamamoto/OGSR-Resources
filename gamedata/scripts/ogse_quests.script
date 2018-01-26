@@ -711,7 +711,7 @@ end
 
 --- Финал игры с Генераторами
 function this_is_the_end()
-	if not db.actor or not has_alife_info("game_end") then
+	if not db.actor_proxy.online or not has_alife_info("game_end") then
 		xr_effects.after_credits()
 	else
 		set_complete_tasks()

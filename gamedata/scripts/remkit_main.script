@@ -409,6 +409,10 @@ function repair_dialog:FillList()
 	item_table_index = 0
 	db.actor:inventory_for_each(item_for_repair) --перебираем инвентарь в поиске совместимых стволов для ремонта
 
+	local item_in_slot_1 = db.actor:item_in_slot( 1 ) and db.actor:item_in_slot( 1 ):id() or false
+	local item_in_slot_2 = db.actor:item_in_slot( 2 ) and db.actor:item_in_slot( 2 ):id() or false
+	local item_in_slot_6 = db.actor:item_in_slot( 6 ) and db.actor:item_in_slot( 6 ):id() or false
+
 	local i = 1
 	while (item_table[i]) do
 		local s_item = item_table[i]
@@ -426,9 +430,9 @@ function repair_dialog:FillList()
 		
 		if s_item:id() == item_in_slot_1 
 		or s_item:id() == item_in_slot_2 then
-			_item_name = _item_name.." (в руках)"
+			_item_name = _item_name..game.translate_string("ogse_repair_in_use_text")
 		elseif s_item:id() == item_in_slot_6 then
-			_item_name = _item_name.." (одет)"
+			_item_name = _item_name..game.translate_string("ogse_repair_equipped_text")
 		end
 		
 		local _item_cond = s_item:condition()*100

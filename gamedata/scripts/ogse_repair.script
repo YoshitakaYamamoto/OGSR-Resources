@@ -151,27 +151,9 @@ function repair_dialog:FillList() --Наполняем список предме
 	db.actor:iterate_inventory(item_for_repair, db.actor)
 -----------Закончили перебирать инвентарь------------
 
-	local item_in_slot_1 = db.actor:item_in_slot(1)
-	local item_in_slot_2 = db.actor:item_in_slot(2)
-	local item_in_slot_6 = db.actor:item_in_slot(6)
-
-	if item_in_slot_1 then
-		item_in_slot_1 = item_in_slot_1:id()
-	else	
-		item_in_slot_1 = 0 
-	end
-
-	if item_in_slot_2 then
-		item_in_slot_2 = item_in_slot_2:id()
-	else	
-		item_in_slot_2 = 0 
-	end
-
-	if item_in_slot_6 then
-		item_in_slot_6 = item_in_slot_6:id()
-	else	
-		item_in_slot_6 = 0 
-	end	
+	local item_in_slot_1 = db.actor:item_in_slot( 1 ) and db.actor:item_in_slot( 1 ):id() or false
+	local item_in_slot_2 = db.actor:item_in_slot( 2 ) and db.actor:item_in_slot( 2 ):id() or false
+	local item_in_slot_6 = db.actor:item_in_slot( 6 ) and db.actor:item_in_slot( 6 ):id() or false
 
 	local i = 1
 	while (item_table[i]) do --Извлекаем предмет из таблицы

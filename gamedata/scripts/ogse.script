@@ -147,7 +147,7 @@ end
 function kill_living_npc(npc_id)
    local s_npc = alife():object(npc_id)
    s_npc.force_offline = true
-   go_offline_kill_timer(npc_id, pos):start()
+   go_offline_kill_timer(npc_id):start()
 end
 -- служебный таймер, ждущий ухода в оффлайн
 class "go_offline_kill_timer" (ogse_qt.quick_timer)

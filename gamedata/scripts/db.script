@@ -18,6 +18,8 @@ trader              = nil --TODO: Вынести в mob_trader
 creature            = {} -- true - человек, false - животное (исключая торговца)
 artefacts			= {} --TODO: вынести в bind_artefact.
 
+is_dbg0             = false
+is_dbg1             = false
 
 function add_obj( obj )
 	if ( obj:is_stalker() or obj:is_actor() ) then
