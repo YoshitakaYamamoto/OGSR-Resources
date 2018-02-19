@@ -73,18 +73,16 @@ function create_level_changer_ex(spawn_item)
 		spawn_item.shapes
 	)
 end
+
 function create_actor_teleporter(destination)
-	local apos = db.actor:position()
-	create_level_changer(
-		story_ids.ogse_dbg_teleport,
-		{apos.x, apos.y, apos.z}, db.actor:level_vertex_id(), db.actor:game_vertex_id(),
-		nil, nil,
-		destination.pos, destination.lvid, destination.gvid,
-		destination.dir or {0,0,0},
-		lcmode.silent,
-		5
+	level.change_level(
+		destination.gvid,
+		destination.lvid,
+		vector():set(unpack(destination.pos)),
+		vector():set(unpack(destination.dir or {0,0,0}))
 	)
 end
+
 -- перенос актора на заданный уровень в первый доступный там вертекс
 function teleport_actor_to_level(level_name)
 	local lvid, gvid = utils2.get_top_graph_ids(level_name)

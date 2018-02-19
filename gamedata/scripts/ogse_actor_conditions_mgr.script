@@ -248,13 +248,13 @@ function on_update()
 	  new_cam_inert = min_cam_inert + ( math.round( ( 0.8 - min_cam_inert ) * new_cam_inert * 100 ) / 100 )
 	  if new_cam_inert ~= cur_cam_inert then
 		--log3("--Change cam_inert = [%s]", new_cam_inert )
-		cmd( "cam_inert", new_cam_inert )
+		level.set_cam_inert( new_cam_inert )
 		cur_cam_inert = new_cam_inert
 	  end
 	end
   elseif cur_cam_inert ~= cam_inert then
 	--log3("--Change cam_inert = [%s]", cam_inert )
-	cmd( "cam_inert", cam_inert )
+	level.set_cam_inert( cam_inert )
 	cur_cam_inert = cam_inert
   end
 
