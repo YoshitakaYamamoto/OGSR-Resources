@@ -951,12 +951,16 @@ function se_smart_terrain:update()
 
 			--' проверять, не собрался ли кто-то к этому времени уже уходить
 			for id, npc_info in pairs( self.npc_info ) do
-				if npc_info.cond and not xr_logic.pick_section_from_condlist( db.actor_proxy, npc_info.se_obj, npc_info.cond ) then
+				local sobj = npc_info.se_obj
+				if not sobj:alive() then
+					log3( "[%s]: %s: %s is dead on update", script_name(), self:name(), sobj:name() )
+					self:unregister_npc( sobj )
+				elseif npc_info.cond and not xr_logic.pick_section_from_condlist( db.actor_proxy, sobj, npc_info.cond ) then
 					--log3("[smart_terrain %s] leaving %s", self:name(), npc_info.name)
-					self:unregister_npc( npc_info.se_obj )
+					self:unregister_npc( sobj )
 					--При переключении смартов попробую сразу обновлять мозги,
 					--что бы новый смарт подхватил непися, как можно быстрее, и дал ему логику.
-					npc_info.se_obj:brain():update()
+					sobj:brain():update()
 				end
 			end
 
