@@ -372,11 +372,11 @@ end
 
 
 local community_forbidden_locations = {
-	["monolith"] = {
+	--["monolith"] = {
 		--["l12_stancia_2"] = true,
-		["l12u_control_monolith"] = true,
-		["l12u_sarcofag"] = true,
-	}
+		--["l12u_control_monolith"] = true,
+		--["l12u_sarcofag"] = true,
+	--}
 }
 -----------------------------------------------------------------------
 --- Ёвалуаторы:
@@ -615,7 +615,7 @@ function action_altcombat:execute()
 		if deadman_target then
 			
 			set_combat_sight(self.object, deadman_target, bw)
-			self.object:set_item(object.aim1, bw)
+			if bw then self.object:set_item( object.aim1, bw ) end
 			
 			if not deadman_vtx[npc:id()] then
 			
@@ -2898,7 +2898,9 @@ function set_combat_state(npc, enemy, weapon)
 		return
 	elseif hit_timeout[npc:id()] then	
 		hit_timeout[npc:id()] = nil
-	end	
+	end
+
+	if not weapon then return end
 
 	local npc_pos = npc:position()
 	local be_pos = enemy:position()
