@@ -112,6 +112,8 @@ function actor_binder:net_destroy()
 	self.object:set_callback(callback.entity_alive_before_hit, nil)
 	self.object:set_callback(callback.on_before_use_item, nil)
 
+	self.object:set_callback( callback.level_changer_action, nil )
+
 	self.am:call("on_destroy")
 --log3("--[%s] End destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 end
@@ -153,6 +155,8 @@ function actor_binder:reinit()
 	--
 	self.object:set_callback(callback.entity_alive_before_hit, self.before_hit_callback, self)
 	self.object:set_callback(callback.on_before_use_item, self.before_use, self)
+
+	self.object:set_callback( callback.level_changer_action, self.level_changer_action, self )
 
 	self.am:call("on_reinit")
 --log3("--[%s] End reinit [%s]", script_name(), self.object and self.object:name() or "nil")
@@ -417,6 +421,21 @@ function actor_binder:load(reader)
 	self.am:call("on_load", reader)
 
 --log3("--[%s] End load [%s]", script_name(), self.object and self.object:name() or "nil")
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:level_changer_action( obj, wnd )
+  local sobj = obj:get_alife_object()
+  local lc   = sobj:get_level_changer()
+  local dest_vertex = lc.dest_game_vertex_id
+  local dest_lname  = alife():level_name(
+    game_graph():vertex( dest_vertex ):level_id()
+  )
+  local msg_text_wnd = wnd:FindChild( "message_box_change_level:message_text" )
+  msg_text_wnd:GetCUIStatic():SetText(
+    game.translate_string( dest_lname ) .. ": "
+    .. game.translate_string( "level_changer_invitation" )
+  )
+  self.am:call( "level_changer_action", obj, wnd )
 end
 ----------------------------------------------------------------------------------------------------------------------
 
