@@ -157,6 +157,15 @@ function se_monster:STATE_Read(packet, size)
 end
 --------------------
 function se_monster:on_before_register()
+	local strn_id = self:smart_terrain_id()
+	if strn_id ~= 65535 then
+		ASSERT(
+			alife():object( strn_id ),
+			"[%s]: %s: wrong smart_terrain_id(): %s",
+			script_name(), self:name(), strn_id
+		)
+	end
+	--
 	ogse_signals.get_mgr():call( "se_monster_on_before_register", self )
 	self:fill_exclusives()
 	if not self.has_none_true then

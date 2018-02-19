@@ -60,8 +60,8 @@ function se_stalker:can_switch_offline ()
 		end
 	end
 	if
-		xr_companion.is_companion(self.id) 
-		and (db.actor and db.actor:position():distance_to(self.position) < 150) 
+		xr_companion.is_companion(self.id)
+		and (db.actor_proxy.online and db.actor:position():distance_to(self.position) < 150) 
 		and not self.force_offline
 	then
 		return false
@@ -149,6 +149,15 @@ function se_stalker:STATE_Read (packet, size)
 end
 --------------------
 function se_stalker:on_before_register()
+	local strn_id = self:smart_terrain_id()
+	if strn_id ~= 65535 then
+		ASSERT(
+			alife():object( strn_id ),
+			"[%s]: %s: wrong smart_terrain_id(): %s",
+			script_name(), self:name(), strn_id
+		)
+	end
+	--
 	ogse_signals.get_mgr():call( "se_stalker_on_before_register", self )
 	self:fill_exclusives()
 	xr_companion.is_companion_se(self)
@@ -166,11 +175,8 @@ local forbidden_comms = {
 	["arena_enemy"] = true
 }
 function se_stalker:on_register()
-	local pk = get_netpk( self, 1 )
-	if pk:isOk() then --TODO: «аменить на движковый способ!
-		local data = pk:get()
-		self._charname = data.character_name -- получаем им€ персонажа дл€ быстрого доступа в дальнейшем
-	end
+	local trader = self:get_trader()
+	self._charname = trader.character_name -- получаем им€ персонажа дл€ быстрого доступа в дальнейшем
 	--
 	alife():remove_in_restrictions( self )
 	--
