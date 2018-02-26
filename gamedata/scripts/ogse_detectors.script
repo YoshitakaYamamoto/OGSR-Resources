@@ -11,7 +11,6 @@
 --- детектору (распознаваемые аномалии и т.п), в его конфиг вещи
 --- Сделать разделение по звукам между детекторами
 --- Сделать деление по определяемым аномалиям между детекторами
---- Сделать для детекторов настраиваемую клавишу в опциях
 -----------------------------------------------------------------------
 
 function attach(sm)
@@ -487,15 +486,13 @@ function on_update()
 			local art_pos = art:position()
 			-- проверка на попадание в радиус детектирования
 			if act_pos:distance_to(art_pos) < det_radius and i < MAX_ARTEFACTS then
-				--set_artefact_slot(i, art_pos.x, art_pos.y, art_pos.z)
-				set_artefact_slot(i, vector2():set(art_pos.x, art_pos.y))
+				set_artefact_slot(i, art_pos.x, art_pos.y, art_pos.z)
 				i = i + 1
 			end
 		end
 	end
 	for j = i,MAX_ARTEFACTS-1 do
-		--set_artefact_slot(j, 0, 0, 0)
-		set_artefact_slot(j, vector2():set(0, 0))
+		set_artefact_slot(j, 0, 0, 0)
 		j = j + 1
 	end
 --------------------------------------------------------------------------------------------------------------------------------
@@ -531,14 +528,12 @@ function on_update()
 		local k = 0
 		for id, anm in pairs(anm_table) do
 			if k < MAX_ARTEFACTS then
-				--set_anomaly_slot(k, anm.pos.x, anm.pos.y, anm.pos.z)
-				set_anomaly_slot(k, vector2():set(anm.pos.x, anm.pos.y))
+				set_anomaly_slot(k, anm.pos.x, anm.pos.y, anm.pos.z)
 				k = k + 1
 			end
 		end
 		for l = k,MAX_ARTEFACTS-1 do
-			--set_anomaly_slot(l, 0, 0, 0)
-			set_anomaly_slot(l, vector2():set(0, 0))
+			set_anomaly_slot(l, 0, 0, 0)
 			l = l + 1
 		end
 	end
