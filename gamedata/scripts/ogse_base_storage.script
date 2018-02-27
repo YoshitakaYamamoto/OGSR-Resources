@@ -65,17 +65,18 @@
 local registry = {}
 
 local function create_storage_object( key )
-  local st_obj = alife():create( "custom_storage", vector(), 0, 0 )
-  local pk = get_netpk( st_obj, 1 )
-  ASSERT( ( pk and pk:isOk() ), "can't read netpacket of %s", st_obj:name() )
-  local data = pk:get()
-  data.custom_data:setTable({ main = { key = key } })
-  pk:set( data )
+  local sobj = alife():create( "custom_storage", vector(), 0, 0 )
+
+  local ini = sobj:spawn_ini()
+  ini.readonly = false
+  ini:w_string( "main", "key", key )
+  sobj:save_spawn_ini()
+
   -- никогда не выйдет в онлайн
-  st_obj:can_switch_online( false )
-  st_obj:can_switch_offline( true )
-  registry[ key ] = st_obj
-  return st_obj
+  sobj:can_switch_online( false )
+  sobj:can_switch_offline( true )
+  registry[ key ] = sobj
+  return sobj
 end
 
 

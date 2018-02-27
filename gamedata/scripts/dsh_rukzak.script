@@ -329,25 +329,30 @@ function parse_weapon_info_str( info_str )
 end
 
 
-function spawn_weapon_in_inv( sect, info_str, who, override, modified_params )
+function spawn_weapon_in_inv( sect, info_str, who )
   if not who then who = db.actor end
   local ammo1_t, ammo1_n, ammo2_t, ammo2_n, scope, gl, silencer =
     parse_weapon_info_str( info_str )
-  if override then
-    if override.scope ~= nil then scope = override.scope end
-  end
   if ammo1_t > 10   then ammo1_t = 0 end
   if ammo1_n > 1000 then ammo1_n = 0 end
-  local addons = 0
-  if scope    then addons = addons + ogse_wpn_utils.addons_flags.scope    end
-  if gl       then addons = addons + ogse_wpn_utils.addons_flags.gl       end
-  if silencer then addons = addons + ogse_wpn_utils.addons_flags.silencer end
-  if not modified_params then modified_params = {} end
-  modified_params.addon_flags  = addons
-  modified_params.ammo_type    = ammo1_t
-  modified_params.ammo_elapsed = ammo1_n
-  se_item.modified_params = modified_params
+  local addons = flags8():zero()
+  addons:set( ogse_wpn_utils.addons_flags.scope,    scope    )
+  addons:set( ogse_wpn_utils.addons_flags.gl,       gl       )
+  addons:set( ogse_wpn_utils.addons_flags.silencer, silencer )
+  --
+  local sm_slot = {
+    signal = "se_item:on_before_register",
+	fun = function( sobj )
+      local wpn = sobj:get_weapon()
+      wpn.addon_flags  = addons
+      wpn.ammo_type    = ammo1_t
+      wpn.ammo_elapsed = ammo1_n
+    end
+  }
+  ogse_signals.get_mgr():subscribe( sm_slot )
   local s_new_weapon = spawn_item_in_inv( sect, who )
+  ogse_signals.get_mgr():unsubscribe( sm_slot )
+  --
   if ammo2_n > 0 then
     local ammo_sections = get_names( sect, "grenade_class" )
     local ammo_sect     = ammo_sections[ ammo2_t + 1 ]

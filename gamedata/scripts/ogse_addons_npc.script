@@ -10,19 +10,22 @@ local function install_remove_addon(cur_weapon, fake_addon, real_addon_section, 
 	local s_cur_weapon = alife():object(cur_weapon:id())
 	if not s_cur_weapon then return false end --на всякий случай
 	--
-	local pk = get_netpk(s_cur_weapon, 1)
-	ASSERT( pk:isOk(), "can't read netpacket of %s", s_cur_weapon:name() )
-	local cur_weapon_data = pk:get()
+    local cur_wpn = s_cur_weapon:get_weapon()
+    local cur_wpn_ammo_type = cur_wpn.ammo_type
+    local cur_wpn_ammo_elapsed = cur_wpn.ammo_elapsed
+	local cur_wpn_addon_flags = cur_wpn.addon_flags
+	local cur_wpn_condition = s_cur_weapon:get_inventory_item().item_condition
+	local cur_wpn_cd = s_cur_weapon.custom_data
 	--
 	local removed_addon_flags = 0
 	--
-	if bit_and(cur_weapon_data.addon_flags, installed_addon_flag) ~= 0 then
+	if cur_wpn_addon_flags:is( installed_addon_flag ) then
 		removed_addon_flags = installed_addon_flag
-	elseif installed_addon_flag == addons_flags.grip and bit_and(cur_weapon_data.addon_flags, addons_flags.gl) ~= 0 then
+	elseif installed_addon_flag == addons_flags.grip and cur_wpn_addon_flags:is( addons_flags.gl ) then
 		removed_addon_flags = addons_flags.gl
-	elseif installed_addon_flag == addons_flags.gl and bit_and(cur_weapon_data.addon_flags, addons_flags.grip) ~= 0 then
+	elseif installed_addon_flag == addons_flags.gl and cur_wpn_addon_flags:is( addons_flags.grip ) then
 		removed_addon_flags = addons_flags.grip
-	elseif installed_addon_flag == addons_flags.scope_mount and bit_and(cur_weapon_data.addon_flags, addons_flags.scope) ~= 0 then
+	elseif installed_addon_flag == addons_flags.scope_mount and cur_wpn_addon_flags:is( addons_flags.scope ) then
 		removed_addon_flags = addons_flags.scope
 	end
 	--
@@ -43,16 +46,26 @@ local function install_remove_addon(cur_weapon, fake_addon, real_addon_section, 
 	if s_fake_addon then
 		alife():release(s_fake_addon, true) -- удаляем использованный аддон
 	end
-	--
-	se_item.modified_params = {
-		condition    = cur_weapon_data.condition,    -- переносим состояние ствола
-		ammo_type    = cur_weapon_data.ammo_type,    -- тип боеприпаса
-		ammo_elapsed = cur_weapon_data.ammo_elapsed, -- количество боеприпаса
-		custom_data  = cur_weapon_data.custom_data,  -- кастомдату
-		addon_flags  = bit_or(bit_and(cur_weapon_data.addon_flags, bit_not(removed_addon_flags)), installed_addon_flag) -- накатываем флажок надеваемого аддона.
-	}
-	ogse.spawn_item_in_inv(new_wpn_section, npc) --Спавним новый ствол с установленным аддоном.
-	return true
+  --
+  local sm_slot = {
+    signal = "se_item:on_before_register",
+	fun = function( sobj )
+      local iitem = sobj:get_inventory_item()
+      iitem.item_condition = cur_wpn_condition -- переносим состояние ствола
+      sobj.custom_data = cur_wpn_cd -- кастомдату
+      local wpn = sobj:get_weapon()
+      wpn.ammo_type    = cur_wpn_ammo_type -- тип боеприпаса
+      wpn.ammo_elapsed = cur_wpn_ammo_elapsed -- количество боеприпаса
+      cur_wpn_addon_flags:set( removed_addon_flags, false ) --Наверное оно не нужно, но пусть будет...
+	  cur_wpn_addon_flags:set( installed_addon_flag, true )
+	  wpn.addon_flags = cur_wpn_addon_flags
+    end
+  }
+  ogse_signals.get_mgr():subscribe( sm_slot )
+  ogse.spawn_item_in_inv(new_wpn_section, npc) --Спавним новый ствол с установленным аддоном.
+  ogse_signals.get_mgr():unsubscribe( sm_slot )
+  --
+  return true
 end
 
 local function process(npc)

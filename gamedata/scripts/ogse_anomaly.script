@@ -642,13 +642,14 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 			end
 		elseif isLc(sobj) then
 			--Учитываем точки входа на локациях.
-			local pk = get_netpk(sobj, 1)
-			ASSERT(pk:isOk(), "PK is not OK in [%s]", sobj:name())
-			local lc_params = pk:get()
-			if lc_params.dest_level_name == lname then
-				--log3("!!LC params of [%s]: %s", sobj:name(), lc_params)
-				lvids_forbidden[lc_params.dest_level_vertex_id] = true
-				table.insert(position_forbidden, lc_params.dest_position)
+			local lc = sobj:get_level_changer()
+			local dest_vertex = lc.dest_game_vertex_id
+			local dest_lname  = alife():level_name(
+				game_graph():vertex( dest_vertex ):level_id()
+			)
+			if dest_lname == lname then
+				lvids_forbidden[lc.dest_level_vertex_id] = true
+				table.insert(position_forbidden, lc.dest_position)
 			end
 			if sobj_lname == lname then --Учитываем точки ухода с локаций
 				lvids_forbidden[ sobj.m_level_vertex_id ] = true
@@ -798,14 +799,10 @@ function set_anomaly_mode(anom_id, status)
 	local sobj = alife():object(anom_id)
 	if not sobj then return end
 
-	local pk = get_netpk(sobj, 1)
-	ASSERT(pk:isOk(), "PK is not OK in [%s]", sobj:name())
-	local data = pk:get()
-	local cd = data.custom_data:getTable()
-	if not cd.m_anom then cd.m_anom = {} end
- 	cd.m_anom["status"] = status
-    data.custom_data:set( cd )
-    pk:set( data )
+	local ini = sobj:spawn_ini()
+	ini.readonly = false
+	ini:w_string( "m_anom", "status", status )
+	sobj:save_spawn_ini()
 
 	if status == "anom_off" then
 		anom_list[anom_id] = nil

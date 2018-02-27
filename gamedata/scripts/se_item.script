@@ -5,54 +5,36 @@ function se_outfit:__init (section) super (section)
 end
 --*********************************************************************************
 
-modified_params = false
-local function wpn_state_read_and_modify(base_class, self, packet, size)
-	if this.modified_params then -- при наличии таблицы с данными дл€ замены
-		local params = {}
-		local pk = get_netpk(self, 1)
-		ASSERT( pk:isOk(), "can't read netpacket of %s", self:name() )
-		pk:_read(params, packet) -- читаем из родного пакета данные
-		--log3("[%s] data of [%s]: %s", script_name(), self:name(), params)
-		for k,v in pairs(this.modified_params) do --ѕодмен€ем значени€ в определЄнных пол€х пакета
-			params[k] = v
-		end
-		local fake_packet = net_packet() -- подмен€ем пакет
-		fake_packet:w_begin(123) -- инициализируем позицию записи
-		pk:_write(params, fake_packet) -- заполн€ем
-		fake_packet:r_seek(2) -- ставим позицию чтени€, учитываем ненужные два байта в начале от w_begin
-		base_class.STATE_Read(self, fake_packet, fake_packet:w_tell()) -- читаем данные в объект из нашего поддельного
-		this.modified_params = false -- обнул€ем табличку с исходными данными
-	else
-		base_class.STATE_Read(self, packet, size)
-	end
-end
-------------------------------------------------------------------------
 class "se_weapon" (cse_alife_item_weapon)
 function se_weapon:__init (section) super (section)
 end
-function se_weapon:STATE_Read(packet, size)
-	wpn_state_read_and_modify(cse_alife_item_weapon, self, packet, size)
+function se_weapon:on_before_register()
+  cse_alife_item_weapon.on_before_register( self )
+  ogse_signals.get_mgr():call("se_item:on_before_register", self)
 end
 ------------------------------------------------------------------------
 class "se_weapon_shotgun" (cse_alife_item_weapon_shotgun)
 function se_weapon_shotgun:__init (section) super (section)
 end
-function se_weapon_shotgun:STATE_Read(packet, size)
-	wpn_state_read_and_modify(cse_alife_item_weapon_shotgun, self, packet, size)
+function se_weapon_shotgun:on_before_register()
+  cse_alife_item_weapon_shotgun.on_before_register( self )
+  ogse_signals.get_mgr():call("se_item:on_before_register", self)
 end
 ------------------------------------------------------------------------
 class "se_weapon_magazined" (cse_alife_item_weapon_magazined)
 function se_weapon_magazined:__init (section) super (section)
 end
-function se_weapon_magazined:STATE_Read(packet, size)
-	wpn_state_read_and_modify(cse_alife_item_weapon_magazined, self, packet, size)
+function se_weapon_magazined:on_before_register()
+  cse_alife_item_weapon_magazined.on_before_register( self )
+  ogse_signals.get_mgr():call("se_item:on_before_register", self)
 end
 ------------------------------------------------------------------------
 class "se_weapon_magazined_w_gl" (cse_alife_item_weapon_magazined_w_gl)
 function se_weapon_magazined_w_gl:__init (section) super (section)
 end
-function se_weapon_magazined_w_gl:STATE_Read(packet, size)
-	wpn_state_read_and_modify(cse_alife_item_weapon_magazined_w_gl, self, packet, size)
+function se_weapon_magazined_w_gl:on_before_register()
+  cse_alife_item_weapon_magazined_w_gl.on_before_register( self )
+  ogse_signals.get_mgr():call("se_item:on_before_register", self)
 end
 --*********************************************************************************
 

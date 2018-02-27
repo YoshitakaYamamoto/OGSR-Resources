@@ -92,11 +92,7 @@ function fix_gar_boars_territory2_logic() --Исправление кривой 
 	if ogse.var_exists("gar_boars_territory2_fix") then return end
 	local sobj = alife():object("gar_boars_territory2")
 	if sobj then
-		local packet = get_netpk(sobj, 1)
-		ASSERT( packet:isOk(), "can't read netpacket of %s", sobj:name() )
-		local my_table = packet:get()
-		my_table.custom_data:set("")
-		packet:set(my_table)
+		sobj.custom_data = ""
 		log3( "--[%s]: Fixed logic in restrictor [%s]!", script_name(), sobj:name() )
 	end
 	ogse.save_var("gar_boars_territory2_fix", true)
