@@ -133,6 +133,7 @@ function on_use(obj, sobj)
 	--
 	-- использованный фейковый создали заново (вне зависимости от дальнейших действий предмет останется в инвентаре,
 	-- если надо будет удалить, то удалим повторно уже по факту установки аддона)
+	log3("~~Spawning object with section [%s] %s", obj:section(), debug.traceback())
 	local s_new_fake_addon = ogse.spawn_item_in_inv(obj:section())
 	-- переносим кастомдату из удалённого аддона в свежесозданный
 	s_new_fake_addon.custom_data = sobj.custom_data
@@ -373,6 +374,7 @@ function convert_after_shg_detached(cur_weapon)
 	local removed_fake_gl_sec = get_string(removed_real_gl_sec, "fake_item_section", nil)
 	ASSERT(removed_fake_gl_sec, "convert_after_shg_detached: No fake addon section defined! Check section: "..removed_real_gl_sec)
 	
+	log3("~~Spawning object with section [%s] %s", removed_fake_gl_sec, debug.traceback())
 	local s_new_fake_addon = ogse.spawn_item_in_inv(removed_fake_gl_sec) -- собственно создаём
 	-- надо добавить из него заряды в кастомдату снятого подствольного дробовика
 	-- проверяем текущий ствол
@@ -403,6 +405,7 @@ function convert_after_shg_detached(cur_weapon)
     end
   }
   ogse_signals.get_mgr():subscribe( sm_slot )
+	log3("~~Spawning object with section [%s] %s", new_wpn_section, debug.traceback())
   local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
   ogse_signals.get_mgr():unsubscribe( sm_slot )
   --
@@ -534,6 +537,7 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 				ASSERT(removed_real_addon_sec, "install_remove_addon: Addon flag is set, but there is no addon section defined! Check logic of code/configs.")
 				local removed_fake_addon_sec = get_string(removed_real_addon_sec, "fake_item_section", nil)
 				ASSERT(removed_fake_addon_sec, "install_remove_addon: No fake addon section defined! Check section: "..removed_real_addon_sec)
+	log3("~~Spawning object with section [%s] %s", removed_fake_addon_sec, debug.traceback())
 				local s_new_fake_addon = ogse.spawn_item_in_inv(removed_fake_addon_sec) -- собственно создаём
 				
 				if get_u32(removed_fake_addon_sec, "is_shotgun") == 1 then -- если "снятый" снятый аддон - подствольный дробовик
@@ -601,6 +605,7 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
     end
   }
   ogse_signals.get_mgr():subscribe( sm_slot )
+	log3("~~Spawning object with section [%s] %s", new_wpn_section, debug.traceback())
   local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
   ogse_signals.get_mgr():unsubscribe( sm_slot )
 	--
@@ -768,6 +773,7 @@ function switch_shg_mode(wpn)
     end
   }
   ogse_signals.get_mgr():subscribe( sm_slot )
+	log3("~~Spawning object with section [%s] %s", new_wpn_section, debug.traceback())
   local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section) --Спавним новый
   ogse_signals.get_mgr():unsubscribe( sm_slot )
   --
@@ -803,10 +809,16 @@ function convert_shg_to_addon(swpn)
 	--
 	local ammo_sections = get_names(cur_weapon_sect, "ammo_class") -- получаем список секций патронов
 	local ammo_sec = ammo_sections[cur_wpn_ammo_type + 1] -- и узнаём заряженную секцию
+	log3("~~Spawning object with section [%s] %s", fake_addon_section, debug.traceback())
 	local s_new_fake_addon = ogse.spawn_item_in_inv(fake_addon_section)
 	set_addon_shg_params_to_cd(s_new_fake_addon, cur_wpn_ammo_type, cur_wpn_ammo_elapsed, ammo_sec, cur_wpn_condition)
 	sim:release(swpn, true)
 end
+
+function is_addon_shotgun( obj )
+	return sys_ini:line_exist( obj:section(), "standalone_shotgun_section" )
+end
+
 function convert_addon_to_shg(saddon, slot_number)
   local cur_addon_sect = saddon:section_name()
   local wpn_section = get_string(cur_addon_sect, "standalone_shotgun_section")
@@ -825,6 +837,7 @@ function convert_addon_to_shg(saddon, slot_number)
     end
   }
   ogse_signals.get_mgr():subscribe( sm_slot )
+	log3("~~Spawning object with section [%s] %s", wpn_section, debug.traceback())
   local s_new_weapon = ogse.spawn_item_in_inv( wpn_section )
   ogse_signals.get_mgr():unsubscribe( sm_slot )
   --
@@ -832,6 +845,7 @@ function convert_addon_to_shg(saddon, slot_number)
     move_weapon_to_slot(s_new_weapon, slot_number, db.actor:active_slot() == slot_number)
   end
 end
+
 -- следим за попаданием в инвентарь ствола XM-26 LSS в режиме автономного оружия для конвертации в аддон
 function on_item_to_ruck(obj, sobj)
 	--if not sobj then return true end
@@ -884,6 +898,7 @@ function on_item_to_ruck(obj, sobj)
 							end
 						}
 						ogse_signals.get_mgr():subscribe( sm_slot )
+	log3("~~Spawning object with section [%s] %s", new_wpn_section, debug.traceback())
 						local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
 						ogse_signals.get_mgr():unsubscribe( sm_slot )
 						--
@@ -912,6 +927,7 @@ function on_item_to_ruck(obj, sobj)
 		end
 	end
 end
+
 -- 1. установка состояния аддонов в соответствии с данными из кастомдаты при их попадании в инвентарь
 -- 2. проверка того, что аддон сняли из ствола. В этом случае надо сконвертировать ствол в обычный
 function on_take(obj, sobj)
@@ -1126,6 +1142,7 @@ function recreate_transfer_data(obj_to_del, sec_to_create)
 	-- не совсем верно проверять по секции создаваемого, 
 	-- но при правильной настройке оба (и удаляемый и создаваемый) должны иметь параметр "is_shotgun" или оба не иметь
 	if get_u32(sec_to_create, "is_shotgun") == 1 then		
+	log3("~~Spawning object with section [%s] %s", sec_to_create, debug.traceback())
 		local s_fake_item = ogse.spawn_item_in_inv(sec_to_create)
 		s_fake_item.custom_data = sobj.custom_data
 	else
