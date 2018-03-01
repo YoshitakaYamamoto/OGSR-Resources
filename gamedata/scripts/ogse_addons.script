@@ -7,9 +7,6 @@
 --- Dusty79, Malandrinus (c) OGS Evolution Team
 --- version 3.0 (01/08/2011)
 -----------------------------------------------------------------------
---[[
-Есть проблемка: при многократном снятии и надевании дробовика на ствол, после снятия и попытки взять его в слот как просто дробовик - получается вылет по попытке заспавнить пустую секцию. Надо разобраться.
-]]--
 
 function attach(sm)
 	sm:subscribe({signal = "on_spawn",        fun = this.on_spawn})
@@ -118,7 +115,6 @@ local monitored_addon_sections = {
 -- колбек на использование инвентарного предмета
 function on_use(obj, sobj)
 	--if sobj == nil then return end
-	--if not sys_ini:line_exist(obj:section(), "new_weapon") then return end
 	local real_addon_section = get_real_addon_section(obj) -- секция реального аддона для фейкового
 	if not real_addon_section then return end -- если её нет, значит это не аддон
 	--log3("real_addon_section: %s", real_addon_section)
@@ -710,7 +706,6 @@ end
 function on_key_down(key, bind)
 	if bind == key_bindings.kWPN_FUNC then
 		local wpn = db.actor:active_item()
-		--if not sys_ini:line_exist(wpn:section(), "new_weapon") then return end
 		if wpn then switch_shg_mode(wpn) end
 	end
 end
@@ -816,7 +811,7 @@ function convert_shg_to_addon(swpn)
 end
 
 function is_addon_shotgun( obj )
-	return sys_ini:line_exist( obj:section(), "standalone_shotgun_section" )
+	return get_string( obj:section(), "standalone_shotgun_section" )
 end
 
 function convert_addon_to_shg(saddon, slot_number)
@@ -919,20 +914,16 @@ function on_item_to_ruck(obj, sobj)
 	end
 	
 	-- обработка снятия шотгана-аддона из слота в рюкзак
-	if sys_ini:line_exist(sobj:section_name(), "addon_mode_section") then
-		local addon_mode_section = get_string(sobj:section_name(), "addon_mode_section")
-		if addon_mode_section then
-			convert_shg_to_addon(sobj)
-			return true -- закончили цепочку вызовов, поскольку объекта больше нет
-		end
+	local addon_mode_section = get_string(sobj:section_name(), "addon_mode_section")
+	if addon_mode_section then
+		convert_shg_to_addon(sobj)
+		return true -- закончили цепочку вызовов, поскольку объекта больше нет
 	end
 end
 
 -- 1. установка состояния аддонов в соответствии с данными из кастомдаты при их попадании в инвентарь
 -- 2. проверка того, что аддон сняли из ствола. В этом случае надо сконвертировать ствол в обычный
 function on_take(obj, sobj)
-	--ASSERT(sobj, "ogse_addons.on_take: sobj is a nil reference. Probably was deleted, and call chain was not properly finished after that. Section of deleted object: "..obj:section())
-	--if not sys_ini:line_exist(obj:section(), "new_weapon") then return end
 	if get_sect_to_convert_after_shg_removed(obj) then
 		-- ствол с дробовиком и при этом с отнятым аддоном подствольника не должен существовать в игре
 		abort("ogse_addons.on_take: Incorrect weapon obtained. Check spawn of section: "..obj:section())

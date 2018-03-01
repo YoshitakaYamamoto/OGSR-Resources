@@ -205,7 +205,7 @@ function get_item_info( obj )
   local info
   if ogse_addons.is_addon_shotgun( obj ) then
     local sobj = alife():object( obj:id() )
-    info = sobj.custom_data or ""
+    info = base64.enc( sobj.custom_data )
   elseif obj:is_weapon_magazined() then
     info = get_wpn_info( obj )
   else
@@ -240,7 +240,7 @@ function get_wpn_info( wpn )
     local cur_t = wpn:get_ammo_type()
     table.insert( info, cur_t    )
     local cur_n = wpn:get_ammo_in_magazine()
-    table.insert( info, cur_n    )
+    table.insert( info, ogse_addons.is_wpn_w_shg( wpn ) and 0 or cur_n )
   else
     local cur_t = wpn:get_ammo_type()
     table.insert( info, cur_t )
@@ -250,7 +250,7 @@ function get_wpn_info( wpn )
       local hidden_t = wpn:get_underbarrel_ammo_type()
       local hidden_n = wpn:get_underbarrel_num_types()
       table.insert( info, hidden_t )
-      table.insert( info, hidden_n )
+      table.insert( info, ogse_addons.is_wpn_w_shg( wpn ) and 0 or hidden_n )
     else
       table.insert( info, 0 )
       table.insert( info, 0 )
@@ -280,7 +280,7 @@ function get_wpn_info( wpn )
   local sobj = alife():object( wpn:id() )
   if sobj then
     --log3("--saved customdata: %s", sobj.custom_data)
-    table.insert( info, sobj.custom_data )
+    table.insert( info, base64.enc( sobj.custom_data ) )
   end
   --
   return table.concat( info, "," )
@@ -326,25 +326,11 @@ function spawn_item_in_inv( sect, who )
 end
 
 function parse_weapon_info_str( info_str )
-  local info_tbl = split_comma_separated_list( info_str )
-  local ammo1_t, ammo1_n, ammo2_t, ammo2_n, scope, gl, silencer = unpack( info_tbl )
-  ammo1_t = tonumber( ammo1_t )
-  ammo1_n = tonumber( ammo1_n )
-  ammo2_t = tonumber( ammo2_t )
-  ammo2_n = tonumber( ammo2_n )
+  local ammo1_t, ammo1_n, ammo2_t, ammo2_n, scope, gl, silencer, cd =
+    unpack( split_comma_separated_list( info_str ) )
   --
-  --KRodin: добавил сохранение кастомдаты. Нужно для поддержки подствольного дробовика. Костыльно сделал, но ничего лучше в голову не пришло.
-  local cd = #info_tbl >= 8 and info_tbl[8] or ""
-  if #info_tbl > 8 then
-    for i = 9, #info_tbl do
-      cd = cd .. #info_tbl[i]
-    end
-  end
-  --
-  if scope    == "1" then scope    = true else scope    = false end
-  if gl       == "1" then gl       = true else gl       = false end
-  if silencer == "1" then silencer = true else silencer = false end
-  return ammo1_t, ammo1_n, ammo2_t, ammo2_n, scope, gl, silencer, cd
+  return tonumber( ammo1_t ), tonumber( ammo1_n ), tonumber( ammo2_t ), tonumber( ammo2_n ),
+    scope == "1", gl == "1", silencer == "1", cd and base64.dec( cd ) or ""
 end
 
 
@@ -992,7 +978,7 @@ function ui_rukzak:move_from_other( ui_item )
       sobj = spawn_weapon_in_inv( item.section, item.info )
     else
       sobj = spawn_item_in_inv( item.section )
-	  sobj.custom_data = item.info or ""
+	  sobj.custom_data = base64.dec( item.info )
     end
     item.count = item.count - 1
     size       = 1
