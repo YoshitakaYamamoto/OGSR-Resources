@@ -308,6 +308,7 @@ function motivator_binder:net_spawn(sobject)
 		self.object:hit(h)
 --]=]
 		local s_obj = alife():object(self.object:id())
+		--log3("~~offline_dead [%s] is [%s], game.time() is [%s]", s_obj:name(), s_obj.offline_dead, game.time())
 		if s_obj.offline_dead == 0 then
 			if s_obj.treasure_processed then --Вечные трупы будут удаляться только после того как их обыщет актор
 				--log3("--[%s] Added trup to delete: [%s]", script_name(), s_obj:name())
@@ -319,7 +320,7 @@ function motivator_binder:net_spawn(sobject)
 		elseif s_obj.offline_dead > 1 and s_obj.offline_dead <= game.time() then
 			if
 				not death_manager.offline_dead_quest_check(self.object)
-				and self.object:position():distance_to( db.actor:position() ) > alife():switch_distance() / 2 --Удаляем только вдалеке от актора
+				and self.object:position():distance_to( db.actor:position() ) > ( alife():switch_distance() / 2 ) --Удаляем только вдалеке от актора
 			then
 				--log3("--[%s] Released trup: [%s]", script_name(), s_obj:name())
 				alife():release(s_obj, true)
