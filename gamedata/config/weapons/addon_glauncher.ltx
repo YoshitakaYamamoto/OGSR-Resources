@@ -89,82 +89,72 @@ inv_grid_y		= 3
 real_item_section = wpn_addon_grenade_launcher_m203
 
 
-;Гладкоствольное подствольное боевое ружье XM-26 LSS (lightweight shotgunsystem) для М16/М4/XM8 (5 патронов 12 калибра)
-[wpn_addon_xm_26_lss]:wpn_addon_grenade_launcher_m203
-$spawn 			= 
-visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
-description		= XM_26_LSS
 
-cost			= 2500
-
-inv_name		= XM_26_LSS
-inv_name_short	= XM_26_LSS
-inv_weight		= 1.02
-inv_grid_width	= 2
-inv_grid_height	= 1
-inv_grid_x		= 17
-inv_grid_y		= 3
-
-fake_item_section	= fake_wpn_addon_xm_26_lss
-is_shotgun      = 1
-standalone_shotgun_section = wpn_xm_26_lss
-
-
-;фейк-XM-26 LSS
-[fake_wpn_addon_xm_26_lss]:wpn_fake_addon_base
-$spawn 			= 
-visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
-description		= XM_26_LSS
-
-cost			= 2500
-
-inv_name		= XM_26_LSS
-inv_name_short	= XM_26_LSS
-inv_weight		= 1.02
-inv_grid_width	= 2
-inv_grid_height	= 1
-inv_grid_x		= 17
-inv_grid_y		= 3
-
-real_item_section = wpn_addon_xm_26_lss
-is_shotgun      = 1
-standalone_shotgun_section = wpn_xm_26_lss
-
-
+-----------------------------------------------------------------------------------------------------------------------------
+;Сменные аддоны ОГСЕ
+-----------------------------------------------------------------------------------------------------------------------------
 ;Модульный боевой подствольный дробовик Remington 870MCS (Modular Combat Shotgun) для М16/М4 (3, 5 или 7 патронов 12 калибра)
+-- требуют специальной процедуры спавна	ogse_addons.set_default_shg_params(ogse.spawn_item_in_inv("wpn_addon_remington_870mcs"))
 [wpn_addon_remington_870mcs]:wpn_addon_grenade_launcher_m203
 $spawn 			= 
+;+++visual 				= weapons\masterkey\wpn_mk.ogf
+;---ЗАТЫЧКА (чтоб юзался стандарт 10R) 
 visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
-description		= Remington 870MCS
+
+description		= wpn_addon_remington_870mcs	;Remington 870MCS
 
 cost			= 2500
 
-inv_name		= Remington 870MCS
-inv_name_short	= Remington 870MCS
+inv_name		= wpn_addon_remington_870mcs	;Remington 870MCS
+inv_name_short	= wpn_addon_remington_870mcs	;Remington 870MCS
 inv_weight		= 2.5
-inv_grid_width	= 2
-inv_grid_height	= 1
-inv_grid_x		= 17
-inv_grid_y		= 3
+inv_grid_width			= 3		;2
+inv_grid_height			= 2		;1
+inv_grid_x				= 60	;17
+inv_grid_y				= 19	;3
 
 fake_item_section	= fake_wpn_addon_remington_870mcs
 is_shotgun      = 1
+standalone_shotgun_section = wpn_remington_870mcs
 
 ;фейк-Remington 870MCS
 [fake_wpn_addon_remington_870mcs]:wpn_fake_addon_base
 $spawn 			= 
+;---ЗАТЫЧКА (чтоб юзался стандарт 10R) 
 visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
-description		= Remington 870MCS
+;---со всеми аддонами---visual 				= weapons\masterkey\wpn_mk.ogf
+description		= fake_wpn_addon_remington_870mcs	;Remington 870MCS
 
 cost			= 2500
 
-inv_name		= Remington 870MCS
-inv_name_short	= Remington 870MCS
+inv_name		= fake_wpn_addon_remington_870mcs	;Remington 870MCS
+inv_name_short	= fake_wpn_addon_remington_870mcs	;Remington 870MCS
 inv_weight		= 2.5
-inv_grid_width	= 2
-inv_grid_height	= 1
-inv_grid_x		= 17
-inv_grid_y		= 3
+inv_grid_width			= 3		;2
+inv_grid_height			= 2		;1
+inv_grid_x				= 60	;17
+inv_grid_y				= 19	;3
 
 real_item_section = wpn_addon_remington_870mcs
 is_shotgun      = 1
+standalone_shotgun_section = wpn_remington_870mcs
+
+
+
+
+
+; Подствольный дробовик Remington 870MCS в автономном режиме
+;--------------------------------------
+;+++[wpn_remington_870mcs]:wpn_masterkey
+;+++$spawn                  = "weapons\wpn_remington_870mcs"
+;---ЗАТЫЧКА (чтоб юзался стандарт 10R)	
+[wpn_remington_870mcs]:wpn_spas12		
+$spawn = "weapons\spas12"
+addon_mode_section = fake_wpn_addon_remington_870mcs
+;---для ЗАТЫЧКИ, чтоб в слот влезала
+;---slot 					= 1
+;---inv_grid_width			= 3		;2
+;---inv_grid_height			= 2		;1
+;---inv_grid_x				= 60	;17
+;---inv_grid_y				= 19	;3
+-----------------------------------------------------------------------------------------------------------------------------
