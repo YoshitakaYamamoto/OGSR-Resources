@@ -128,7 +128,8 @@ function restrictor_binder:actor_update( delta )
   local dist = self.object:position():distance_to(db.actor:position()) - self.radius --Точный рассчёт расстояния от актора до рестриктора
   self.sm:reschedule(
     --( dist < 15 and 200 ) or ( dist < 30 and math.random(1000, 2000) ) or math.random( 5000, 6000 )
-    dist < 15 and 200 or math.random(1000, 2000)
+    --dist < 15 and 200 or math.random(1000, 2000)
+	200 --KRodin: некоторые сюжетные рестрикторы ведут себя неадекватно при более редком обновлении.
   )
 end
 
