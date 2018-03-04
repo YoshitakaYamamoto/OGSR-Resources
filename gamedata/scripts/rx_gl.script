@@ -85,6 +85,9 @@ function evaluator_launch_grenade:evaluate()
 	end
 --	self.st.charged = true
 	local npc = self.object
+	--
+	if not npc:alive() then return end
+	--
 	local wpn = npc:active_item()
 	local tg = time_global()
 	if xr_wounded.is_wounded(npc) then

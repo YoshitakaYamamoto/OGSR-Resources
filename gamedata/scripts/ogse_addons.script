@@ -859,6 +859,7 @@ function on_item_to_ruck(obj, sobj)
 --				log1("ON_ITEM_TO_RUCK: checking slot "..tostring(i))
 				local wpn = db.actor:item_in_slot(i)
 				if wpn then
+					local new_wpn_section = get_string(wpn:section(), "scope_removed_section")
 --					log1("ON_ITEM_TO_RUCK: slot "..tostring(i).." has weapon "..wpn:name())
 					local s_cur_weapon = sim:object(wpn:id())
 					--

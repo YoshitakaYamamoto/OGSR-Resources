@@ -370,10 +370,10 @@ local needs_refit = {}
 --	И если костюм есть и его визуал круче чем текущий, то переодеваем нпс.
 function Update(oNpc, oItem)
 	local aVisual = string.explode( "\\", oNpc:get_visual_name() ) --не должно быть расширения и разделителей
-	log3("~~[%s] Visual afther parsing: for [%s]: %s", script_name(), oNpc:name(), aVisual)
+	--log3("~~[%s] Visual afther parsing: for [%s]: %s", script_name(), oNpc:name(), aVisual)
 
 	if not aVisualGroups[aVisual[2]] then  --вторая строка в таблице, т.е. типа группировка
-		log3( "!![%s] Can't find visual groups for [%s]", script_name(), aVisual[2] )
+		--log3( "!![%s] Can't find visual groups for [%s]", script_name(), aVisual[2] )
 		return 
 	end
 
@@ -381,14 +381,14 @@ function Update(oNpc, oItem)
 	local aAvailableVis
 	for k, v in pairs(aVisualGroups[aVisual[2]]) do --Вторую строку визуала ищем в таблице
 		if string.find(aVisual[3], k) then --Если нашли вхождения третьей строки визуала в ключ таблицы выше
-			log3("~~[%s] Finded visual [%s] in aVisualGroups table. Key: [%s]", script_name(), aVisual[3], k) 
+			--log3("~~[%s] Finded visual [%s] in aVisualGroups table. Key: [%s]", script_name(), aVisual[3], k) 
 			aAvailableVis = v --табличка с группой визуалов в которые можно переодеть нпс
 			break
 		end
 	end
 	
 	if not aAvailableVis then --Вот это типа {"killer","monolit","military","stalker","exo","svoboda","dolg","ecolog"}
-		log3("!![%s] Can't find aAvailableVis for [%s]", script_name(), oNpc:name())
+		--log3("!![%s] Can't find aAvailableVis for [%s]", script_name(), oNpc:name())
 		return
 	end
 
@@ -398,10 +398,10 @@ function Update(oNpc, oItem)
 	local aVisList = aVisualList[sVis] --Список визуалов.
 
 	if not sVis then
-		log3("!![%s] Can't find sect [%s] in table [aOutfitsList]", script_name(), sSect)
+		--log3("!![%s] Can't find sect [%s] in table [aOutfitsList]", script_name(), sSect)
 		return
 	elseif not aVisList then
-		log3("!![%s] Can't find VisualList for [%s]", script_name(), sVis)
+		--log3("!![%s] Can't find VisualList for [%s]", script_name(), sVis)
 		return
 	end
 
@@ -417,7 +417,7 @@ function Update(oNpc, oItem)
 		else
 			sVisual = aVisList[math.random( #aVisList )]
 		end
-		log3("--[%s] Selected visual for [%s], exo: [%s]", script_name(), sVisual, sVis == "exo") 
+		--log3("--[%s] Selected visual for [%s], exo: [%s]", script_name(), sVisual, sVis == "exo") 
 	end
 
 	local pk = get_netpk(oNpc, 1)
@@ -429,7 +429,7 @@ function Update(oNpc, oItem)
 		--Типа продажа текущего костюма
 		local current_outfit_sect = ogse_real_armor.vis_to_armor(oNpc)
 		if current_outfit_sect then
-			log3("--[%s] Finded outfit: [%s]", script_name(), current_outfit_sect)
+			--log3("--[%s] Finded outfit: [%s]", script_name(), current_outfit_sect)
 			local iCost = sys_ini:r_float(current_outfit_sect, "cost")
 			local iMoney = math.floor(iCost/20)	
 			data.money = data.money + iMoney
@@ -437,11 +437,11 @@ function Update(oNpc, oItem)
 
 		data.visual_name = sVisual
 		needs_refit[oNpc:id()] = true
-		log3("--[%s] planned refit npc [%s], visual: [%s]", script_name(), oNpc:name(), sVisual)
+		--log3("--[%s] planned refit npc [%s], visual: [%s]", script_name(), oNpc:name(), sVisual)
 	elseif not xr_companion.is_companion(oNpc:id()) then --Если визуал недоступен, продаём костюм. Напарники не должны продавать костюмы.
 		local iCost = sys_ini:r_float(sSect, "cost")
 		local iMoney = math.floor(iCost/20)	
-		log3("!![%s] Can't find new visual for npc [%s], outfit: [%s]", script_name(), oNpc:name(), oItem:section())
+		--log3("!![%s] Can't find new visual for npc [%s], outfit: [%s]", script_name(), oNpc:name(), oItem:section())
 		data.money = data.money + iMoney
 	end
 
