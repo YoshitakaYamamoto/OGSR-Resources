@@ -134,7 +134,7 @@ function on_attach_vehicle(obj) --Только что залезли в машину
 	if in_btr then
 		enable_car_gun(obj, true)
 		--log3("~~[%s] god_mode is: [%s]", script_name(), get_con_bool("g_god"))
-		cmd("g_god on")
+		--cmd("g_god on") --KRodin: Временно отключаю. Надо переделать по-другому.
 	end
 	--
 	show_car_hud()
@@ -151,7 +151,7 @@ function on_detach_vehicle() --Только что вылезли из машины
 	hide_car_hud(in_btr)
 	if in_btr then
 		in_btr = false
-		cmd("g_god off")
+		--cmd("g_god off") --KRodin: Временно отключаю. Надо переделать по-другому.
 	end
 	--
 	--Включим фонарик актора, если выключали
@@ -209,7 +209,7 @@ function on_spawn()
 	current_btr_fov = ogse.load_var( script_name()..".current_btr_fov", fov_vol, "float") --Загружаем fov
 	--
 	if not ogse.var_exists( "god_mode_in_btr" ) then
-		cmd("g_god off")
+		--cmd("g_god off") --KRodin: Временно отключаю. Надо переделать по-другому.
 	end
 end
 
