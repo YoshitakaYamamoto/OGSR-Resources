@@ -5,6 +5,8 @@ function attach( sm ) -- для менеджера сигналов
   sm:subscribe({ signal = "on_spawn", fun = this.on_spawn })
 end
 
+local inert_enabled = get_u32("options", "bleed_enable") == 1
+
 -- читаем глобальные параметры эффектов здоровья
 local satiety_v = get_float("actor_script_condition", "satiety_v")
 ASSERT(satiety_v, "ogse_actor_conditions_mgr: 'satiety_v' parameter not found!")
@@ -248,13 +250,17 @@ function on_update()
 	  new_cam_inert = min_cam_inert + ( math.round( ( 0.8 - min_cam_inert ) * new_cam_inert * 100 ) / 100 )
 	  if new_cam_inert ~= cur_cam_inert then
 		--log3("--Change cam_inert = [%s]", new_cam_inert )
-		level.set_cam_inert( new_cam_inert )
+		if inert_enabled then
+			level.set_cam_inert( new_cam_inert )
+		end
 		cur_cam_inert = new_cam_inert
 	  end
 	end
   elseif cur_cam_inert ~= cam_inert then
 	--log3("--Change cam_inert = [%s]", cam_inert )
-	level.set_cam_inert( cam_inert )
+	if inert_enabled then
+		level.set_cam_inert( cam_inert )
+	end
 	cur_cam_inert = cam_inert
   end
 
