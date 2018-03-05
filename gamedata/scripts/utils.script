@@ -319,8 +319,7 @@ end
 function send_to_nearest_accessible_vertex( npc, v_id )
 	if npc and v_id then
 		if not npc:accessible( v_id ) then
-			local vtemp = vector()
-			v_id, vtemp = npc:accessible_nearest( level.vertex_position( v_id ), vtemp )
+			v_id = npc:accessible_nearest( level.vertex_position( v_id ), vector() )
 		end
 		npc:set_dest_level_vertex_id( v_id )
 	end

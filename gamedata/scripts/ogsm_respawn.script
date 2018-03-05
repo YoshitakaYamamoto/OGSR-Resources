@@ -7,11 +7,11 @@
 
 --KRodin: Респавн выключен. Теперь скрипт просто спавнит монстров после выброса и при первом запуске игры.
 
-local additional_spawn_accept = 0 --1 --get_u32("options", "additional_spawn", 1)
+local additional_spawn_accept = get_u32("options", "additional_spawn", 0) == 1
 
 function attach(sm)
-	--sm:subscribe({signal = "on_storyline_start", fun = this.first_run}) --Спавн разных монстров на локациях при первом запуске игры.
-	if additional_spawn_accept == 1 then --Если включен доп.спавн после выброса
+	if additional_spawn_accept then --Если включен доп.спавн
+		sm:subscribe({signal = "on_storyline_start", fun = this.first_run}) --Спавн разных монстров на локациях при первом запуске игры.
 		sm:subscribe({signal = "on_after_blowout", fun = this.level_spawn}) --Спавним монстров на текущей локации.
 	end
 end
@@ -26,8 +26,8 @@ end
 
 
 -- Обобщенная процедура спавна
-function proceed_spawn(p_name, p_vector, p_lv, p_gv)
-	return dsh.create_free_mob(p_name, p_vector, p_lv, p_gv)
+function proceed_spawn( ... )
+	return dsh.create_free_mob( ... )
 end
 
 -- Спавн монстров на всех локациях при первом запуске мода
