@@ -829,6 +829,11 @@ end
 
 --- Находится ли чувак в данный момент в состоянии мита
 function is_meet(npc)
+	--KRodin: !!!Такое тоже бывает. И вызывает мерзкий вылет с зависанием шедулера непися.
+	--В движке тоже поправил, чтоб просто писало в лог, а не вылетало.
+	if npc:is_actor() then return false end
+	--
+	--log3("~~Called is_meet for [%s] %s", npc:name(), debug.traceback())
 	local manager = npc:motivation_action_manager()
 	if manager and manager:initialized() then
 		local id = manager:current_action_id()
