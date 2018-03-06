@@ -26,6 +26,9 @@ function attach(sm)
 end
 
 --==========================================================Настройки=================================================================
+--Отключение ПНВ (который в слоте) при прицеливании через оптику.
+local turn_off_pnv_in_sniper_mode = get_bool( "wpn_addon_setup", "cheat_nv_block", true )
+
 local scope_section							-- Секция прицела в строковом виде.
 
 --флаги
@@ -153,10 +156,13 @@ end
 --==========================================Режим прицеливания через оптику===========================================
 local night_vision_fx_store = false --с помощью этого флага будем восстанавливать работу прибора ПНВ после прицеливания.
 function on_sniper_mode() --Вошли в режим прицеливания. Вызывается из ogse_hud_control.update_hud_control()
-	if night_vision_fx_on then --Если пнв включен, запомним что он был включен и выключим.
-		night_vision_fx_store = true
-		turn_off_nv_fx()
+	if turn_off_pnv_in_sniper_mode then --Если включено отключение прибора ПНВ при прицеливании
+		if night_vision_fx_on then --Если пнв включен, запомним что он был включен и выключим.
+			night_vision_fx_store = true
+			turn_off_nv_fx()
+		end
 	end
+	--
 	night_vision_fx_not_sniper = false --С помощью этого флага будем определять, находимся ли в режиме прицеливания.
 	scope_section = get_active_scope_section() --получаем секцию прицела
 	if nv_scope_fx_autoenable then --если задано автовключение пнв в прицеле, то:
@@ -170,10 +176,12 @@ function off_sniper_mode() --Вышли из режима прицеливани
 	if night_vision_scope_fx_on then turn_off_nv_scope_fx()	end -- вырубаем пнв в прицеле
 	scope_section = nil --переводим в nil, на всякий случай
 	night_vision_fx_not_sniper = true --вышли из режима прицеливания.
-	if night_vision_fx_store then --Если запомнили что пнв был включен, значит включаем его.
-		night_vision_fx_store = false
-		if not night_vision_surge_block then
-			nv_fx_on()
+	if turn_off_pnv_in_sniper_mode then --Если включено отключение прибора ПНВ при прицеливании
+		if night_vision_fx_store then --Если запомнили что пнв был включен, значит включаем его.
+			night_vision_fx_store = false
+			if not night_vision_surge_block then
+				nv_fx_on()
+			end
 		end
 	end
 end
