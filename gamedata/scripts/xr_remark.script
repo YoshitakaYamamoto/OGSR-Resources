@@ -298,7 +298,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
             st.target_id = id_by_sid(sid)
             if not st.target_id then
                   st.target_id = nil                
---                abort("remark <error>: Wrong story id [%s] for [%s] in section [%s].", st.target, npc:name(), section)
+				  log3("!!remark <error>: Wrong story id [%s] for [%s] in section [%s]", st.target, npc:name(), section)
             end
             st.target_init = true
             else

@@ -196,7 +196,7 @@ function repair_dialog:FillList() --Наполняем список предме
 end
 
 function item_for_repair(npc, item)
-	if item:condition() < max_condition and item:condition() > min_condition and (item:is_weapon_magazined() or item:is_outfit()) then
+	if item:condition() < max_condition and item:condition() > min_condition and ((item:is_weapon_magazined() and not string.find( item:section(), "wpn_binoc" )) or item:is_outfit()) then
 		item_table_index = item_table_index + 1
 		item_table[item_table_index] = item
 	end
