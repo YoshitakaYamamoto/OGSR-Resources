@@ -209,6 +209,10 @@ function del_buggy_mapspots() --Удаление глючных меток с к
 	and level_tasks.is_map_spot_present(story_ids.sar_secret_door, "green_location") then
 		level_tasks.remove_location_by_sid(story_ids.sar_secret_door, "green_location") --Вечная метка на кодовую дверь в саркофаге
 	end
+	if has_alife_info("val_escort_scene_end")
+	and level_tasks.is_map_spot_present(story_ids.val_escort_captive, "green_location") then
+		level_tasks.remove_location_by_sid(story_ids.val_escort_captive, "green_location") --Вечная метка на долговце, которого спасаем с Пулей.
+	end
 
 	if has_alife_info("freeplay") then
 		if level_tasks.is_map_spot_present(story_ids.warlab_dolg_commander, "green_location") then
