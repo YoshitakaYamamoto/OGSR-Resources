@@ -32,7 +32,7 @@ function fix_bandit_trader() --Телепорт торгаша бандитов 
   if ogse.var_exists("fix_bandit_trader") then return end
   --
   for id, sobj in alife():objects() do --У него нет ни нормального стори_айди, ни уникального имени, поэтому так.
-	if string.find( sobj:name(), "^bandit_trader_spawn" ) then
+	if sobj:section_name() == "bandit_trader_spawn" then
       local patrol = patrol( "bandit_trader_walk" )
       alife():teleport_object(
         id, patrol:point( 0 ),

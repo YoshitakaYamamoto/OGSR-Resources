@@ -3500,6 +3500,8 @@ function question_of_immortality_fisrt_part_prepare_spawn_firefly()
 	ogse.save_var("common_anomaly_id", common_anom.id, "u16")
 end
 
+local firefly_upd_signal = false
+
 function on_first_update_firefly()
 	if not db.actor:has_info("dead_stalker_question_of_immortality_first_part_start") or
 	db.actor:has_info("dead_stalker_question_of_immortality_get_firefly") then return end
@@ -3509,7 +3511,8 @@ function on_first_update_firefly()
 	if not sobj then return end
 	if level.name() ~= level_system_name_by_gvid(sobj.m_game_vertex_id) then return end
 
-	ogse_signals.get_mgr():subscribe({ signal = "on_update", fun = this.on_firefly_update, queued = true })
+	firefly_upd_signal = { signal = "on_update", fun = this.on_firefly_update, queued = true }
+	ogse_signals.get_mgr():subscribe( firefly_upd_signal )
 
 	if ogse.var_exists("art_firefly_id") then
 		local art_id = ogse.load_var("art_firefly_id")
@@ -3589,7 +3592,10 @@ function question_of_immortality_fisrt_part_delete_firefly_trash()
 	ogse.delete_var("common_anomaly_id")
 	ogse.delete_var("art_firefly_id")
 
-	ogse_signals.get_mgr():unsubscribe({signal = "on_update", fun = this.on_firefly_update})
+	if firefly_upd_signal then
+		ogse_signals.get_mgr():unsubscribe(firefly_upd_signal)
+		firefly_upd_signal = false
+	end
 	ogse.give_info("dead_stalker_question_of_immortality_delete_firefly_trash")
 end
 
