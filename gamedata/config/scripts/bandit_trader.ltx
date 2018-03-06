@@ -4,17 +4,18 @@ none = true
 [dont_spawn_loot]
 
 [logic]
-active = walker
+;active = walker
+active = walker2
 trade = misc\trade_bandit.ltx
 combat_ignore = combat_ignore
 
-[walker]
-path_walk = bandit_trader_spawn
-path_look = bandit_trader_look
-meet = meet
-danger = danger_condition
-combat_ignore_cond = always
-on_timer = 5000 | walker2
+;[walker]
+;path_walk = bandit_trader_spawn
+;path_look = bandit_trader_look
+;meet = meet
+;danger = danger_condition
+;combat_ignore_cond = always
+;on_timer = 5000 | walker2
 
 [walker2]
 path_walk = bandit_trader_walk

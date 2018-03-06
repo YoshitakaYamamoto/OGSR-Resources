@@ -16,12 +16,33 @@ function on_spawn()
 	fix_gar_boars_territory2_logic() --тоже самое.
 	--fix_yan_st_stalker3_kamp_1() --тоже самое
 	fix_mg_smarts() --тоже самое
+	--
+	fix_bandit_trader()
+	--
 end
 
 function on_first_update()
 	aem_fix() --Удалить по окончании игры! С НИ ЭТО НЕ НУЖНО!
 	--
 	fix_mg_respawners() --Снести с НИ
+end
+
+
+function fix_bandit_trader() --Телепорт торгаша бандитов на место.
+  if ogse.var_exists("fix_bandit_trader") then return end
+  --
+  for id, sobj in alife():objects() do --У него нет ни нормального стори_айди, ни уникального имени, поэтому так.
+	if string.find( sobj:name(), "^bandit_trader_spawn" ) then
+      local patrol = patrol( "bandit_trader_walk" )
+      alife():teleport_object(
+        id, patrol:point( 0 ),
+        patrol:level_vertex_id( 0 ), patrol:game_vertex_id( 0 )
+      )
+	  log3("--KRodin: bandit trader teleported to pos = {%s,%s,%s}, lvid = %s, gvid = %s", patrol:point( 0 ).x, patrol:point( 0 ).y, patrol:point( 0 ).z, patrol:level_vertex_id( 0 ), patrol:game_vertex_id( 0 ) )
+    end
+  end
+  --
+  ogse.save_var("fix_bandit_trader", true)
 end
 
 
