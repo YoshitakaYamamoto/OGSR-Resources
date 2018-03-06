@@ -253,43 +253,34 @@ function loc_row:create_location_group(index)
 			self)
 	end
 	local insert_btn = xml:Init3tButton("loc_list:loc_row:loc_item:insert_btn", bgnd)
+	--
 	local insert_btn_wname = "insert_btn"..index
 	self.msg_handler:Register(insert_btn, insert_btn_wname)
-	self.msg_handler:AddCallback(insert_btn_wname, ui_events.WINDOW_LBUTTON_DB_CLICK, 
-		function(self) 
-			take_screenshot(self.host, index):start()
-		end, 
-		self)
+	self.msg_handler:AddCallback(
+		insert_btn_wname,
+		ui_events.WINDOW_LBUTTON_DB_CLICK, 
+		function(self)
+			self.host:Show(false) -- скрываем окно
+			dsh.timeout(
+				100, --KRodin: меньше не делать! Иначе окно не успеет исчезнуть.
+				function()
+					local fs = getFS()
+					local full_path, add_name, fname = get_unique_fname("$game_textures$", "level_change\\"..self.host.lname, self.host.lname, "dds")
+
+					screenshot(screenshot_modes.gamesave, full_path) -- снимаем скриншот при скрытых руках и главном окне
+					self.host:Show(true) -- показываем окно
+
+					-- открываем диалог редактирования точки перехода
+					local ins_dlg = InsertNewLocationInfo(self.host, index, add_name)
+					self.host:GetHolder():start_stop_menu(ins_dlg, false)
+				end
+			)
+		end,
+		self
+	)
 	--
-		
 	local loc_group = {bgnd = bgnd, title = loc_title, sel_frame = sel_frame, insert_btn = insert_btn, btn = btn}
 	return loc_group
-end
-
--- таймер снятия скриншота. Нужен для того, чтобы успеть скрыть окно
-class "take_screenshot" (ogse_qt.quick_timer)
-function take_screenshot:__init(host_dlg, index)
-	self.counter = 0
-	self.host_dlg = host_dlg
-	self.insert_pos = index
-	host_dlg:Show(false) -- скрываем окно
-	--self.hud_visible = get_console():get_integer("hud_weapon")
-	--get_console():execute("hud_weapon 0") -- скрываем руки/оружие
-end
-function take_screenshot:condition()
-	self.counter = self.counter + 1
-	return self.counter == 1
-end
-function take_screenshot:action()
-	local fs = getFS()
-	local full_path, add_name, fname = get_unique_fname("$game_textures$", "level_change\\"..self.host_dlg.lname, self.host_dlg.lname, "dds")
-
-	screenshot(screenshot_modes.gamesave, full_path) -- снимаем скриншот при скрытых руках и главном окне
-	self.host_dlg:Show(true) -- показываем окно
-	--get_console():execute("hud_weapon "..self.hud_visible) -- показываем оружие
-	-- открываем диалог редактирования точки перехода
-	local ins_dlg = InsertNewLocationInfo(self.host_dlg, self.insert_pos, add_name)
-	self.host_dlg:GetHolder():start_stop_menu(ins_dlg, false)
 end
 
 class "InsertNewLocationInfo" (CUIScriptWnd)
