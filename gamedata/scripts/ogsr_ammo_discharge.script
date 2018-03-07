@@ -1,0 +1,94 @@
+
+--јвторазр€жалка оружи€ при вз€тии ствола в инвентарь.
+--KRodin (c) 2018
+
+function attach( sm )
+	sm:subscribe({ signal = "on_take", fun = this.ts_on_item_take })
+	--sm:subscribe({ signal = "on_drop", fun = this.ts_on_item_drop }) --KRodin: на мой взгл€д, это лишнее уже.
+end
+
+function ammo_discharge( wpn )
+  local gl_status, has_gl = 0, false
+  if wpn:is_weapon_gl() then
+    if
+      ogse_wpn_utils.get_grenade_launcher_status( wpn ) == 2
+      and
+      ogse_wpn_utils.get_grenade_launcher_flag( wpn )
+    then
+      gl_status = 1
+    end
+    has_gl = (
+      ogse_wpn_utils.get_grenade_launcher_status( wpn ) == 1
+      or
+      gl_status == 1
+    )
+  end
+  --
+  local hidden_t, hidden_n, cur_t, cur_n
+  if has_gl and ogse_wpn_utils.get_gl_mode( wpn ) then
+    do return end --— неписей оружие в режиме подствола и так не выпадает, поэтому это и не нужно. ƒа и работает как-то странно.
+    cur_t = wpn:get_underbarrel_ammo_type()
+    cur_n = wpn:get_underbarrel_num_types()
+    hidden_t = wpn:get_ammo_type()
+    hidden_n = wpn:get_ammo_in_magazine()
+  else
+    cur_t = wpn:get_ammo_type()
+    cur_n = wpn:get_ammo_in_magazine()
+    if has_gl then
+      hidden_t = wpn:get_underbarrel_ammo_type()
+      hidden_n = wpn:get_underbarrel_num_types()
+    else
+      hidden_t = 0
+      hidden_n = 0
+    end
+  end
+  --
+  if cur_n > 0 then
+    local ammo_sections = get_names( wpn:section(), "ammo_class" )
+    local ammo_sect     = ammo_sections[ cur_t + 1 ]
+    ogse.spawn_ammo_in_inv( ammo_sect, cur_n )
+    wpn:unload_magazine()
+    --log3("--[%s] unloaded wpn [%s]: [%s,%s]", script_name(), wpn:name(), ammo_sect, cur_n)
+  end
+  --[=[ --–азр€жание гранат нормально не работает, да с неписей вроде и не выпадает оружие с гранатами.
+  if hidden_n > 0 then
+    local ammo_sections = get_names( wpn:section(), "grenade_class" )
+    local ammo_sect     = ammo_sections[ hidden_t + 1 ]
+    ogse.spawn_ammo_in_inv( ammo_sect, hidden_n )
+    wpn:unload_magazine()
+    log3("--[%s] unloaded wpn [%s]: [%s,%s]", script_name(), wpn:name(), ammo_sect, hidden_n)
+  end
+  --]=]
+end
+
+--
+local function process( obj )
+	if device().precache_frame > 1 then return end --¬о врем€ загрузки ничего не делаем
+	--
+	if not obj:is_weapon_magazined() or obj:is_binoculars() then return end
+	--
+	--ћетод wpn:is_in_slot() тут вылетает с непон€тной диагностикой, поэтому так.
+	local obj_id = obj:id()
+	local PistolSlot = db.actor:item_in_slot(1)
+	if PistolSlot then
+		if PistolSlot:id() == obj_id then return end
+	end
+	local AutomaticSlot = db.actor:item_in_slot(2)
+	if AutomaticSlot then
+		if AutomaticSlot:id() == obj_id then return end
+	end
+	--
+	ammo_discharge( obj )
+end
+--
+
+function ts_on_item_take( ... )
+	if db.actor:has_info("ui_inventory") then return end --„тоб не было возможных проблем с системой аддонов
+	process( ... )
+end
+
+function ts_on_item_drop( ... )
+	if not db.actor:has_info("ui_inventory") then return end
+	--
+	process( ... )
+end
