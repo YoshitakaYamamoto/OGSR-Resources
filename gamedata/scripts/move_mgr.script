@@ -27,7 +27,8 @@ local state_standing = 2
 local sync = {}
 
 local extrapolate_hack_type = {
-	[ "yan_scientist_door_2_walk" ] = patrol.custom
+	[ "yan_scientist_door_2_walk" ] = patrol.custom,
+	[ "yan_scientist_help_walk_1" ] = patrol.custom, --KRodin: этот путь тоже занёс в исключения, чтоб круглов не мотался туда-сюда на одном месте.
 }
 
 ------------------------------------------------------------------------------------------------------------------
