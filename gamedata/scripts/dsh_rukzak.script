@@ -205,7 +205,7 @@ function get_item_info( obj )
   local info
   if ogse_addons.is_addon_shotgun( obj ) then
     local sobj = alife():object( obj:id() )
-    info = base64.enc( sobj.custom_data )
+    info = sobj.custom_data and base64.enc( sobj.custom_data ) or ""
   elseif obj:is_weapon_magazined() then
     info = get_wpn_info( obj )
   else
@@ -278,7 +278,7 @@ function get_wpn_info( wpn )
   --
   --KRodin: добавил сохранение кастомдаты. Нужно для подствольного дробовика.
   local sobj = alife():object( wpn:id() )
-  if sobj then
+  if sobj and sobj.custom_data then
     --log3("--saved customdata: %s", sobj.custom_data)
     table.insert( info, base64.enc( sobj.custom_data ) )
   end
