@@ -126,7 +126,7 @@ function create_items(obj, section, number, rnd)
 		if math.random() <= rnd	then
 			local num_in_box = get_u32(section, "box_size")
 			while number > num_in_box or number > 0 do
-				local sammo = alife():create_ammo(section, position, obj:level_vertex_id(), obj:game_vertex_id(), 65535, num_in_box)
+				local sammo = alife():create_ammo(section, position, obj:level_vertex_id(), obj:game_vertex_id(), 65535, number < num_in_box and number or num_in_box)
 				local _sammo = alife():object(sammo.id)
 				alife():use_ai_locations(_sammo, false)
 				number = number - num_in_box
