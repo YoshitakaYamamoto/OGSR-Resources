@@ -19,6 +19,8 @@ function on_spawn()
 	--
 	fix_bandit_trader()
 	--
+	fix_wpn_flame_in_rukzak()
+	--
 end
 
 function on_first_update()
@@ -43,6 +45,34 @@ function fix_bandit_trader() --Телепорт торгаша бандитов 
   end
   --
   ogse.save_var("fix_bandit_trader", true)
+end
+
+
+function fix_wpn_flame_in_rukzak() --KRodin: Фикс моей невнимательности
+	if ogse.var_exists("fix_wpn_flame_in_rukzak") then return end
+	--
+	for _, k in ipairs( ogse_unist.get_all_names() ) do
+		local id = string.match( k, "^dsh_rukzak%.([^.]+)%.sections$" )
+		if id then
+			id = tonumber( id )
+			local items = dsh_rukzak.load_rukzak( id )
+			local fixed = false
+			for i=1, #items do
+				local item = items[i]
+				if item.section == "wpn_flame" then
+					local str = item.info:sub(2)
+					item.info = "0"..str
+					--
+					fixed = true
+				end
+			end
+			if fixed then
+				dsh_rukzak.save_rukzak( id, items )
+			end
+		end
+	end
+	--
+	ogse.save_var("fix_wpn_flame_in_rukzak", true)
 end
 
 

@@ -1438,7 +1438,7 @@ function spawn_item_in_rukzak( rukzak_id, sect, num )
 	item.condition = 100
 	item.game_type = get_game_type( sect )
 	item.count     = ammo_clsids[class] and get_u32(sect, "box_size") * (num or 1) or (num or 1)
-	item.info      = wpn_magazined_clsids[class] and "1,"..get_string_wq(sect, "ammo_mag_size")..",0,0,0,0,0" or ""
+	item.info      = wpn_magazined_clsids[class] and "0,"..get_string_wq(sect, "ammo_mag_size")..",0,0,0,0,0" or ""
 	item.key       = string.format( "%s:%.2f:%s", sect, 100, item.info )
 	table.insert( items, item )
 	save_rukzak( rukzak_id, items )
@@ -1497,7 +1497,7 @@ function create_rukzak( pos, lv, gv, items, mapspot, hint )
 		item.condition = 100
 		item.game_type = get_game_type( sect )
 		item.count     = ammo_clsids[class] and get_u32(sect, "box_size") * num or num
-		item.info      = wpn_magazined_clsids[class] and "1,"..get_string_wq(sect, "ammo_mag_size")..",0,0,0,0,0" or ""
+		item.info      = wpn_magazined_clsids[class] and "0,"..get_string_wq(sect, "ammo_mag_size")..",0,0,0,0,0" or ""
 		item.key       = string.format( "%s:%.2f:%s", sect, 100, item.info )
 		table.insert( ruck_items, item )
 	end
