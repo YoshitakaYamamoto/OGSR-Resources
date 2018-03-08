@@ -28,6 +28,8 @@ function on_first_update()
 	aem_fix() --Удалить по окончании игры! С НИ ЭТО НЕ НУЖНО!
 	--
 	fix_mg_respawners() --Снести с НИ
+	--
+	fix_crazy_respawn()
 end
 
 
@@ -103,6 +105,31 @@ function fix_prizrak_trup()
 		--
 		log3("--[%s] prizrak trup fixed!", script_name())
 	end
+end
+
+
+function fix_crazy_respawn() --KRodin: Ещё один фикс моей невнимательности.
+  if ogse.var_exists("fix_crazy_respawn") then return end
+  --
+  dsh_respawn.iterate_respawners( function( respawner )
+    if respawner.item_spawn and #respawner.spawned_obj > 0 then
+      local ids = {}
+      for _, id in ipairs( respawner.spawned_obj ) do
+        table.insert( ids, id )
+      end
+      for _, id in ipairs( ids ) do
+        respawner:remove_spawned( id )
+        local sobj = alife():object( id )
+        if sobj then
+          log3("~~[%s] removed object [%s] from respawner [%s]", script_name(), sobj:name(), respawner.name)
+          alife():release(sobj, true) --Удаляем все лишние предметы, что наплодил респавнер.
+        end
+      end
+      dsh_respawn.spawn(respawner.name) --спавним нормальное кол-во предметов.
+    end
+  end )
+  --
+  ogse.save_var("fix_crazy_respawn", true)
 end
 
 

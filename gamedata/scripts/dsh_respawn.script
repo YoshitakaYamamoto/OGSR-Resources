@@ -189,6 +189,8 @@ function dsh_respawner:init_respawn_params() --Вычитываем настро
   --  self.respawn_radius = -1
   --end
   self.parent = get_float("respawn", "parent", nil, ini)
+  self.item_spawn = get_bool("respawn", "item_spawn", false, ini)
+  --log3("--[%s] respawner [%s] item_spawn is [%s]", script_name(), self.name, self.item_spawn)
 end
 
 function dsh_respawner:read_spawned_obj()
@@ -219,6 +221,8 @@ function dsh_respawner:load_spawned_obj()
       table.insert( self.spawned_obj, k )
     end
   end
+  --
+  --log3("--self.spawned_obj of [%s] : %s", self.name, self.spawned_obj)
 end
 
 function dsh_respawner:remove_spawned( id )
@@ -264,12 +268,16 @@ function dsh_respawner:do_refresh_spawned_obj()
           table.insert( filtered, v )
         end
       else
+        --log3("!!Remove object with id [%s], sect: [%s]", v, sobj and sobj:section() or "NOT FOUND")
         all_spawned_obj[ v ] = nil
       end
     end
     self.spawned_obj = filtered
   end
-
+  --
+  --Если спавн событийный - далее делать нечего. Иначе будет бешеный респавн содержимого ящиков.
+  if self.item_spawn then return end
+  --
   if
     xr_logic.pick_section_from_condlist(
       db.actor_proxy, self.object, self.conditions
@@ -356,6 +364,7 @@ function dsh_respawner:create( prob )
 			self.object.m_game_vertex_id,
 			parent_id
 		)
+		--log3("~~[%s] spawned item [%s] in resp [%s], %s", script_name(), sobj:name(), self.name, debug.traceback())
 	end
 	--level.map_add_object_spot_ser(sobj.id, "red_location", script_name()..": "..sobj:name()) --DEBUG
 
