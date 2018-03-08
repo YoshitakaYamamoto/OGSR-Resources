@@ -128,9 +128,14 @@ function se_monster:STATE_Write(packet)
 
 	packet:w_bool(self.was_in_smart_terrain)
 
-	--if self.id ~= 65535 then --–азве такое может быть?
+	--KRodin: вот это важное условие! ≈сли его убрать, не спавн€тс€ некоторые вечные трупы, в т.ч. квестовые, например труп ѕризрака в X-16
+	--Ќа монстров оно тоже может вли€ть, значит.
+	if self.id ~= 65535 then
+		--log3("~~[se_stalker:STATE_Write] id of [%s] is [%s]", self:name(), self.id)
 		packet:w_u32(self.offline_dead)
-	--end	
+	else
+		--log3("~~[se_stalker:STATE_Write] id of [%s] is [%s]", self:name(), self.id)
+	end
 end
 --------------------
 function se_monster:STATE_Read(packet, size)
@@ -151,9 +156,14 @@ function se_monster:STATE_Read(packet, size)
 
 	self.was_in_smart_terrain = packet:r_bool()
 
-	--if self.id ~= 65535 then --–азве такое может быть?
+	--KRodin: вот это важное условие! ≈сли его убрать, не спавн€тс€ некоторые вечные трупы, в т.ч. квестовые, например труп ѕризрака в X-16
+	--Ќа монстров оно тоже может вли€ть, значит.
+	if self.id ~= 65535 then
+		--log3("~~[se_monster:STATE_Read] id of [%s] is [%s]", self:name(), self.id)
 		self.offline_dead = packet:r_u32()
-	--end	
+	else
+		--log3("~~[se_monster:STATE_Read] id of [%s] is [%s]", self:name(), self.id)
+	end
 end
 --------------------
 function se_monster:on_before_register()

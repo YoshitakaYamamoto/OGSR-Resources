@@ -21,6 +21,7 @@ function on_spawn()
 	--
 	fix_wpn_flame_in_rukzak()
 	--
+	fix_prizrak_trup()
 end
 
 function on_first_update()
@@ -73,6 +74,35 @@ function fix_wpn_flame_in_rukzak() --KRodin: Фикс моей невнимат�
 	end
 	--
 	ogse.save_var("fix_wpn_flame_in_rukzak", true)
+end
+
+
+--KRodin: поправил пропажу Призрака. Пропажа трупов правится в другом месте, и требует НИ.
+--Поэтому будем извращаться, чтоб сохранить совместимость сейвов.
+function fix_prizrak_trup()
+	local lost_sobj = alife():story_object( story_ids.yan_ghost )
+	if not lost_sobj and not has_alife_info("yan_has_ghost_pda") then --Трупа нет и его ещё не обыскали
+		local sobj = alife():create("stalker", vector():set(-100.799301147461, 5.60592746734619, -23.0884437561035), 717, 1583)
+		--
+		local pk = get_netpk(sobj)
+		ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
+		local data = pk:get()
+		data.health = 0
+		data.upd.health = 0
+		data.visual_name = "actors\\neytral\\stalker_prizrak"
+		local custom_data_string = "[logic] \nactive = nil \n[known_info] \nyan_has_ghost_pda \n[smart_terrains] \nnone = true"
+		data.custom_data:setString(custom_data_string)
+		pk:set(data)
+		--
+		alife():assign_story_id(sobj.id, story_ids.yan_ghost)
+		--
+		ogse.spawn_item_in_inv("wpn_val", sobj) 
+		ogse.spawn_item_in_inv("ammo_9x39_ap", sobj) 
+		ogse.spawn_item_in_inv("lab_x16_documents", sobj) 
+		ogse.spawn_item_in_inv("outfit_stalker_m1", sobj) 
+		--
+		log3("--[%s] prizrak trup fixed!", script_name())
+	end
 end
 
 
