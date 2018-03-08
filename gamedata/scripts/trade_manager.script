@@ -1,5 +1,8 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
+--Минимальное и максимальное время обновления торговли в игровых часах.
+local MIN_TRADE_UPD_TIME, MAX_TRADE_UPD_TIME = 1, 3
+
 
 function attach( sm )
   sm:subscribe({ signal = "on_monster_death",       fun = this.on_death   })
@@ -11,12 +14,16 @@ function attach( sm )
   sm:subscribe({ signal = "on_trade_hide", fun = this.on_trade_hide })
 end
 
+
 function on_death( obj )
-  local binder     = obj:binded_object()
-  local subscribed = binder[ script_name() .. ".subscribed" ]
-  if subscribed then
-    ogse_signals.get_mgr():unsubscribe( subscribed )
-    binder[ script_name() .. ".subscribed" ] = nil
+  local binder = obj:binded_object()
+  local slots = { script_name() .. ".subscribed", script_name() .. ".subscribed2", script_name() .. ".subscribed3"}
+  for i=1, #slots do
+    local slot = binder[ slots[i] ]
+    if slot then
+      ogse_signals.get_mgr():unsubscribe( slot )
+      binder[ slots[i] ] = nil
+    end
   end
 end
 
@@ -102,10 +109,7 @@ function trade_init( npc, cfg )
           local resuply_time = get_string( sect, "resuply_time", nil, ini )
           if resuply_time then
             tt.resuply_time = unpack_time_from_string( resuply_time )
-            -- log2(
-            --   "TRADE INIT[%s] resuply_time in %s seconds",
-            --   npc:name(), tt.resuply_time:diffSec( game.get_game_time() )
-            -- )
+            --log3( "--TRADE INIT [%s] resuply_time is [%s]", npc:name(), time2string(tt.resuply_time, "%04d/%02d/%02d %02d:%02d:%02d.%03d", {'y','m','d','h','min','s','ms'}))
           end
          end
        end
@@ -114,21 +118,44 @@ function trade_init( npc, cfg )
     tt.buy_supplies = nil
   end
 
-  update( npc, true ) --KRodin: вынужденный апдейт торговли, сделал чтобы нормально обновлялась при взятии/отпускании напарников.
-
   if npc:alive() then
+    local sm = ogse_signals.get_mgr()
     local binder = npc:binded_object()
-    if not binder[ script_name() .. ".subscribed" ] then
-      local s_name = ( npc:clsid() == clsid.script_trader )
-        and ( "on_monster_update." .. npc:id() )
-        or  ( "on_npc_update."     .. npc:id() )
+    local s_name = ( npc:clsid() == clsid.script_trader )
+      and ( "on_monster_update." .. npc:id() )
+      or  ( "on_npc_update."     .. npc:id() )
+    --buy_supplies обновляем отдельно, в строго определённое время в соответствии с таймаутом.
+    if tt.buy_supplies and not binder[ script_name() .. ".subscribed" ] then
       local s = {
+        [ "signal" ] = s_name,
+        [ "fun"    ] = this.update_buy_supplies,
+        --[ "queued" ] = true, --не нужно.
+      }
+      if tt.resuply_time then --Его может не быть, если инитим торговлю впервые.
+        s.timeout = time_global() + ( ( tt.resuply_time:diffSec( game.get_game_time() )  * 1000 )  / ogse.game_time_factor )
+		--log3("--TRADE ON_SPAWN Timeout for [%s] is [%s]", npc:name(), s.timeout)
+      end
+      binder[ script_name() .. ".subscribed" ] = s
+      sm:subscribe( s )
+      --Сигнал для корректного обновления после сна.
+      local s2 = {
+        [ "signal" ] = "after_time_change",
+		[ "self"   ] = npc,
+        [ "fun"    ] = this.update_after_time_change,
+      }
+      binder[ script_name() .. ".subscribed2" ] = s2
+      sm:subscribe( s2 )
+    end
+	--
+	--Всё остальное просто периодически обновляем.
+    if not binder[ script_name() .. ".subscribed3" ] then
+      local s3 = {
         [ "signal" ] = s_name,
         [ "fun"    ] = this.update,
         [ "queued" ] = true,
       }
-      binder[ script_name() .. ".subscribed" ] = s
-      ogse_signals.get_mgr():subscribe( s )
+      binder[ script_name() .. ".subscribed3" ] = s3
+      sm:subscribe( s3 )
     end
   end
 end
@@ -139,20 +166,11 @@ function cleanup( obj )
 end
 
 
-function update( npc, forced )
+function update( npc )
+  ogse_signals.get_mgr():reschedule( math.random(5000, 10000) ) --Можно и прибавить будет.
+  --
   local tt = trade_manager[ npc:id() ]
   ASSERT( tt, "trade_manager[ npc:id() ] npc found: %s", npc:name() )
-
-  if forced ~= true then
-    if tt.update_time and tt.update_time > time_global() then
-      ogse_signals.get_mgr():reschedule( tt.update_time - time_global() )
-      return
-    end
-
-    local update_t = math.random( 1800, 3600 ) * 1000
-    tt.update_time = time_global() + update_t
-    ogse_signals.get_mgr():reschedule( update_t )
-  end
 
   local str = xr_logic.pick_section_from_condlist(
     db.actor, npc, tt.buy_condition
@@ -170,41 +188,62 @@ function update( npc, forced )
     npc:sell_condition( tt.config, str )
     tt.current_sell_condition = str
   end
+end
 
-  if forced ~= true and tt.buy_supplies then
-    if
-      tt.resuply_time
-      and tt.resuply_time:diffSec( game.get_game_time() ) > 0
-    then
-      return
-    end
-    str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_supplies )
-    if str and (not tt.current_buy_supplies or tt.current_buy_supplies ~= str) then
-      -- log2( "TRADE UPDATE[%s]: buy_supplies = %s", npc:name(), str )
-      npc:buy_supplies( tt.config, str )
-      add_buy_supplies( npc, tt.config, str )
-      tt.current_buy_supplies = str
-    end
-    tt.resuply_time = game.get_game_time()
-      + seconds2ctime( math.random( 3, 12 ) * 3600 )
-    -- log2(
-    --   "TRADE UPDATE[%s] resuply_time in %s seconds",
-    --   npc:name(), tt.resuply_time:diffSec( game.get_game_time() )
-    -- )
-    local sobj = alife():object( npc:id() )
-    if sobj then
-      local ini  = sobj:spawn_ini()
-      local sect = "trade_manager"
-      ini.readonly = false
-      ini:w_string(
-        sect, "resuply_time", pack_time_to_string( tt.resuply_time )
-      )
-      sobj:save_spawn_ini()
-      -- log2( "TRADE UPDATE[%s] custom_data = %s", npc:name(), sobj.custom_data )
-    end
+
+-----------------------------------------------------------------------
+local function change_new_update_time( slot, next_update, forced )
+  local sm = ogse_signals.get_mgr()
+  local current_time = game.get_game_time()
+  --local next_upd_game_time = time2string(next_update, "%04d/%02d/%02d %02d:%02d:%02d.%03d", {'y','m','d','h','min','s','ms'}) --убрать потом.
+  local game_time_delta = next_update:diffSec(current_time) --Посчитаем, через сколько игровых секунд нужно обновить торговлю
+  local game_time_delta_ms = game_time_delta * 1000 --Переводим в игровые миллисекунды
+  local REAL_time_delta_ms = game_time_delta_ms / ogse.game_time_factor --Конвертируем в РЕАЛЬНОЕ время
+  --log3("##[%s] Next update game time: %s, \nDelta in game seconds: [%s], \nDelta in game ms: [%s] \nTime Factor: [%s] \nDelta in REAL ms: [%s] \nCurrent global time: [%s] \nNext update global time: [%s]", script_name(), next_upd_game_time, game_time_delta, game_time_delta_ms, ogse.game_time_factor, REAL_time_delta_ms, time_global(), time_global() + REAL_time_delta_ms)
+  if not forced then --Если это обычный апдейт, вызванный менеджером сигналов
+    sm:reschedule( REAL_time_delta_ms ) --Устанавливаем таймаут для текущего слота
+  else --Если это вынужденный апдейт, вызванный НЕ из менеджера сигналов
+    sm:rechange_scheduled_time( slot, REAL_time_delta_ms ) --Переустанавливаем таймаут для слота обновления другим методом, т.к. метод reschedule в этом случае не подходит.
   end
 end
 
+function update_after_time_change( obj ) --Обновление после изменения времени (сна)
+  local binder = obj:binded_object()
+  local slot = binder[ script_name() .. ".subscribed" ]
+  if slot then
+    local tt = trade_manager[ obj:id() ]
+    change_new_update_time( slot, tt.resuply_time, true )
+  end
+end
+
+function update_buy_supplies( npc )
+  local tt = trade_manager[ npc:id() ]
+  ASSERT( tt, "trade_manager[ npc:id() ] npc found: %s", npc:name() )
+  --
+  str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_supplies )
+  if str and (not tt.current_buy_supplies or tt.current_buy_supplies ~= str) then
+    --log3( "TRADE UPDATE[%s]: buy_supplies = %s", npc:name(), str )
+    npc:buy_supplies( tt.config, str )
+    add_buy_supplies( npc, tt.config, str )
+    tt.current_buy_supplies = str
+  end
+  --Вот тут устанавливается время следующего обновления торговли.
+  tt.resuply_time = game.get_game_time() + seconds2ctime( math.random( MIN_TRADE_UPD_TIME, MAX_TRADE_UPD_TIME ) * 3600 )
+  change_new_update_time( nil, tt.resuply_time, false )
+  --
+  local sobj = alife():object( npc:id() )
+  if sobj then
+    local ini  = sobj:spawn_ini()
+    local sect = "trade_manager"
+    ini.readonly = false
+    ini:w_string(
+      sect, "resuply_time", pack_time_to_string( tt.resuply_time )
+    )
+    sobj:save_spawn_ini()
+    -- log2( "TRADE UPDATE[%s] custom_data = %s", npc:name(), sobj.custom_data )
+  end
+end
+--------------------------------------------------------------------------------
 
 function save( obj, packet )
   local tt = trade_manager[ obj:id() ]
@@ -250,26 +289,8 @@ function save( obj, packet )
     packet:w_stringZ( "" )
   end
 
-  local cur_tm = time_global()
-  if tt.update_time then
-    -- log2(
-    --   "TRADE SAVE[%s]: update_time = %s",
-    --   obj:name(), ( tt.update_time - cur_tm ) / 1000
-    -- )
-    packet:w_s32( tt.update_time - cur_tm )
-  else
-    packet:w_s32( -1 )
-  end
-
-  if tt.resuply_time then
-    -- log2(
-    --   "TRADE SAVE[%s]: resuply_time = %s",
-    --   obj:name(), tt.resuply_time:diffSec( game.get_game_time() )
-    -- )
-    packet:w_s32( tt.resuply_time:diffSec( game.get_game_time() ) * 1000 )
-  else
-    packet:w_s32( -1 )
-  end
+  packet:w_s32( -1 ) --KRodin: для совместимости сейвов.
+  packet:w_s32( -1 ) --Тоже самое.
 end
 
 
@@ -311,20 +332,8 @@ function load( obj, packet )
   -- )
   if a ~= "" then tt.current_buy_supplies = a end
 
-  local cur_tm = time_global()
-  a = packet:r_s32()
-  -- log2(
-  --   "TRADE LOAD[%s]: update_time = %s", obj:name(), tostring( a )
-  -- )
-  if a > 0 then tt.update_time = cur_tm + a end
-
-  a = packet:r_s32()
-  -- log2(
-  --   "TRADE LOAD[%s]: resuply_time = %s", obj:name(), tostring( a )
-  -- )
-  if a > 0 then
-    tt.resuply_time = game.get_game_time() + seconds2ctime( a / 1000 )
-  end
+  packet:r_s32() --KRodin: для совместимости сейвов.
+  packet:r_s32() --Тоже самое
 end
 
 
