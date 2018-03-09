@@ -372,6 +372,7 @@ function controller_psy_attack( obj )
 			and npc:character_community() ~= "actor_zombied"
 			and obj:position():distance_to(npc:position()) < math.random(10, 60)
 			and not ogse.is_quest_npc(npc)
+			and not xr_companion.is_companion(npc:id())
 		then
 			local sobj = alife():object( npc:id() )
 			if sobj and sobj.online then
