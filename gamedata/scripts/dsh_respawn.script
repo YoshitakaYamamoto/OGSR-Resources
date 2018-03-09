@@ -190,7 +190,10 @@ function dsh_respawner:init_respawn_params() --Вычитываем настро
   --end
   self.parent = get_float("respawn", "parent", nil, ini)
   self.item_spawn = get_bool("respawn", "item_spawn", false, ini)
-  --log3("--[%s] respawner [%s] item_spawn is [%s]", script_name(), self.name, self.item_spawn)
+  --
+  if not self.item_spawn and self.max_spawn > 1 then
+    self.max_spawn = self.max_spawn * 2 --KRodin: увеличил в два раза, чтоб даже теоретически не было проблем с неполным заполнением некоторых смартов.
+  end
 end
 
 function dsh_respawner:read_spawned_obj()
