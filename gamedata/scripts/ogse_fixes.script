@@ -30,6 +30,8 @@ function on_first_update()
 	fix_mg_respawners() --Снести с НИ
 	--
 	fix_crazy_respawn()
+	--
+	fix_monsters_spawn()
 end
 
 
@@ -130,6 +132,15 @@ function fix_crazy_respawn() --KRodin: Ещё один фикс моей нев�
   end )
   --
   ogse.save_var("fix_crazy_respawn", true)
+end
+
+
+function fix_monsters_spawn()
+  if ogse.var_exists("fix_monsters_spawn") then return end
+  --
+  ogsm_respawn.first_run()
+  --
+  ogse.save_var("fix_monsters_spawn", true)
 end
 
 

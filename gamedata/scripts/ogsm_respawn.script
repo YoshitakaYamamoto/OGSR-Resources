@@ -11,9 +11,7 @@ local additional_spawn_accept = get_u32("options", "additional_spawn", 0) == 1
 
 function attach(sm)
 	if additional_spawn_accept then --Если включен доп.спавн
-		--KRodin: оно вызывает вылеты.
-		--sm:subscribe({signal = "on_storyline_start", fun = this.first_run}) --Спавн разных монстров на локациях при первом запуске игры.
-		--sm:subscribe({signal = "on_after_blowout", fun = this.level_spawn}) --Спавним монстров на текущей локации.
+		sm:subscribe({signal = "on_after_blowout", fun = this.level_spawn}) --Спавним монстров на текущей локации.
 	end
 end
 
@@ -27,8 +25,8 @@ end
 
 
 -- Обобщенная процедура спавна
-function proceed_spawn( ... )
-	return dsh.create_free_mob( ... )
+local function proceed_spawn(p_name, p_vector, p_lv, p_gv)
+	return dsh.create_free_mob(p_name, p_vector, p_lv, p_gv)
 end
 
 -- Спавн монстров на всех локациях при первом запуске мода
