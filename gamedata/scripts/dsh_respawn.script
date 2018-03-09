@@ -384,7 +384,7 @@ function dsh_respawner:create( prob )
           if object_level_name(sobj) == level.name() and sobj.position:distance_to(db.actor:position()) <= alife():switch_distance() then
             --log3("--[%s] Switching offline: [%s] on level: [%s]", script_name(), sobj:name(), object_level_name(sobj))
 			switch_offline(sobj.id)
-            swith_online_cond_timer(sobj:name()):init(sobj.id):start()
+            swith_online_cond_timer("swith_online_cond_timer "..sobj:name()):init(sobj.id):start()
           end
         end
       end

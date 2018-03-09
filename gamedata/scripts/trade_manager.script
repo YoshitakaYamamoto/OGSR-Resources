@@ -224,7 +224,7 @@ function update_buy_supplies( npc )
   local tt = trade_manager[ npc:id() ]
   ASSERT( tt, "trade_manager[ npc:id() ] npc found: %s", npc:name() )
   --
-  str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_supplies )
+  local str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_supplies )
   if str then
     npc:buy_supplies( tt.config, str )
     add_buy_supplies( npc, tt.config, str )

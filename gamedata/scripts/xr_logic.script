@@ -1126,8 +1126,8 @@ function pstor_load_all(obj, reader)
 	end
 
 	if obj:is_actor() and ogse.var_exists( script_name() .. ".pstor_actor" ) then
-		pstor = ogse.load_var( script_name() .. ".pstor_actor" )
-		--log3("[%s] Loaded actor pstor: %s", script_name(), pstor)
+		db.storage[npc_id].pstor = ogse.load_var( script_name() .. ".pstor_actor" )
+		--log3("[%s] Loaded actor pstor: %s", script_name(), db.storage[npc_id].pstor)
 	else
 		if obj:is_actor() then --Убрать с НИ!!!
 			if ogse.var_exists( script_name() .. ".actor_pstor" ) then

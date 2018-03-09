@@ -121,8 +121,6 @@ function on_info(npc, info_id)
 end
 
 function check_freedom_attack_end()
-
-	
 	if not db.actor:has_info("mil_freedom_attack") then
 		return
 	end
@@ -142,7 +140,6 @@ function check_freedom_attack_end()
 	end
 	
 	if check == true then
-		log1("!!CHECKING!!")
 		if db.actor:has_info("mil_freedom_departed_1") and not db.actor:has_info("mil_freedom_returned_1") then
 			return
 		end
@@ -170,9 +167,7 @@ function check_freedom_attack_end()
 		if db.actor:has_info("mil_freedom_departed_9") and not db.actor:has_info("mil_freedom_returned_9") then
 			return
 		end
-		
-		log1("!!ATTACK ENDED!!")
-		
+				
 		db.actor:disable_info_portion("mil_freedom_attack")
 		
 		db.actor:disable_info_portion("mil_freedom_departed_1")
@@ -3193,7 +3188,7 @@ end
 -- Данные таймера сохраняются даже после окончания текущей игровой сессии
 
 class "delete_when_offline" (ogse_st_mgr.savable_timer)
-function delete_when_offline:__init(npc_id) super()
+function delete_when_offline:__init(npc_id) super(npc_id) --НЕ НАДО ТАК ДЕЛАТЬ! В конструкторе должно быть не npc_id, а уникальное имя таймера! А так могут и дублирования имён таймеров возникнуть, что вызовет вылет.
 	-- обязательная строка с именем класса таймера
 	self.class = script_name()..".delete_when_offline"
 	self.npc_id = npc_id
