@@ -129,7 +129,7 @@ function on_use(obj, sobj)
 	--
 	-- использованный фейковый создали заново (вне зависимости от дальнейших действий предмет останется в инвентаре,
 	-- если надо будет удалить, то удалим повторно уже по факту установки аддона)
-	log3("~~Spawning object with section [%s] %s", obj:section(), debug.traceback())
+	--log3("~~Spawning object with section [%s] %s", obj:section(), debug.traceback())
 	local s_new_fake_addon = ogse.spawn_item_in_inv(obj:section())
 	-- переносим кастомдату из удалённого аддона в свежесозданный
 	s_new_fake_addon.custom_data = sobj.custom_data
@@ -370,7 +370,7 @@ function convert_after_shg_detached(cur_weapon)
 	local removed_fake_gl_sec = get_string(removed_real_gl_sec, "fake_item_section", nil)
 	ASSERT(removed_fake_gl_sec, "convert_after_shg_detached: No fake addon section defined! Check section: "..removed_real_gl_sec)
 	
-	log3("~~Spawning object with section [%s] %s", removed_fake_gl_sec, debug.traceback())
+	--log3("~~Spawning object with section [%s] %s", removed_fake_gl_sec, debug.traceback())
 	local s_new_fake_addon = ogse.spawn_item_in_inv(removed_fake_gl_sec) -- собственно создаём
 	-- надо добавить из него заряды в кастомдату снятого подствольного дробовика
 	-- проверяем текущий ствол
@@ -385,7 +385,7 @@ function convert_after_shg_detached(cur_weapon)
 	local cur_wpn_slot_cfg = get_u32(cur_weapon:section(), "slot")
 	local is_slot_active = db.actor:active_slot() == cur_wpn_slot_engine
 
-	db.actor:move_to_ruck(cur_weapon) -- освобождаем слот
+	db.actor:drop_item(cur_weapon)
 	sim:release(s_cur_weapon, true) -- удаляем старый ствол
   --
   local sm_slot = {
@@ -401,7 +401,7 @@ function convert_after_shg_detached(cur_weapon)
     end
   }
   ogse_signals.get_mgr():subscribe( sm_slot )
-	log3("~~Spawning object with section [%s] %s", new_wpn_section, debug.traceback())
+  --log3("~~Spawning object with section [%s] %s", new_wpn_section, debug.traceback())
   local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
   ogse_signals.get_mgr():unsubscribe( sm_slot )
   --
@@ -533,7 +533,7 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 				ASSERT(removed_real_addon_sec, "install_remove_addon: Addon flag is set, but there is no addon section defined! Check logic of code/configs.")
 				local removed_fake_addon_sec = get_string(removed_real_addon_sec, "fake_item_section", nil)
 				ASSERT(removed_fake_addon_sec, "install_remove_addon: No fake addon section defined! Check section: "..removed_real_addon_sec)
-	log3("~~Spawning object with section [%s] %s", removed_fake_addon_sec, debug.traceback())
+				--log3("~~Spawning object with section [%s] %s", removed_fake_addon_sec, debug.traceback())
 				local s_new_fake_addon = ogse.spawn_item_in_inv(removed_fake_addon_sec) -- собственно создаём
 				
 				if get_u32(removed_fake_addon_sec, "is_shotgun") == 1 then -- если "снятый" снятый аддон - подствольный дробовик
@@ -572,8 +572,10 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 	local cur_wpn_slot_cfg = get_u32(cur_weapon:section(), "slot")
 	local is_slot_active = db.actor:active_slot() == cur_wpn_slot_engine
 
-	--
-	db.actor:move_to_ruck(cur_weapon) -- освобождаем слот, чтобы туда мог встать новый ствол
+	--KRodin: здесь вместо перемещения в рюкзак будем выкидывать для предотвращения двойного удаления
+	--(шотган при перемещении из слота в рюкзак конвертируется в фейк, а сам удаляется. И тут мы пытаемся второй раз удалить - получаем завис алайфа или вылет).
+	db.actor:drop_item(cur_weapon)
+	--log3("--[%s] release wpn [%s]", script_name(), cur_weapon:name())
 	sim:release(s_cur_weapon, true) -- удаляем старый ствол
 	--	
   local sm_slot = {
@@ -601,7 +603,7 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
     end
   }
   ogse_signals.get_mgr():subscribe( sm_slot )
-	log3("~~Spawning object with section [%s] %s", new_wpn_section, debug.traceback())
+  --log3("~~Spawning object with section [%s] %s", new_wpn_section, debug.traceback())
   local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
   ogse_signals.get_mgr():unsubscribe( sm_slot )
 	--
@@ -750,7 +752,7 @@ function switch_shg_mode(wpn)
 	local is_slot_active = db.actor:active_slot() == cur_wpn_slot_engine
 	--
 	--Удаляем старый ствол
-	db.actor:move_to_ruck(wpn)
+	db.actor:drop_item(wpn)
 	sim:release(s_cur_weapon, true)
   --
   local sm_slot = {
@@ -768,7 +770,7 @@ function switch_shg_mode(wpn)
     end
   }
   ogse_signals.get_mgr():subscribe( sm_slot )
-	log3("~~Spawning object with section [%s] %s", new_wpn_section, debug.traceback())
+  --log3("~~Spawning object with section [%s] %s", new_wpn_section, debug.traceback())
   local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section) --Спавним новый
   ogse_signals.get_mgr():unsubscribe( sm_slot )
   --
@@ -804,7 +806,7 @@ function convert_shg_to_addon(swpn)
 	--
 	local ammo_sections = get_names(cur_weapon_sect, "ammo_class") -- получаем список секций патронов
 	local ammo_sec = ammo_sections[cur_wpn_ammo_type + 1] -- и узнаём заряженную секцию
-	log3("~~Spawning object with section [%s] %s", fake_addon_section, debug.traceback())
+	--log3("~~Spawning object with section [%s] %s", fake_addon_section, debug.traceback())
 	local s_new_fake_addon = ogse.spawn_item_in_inv(fake_addon_section)
 	set_addon_shg_params_to_cd(s_new_fake_addon, cur_wpn_ammo_type, cur_wpn_ammo_elapsed, ammo_sec, cur_wpn_condition)
 	sim:release(swpn, true)
@@ -832,7 +834,7 @@ function convert_addon_to_shg(saddon, slot_number)
     end
   }
   ogse_signals.get_mgr():subscribe( sm_slot )
-	log3("~~Spawning object with section [%s] %s", wpn_section, debug.traceback())
+  --log3("~~Spawning object with section [%s] %s", wpn_section, debug.traceback())
   local s_new_weapon = ogse.spawn_item_in_inv( wpn_section )
   ogse_signals.get_mgr():unsubscribe( sm_slot )
   --
@@ -843,24 +845,18 @@ end
 
 -- следим за попаданием в инвентарь ствола XM-26 LSS в режиме автономного оружия для конвертации в аддон
 function on_item_to_ruck(obj, sobj)
-	--if not sobj then return true end
-	
 	-- обработка всех полученных фейк-предметов при открытом инвентаре
 	if db.actor:has_info("ui_inventory") then
-		--ASSERT(obj, "ogse_ui_item_effects.on_item_to_ruck: obj is a nil reference")
-		--ASSERT(sobj, "ogse_ui_item_effects.on_item_to_ruck: sobj is a nil reference, name="..obj:name())
 		local sec = obj:section()
 		-- проверяем, а не прицел ли снимаем
 		if is_scope(sec) then
---			log1("ON_ITEM_TO_RUCK: "..sec.." is scope")
-			-- таки прицел. Надо проверить, а не надо ли заменить оружие в слоте
-			-- Условия - на стволе в слоте нет прицела, но есть параметр scope_removed_section в секции
-			for i = 1,2 do
---				log1("ON_ITEM_TO_RUCK: checking slot "..tostring(i))
-				local wpn = db.actor:item_in_slot(i)
-				if wpn then
+			-- таки прицел. Надо проверить, а не надо ли заменить оружие в инвентаре.
+			-- Условия - на стволе нет прицела, но есть параметр scope_removed_section в секции
+			-- KRodin: в оригинале проверялось оружие только в слотах, и в при снятии прицела со ствола в инвентаре, он не конвертировался в нужную секцию.
+			-- Теперь же будем перебирать весь инвентарь.
+			db.actor:inventory_for_each( function(wpn, actor)
+				if wpn and wpn:is_weapon_magazined() then
 					local new_wpn_section = get_string(wpn:section(), "scope_removed_section")
---					log1("ON_ITEM_TO_RUCK: slot "..tostring(i).." has weapon "..wpn:name())
 					local s_cur_weapon = sim:object(wpn:id())
 					--
 					local cur_wpn = s_cur_weapon:get_weapon()
@@ -871,14 +867,17 @@ function on_item_to_ruck(obj, sobj)
 					local cur_wpn_cd = s_cur_weapon.custom_data
 					--
 					if not is_scope_installed(wpn) and new_wpn_section then
---						log1("ON_ITEM_TO_RUCK: weapon "..wpn:name().." has no scope and has parameter scope_removed_section ("..new_wpn_section..")")
-						-- ага, нужная ситуация
-
-						local cur_wpn_slot_engine = get_inv_item_slot( wpn )
-						local cur_wpn_slot_cfg = get_u32(wpn:section(), "slot")
-						local is_slot_active = db.actor:active_slot() == cur_wpn_slot_engine
-
-						db.actor:move_to_ruck(wpn) -- освобождаем слот, чтобы туда мог встать новый ствол
+						--log1("~~[ogse_addons] ON_ITEM_TO_RUCK: weapon "..wpn:name().." has no scope and has parameter scope_removed_section ("..new_wpn_section..")")
+						--
+						local cur_wpn_slot_engine, cur_wpn_slot_cfg, is_slot_active
+						local is_wpn_in_slot = actor:is_in_slot( wpn )
+						if is_wpn_in_slot then
+							cur_wpn_slot_engine = get_inv_item_slot( wpn )
+							cur_wpn_slot_cfg = get_u32(wpn:section(), "slot")
+							is_slot_active = actor:active_slot() == cur_wpn_slot_engine
+						end
+						--
+						actor:drop_item(wpn)
 						sim:release(s_cur_weapon, true) -- удаляем старый ствол
 						--
 						local sm_slot = {
@@ -894,16 +893,16 @@ function on_item_to_ruck(obj, sobj)
 							end
 						}
 						ogse_signals.get_mgr():subscribe( sm_slot )
-	log3("~~Spawning object with section [%s] %s", new_wpn_section, debug.traceback())
+						--log3("~~Spawning object with section [%s] %s", new_wpn_section, debug.traceback())
 						local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
 						ogse_signals.get_mgr():unsubscribe( sm_slot )
 						--
-						if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
+						if is_wpn_in_slot and cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
 							move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
 						end
 					end
 				end
-			end
+			end )
 		end
 		
 		local fake_item_section = get_string(sec, "fake_item_section")
@@ -911,9 +910,8 @@ function on_item_to_ruck(obj, sobj)
 			convert_item_to_fake_in_inventory(obj)
 			return true
 		end
-		--return false
 	end
-	
+
 	-- обработка снятия шотгана-аддона из слота в рюкзак
 	local addon_mode_section = get_string(sobj:section_name(), "addon_mode_section")
 	if addon_mode_section then
@@ -1134,7 +1132,7 @@ function recreate_transfer_data(obj_to_del, sec_to_create)
 	-- не совсем верно проверять по секции создаваемого, 
 	-- но при правильной настройке оба (и удаляемый и создаваемый) должны иметь параметр "is_shotgun" или оба не иметь
 	if get_u32(sec_to_create, "is_shotgun") == 1 then		
-	log3("~~Spawning object with section [%s] %s", sec_to_create, debug.traceback())
+		--log3("~~Spawning object with section [%s] %s", sec_to_create, debug.traceback())
 		local s_fake_item = ogse.spawn_item_in_inv(sec_to_create)
 		s_fake_item.custom_data = sobj.custom_data
 	else
