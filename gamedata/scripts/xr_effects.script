@@ -999,17 +999,19 @@ function set_freedom_actor_enemy (actor, npc)
     this.actor_enemy (actor, luk)
 end
 
-function military_dolg_dead (actor, npc)
-    -- если нет актера, то вылетаем с грохотом и треском
-    if actor == nil then return end
-    -- проапдейтим количество мертвых долговцев
-    local mil_dolg_killed = xr_logic.pstor_retrieve(actor, "mil_dolg_killed", 0) + 1
-    xr_logic.pstor_store(actor, "mil_dolg_killed", mil_dolg_killed)
-    if mil_dolg_killed == 8 then
-       actor:give_info_portion ("mil_dolg_dead")
-	   ogse.del_variable("mil_dolg_killed")
-    end   
-    
+function military_dolg_dead()
+	local gulag = xr_gulag.get_gulag_by_name( "mil_dolg" )
+	for obj_id, _ in pairs( gulag.Object_begin_job ) do
+		local sobj = alife():object( obj_id )
+		if sobj then
+			if sobj:alive() then
+				return false
+			end
+		end
+	end
+	--
+	db.actor:give_info_portion("mil_dolg_dead")
+	return true
 end
 
 function mil_patrol_death_check (actor, npc)
