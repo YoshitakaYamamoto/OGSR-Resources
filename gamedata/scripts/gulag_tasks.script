@@ -4,15 +4,15 @@
 -- кэш для динамических ltx
 local dynamic_ltx = {}
 
-function loadJob(sj, gname, type, squad, groups, gulag)
+function loadJob( ... )
     for _, v in pairs(xr_gulag.level_gulags) do
-        v.load_job(sj, gname, type, squad, groups, gulag)
+        v.load_job( ... )
     end
 end
 
-function loadStates(gname, type)
+function loadStates( ... )
     for _, v in pairs(xr_gulag.level_gulags) do
-	    local f = v.load_states(gname, type)
+	    local f = v.load_states( ... )
 	    if f then
 		    return f
 	    end

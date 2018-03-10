@@ -1,20 +1,13 @@
 --[[
---“ÂÒÚ Ò ÛÒÒÍËÏË ·ÛÍ‚‡ÏË
-log1(string.lower("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
-log1(string.lower("¿¡¬√ƒ≈®∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸ⁄€‹›ﬁﬂ"))
-log1(string.upper("abcdefghijklmnopqrstuvwxyz"))
-log1(string.upper("‡·‚„‰Â∏ÊÁËÈÍÎÏÌÓÔÒÚÛÙıˆ˜¯˘˙˚¸˝˛ˇ"))
---]]
-
---[[
---“ÂÒÚ ÒÚÂÍÚÂÈÒ ÍÓÎÎÂÍÚÓÓ‚
+--–¢–µ—Å—Ç —Å—Ç–µ–∫—Ç—Ä–µ–π—Å –∫–æ–ª–ª–µ–∫—Ç–æ—Ä–æ–≤
 level.add_call(function() return true end, function() fail("err") end)
 --]]
 
 --log1(debug.traceback())
-collectgarbage("collect")
+--collectgarbage("collect")
 
---¬˚‚Ó‰ Ì‡ Í‡ÚÛ Õœ—, ÍÓÚÓ˚ı ÒÓÁ‰‡ÎË ÂÒÔ‡‚ÌÂ˚.
+--[=[
+--–í—ã–≤–æ–¥ –Ω–∞ –∫–∞—Ä—Ç—É –ù–ü–°, –∫–æ—Ç–æ—Ä—ã—Ö —Å–æ–∑–¥–∞–ª–∏ —Ä–µ—Å–ø–∞–≤–Ω–µ—Ä—ã.
   dsh_respawn.iterate_respawners( function( respawner )
     if not respawner.item_spawn and #respawner.spawned_obj > 0 then
       for _, id in ipairs( respawner.spawned_obj ) do
@@ -30,3 +23,27 @@ collectgarbage("collect")
       end
     end
   end )
+--]=]
+--[=[
+--–í—ã–≤–æ–¥ –Ω–∞ –∫–∞—Ä—Ç—É –ù–ü–°, –∫–æ—Ç–æ—Ä—ã—Ö —Å–æ–∑–¥–∞–ª–∏ —Ä–µ—Å–ø–∞–≤–Ω–µ—Ä—ã, –∏ –∫–æ—Ç–æ—Ä—ã–µ –Ω–µ –Ω–∞—Ö–æ–¥—è—Ç—Å—è –≤ —Å–º–∞—Ä—Ç–∞—Ö.
+  dsh_respawn.iterate_respawners( function( respawner )
+    if not respawner.item_spawn and #respawner.spawned_obj > 0 then
+      for _, id in ipairs( respawner.spawned_obj ) do
+        local sobj = alife():object( id )
+        if sobj then
+          if sobj:smart_terrain_id() == 65535 then
+            level.map_add_object_spot( sobj.id, "red_location", sobj:name()..": NO SMART TERRAIN! Respawner: "..respawner.name )
+          end
+        end
+      end
+    end
+  end )
+--]=]
+--[=[
+--–¢–µ—Å—Ç –¥—Ä–æ–±–æ–≤–∏–∫–∞
+ogse_addons.set_default_shg_params(ogse.spawn_item_in_inv("wpn_addon_remington_870mcs"))
+ogse.spawn_item_in_inv("wpn_m16a1_sk1")
+ogse.spawn_item_in_inv("wpn_addon_acog")
+ogse.spawn_item_in_inv("wpn_addon_scope_eotech")
+ogse.spawn_item_in_inv("wpn_addon_mag_mk6")
+--]=]
