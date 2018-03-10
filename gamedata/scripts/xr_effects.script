@@ -921,17 +921,11 @@ end
 -- end
 
 -- function esc_lager_promise_actor(actor, npc)
---	local gulag = xr_gulag.get_gulag_by_name ("esc_lager")
---    if (gulag) then
---       gulag:set_relation (game_object.neutral, actor)
---    end  
+--    xr_gulag.setGulagNeutral( "esc_lager", actor )
 -- end
 
 -- function esc_lager_rage_actor(actor, npc)
---	local gulag = xr_gulag.get_gulag_by_name ("esc_lager")
---    if (gulag) then
---       gulag:set_relation (game_object.enemy, actor)
---    end  
+--    xr_gulag.setGulagEnemy( "esc_lager", actor )
 -- end
 
 --' garbage
@@ -988,10 +982,7 @@ end
 
 
 function mil_paul_frost_dead (actor, npc)     
-    local gulag = xr_gulag.get_gulag_by_name ("mil_freedom")
-    if (gulag) then
-       gulag:set_relation (game_object.neutral, actor)
-    end   
+    xr_gulag.setGulagNeutral( "mil_freedom", actor )
 end
 
 function set_freedom_actor_enemy (actor, npc)
