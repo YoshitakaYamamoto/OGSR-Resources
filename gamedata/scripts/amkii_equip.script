@@ -54,7 +54,7 @@ function can_refit( oNpc )
     or excluded_npcs[ oNpc:name() ]
     or excluded_npcs[ oNpc:section() ]
     or excluded_npcs[ oNpc:profile_name() ]
-    or ogse.is_quest_npc( oNpc )
+    or ( ogse.is_quest_npc( oNpc ) and not xr_companion.is_companion(oNpc:id()) )
   then
     return false
   end

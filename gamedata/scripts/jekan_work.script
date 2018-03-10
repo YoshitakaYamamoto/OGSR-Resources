@@ -4337,7 +4337,7 @@ function digger_weapon_in(first_speaker, second_speaker)
 end
 
 function digger_weapon_out(first_speaker, second_speaker)
-    dialogs.relocate_item_section(second_speaker, "diggers_weapon", "out")
+    ogse.remove_item_from_inventory_by_name("diggers_weapon", db.actor)
 end
 
 function has_diggers_weapon(stalker, player)
