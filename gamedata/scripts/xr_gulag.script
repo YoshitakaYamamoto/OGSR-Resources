@@ -1196,7 +1196,7 @@ end
 function gulag:get_personal_goodwill_online( target_obj )
 	local rel = 50000
 	for obj_id, obj in pairs( self.Object ) do
-		if obj ~= true then
+		if obj ~= true and level.object_by_id( obj_id ) then
 			local o_rel = obj:general_goodwill( target_obj )
 			--log3( "~~[%s.get_personal_goodwill_online] goodwill of [%s] to [%s] is [%s]", script_name(), obj:name(), target_obj:name(), o_rel )
 			if o_rel < rel then
