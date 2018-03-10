@@ -67,16 +67,7 @@ local function process( obj )
 	--
 	if not obj:is_weapon_magazined() or obj:is_binoculars() then return end
 	--
-	--Метод wpn:is_in_slot() тут вылетает с непонятной диагностикой, поэтому так.
-	local obj_id = obj:id()
-	local PistolSlot = db.actor:item_in_slot(1)
-	if PistolSlot then
-		if PistolSlot:id() == obj_id then return end
-	end
-	local AutomaticSlot = db.actor:item_in_slot(2)
-	if AutomaticSlot then
-		if AutomaticSlot:id() == obj_id then return end
-	end
+	if db.actor:is_in_slot( obj ) then return end --Предметы в слотах не разряжаем.
 	--
 	ammo_discharge( obj )
 end
