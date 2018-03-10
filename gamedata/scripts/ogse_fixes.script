@@ -22,6 +22,8 @@ function on_spawn()
 	fix_wpn_flame_in_rukzak()
 	--
 	fix_prizrak_trup()
+	--
+	fix_fourth_neutral_trup()
 end
 
 function on_first_update()
@@ -141,6 +143,30 @@ function fix_monsters_spawn()
   ogsm_respawn.first_run()
   --
   ogse.save_var("fix_monsters_spawn", true)
+end
+
+
+function fix_fourth_neutral_trup()
+	local lost_sobj = alife():story_object( story_ids.fourth_neutral )
+	if not lost_sobj and not has_alife_info("boltun_nayden") then --Трупа нет и его ещё не обыскали
+		local sobj = alife():create("stalker", vector():set(-219.779998779297, 8.10000038146973, -337.399993896484), 158437, 3065)
+		--
+		local pk = get_netpk(sobj)
+		ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
+		local data = pk:get()
+		data.health = 0
+		data.upd.health = 0
+		data.visual_name = "actors\\soldier\\soldier_spetsnaz"
+		local custom_data_string = "[spawner] \ncond = {+hunter_about_boltun} \n[known_info] \nboltun_nayden \n[smart_terrains] \nnone = true"
+		data.custom_data:setString(custom_data_string)
+		pk:set(data)
+		--
+		alife():assign_story_id(sobj.id, story_ids.fourth_neutral)
+		--
+		ogse.spawn_item_in_inv("klondaik_flash_4", sobj) 
+		--
+		log3("--[%s] fourth_neutral trup fixed!", script_name())
+	end
 end
 
 
