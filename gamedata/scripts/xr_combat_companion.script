@@ -277,7 +277,7 @@ end
 function process_enemy(npc, enemy)
 	-- проверка выбора врагом напарника или ГГ
 	-- данная функция помещается в апдейты монстров и неписей
-	if enemy and enemy.clsid and (enemy:is_stalker() or enemy:is_monster()) and enemy:alive() and not xr_companion.is_companion(enemy:id()) then
+	if enemy and enemy.clsid and (IsStalker(enemy) or IsMonster(enemy)) and enemy:alive() and not xr_companion.is_companion(enemy:id()) then
 		write_log("!!!PROCESSING_%s RESULT IS_STK [%s] IS_MNSTR [%s] CHK [%s]", enemy:name(), enemy:is_stalker(), enemy:is_monster(), we_are_under_attack(enemy))
 		if we_are_under_attack(enemy) then
 			-- человек ты иль монструшка
