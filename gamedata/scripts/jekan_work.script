@@ -4747,7 +4747,7 @@ end
 function re_anom_bolts()
 	if db.actor:object("af_bolt") then
 		db.actor:iterate_inventory(function(dummy, item) 
-			if obj:section() == "af_bolt" then
+			if item:section() == "af_bolt" then
 				ogse.remove_item(item)
 			end
 		end)
