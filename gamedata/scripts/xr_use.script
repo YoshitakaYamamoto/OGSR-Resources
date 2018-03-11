@@ -27,11 +27,11 @@ function notify_on_use(victim, who)
 	if victim:is_talk_enabled() == true then
 		if not xr_wounded.is_wounded(victim) then
 			local act_it = db.actor:active_item()
-			if act_it and act_it:is_weapon() and not string.find( act_it:section(), "wpn_binoc" ) and not victim:best_danger() and not victim:best_enemy() then
+			if act_it and act_it:is_weapon() and not act_it:is_binoculars() and not victim:best_danger() and not victim:best_enemy() then
 				victim:disable_talk() 
 				xr_sound.set_sound_play(victim, "use_no_weapon")
 				xr_abuse.add_abuse(victim, 1)	
-			else		
+			else
 				victim:enable_talk()
 			end	
 		end
@@ -61,7 +61,7 @@ function notify_on_use(victim, who)
 		elseif db.storage[victim:id()].active_scheme == "kamp" then
 			-- ёзание чувака в лагере
 			local act_it = db.actor:active_item()
-			if act_it and act_it:is_weapon() and not string.find( act_it:section(), "wpn_binoc" ) then
+			if act_it and act_it:is_weapon() and not act_it:is_binoculars() then
 				xr_sound.set_sound_play(victim, "use_no_weapon")
 				xr_abuse.add_abuse(victim, 1)				
 			end

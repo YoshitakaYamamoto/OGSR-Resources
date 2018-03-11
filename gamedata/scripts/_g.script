@@ -460,9 +460,6 @@ function IsAnomaly(object, class_id)
 end
 -------------------------------------------------------------------------------------------
 function isWeapon(object, class_id)
-	if object and string.find(object:name(), "wpn_binoc") then
-		return false
-	end
 	local id = class_id or get_clsid(object)
 	return id and weapon_classes[id]
 end

@@ -295,7 +295,7 @@ function Cmeet_manager:process_meet()
 	local key
 	local is_talking = self.npc:is_talking()
 	local act_it = db.actor:active_item()
-	if act_it and act_it:is_weapon() and not string.find( act_it:section(), "wpn_binoc" ) and
+	if act_it and act_it:is_weapon() and not act_it:is_binoculars() and
        self.npc:relation(db.actor) ~= game_object.friend and self:actor_targets_npc(self.npc) and not xr_companion.is_companion(self.npc:id())
     then
 		key = self:get_key_from_distance(self.a.meet_state_wpn)
@@ -339,7 +339,7 @@ end
 function Cmeet_manager:process_victim()
 	local key
 	local act_it = db.actor:active_item()
-	if act_it and act_it:is_weapon() and not string.find( act_it:section(), "wpn_binoc" ) and not xr_companion.is_companion(self.npc:id())	then
+	if act_it and act_it:is_weapon() and not act_it:is_binoculars() and not xr_companion.is_companion(self.npc:id())	then
 		key = self:get_key_from_distance(self.a.victim_wpn)
 		if key ~= nil then
 			return tostring(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.victim_wpn[key].state))
@@ -404,7 +404,7 @@ function Cmeet_manager:process_use()
 	
 	local t
 	local act_it = db.actor:active_item()
-	if act_it and act_it:is_weapon() and not string.find( act_it:section(), "wpn_binoc" ) and not xr_companion.is_companion(self.npc:id()) then
+	if act_it and act_it:is_weapon() and not act_it:is_binoculars() and not xr_companion.is_companion(self.npc:id()) then
 		t = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.use_wpn)
 		if t == "false" then
 			self.disable_talk_weapon = true
@@ -848,7 +848,7 @@ function cannot_talk_by_weapon(npc)
 	local st = db.storage[npc:id()].meet
 	if st then
 		local act_it = db.actor:active_item()
-		if not act_it or not act_it:is_weapon() or string.find( act_it:section(), "wpn_binoc" ) then return false end
+		if not act_it or not act_it:is_weapon() or act_it:is_binoculars() then return false end
 		if st.use then
 			local t = xr_logic.pick_section_from_condlist(db.actor, npc, st.use)
 			if t == "false" then
