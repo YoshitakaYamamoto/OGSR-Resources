@@ -46,7 +46,7 @@ cond = {-gar_dm_novice_change_st}
 ;================================================================
 [dsh.gulag.override.gar_smart_graveyard] ;Сталкеры на кладбище техники, в т.ч. Бес.
 capacity = 10 ;7
-communities = stalker, freedom
+communities = stalker
 cond = {+gar_hellcar_dialog_end}, {+gar_hellcar_death} ;Не будем этот смарт закрывать.
 ;================================================================
 [dsh.se_stalker.gar_hellcar.smart_terrains] ;Бес теперь останется на кладбище техники, и никуда оттуда не уйдёт.
@@ -64,7 +64,7 @@ gar_smart_graveyard = {+gar_hellcar_dialog_end}, {+gar_hellcar_death}
 ;
 [dsh.gulag.override.gar_smart_garage] ;Сталкеры в ангаре. На них периодически нападают бандиты.
 capacity = 12; 6
-communities = stalker, freedom
+communities = stalker, dolg
 ;================================================================
 [dsh.se_stalker.gar_seryi.smart_terrains] ;Серый теперь останется в ангаре
 gar_angar = {-garbage_meetstalker_done -garbage_meetstalker_die}
@@ -80,7 +80,7 @@ gar_smart_garage = {+garbage_meetstalker_done}, {+garbage_meetstalker_die}
 ;================================================================
 ;
 [dsh.gulag.override.gar_smart_stalkers_1] ;Лагерь за кладбищем техники
-communities = killer, bandit, military, stalker, freedom ;Пусть сюда кто угодно приходит.
+communities = killer, bandit, stalker
 ;================================================================
 [dsh.gulag.override.gar_smart_bandit_large_lager] ;бандиты, периодически нападающие на ангар
 capacity = 11; 8

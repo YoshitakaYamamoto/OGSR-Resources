@@ -24,6 +24,8 @@ function on_spawn()
 	fix_prizrak_trup()
 	--
 	fix_fourth_neutral_trup()
+	--
+	fix_yantar_guider()
 end
 
 function on_first_update()
@@ -52,6 +54,19 @@ function fix_bandit_trader() --Телепорт торгаша бандитов 
   end
   --
   ogse.save_var("fix_bandit_trader", true)
+end
+
+
+function fix_yantar_guider()
+  local sobj = alife():object("yantar_guider")
+  if not sobj then return end
+  --
+  local patrol = patrol( "yan_scientist_guider_walk" )
+  alife():teleport_object(
+    sobj.id, patrol:point( 0 ),
+    patrol:level_vertex_id( 0 ), patrol:game_vertex_id( 0 )
+  )
+  log3("--KRodin: yantar guider teleported to pos = {%s,%s,%s}, lvid = %s, gvid = %s", patrol:point( 0 ).x, patrol:point( 0 ).y, patrol:point( 0 ).z, patrol:level_vertex_id( 0 ), patrol:game_vertex_id( 0 ) )
 end
 
 
