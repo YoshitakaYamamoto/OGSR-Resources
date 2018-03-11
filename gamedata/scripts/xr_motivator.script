@@ -478,8 +478,10 @@ function motivator_binder:before_hit_callback(hit_data)
 			elseif --Проверяем условия игнорирования урона от дружественного огня
 				obj:is_stalker()
 				and hit_data.who_id ~= self.object:id() --если не сам себя
-				and self.object:relation( obj ) ~= game_object.enemy
-				and obj:relation( self.object ) ~= game_object.enemy
+				and (
+					( self.object:relation( obj ) ~= game_object.enemy and obj:relation( self.object ) ~= game_object.enemy )
+					or ( xr_companion.is_companion(self.object:id()) and xr_companion.is_companion(hit_data.who_id) )
+				)
 			then
 				hit_data.ignore_hit = true
 			end
