@@ -3262,11 +3262,15 @@ function play_klondike_activate_sound()
 	end
 end
 
-local sects = {"weak", "normal", "strong", "strong_klondike", "plague"}
 function spawn_zombies()
-	local diff = level.get_game_difficulty()
-	local num = diff < 2 and 27 or diff * 27
-	for i = 0, num do
+	local sects = { "weak", "normal", "strong", "strong_klondike", "plague" }
+	local diff_num = {
+		[0] = 27,
+		[1] = 40,
+		[2] = 54,
+		[3] = 81
+	}
+	for i = 1, diff_num[level.get_game_difficulty()] do
 		local sect = "zombie_"..sects[math.random(1, #sects)]
 		if math.random() > 0.5 then
 			dsh.create_free_mob(sect, vector():set(12.57, 1.08, 72.53+i*0.7), 511607+i,3617)
