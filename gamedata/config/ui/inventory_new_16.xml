@@ -15,33 +15,33 @@
 	</belt_slots>
 	
 	<dragdrop_belt x="40" y="288" width="630" height="51"
-            cell_width = "42" cell_height="45" rows_num="1" cols_num="15"/>
+            cell_width = "42" cell_height="45" rows_num="1" cols_num="15" show_grid="0" />
 
 	<!-- расположение икони броника в инвентаре -->
     <dragdrop_outfit x="910" y="120" width="76" height="135" 
             cell_width = "38" cell_height="45" rows_num="3" cols_num="2" 
-            custom_placement="0"/>
+            custom_placement="0" show_grid="0" />
 
 	<dragdrop_helmet x="918" y="48" width="60" height="72"
             cell_width = "30" cell_height="36" rows_num="2" cols_num="2"
-            custom_placement="0"/>
+            custom_placement="0" show_grid="0" />
 	<dragdrop_nv x="708" y="595" width="60" height="72"
             cell_width = "30" cell_height="36" rows_num="1" cols_num="2"
-            custom_placement="0"/>
+            custom_placement="0" show_grid="0" />
 	<dragdrop_torch x="708" y="650" width="60" height="72"
             cell_width = "30" cell_height="36" rows_num="1" cols_num="2"
-            custom_placement="0"/>	
+            custom_placement="0" show_grid="0" />	
 			
 	<dragdrop_knife x="855" y="595" width="120" height="72"
             cell_width = "30" cell_height="36" rows_num="1" cols_num="3"
-            custom_placement="0"/>
+            custom_placement="0" show_grid="0" />
     <dragdrop_pistol x="710" y="402" width="270" height="72"
             cell_width = "30" cell_height="36" rows_num="2" cols_num="9"
-            custom_placement="0"/>
+            custom_placement="0" show_grid="0" />
 
     <dragdrop_automatic x="710" y="502" width="270" height="72"
             cell_width = "30" cell_height="36" rows_num="2" cols_num="9"
-            custom_placement="1"/>
+            custom_placement="1" show_grid="0" />
 
 
 	<dragdrop_detector x="855" y="648" width="30" height="36"
@@ -52,7 +52,7 @@
             custom_placement="0" show_grid="0"/>
 	<dragdrop_binocular x="782" y="602" width="60" height="72"
             cell_width = "30" cell_height="36" rows_num="2" cols_num="2"
-            custom_placement="0"/>
+            custom_placement="0" show_grid="0" />
 		
 	
 	<back x="0" y="0" width="1024" height="768">
@@ -65,7 +65,7 @@
 
     <dragdrop_bag x="17" y="153" width="646" height="350"   
             cell_width = "30" cell_height="35" rows_num="10" cols_num="21" 
-            unlimited="1" group_similar="1"/>
+            unlimited="1" group_similar="1" show_grid="0" />
 
     <bag_static x="15" y="238" width="859" height="762" complex_mode="1">		
         <text x="715" y="87" font="graffiti22" r="231" g="153" b="22">ui_inv_bag</text>
@@ -148,7 +148,7 @@
     </rank>
     
     <progress_background x="701" y="245" width="164" height="55">
-		<texture>ui_scale_three</texture>
+		<!--texture>ui_scale_three</texture-->
     </progress_background>
     
     <progress_back_rank x="777" y="342" width="38" height="215">
@@ -156,21 +156,21 @@
     </progress_back_rank>
 
     <progress_bar_health x="28" y="4" width="124" height="9" horz="1" min="0" max="100" pos="0">
-		<progress>
+		<!--progress>
 			<texture>ui_scale_red_1</texture>
-		</progress>
+		</progress-->
     </progress_bar_health>    
 
     <progress_bar_psy x="28" y="22" width="124" height="9" horz="1" min="0" max="100" pos="0">
-		<progress>
+		<!--progress>
 			<texture>ui_scale_blue_1</texture>
-		</progress>
+		</progress-->
 	</progress_bar_psy>
 
     <progress_bar_radiation x="28" y="41" width="124" height="9" horz="1" min="0" max="100" pos="0">
-		<progress>
+		<!--progress>
 			<texture>ui_scale_yellow_1</texture>
-		</progress>
+		</progress-->
     </progress_bar_radiation>
     
     <progress_bar_rank x="20" y="22" width="10" height="141" horz="0" min="0" max="100" pos="0">
@@ -179,13 +179,15 @@
 		</progress>
     </progress_bar_rank>
     
-    <time_static x="689" y="724" width="200" height="30">        
+    <time_static x="689" y="724" width="200" height="30">    
+<!--    
 		<texture x=1021 y=975 width=190 height=36>ui_dg_time</texture>
         <text x="30" y="7" font="letterica16" r="240" g="217" b="182" a="255">ui_inv_time</text>
+-->
 	</time_static>
 
     <time_static_str x="105" y="7" width="107" height="30">        
-        <text font="letterica16" r="240" g="217" b="182" a="255"/>
+        <text font="letterica16" r="240" g="217" b="182" a="0"/>
 	</time_static_str>
 
     <exit_button x="865" y="718" width="157" height="48">
