@@ -1362,7 +1362,7 @@ function setGulagEnemy( name_or_sid, target_obj )
 end
 --Сделать указанного персонажа нейтральным для всех персонажей смарта
 function setGulagNeutral( name_or_sid, target_obj )
-	setGulagPersonalGoodwill( name_or_sid, attitude_neutal_threshold + 300, target_obj )
+	setGulagPersonalGoodwill( name_or_sid, attitude_neutal_threshold + 600, target_obj )
 end
 --Сделать указанного персонажа другом для всех персонажей смарта
 function setGulagFriend( name_or_sid, target_obj )
