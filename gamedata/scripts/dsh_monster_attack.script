@@ -395,10 +395,11 @@ function controller_psy_attack( obj )
 					end
 				end
 
-				local active_item = npc:active_item()
-				if active_item and active_item:section() ~= "bolt" and not active_item:is_knife() and math.random(100) / 100 > npc.psy_health then
-					npc:drop_item(active_item)
-				end
+				--KRodin: убрал, т.к. это лишнее.
+				--local active_item = npc:active_item()
+				--if active_item and active_item:section() ~= "bolt" and not active_item:is_knife() and math.random(100) / 100 > npc.psy_health then
+				--	npc:drop_item(active_item)
+				--end
 			end
 		end
 	end
