@@ -26,6 +26,8 @@ function on_spawn()
 	fix_fourth_neutral_trup()
 	--
 	fix_yantar_guider()
+	--
+	fix_deadcity_trups()
 end
 
 function on_first_update()
@@ -182,6 +184,49 @@ function fix_fourth_neutral_trup()
 		--
 		log3("--[%s] fourth_neutral trup fixed!", script_name())
 	end
+end
+
+
+function fix_deadcity_trups()
+  if ogse.var_exists("fix_deadcity_trups") or not has_alife_info("master_quest_start") then return end
+  --
+  local t = {
+    ["master_quest_info_9"] = { pos = { -30.502738952637,11.227934837341,26.018726348877 }, lv = 446837, gv = 3792, name = "deadcity_dead_ecolog_9" },
+    ["master_quest_info_8"] = { pos = { -105.9154510498,15.611465454102,-23.27180480957 }, lv = 338013, gv = 3819, name = "deadcity_dead_ecolog_8" },
+    ["master_quest_info_7"] = { pos = { 37.58712387085,6.2540092468262,-110.84191894531 }, lv = 542530, gv = 3753, name = "deadcity_dead_ecolog_7" },
+    ["master_quest_info_6"] = { pos = { -92.041038513184,15.766061782837,-110.32796478271 }, lv = 340334, gv = 3819, name = "deadcity_dead_ecolog_6" },
+    ["master_quest_info_5"] = { pos = { -5.8504018783569,-1.6546441316605,44.151031494141 }, lv = 486756, gv = 3776, name = "deadcity_dead_ecolog_5" },
+    ["master_quest_info_4"] = { pos = { 51.409843444824,15.624316215515,94.350875854492 }, lv = 558042, gv = 3622, name = "deadcity_dead_ecolog_4" },
+    ["master_quest_info_3"] = { pos = { -191.00122070313,11.670829772949,462.79840087891 }, lv = 184347, gv = 3348, name = "deadcity_dead_ecolog_3" },
+    ["master_quest_info_2"] = { pos = { -155.09509277344,4.150454044342,-93.189254760742 }, lv = 241999, gv = 3826, name = "deadcity_dead_ecolog_2" },
+    ["master_quest_info_1"] = { pos = { -179.67881774902,5.5502276420593,-222.21566772461 }, lv = 201198, gv = 3594, name = "deadcity_dead_ecolog_1" }
+  }
+  local i = 1
+  for info, trup in pairs(t) do
+	if not has_alife_info(info) then
+	  if not alife():object(trup.name) then
+		local sobj = alife():create("stalker", vector():set(unpack(trup.pos)), trup.lv, trup.gv)
+		--
+		local pk = get_netpk(sobj)
+		ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
+		local data = pk:get()
+		data.health = 0
+		data.upd.health = 0
+		--data.visual_name = "actors\\soldier\\soldier_spetsnaz"
+		local custom_data_string = "[spawner] \ncond = {+master_quest_start} \n[known_info] \n"..info.." \n[smart_terrains] \nnone = true"
+		data.custom_data:setString(custom_data_string)
+		pk:set(data)
+		--
+		--alife():assign_story_id(sobj.id, 30000)
+		log3("--[%s] [%s] trup fixed!", script_name(), trup.name)
+	    --level.map_add_object_spot_ser(sobj.id, "red_location", script_name()..": NEW"..sobj:name()) --DEBUG
+      else
+	    --level.map_add_object_spot_ser(alife():object(trup.name).id, "red_location", script_name()..": "..alife():object(trup.name):name()) --DEBUG
+	  end
+	end
+  end
+  --
+  ogse.save_var("fix_deadcity_trups", true)
 end
 
 
