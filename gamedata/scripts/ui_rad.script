@@ -1,15 +1,12 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
---[[--------------------------------------------------------------------------------
--|ui_rad.script
--|Полоска радиации на худе.
--|Dsh © 2015
--|https://github.com/dsh2dsh/op2ogse/commit/d10a49dd08bf86bfbbbcd47e609c9b472958d256
--|----------------------------------------------------------------------------------
--|Под OGSE адаптировал KRodin © 07.02.2016
-----------------------------------------------------------------------------------]]
-
 local cfg = {
+   ["ui_psy"] = {
+      ["hud_back"]     = "hud_psy_back",
+      ["hud_level"]    = "hud_psy_level",
+      ["saved_aspect"] =  0,
+      ["saved_width"]  = -1,
+   },
 	["ui_rad"] = {
 		["hud_back"]     = "hud_rad_back",
 		["hud_level"]    = "hud_rad_level",
@@ -24,13 +21,15 @@ end
 
 function update()
 	ogse_signals.get_mgr():reschedule(math.random(450, 550))
-
+	--
+	if sys_ini:section_exist( "ui_psy" ) then
+		update_hud( "ui_psy", cfg.ui_psy, true, db.actor.psy_health )
+	end
+	--
 	update_hud( "ui_rad", cfg.ui_rad, db.actor:item_in_slot(8), db.actor.radiation )
 end
 
 function update_hud( sect_name, params, bDetected, val )
-	if not val then return end
-
 	local hud = get_hud()
 	if hud then
 		local custom_static_rad_back = hud:GetCustomStatic( params.hud_back  )

@@ -368,15 +368,22 @@
 	</cs_debug>
 
 <!-- Geiger on HUD -->	
-
 	<hud_rad_back x="1" y="1" width="1" height="1" stretch="1" complex_mode="1">
 		<texture x="650" y="100" width="156" height="36">ui\ui_hud</texture>
 	</hud_rad_back>
 	<hud_rad_level x="1" y="1" width="1" height="1" stretch="1" complex_mode="1">
 		<texture x="650" y="150" width="110" height="10">ui\ui_hud</texture>
 	</hud_rad_level>
-
 <!-- Fuel on HUD -->	
+
+<!-- Psy Health on HUD -->	
+	<hud_psy_back x="1" y="1" width="1" height="1" stretch="1" complex_mode="1">
+		<texture x="820" y="162" width="156" height="36">ui\ui_hud</texture>
+	</hud_psy_back>
+	<hud_psy_level x="1" y="1" width="1" height="1" stretch="1" complex_mode="1">
+		<texture x="650" y="176" width="110" height="10">ui\ui_hud</texture>
+	</hud_psy_level>
+<!-- Psy Health on HUD -->	
 
 	<hud_fuel_back x="1" y="1" width="1" height="1" stretch="1" complex_mode="1">
 		<texture x="820" y="100" width="156" height="48">ui\ui_hud</texture>
@@ -388,24 +395,24 @@
 	
 <!-- sleep icon -->	
 
-	<shelter_static x="973" y="505" width="50" height="50" stretch="1">
+	<shelter_static x="973" y="485" width="50" height="50" stretch="1">
 		<texture>ui_hud_icon_shelter</texture>
 	</shelter_static>
-	<shelter_static_16 x="985" y="505" width="38" height="50" stretch="1">
+	<shelter_static_16 x="985" y="485" width="38" height="50" stretch="1">
 		<texture>ui_hud_icon_shelter</texture>
 	</shelter_static_16>
 	
-	<need_sleep_static x="973" y="450" width="50" height="50" stretch="1">
+	<need_sleep_static x="973" y="442" width="50" height="50" stretch="1">
 		<texture>ui_hud_icon_need_sleep</texture>
 	</need_sleep_static>
-	<need_sleep_static_16 x="985" y="450" width="38" height="50" stretch="1">
+	<need_sleep_static_16 x="985" y="442" width="38" height="50" stretch="1">
 		<texture>ui_hud_icon_need_sleep</texture>
 	</need_sleep_static_16>
 
-	<can_not_sleep_static x="973" y="450" width="50" height="50" stretch="1">
+	<can_not_sleep_static x="973" y="442" width="50" height="50" stretch="1">
 		<texture>ui_hud_icon_can_not_sleep</texture>
 	</can_not_sleep_static>
-	<can_not_sleep_static_16 x="985" y="450" width="38" height="50" stretch="1">
+	<can_not_sleep_static_16 x="985" y="442" width="38" height="50" stretch="1">
 		<texture>ui_hud_icon_can_not_sleep</texture>
 	</can_not_sleep_static_16>
 	
