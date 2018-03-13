@@ -73,6 +73,8 @@ local function process(npc)
 	local addon_table = {}
 	--
 	npc:iterate_inventory( function(_, obj)
+		if not alife():object(obj:id()) then return end
+		--
 		if obj:is_weapon_magazined() then --Заносим в таблицу все стволы в инвентаре НПС
 			wpn_table[obj] = obj:section()
 		else
