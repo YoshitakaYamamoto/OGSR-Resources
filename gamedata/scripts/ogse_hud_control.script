@@ -5,6 +5,7 @@
 --|Управление худом.
 --|KRodin © 2016
 --|Version: 4.0
+--|TODO: Переписать для корректной поддержки двойного прицеливания. Надо снова на постоянный апдейт повесить.
 ---------------------------
 
 function attach(sm)
@@ -19,10 +20,12 @@ function on_actor_death() --При смерти актора
 end
 ------------------------------------------------------
 
+local cs_tmr = false
+
 function check_keys(key, bind) --Проверка нажатия клавиш
 	if bind == key_bindings.kWPN_ZOOM and not level.main_input_receiver() then
-		if actor_keeps_wpn_with_optical_sight() then
-			check_sniper_timer():start()
+		if not cs_tmr and actor_keeps_wpn_with_optical_sight() then
+			cs_tmr = check_sniper_timer():start()
 		end
 	end
 end
@@ -32,6 +35,7 @@ function actor_keeps_wpn_with_optical_sight() --Проверка, держит �
 	if	not wpn --Если в руках ничего нет
 		or not wpn:is_weapon_magazined() --или в руках не оружие
 		or ogse_wpn_utils.get_forced_notex_scope(wpn) --или на оружии установлен колиматорный прицел
+		or wpn:get_weapon().is_second_zoom_offset_enabled --или включен режим альтернативного прицеливания
 	then
 		return false
 	end
@@ -52,7 +56,7 @@ function check_sniper_timer:__init() super()
 	self.sm = ogse_signals.get_mgr()
 end
 function check_sniper_timer:condition() --Запускается на каждом апдейте, пока не вернёт true
-	if db.actor:zoom_mode() then --Если актор смотрит в оптику
+	if db.actor:zoom_mode() and actor_keeps_wpn_with_optical_sight() then --Если актор смотрит в оптику
 		if self.show_indicators then
 			level.hide_indicators() --убираем худ
 			self.show_indicators = false
@@ -78,8 +82,11 @@ function check_sniper_timer:condition() --Запускается на каждо
 		end
 		level.show_indicators() --покажем худ
 		self.show_indicators = true
+		--
+		cs_tmr = false
 		return true
 	else
+		cs_tmr = false
 		return true
 	end
 end

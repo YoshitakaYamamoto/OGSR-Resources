@@ -155,12 +155,14 @@ function wpn_binder:__init (obj) super(obj)
 		sd.default_hud_rotate = vector2():set(def_zrx, def_zry)
 		--sd.ironsight_desc = {}
 	end
+	self.sm = ogse_signals.get_mgr()
 end
 ----------------------------------------------------------------------------------------------------------------------
 function wpn_binder:reinit()
 	self.object:set_callback(callback.on_addon_init, self.init_addons, self)
 	self.object:set_callback(callback.update_hud_addons_visibility, self.update_hud_addons_visibility, self)
 	self.object:set_callback(callback.update_addons_visibility, self.update_addons_visibility, self)
+	self.object:set_callback(callback.second_scope_switch, self.on_second_scope_switch, self)
 	--self:dbg_log("wpn_binder:reinit")
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -189,6 +191,7 @@ function wpn_binder:net_destroy()
 	self.object:set_callback(callback.update_hud_addons_visibility, nil)
 	self.object:set_callback(callback.on_addon_init, nil)
 	self.object:set_callback(callback.update_addons_visibility, nil)
+	self.object:set_callback(callback.second_scope_switch, nil)
 end
 
 function wpn_binder:set_hud_bones_visibility(bones_list, vis)
@@ -290,3 +293,17 @@ function wpn_binder:update_hud_addons_visibility()
 	self.need_initialize_hud = false
 	--self:dbg_log("wpn_binder:update_hud_addons_visibility - end")
 end
+
+function wpn_binder:on_second_scope_switch( enabled )
+	local parent = self.object:parent()
+	if not parent or not parent:is_actor() or not parent:is_in_slot(self.object) then
+		return
+	end
+	--
+	if not enabled then 
+		self.need_initialize_hud = true
+		self:update_hud_addons_visibility() --подумать, может тут апдейтить не всё, а только оффсет? Хотя, пусть так и будет - нормально.
+	end
+	--self.sm:call("on_second_scope_switch", enabled)
+end
+
