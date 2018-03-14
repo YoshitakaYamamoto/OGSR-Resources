@@ -138,14 +138,20 @@ end
 --	self.am:call("on_monster_use", self.object, who)
 --end
 
-function generic_object_binder:extrapolate_callback()
+function generic_object_binder:extrapolate_callback(cur_pt, path_name)
     if not self.object:get_script() then return false end
-
-	local cur_pt = self.object:get_current_point_index()
-	if cur_pt then
-		if patrol(self.object:patrol()):flags(cur_pt):get() == 0 then
-			return true
-		end
+	--
+	--KRodin: заткнул тут вылет. ¬ылет бывает в очень редких случа€х из-за того,
+	--что self.object:patrol() выдаЄт пустую строку со всеми вытекающими.
+	--«десь зделано так, что вылета нет, но в этом случае логика накрываетс€ без вариантов.
+	--Ќадо исправл€ть в движке, как будет врем€.
+	--ѕричина в том, что в CScriptEntity::GetPatrolPathName() по условию m_tpActionQueue.empty() возвращаетс€ пуста€ строка.
+	--¬от и надо разбиратьс€, почему так происходит.
+	if self.object:patrol() == "" then
+		log3("!![generic_object_binder:extrapolate_callback] [%s] path not found! Using override: [%s]", self.object:name(), self.object:patrol(), path_name)
+	end
+	if patrol( self.object:patrol() ~= "" and self.object:patrol() or path_name ):flags( cur_pt ):get() == 0 then
+		return true
 	end
 	return false
 end
