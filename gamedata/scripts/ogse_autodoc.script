@@ -82,6 +82,8 @@ local threshold_r_min 	= sys_ini:r_float("autodoctor", "ad_threshold_r_min")
 
 ---------------- Get and save charges count ---------------
 local started_up = false
+local long_time_exposure = false
+local medication_delay = false
 
 -- Загружаем количество зарядов в подсистемах автодока и их состояние
 function get_autodoc_states()
@@ -334,7 +336,7 @@ function autohealing()
 		exposure_count = 0
 		long_time_exposure = false
 		medication_delay = time_global() + 3000
-	elseif( switch_on["r"] and (medication_delay == nil or medication_delay < time_global()) )
+	elseif( switch_on["r"] and (not medication_delay or medication_delay < time_global()) )
 	then
 		if db.actor.radiation >= threshold_r_min
 		then

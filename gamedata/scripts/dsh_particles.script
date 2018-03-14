@@ -97,6 +97,9 @@ end
 
 function play_particle( obj, params )
   local binder = obj:binded_object()
+  if not binder then return end
+  if not binder.particles then return end
+  --
   local key = params.bone .. params.particle
   if not binder.particles[ key ] then
     binder.particles[ key ] = amk_particle( params )
