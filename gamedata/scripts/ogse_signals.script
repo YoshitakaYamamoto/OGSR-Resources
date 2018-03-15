@@ -350,7 +350,7 @@ function signals_mgr:call( signal_name, ... )
         table.remove( slots.normal, next_in_normal )
       end
       --
-      if result == true then --Если вызванный слот вернул true, цикл прерываем.
+      if result == true and not slots.time_limited then --Если вызванный слот вернул true, цикл прерываем.
         --log3( "~~[%s] Call [%s] is interrupted from slot [%s.%s]", script_name(), signal_name, slot.script_name, slot.line )
         break
       end
