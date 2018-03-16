@@ -375,8 +375,12 @@ function controller_psy_attack( obj )
 			and not xr_companion.is_companion(npc:id())
 		then
 			local sobj = alife():object( npc:id() )
-			if sobj and sobj.online then
-				npc:set_character_community("zombied",0,0)
+			local gl = xr_gulag.get_npc_gulag(npc)
+			if not gl or ( gl.name ~= "mil_fblockpost" and gl.name ~= "mil_fneutral" ) then
+				if sobj and sobj.online then
+					npc:set_character_community("zombied",0,0)
+					--log3("!![%s] change zombied [%s], gulag: [%s]!", script_name(), npc:name(), tostring(gl.name))
+				end
 			end
 		end
 ----------------------------------------------------------------------
