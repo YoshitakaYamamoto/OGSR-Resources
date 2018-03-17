@@ -360,6 +360,7 @@ function dsh_respawner:create( prob )
 			self.object.m_level_vertex_id, 
 			self.object.m_game_vertex_id
 		)
+		--log3("~~[%s] spawned object [%s] in resp [%s]", script_name(), sobj:name(), self.name)
 	else
 		sobj = alife():create(spawn_section,
 			self.object.position,
@@ -367,7 +368,7 @@ function dsh_respawner:create( prob )
 			self.object.m_game_vertex_id,
 			parent_id
 		)
-		--log3("~~[%s] spawned item [%s] in resp [%s], %s", script_name(), sobj:name(), self.name, debug.traceback())
+		--log3("~~[%s] spawned item [%s] in resp [%s]", script_name(), sobj:name(), self.name)
 	end
 	--level.map_add_object_spot_ser(sobj.id, "red_location", script_name()..": "..sobj:name()) --DEBUG
 
@@ -376,7 +377,7 @@ function dsh_respawner:create( prob )
       if tt.check == true then
         sobj:brain():update()
         if sobj:smart_terrain_id() == 65535 then
-		  --log3("!!SPAWNING [%s] -> [%s], NO SMART_TERRAIN AVAILABLE!!!", self.name, spawn_section)
+		  --log3("!![%s] [%s] -> [%s], NO SMART_TERRAIN AVAILABLE!!!", script_name(), sobj:name(), self.name)
           alife():release( sobj, true )
           return false
 		else

@@ -2,7 +2,7 @@
 
 --|Чтобы при отключении в настройках динамических новостей, они не вызывались вообще.
 
-local random_news = 1 --get_u32("options", "random_news", 1)
+local random_news = get_u32("options", "random_news", 1)
 
 function attach(sm)
 	if random_news == 1 then
