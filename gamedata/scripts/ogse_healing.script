@@ -367,21 +367,26 @@ end
 ----------------------------------------------------------------------------------------------------
 
 function use_medkit(item, section)
-	--KRodin: ухудшение аптечек пусть работает только вместе с медленными аптечками.
-	--Иначе теперь возникают проблемы - при использовании аптечки в ноль падает выносливость и её невозможно восстановить даже энергетиком.
-	if not slow_medicine then return end
-	--
 	-- для имитации ничегонеделания обнуляем все движковые параметры объекта
-	zero_all_item_effects(item)
 	if ogse_autodoc.ad_on_belt and ogse_autodoc.switch_on.ad then
+		zero_all_item_effects(item)
 		ogse_screen_msg.show_message_trouble(text_autodoctor_using)	-- нельзя использовать аптечки параллельно с автодоком
 		return post_use_action.create_new_item
 	end
 	if ogse_st_mgr.timer_exists("using_medkit") then -- если сейчас активна медленная аптечка
+		zero_all_item_effects(item)
 		ogse_screen_msg.show_message_trouble(text_already_using) -- действие предыд. аптечки еще не закончилось
 		return post_use_action.create_new_item
 	end
-	
+	--
+	--KRodin: ухудшение аптечек пусть работает только вместе с медленными аптечками.
+	--Иначе теперь возникают проблемы - при использовании аптечки в ноль падает выносливость и её невозможно восстановить даже энергетиком.
+	if slow_medicine then
+		zero_all_item_effects(item)
+	else
+		return
+	end
+	--
 	-- ухудшение эффективности аптечек
 	local poisoning_scale = 1.0
 	if poison_medicine then
