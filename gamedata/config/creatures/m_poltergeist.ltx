@@ -47,7 +47,7 @@ ph_box0_center 		 = 0.0,  0.2,  0.0	;0.0,  0.9,  0.0
 ph_box0_size 		 = 0.50, 0.4,  0.50
 ph_box1_center 		 = 0.0,  0.2,  0.0
 ph_box1_size 		 = 0.50, 0.4,  0.50
-ph_crash_speed_min			= 16
+ph_crash_speed_min			= 10
 ph_crash_speed_max			= 30
 ph_collision_damage_factor	= 0 ;0.1
 ph_mass 		     = 80						; also it's the food
@@ -55,12 +55,13 @@ ph_mass 		     = 80						; also it's the food
 destroyed_vis_name	 = physics\Dead_Body\trupik_crash
 
 ;---------------------------------------------------------------------
-ph_skeleton_airr_lin_factor   = -0.40 ;2.0 ;550.0 (изменно из-за того, что убрано домножение коэффициент 0.002 из кода)
-ph_skeleton_airr_ang_factor   = -0.20 ;0.0 ;0.0 (изменно из-за того, что убрано домножение на коэффициент 0.3 из кода (0.0*0.3=0.0))
+ph_skeleton_airr_lin_factor   = 0.1 ;550.0 (изменно из-за того, что убрано домножение коэффициент 0.002 из кода)
+ph_skeleton_airr_ang_factor   = -0.1 ;0.0 (изменно из-за того, что убрано домножение на коэффициент 0.3 из кода (0.0*0.3=0.0))
 ph_skeleton_hinger_factor1    = 1.0 ;1.0 (изменно из-за того, что убрано домножение на коэффициент 5.0 из кода)
-ph_skeleton_ddelay	      = 15.0 ;Время изменения значения трения в суставе с момента создания шелла, сек
+ph_skeleton_hinge_vel		  = 0.7
+ph_skeleton_ddelay	     	  = 10.0 ;Время изменения значения трения в суставе с момента создания шелла, сек
 
-ph_skel_fatal_impulse_factor  = 1.0 ;6.0
+ph_skel_fatal_impulse_factor  = 6.0
 ph_after_death_velocity_factor= 0.75
 ph_skel_shot_up_factor        = 0.25
 ;---------------------------------------------------------------------
@@ -80,19 +81,19 @@ Velocity_Steal			= 1.5,		3.0,			3.0,		1,		1
 
 ; Speed factors while invisible
 Velocity_Invisible_Linear		= 5.0
-Velocity_Invisible_Angular		= 4.0
+Velocity_Invisible_Angular		= 3.5 ;4.0
 
 ; acceleration
 Accel_Generic			= 1.5
 Accel_Calm				= 2.5
-Accel_Aggressive		= 10.0
+Accel_Aggressive		= 3.0 ;10
 
 ;--------------------------------------------------------------------------
 ; Attack parameters
 ;--------------------------------------------------------------------------
 ;attack parameters
 MinAttackDist		= 0.5	;2.1
-MaxAttackDist		= 3.0
+MaxAttackDist		= 2.0
 
 as_min_dist				= 0.1
 as_step					= 0.3
@@ -223,15 +224,15 @@ damage					= m_poltergeist_damage
 ;---------------------------
 
 Invisible_Energy_Restore_Velocity				= 0.1
-Invisible_Energy_Decline_Velocity				= 0.0
-Invisible_Energy_Critical_Value					= 0.01
+Invisible_Energy_Decline_Velocity				= 0.025
+Invisible_Energy_Critical_Value					= 0.02
 Invisible_Energy_Activate_Value					= 0.99
-Invisible_Energy_Aggressive_Restore_Velocity	= 0.1
+Invisible_Energy_Aggressive_Restore_Velocity	= 0.5
 
 Particles_Damage				= monsters\polter_damage
 Particles_Death					= monsters\polter_death
-Particles_Idle					= _ecp\mutant_polt_idle
-Particles_Hidden				= _ecp\mutant_polt_idle
+Particles_Idle					= _ecp\mutant_polt_idle ;monsters\polter_idle
+Particles_Hidden				= _ecp\mutant_polt_idle ;monsters\polter_linza
 
 ;-- Delays -------------------
 
@@ -241,7 +242,7 @@ Delay_Flame_Aggressive	= 30001
 
 Delay_Tele_Min			= 0   ;100
 Delay_Tele_Normal		= 100 ;300
-Delay_Tele_Aggressive	= 10  ;200
+Delay_Tele_Aggressive	= 100  ;200
 
 Delay_Scare_Min			= 30000
 Delay_Scare_Normal		= 30001
@@ -264,7 +265,7 @@ critical_wound_decrease_quant	= 0.
 ;<hit_scale>	- коэфф. изменения хита (уменьшения здоровья)
 ;<wound_scale>	- коэфф. изменения величины открытой раны
 
-default				= 0.1, -1, 0.1
+default				= 1.0,	-1,	0.1
 
 bip01_pelvis 		= 0.1, -1, 0.1
 bip01_spine 		= 0.1, -1, 0.1
