@@ -300,7 +300,7 @@ function wpn_binder:on_second_scope_switch( enabled )
 		return
 	end
 	--
-	if not enabled then 
+	if not enabled and not ( self.object:is_weapon_gl() and self.object:get_gl_mode() ) then 
 		self.need_initialize_hud = true
 		self:update_hud_addons_visibility() --подумать, может тут апдейтить не всё, а только оффсет? Хотя, пусть так и будет - нормально.
 	end

@@ -1855,9 +1855,9 @@ function cheb_2_5:btn9()
 		end
 	end
 	if db.actor:dont_has_info("dead_stalker_question_of_immortality_get_chameleon") then
-		tips = tips..game.translate_string("cheb_2_5_9_chameleon")
+		tips = tips..game.translate_string("cheb_2_5_9_chameleon").."\\n \\n"
 	end
-	tips = tips..game.translate_string("cheb_2_5_9_common").."\\n \\n"
+	tips = tips..game.translate_string("cheb_2_5_9_common")
 	show_quest_tip(tips, "cheb_2_5_9_1")
 end
 

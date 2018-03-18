@@ -132,6 +132,7 @@ function move_mgr:extrapolate_callback(npc)
 	-- https://github.com/dsh2dsh/op2ogse/commit/e78862f4ba544e6b2b28bf660236d7e89a7e4e2f
 	self.object:set_start_point(self.current_point_index)
 	self.object:set_patrol_path(self.path_walk, ( extrapolate_hack_type[ self.path_walk ] or patrol.next ), patrol.continue, true)
+	--log3("~~[move_mgr:extrapolate_callback] patrol path for [%s] is [%s]", self.object:name(), self.path_walk)
 end
 
 function move_mgr:standing_on_terminal_waypoint()
@@ -314,8 +315,10 @@ function move_mgr:setup_movement_by_patrol_path()
   	if self.current_point_index then
   		self.object:set_start_point(self.current_point_index)
   		self.object:set_patrol_path(self.path_walk, patrol.next,    patrol.continue, true)
+		--log3("~~[move_mgr:setup_movement_by_patrol_path] patrol path for [%s] is [%s]", self.object:name(), self.path_walk)
   	else
   		self.object:set_patrol_path(self.path_walk, patrol.nearest, patrol.continue, true)
+		--log3("~~[move_mgr:setup_movement_by_patrol_path] patrol path for [%s] is [%s]", self.object:name(), self.path_walk)
   	end
   else
     -- путь недоступен. отправляем в ближайшую доступную точку

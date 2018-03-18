@@ -496,8 +496,8 @@ function car_trade_dialog:buy_car()
 	
 	if money >= cost then 
 
-		--car_obj = alife():create( destr_item.section, vector():set(destr_item.coord_x, destr_item.coord_y, destr_item.coord_z), destr_item.l_vid, destr_item.g_vid)
-		car_obj = ogse.spawn_object(destr_item.spawn_item)
+		--alife():create( destr_item.section, vector():set(destr_item.coord_x, destr_item.coord_y, destr_item.coord_z), destr_item.l_vid, destr_item.g_vid)
+		ogse.spawn_object(destr_item.spawn_item)
 
 		destr_item.disabled = 1
 	
@@ -718,17 +718,18 @@ end
 
 function transport_spawn_load()
 	-- На Кордоне.																					--Вынес в all.spawn + дописал стори_айди 099 Призрак
-	--car_obj = sim:create( "vehicle_zaz", vector():set(-226.2, -20.3, -158.4), 28485, 48)
+	--sim:create( "vehicle_zaz", vector():set(-226.2, -20.3, -158.4), 28485, 48)
 
-	--car_obj = sim:create( "vehicle_btr", vector():set(-148.15, -30.0, -383), 101494, 15)
-	car_obj = sim:create( "vehicle_tr13", vector():set(9, 0.5, 280.3), 286415, 181)
+	--sim:create( "vehicle_btr", vector():set(-148.15, -30.0, -383), 101494, 15)
+	sim:create( "vehicle_tr13", vector():set(9, 0.5, 280.3), 286415, 181)
 
 	-- На Агропроме. на территории института у гаражей
-	--- car_obj = sim:create("vehicle_moskvich2", vector():set(-143.9, -0.2, -212.7) ,93986, 677)
+	--sim:create("vehicle_moskvich2", vector():set(-143.9, -0.2, -212.7) ,93986, 677)
 
 	-- Территория Бара
-	car_obj = sim:create( "vehicle_uaz2", vector():set(413.73626, 14.3532, -414.77145), 97806, 1289)
+	sim:create( "vehicle_uaz2", vector():set(413.73626, 14.3532, -414.77145), 97806, 1289)
 
 	-- На АЭС 2
-	car_obj = sim:create("vehicle_uazbuhanka",vector():set(794.17,-0.0,279.42),212718,2643)
+	sim:create("vehicle_uazbuhanka",vector():set(794.17,-0.0,279.42),212718,2643)
+	sim:create("vehicle_uaz2",vector():set(1040.425,0.0,140.485),603417,2755)
 end

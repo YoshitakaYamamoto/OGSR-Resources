@@ -67,8 +67,8 @@ function mob_walker:reset_scheme()
 	self.last_index = nil
 	self.last_look_index = nil
 	
-	action(self.object, move(move.run_fwd, patrol(self.st.path_walk, patrol.next, patrol.continue)),
-		cond(cond.move_end))
+	--log3("~~[mob_walker:update_movement_state1] patrol path for [%s] is [%s]", self.object:name(), self.st.path_walk)
+	action(self.object, move(move.run_fwd, patrol(self.st.path_walk, patrol.next, patrol.continue)), cond(cond.move_end))
 end
 
 function mob_walker:update(delta)
@@ -227,11 +227,12 @@ function mob_walker:update_movement_state()
 	end
 
 	if self.scheduled_snd then
-		printf("_bp [%s]: playing scheduled sound", self.object:name())
+		--log3("~~[mob_walker:update_movement_state2] patrol path for [%s] is [%s]", self.object:name(), self.st.path_walk)
 		action(self.object, move(m, patrol(self.st.path_walk, patrol.next, patrol.continue)),
 			sound(sound[self.scheduled_snd]), cond(cond.move_end))
 		self.scheduled_snd = nil
 	else
+		--log3("~~[mob_walker:update_movement_state3] patrol path for [%s] is [%s]", self.object:name(), self.st.path_walk)
 		action(self.object, move(m, patrol(self.st.path_walk, patrol.next, patrol.continue)), cond(cond.move_end))
 	end
 end
