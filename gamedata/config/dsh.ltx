@@ -1,5 +1,18 @@
 ; -*- mode: conf-windows; coding: windows-1251-dos -*-
 
+; Игнорировать цели из этого списка или принадлежащих смартам из этого
+; списка. В качестве ключей можно использовать community или "monster".
+[dsh.enemy.ignore]
+; Военные и Деревня Новичков
+esc_blokpost = esc_lager, esc_lekar, zona_brother2, zona_brother1, freezer_bandos, esc_starik_searcing_doch, esc_buharik, sidr_guard
+esc_specnaz = esc_lager, esc_lekar, zona_brother2, zona_brother1, freezer_bandos, esc_starik_searcing_doch, esc_buharik, sidr_guard
+; военные под мостом и сталкеры в домике Лиса и на ферме
+esc_bridge = esc2_st_fox_place, esc_farm_lager, esc_stalker_camp, esc_stone_lager, esc_lekar
+; Бандиты в ТД и долговцы уходящие на свалку.
+val_lager_bandits = gar_dolg_blokpost, val_escort_captive, val_escort_nap1
+; наемникам на ДТ нужен живой Круглов
+bar_freedom_attack = bar_ecolog_professor
+
 ; Разрешить/запретить постоянные нападения одних гулагов на другие.
 [dsh.gulag.raid]
 gar_smart_graveyard = false ;Сталкеры на кладбище техники не атакуют обитателей лагеря gar_smart_stalkers_1
