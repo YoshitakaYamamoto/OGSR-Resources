@@ -1,6 +1,7 @@
-; Штурмовая винтовка (автомат) Heckler-Koch G36
+; Штурмовая винтовка Heckler und Koch G36
+;(C) k01jan. Модель/текстуры ???, анимации ???, правлены ???, звуки ???.
 ;----------------------------------------------
-[wpn_g36]:identity_immunities
+[wpn_g36]:identity_immunities,base_wpn_zoom
 GroupControlSection			= spawn_group
 discovery_dependency		= 
 $spawn              		= "weapons\g36"		; option for Level Editor
@@ -16,6 +17,14 @@ launch_speed				= 0
 ef_main_weapon_type			= 2
 ef_weapon_type				= 6
 
+;******************************************************************************
+;KRodin: FOV для 3D прицела рассчитывается по формуле: FOV камеры актора * scope_lense_fov_factor
+scope_lense_fov_factor = 0.2
+
+;Поднесём колиматор поближе к морде актора
+second_scope_zoom_factor = 3
+;******************************************************************************
+
 ;-----------------------------------------------------------------------------------
 holder_range_modifier	= 1.5		       ; во сколько раз увеличивается eye_range 
 holder_fov_modifier		= 1.0              ; во сколько раз увеличивается eye_fov
@@ -28,7 +37,7 @@ ammo_elapsed				= 30
 ammo_mag_size				= 30
 ammo_class					= ammo_5.56x45_ss190, ammo_5.56x45_ap
 grenade_class		        = ammo_m209
-fire_modes					= 1, -1
+fire_modes				= 3, 1, 0, -1		;Авто, 3, одиночные, пред (по кругу)
 
 hand_dependence				= 1
 single_handed				= 0	
@@ -52,10 +61,10 @@ kill_msg_height				= 31
 
 ;-----------------------------------------------------------------------------------
 ;базовая дисперсия
-dispersion_start		= 2
-fire_dispersion_base		= 0.15 	;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
-control_inertion_factor		= 1.15f
-disp_rate 			= 1.88
+;dispersion_start		= 2
+fire_dispersion_base	= 0.11	;+0.12	;0.15 	;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor	= 1.15f
+disp_rate 				= 1.88
 
 ;отдача
 cam_relax_speed         	= 5.7;0.2	;скорость возврата в исходное положение
@@ -73,14 +82,17 @@ misfire_condition_k			= 0.05
 condition_shot_dec 			= 0.00015 	;увеличение износа при каждом выстреле
 ;-----------------------------------------------------------------------------------
 direction              		=  0, 0, 1
-fire_point             		=  0.0, 0.21, 0.58
-fire_point2            		=  0.0, 0.21, 0.71
+;fire_point             		=  0.0, 0.21, 0.58
+fire_point              			= 0.0, 0.229, 0.700
+;fire_point2            		=  0.0, 0.21, 0.71
+fire_point2             			= 0.0, 0.190, 0.595
 
 flame_particles				= weapons\generic_weapon05
 smoke_particles				= weapons\generic_shoot_00
 grenade_flame_particles		= weapons\generic_weapon01
 	
-shell_point		 			= 0.0, 0.21, 0.13
+;shell_point		 			= 0.0, 0.21, 0.13
+shell_point            				= 0.010000,0.250000,0.095000
 shell_dir		 			= 0.0, 0.0, 0.4
 shell_particles	 			= weapons\generic_shells
 
@@ -110,13 +122,17 @@ hud                      	= wpn_g36_hud
 normal                   	= 0, 1, 0
 
 ;-----------------------------------------------------------------------------------
-position         	        = -0.026, -0.132, 0.0
+;position         	        = -0.026, -0.132, 0.0
+position                 			= -0.026, -0.170, 0.0
 orientation      	        = 0, 0, 0
 
 ;--STRAP PARAMETERS-----------------------------------------------------------------
 ;под мишкой
-strap_position         		= -0.26,-0.11,0.25			; position (offset) and orientation of the weapon when it is strapped
-strap_orientation      		= -15,-9,110				; (3rd person view in degrees)
+;strap_position         		= -0.26,-0.11,0.25			; position (offset) and orientation of the weapon when it is strapped
+strap_position         				= -0.16,-0.40,0.15			; position (offset) and orientation of the weapon when it is strapped
+;strap_orientation      		= -15,-9,110				; (3rd person view in degrees)
+strap_orientation      				= -10,-5,10					; (3rd person view in degrees)
+
 strap_bone0					= bip01_spine2
 strap_bone1					= bip01_spine1
 
@@ -130,25 +146,29 @@ light_var_range				= 0.5
 light_time 					= 0.2
 
 ;addons
-scope_status				= 1
-silencer_status				= 2
-grenade_launcher_status		= 2
+scope_status 			 = 1	;1 - для второго (ОГСР) режима прицеливания будет использоваться текстура (ПЫС-вариант, скрытый в модели меш привязан к движковой кости wpn_scope); 0 - сквозная оптика (модель)
+silencer_status 		 = 2	;2 в модели есть (кривой)
+grenade_launcher_status  = 2	;40-мм гранатомёт HK AG36
 
-zoom_enabled			= true		; (on,off)zoom mode (right mouse button)
-scope_zoom_factor	 	= 3.5 	; G36 x3.5	; fov for zoom mode
-ironsight_zoom_factor		= 1.0
+zoom_enabled			= true												; (on,off)zoom mode (right mouse button)
+;через коллиматор наследуется, для встроенной оптики ставить scope_zoom_factor	 	= 3.5	; fov for zoom mode
+;через коллиматор наследуется, для встроенной оптики ставить ironsight_zoom_factor	= 3.5	;KD: должен быть равен scope_zoom_factor; избыточен для некоторых типов оружия, но и вреда от него в этом случае тоже не будет
 
+;для несъёмного - не наследуется!
 scope_texture			= wpn\scopes\scope_g36
 
-;scope_name 				= wpn_addon_scope_susat
-;scope_x 					= 78
-;scope_y 					= 0
+;scope_name 					= wpn_addon_scope_g36
+;Сменные аддоны ОГСЕ д/б: 
+scope_name = wpn_scope
+
+scope_x 					= 78
+scope_y 					= 0
 silencer_name  				= wpn_addon_sil_556_ar
-silencer_x 					= 214
-silencer_y 					= 12
-grenade_launcher_name 		= wpn_addon_grenade_launcher_m203
-grenade_launcher_x 			= 130
-grenade_launcher_y 			= 31
+silencer_x 					= 225			;214	;подогнать
+silencer_y 					= 11			;12		;подогнать
+grenade_launcher_name 		= wpn_addon_grenade_launcher_m203		;HK AG36 wpn_addon_grenade_launcher_ag36
+grenade_launcher_x 			= 162			;130	;подогнать
+grenade_launcher_y 			= 29			;31		;подогнать
 
 ;настройки для глушителя
 silencer_hit_power       	= 0.63
@@ -167,18 +187,21 @@ silencer_light_time 		= 0.2
 
 ;------------------------------ S.T.A.L.K.E.R`s sound remake ----------------
 ;звуки
-snd_draw					= weapons\g36\g36_draw
-snd_holster					= weapons\generic_avtomat_holster
+snd_draw					= weapons\g36\draw			;ОГСЕ weapons\g36\g36_draw
+snd_holster					= weapons\g36\holster		;ОГСЕ weapons\generic_avtomat_holster
 snd_shoot					= weapons\g36\g36_shoot
 snd_shoot1					= weapons\g36\g36_shoot1
 snd_shoot2					= weapons\g36\g36_shoot2
-snd_shoot3					= weapons\g36\g36_shoot3      
-snd_empty					= weapons\g36\g36_empty, 0.8
-snd_reload					= weapons\g36\g36_reload, 0.7, 0.35
-snd_shoot_grenade			= weapons\m203\M203_grenshoot
-snd_reload_grenade			= weapons\g36\g36_grenload, 1.0, 0.3
-snd_switch					= weapons\m203\M203_switch, 1.0, 0.5
-snd_silncer_shot			= weapons\g36\g36_shot_sil 
+snd_shoot3					= weapons\g36\g36_shoot3	;ОГСЕ weapons\g36\g36_shoot3      
+snd_empty					= weapons\g36\empty			;ОГСЕ weapons\g36\g36_empty, 0.8
+snd_reload					= weapons\g36\g36_reload	;ОГСЕ weapons\g36\g36_reload, 0.7, 0.35
+snd_shoot_grenade			= weapons\g36\AG36_shot		;ОГСЕ weapons\m203\M203_grenshoot
+snd_reload_grenade			= weapons\g36\AG36_G36_load	;ОГСЕ weapons\g36\g36_grenload, 1.0, 0.3
+snd_switch					= weapons\g36\switch		;ОГСЕ weapons\m203\M203_switch, 1.0, 0.5
+snd_silncer_shot			= weapons\g36\m16_special_01;ОГСЕ weapons\g36\g36_shot_sil 
+;+
+snd_silncer_shot1				= weapons\g36\m16_special_02 
+snd_silncer_shot2				= weapons\g36\m16_special_03 
 ;-----------------------------------------------------------------------------
 
 ;-----------------------------------------------------------------------------
@@ -188,58 +211,79 @@ snd_silncer_shot			= weapons\g36\g36_shot_sil
 
 allow_inertion			= true
 
-shell_point			= 0.15, 0.0, -0.05
+;shell_point			= 0.15, 0.0, -0.05
+shell_point			= 0.019,-0.08,-0.053
 shell_dir			= 0.0, 1.0, 0.0
 
-fire_point			= -0.000000,0.062000,0.134000
-fire_point2 			= 0.30, 0.00, 0.05
+;fire_point				= -0.000000,0.062000,0.134000
+fire_point			= 0.007000,-0.00040,0.2200090
+;fire_point2 			= 0.30, 0.00, 0.05
+fire_point2			= 0.0060000,-6.929000,-0.297000
 fire_bone 			= wpn_body
 
-orientation 			= 5, 0, 0
-position 			= 0, 0, 0
+;orientation 			= 5, 0, 0
+orientation         = 2, 3, 0
+;position 				= 0, 0, 0
+position            = 0.13,-0.01,0.13
 visual 				= weapons\g36\wpn_g36_hud.ogf
 
-grenade_bone 			= grenade
+;grenade_bone 			= grenade
+grenade_bone            			= wpn_grenade
 
 anim_idle			= idle
-anim_idle_aim			= idle
+anim_idle_aim		= idle_aim					;idle
 anim_reload			= reload
 anim_draw			= draw
-anim_holster			= shoot
+anim_holster		= holster					;shoot
 anim_shoot			= shoot
-anim_idle_sprint		= idle_sprint
+anim_idle_sprint	= idle_sprint_w_gl			;idle_sprint
 			
 ;анимации с подключенным подствольником
 ;(режим стрельбы из подствольника)
-anim_idle_g			= idle_grenade
-anim_idle_g_aim			= idle_grenade
+anim_idle_g				= idle_grenade
+anim_idle_g_aim			= idle_grenade_aim		;idle_grenade
 anim_reload_g			= reload_grenade
 anim_shoot_g			= shoot_grenade
-anim_switch_grenade_on		= switch_on
-anim_switch_grenade_off		= switch_off
-anim_draw_g			= switch_on
-anim_holster_g			= switch_off
+anim_switch_grenade_on	= switch_on
+anim_switch_grenade_off	= switch_off
+anim_draw_g				= draw_grenade			;switch_on
+anim_holster_g			= holster_grenade		;switch_off
 ;(режим обычной стрельбы)			 
 anim_idle_gl			= idle_w_gl
-anim_idle_gl_aim		= idle_w_gl
+anim_idle_gl_aim		= idle_w_gl_aim			;idle_w_gl
 anim_reload_gl			= reload_w_gl
 anim_draw_gl			= draw_w_gl
 anim_holster_gl			= holster_w_gl
 anim_shoot_gl			= shoot_w_gl
 
-;смещения HUD для режима приближения
-zoom_offset                 = -0.135500,0.010000,0.000000
-zoom_rotate_x          		= -0.013900
-zoom_rotate_y          		= 0.067000
 
-;режим подствольника
-grenade_zoom_offset			= -0.1173,-0.234600,0.000000
-grenade_zoom_rotate_x		= -0.266700
-grenade_zoom_rotate_y		= 0.067000
-
-grenade_normal_zoom_offset			= -0.135500,0.010000,-0.1
-grenade_normal_zoom_rotate_x		= -0.013900
-grenade_normal_zoom_rotate_y		= 0.067000
+;;;;;;;;;;;;;;;;;;;;;;Альтернативное прицеливание ОГСР через встроенный коллиматор 36 (штатный механический прицел)
+;смещения HUD для режима приближения (прицеливание без увеличения)
+;ствол без установленного гранатомёта
+second_zoom_offset							= -0.137400,0.028000,-0.226000
+second_zoom_rotate_x						= 0.060700
+second_zoom_rotate_y						= 0.035080
+;ствол с установленным гранатомётом в основном режиме (ствол)
+second_grenade_normal_zoom_offset			= -0.137400,0.028000,-0.226000	
+second_grenade_normal_zoom_rotate_x		= 0.060700
+second_grenade_normal_zoom_rotate_y		= 0.035080
+;режим подствольника (положение д/б одинаковым - у подствола свой прицел)
+second_grenade_zoom_offset					= -0.149000,0.059600,-0.124000
+second_grenade_zoom_rotate_x				= 0.061600
+second_grenade_zoom_rotate_y				= 0.058400
+;;;;;;;;;;;;;;;;;;;;;;Прицеливание через оптику (перекрывается текстуроЙ)
+;прицеливание по умолчанию (по-старому, через "оптику" - ТЕКСТУРОЙ), альтернативное ОГСЕ (мех.прицел, МОДЕЛЬЮ) сбрасывается при установке любого аддона, включая ПЫС-подствол)
+zoom_offset			= -0.137400,0.071000,-0.226000
+zoom_rotate_x		= 0.060700
+zoom_rotate_y		= 0.034080
+;режим ствола
+grenade_normal_zoom_offset		= -0.137400,0.071000,-0.226000		;далеко 0.130000
+grenade_normal_zoom_rotate_x		= 0.060700
+grenade_normal_zoom_rotate_y		= 0.034080
+;режим подствольника (положение д/б одинаковым - у подствола свой прицел)
+grenade_zoom_offset				= -0.149000,0.059600,-0.124000 
+grenade_zoom_rotate_x			= 0.061600
+grenade_zoom_rotate_y			= 0.058400
 
 ;прячем перекрестие прицела в зуме
 zoom_hide_crosshair		= true
@@ -251,3 +295,4 @@ rotate_time			= 0.4
 [wpn_g36_repair]
 tech_complication = 1000
 repair_compatibility = g36
+
