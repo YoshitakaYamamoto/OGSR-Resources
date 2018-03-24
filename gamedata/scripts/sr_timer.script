@@ -38,7 +38,9 @@ function action_timer:update(delta)
 		
 	end
 
-	if level.name()=="l12_stancia" then self.st.start_value = vars.aes_timer*60000 end
+	if level.name() == "l12_stancia" then
+		self.st.start_value = get_u32("options", "aes_timer", 15) * 60000
+	end
 
 	if xr_logic.try_switch_to_another_section(self.object, self.st, actor) then
 		return
