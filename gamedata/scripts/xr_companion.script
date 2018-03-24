@@ -85,12 +85,6 @@ local sound_wait = {
 }
 local sound_prob = 0.2
 local testing_sound = false
-local timeout
-
-local scared = false
-local scared_timer = nil
-local disabled_objects = {}
-local calm_down_timer = nil
 
 -- ћодели поведени€:
 beh_walk_simple = 0
@@ -127,7 +121,7 @@ local locked_vertexes 		= {}		-- зан€тые вертексы
 local talking_time = 5000
 local talking_npc = {}
 
-being_attacked = false
+being_attacked = false --KRodin: хм, а при нескольких напарниках оно нормально работает? ≈сли будут проблемы - завести массив и там этот флаг хранить дл€ каждого.
 --actor_attacked = false --нигде не мен€етс€
 
 -----------------------------------------------------

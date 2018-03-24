@@ -17,7 +17,6 @@ game_time_factor = get_float("alife", "time_factor")
 local fov_vol = get_u32("options", "fov_volume")
 local max_alarm_fov_vol = sys_ini:r_s32("options","max_fov_volume")
 local min_alarm_fov_vol = sys_ini:r_s32("options","min_fov_volume")
-local ammo_on_belt = sys_ini:r_s32("options","ammunition_on_belt")
 ---------------------------------------------------------------
 deadmans_table = {} -- см. dsh_deadmans_table_proxy.script
 -- Формат хранения:

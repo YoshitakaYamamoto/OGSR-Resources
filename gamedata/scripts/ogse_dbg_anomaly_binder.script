@@ -61,7 +61,10 @@ function anomaly_binder:net_spawn(data)
 	end
 
 	local id = self.object:id()
-	local status = ogse_anomaly.get_anomaly_mode( alife():object(id) )
+	local sobj = alife():object( id )
+	if not sobj then return true end
+	--
+	local status = ogse_anomaly.get_anomaly_mode( sobj )
 	if status == "anom_off" then
 		--log3("~~[%s] Disabling anomaly: [%s]", script_name(), self.object:name())
 		self.object:disable_anomaly()

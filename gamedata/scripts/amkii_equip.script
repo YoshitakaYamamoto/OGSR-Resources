@@ -459,7 +459,7 @@ end
 function refit_npc(npc, npc_id)
    local s_npc = alife():object(npc_id)
    s_npc.force_offline = true
-   go_offline_watch_timer(npc_id, pos):start()
+   go_offline_watch_timer(npc_id):start()
 end
 
 -- служебный таймер, ждущий ухода в оффлайн

@@ -154,12 +154,11 @@ function trade_init( npc, cfg )
       binder[ script_name() .. ".subscribed2" ] = s2
       sm:subscribe( s2 )
     end
-	--
 	--Всё остальное просто периодически обновляем.
     if not binder[ script_name() .. ".subscribed3" ] then
       local s3 = {
         [ "signal" ] = s_name,
-        [ "fun"    ] = this.update,
+        [ "fun"    ] = function(...) this.update(...) end, --KRodin: так сделано специально! Костыль от очень редкого вылета.
         [ "queued" ] = true,
       }
       binder[ script_name() .. ".subscribed3" ] = s3
