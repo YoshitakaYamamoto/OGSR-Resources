@@ -130,7 +130,7 @@ function check_is_enemy_always( obj, enemy )
           enemy:name() == ignore_name
           or ( IsStalker( enemy ) and enemy:profile_name() == ignore_name )
           or is_ignored_community( enemy, ignore_name )
-          or ( strn and strn:name() == ignore_name and begin_job )
+          or ( strn and strn:name() == ignore_name --[[and begin_job]] )
         then
           return false
         end
