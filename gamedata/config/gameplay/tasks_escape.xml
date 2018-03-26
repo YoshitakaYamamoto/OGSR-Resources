@@ -713,7 +713,7 @@
 		<text>atp_band_cheat_text_task</text>
 		<icon>ui_iconsTotal_gar_help_dymon</icon>
 		<article>atp_band_cheat</article>
-		<infoportion_complete>shustriy_in_lager</infoportion_complete>
+		<function_complete>xr_conditions.is_shustriy_in_lager</function_complete>
 		<infoportion_fail>shustriy_dead</infoportion_fail>
 	</objective>
 	<objective>
@@ -731,7 +731,7 @@
 		<text>atp_band_cheat_text5_task</text>
 		<map_location_type hint="atp_band_cheat_text6_task">green_location</map_location_type>
 		<object_story_id>Escape_tutorial_wounded</object_story_id>
-		<infoportion_complete>shustriy_in_lager</infoportion_complete>
+		<function_complete>xr_conditions.is_shustriy_in_lager</function_complete>
 		<infoportion_fail>shustriy_dead</infoportion_fail>
 	</objective>
 </game_task>

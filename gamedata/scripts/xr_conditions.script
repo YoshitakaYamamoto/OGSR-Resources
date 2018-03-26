@@ -1712,3 +1712,29 @@ function dist_to_friendly_npc_le(_, door, tbl)
 	end
 	return false
 end
+
+
+function shustriy_bugfix( actor, npc )
+  local sobj = npc:get_alife_object()
+  if sobj then
+	ogse.reset_npc_logic(npc) --В некоторых случаях без этого логика не переключается в nil.
+    sobj:brain():update()
+	return true
+  end
+end
+
+function is_shustriy_in_lager()
+	local sobj = alife():story_object(story_ids.esc_wounded_flash)
+	if sobj then
+		local strn_id = sobj:smart_terrain_id()
+		if strn_id ~= 65535 then
+			local strn = alife():object( strn_id )
+			if strn and strn:is_initialized() then
+				if strn.gulag.Object_didnt_begin_job[ sobj.id ] == false then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end
