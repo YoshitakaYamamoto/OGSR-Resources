@@ -41,7 +41,12 @@ function main_menu:InitBackground(xml)
 	local night = time <= 8 or time >= 20
 	self.bg_st = xml:InitStatic("back_movie", self)
 	self.bg_st:InitTexture(night and "ui\\ui_mm_night_back" or "ui\\ui_mm_main_back")
-	local tex_orig_w = screen_aspect_ratio * 1024 * 0.5625
+	local multiplier = 0.5625
+	if screen_aspect_ratio > 2 then
+	-- ultra-wide
+		multiplier = 0.40
+	end
+	local tex_orig_w = screen_aspect_ratio * 1024 * multiplier
 	local tex_orig_x_offs = (1024 - tex_orig_w) / 2
 	self.bg_st:SetOriginalRect(tex_orig_x_offs, 0, tex_orig_w, 768);
 end
