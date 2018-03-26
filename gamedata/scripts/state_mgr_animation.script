@@ -708,22 +708,24 @@ function animation:anim_callback()
 	
 	-- Производим действия находящиеся на 1 позиции
 	if v.a then
-		ASSERT(
-			( not self.attached_item ),
-			"[%s]: %s is trying to attach %s, but %s is already attached",
-			script_name(), self.npc:name(), v.a, tostring( self.attached_item )
-		)
+		--KRodin: отключаю, не фатально.
+		--ASSERT(
+		--	( not self.attached_item ),
+		--	"[%s]: %s is trying to attach %s, but %s is already attached",
+		--	script_name(), self.npc:name(), v.a, tostring( self.attached_item )
+		--)
 		local obj = self.npc:object( v.a )
 		if obj then
 			obj:enable_attachable_item( true )
 		end
 		self.attached_item = v.a
 	elseif v.d and self.attached_item then
-		ASSERT(
-			self.attached_item == v.d,
-			"[%s]: %s is trying to detach %s, but %s is attached",
-			script_name(), self.npc:name(), v.d, tostring( self.attached_item )
-		)
+		--KRodin: отключаю, не фатально.
+		--ASSERT(
+		--	self.attached_item == v.d,
+		--	"[%s]: %s is trying to detach %s, but %s is attached",
+		--	script_name(), self.npc:name(), v.d, tostring( self.attached_item )
+		--)
 		local obj = self.npc:object( v.d )
 		if obj then
 			obj:enable_attachable_item( false )
