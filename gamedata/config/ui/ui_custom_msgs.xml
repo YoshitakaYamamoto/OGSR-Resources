@@ -374,7 +374,6 @@
 	<hud_rad_level x="1" y="1" width="1" height="1" stretch="1" complex_mode="1">
 		<texture x="650" y="150" width="110" height="10">ui\ui_hud</texture>
 	</hud_rad_level>
-<!-- Fuel on HUD -->	
 
 <!-- Psy Health on HUD -->	
 	<hud_psy_back x="1" y="1" width="1" height="1" stretch="1" complex_mode="1">
@@ -383,15 +382,6 @@
 	<hud_psy_level x="1" y="1" width="1" height="1" stretch="1" complex_mode="1">
 		<texture x="650" y="176" width="110" height="10">ui\ui_hud</texture>
 	</hud_psy_level>
-<!-- Psy Health on HUD -->	
-
-	<hud_fuel_back x="1" y="1" width="1" height="1" stretch="1" complex_mode="1">
-		<texture x="820" y="100" width="156" height="48">ui\ui_hud</texture>
-	</hud_fuel_back>
-	<hud_fuel_level x="1" y="1" width="1" height="1" stretch="1" complex_mode="1">
-		<texture x="347" y="197" width="110" height="10">ui\ui_hud</texture>
-	</hud_fuel_level>
-	
 	
 <!-- sleep icon -->	
 
