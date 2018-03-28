@@ -3146,7 +3146,10 @@ function check_vertex_locked(npc, vertex)
 		if (v == vertex or vertex_pos:distance_to(loced_vtx_pos) < 4) and k ~= npc:id() then
 			local checking_npc = level.object_by_id(k)
 			if checking_npc and checking_npc:alive() and not xr_wounded.is_wounded(checking_npc) then
-				if checking_npc:character_community() == npc:character_community() then
+				if
+					npc:relation( checking_npc ) ~= game_object.enemy
+					and checking_npc:relation( npc ) ~= game_object.enemy
+				then
 					return true
 				end
 			end			
