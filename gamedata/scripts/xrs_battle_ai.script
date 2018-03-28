@@ -746,12 +746,13 @@ function action_altcombat:execute()
 	
 	local raytrace_see = false
 
+	--Dsh: что то у меня такое ощущение, что actor_see_raytrace() тут никакого смысла не имеет
 	if be:is_actor() then
-		if use_raytrace then
-			raytrace_see = actor_see_raytrace(npc)
-		else
+		--if use_raytrace then
+		--	raytrace_see = actor_see_raytrace(npc)
+		--else
 			raytrace_see = actor_see(npc)
-		end
+		--end
 	end
 	
 	if npc:see(be) and not is_armor(be) and knife_scheme[npc:id()] then
