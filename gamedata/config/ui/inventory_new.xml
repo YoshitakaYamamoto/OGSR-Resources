@@ -2,58 +2,64 @@
 <w>
 	<properties_box>
 		<texture>ui_cb_listbox</texture>
-		<list x="0" y="0" width="10" height="10" item_height="18"  always_show_scroll="0" can_select="1" bottom_indent="10" right_ident="10" left_ident="20">				
-		<font_s r="218" g="217" b="213"/>				
+		<list x="0" y="0" width="10" height="10" item_height="18"  always_show_scroll="0" can_select="1" bottom_indent="10" right_ident="10" left_ident="20">
+		<font_s r="218" g="217" b="213"/>
 		<font r="131" g="131" b="131" font="letterica16"/>
 		</list>
 	</properties_box>
-	
+
 	<main x=0 y=0 width=1024 height=768/>
-	
+
 	<belt_slots x="691" y="360" width="330" height="445">
-		<texture>ui_slots_armory</texture>		
+		<texture>ui_slots_armory</texture>
 	</belt_slots>
-	
-	<dragdrop_belt x="40" y="290" width="630" height="45"
-            cell_width = "42" cell_height="42" rows_num="1" cols_num="15" show_grid="0" />
 
-    <dragdrop_outfit x="903" y="120" width="90" height="135" 
-            cell_width = "45" cell_height="45" rows_num="3" cols_num="2" 
+	<dragdrop_belt x="132" y="290" width="630" height="45"
+            cell_width = "45" cell_height="45" rows_num="1" cols_num="13" show_grid="1"/>
+	<dragdrop_detector x="72" y="310" width="37" height="37"
+            cell_width = "37" cell_height="37" rows_num="1" cols_num="1"
+            custom_placement="0"/>
+
+	<dragdrop_biodetector x="738" y="310" width="37" height="37"
+            cell_width = "37" cell_height="37" rows_num="1" cols_num="1"
+            custom_placement="0"/>
+
+<!-- расположение икони броника в инвентаре -->
+    <dragdrop_outfit x="910" y="120" width="76" height="135" 
+            cell_width = "43" cell_height="45" rows_num="3" cols_num="2" 
             custom_placement="0" show_grid="0" />
 
-	<dragdrop_helmet x="918" y="48" width="60" height="64"
-            cell_width = "30" cell_height="32" rows_num="2" cols_num="2"
+	<dragdrop_helmet x="918" y="48" width="60" height="72"
+            cell_width = "35" cell_height="36" rows_num="2" cols_num="2"
             custom_placement="0" show_grid="0" />
-	<dragdrop_nv x="708" y="596" width="60" height="64"
-            cell_width = "30" cell_height="32" rows_num="1" cols_num="2"
-            custom_placement="0" show_grid="0" />
-	<dragdrop_torch x="708" y="650" width="60" height="64"
-            cell_width = "30" cell_height="32" rows_num="1" cols_num="2"
-            custom_placement="0" show_grid="0" />	
-			
-	<dragdrop_knife x="854" y="596" width="120" height="64"
-            cell_width = "30" cell_height="32" rows_num="1" cols_num="3"
-            custom_placement="0" show_grid="0" />
-    <dragdrop_pistol x="710" y="410" width="270" height="60"
+
+<!-- ТЕСТим ноые параматры (было x="710" y="418" width="120" height="60" rows_num="1" cols_num="3") -->
+	<dragdrop_knife x="806" y="280" width="90" height="120"
+            cell_width = "30" cell_height="30" rows_num="3" cols_num="1"
+            custom_placement="0" vertical_placement="1" show_grid="1"/>
+
+	<dragdrop_pistol x="710" y="406" width="270" height="60"
             cell_width = "30" cell_height="30" rows_num="2" cols_num="9"
-            custom_placement="0" show_grid="0" />
+            custom_placement="0" vertical_placement="0" show_grid="1"/>
 
-    <dragdrop_automatic x="710" y="510" width="270" height="60"
+	<dragdrop_automatic x="710" y="527" width="270" height="60"
             cell_width = "30" cell_height="30" rows_num="2" cols_num="9"
-            custom_placement="1" show_grid="0" />
+            custom_placement="1" vertical_placement="0" show_grid="1"/>
 
 
-	<dragdrop_detector x="855" y="650" width="30" height="32"
-            cell_width = "30" cell_height="32" rows_num="1" cols_num="1"
-            custom_placement="0" show_grid="0"/>			
-	<dragdrop_biodetector x="917" y="650" width="30" height="32"
-            cell_width = "30" cell_height="32" rows_num="1" cols_num="1"
-            custom_placement="0" show_grid="0"/>
-	<dragdrop_binocular x="784" y="610" width="60" height="60"
-            cell_width = "30" cell_height="30" rows_num="2" cols_num="2"
-            custom_placement="0" show_grid="0" />
-			
-	
+	<dragdrop_binocular x="710" y="648" width="60" height="60"
+            cell_width = "30" cell_height="30" rows_num="1" cols_num="2"
+            custom_placement="0"/>
+
+	<dragdrop_torch x="786" y="648" width="60" height="64"
+            cell_width = "30" cell_height="32" rows_num="1" cols_num="2"
+            custom_placement="0"/>
+
+	<dragdrop_nv x="860" y="648" width="60" height="64"
+            cell_width = "30" cell_height="32" rows_num="1" cols_num="2"
+            custom_placement="0"/>
+
+
 	<back x="0" y="0" width="1024" height="768">
 		<texture>ui_inventory_main</texture>
 	</back>
@@ -64,13 +70,14 @@
 
     <dragdrop_bag x="17" y="153" width="646" height="350"   
             cell_width = "35" cell_height="35" rows_num="10" cols_num="18" 
-            unlimited="1" group_similar="1" show_grid="0" />
+            unlimited="1" group_similar="1" show_grid="1" />
 
-    <bag_static x="15" y="238" width="859" height="762" complex_mode="1">		
-        <text x="691" y="87" font="graffiti22" r="231" g="153" b="22">ui_inv_bag</text>
+    <bag_static x="20" y="238" width="859" height="762" complex_mode="1">		
+        <!--  <text x="691" y="87" font="graffiti22" r="231" g="153" b="22">ui_inv_bag</text> -->
+		 <text x="30" y="126" font="graffiti22" r="231" g="153" b="22">ui_inv_bag</text>
     </bag_static>
-    
-    <money_static x="885" y="320" width="108" height="33" stretch="1">
+
+    <money_static x="545" y="359" width="108" height="33" stretch="1">
 		<text font="graffiti22" r="238" g="153" b="26" align="c" vert_align="c"></text>
     </money_static>
  
@@ -78,13 +85,14 @@
         <text x="20" y="3" font="graffiti22" r="238" g="155" b="23">ui_inv_description</text>
     </descr_static>
     
-    <character_frame_window x="730" y="260" width="268" height="460">
+<!-- характеристики броника в инвентаре -->
+    <character_frame_window x="730" y="260" width="177" height="460">
         <title x="160" y="-242" width="240" height="60">
 			<text font="graffiti22" r="231" g="153" b="22">ui_inv_personal</text>
         </title>
     </character_frame_window>
     
-	<outfit_info x="705" y="13" width="60" height="282">
+	<outfit_info x="712" y="13" width="60" height="282">
 		<auto_static x="60" y="5">
 			<text font="graffiti22" color="UI_orange" complex_mode="0">ui_st_params</text>
 		</auto_static>
@@ -135,65 +143,72 @@
 			<texture>ui_inv_icon_fire_wound_immunity</texture>
 			<text font="letterica16" x="17" y="0" color="ui_clr_1"/>
 		</static_fire_wound_immunity>
-		
 	</outfit_info>
 
 	<static_personal x=1 y=285 width=100 height=260/>
 
-    <rank x="707" y="49" width="75" height="65">
+	<rank x="862" y="118" width="75" height="65">
 		<texture>ui_inventory_rank</texture>
-		<pic x="14" y="17" width="46" height="47" />
+		 <pic x="14" y="17" width="46" height="47" />
     </rank>
-    
-    <progress_background x="708" y="243" width="164" height="55">
-		<!--texture>ui_scale_three</texture-->
+
+<!-- подложка для шкал 	<progress_background x="862" y="313" width="164" height="55"> -->
+    <!-- <progress_background x="862" y="313" width="164" height="55"> -->
+	<progress_background x="858" y="323" width="164" height="55">
+		<texture>ui_scale_three</texture>
     </progress_background>
-    
-    <progress_back_rank x="704" y="340" width="38" height="215">
+
+   <progress_back_rank x="878" y="410" width="38" height="215">
 		<texture>ui_scale_one</texture>		
     </progress_back_rank>
 
     <progress_bar_health x="27" y="4" width="124" height="9" horz="1" min="0" max="100" pos="0">
-		<!--progress>
+		<progress>
 			<texture>ui_scale_red_1</texture>
-		</progress-->
+		</progress>
     </progress_bar_health>    
 
+<!-- 2я - "лёгкие" синяя ui_scale_blue_1 -->
     <progress_bar_psy x="27" y="22" width="124" height="9" horz="1" min="0" max="100" pos="0">
-		<!--progress>
-			<texture>ui_scale_blue_1</texture>
-		</progress-->
+		<progress>
+			<texture>ui_scale_magenta_1</texture>
+		</progress>
 	</progress_bar_psy>
 
     <progress_bar_radiation x="27" y="41" width="124" height="9" horz="1" min="0" max="100" pos="0">
-		<!--progress>
+		<progress>
 			<texture>ui_scale_yellow_1</texture>
-		</progress-->
+		</progress>
     </progress_bar_radiation>
-    
-    <progress_bar_rank x="20" y="22" width="10" height="141" horz="0" min="0" max="100" pos="0">
+
+
+ <!-- "годность" итема  -->
+	<progress_bar_rank x="20" y="22" width="10" height="141" horz="0" min="0" max="100" pos="0">
 		<progress>
 			<texture>ui_scale_green</texture>
 		</progress>
     </progress_bar_rank>
     
-    <time_static x="689" y="724" width="200" height="30">
-<!--
+
+<!--     <time_static x="689" y="724" width="200" height="30"> -->
+<!-- +, -фон <time_static x="689" y="527" width="200" height="30"> двигаем под нож -->
+     	<time_static x="926" y="675" width="200" height="30">	<!-- прячем на ГОСТе -->
 		<texture x=1021 y=975 width=190 height=36>ui_dg_time</texture>
-        <text x="30" y="7" font="letterica16" r="240" g="217" b="182" a="255">ui_inv_time</text>
--->
+		<!-- убираем "Время" - достаточно только цифр ЧЧ:мм -->  
+        <!--<text x="30" y="7" font="letterica16" r="240" g="217" b="182" a="255">ui_inv_time</text> -->
 	</time_static>
 
-    <time_static_str x="105" y="7" width="107" height="30">        
-        <text font="letterica16" r="240" g="217" b="182" a="0"/>
+<!--    <time_static_str x="105" y="7" width="107" height="30">   -->  
+	<time_static_str x="15" y="7" width="107" height="30">
+        <text font="letterica16" r="240" g="217" b="182" a="255"/>
 	</time_static_str>
 
     <exit_button x="865" y="718" width="157" height="48">
         <texture>ui_button_main02</texture>
         <text font="graffiti22" r="238" g="153" b="26">ui_inv_exit</text>
         <text_color>
-			<e r="240" g="217" b="182"/>				
-			<t r="0" g="0" b="0"/>				
+			<e r="240" g="217" b="182"/>
+			<t r="0" g="0" b="0"/>
 			<d r="135" g="123" b="116"/>
 			<h r="0" g="0" b="0"/>
 		</text_color>
