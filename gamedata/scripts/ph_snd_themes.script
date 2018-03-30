@@ -212,9 +212,7 @@ esc_music_day = {
 }
 sidor_music_day = {
 	[[characters_voice\scenario\esc\sidor_music_1]],
-	[[characters_voice\scenario\esc\sidor_music_2]],
 	[[characters_voice\scenario\esc\sidor_music_3]],
-	[[characters_voice\scenario\esc\sidor_music_4]],
 	[[characters_voice\scenario\esc\sidor_music_5]],
 	[[characters_voice\scenario\esc\sidor_music_6]],
 	[[characters_voice\scenario\esc\sidor_music_7]],
@@ -488,6 +486,8 @@ gunsrepair_music = {
 	[[characters_voice\scenario\escape\radio\utesov3]],
 	[[characters_voice\scenario\escape\radio\utesov4]],
 	[[characters_voice\scenario\escape\radio\utesov5]],
+	[[characters_voice\scenario\esc\sidor_music_2]],
+	[[characters_voice\scenario\esc\sidor_music_4]],
 }
 -- Расстрел шарманки Оружейника
 gunsrepair_music_broke = {
