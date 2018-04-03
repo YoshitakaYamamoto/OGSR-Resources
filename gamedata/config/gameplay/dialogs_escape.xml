@@ -2074,7 +2074,7 @@
 	</dialog>
 	<dialog id="escape_trader_jobs" priority="5">
 		<has_info>esc_serious_talk</has_info>
-		<!--<precondition>tasks_functor.esc_deal_with_mils_done</precondition>-->
+		<dont_has_info>escape_blockpost_case_done</dont_has_info>
 		<phrase_list>
 			<phrase id="51111">
 				<text>escape_trader_jobs_51111</text>
