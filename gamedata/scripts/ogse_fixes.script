@@ -319,15 +319,12 @@ function fix_gar_boars_territory2_logic() --Исправление кривой 
 	ogse.save_var("gar_boars_territory2_fix", true)
 end
 
-function lc_question_add() --Переход "Припять - ЧАЭС" задаёт вопрос о смене уровня. Взято из аддона Naxac'а
+function lc_question_add() --Переход "Припять - ЧАЭС" задаёт вопрос о смене уровня.
 	local sobj = alife():object("exit_to_stancia_01")
 	if sobj then
-		local pk = get_netpk(sobj, 1)
-		ASSERT( pk:isOk(), "can't read netpacket of %s", sobj:name() )
-		local data = pk:get()
-		if data.silent_mode ~= 0 then
-			data.silent_mode = 0
-			pk:set(data)
+		local lc = sobj:get_level_changer()
+		if lc.silent_mode ~= 0 then
+			lc.silent_mode = 0
 			log3( "~~[%s]: fixed ['exit_to_stancia_01']...", script_name() )
 		end
 	end

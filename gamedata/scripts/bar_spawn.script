@@ -61,12 +61,9 @@ function spawn_barman_document()
 end
 
 function spawn_cherep_svd()
-	local wpn = ogse.spawn_object(spawn_db.spawn_cherep_svd)
-	local pk = get_netpk(wpn, 1)
-	ASSERT( pk:isOk(), "can't read netpacket of %s", wpn:name() )
-	local wpndata = pk:get()
-	wpndata.addon_flags = wpndata.addon_flags + 1
-	pk:set(wpndata)
+	local sobj = ogse.spawn_object(spawn_db.spawn_cherep_svd)
+    local wpn = sobj:get_weapon()
+    wpn.addon_flags = wpn.addon_flags:set( ogse_wpn_utils.addons_flags.scope, true )
 end
 -------------------------------------------------------
 ---' Массивы атакующих
