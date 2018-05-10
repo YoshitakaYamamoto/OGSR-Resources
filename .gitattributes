@@ -2,7 +2,8 @@
 * text=auto
 
 # Custom
-*.script diff=lua
-*.ltx diff=ini
-*.ps diff=cpp
-*.vs diff=cpp
+*.script text diff=lua
+*.ltx    text diff=ini
+*.ps     text diff=cpp
+*.vs     text diff=cpp
+*.s      text diff=lua
