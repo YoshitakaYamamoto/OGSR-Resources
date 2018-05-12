@@ -2,7 +2,7 @@ local tex_env0	= "$user$sky0"
 local tex_env1	= "$user$sky1"
 
 function normal   (shader, t_base, t_second, t_detail)
-	shader:begin	("model_env_lq","model_scope_lense")
+	shader:begin	("model_env_lq","models_lense_scope")
       : fog			(true)
       : zb			(true,false)
       : blend		(true,blend.srcalpha,blend.invsrcalpha)
