@@ -200,7 +200,7 @@
 	<objective>
 		<text>tutorial_help_wounded_2</text>
 		<map_location_type hint="tutorial_wounded">green_location</map_location_type>
-		<object_story_id>Escape_tutorial_wounded</object_story_id>
+		<object_story_id>esc_wounded_flash</object_story_id>
 		<map_location_hidden>1</map_location_hidden>
 		<infoportion_complete>tutorial_wounded_give_info</infoportion_complete>
 	</objective>
@@ -286,7 +286,7 @@
 	<objective>
 		<text>go_with_vodka</text>
 		<map_location_type hint="tolik">green_location</map_location_type>
-		<object_story_id>Escape_tutorial_wounded</object_story_id>
+		<object_story_id>esc_wounded_flash</object_story_id>
 		<infoportion_complete>find_tolik_vodka</infoportion_complete>
 		<function_fail>ogsm_quests.tolik_death</function_fail>
 	</objective>
@@ -730,7 +730,7 @@
 	<objective>
 		<text>atp_band_cheat_text5_task</text>
 		<map_location_type hint="atp_band_cheat_text6_task">green_location</map_location_type>
-		<object_story_id>Escape_tutorial_wounded</object_story_id>
+		<object_story_id>esc_wounded_flash</object_story_id>
 		<function_complete>xr_conditions.is_shustriy_in_lager</function_complete>
 		<infoportion_fail>shustriy_dead</infoportion_fail>
 	</objective>
