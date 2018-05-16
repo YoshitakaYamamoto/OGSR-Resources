@@ -63,6 +63,11 @@ string.explode = function ( div,		-- разделитель
 	return ret
 end
 --==============================================================================================
+-- очистка строки от "лишних" символов (полезно при работе с FS)
+string.clear = function(str) --KRodin: поправил функцию, теперь работает.
+	return str:gsub( '[/:<>|%*%?"\\]*', "" )
+end
+--==============================================================================================
 -- Форматирование текста по ширине
 -- http://www.amk-team.ru/forum/topic/13216-sborochnyy-ceh/?do=findComment&comment=959286
 string.width = function(str, width, return_table, indent, paragrapf)
@@ -362,24 +367,22 @@ function get_clsid(npc)
 	--return nil
 end
 
+
 --/ Вычисляет yaw в радианах
 function yaw(v1, v2)
-	if v1 and v2 then
-		return math.abs(v2:getH()-v1:getH())
-	else return 1 end
+	return math.abs(v2:getH() - v1:getH())
 end
-function yaw_degree(v1, v2)
-	return yaw(v1, v2) * 57.295779513
+
+function yaw_degree(...)
+	return yaw(...) * 57.295779513
 end
+
 function yaw_degree3d(v1, v2)
-	if v1 and v2 then
-		return math.acos(v1:dotproduct(v2))*57.295779513
-	else return 1 end
+	return math.acos(v1:dotproduct(v2)) * 57.295779513
 end
-function vector_cross(v1, v2)
-	if v1 and v2 then
-		return vector():crossproduct(v1, v2)
-	else return vector():set(0, 0, 0) end
+
+function vector_cross(...)
+	return vector():crossproduct(...)
 end
 
 --/ Вращает вектор вокруг оси y против часовой стрелки
@@ -390,12 +393,6 @@ function vector_rotate_y(v, angle)
     return vector ():set (v.x * c - v.z * s, v.y, v.x * s + v.z * c)
 end
 
---/ очистка таблицы
-function clear_table(t)
-	for k, _ in pairs(t) do
-		t[k] = nil
-	end
-end
 
 function stop_play_sound(obj)
 	if obj:alive() == true then
