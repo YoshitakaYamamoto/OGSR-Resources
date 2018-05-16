@@ -1,26 +1,16 @@
--- -*- mode: lua; coding: windows-1251-dos -*-
 
--- File:		UI_NUMPAD.SCRIPT
--- Description:		Numpad for password input
--- Created:		23.02.2005
--- Author:		Serge Vynnychenko
---
--- Copyright 2004 GSC Game World
-
-local numpad_wnd
 class "numpad" (CUIScriptWnd)
 function numpad:__init(owner) super()
-	numpad_wnd = self
 	self.owner = owner
 	self:Init_window()
-	--log1("--numpad:__init()")
 end
+
 function numpad:__finalize()
-	--log1("~~numpad:__finalize()")
+	--log1("--numpad:__finalize()")
 end
 
 function numpad:Init_window()
-	self:Init(342,199,339,369)			  
+	self:Init(342, 199, 339, 369)			  
     local xml = CScriptXmlInit()
     xml:ParseFile("ui_numpad_wnd.xml")
      
@@ -30,76 +20,74 @@ function numpad:Init_window()
 	--
 	for n = 0, 9 do
 		self:Register( xml:Init3tButton("btn_"..n, self), "btn_"..n )	
-		self:Connect("btn_"..n, ui_events.BUTTON_CLICKED, self.AddNumber, nil, n)
+		self:Connect("btn_"..n, ui_events.BUTTON_CLICKED, self.AddNumber, self, n)
 	end
 	--	
-	self:Register(xml:Init3tButton("btn_c",			self),	"btn_c")
-	self:AddCallback("btn_c", ui_events.BUTTON_CLICKED, self.OnButton_c_clicked)
-	self:Register(xml:Init3tButton("btn_backspase",	self),	"btn_backspase")
-	self:AddCallback("btn_backspase", ui_events.BUTTON_CLICKED, self.OnButton_backspace_clicked)
-	self:Register(xml:Init3tButton("btn_enter",		self),	"btn_enter")
-	self:AddCallback("btn_enter", ui_events.BUTTON_CLICKED, self.OnButton_OK_clicked)
-	self:Register(xml:Init3tButton("btn_cancel",	self),	"btn_cancel")
-	self:AddCallback("btn_cancel", ui_events.BUTTON_CLICKED, self.OnButton_CANCEL_clicked)	
+	self:Register(xml:Init3tButton("btn_c", self), "btn_c")
+	self:AddCallback("btn_c", ui_events.BUTTON_CLICKED, self.OnButton_c_clicked, self)
+	self:Register(xml:Init3tButton("btn_backspase",	self), "btn_backspase")
+	self:AddCallback("btn_backspase", ui_events.BUTTON_CLICKED, self.OnButton_backspace_clicked, self)
+	self:Register(xml:Init3tButton("btn_enter", self), "btn_enter")
+	self:AddCallback("btn_enter", ui_events.BUTTON_CLICKED, self.OnButton_OK_clicked, self)
+	self:Register(xml:Init3tButton("btn_cancel", self), "btn_cancel")
+	self:AddCallback("btn_cancel", ui_events.BUTTON_CLICKED, self.OnButton_CANCEL_clicked, self)	
 end
 
 function numpad:AddNumber(number)
-	local edit_window = numpad_wnd:GetStatic("edit_window")
+	local edit_window = self:GetStatic("edit_window")
 	local text = edit_window:GetText()
-	
+
 	if text == nil then
 		text = "" .. number
 	else
 		if (string.len(text) > 12) then
 			return
 		end
-		
+
 		text = text .. number
 	end
-	
+
 	edit_window:SetText(text)
 end
 
 function numpad:OnButton_backspace_clicked()
-	local edit_window = numpad_wnd:GetStatic("edit_window")
+	local edit_window = self:GetStatic("edit_window")
 	local text = edit_window:GetText()
-	
+
 	if text == nil then
 		return
 	end
-	
+
 	local b = 1
 	local e = string.len(text) - 1
-	
+
 	text = string.sub(text, b, e)
-	
+
 	edit_window:SetText(text)
 end
 
 function numpad:OnButton_c_clicked()
-	local edit_window = numpad_wnd:GetStatic("edit_window")	
+	local edit_window = self:GetStatic("edit_window")	
 	edit_window:SetText("")
 end
 
 function numpad:OnButton_CANCEL_clicked()
-	numpad_wnd.owner:OnNumberReceive("")
-	numpad_wnd:quit()
+	self.owner:OnNumberReceive("")
+	self:quit()
 end
 
 function numpad:OnButton_OK_clicked()
-	local edit_window = numpad_wnd:GetStatic("edit_window")
+	local edit_window = self:GetStatic("edit_window")
 	local text = edit_window:GetText()
-	numpad_wnd.owner:OnNumberReceive(text)
-	numpad_wnd:quit()
+	self.owner:OnNumberReceive(text)
+	self:quit()
 end
 
-function numpad:OnKeyboard(dik, keyboard_action)  --virtual function
-	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
-	
+function numpad:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self, dik, keyboard_action)
+
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
-		if dik == DIK_keys.DIK_ESCAPE then
-			self:quit()
-		elseif dik == DIK_keys.DIK_0 or dik == DIK_keys.DIK_NUMPAD0 then
+		if dik == DIK_keys.DIK_0 or dik == DIK_keys.DIK_NUMPAD0 then
 			self:AddNumber(0)
 		elseif dik == DIK_keys.DIK_1 or dik == DIK_keys.DIK_NUMPAD1 then
 			self:AddNumber(1)
@@ -125,13 +113,16 @@ function numpad:OnKeyboard(dik, keyboard_action)  --virtual function
 			self:OnButton_OK_clicked()
 		elseif dik == DIK_keys.DIK_DELETE or dik == DIK_keys.DIK_NUMPADCOMMA then
 			self:OnButton_c_clicked()
+		elseif dik_to_bind(dik) == key_bindings.kQUIT then
+			self:quit()
 		end
 	end
-	
+
 	return true
 end
 
 function numpad:quit()
+	self.owner = nil
 	self:GetHolder():start_stop_menu(self, true)
-	numpad_wnd = nil
+	self:ClearCallbacks() --Очищаем каллбеки и отпускаем объект для сборщика мусора.
 end
