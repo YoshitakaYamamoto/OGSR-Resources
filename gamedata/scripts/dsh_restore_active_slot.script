@@ -11,7 +11,7 @@ function on_first_update()
   -- Восстанавливаем активный слот
   local loaded_slot = ogse.load_var_safe( "store_slot" )
   local check_slot  = db.actor:active_slot()
-  if loaded_slot and check_slot ~= loaded_slot then
+  if loaded_slot and loaded_slot ~= -1 and check_slot ~= loaded_slot then
     db.actor:activate_slot( loaded_slot )
   end
 end
@@ -19,5 +19,5 @@ end
 
 function on_save()
   -- Запоминаем активный слот
-  ogse.save_var( "store_slot", db.actor:active_slot(), "s8" )
+  ogse.save_var( "store_slot", db.actor:active_slot(), "u32" )
 end
