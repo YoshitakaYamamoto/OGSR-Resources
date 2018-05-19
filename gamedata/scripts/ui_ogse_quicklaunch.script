@@ -53,9 +53,10 @@ function chek_keys(key, bind)
 		if not quicklaunch then
 			hud:AddCustomStatic(string_id, true)
 			quicklaunch = hud:GetCustomStatic(string_id):wnd()
+			local dik = bind_to_dik(strings[i].keybind)
 			local key_name =
 				strings[i].keybind
-				and ogse_rebind_key.dik_to_name(bind_to_dik(strings[i].keybind)) .. " = "
+				and ( dik and dik_to_keyname(dik) or "---" ) .. " = "
 				or ""
 			quicklaunch:SetText(key_name..strings[i].text)
 		end
