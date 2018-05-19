@@ -1402,7 +1402,7 @@ function ui_rukzak:show_item_descr( ui_item )
   )
   if self.item_descr then
     self.descr_scroll:Clear()
-	self.item_descr = nil
+	self.item_descr:DetachFromParent()
   end
   self.item_descr = self.xml:InitStatic(
     "main_dialog:descr_text", self.descr_scroll
