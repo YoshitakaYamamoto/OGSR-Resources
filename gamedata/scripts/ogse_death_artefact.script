@@ -1,5 +1,7 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
+--TODO: Настроить конфиги аномалий, и избавиться от этого скрипта вообще. Рождение артов починено в движке.
+
 ------- Рождение артефактов при смерти монстров/неписей в аномалиях ------------
 -------------------- Copyright 2009-2014 KamikaZze, Dusty79 --------------------
 
@@ -16,7 +18,7 @@ local sect_particles = {
 	["zone_burning_fuzz"] 		= "ogse\\puh_art",
 	["zone_buzz"] 				= "ogse\\slime_art",
 	["zone_gravi"] 				= "ogse\\gravi_weak_art",
-	["zone_mincer"] 			= "ogse\\gravi_high_art",
+	--["zone_mincer"] 			= "ogse\\gravi_high_art",
 	["zone_mosquito_bald"]	 	= "ogse\\gravi_mid_art",
 	["zone_witches_galantine"] 	= "ogse\\electra_art",
 	["zone_zharka_static"]		= "ogse\\zharka_art",
@@ -47,6 +49,11 @@ function on_death(victim)
 	end
 	--
 	local anom_sect = anom:section()
+	--
+	--В движке реализовано рождение артов при разрыве тел в мясорубке,
+	--поэтому для таких аномалий скриптом спавнить арты не нужно.
+	if anom_sect:find("zone_mincer") then return end
+	--
 	local art_section = ogse_anomaly.parse_string_arts(anom_sect)
 	if art_section then
 		local lv = anom:level_vertex_id()
