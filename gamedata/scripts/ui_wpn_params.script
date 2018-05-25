@@ -126,7 +126,6 @@ function GetAccuracy(section)
 		if accfactor > 1.5 then accfactor = 1.5 end
 		val = 100 - accfactor/0.015
 		val = val * val / 100
-		-- dbglog("first_shot_acc_%s=%f",section,val)
 	else
 		if k_disp > 3.5 then	-- shotgun pellets = 10
 			k_disp = 0.3
@@ -138,7 +137,6 @@ function GetAccuracy(section)
 		local fra = math.pow(cam_dispersion_frac,1.5)
 
 		val =  30*fir + 15*dis*fra + 0.02*rpm*inc*fra
-		-- dbglog("acc_%s=%f",section,val)
 	end
 
 	return normalize(val)

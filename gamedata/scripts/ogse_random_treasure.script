@@ -300,7 +300,6 @@ function random_treasure:get_item(item)
 			if self.order[1] == "weapons" then time_array["prob"] = math.random(1,h) * num_in_box else time_array["prob"] = math.random(2,h) * num_in_box end
 		end
 	
-	--print_table_inlog(time_array,"time_array:")
 	return time_array
 end
 
@@ -328,8 +327,6 @@ function random_treasure:get_addon_to_weapon()
 	for k,v in pairs(changeble_addons) do
 		if sys_ini:line_exist(weapon, v) then table.insert(addons, v) end
 	end
-	
-	--print_table_inlog(addons, "addons->")
 	
 	if #addons ~= 0 then return addons[math.random(#addons)] else return "medkit" end -- вернём аптечку, если нет аддона к орудию в принципе
 	

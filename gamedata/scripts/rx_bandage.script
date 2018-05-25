@@ -2,11 +2,6 @@
 
 ---- Rulix aka Bak --- 21.7.2009
 
---function printf(s, ...)
---	rx_ai.printf("bandage:"..s,...)
---	get_console():execute("flush")
---end
-
 enable_scheme = get_bool("rx_bandage_main", "enabled", true)
 
 local bandage_sets = {forbiddens = {items = {},factions = {},npcs = {}},
@@ -33,7 +28,6 @@ end
 function evaluator_bandage:evaluate()
 	local npc = self.object
 	if (self.hitt and self.hitt > time_global()) or xr_wounded.is_wounded(npc) then
---		printf("eva[%s]: false(hitt)",npc:character_name())
 		self.st.action = nil
 		return false
 	end
@@ -50,7 +44,6 @@ function evaluator_bandage:evaluate()
 	if self.st.action and not rx_utils.npc_in_cover(npc) then
 		self.st.action = nil
 		self.hitt = time_global()+2000
-		printf("eva[%s]: false(not cover)",npc:character_name())
 		return false
 	end
 	local be = npc:best_enemy()
@@ -60,7 +53,6 @@ function evaluator_bandage:evaluate()
 		return false
 	end
 	if medkit and self.st.action then
---		printf("eva[%s]: true(act)",npc:character_name())
 		ogse_debug.add_active_eval( self.object, script_name(), "bandage" )
 		return true
 	end
@@ -75,15 +67,12 @@ function evaluator_bandage:evaluate()
 				medkit = npc:object(v)
 				if medkit then
 					self.st.medkit = v
-					printf("eva[%s]: find self.st.medkit %s",npc:character_name(),self.st.medkit)
 					break
 				end
 			end
 		end
 		if medkit and rx_utils.npc_in_cover(npc) then
---			printf("eva[%s]:self.st.medkit true",npc:character_name())
 			self.st.action = true
-			printf("eva[%s]: true(check)",npc:character_name())
 			ogse_debug.add_active_eval( self.object, script_name(), "bandage_2" )			
 			return true
 		end
@@ -105,7 +94,6 @@ end
 function action_bandage:initialize()
 	action_base.initialize(self)
 	local npc = self.object
-	printf("act[%s]:init",npc:character_name())
 	if not npc:best_enemy() then
 		self.st.action = nil
 		return
@@ -125,20 +113,17 @@ end
 function action_bandage:execute()
 	action_base.execute(self)
 	local npc = self.object
---	printf("act[%s]:exec",npc:character_name())
 --	npc:set_sight(look.direction,self.dir)
 	if not self.item then
 		self.item = npc:object("yad")
 	end
 	if not self.st.action then
-		printf("act[%s]:not self.st.action",npc:character_name())
 		npc:set_item(object.idle,rx_utils.get_weapon(npc))
 		if self.item then
 			self.item:enable_attachable_item(false)
 		end
 		return
 	elseif npc:active_item() then
-		printf("act[%s]:hide item",npc:character_name())
 		npc:set_item(object.idle,nil)
 		return
 	end
@@ -154,48 +139,37 @@ function action_bandage:execute()
 	end
 	if self.timer < time_global() then
 		self.animst = self.animst+1
-		printf("act[%s]:add anim %s(%s)",npc:character_name(),self.animst,tostring(anims[self.animst] and anims[self.animst].a))
 	else
 		return
 	end
-	printf("act[%s]:exec2",npc:character_name())
 	if anims[self.animst] then
-		printf("act[%s]:play anim",npc:character_name())
 		if self.item then
 			self.item:enable_attachable_item(true)
 		end
 		npc:play_cycle(anims[self.animst].a,true)
 		self.timer = time_global()+anims[self.animst].t
 	else
-		printf("act[%s]:end start",npc:character_name())
 		local medkit = self.st.medkit and npc:object(self.st.medkit)
 		if medkit then
-			printf("act[%s]:eat %s",npc:character_name(),medkit:name())
 			rx_utils.eat_medkit(npc,medkit)
 		else
-			printf("act[%s]:not medkit!",npc:character_name())
 			npc.health = 0.5
 		end
 		self.st.medkit = nil
 		self.st.action = nil
-		printf("act[%s]:end",npc:character_name())
 	end
-	printf("act[%s]:exec3",npc:character_name())
 end
 function action_bandage:finalize()
     action_base.finalize(self)
 	local npc = self.object
 	if self.st.medkit and self.animst and self.animst > 1 then
-		printf("act[%s]: fin add hh",npc:character_name())
 		npc.health = 0.1
 	end
 --	if self.st.action then
 --		npc:set_item(object.idle,rx_utils.get_weapon(npc))
 --	end
-	printf("act[%s]:fin",npc:character_name())
 	if npc:alive() then
 		if self.item then
-			printf("act[%s]:fin detach",npc:character_name())
 			self.item:enable_attachable_item(false)
 		end
 	end
@@ -207,7 +181,6 @@ function action_bandage:hit_callback(amount)
 	if self.act and self.animst and self.animst > 1 and math.random() < 0.4 then
 		local ban = npc:object("bandage")
 		if ban then
-			printf("hit_callback[%s]:drop %s",npc:character_name(),ban:name())
 			npc:drop_item(ban)
 			self.st.medkit = nil
 		end

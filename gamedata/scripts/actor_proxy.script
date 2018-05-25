@@ -15,7 +15,6 @@ end
 -- происходит только в момент первого после старта симулятора обращения.
 function actor_proxy:init()
 	if not self.initialized then
---		printf( "actor_proxy: init" )
 
 		self.online      = false
 		self.alife       = alife()
@@ -35,7 +34,6 @@ end
 -- вызывается из se_smart_terrain:on_unregister() TODO remove this hack
 function actor_proxy:deinit()
 	if self.initialized then
---		printf( "actor_proxy: deinit" )
 
 		self.alife = nil
 		self.actor = nil
@@ -61,10 +59,8 @@ function actor_proxy:dont_has_info( name )
 	self:init()
 
 	if self.online then
---		printf( "actor_proxy: dont_has_info online: info=%s", name )
 		return not has_alife_info( name )
 	else
---		printf( "actor_proxy: dont_has_info offline: info=%s", name )
 		return not has_alife_info( self.actor_id, name )
 	end
 end

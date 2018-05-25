@@ -39,8 +39,6 @@ function read_all_ranks()
 	monster_max_rank_name = parse_ranks( sys_ini:r_string( "game_relations", "monster_rating" ), monster_rank_intervals )
 
 	ranks_loaded = true
-
---	print_table( stalker_rank_intervals )
 end
 
 -- 

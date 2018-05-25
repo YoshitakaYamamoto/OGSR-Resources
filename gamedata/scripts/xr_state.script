@@ -229,7 +229,6 @@ function body_state:__init(npc)
 									[3]	= {	"uhodi_3_1" },
 									[4]	= {	"uhodi_4_1" }}}									
 	}
-	--print_table(self.animations)
 end
 --' ѕровер€ет закончили ли мы изменение положени€ тела
 function body_state:finish_state()
@@ -303,16 +302,9 @@ function body_state:weapon_slot()
 end
 function body_state:anim_update(type)
 	--' ќпредел€ем - это у нас включение новой анимации или продолжение старой
-	if type ~= self.states.current_state then
-		if type ~= nil then
-			printf("ANIMS: |%s| for %s", type, self.npc:name())
-		else
-			printf("ANIMS: |nil| for %s", self.npc:name())
-		end
-		
+	if type ~= self.states.current_state then		
 		--' ѕроверка на существование темы
 		if type ~= nil and self.animations[type] == nil then
-			printf("ERROR: Non existen ANIM STATEd called: %s", type)
 			return
 		end
 		
@@ -375,17 +367,12 @@ function body_state:anim_update(type)
 			self.npc:clear_animations()
 			if self.animations[self.states.current_state].rnd[self:weapon_slot()][r] ~= nil then
 				self.npc:add_animation (self.animations[self.states.current_state].rnd[self:weapon_slot()][r], true, false)
-			else
-				printf("ANIM ERROR: Select wrong animation %d of %d, type: %s, weapon_slot: %d", r,
-							table.getn(self.animations[self.states.current_state].rnd[self:weapon_slot()]),
-							self.states.current_state, self:weapon_slot() )
 			end
 			if self.animations[type].idle ~= nil then
 				self.npc:add_animation (self.animations[self.states.current_state].idle[self:weapon_slot()], true, false)
 			end	
 		end
 	end
-	--printf("animcount %d", self.npc:animation_count())
 	
 	return self:finish_state() and self.npc:animation_count() == 0
 end                            

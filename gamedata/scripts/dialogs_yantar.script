@@ -27,14 +27,6 @@
 ---------------------------------------------------------------------------------
 -- Служебные функции
 ---------------------------------------------------------------------------------
-local total_debug = false
-
-function write_log(str)
-	if total_debug then
-		log1(str)
-	end
-end
-
 
 function check_preconditions(info_plus_list, info_minus_list, objects_have, objects_not_have)
 -- info_plus_list, info_minus_list - таблички инфо вида { "info", }
@@ -50,12 +42,10 @@ function check_preconditions(info_plus_list, info_minus_list, objects_have, obje
 	local flag_objects_not_have_need = (objects_not_have ~= nil)
 	
 	if flag_info_plus_need then
-		write_log("!!PRECOND_CHECK_NEED_INFOS")
 		local num_check = #info_plus_list
 		local count = 0
 		for k, v in pairs(info_plus_list) do
 			if has_alife_info(v) then
-				write_log("!!PRECOND_CHECK_NEED=HAVE["..v.."]")
 				count = count + 1
 			end		
 		end
@@ -65,12 +55,10 @@ function check_preconditions(info_plus_list, info_minus_list, objects_have, obje
 	end
 	
 	if flag_info_minus_need then
-		write_log("!!PRECOND_CHECK_NOT_NEED_INFOS")
 		local num_check = #info_minus_list
 		local count = 0
 		for k, v in pairs(info_minus_list) do
 			if not has_alife_info(v) then
-				write_log("!!PRECOND_CHECK_NEED=NOT_HAVE["..v.."]")
 				count = count + 1
 			end
 		end
@@ -152,7 +140,6 @@ end
 ---------------------------------------------------------------------------------
 function precondition_stage_z(first_speaker, second_speaker)
 	precondition_talked_professor()
-	write_log("!!PRECOND_Z")
 	local infos_need = {
 		"test_info",
 	}
@@ -192,7 +179,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_za(first_speaker, second_speaker)
-	write_log("!!PRECOND_ZA")
 	local infos_need = {
 		"bar_rescue_research_done",
 	}
@@ -218,7 +204,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_za1(first_speaker, second_speaker)
-	write_log("!!PRECOND_ZA1")
 	local infos_need = {
 		"bar_rescue_research_done",
 		"yan_ecolog_outfit_given",
@@ -244,7 +229,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_0(first_speaker, second_speaker)
-	write_log("!!PRECOND_0")
 	local infos_need = {
 		"bar_heli_scene_professor_die",
 		"bar_x16_documents_start",
@@ -269,7 +253,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_0a(first_speaker, second_speaker)
-	write_log("!!PRECOND_0A")
 	local infos_need = {
 		"bar_heli_scene_professor_die",
 		"bar_x16_documents_start",
@@ -294,7 +277,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_1(first_speaker, second_speaker)
-	write_log("!!PRECOND_1")
 	local infos_need = {
 		"bar_rescue_research_done",
 		"bar_x16_documents_start",
@@ -320,7 +302,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_1a(first_speaker, second_speaker)
-	write_log("!!PRECOND_1A")
 	local infos_need = {
 		"bar_rescue_research_done",
 		"bar_x16_documents_start",
@@ -345,7 +326,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_2(first_speaker, second_speaker)
-	write_log("!!PRECOND_2")
 	local infos_need = {
 		"loschina_task_start",
 		"bar_x16_documents_start",
@@ -369,7 +349,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_3(first_speaker, second_speaker)
-	write_log("!!PRECOND_3")
 	local infos_need = {
 		"loschina_task_finished",
 		"loschina_task_start",
@@ -393,7 +372,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_4(first_speaker, second_speaker)
-	write_log("!!PRECOND_4")
 	local infos_need = {
 		"yan_find_scientist_task_start",
 		"loschina_task_finished",
@@ -419,7 +397,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_4a(first_speaker, second_speaker)
-	write_log("!!PRECOND_4A")
 	local infos_need = {
 		"yan_scientist_die",
 		"yan_find_scientist_start",
@@ -447,7 +424,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_4b(first_speaker, second_speaker)
-	write_log("!!PRECOND_4B")
 	local infos_need = {
 		"yan_scientist_die",
 		"yan_find_scientist_semenov_start",
@@ -475,7 +451,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_5(first_speaker, second_speaker)
-	write_log("!!PRECOND_5")
 	local infos_need = {
 		"yan_find_scientist_done",
 		"yan_scientist_return_to_bunker",
@@ -501,7 +476,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_5a(first_speaker, second_speaker)
-	write_log("!!PRECOND_5A")
 	local infos_need = {
 		"yan_scientist_die",
 		"yan_scientist_return_to_bunker",
@@ -529,7 +503,6 @@ end
 -- Брейнлаб не взят
 ---------------------------------------------------------------------------------
 function precondition_stage_5b(first_speaker, second_speaker)
-	write_log("!!PRECOND_5B")
 	local infos_need = {
 		"yan_scientist_die",
 		"yan_scientist_return_to_bunker",
@@ -557,7 +530,6 @@ end
 -- Брейнлаб не взят, флешка отдана
 ---------------------------------------------------------------------------------
 function precondition_stage_5c(first_speaker, second_speaker)
-	write_log("!!PRECOND_5C")
 	local infos_need = {
 		"yan_find_scientist_done",
 		"yantar_scientist_talk_helmet",
@@ -584,7 +556,6 @@ end
 -- Брейнлаб ВЗЯТ
 ---------------------------------------------------------------------------------
 function precondition_stage_6(first_speaker, second_speaker)
-	write_log("!!PRECOND_6")
 	local infos_need = {
 		"yan_find_vasilyev_start",
 		"yan_find_scientist_task_start",
@@ -607,7 +578,6 @@ end
 -- Брейнлаб ВЗЯТ и ВЫПОЛНЕН, награда ещё НЕ получена
 ---------------------------------------------------------------------------------
 function precondition_stage_7(first_speaker, second_speaker)
-	write_log("!!PRECOND_7")
 	local infos_need = {
 		"yantar_attack_start",
 		"yan_find_vasilyev_start",
@@ -630,7 +600,6 @@ end
 -- Брейнлаб ВЗЯТ и ВЫПОЛНЕН, награда ПОЛУЧЕНА
 ---------------------------------------------------------------------------------
 function precondition_stage_8(first_speaker, second_speaker)
-	write_log("!!PRECOND_8")
 	local infos_need = {
 		"yan_kill_brain_done",
 		"yantar_attack_start",

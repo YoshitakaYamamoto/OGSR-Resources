@@ -29,7 +29,6 @@ function action_impulse:__init(obj, storage)
 end
 
 function action_impulse:reset_scheme()
-	printf("_hr: action_impulse:reset_scheme: self.object:name()='%s'", self.object:name())
 	
     self.joint	= self.object:get_physics_shell():get_joint_by_bone_name(self.st.bone)
 
@@ -65,7 +64,6 @@ function action_impulse:reset_scheme()
 end
 
 function action_impulse:update(delta)
-	printf("_hr: action_impulse:update()")
 
 	if xr_logic.try_switch_to_another_section(self.object, self.st, db.actor) then
 		return
@@ -91,7 +89,6 @@ function action_impulse:update(delta)
 end
 
 function action_impulse:perform_impulse(dir)
-	printf("self:perform_impulse: %d", time_global())
 	
 	local force_x, force_y, force_z = 0, 0, 0
 
@@ -120,7 +117,6 @@ end
 
 ---------------------------------------------------------------------------------------------------------------------
 function add_to_binder(npc, ini, scheme, section, storage)
-	printf("DEBUG: add_to_binder: scheme='%s', section='%s'", scheme, section)
 
 	local new_action = action_impulse(npc, storage)
 

@@ -14,7 +14,6 @@ act_hideout = act_base+1
 act_psy_effect = act_base+2
 act_inhide = act_base+3
 
-local debug_flag = false
 
 local locked_vertexes 		= {}		-- занятые вертексы
 
@@ -187,10 +186,8 @@ function evaluator_blowout:evaluate()
 	   (ogse_surge_mgr.is_surge_started or scared[self.object:id()] == true) and not ogse_surge_mgr.is_surge_raskolbas and 
 	   not (level.name()=="l11_pripyat" and self.object:character_community() == "monolith") and
 	   not ogse_hideouts.npc_inside_safe_zone(self.object) then
-		if debug_flag then log1("!!BLOW_UNSAFE "..self.object:name()) end
 		self.st.blowout = true
 	else
-		if debug_flag then log1("--BLOW_SAFE "..self.object:name()) end
 		self.st.blowout = false
 	end
 	
@@ -238,10 +235,8 @@ function evaluator_hideout:evaluate()
 	end
 
 	if ogse_surge_mgr.is_surge_raskolbas and not ogse_hideouts.npc_inside_safe_zone(self.object) then
-		if debug_flag then log1("!!BLOW_HIDEOUT_LOST "..self.object:name()) end
 		self.st.hideout_lost = true
 	else
-		if debug_flag then log1("--BLOW_HIDEOUT_HAVE "..self.object:name()) end
 		self.st.hideout_lost = false
 	end
 	if self.st.hideout_lost == true then
@@ -272,15 +267,12 @@ function evaluator_inhide:evaluate()
 	if self.object:best_enemy() then
 		local be = self.object:best_enemy()
 		if be:alive() then
-			if debug_flag then log1("!!BLOW_INHIDE_ENEMY "..self.object:name()) end
 			return false
 		end
 	end
 	if (ogse_surge_mgr.is_surge_started or scared[self.object:id()] == true) and ogse_hideouts.npc_inside_safe_zone(self.object) then
-		if debug_flag then log1("--BLOW_IN_HIDE "..self.object:name()) end
 		self.st.inhide = true
 	else
-		if debug_flag then log1("!!BLOW_NOT_IN_HIDE "..self.object:name()) end
 		self.st.inhide = false
 	end
 	if self.st.inhide == true then
@@ -312,12 +304,10 @@ function action_hideout:initialize()
 			stop_play_sound(npc)
 			npc_run[npc:id()] = 1
 		-- else
-			-- if debug_flag then log1("!!BLOW_CANNOT_REACH_HIDE "..self.object:name()) end
 			-- self.st.deadman = 1
 		end
 	else
 		-- нет укрытия
-		if debug_flag then log1("!!BLOW_CANNOT_FIND_HIDE "..self.object:name()) end
 		self.st.deadman = 1
 	end
 end

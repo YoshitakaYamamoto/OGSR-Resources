@@ -9,8 +9,6 @@ local def_attack_dist = 1000 -- расстояние, на котором вертолёт может быть атако
 local def_actor_dist  = 20  -- расстояние, на котором игрок может быть атакован
 
 function get_nearest_heli(npc_position, attack_dist_sqr)
---	print_table(db.heli)
-
 	local heli = nil
 
 	for k,v in pairs(db.heli) do
@@ -62,7 +60,6 @@ function evaluator_shoot:evaluate()
 
 		-- проверка не потерялся ли вертолет.
 --		if db.heli[self.a.heli:id()] ~= nil and
---		printf( "dist=%d", self.a.heli:position():distance_to_sqr(self.object:position()) )
 		if self.a.heli:position():distance_to_sqr(self.object:position()) > self.a.attack_dist_sqr then
 			self.a.heli = nil
 			return false
@@ -124,7 +121,6 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 
 function add_to_binder( npc, ini, scheme, section, storage )
-	printf( "DEBUG: add_to_binder: scheme='%s'", scheme )
 
 	local manager = npc:motivation_action_manager()
 
@@ -147,7 +143,6 @@ function add_to_binder( npc, ini, scheme, section, storage )
 end
 
 function set_scheme( npc, ini, scheme, section )
-	printf( "DEBUG: set_scheme: scheme='%s' section='%s'", scheme, utils.to_str(section) )
 
 	local a = xr_logic.assign_storage_and_bind( npc, ini, scheme, section )
 

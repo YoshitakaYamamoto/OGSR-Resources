@@ -4,14 +4,6 @@
 
 --------------------------------------utils------------------------------------------
 
-function printf(str,...)
---	if not str then
---		str = "((string is nil))"
---	end
---	log1(script_name()..string.format(str,...))
---	get_console():execute("flush")
-end
-
 function count_table(t)
 	if type(t) ~= "table" then
 		return
@@ -29,7 +21,6 @@ function get_storage(id,name)
 	end
 	local st = db.storage[id]
 	if not st then
-		--printf("get_storage:not npc storage!")
 		return
 	end
 	if not st.rx_ai then
@@ -69,7 +60,6 @@ if npc then
 	if not st then
 		return
 	end
---	printf("issue[%s]:%s",npc:name(),name)
 	for k,v in pairs(st) do
 		if v and k[name] then
 			k[name](k,...)
@@ -80,12 +70,10 @@ end
 
 function subscribe_for_events(npc,obj)
 	local st = get_storage(npc:id(),"events")
---	printf("subscribe[%s]",npc:name())
 	st[obj] = true
 end
 
 function unsubscribe_from_events(npc,obj)
---	printf("unsubscribe[%s]",npc:name())
 	local st = npc and get_storage(npc:id(),"events")
 	if st then
 		if obj then

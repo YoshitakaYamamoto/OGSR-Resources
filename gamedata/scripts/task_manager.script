@@ -372,9 +372,6 @@ end
 function CRandomTask:active_parent_task(actor, npc)
 	local parent = self:get_parent(npc)
 	for k,v in pairs(self.active_task_by_type) do
---		printf("active_parent_task: %s", tostring(v))
---		printf("active_parent_task: parent = %s", tostring(self.task_info[v].parent))
---		printf("active_parent_task: status = %s", tostring(self.task_info[v].status))
 
 		if self.task_info[v].parent == parent and
 		  (self.task_info[v].status == "selected" or
@@ -399,12 +396,8 @@ function has_item_to_bring(task_desc)
 end
 
 function CRandomTask:have_completed_job(actor, npc)
-	--print_table(self.active_task_by_type)
 	local parent = self:get_parent(npc)
 	for k,v in pairs(self.active_task_by_type) do
---		printf("have_completed_job: %s", tostring(v))
---		printf("have_completed_job: parent = %s", tostring(self.task_info[v].parent))
---		printf("have_completed_job: status = %s", tostring(self.task_info[v].status))
 
 		--if self.task_info[v].parent == parent and
 --self.task_info[v].status == "completed"
@@ -419,7 +412,6 @@ end
 function CRandomTask:action_give_task(actor, npc, p1, p2)
 	local task = CGameTask()
 	
-	--printf("p1 = %s p2 = %s", tostring(p1), tostring(p2))
 
 	local task_desc = self.task_info[self.task_id_by_yes_phrase_id[p2]]
 --[[	
@@ -441,9 +433,6 @@ function CRandomTask:action_give_task(actor, npc, p1, p2)
 	--' Выбираем текущую цель квеста
 	if task_desc.target_objects ~= nil then
 		self.task_info[self.task_id_by_yes_phrase_id[p2]].selected_target = task_desc.target_objects[math.random(table.getn(task_desc.target_objects))]
-		--printf("TARGET DEBUG INFO")
-		--printf("selected = %s", tostring(self.task_info[self.task_id_by_yes_phrase_id[p2]].selected_target))
-		--print_table(task_desc.target_objects)
 	end
 	--
 	if task_desc.selected_target then
@@ -529,10 +518,6 @@ function CRandomTask:task_complete(p1, p2)
 
 	local sel_task = self.task_info[self.active_task_by_type[p1]]
 	if sel_task == nil then
-		--printf("!!!")
-		--print_table(self.active_task_by_type)
-		--printf("!!!")
-		--print_table(self.task_info)
 		abort("WRONG RANDOM TASK %s %s", tostring(p1), tostring(p2))
 	end
 
@@ -589,10 +574,6 @@ function CRandomTask:task_fail(p1, p2)
 		local sel_task = self.task_info[self.active_task_by_type[p1]]
 		
 		if sel_task == nil then
-			--printf("!!!")
-			--print_table(self.active_task_by_type)
-			--printf("!!!")
-			--print_table(self.task_info)
 			abort("WRONG RANDOM TASK %s %s", tostring(p1), tostring(p2))
 		end
 
@@ -988,16 +969,6 @@ function CRandomTask:on_first_update()
 		end
 	end
 end
-
---function CRandomTask:stats(obj)
-	--printf("### TASK STATISTIC ###")
-	--for k,v in pairs(self.task_info) do
-		--if v.init_condition ~= nil then
-			--printf("[%s] %s : %s", v.status, k, tostring(v.enabled_props))
-			--print_table(v.init_condition)
-		--end
-	--end
---end
 
 function get_random_task()
 	if not random_task then

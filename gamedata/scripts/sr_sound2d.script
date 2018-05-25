@@ -32,14 +32,6 @@ function action_sound2d:recreate_sounds ()
     self.snd_obj_l = nil
     self.snd_obj_r = nil
     local name_left, name_right = self:get_sound_name ()
-    
-    if name_left ~= nil then
-       printf ("RECREATE_SOUNDS. LEFT CHANNEL = %s", name_left)
-    end    
-
-    if name_right ~= nil then
-       printf ("RECREATE_SOUNDS. RIGHT CHANNEL = %s", name_right)
-    end    
 
     self.snd_obj_l = xr_sound.get_safe_sound_object (name_left)
     if name_right ~= nil then

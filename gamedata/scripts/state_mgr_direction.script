@@ -1,21 +1,11 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
-local total_debug = ogse_debug.verbose_debug
-
-function write_log(str)
-	if total_debug then
-		log1(str)
-	end
-end
-
-
 --' Смотрим ли мы сейчас туда, куда нужно или нет?
 class "eva_state_mgr_direction" (property_evaluator)
 function eva_state_mgr_direction:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_direction:evaluate()
-	write_log("~~STATEMGR_dir_eva_1")
     local sight_type = self.object:sight_params()
     
 	-- Если задан объект на который смотреть
@@ -43,9 +33,6 @@ function eva_state_mgr_direction:evaluate()
 			dir.y = 0
 		end		
         if sight_type.m_vector:similar(dir, 0.01) ~= 1 then
-            --printf("%s false vector", self.object:name())
-            --printf("%s %s %s", sight_type.m_vector.x, sight_type.m_vector.y, sight_type.m_vector.z)
-            --printf("%s %s %s", dir.x, dir.y, dir.z)
             return false
         end
 
@@ -68,7 +55,6 @@ function eva_state_mgr_direction:evaluate()
 	return true
 end
 function eva_state_mgr_direction:callback()
-write_log("~~STATEMGR_dir_call_1")
 	if self.st.callback ~= nil and
 	   self.st.callback.turn_end_func ~= nil
 	then
@@ -84,7 +70,6 @@ function eva_state_mgr_direction_search:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_direction_search:evaluate()
-write_log("~~STATEMGR_dir_eva_2")
 	if self.st.look_position ~= nil or self.st.look_object ~= nil then
 		return false
 	end
@@ -97,7 +82,6 @@ function eva_state_mgr_direction_turning:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_direction_turning:evaluate()
-write_log("~~STATEMGR_dir_eva_3")
 	if self.object:mental_state() == anim.danger then
 		return false
 	end
@@ -123,7 +107,6 @@ function act_state_mgr_direction_turn:finalize()
 	action_base.finalize(self)
 end
 function act_state_mgr_direction_turn:turn()
-	write_log("~~STATEMGR_dir_1")
 	self.st.point_obj_dir = look_object_type(self.object, self.st)
 	
 	if self.st.look_object ~= nil and
@@ -137,7 +120,6 @@ function act_state_mgr_direction_turn:turn()
 		end
 		self.object:set_sight(look.direction, dir, true)
 	end
-	write_log("~~STATEMGR_dir_1_end")
 end
 
 
@@ -148,10 +130,7 @@ function act_state_mgr_direction_search:__init(name, st) super (nil, name)
 end
 function act_state_mgr_direction_search:initialize()
 	action_base.initialize(self)
---'    printf("set sight %s nil", self.object:name())
-	write_log("~~STATEMGR_dir_2")
     self.object:set_sight(look_position_type(self.object, self.st), nil, 0)
-	write_log("~~STATEMGR_dir_2_end")
 end
 function act_state_mgr_direction_search:execute()
 	action_base.execute(self)

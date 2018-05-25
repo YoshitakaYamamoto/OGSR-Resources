@@ -122,7 +122,6 @@ end
 --	Установка и распарсивание тем в файлы.
 -----------------------------------------------------------------------------------------------------------------------------------
 function set_sound(npc, sound, now, into_timeout)
---	printf("*SND* [%s] try to change SND to [%s]", npc:name(), tostring(sound))
 
 	local npc_id = npc:id()
 	if (db.sound[npc_id] == nil or
@@ -130,9 +129,7 @@ function set_sound(npc, sound, now, into_timeout)
 	   now == true
 	then
 --		if db.sound[npc_id] == nil then
---			printf("*SND* change SND [_] to [%s] for [%s]", tostring(sound), npc:name())
 --		else
---			printf("*SND* change SND [%s] to [%s] for [%s]", tostring(db.sound[npc_id].theme), tostring(sound), npc:name())
 --		end
 		-- Туточки надобно распарсить имена тем в их id
 		if sound == nil then sound = "" end
@@ -216,7 +213,6 @@ function update(npc)
 		return
 	end
 	
---	printf("EE: group = %s begin = %s idle = %s", tostring(key), tostring(group_table.begin), tostring(group_table.idle))
 	if group_table.begin == nil or
 	   time_global() - group_table.begin >= group_table.idle
 	then
@@ -245,14 +241,10 @@ function play_sound(npc, themes, timeout)
 		end
 		t = t + 1
 	end	
-	--printf("*")
-	--print_table(snd_table)
 	if t == 0 then return end
 	-- из списка тем выбираем одну.	
 	local snd = snd_table[math.random(0, t-1)]
 	if snd ~= nil then
-		--printf("!")
-		--print_table(snd)
 		if snd.min_snd == nil then return end
 		local npc_id = npc:id()
 		local group_table = xr_sound.group_idle[get_key(npc)]
@@ -275,10 +267,8 @@ function play_sound(npc, themes, timeout)
 			-- играем входные
 			if db.sound[npc_id].last_snd[snd.into_id] == nil then db.sound[npc_id].last_snd[snd.into_id] = -1 end
 			
-			--printf("*SND* play seq [%s] for [%s]", db.sound[npc_id].last_snd[snd.into_id]+1, npc:name())
 			npc:play_sound(snd.into_id, 1, 0, 1, 0, db.sound[npc_id].last_snd[snd.into_id]+1)
 			db.sound[npc_id].last_snd[snd.into_id] = db.sound[npc_id].last_snd[snd.into_id] + 1
-			--printf("*SND* play seq [%s] for [%s]", db.sound[npc_id].last_snd[snd.into_id], npc:name())
 			return
 		end		
 		if snd.rnd_max ~= nil and
@@ -303,7 +293,6 @@ function play_sound(npc, themes, timeout)
 			if timeout == nil then
 				timeout = 0
 			end							
-			--printf("*SND* play rnd [%s] for [%s]", s, npc:name())
 			npc:play_sound(snd.rnd_id, timeout+1, timeout, 1, 0, s)
 			--db.sound[npc_id].last_snd[snd.rnd_id] = s
 			group_table.last_snd[snd.rnd_id] = s
@@ -317,7 +306,6 @@ function get_last_IDS(npc, theme)
 	if sound_theme.theme[theme] ~= nil then
 		get_sound(theme, snd_table, npc)
 	end	
-	--printf("LAST INTO ID for [%s] = [%s], max [%s]", theme, last_table[snd_table.into_id], snd_table.into_max)
 	return last_table[snd_table.into_id], snd_table.into_max
 end
 
@@ -327,7 +315,6 @@ local actor_sound = {}
 local subscribed
 
 function set_actor_sound(sound)
-	--printf("*ACTOR SND* try to change SND to [%s]", tostring(sound))
 	if actor_sound.theme ~= sound then
 		--' Туточки надобно распарсить имена тем в их id
 		if sound == nil then sound = "" end		

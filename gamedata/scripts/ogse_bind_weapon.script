@@ -85,26 +85,7 @@ local addon_templates = {
 ----------------------------------------------------------------------------------------------------------------------
 class "wpn_binder" (object_binder)
 ----------------------------------------------------------------------------------------------------------------------
-
-function wpn_binder:dbg_log(f,...)
-	if not write_debug_log then return end
-	self.aux_log_counter = aux_log_counter or 0
-	if not self.fdbglog then
-		local log_path = getFS():update_path(
-			"$logs$", 
-			string.format("wpn_log_%d_%s_%d.txt", get_game_id(), self.object:section(), self.object:id())
-		)
-		self.fdbglog = io.open(log_path, "a")
-	end
-	local time_str = time2string(game.get_game_time(), "%04d/%02d/%02d %02d:%02d:%02d.%03d", {'y','m','d','h','min','s','ms'})
-	local cntr_str = string.format(" %03d] ", self.aux_log_counter)
-	self.fdbglog:write('['..time_str..cntr_str..f:format(...)..'\n')
-	self.fdbglog:flush()
-	self.aux_log_counter = self.aux_log_counter + 1
-end
-
 function wpn_binder:__init (obj) super(obj)
-	--self:dbg_log("wpn_binder:__init: sec = '%s', name = '%s', id = %d", self.object:section(), self.object:name(), self.object:id())
 	--self.spawned = false
 	self.wpn_binder = true
 	self.need_initialize_hud = false
@@ -163,7 +144,6 @@ function wpn_binder:reinit()
 	self.object:set_callback(callback.update_hud_addons_visibility, self.update_hud_addons_visibility, self)
 	self.object:set_callback(callback.update_addons_visibility, self.update_addons_visibility, self)
 	self.object:set_callback(callback.second_scope_switch, self.on_second_scope_switch, self)
-	--self:dbg_log("wpn_binder:reinit")
 end
 ----------------------------------------------------------------------------------------------------------------------
 function wpn_binder:init_addons(a)
@@ -182,12 +162,10 @@ function wpn_binder:init_addons(a)
 end
 
 function wpn_binder:net_spawn(data)
-	--self:dbg_log("wpn_binder:net_spawn")
 	return true
 end
 ----------------------------------------------------------------------------------------------------------------------
 function wpn_binder:net_destroy()
-	--self:dbg_log("wpn_binder:net_destroy")
 	self.object:set_callback(callback.update_hud_addons_visibility, nil)
 	self.object:set_callback(callback.on_addon_init, nil)
 	self.object:set_callback(callback.update_addons_visibility, nil)
@@ -195,7 +173,6 @@ function wpn_binder:net_destroy()
 end
 
 function wpn_binder:set_hud_bones_visibility(bones_list, vis)
-	--self:dbg_log("wpn_binder:set_hud_bones_visibility")
 	ASSERT(bones_list, "wpn_binder:set_hud_bones_visibility: %s", type(bones_list))
 	local vis_val = vis and 1 or 0
 	for i,bone in ipairs(bones_list) do
@@ -204,7 +181,6 @@ function wpn_binder:set_hud_bones_visibility(bones_list, vis)
 end
 
 function wpn_binder:set_bones_visibility(bones_list, vis)
-	--self:dbg_log("wpn_binder:set_bones_visibility")
 	ASSERT(bones_list, "wpn_binder:set_bones_visibility")
 	local vis_val = vis and 1 or 0
 	for _,bone in ipairs(bones_list) do
@@ -213,21 +189,17 @@ function wpn_binder:set_bones_visibility(bones_list, vis)
 end
 
 function wpn_binder:update_addons_visibility()
-	--self:dbg_log("wpn_binder:update_addons_visibility")
 	if not self.wm_initialized then
-		--self:dbg_log("wpn_binder:update_addons_visibility - the very first")
 		-- гасим по умолчанию все управляемые скриптами кости
 		self:set_bones_visibility(self.managed_bones, false)
 		self.wm_initialized = true
 	end
 	for des_name,desc in pairs(self.addon_descriptors) do	
-		--self:dbg_log("wpn_binder:update_addons_visibility - set addons")
 		local addon_attached = desc.addon_attached_fun(self.object)
 		--log1("[wpn_binder] "..self.object:name().." "..des_name.." "..tostring(addon_attached))
 		if desc.wm_attached ~= addon_attached then
 			desc.wm_attached = addon_attached
 			desc.set_cntr = self.change_safe_cntr
-			--self:dbg_log("wpn_binder:update_addons_visibility - desc.set_cntr = %d", desc.set_cntr)
 		end
 		if desc.set_cntr > 0 then
 			self:set_bones_visibility(desc.bones, desc.wm_attached)
@@ -241,14 +213,9 @@ end
 
 function wpn_binder:update_hud_addons_visibility()
 	--log1("wpn_binder:update_hud_addons_visibility")
-	--self:dbg_log("wpn_binder:update_hud_addons_visibility")
 	
-	--self:dbg_log("forced_notex_scope: %s", tostring(ogse_wpn_utils.get_forced_notex_scope(self.object)))
-	--self:dbg_log("hud_offset: %7.2f, %7.2f, %7.2f", unpack(ogse_wpn_utils.get_hud_offset(self.object)))
-	--self:dbg_log("hud_rotate: %7.2f, %7.2f", unpack(ogse_wpn_utils.get_hud_rotate(self.object)))
 
 	if self.need_initialize_hud then
-		--self:dbg_log("wpn_binder:update_hud_addons_visibility - the very first")
 		-- гасим по умолчанию все управляемые скриптами кости
 		self:set_hud_bones_visibility(self.managed_bones, false)
 	end
@@ -263,13 +230,11 @@ function wpn_binder:update_hud_addons_visibility()
 		end
 		local addon_attached = desc.addon_attached_fun(self.object)
 		if desc.hud_attached ~= addon_attached or self.need_initialize_hud then
-			--print_table_inlog(desc)
 			desc.hud_attached = addon_attached
 			if desc.extra_actions then desc.extra_actions(self.object, desc) end
 			desc.hud_set_cntr = self.change_safe_cntr
 			if addon_attached then
 				if desc.bones_hide then
-					--self:dbg_log("hide_bones: hide, %d", desc.hud_set_cntr)
 					self:set_hud_bones_visibility(desc.bones_hide, false)
 				end
 			else
@@ -281,17 +246,13 @@ function wpn_binder:update_hud_addons_visibility()
 				self:set_hud_bones_visibility(desc.bones, true)
 			else
 				if desc.bones_hide then
-					--self:dbg_log("hide_bones: show, %d", desc.hud_set_cntr)
-					--print_table_inlog(desc.bones_hide)
 					self:set_hud_bones_visibility(desc.bones_hide, true)
-					--self:dbg_log("done")
 				end
 			end
 			desc.hud_set_cntr = desc.hud_set_cntr - 1
 		end
 	end
 	self.need_initialize_hud = false
-	--self:dbg_log("wpn_binder:update_hud_addons_visibility - end")
 end
 
 function wpn_binder:on_second_scope_switch( enabled )

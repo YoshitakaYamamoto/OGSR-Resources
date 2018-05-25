@@ -3,14 +3,6 @@
 
 local intro_id = 100
 
-local total_debug = false
-
-function write_log(str)
-	if total_debug then
-		log1(str)
-	end
-end
-
 phrase = {
 	intro = {},
 	cool_info = {},
@@ -97,19 +89,15 @@ end
 function init_intro_dialog(dlg)
 	local phr = dlg:AddPhrase("","0","",-10000)
 		phr = dlg:AddPhrase("","1","0",-10000)
-
---	print_table_inlog(phrase.intro, "!!PHRASE:")	
 		
 	local k,v = 0,0
 	for k,v in pairs(phrase.intro) do
 	
 		phr = dlg:AddPhrase(v.name, v.phr_id, "1", -10000)
 		
-		write_log("!!PHRASE_ADDNIG: ["..tostring(v.name).."] id ["..tostring(v.phr_id).."]")
 		
 		if phr then
 		
-			write_log("!!PHRASE_ADDNIG_SUCCESS: ["..tostring(v.name).."] id ["..tostring(v.phr_id).."]")
 		
 			local phrase_script = phr:GetPhraseScript()
 			phrase_script:AddPrecondition("dialog_manager.precondition_intro")
@@ -248,10 +236,7 @@ function get_t_size(t)
 	return counter
 end
 
-function draw_t_keys(t)
-	for i,v in pairs(t) do
-		printf("key [%s]", tostring(i))
-	end
+function draw_t_keys()
 end
 
 function precondition(npc, actor, tbl, sel_tbl, p1, p2, p3)
@@ -261,40 +246,17 @@ function precondition(npc, actor, tbl, sel_tbl, p1, p2, p3)
 		
 		local lll = sel_tbl[npc:id()]
 		if (lll==nil) then
-			----- write_log("WARN! lll is nil")
 		end
 		local ttt = tbl[lll.phrase]
 		
-		----- write_log("INFO "..tostring(ttt))
 
-		if (ttt==nil) then
-			----- write_log("WARN! !!! "..lll.phrase.." tbl are NIL")
-			---print_table(tbl)
-			---local a = lll.phrase + 1  
---[[		
-		
-			printf("%d", get_t_size(tbl))
-			printf("%d", get_t_size(sel_tbl))
-			printf("needed phrase=[%s]",lll.phrase)
-			printf("----")
-			draw_t_keys(sel_tbl)
-			printf("----")
-			printf("%d", get_t_size(phrase))
-			printf("%d", get_t_size(phrase.intro))
-			printf("%d", get_t_size(phrase.cool_info))
-			printf("%d", get_t_size(phrase.help_thanks))
-]]			
-			----- write_log("INFO: "..get_t_size(tbl))
-			----- write_log("INFO: "..get_t_size(sel_tbl))
-			----- write_log("INFO: needed phrase="..lll.phrase)
-			
+		if (ttt==nil) then			
 			sel_tbl[npc:id()] = nil  --- KamikaZze * этот код инициализирует память фраз непися если возникает её сбой
 		end
 		
 		local value, number = calculate_predicate(npc, ttt )
 		--' Если запомненная фраза недоступна - необходимо забыть ее
 		if value == false then
-			printf("*** restore memory phrase")
 			sel_tbl[npc:id()] = nil
 		end
 	end
@@ -307,21 +269,15 @@ function precondition(npc, actor, tbl, sel_tbl, p1, p2, p3)
 	if ( (sel_tbl ~= nil) and (sel_tbl[npc:id()] ~= nil) ) then
 		--' Если проверяется не запомненная фраза
 		if (sel_tbl[npc:id()].phrase ~= phrase.phr_id) then
-			printf("*** not memory phrase [%s] ~= [%s]", sel_tbl[npc:id()].phrase, phrase.phr_id)
-			write_log("!!PHRASE_FALSE_!")
 			return false
 		end
 		if (sel_tbl[npc:id()].count >= 1) then
-			write_log("!!PHRASE_FALSE_!2")
 			return false
 		end
 	end	
 
 	--' Определяем доступна ли эта фраза:
-	write_log("!!PHRASE--------")
 	local value, number = calculate_predicate(npc, phrase)
-	write_log("!!PHRASE_["..tostring(value).."] NUM ["..tostring(number).."]")
---	print_table_inlog(phrase, "!!CUR_PHRASE")
 	return value
 end
 
@@ -348,10 +304,8 @@ function calculate_predicate(npc, tbl, settings)
 	local property_num = 0
 	local k,v = 0,0
 	
-	write_log("!!PHRASE_PREDICATE_1")
 	
 	if not tbl then 
-	write_log("!!PHRASE_PREDICATE_1_RET_TRUE")
 	return true, property_num end
 	
 	local rating_names = 
@@ -364,17 +318,13 @@ function calculate_predicate(npc, tbl, settings)
 	
 	if tbl.community ~= nil then
 		local susbt = community_substitutes[db.actor:character_community()]
-		write_log("!!PHRASE_PREDICATE_1_RET_SUBST "..tostring(susbt).." and "..tostring(tbl.community == susbt))
 		if tbl.community ~= db.actor:character_community() and not (susbt and tbl.community == susbt) then 
-		write_log("!!PHRASE_PREDICATE_1_RET_FALSE")
 		return false,0 end
 		property_num = property_num + 1		
 	end
 	if tbl.npc_community ~= nil then
 		local susbt = community_substitutes[npc:character_community()]
-		write_log("!!PHRASE_PREDICATE_2_RET_SUBST "..tostring(susbt).." and "..tostring(tbl.npc_community == susbt))
 		if tbl.npc_community ~= npc:character_community() and not (susbt and tbl.npc_community == susbt) then 
-		write_log("!!PHRASE_PREDICATE_2_RET_FALSE")
 		return false,0 end
 		property_num = property_num + 1		
 	end
@@ -383,40 +333,33 @@ function calculate_predicate(npc, tbl, settings)
 		   (tbl.relation == "neutral" and npc:relation(db.actor) ~= game_object.neutral) or
 		   (tbl.relation == "enemy" and npc:relation(db.actor) ~= game_object.enemy)
 		then 
-			write_log("!!PHRASE_PREDICATE_3_RET_FALSE")
 			return false,0 
 		end
 		property_num = property_num + 1		
 	end
 	if tbl.npc_rank ~= nil then
 		if tbl.npc_rank > npc:character_rank() then 
-		write_log("!!PHRASE_PREDICATE_4_RET_FALSE")
 		return false,0 end
 		property_num = property_num + 1		
 	end
 	-- Mixser, проверка на ранг актора
 	if tbl.actor_rank then
-		--write_log("rating_names")
 		if rating_names[ranks.get_obj_rank_name(db.actor)] > rating_names[ranks.get_obj_rank_name(npc)] then 
-		write_log("!!PHRASE_PREDICATE_5_RET_FALSE")
 		return false,0 end
 		property_num = property_num + 1	
 	end
 	if tbl.level ~= nil then
 		if tbl.level ~= level.name() then 
-		write_log("!!PHRASE_PREDICATE_6_RET_FALSE")
 		return false,0 end
 		property_num = property_num + 1		
 	end
 	if tbl.condlist ~= nil then
 		if xr_logic.pick_section_from_condlist(db.actor, db.actor, tbl.condlist) ~= "true" then 
-		write_log("!!PHRASE_PREDICATE_7_RET_FALSE")
 		return false,0 end
 		property_num = property_num + table.getn(tbl.condlist.infop_check)
 	end
 	if tbl.smart_terrain ~= nil then
 		if tbl.smart_terrain ~= xr_gulag.isUnderFraction(npc) then 
-		write_log("!!PHRASE_PREDICATE_8_RET_FALSE")
 		return false,0 end
 		property_num = property_num + 1		
 	end
@@ -426,7 +369,6 @@ function calculate_predicate(npc, tbl, settings)
 		    xr_wounded.is_heavy_wounded_by_id(npc:id()) or
 		    xr_wounded.is_psy_wounded_by_id(npc:id()))
 		then
-			write_log("!!PHRASE_PREDICATE_9_RET_FALSE")
 			return false,0
 		end
 		if tbl.wounded == "false" and
@@ -434,7 +376,6 @@ function calculate_predicate(npc, tbl, settings)
 		    xr_wounded.is_heavy_wounded_by_id(npc:id()) or
 		    xr_wounded.is_psy_wounded_by_id(npc:id()))
 		then
-			write_log("!!PHRASE_PREDICATE_10_RET_FALSE")
 			return false,0
 		end
 		property_num = property_num + 1		
@@ -443,20 +384,17 @@ function calculate_predicate(npc, tbl, settings)
 		if (db.actor:money() < tbl.price) and
 		   (settings == nil or settings.no_price ~= true) 
 		then
-			write_log("!!PHRASE_PREDICATE_11_RET_FALSE")
 			return false,0 
 		end
 		
 		if tbl.article_info ~= nil then
 			for k,v in pairs(tbl.article_info) do
 				if has_alife_info(v) then
-					write_log("!!PHRASE_PREDICATE_12_RET_FALSE")
 					return false,0
 				end
 			end				
 		end
 	end
-	write_log("!!PHRASE_PREDICATE_2_RET_TRUE")
 	return true, property_num
 end
 

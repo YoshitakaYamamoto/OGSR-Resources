@@ -408,7 +408,6 @@ function random_task_reward:generate_reward_complect()
 			self:code_list(index, self.final_list) -- так как нельзя сохранить в сейве таблицу, то закодируем её в понятный системе формат.
 			table.insert(order_complect, index)
 		end
-		--print_table_inlog(order_complect, "generate_reward_complect:")
 		self:code_complect(order_complect) -- сохраним таблицу в понятный системе вид
 		--ogse.save_variable("rr_"..self.trader.."_"..self.difficult.."_order", order_complect)
 	end
@@ -435,17 +434,14 @@ end
 
 -- Взятие комплекта награды
 function random_task_reward:set_reward_complect()
-	log1("---Текущая награда---")
 	local order_complect = self:recode_complect()
-	
+
 	if order_complect then
 		local index = order_complect[1]
 		self.money_reward = ogse.load_variable("rr_"..self.trader.."_"..self.task_info.difficult.."_money"..index, 0)
 		log1("self.money_reward = "..tostring(self.money_reward))
 		self.final_list = self:recode_list(index) -- переведём информацию о вещах в удобоваримый вид
-		print_table_inlog(self.final_list, "self.final_list:")
 	end
-	log1("---Текущая награда---")
 end
 
 -- Перекодирование информации о порядке очерёдности комплектов в таблицу
@@ -487,7 +483,6 @@ function random_task_reward:add_to_complect()
 		self:code_list(index, self.final_list)
 		table.insert(order_complect, index)
 		table.remove(order_complect, 1)
-		--print_table_inlog(order_complect, "!->")
 		self:code_complect(order_complect)
 	end
 end

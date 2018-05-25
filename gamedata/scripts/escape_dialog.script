@@ -13,7 +13,6 @@ end
 
 function factions_repair_checkstalker_r(trader, actor)
 	local whatami = db.actor:character_community()
---	printf("Testing_stalker:_" .. whatami) --/#~#
 	local howmuch = 20000
 	--local gulag = xr_gulag.get_gulag_by_name ("esc_lager")
 	--if (gulag) then
@@ -32,11 +31,9 @@ function factions_repair_checkstalker_r(trader, actor)
 			 (whatami ~= "military") and
 			 (whatami ~= "killer")
 			then
---			printf("Repair_Stalker~Y")
 			return true
 		end
 	end
---	printf("Repair_Stalker~N")
 	return false
 end
 
@@ -59,7 +56,6 @@ function factions_repair_checkstalker(first_speaker, second_speaker)
 		item_name_and_price = game.translate_string("list_factions_repair_4").." %c[255,238,155,23]"..howmuch.."Ru%c[default]"
 		db.actor:give_talk_message(item_name_and_price, task_texture, task_rect, "iconed_trade_info")
 	end
---	printf("factions_repair_checkstalker") --/#~#
 end
 
 ---
@@ -125,7 +121,6 @@ function not_final_job(trader, actor)
 end
 
 function trader_test(actor, npc)
- 	printf ("!!!!!")	
 	return true
 end
 
@@ -431,7 +426,6 @@ function fox_pay_money(actor, npc)
 end
 
 function run_tutorial_pda(first_speaker, second_speaker)
-	printf("!-!-!")
 	first_speaker:stop_talk()
     second_speaker:stop_talk()
 	game.start_tutorial("part_1_pda")

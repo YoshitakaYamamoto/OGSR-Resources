@@ -32,14 +32,6 @@ local spawn_db = ogse_spawn_db.script_spawn_registry.ogse_quests
 
 -- ÌÃ êâåñòû ñ ÁÒÐ
 
-local current_debug = false
-
-function write_log(str)
-	if current_debug then
-		log1(str)
-	end
-end
-
 function btr_finished()
 	local sim = alife()
 	local btr = sim:story_object(story_ids.dead_city_btr_real)
@@ -1046,7 +1038,6 @@ function check_scientists_story_ids()
 	end
 	if not needed_infos then
 		needed_infos = ogse.load_var("master_quest_infos", 0, "number")
-		write_log("!!DEBUG! MG Science saved infos ["..tostring(needed_infos).."]")
 	end
 	if needed_infos == 0 then
 		local info_1, info_2, info_3 = 0, 0, 0
@@ -1055,14 +1046,12 @@ function check_scientists_story_ids()
 		info_3 = math.random(info_1+1,9)
 		needed_infos = tonumber(info_1..info_2..info_3)
 		ogse.save_var("master_quest_infos", needed_infos, "number")
-		write_log("!!DEBUG! MG Science quest init ["..tostring(needed_infos).."]")
 		return false
 	elseif needed_infos > 0 then
 		local unpack_value = tostring(needed_infos)
 		local check_info_1 = string.sub(unpack_value,1,1)
 		local check_info_2 = string.sub(unpack_value,2,2)
 		local check_info_3 = string.sub(unpack_value,3,3)
-		write_log("!!DEBUG! MG Science needed_infos is ["..check_info_1.."_"..check_info_2.."_"..check_info_3.."]")
 		local counter = 0
 		for i=1,9 do
 			if db.actor:has_info("master_quest_info_"..tostring(i)) and 
@@ -1088,25 +1077,20 @@ function check_scientists_story_ids()
 				end
 			end
 		end
-		write_log("!!DEBUG! MG Science actor has needed_infos: ["..tostring(counter).."]")
 		if counter >= 3 then
 			db.actor:give_info_portion("master_quest_info_found")
 			news_manager.send_tip(db.actor, "deadcity_all_data_part_found", nil, "ecolog", 15000, nil)
 			ogse.delete_var("master_quest_infos")
-			write_log("!!DEBUG! MG Science needed_infos subquest completed")
 			return true
 		end		
 	else
-		write_log("!!DEBUG! MG Science quest ivalid needed_infos value ["..tostring(needed_infos).."]")
 		return false
 	end
 	return false
 end
 
 function mark_logovo()
-	write_log("!!DEBUG Will mark logovo")
 	level_tasks.add_location_by_sid(story_ids.master_lair, "crlc_big", "deadcity_logovo_mark")
-	write_log("!!DEBUG marked logovo")
 end
 
 function unmark_logovo()
@@ -1195,7 +1179,6 @@ function save_bidon_bomb()
 				local bomb = db.actor:object("bidon_bomb")
 				local id = bomb:id()
 				ogse.save_var("bidon_bomb", id, "u16")
-				write_log("!!DEBUG! Bidon_bomb_id_saved["..tostring(id).."]")
 			end
 		else
 			bomb_is_ok = true
@@ -1219,7 +1202,6 @@ function start_bomb_timer()
 end
 
 function blow_bidon_bomb()
-	write_log("!!DEBUG! Will try to blow bomb!")
 	if db.actor:object("bidon_bomb") ~= nil then
 		local bomb = db.actor:object("bidon_bomb")
 		db.actor:drop_item(bomb)
@@ -1231,13 +1213,11 @@ function blow_bidon_bomb()
 		abort("Deadcity master quest - cannot find master restrictor!")
 	end
 	if bomb_obj then
-		write_log("!!DEBUG! Will try to blow bomb ONLINE! ID "..tostring(bomb_id))
 		local bomb_pos = bomb_obj:position()
 		if db.actor:object("bidon_bomb") ~= nil then
 			bomb_pos = db.actor:position()
 		end
 		local dist = bomb_pos:distance_to(master.position)
-		write_log("!!DEBUG! DISTANCE_IS "..tostring(dist))
 		if dist <= 30 then
 		-- win
 			db.actor:give_info_portion("master_quest_soup_ready")
@@ -1253,9 +1233,7 @@ function blow_bidon_bomb()
 		hit.draftsman = db.actor
 		hit.direction = vector():set(0,0,0)
 		bomb_obj:hit(hit)
-		write_log("!!DEBUG! BOMB HAS BLOWN!")
 	else
-		write_log("!!DEBUG! Will try to blow bomb OFFLINE! ID "..tostring(bomb_id))
 		local bomb_srv_obj = alife():object(bomb_id)
 		if bomb_srv_obj then
 			local bomb_pos = bomb_srv_obj.position
@@ -1263,7 +1241,6 @@ function blow_bidon_bomb()
 				bomb_pos = db.actor:position()
 			end
 			local dist = bomb_pos:distance_to(master.position)
-			write_log("!!DEBUG! DISTANCE_IS "..tostring(dist))			
 			-- offline explode
 			if dist <= 30 then
 			-- win
@@ -1273,7 +1250,6 @@ function blow_bidon_bomb()
 				db.actor:give_info_portion("master_quest_total_failure")
 			end
 			alife():release(bomb_srv_obj, true)
-			write_log("!!DEBUG! BOMB HAS BLOWN!")
 		else	
 			abort("Deadcity master quest - cannot find the bomb!")
 		end	
@@ -1650,7 +1626,6 @@ end
 local dolg_infuence_points = 0
 
 function init_actor_points_dolg(first_speaker, second_speaker)
-	write_log("!!DEBUG! Talk Dolg init points ["..tostring(dolg_infuence_points).."]")
 	dolg_infuence_points = 0
 end
 
@@ -1667,21 +1642,17 @@ function count_actor_points_dolg_quests(first_speaker, second_speaker)
 	if not db.actor:has_info("bar_heli_scene_professor_die") then
 		dolg_infuence_points = dolg_infuence_points + 1
 	end	
-	write_log("!!DEBUG! Talk Dolg quest points ["..tostring(dolg_infuence_points).."]")
 end
 
 function add_actor_points_dolg(first_speaker, second_speaker)
 	dolg_infuence_points = dolg_infuence_points + 1
-	write_log("!!DEBUG! Talk Dolg points increased ["..tostring(dolg_infuence_points).."]")
 end
 
 function actor_have_needed_points_dolg(first_speaker, second_speaker)
-	write_log("!!DEBUG! Talk Dolg current points ["..tostring(dolg_infuence_points).."]")
 	return dolg_infuence_points >= 6
 end
 
 function actor_doesnt_have_needed_points_dolg(first_speaker, second_speaker)
-	write_log("!!DEBUG! Talk Dolg current points ["..tostring(dolg_infuence_points).."]")
 	return dolg_infuence_points < 6
 end
 
@@ -1695,7 +1666,6 @@ end
 local freedom_infuence_points = 0
 
 function init_actor_points_freedom(first_speaker, second_speaker)
-	write_log("!!DEBUG! Talk freedom init points ["..tostring(freedom_infuence_points).."]")
 	freedom_infuence_points = 0
 end
 
@@ -1712,21 +1682,17 @@ function count_actor_points_freedom_quests(first_speaker, second_speaker)
 	if db.actor:has_info("btr_quest_finished") then
 		freedom_infuence_points = freedom_infuence_points + 1
 	end	
-	write_log("!!DEBUG! Talk freedom quest points ["..tostring(freedom_infuence_points).."]")
 end
 
 function add_actor_points_freedom(first_speaker, second_speaker)
 	freedom_infuence_points = freedom_infuence_points + 1
-	write_log("!!DEBUG! Talk freedom points increased ["..tostring(freedom_infuence_points).."]")
 end
 
 function actor_have_needed_points_freedom(first_speaker, second_speaker)
-	write_log("!!DEBUG! Talk freedom current points ["..tostring(freedom_infuence_points).."]")
 	return freedom_infuence_points >= 6
 end
 
 function actor_doesnt_have_needed_points_freedom(first_speaker, second_speaker)
-	write_log("!!DEBUG! Talk freedom current points ["..tostring(freedom_infuence_points).."]")
 	return freedom_infuence_points < 6
 end
 

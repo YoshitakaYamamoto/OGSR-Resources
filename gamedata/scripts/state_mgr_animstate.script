@@ -348,7 +348,6 @@ function body_state:update()
 end
 --' Возвращает текущее состояние тела
 function body_state:state()
-	--printf("%s",self.current_state)
 	return self.current_state
 end
 --' Установка нового положения тела

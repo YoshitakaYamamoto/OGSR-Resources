@@ -59,18 +59,6 @@ local periscope_mode
 local recognition_target_mode -- флаг распознавания цели
 local actor_torch_was_enabled = false
 
---
-local car_log
-local debug_output = false
-
-local function dbg_log(s)
-	if debug_output and car_log then
-		car_log:write(s, '\n')
-		car_log:flush()
-	end
-end
-
-
 local article_by_car_section = {
 	vehicle_zaz			 = "vehicles_zaporozh_gorb_article",
 	vehicle_zaz968		 = "vehicles_zaporozh_ush_article",	
@@ -198,12 +186,7 @@ function on_spawn()
 	car_hud_wnd = car_hud()
 	ASSERT(car_hud_wnd, "ogse_car_control.on_spawn: car_hud_wnd == nil") -- на всякий случай
 	bg:AttachChild(car_hud_wnd)
-	--
-	if debug_output then
-		local log_dir = getFS():update_path("$logs$", "car_log.txt")
-		car_log = io.open(log_dir, "a+")
-	end
-	--
+
 	periscope_mode = ogse.load_var( script_name()..".periscope_mode", periscope_modes.manual, "u8") --Загружаем режим стрельбы
 	recognition_target_mode = ogse.load_var( script_name()..".recognition_target_mode", true, "bool") --Загружаем режим автораспознавания
 	current_btr_fov = ogse.load_var( script_name()..".current_btr_fov", fov_vol, "float") --Загружаем fov
@@ -238,8 +221,6 @@ function on_destroy()
 	if get_hud():GetCustomStatic("btr_hud_background") then
 		get_hud():RemoveCustomStatic("btr_hud_background")
 	end
-	--
-	if car_log then car_log:close() end
 end
 
 function transfer_btr_hud_to_static()
@@ -706,18 +687,11 @@ function update_car_gun_direction(car)
 			explode_old_value = explode
 		end
 	end
-	if debug_output then log1("CAR_EXPLODE "..tostring(explode).." AVOID "..tostring(avoid_bug)) end
 	if is_manual_mode() then -- ручной контроль
 		local dev = device()
 		local dist = level.get_target_dist()
 		if dist < 1 then dist = 100 end
 		position = dev.cam_pos:mad(dev.cam_dir, dist)
-		if debug_output then
-			log1("DEBUG_BTR MAD cam_pos:["..dev.cam_pos.x..","..dev.cam_pos.y..","..dev.cam_pos.z.."]")
-			log1("DEBUG_BTR MAD cam_dir:["..dev.cam_dir.x..","..dev.cam_dir.y..","..dev.cam_dir.z.."]")
-			log1("DEBUG_BTR MAD dist:["..dist.."]")
-			log1("DEBUG_BTR MAD RESULT:["..position.x..","..position.y..","..position.z.."]")
-		end
 	elseif is_target_select_mode() or (is_auto_fire_mode() and auto_fire_operable) then -- автоматический контроль
 		local targ_item = targets[current_target_id]
 		local targ
@@ -727,9 +701,6 @@ function update_car_gun_direction(car)
 		if not targ or not targ:alive() then -- цель отсутствует, в оффлайне или дохлая
 			current_target_id = nil
 			if avoid_bug < time_global() or not actor_has_control_module() then
-				if debug_output then
-					log1("DEBUG_BTR MAD VAR:[1]")
-				end
 				script_car:SetParam(CCar.eWpnToDefaultDir, vector())
 				need_warn_turret_failure = false
 			else	
@@ -738,15 +709,9 @@ function update_car_gun_direction(car)
 			return
 		end
 		position = get_aiming_point_for_target(targ)
-		if debug_output then
-			log1("DEBUG_BTR MAD RESULT_2:["..position.x..","..position.y..","..position.z.."]")
-		end
 	end
 	if avoid_bug < time_global() or not actor_has_control_module() then
 		if position then
-			if debug_output then
-				log1("DEBUG_BTR MAD [2]:["..position.x..","..position.y..","..position.z.."]")
-			end
 			script_car:SetParam(CCar.eWpnDesiredPos, position)
 		end
 		need_warn_turret_failure = false
@@ -1165,11 +1130,7 @@ function reprioritize_targets(car)
 	
 	get_targets_from_registry(car)
 	refresh_targets_btr(car)
-	
-	--
-	if debug_output then
-		print_table_inlog_v2(targets_list, "TARGS_BTR>>")
-	end
+
 	-- На дистанциях выше 20 метров приоритет неписям, ближе 20 метров приоритет монстрам. При дистанции ниже 10 метров но выше минимальной объект сразу становится примари_таргет без вариантов. 
 	-- При варианте далее 20 метров проверяем видимость, приоритет видимому.
 	local last_weight 	= 1000

@@ -89,12 +89,8 @@ end
 function set_order_array(index)
 	local time_array = get_order_array()
 	
-	--print_table_inlog(time_array, "!>")
-	
 	table.insert(time_array, index) -- вставим искомый элемент в конец очереди
 	table.remove(time_array, 1) -- удалим из очереди первый элемент
-	
-	--print_table_inlog(time_array, "!-->")
 	
 	for i=1, order_length do
 		ogse.save_variable("yan_random_quest_order_array"..tostring(i), time_array[i])

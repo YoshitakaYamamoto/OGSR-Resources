@@ -91,18 +91,15 @@ function action_remark_activity:get_target()
     return look_tbl
 end
 function action_remark_activity:turn_end_callback()
-  printf("TURN END CALLBACK CALLED")
 --  self.state = state_sound
 --  self:update()
 end
 function action_remark_activity:time_callback()
-  printf("TIME CALLBACK CALLED")
   self.state = state_sound
   self:update()
 end
 function action_remark_activity:update()
   --' 1. Мы должны повернуться на объект.
-  --printf("REMARK: [%s] state[%s]", self.object:name(), self.state)
   if self.state == state_initial then
     local cb = { obj = self, func = self.time_callback, turn_end_func = self.turn_end_callback }
     local synsound
@@ -196,7 +193,6 @@ end
 --remark binder
 ----------------------------------------------------------------------------------------------------------------------
 function add_to_binder(npc, ini, scheme, section, storage)
-    printf("DEBUG: add_to_binder [%s]: scheme='%s', section='%s'", npc:name(), scheme, section)
       local operators = {}
       local properties  = {}
     
@@ -263,9 +259,7 @@ end
 
 -- Включение схемы
 function set_scheme(npc, ini, scheme, section, gulag_name)
-  printf("DEBUG: set_scheme: scheme='%s', section='%s'", scheme, section)
   local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
-  printf("DEBUG: set_scheme: storage assigned")
 
   st.logic     = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 

@@ -227,16 +227,7 @@ function load_scheme(filename, scheme, stype)
 	schemes[scheme] = filename
 	stypes[scheme] = stype
 end
-
 ----------------------------------------------------------------------
-
---TODO: Ïîîòğûâàòü âûçîâû è óäàëèòü!
-function printf(fmt,...)
-end
---TODO: Ïîîòğûâàòü âûçîâû è óäàëèòü!
-function dbglog(fmt,...)
-end
-
 
 function validate_enemy_object( enemy )
   if not ( enemy and enemy.clsid ) then return false, nil end
@@ -401,20 +392,6 @@ function stop_play_sound(obj)
 		obj:set_sound_mask(0)
 	end
 end
-
-
---TODO: ÏÎÎÒĞÛÂÀÒÜ ÂÛÇÎÂÛ È ÓÄÀËÈÒÜ!
-function print_table_inlog_v2(table, subs)
-end
-
---TODO: ÏÎÎÒĞÛÂÀÒÜ ÂÛÇÎÂÛ È ÓÄÀËÈÒÜ!
-function print_table(table, subs)
-end
-
---TODO: ÏÎÎÒĞÛÂÀÒÜ ÂÛÇÎÂÛ È ÓÄÀËÈÒÜ!
-function print_table_inlog(table, subs)
-end
-
 
 -------------------------------------------------------------------------------------------
 function switch_online(id)

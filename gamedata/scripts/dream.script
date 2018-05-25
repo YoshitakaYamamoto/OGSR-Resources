@@ -65,15 +65,12 @@ function dream_mgr:__init()
 
                             self.regular[rd_sect] = {dream_path, prob, tp}
                         else
-                            --printf("dream <error>: can't find field <dream> in section [%s].", rd_sect)
                         end
                     else
-                        --printf("dream <error>: can't find section [%s] defined in the field <regular> in section [dreams].", rd_sect)
                     end
                 end
             end
         else
-            --printf("dream <error>: can't find field <regular> in section [dreams].")
         end
 
         if sys_ini:line_exist("drm_dreams", "scenario") then
@@ -107,24 +104,18 @@ function dream_mgr:__init()
 
                                 self.scenario[sd_sect] = {dream_path, cond, to_regular}
                             else
-                                --printf("dream <error>: can't find field <cond> in section [%s].", sd_sect)
                             end
                         else
-                            --printf("dream <error>: can't find field <dream> in section [%s].", sd_sect)
                         end
                     else
-                       -- printf("dream <error>: can't find section [%s] defined in the field <scenario> in section [dreams].", sd_sect)
                     end
                 end
             end
         else
-           -- printf("dream <error>: can't find field <scenario> in section [dreams].")
         end
     else
-       -- printf("dream <error>: can't find section [dreams].")
     end
 
-   -- printf("dream <init>: END INITIALIZATION")
 end
 
 function dream_mgr:name()
@@ -137,10 +128,8 @@ function dream_mgr:get_dream()
 
     for k, v in pairs(self.scenario) do
 	    local c = xr_logic.pick_section_from_condlist(db.actor, self, v[2].condlist)
-	    --printf("dream <sleep>: dream(%s) cond(%s)", k, tostring(c))
 	    if c == "true" or c == "" then
 	        dream = k
-	        --printf("dream <sleep>: take")
 	        break
 	    end
     end

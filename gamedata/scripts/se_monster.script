@@ -85,12 +85,10 @@ function se_monster:can_switch_online()
 
         --если задана дистанция проверки, то проверим.
         if self.check_distance == true then
-           --printf ("Check distance")
            --получим позицию.
            local pos = level.vertex_position (self.m_level_vertex_id)
             -- проверим дистанцию до игрока. если меньше требуемой, то от винта
             if pos:distance_to (db.actor:position ()) < self.min_distance then
-               --printf ("Check distance 1")
                return false
             end
         end

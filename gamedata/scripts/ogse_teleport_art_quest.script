@@ -11,15 +11,7 @@ function attach(sm)
 	sm:subscribe({ signal = "on_first_update", fun = this.check_actor_leave_zone })
 end
 
-
 local spawn_db = ogse_spawn_db.script_spawn_registry.ogse_teleport_art_quest
-local total_debug = false
-
-function write_log(str)
-	if total_debug then
-		log1("!!TELEPORT_ART: "..str)
-	end
-end
 
 
 --SPAWN_V1
@@ -54,8 +46,6 @@ function init_teleport_art_and_zone()
 	id_table.sr = obj.id
 	local packet = get_netpk(obj, 1)
 	ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
-	write_log("packet ok")
-	--write_log(packet:dumpDesc())
 	local my_table = packet:get()
 	my_table.shapes:addSphere(10)
 	my_table.restrictor_type = 3
@@ -70,26 +60,20 @@ end
 
 -- Телепортация актора
 function teleport_actor(my_vector)
-	write_log("begin teleport actor")
 	level.add_pp_effector ("teleport.ppe", 2006, false)
 	db.actor:set_actor_position(my_vector)
-	write_log("end teleport actor")
 end
 
 -- Спаун ГГ с артефактом обратно или выпускание его обратно и спаун артефакта внутрь зоны
 function teleport_actor_in_zone()
 	if db.actor:has_info("ogse_teleport_art_actor_inside") then -- чтобы не срабатывало до того, как мы зашли в рестриктор
 		if db.actor:object("af_teleport_trap") and not db.actor:has_info("ogse_teleport_trap_research_art_actor_journey") then -- с артом выйти нельзя, когда мы уже долетали!
-			write_log("will begin teleport actor!")
 			teleport_actor(teleport_art_restrictor_position)
 			if db.actor:has_info("ogse_teleport_trap_find_art_get_trouble") then
 				local teleport_count = ogse.var_exists("teleport_count") and ogse.load_var("teleport_count") or false
-				write_log("teleport count "..tostring(teleport_count))
 				if not teleport_count then
 					ogse.save_var("teleport_count", 1, "u8")
-					write_log("no teleport count set 1")
 				else
-					write_log("teleport count already "..teleport_count)
 					if teleport_count == 5 then
 						ogse.send_tip(game.translate_string("ogse_tp_art_1_text"))
 					elseif teleport_count == 10 then
@@ -143,19 +127,16 @@ function af_teleport_trap_binder:__init(obj) super(obj)
 end 
 
 function af_teleport_trap_binder:reload(section)
-	write_log("af_teleport_trap_binder:reload")
     object_binder.reload(self, section)
 end
 
 function af_teleport_trap_binder:reinit()
-	write_log("af_teleport_trap_binder:reinit")
 	telekill_case_id = ogse.var_exists("telekill_case_id") and ogse.load_var("telekill_case_id") or false
 
    object_binder.reinit(self)
 end
 
 function af_teleport_trap_binder:update(delta)
-	write_log("af_teleport_trap_binder:update")
 	local restrictor  
 	if self.id_table then restrictor = level.object_by_id(self.id_table.sr) end
 	
@@ -200,9 +181,7 @@ function af_teleport_trap_binder:update(delta)
 		if db.actor:has_info("ogse_teleport_trap_research_art_start") 
 		and not db.actor:has_info("ogse_teleport_trap_research_art_actor_journey_finish") 
 		and db.actor:object("art_analyzer") then 
-			write_log("1")
 			if not db.actor:has_info("ogse_teleport_trap_research_art_saharov_tell_about_complete_timer") then
-				write_log("11")
 				db.actor:give_info_portion("ogse_teleport_trap_research_art_saharov_tell_about_complete_timer") 
 			end
 		end
@@ -211,20 +190,17 @@ function af_teleport_trap_binder:update(delta)
 end
 
 function af_teleport_trap_binder:net_spawn(data)
-	write_log("af_teleport_trap_binder:net_spawn")
     return object_binder.net_spawn(self, data)
 end
 
 
 function af_teleport_trap_binder:net_destroy()
-	write_log("af_teleport_trap_binder:net_destroy")
     object_binder.net_destroy(self)
 end
 
 -- Спавним смертельные зоны
 function spawn_dead_zone()
 
-	write_log("spawn_dead_zone")
 
 	-- Вызовим типс с Сахоровым.
 	saharov_end_research()
@@ -334,11 +310,8 @@ function spawn_dead_zone()
 --SPAWN_V2
 	for _,spawn_item in pairs(spawn_db.anom_positions) do
 		local anom_name = anom_type[math.random(#anom_type)]
-		--write_log("anom_name = "..anom_name)
 		local anom_rad = anom_radius[anom_name]
-		--write_log("anom_rad = "..anom_rad)
 		local anom_section = anom_name..power_type[math.random(#power_type)]
-		--write_log("anom_section = "..anom_section)
 		--local obj = alife():create(anom_section, spawn_item.position, spawn_item.lvid, spawn_item.gvid)
 		local obj = ogse.quest_spawn_ex(anom_section, 1, spawn_item)
 		table.insert(dead_zone_id, obj.id)
@@ -350,9 +323,6 @@ function spawn_dead_zone()
 		local coef_effective_radius = 1
 		if sys_ini:line_exist(anom_section, "effective_radius") then coef_effective_radius = sys_ini:r_float(anom_section, "effective_radius") end
 			
-		write_log("coef_effective_radius = "..coef_effective_radius)
-		write_log("new_radius = "..anom_rad*coef_effective_radius)
-		write_log("power = "..sys_ini:r_float(anom_section, "max_start_power"))
 
 		my_table.shapes:addSphere(anom_rad*coef_effective_radius, vector():set(0,0,0))
 		my_table.max_power = sys_ini:r_float(anom_section, "max_start_power")
@@ -373,7 +343,6 @@ function spawn_dead_zone()
 	
 	local packet = get_netpk(obj, 1)
 	ASSERT( packet:isOk(), "can't read netpacket of %s", obj:name() )
-	--write_log(packet:dumpDesc())
 	local my_table = packet:get()
 	my_table.shapes:addBox(
 		vector():set(10, 0, 0), 
@@ -389,7 +358,6 @@ function spawn_dead_zone()
 end
 
 function journey_step()
-	write_log("journey_step")
 	if teleport_position then
 		if #teleport_position >= 6 then
 			local step = {}
@@ -410,12 +378,10 @@ function journey_step()
 end
 
 function journey_timer_begin() -- отложим начало веселья
-	write_log("journey_timer_begin")
 	ogse.start_timer("art_trap", 5, script_name() .. ".journey_begin")
 end
 
 function journey_begin()
-	write_log("journey_timer_run")
 	db.actor:give_info_portion("ogse_teleport_trap_research_art_actor_journey") -- начинаем телепортацию
 end
 
@@ -433,7 +399,6 @@ function check_actor_leave_zone()
 end
 
 function saharov_tell_about_complete_timer()
-	write_log("2")
 	local text = game.translate_string("ogse_tp_art_4_text")
 	db.actor:give_info_portion("ogse_teleport_trap_find_art_get_trouble")
 	ogse.send_tip(text, game.translate_string("yan_saharov_name")..":", 0, 15, "saharov", "task")
@@ -510,8 +475,6 @@ function give_reward_and_pick_up_items(first_speaker, second_speaker)
 end
 
 function spawn_case_with_art()
-	write_log(debug.traceback())
-	write_log("start")
 	level.add_pp_effector ("teleport.ppe", 2006, false)
 	-- Удаляем арт, зону, кейс, спавним кейс с артефактом
 	local table_id = ogse.var_exists("ogse_teleport_art_id") and ogse.load_var("ogse_teleport_art_id") or false
@@ -526,7 +489,6 @@ function spawn_case_with_art()
 				end
 			end
 		end
-	else write_log("table_id not found!")
 	end
 	ogse.delete_var("ogse_teleport_art_id")
 	if telekill_case_id then

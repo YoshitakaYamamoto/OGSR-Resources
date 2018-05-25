@@ -32,8 +32,6 @@ local breather_prefixes = {
 	["military_outfit"] = true,
 }
 
-local debug_flag = false
-
 
 -- вызывается из биндера рестрикторов
 function update(obj)
@@ -91,9 +89,6 @@ function fx_start(id)
 	if not underwater[id] then
 		local breather = actor_has_breather()
 		time_submerged = time_global()
-		if debug_flag then
-			db.actor:give_game_news(id.." CAMERA UNDERWATER!!! ", "ui\\ui_iconsTotal", Frect():set(498,47,83,47),0, 1000)
-		end
 		local hud = get_hud()
 		local info = hud:GetCustomStatic("oxygen_hud")
 		if not info then
@@ -197,9 +192,6 @@ function fx_stop(id)
 		end
 		time_submerged = 0
 		o2_amount = 100		
-		if debug_flag then
-			db.actor:give_game_news(id.." CAMERA NOT UNDERWATER!!! ", "ui\\ui_iconsTotal", Frect():set(498,47,83,47),0, 1000)
-		end
 		local hud = get_hud()
 		local info = hud:GetCustomStatic("oxygen_hud")
 		if info then

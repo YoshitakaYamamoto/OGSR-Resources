@@ -42,17 +42,6 @@ local sim = alife()
 local spawn_db = ogse_spawn_db.script_spawn_registry.aem_manager
 
 ---------------------------------------------------------------------------------------------------
--- вывод отладочной информации
----------------------------------------------------------------------------------------------------
---SPAWN_V1 : примечание. Смотри также файл config\misc\aem_manager.ltx и отметку в нём
-
---function printf(fmt, ...)
---	local msg = string.format(fmt, ...)
---	local msg_no_ws = string.gsub(msg, "%s", "_")
---	get_console():execute("dbg:" .. msg_no_ws)
---end
-
----------------------------------------------------------------------------------------------------
 -- функции для работы с ltx
 ---------------------------------------------------------------------------------------------------
 
@@ -96,7 +85,6 @@ function parse_place(line)
 end
 
 function load_team(ini, section)
-	--printf("load_team('%s')", section)
 	local info = {}
 	info.name   = read_string(ini, section, "name", true, "aem_" .. section)
 	info.name1  = read_string(ini, section, "name1", true, "aem_" .. section .. "1")
@@ -115,7 +103,6 @@ function load_team(ini, section)
 end
 
 function load_group(ini, section)
-	--printf("load_group('%s')", section)
 	local info = {}
 
 	if section == "turnament" then
@@ -145,7 +132,6 @@ function load_group(ini, section)
 end
 
 function load_fight(ini, section, group)
-	--printf("load_fight('%s')", section)
 	local info = {}
 	info.group = group
 
@@ -195,7 +181,6 @@ end
 
 class "CArenaext"
 function CArenaext:__init()
-	--printf("CArenaext:__init")
 	local i, j, n, n2, id, id2, value, info
 
 	time_def = time_get_start()
@@ -222,7 +207,6 @@ function CArenaext:__init()
 		n = ini:line_count("arena_items")
 		for i=0,n-1 do
 			result, id, value = ini:r_line("arena_items",i)
-			--printf(" arena_items: '%s'", id)
 			self.arena_items[id] = true
 		end
 	end
@@ -233,7 +217,6 @@ function CArenaext:__init()
 		n = ini:line_count("remove_items")
 		for i=0,n-1 do
 			result, id, value = ini:r_line("remove_items",i)
-			--printf(" remove_items: '%s'", id)
 			self.remove_items[id] = true
 		end
 	end
@@ -244,7 +227,6 @@ function CArenaext:__init()
 		n = ini:line_count("keep_items")
 		for i=0,n-1 do
 			result, id, value = ini:r_line("keep_items",i)
-			--printf(" keep_items: '%s'", id)
 			self.keep_items[id] = true
 		end
 	end
@@ -257,7 +239,6 @@ function CArenaext:__init()
 	n = ini:line_count("places")
 	for i=0,n-1 do
 		result, id, value = ini:r_line("places",i)
-		--printf(" places: '%s'-'%s'", id, value)
 		self.places[id] = parse_place(value)
 	end
 
@@ -269,7 +250,6 @@ function CArenaext:__init()
 	n = ini:line_count("teams")
 	for i=0,n-1 do
 		result, id, value = ini:r_line("teams",i)
-		--printf(" teams: '%s'-'%s'", id, value)
 		self.teams[id] = load_team(ini, id)
 	end
 
@@ -448,7 +428,6 @@ end
 -- вызывается в случае смерти каждого участника боя
 -------
 function CArenaext:on_death(npc, team)
-	--printf("CArenaext:on_death('%s'-'%s')", team, npc:section())
 
 	if team ~= "team1" and team ~= "team2" then
 		abort("CArenaext:on_death('invalid team')")
@@ -475,7 +454,6 @@ end
 -------
 function CArenaext:on_done_fight()
 	local name = self:current()
-	--printf("CArenaext:on_done_fight('%s')", name)
 	local info = self:description(name)
 
 	-- запрещаем бой для диалога
@@ -514,7 +492,6 @@ function CArenaext:on_done_fight()
 				if table.getn(info.spawn) == 6 then
 					self.mk = bit_or(self.mk, group.mk)
 					xr_logic.pstor_store(db.actor, "aem_mk", self.mk)
-					--printf("mk=%x", self.mk)
 				end
 			end
 		end
@@ -540,7 +517,6 @@ end
 -- вызывается в случае завершения группы боёв
 -------
 function CArenaext:on_done_group(name)
-	--printf("CArenaext:on_done_group('%s')", name)
 	local info = self.groups[name]
 
 	-- запрещаем группу для диалога
@@ -564,7 +540,6 @@ end
 -- вызывается в случае завершения всех боёв арены
 -------
 function CArenaext:on_done_all()
-	--printf("CArenaext:on_done_all()")
 	db.actor:give_info_portion("aem_done")
 end
 
@@ -572,7 +547,6 @@ end
 -- инициализация мода
 -------
 function CArenaext:startup()
-	--printf("CArenaext:startup()")
 	if db.actor:dont_has_info("aem_startup") then
 		db.actor:give_info_portion("aem_spam")
 		db.actor:give_info_portion("aem_startup")
@@ -649,7 +623,6 @@ end
 -------
 function CArenaext:cleanup()
 	local i, n, result, id, value, obj, section
-	--printf("CArenaext:cleanup()")
 	
 	-- чтение LTX
 	local ini = dsh.cached_ini_file("misc\\aem_manager.ltx")
@@ -713,7 +686,6 @@ end
 -- сгенерить доступные бои
 -------
 function CArenaext:reinit()
-	--printf("CArenaext:reinit()")
 	local name, info, t, tt, i, j, n, nn, cnt, rnd, fight
 
 	---- именно здесь, до установки info_portion-ов
@@ -918,7 +890,6 @@ function CArenaext:update()
 		local idle_time = game.CTime()
 		idle_time:setHMSms(0, 5, 0, 0)
 		update_time = game.get_game_time() + idle_time
-		--printf("CArenaext:update(30sec_update_done)")
 		if id > 0 then	
 			id = xr_logic.pstor_retrieve(db.actor, "aem_id")
 			npc = sim:object(id)
@@ -1008,7 +979,6 @@ function CArenaext:update()
 	if db.actor:has_info("aem_startup") then
 		if db.actor:has_info("aem_open") then
 			if db.actor:has_info("aem_done") then
-				--printf("CArenaext:update(~aem_open)")
 				self.nt = time_get_next(curr + 1) -- хотя бы часовой перерыв
 				xr_logic.pstor_store(db.actor, "aem_nt", self.nt)
 				db.actor:disable_info_portion("aem_done")
@@ -1026,7 +996,6 @@ function CArenaext:update()
 				db.actor:dont_has_info("bar_arena_fight") and
 				db.actor:dont_has_info("aem_fight_wait")
 			then
-				--printf("CArenaext:update(~aem_open)")
 				self.nt = time_get_next(curr + 1) -- хотя бы часовой перерыв
 				xr_logic.pstor_store(db.actor, "aem_nt", self.nt)
 				db.actor:disable_info_portion("aem_open")
@@ -1042,7 +1011,6 @@ function CArenaext:update()
 			end
 		else
 			if curr >= self.nt then
-				--printf("CArenaext:update(aem_open)")
 				db.actor:give_info_portion("aem_open")
 				db.actor:disable_info_portion("aem_go_bar")
 			elseif (curr + 3 >= self.nt) and (self.lt + 3 < self.nt) then
@@ -1086,7 +1054,6 @@ end
 -------
 function CArenaext:start(phr_id)
 	local name = self:fight_by_phrase(phr_id)
-	--printf("CArenaext:start('%s')", name)
 
 	-- запоминаем имя боя
 	xr_logic.pstor_store(db.actor, "aem_cr", name)
@@ -1238,7 +1205,6 @@ end
 -------
 function CArenaext:finish()
 	local name = self:current()
-	--printf("CArenaext:finish('%s')", name)
 	local info = self.fights[name]
 
 	-- бой окончен, пометим это и кое-что ещё
@@ -1286,7 +1252,6 @@ end
 function CArenaext:close()
 	local name = self:current()
 	--log1("Current Fight "..tostring(name))
-	--printf("CArenaext:close('%s')", name)
 	local info = self.fights[name]
 	
 	if info then
@@ -1485,7 +1450,6 @@ end
 -- создаётся диалог актера, в котором будут выдаваться задания
 -------
 function CArenaext:dlg_init(dlg)
-	--printf("CArenaext:dlg_init(...)")
 
 	local phr = dlg:AddPhrase("aem_job_quest", chk_ver(0), chk_ver(-1), -10000)
 	local phr_script = phr:GetPhraseScript()
@@ -1522,7 +1486,6 @@ end
 -- добавляет в диалог группу обычных боёв
 -------
 function CArenaext:dlg_init_group(dlg, name, parent)
-	--printf("CArenaext:dlg_init_group('%s')", name)
 
 	local group = self.groups[name]
 	local dlg_id = group.dlg_id
@@ -1546,7 +1509,6 @@ end
 -- добавляет в диалог один обычный бой
 -------
 function CArenaext:dlg_init_fight(dlg, name, parent)
-	--printf("CArenaext:dlg_init_fight('%s')", name)
 
 	local fight = self.fights[name]
 	local dlg_id = fight.dlg_id
@@ -1643,7 +1605,6 @@ end
 -- добавляет в диалог группу stakes
 -------
 function CArenaext:dlg_init_stakes(dlg, parent)
-	--printf("CArenaext:dlg_init_stakes()")
 
 	local group = self.groups["stakes"]
 	local dlg_id = group.dlg_id
@@ -1675,7 +1636,6 @@ end
 -- добавляет в диалог один бой stakes
 -------
 function CArenaext:dlg_init_stakes_fight(dlg, name1, name2, parent, dlg_id)
-	--printf("CArenaext:dlg_init_stakes_fight('%s vs %s')", name1, name2)
 
 	local team1 = self.teams[name1]
 	local team2 = self.teams[name2]
@@ -1715,7 +1675,6 @@ end
 -- добавляет в диалог группу turnament
 -------
 function CArenaext:dlg_init_turnament(dlg, parent)
-	--printf("CArenaext:dlg_init_turnament()")
 
 	local group = self.groups["turnament"]
 	local dlg_id = group.dlg_id
@@ -1748,7 +1707,6 @@ end
 -- добавляет в диалог один бой turnament
 -------
 function CArenaext:dlg_init_turnament_fight(dlg, name1, name2, parent, dlg_id)
-	--printf("CArenaext:dlg_init_turnament_fight('%s vs %s')", name1, name2)
 
 	local team1 = self.teams[name1]
 	local team2 = self.teams[name2]
@@ -1933,13 +1891,11 @@ end
 -- void put_items_to_box(game_object box, {["section1"]=true, ["section2"]=true, ...} items)
 -------
 function put_items_to_box(box, items)
-	--printf("put_items_to_box('%s')", box:name())
 	local obj
 	local cnt = db.actor:object_count()
 	for i=0, cnt-1 do
 		obj = db.actor:object(i)
 		if obj and items[obj:section()] == true then
-			--printf(" section='%s'", obj:section())
 			db.actor:transfer_item(obj, box)
 		end
 	end
@@ -1950,14 +1906,12 @@ end
 -- void put_items_to_box_exept(game_object box, {["section1"]=true, ["section2"]=true, ...} exept)
 -------
 function put_items_to_box_exept(box, exept)
-	--printf("put_items_to_box_exept('%s')", box:name())
 	local obj
 	local cnt = db.actor:object_count()
 	for i=0, cnt-1 do
 		obj = db.actor:object(i)
 		if obj and obj:clsid() ~= clsid.equ_stalker_s then -- оставить ГГ костюм
 			if exept[obj:section()] ~= true then
-				--printf(" section='%s'", obj:section())
 				db.actor:transfer_item(obj, box)
 			end
 		end
@@ -1969,13 +1923,11 @@ end
 -- void get_items_from_box(game_object box)
 ------
 function get_items_from_box(box)
-	--printf("get_items_from_box('%s')", box:name())
 	local obj
 	local ids = enum_box_items(box)
 	for i, id in pairs(ids) do
 		obj = level.object_by_id(id)
 		if obj ~= nil then
-			--printf(" section='%s'", obj:section())
 			box:transfer_item(obj, db.actor)
 		end
 	end
@@ -1986,13 +1938,11 @@ end
 -- void clear_items({["section1"]=true, ["section2"]=true, ...} items)
 -------
 function clear_items(items)
-	--printf("clear_items()")
 	local obj
 	local cnt = db.actor:object_count()
 	for i=0, cnt-1 do
 		obj = db.actor:object(i)
 		if obj and items[obj:section()] == true then
-			--printf(" section='%s'", obj:section())
 			local sobj = sim:object(obj:id())
 			if sobj then
 				sim:release(sobj, true)
@@ -2006,7 +1956,6 @@ end
 -- void clear_box(game_object box)
 -------
 function clear_box(box)
-	--printf("clear_box('%s')", box:name())
 	local obj
 	local ids = enum_box_items(box)
 	for i, id in pairs(ids) do

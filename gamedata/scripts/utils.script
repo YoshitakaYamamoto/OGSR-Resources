@@ -199,11 +199,9 @@ end
 
 -- a | b | c  ==>  { 1 = "a", 2 = "b", 3 = "c" }
 function parse_params(params)
-	--printf("_bp: parse_params: params=%s", params)
 	local rslt = {}
 	local n = 1
 	for fld in string.gmatch(params, "%s*([^|]+)%s*") do
-		--printf("_bp: parse_params iter=%d, fld=%s", n, fld)
 		rslt[n] = fld
 		n = n + 1
 	end
@@ -345,7 +343,6 @@ function parse_data_1v(npc,s)
 
     if s then
 		for name in string.gmatch( s, "(%|*%d+%|[^%|]+)%p*" ) do
---			printf("[%s]", utils.to_str(name))
 			local dat = {	dist = nil,
 							state = nil}	
 			
@@ -354,7 +351,6 @@ function parse_data_1v(npc,s)
 			local dist = string.sub( name, 1, t_pos - 1 )
 			local state	= string.sub( name, t_pos + 1)
 		
---			printf("	[%s]=[%s][%s]", utils.to_str(dist), utils.to_str(state), utils.to_str(sound))
 			dat.dist = tonumber(dist)
 			if state then
 				dat.state = xr_logic.parse_condlist(npc, dist, state, state)

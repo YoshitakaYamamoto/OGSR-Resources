@@ -1,14 +1,5 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
-
-local total_debug = ogse_debug.verbose_debug
-
-function write_log(str)
-	if total_debug then
-		log1(str)
-	end
-end
-
 --' ПЕРЕМЕЩЕНИЕ
 --' мы уже находимся в необходимом состоянии?
 class "eva_state_mgr_movement" (property_evaluator)
@@ -16,10 +7,7 @@ function eva_state_mgr_movement:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_movement:evaluate()
---	printf("MOVE: %s",utils.to_str((state_lib.states[self.st.target_state].movement == nil) or
 --		   (state_lib.states[self.st.target_state].movement == self.object:target_movement_type())))
---	printf("MOVE: %s",utils.to_str(self.object:target_movement_type()))
-	write_log("~~STATEMGR_move_eva_1")	   
 	return (state_lib.states[self.st.target_state].movement == nil) or
 		   (state_lib.states[self.st.target_state].movement == self.object:target_movement_type())
 --		   (state_lib.states[self.st.target_state].movement == self.object:movement_type())		   
@@ -30,7 +18,6 @@ function eva_state_mgr_movement_walk:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_movement_walk:evaluate()
-write_log("~~STATEMGR_move_eva_2")	 
 	return state_lib.states[self.st.target_state].movement == move.walk
 end
 --' нужно ли нам бежать
@@ -39,7 +26,6 @@ function eva_state_mgr_movement_run:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_movement_run:evaluate()
-write_log("~~STATEMGR_move_eva_3")	 
 	return state_lib.states[self.st.target_state].movement == move.run
 end
 --' нужно ли нам стоять
@@ -48,7 +34,6 @@ function eva_state_mgr_movement_stand:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_movement_stand:evaluate()
-write_log("~~STATEMGR_move_eva_4")	 
 	return state_lib.states[self.st.target_state].movement == move.stand
 end
 --' стоим ли мы
@@ -57,7 +42,6 @@ function eva_state_mgr_movement_stand_now:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_movement_stand_now:evaluate()
-write_log("~~STATEMGR_move_eva_5")	 
 	return self.object:target_movement_type() == move.stand
 --	return self.object:movement_type() == move.stand
 end
@@ -71,13 +55,8 @@ end
 function act_state_mgr_movement_walk:initialize()
 	
 	action_base.initialize(self)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- WALK", tostring(self.object:movement_type()))
-	write_log("~~STATEMGR_move_1")
 	self.object:set_movement_type(move.walk)
-	write_log("~~STATEMGR_move_1_end")
-	--printf("ENABLING MOVEMENT ")
 	--'self.object:movement_enabled(true)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- WALK", tostring(self.object:movement_type()))
 end
 function act_state_mgr_movement_walk:execute()
 	action_base.execute(self)
@@ -92,13 +71,8 @@ function act_state_mgr_movement_run:__init(name, st) super (nil, name)
 end
 function act_state_mgr_movement_run:initialize()
 	action_base.initialize(self)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- RUN", tostring(self.object:movement_type()))
-	write_log("~~STATEMGR_move_2")
 	self.object:set_movement_type(move.run)
-	write_log("~~STATEMGR_move_2_end")
---	printf("ENABLING MOVEMENT !!!!!")
 	--'self.object:movement_enabled(true)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- RUN", tostring(self.object:movement_type()))
 end
 function act_state_mgr_movement_run:execute()
 	action_base.execute(self)
@@ -113,10 +87,7 @@ function act_state_mgr_movement_stand:__init(name, st) super (nil, name)
 end
 function act_state_mgr_movement_stand:initialize()
 	action_base.initialize(self)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- stand", tostring(self.object:movement_type()))
-	write_log("~~STATEMGR_move_3")
 	self.object:set_movement_type(move.stand)
-	write_log("~~STATEMGR_move_3_end")
 end
 
 function act_state_mgr_movement_stand:execute()
@@ -145,7 +116,6 @@ function act_state_mgr_movement_stand_turn:initialize()
 	action_base.initialize(self)
 	
 	state_mgr_direction.turn(self.object, self.st)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- stand", tostring(self.object:movement_type()))	
 	self.object:set_movement_type(move.stand)
 	
 	
@@ -168,9 +138,7 @@ end
 function act_state_mgr_movement_stand_search:initialize()
 
 	action_base.initialize(self)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- stand", tostring(self.object:movement_type()))
 	self.object:set_movement_type(move.stand)
-	printf("SET_SIGHT!!!act_state_mgr_movement_stand_search:initialize()")
 	self.object:set_sight(state_mgr_direction.look_position_type(self.object, self.st), nil, 0)
 
 end
@@ -189,11 +157,8 @@ function act_state_mgr_movement_walk_turn:__init(name, st) super (nil, name)
 end
 function act_state_mgr_movement_walk_turn:initialize()
 	action_base.initialize(self)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- WALK", tostring(self.object:movement_type()))
 	self.object:set_movement_type(move.walk)
---	printf("ENABLING MOVEMENT !!!!!")
 	--'self.object:movement_enabled(true)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- WALK", tostring(self.object:movement_type()))
 	state_mgr_direction.turn(self.object, self.st)
  
 end
@@ -213,12 +178,8 @@ function act_state_mgr_movement_walk_search:__init(name, st) super (nil, name)
 end
 function act_state_mgr_movement_walk_search:initialize()
 	action_base.initialize(self)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- WALK", tostring(self.object:movement_type()))
 	self.object:set_movement_type(move.walk)
---	printf("ENABLING MOVEMENT !!!!!")
 	--'self.object:movement_enabled(true)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- WALK", tostring(self.object:movement_type()))
-	printf("SET_SIGHT!!!act_state_mgr_movement_walk_search:initialize()")
 	self.object:set_sight(state_mgr_direction.look_position_type(self.object, self.st), nil, 0)
 	
 end
@@ -238,11 +199,8 @@ function act_state_mgr_movement_run_turn:__init(name, st) super (nil, name)
 end
 function act_state_mgr_movement_run_turn:initialize()
 	action_base.initialize(self)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- RUN", tostring(self.object:movement_type()))
 	self.object:set_movement_type(move.run)
---	printf("ENABLING MOVEMENT !!!!!")
 	--'self.object:movement_enabled(true)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- RUN", tostring(self.object:movement_type()))
 	state_mgr_direction.turn(self.object, self.st)
  
 end
@@ -262,12 +220,8 @@ function act_state_mgr_movement_run_search:__init(name, st) super (nil, name)
 end
 function act_state_mgr_movement_run_search:initialize()
 	action_base.initialize(self)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- RUN", tostring(self.object:movement_type()))
 	self.object:set_movement_type(move.run)
---	printf("ENABLING MOVEMENT !!!!!")
 	--'self.object:movement_enabled(true)
-	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- RUN", tostring(self.object:movement_type()))
-	printf("SET_SIGHT!!!act_state_mgr_movement_run_search:initialize()")
 	self.object:set_sight(state_mgr_direction.look_position_type(self.object, self.st), nil, 0)
 	
 end

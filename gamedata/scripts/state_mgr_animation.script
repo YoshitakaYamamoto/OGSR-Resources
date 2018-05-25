@@ -1,11 +1,11 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
 
-function write_log_3(npc, fmt, ...)
+function write_log_3(npc, ...)
 	if _sdata.GlobalEnable == true then
 		local target_obj = level.get_target_obj()
 		if target_obj and target_obj:id() == npc:id() then
-			log3(fmt, ...)
+			log3(...)
 		end
 	end
 end
@@ -693,7 +693,6 @@ end
 function animation:anim_callback()
 	write_log_3(self.npc, "~~STMGR[%s] animation_anim_callback_1", self.npc:name())
 	write_log_3(self.npc, "~~STMGR: anim callback [%s]", self.npc:animation_count())
-	--print_table(self.clb_settings)
 	-- ѕроходим по таблице, из 1 позиции вычитываем действий. ќстальные просто сдвигаем
 	local v = self.clb_settings[1]
 	

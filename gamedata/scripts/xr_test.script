@@ -31,7 +31,6 @@ function action_test_activity:__init (npc_name, action_name, storage) super(nil,
 end
 
 function action_test_activity:initialize()
-  --printf("_bp: action_test_activity: initialize")
   action_base.initialize(self)
   self.object:set_node_evaluator()
   self.object:set_path_evaluator()
@@ -40,7 +39,6 @@ function action_test_activity:initialize()
 
   self.move_mgr:initialize()
 
-  --printf("initiz")
   self.initialized = true
 
   self:reset_scheme()
@@ -48,7 +46,6 @@ end
 
 
 function action_test_activity:reset_scheme()
-  --printf("reset_scheme, initialized=%s", utils.to_str(self.initialized))
   if not self.initialized then
     return
   end
@@ -89,8 +86,6 @@ end
 --test binder
 ----------------------------------------------------------------------------------------------------------------------
 function add_to_binder(npc, ini, scheme, section, storage)
-    printf("________________________________________bind_stalker test")
-	printf("DEBUG: add_to_binder: scheme='%s', section='%s'", scheme, section)
       local operators  = {}
       local properties  = {}
 
@@ -127,9 +122,7 @@ end
 -- team [опционально] - команда для синхронизации
 --
 function set_scheme(npc, ini, scheme, section, gulag_name)
-  printf("DEBUG: set_scheme: scheme='%s', section='%s'", scheme, section)
   local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
-  printf("DEBUG: set_scheme: storage assigned")
 
   st.logic     = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 

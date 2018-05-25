@@ -108,49 +108,8 @@ function on_npc_enemy_callback( obj, enemy, result )
     return true
   end
 end
---------------------------------------------------------------------------------------------
 
-local debug_flag = false		-- включить отладочный вывод
 
-function printf(fmt, ...)
-	if debug_flag then
-		 ogse.send_tip(fmt)
-		local info = get_hud():GetCustomStatic("companion_hud")
-		if not info then
-			get_hud():AddCustomStatic("companion_hud", true)
-			info = get_hud():GetCustomStatic("companion_hud"):wnd()
-			info:SetText(fmt)
-		else
-			info = get_hud():GetCustomStatic("companion_hud"):wnd()
-			info:SetText(fmt)
-		end
-		log1("**XR_COMBAT_COMP: "..fmt)
-		 get_console():execute("flush")	
-	end
-end
-
-function prints(fmt, ...)
-	if debug_flag then
-		-- ogse.send_tip(fmt)
-		local info = get_hud():GetCustomStatic("companion_hud")
-		if not info then
-			get_hud():AddCustomStatic("companion_hud", true)
-			info = get_hud():GetCustomStatic("companion_hud"):wnd()
-			info:SetText(fmt)
-		else
-			info = get_hud():GetCustomStatic("companion_hud"):wnd()
-			info:SetText(fmt)
-		end
-		-- log1("**XR_COMBAT_COMP: "..fmt)
-		-- get_console():execute("flush")	
-	end
-end
-
-function write_log(...)
-	if debug_flag then
-		log3(...)
-	end
-end
 ----------------------------------------------------------------------------------------------------
 -- Настройки схемы
 ----------------------------------------------------------------------------------------------------
@@ -278,7 +237,6 @@ function process_enemy(npc, enemy)
 	-- проверка выбора врагом напарника или ГГ
 	-- данная функция помещается в апдейты монстров и неписей
 	if enemy and enemy.clsid and (IsStalker(enemy) or IsMonster(enemy)) and enemy:alive() and not xr_companion.is_companion(enemy:id()) then
-		write_log("!!!PROCESSING_%s RESULT IS_STK [%s] IS_MNSTR [%s] CHK [%s]", enemy:name(), enemy:is_stalker(), enemy:is_monster(), we_are_under_attack(enemy))
 		if we_are_under_attack(enemy) then
 			-- человек ты иль монструшка
 			register_as_target(enemy)
@@ -311,13 +269,11 @@ function we_are_under_attack(enemy)
 					local enemy_status = check_is_enemy_of_me_or_actor(npc, enemy)
 					local enemy_target = xrs_battle_ai.primary_target[enemy:id()]
 					if (target:id() == actor_id or (enemy_target and enemy_target == actor_id)) and not must_stay(npc) then
-						write_log("!!**XR_COMBAT_COMP: ACTOR BEST ENEMY OF %s ENEMY_STAT [%s]", enemy:name(), enemy_status)
 						if enemy_status then
 							return true
 						end						
 					end
 					if target:id() == npc:id() or (enemy_target and enemy_target == npc:id()) then
-						write_log("!!**XR_COMBAT_COMP: COMPANION BEST ENEMY OF %s ENEMY_STAT [%s]", enemy:name(), enemy_status)
 						if enemy_status then
 							return true
 						end				
@@ -332,7 +288,6 @@ function we_are_under_attack(enemy)
 end
 
 function register_as_target(enemy)
-	write_log("!!XR_COMBAT_COMP: REG_TARGET %s", enemy:name())
 	chk_comp = {}
 	local id = enemy:id()
 	if not targets_list[id] then
@@ -342,7 +297,6 @@ function register_as_target(enemy)
 				chk_comp[ids] = true
 			end
 		end
-		write_log("!!XR_COMBAT_COMP: REG_TARGET %s", enemy:name())
 		if chk_comp ~= {} then
 			for companion_id, v in pairs(chk_comp) do
 				if companion_id == id or enemy:is_actor() then
@@ -409,10 +363,6 @@ function reprioritize_targets(companion)
 	get_targets_from_memory(companion)
 	refresh_targets(companion)
 	
-	--
-	if debug_flag then
-		print_table_inlog_v2(targets_list, "TARGS>>")
-	end
 	-- На дистанциях выше 10 метров приоритет неписям, ближе 10 метров приоритет монстрам. При дистанции ниже пары метров объект сразу становится примари_таргет без вариантов. 
 	-- При варианте далее 10 метров проверяем видимость, приоритет видимому.
 	local last_weight 	= 1000
@@ -472,14 +422,10 @@ function reprioritize_targets(companion)
 	if primary_target ~= nil then
 		last_reprioritize = time_global()
 		xr_companion.being_attacked = true
-		if debug_flag then
-			write_log("--XR_COMBAT_COMP: Выбрана цель: %s", primary_target)
-		end
 		return
 	else
 		local deadman = have_fresh_deadman()
 		if deadman == false then
-			prints("Напарник: активные угрозы не обнаружены")
 			last_time_send = nil
 			last_enemy = nil
 			last_enemy_id = nil
@@ -500,7 +446,6 @@ function refresh_targets(companion)
 		if not targets_list[enemy_by_engine:id()] and (check_is_enemy_of_me_or_actor(companion, enemy_by_engine) or 
 		(xrs_battle_ai and (xrs_battle_ai.primary_target[enemy_by_engine:id()] and (xrs_battle_ai.primary_target[enemy_by_engine:id()] == companion_id or xrs_battle_ai.primary_target[enemy_by_engine:id()] == actor_id))))
 		then
-			write_log("!!**XR_COMBAT_COMP: WE'RE ENGINE ENEMY OF %s", enemy_by_engine:name())
 			register_as_target(enemy_by_engine)
 		end
 	end
@@ -584,10 +529,8 @@ function get_max_weapon_range(companion)
 			if sys_ini:section_exist(sect) and sys_ini:line_exist(sect, "max_radius") then
 				return sys_ini:r_float(sect, "max_radius")
 			elseif not sys_ini:section_exist(sect) then	
-				write_log("!!XR_COMBAT_COMP: WEAPON SECTION NOT EXIST [%s]", sect)
 				return 36.0
 			elseif not sys_ini:line_exist(sect, "max_radius") then	
-				write_log("!!XR_COMBAT_COMP: WEAPON RADIUS NOT EXIST [%s]", sect)
 				return 36.0
 			end
 		else
@@ -618,9 +561,6 @@ function combat_ranges(npc, enemy_is_npc)
 	if npc then
 		local wpn_check_max_range = get_max_weapon_range(npc)
 		if no_aggression(npc) then
-			if debug_flag then
-				write_log("##XR_COMBAT_COMP:: NO_AGGR_MODE")
-			end
 			if dont_touch_us then
 				-- не воюем пока не стукнули
 				if enemy_is_npc then
@@ -637,9 +577,6 @@ function combat_ranges(npc, enemy_is_npc)
 				end
 			end		
 		elseif low_aggression(npc) then
-			if debug_flag then
-				write_log("##XR_COMBAT_COMP:: LOW_AGGR_MODE")
-			end		
 			if dont_touch_us then
 				-- берем ближние цели
 				if enemy_is_npc then
@@ -657,9 +594,6 @@ function combat_ranges(npc, enemy_is_npc)
 			end
 		else
 		-- берем всех
-			if debug_flag then
-				write_log("##XR_COMBAT_COMP: NORMAL_MODE")
-			end		
 			if enemy_is_npc then
 				return low_range_npc_aggr, wpn_check_max_range
 			else
@@ -667,7 +601,6 @@ function combat_ranges(npc, enemy_is_npc)
 			end
 		end
 	else
-		write_log("!!XR_COMBAT_COMP: Функция рассчета расстояний не получила параметр npc!")
 		return 30, 150
 	end
 end
@@ -698,12 +631,7 @@ function set_weapons_fire(npc, enemy, weapon)
 
 		local type_of_fire = object.aim1
 
-		if use_raytrace then
-
-			if debug_flag then
-				write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE: %s", enemy:id())
-			end
-		
+		if use_raytrace then		
 			local be_pos = enemy:position()
 			local npc_pos = weapon:position()
 			local distance = npc_pos:distance_to(be_pos)
@@ -724,41 +652,21 @@ function set_weapons_fire(npc, enemy, weapon)
 			local dist = distance+1
 			local res = level.ray_query(aim_point, dir_enemy, dist, rq_target.rqtBoth, npc)
 			local obj = res.object
-
-			if debug_flag then
-				write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_PREPARED: %s", enemy:id())
-			end			
 			
 			if obj then
-			
-				if debug_flag then
-					write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_PHASE_1: %s", enemy:id())
-				end			
 				
 				if obj and obj:id() == enemy:id() then
 					type_of_fire = object.fire1
-					if debug_flag then
-						write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_SUCCESS: %s", enemy:id())
-					end
 				else
 					if obj then
 						if check_is_enemy_of_me_or_actor(npc, obj) and not obj:is_actor() then
 							type_of_fire = object.fire1
-							if debug_flag then
-								write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_FAIL_BUT_VALID_TARGET: %s", obj:id())
-							end
 						else
 							type_of_fire = object.aim1
-							if debug_flag then
-								write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_FAIL_ACTOR_OR_FRIENDLY: %s", obj:id())
-							end
 						end
 					else
 						if npc:see(enemy) then
 							type_of_fire = object.fire1
-							if debug_flag then
-								write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_FAIL_TRY_TO_SEE: %s", enemy:id())
-							end
 						end
 					end
 				end
@@ -766,15 +674,9 @@ function set_weapons_fire(npc, enemy, weapon)
 			else	
 				-- если рейтрейс не вернул результат
 				type_of_fire = object.fire1
-				if debug_flag then
-					write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_ERROR: %s", enemy:id())
-				end				
 			end			
 	
 		else
-			if debug_flag then
-				write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_CHECK_RAYTRACE_OFF: %s", enemy:id())
-			end		
 			type_of_fire = object.fire1
 		end
 	
@@ -1059,27 +961,17 @@ function find_cover(npc, enemy, mode)
 				move_speed = 2.5
 			end
 			local move_time = dist_to_cover / move_speed
-			if debug_flag then
-				write_log("--!!XR_COMBAT_COMP: УКРЫТИЕ %s ДИСТАНЦИЯ: %s ВРЕМЯ НА ПУТЬ: %s", cover_vertex, dist_to_cover, move_time)
-			end
 			if locked_actor_vertex and cover_vertex == locked_actor_vertex then
-				if debug_flag then
-					write_log("!!XR_COMBAT_COMP: Напарник не нашёл подходящего укрытия, оно занято ГГ")
-				end	
 				return select_position(npc, nil, true)
 			end
 			last_time_send = time_global() + move_time + time_to_hide
 			last_hideout = cover_vertex
 			return cover_vertex
 		else	
-			if debug_flag then
-				write_log("!!XR_COMBAT_COMP: Напарник не нашёл подходящего укрытия")
-			end	
 			return select_position(npc, nil, true)
 		end
 		
 	else
-		write_log("!!XR_COMBAT_COMP: find_cover не найден параметр npc или enemy")
 		return nil
 	end
 	
@@ -1089,9 +981,6 @@ end
 function combat_send(npc, assist_point)
 	if assist_point then
 		utils.send_to_nearest_accessible_vertex(npc, assist_point)
-		if debug_flag then
-			write_log("!!XR_COMBAT_COMP: Напарник ОТПРАВЛЕН К МЕСТУ")
-		end
 	end
 end
 
@@ -1195,9 +1084,6 @@ function in_hideout(npc)
 		local hideout_pos = level.vertex_position(last_hideout)
 		local distance_to_cover = npc_pos:distance_to(hideout_pos)
 		if distance_to_cover < 3 or npc_vert == last_hideout then
-			if debug_flag then
-				prints("Напарник сидит в укрытии")
-			end
 			return true
 		end
 	end
@@ -1331,9 +1217,6 @@ function action_combat_activity:execute()
 		enemy = level.object_by_id(primary_target)	-- получим объект цели
 	end
 	if not enemy and deadman == false then
-		if debug_flag then
-			write_log("!!XR_COMBAT_COMP: COMPANION_COMBAT_NO_TARGET: %s", primary_target)
-		end
 		last_time_send = nil
 		last_enemy = nil
 		last_enemy_id = nil
@@ -1347,7 +1230,6 @@ function action_combat_activity:execute()
 	-- получим текущее оружие
 	local weap_lost, vtx, lost_id = xr_companion.check_lost_weapon(self.object)
 	if weap_lost then
-		printf("Напарник выронил оружие, попробует подобрать")
 		assist_point = vtx
 		local last_weapon_obj = level.object_by_id(lost_id)
 		if last_weapon_obj and self.object:position():distance_to(last_weapon_obj:position()) > 1.3 then
@@ -1375,7 +1257,6 @@ function action_combat_activity:execute()
 	if not bw then bw = self.object:best_weapon() end
 	
 	if not bw and enemy then 
-		printf("Напарник совсем без оружия "..enemy:name())
 		set_combat_state(self.object, enemy, true, true, true)
 		if ( enemy:is_stalker() or enemy:is_actor() ) then
 			assist_point = find_cover(self.object, enemy, 0)
@@ -1396,15 +1277,8 @@ function action_combat_activity:execute()
 			set_combat_sight(self.object, deadman_target, bw)
 			self.object:set_item(object.aim1, bw)
 			defensive_send(self.object, deadman_target, stay)
-			if debug_flag and last_mode ~= 4 then
-				printf("РЕЖИМ5 = Напарник завершает схему боевки, таймаут 6 секунд")
-				last_enemy = nil
-				last_enemy_id = nil
-				last_mode = 4
-			end
 			return			
 		else
-			printf("Работа боевки напарника завершена. Код выхода 1")
 			last_target[deadman] = nil
 			last_time_send = nil
 			last_enemy = nil
@@ -1442,18 +1316,12 @@ function action_combat_activity:execute()
 		
 		self.object:set_relation(game_object.enemy, enemy)		
 		self.object:set_item(object.aim2, bw)
-		
-		if debug_flag then
-			printf("Напарник избрал целью "..enemy:name())
-		end
-		
 	end
 	
 	-- переключение между целями
 	
 	if change_flag or change_time > time_global() then
 	
-		printf("Напарник переключается на врага "..enemy:name())
 		set_combat_state(self.object, enemy, true, true, in_ambush(self.object))
 		set_combat_sight(self.object, enemy, bw)
 		-- set_weapons_fire(self.object, enemy, bw)
@@ -1476,10 +1344,6 @@ function action_combat_activity:execute()
 		-- если видим врага
 		if have_seen then
 			local mode = 0
-			if debug_flag and last_mode ~= mode then
-				printf("РЕЖИМ1 = Напарник видит цель и цель видит его")
-				last_mode = mode
-			end
 			if math.random() < sound_prob and not in_ambush(self.object) then
 				xr_sound.set_sound(self.object, "fight_enemy")
 			end
@@ -1495,10 +1359,6 @@ function action_combat_activity:execute()
 			combat_send(self.object, assist_point)
 		else
 			local mode = 1
-			if debug_flag and last_mode ~= mode then
-				printf("РЕЖИМ2 = Напарник видит цель и цель НЕ видит его")
-				last_mode = mode
-			end
 			if math.random() < sound_prob and not in_ambush(self.object) then
 				xr_sound.set_sound(self.object, "fight_attack")
 			end		
@@ -1518,10 +1378,6 @@ function action_combat_activity:execute()
 		-- если не видим врага
 		if have_seen then
 			local mode = 2
-			if debug_flag and last_mode ~= mode then
-				printf("РЕЖИМ3 = Напарник НЕ видит цель и цель видит его")
-				last_mode = mode
-			end
 			if math.random() < sound_prob and not in_ambush(self.object) then
 				xr_sound.set_sound(self.object, "fight_enemy")
 			end			
@@ -1537,10 +1393,6 @@ function action_combat_activity:execute()
 			combat_send(self.object, assist_point)
 		else
 			local mode = 3
-			if debug_flag and last_mode ~= mode then
-				printf("РЕЖИМ4 = Напарник НЕ видит цель и цель НЕ видит его")
-				last_mode = mode
-			end
 			if math.random() < sound_prob and not in_ambush(self.object) then
 				xr_sound.set_sound(self.object, "fight_search")
 			end			
@@ -1556,11 +1408,6 @@ function action_combat_activity:execute()
 			end
 			
 		end	
-	end
-	
-	if debug_flag and (not last_enemy or (last_enemy and last_enemy ~= enemy:name())) then
-		printf("Напарник ведёт огонь по "..enemy:name())
-		last_enemy = enemy:name()
 	end
 end
 
@@ -1685,7 +1532,6 @@ function enable_scheme(npc, ini)
 	if st then
 		if tostring(flag) == "1" then
 			st.enabled = true
-			write_log("--XR_COMBAT_COMP: Схема боёвки напарника включена для %s", npc:name())
 		else
 			st.enabled = false
 		end

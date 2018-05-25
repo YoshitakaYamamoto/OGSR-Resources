@@ -1141,7 +1141,6 @@ function is_from_novice_village(actor, npc)
 	--log3("gulag = %s", tostring(gl and gl.name or "none"))
 	if gl and gl.name == "esc_lager" and string.find(npc:name(), "esc_lager") then
 		--local job = gl:getJob(npc:id())
-		--print_table_inlog(job)
 		--local ex =  not not gl.npc_info[npc:id()].exclusive
 		--log3("exclusive: %s", ex)
 		return true

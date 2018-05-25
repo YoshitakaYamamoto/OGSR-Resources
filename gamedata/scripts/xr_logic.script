@@ -146,7 +146,6 @@ function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_n
 	else
 		local filename = utils.cfg_get_string(ini, section_logic, "cfg", npc, false, "")
 		if filename then
-      -- printf("_bp: enable_scripts: object '%s' has external configuration file '%s'", npc:name(), filename)
 			-- Рекурсивно обработать конфигурационный файл, на который ссылается поле cfg
 			actual_ini_filename = filename
 			actual_ini = dsh.cached_ini_file(filename)
@@ -159,7 +158,6 @@ function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_n
 			end
 			--]]
 		else
-      -- printf("_bp: enable_scripts: object '%s' has NO external configuration file, using '%s'", npc:name(), ini_filename)
 			actual_ini_filename = ini_filename
 			actual_ini = ini
 		end
@@ -304,7 +302,6 @@ function enable_generic_schemes(ini, npc, stype, section)
 
 		local combat_ignore_section = utils.cfg_get_string(ini, section, "combat_ignore", npc, false, "")
 		if combat_ignore_section then
-			-- printf("combat_ignore_section= '%s'", combat_ignore_section )
 			xr_combat_ignore.set_combat_ignore_checker(npc, ini, "combat_ignore", combat_ignore_section)
 		end
 
@@ -336,7 +333,6 @@ function enable_generic_schemes(ini, npc, stype, section)
 
 	elseif stype == modules.stype_item then
 		local hit_section = utils.cfg_get_string(ini, section, "on_hit", npc, false, "")
-    -- printf("HIT SECTION [%s]", tostring(hit_section))
 		if hit_section then
 			ph_on_hit.set_scheme(npc, ini, "ph_on_hit", hit_section)
 		end
@@ -406,7 +402,6 @@ function activate_by_section(npc, ini, section, loading)
 			abort("xr_logic: can't call %s.set_scheme() - a nil value", filename)
 		end
 		_G[filename].set_scheme(npc, ini, scheme, section, db.storage[npc_id]["gulag_name"])
-		--printf("DEBUG: activate_by_section: scheme '%s' activated from section '%s'", scheme, section)
 		db.storage[npc_id].active_section = section
 		db.storage[npc_id].active_scheme = scheme
 
@@ -429,7 +424,6 @@ end
 --	новой схемы.
 --]]
 function reset_generic_schemes_on_scheme_switch(npc, scheme, section)
-	-- printf("_bp: reset_generic_schemes_on_scheme_switch: npc:name()='%s'", npc:name())
 	local st = db.storage[npc:id()]
 
 	if not st.stype then return end
@@ -471,7 +465,6 @@ end
 function assign_storage_and_bind(npc, ini, scheme, section)
 	local npc_id = npc:id()
 	local st
-	-- dbglog("DEBUG: assign_storage_and_bind: bind scheme for %s: '%s'", npc:name(), scheme)
 
 	if not db.storage[npc_id][scheme] then
 		db.storage[npc_id][scheme] = {}
@@ -480,7 +473,6 @@ function assign_storage_and_bind(npc, ini, scheme, section)
 		st["npc"] = npc
 
 		-- Схема стартует впервые - прибиндить
-		--printf("DEBUG: assign_storage_and_bind: bind scheme: '%s'", scheme)
 		_G[schemes[scheme]].add_to_binder(npc, ini, scheme, section, st)
 	else
 		st = db.storage[npc_id][scheme]
@@ -494,7 +486,6 @@ function assign_storage_and_bind(npc, ini, scheme, section)
 end
 
 function subscribe_action_for_events(npc, storage, new_action)
-	--printf("DEBUG: registering new action for reset event (npc:name() = '%s')", npc:name())
 
 	if not storage.actions then
 		storage.actions = {}
@@ -790,18 +781,15 @@ function parse_condlist(npc, section, field, src)
 	-- 1) Разбиваем на разделенные запятыми части:
 	local at, to, infop_check_lst, remainings, infop_set_lst, newsect
 
-	--printf("_bp: src = %s", src)
 
 	local n = 1
 	for fld in string.gmatch(src, "%s*([^,]+)%s*") do
 		-- Здесь fld это набор infoportions в {} и имя секции, на которую переключиться.
 		lst[n] = {}
-		--printf("_bp: iter %d: fld = %s", n, fld)
 
 		-- Выделяем список infoportions для проверки:
 		at, to, infop_check_lst = string.find(fld, "{%s*(.*)%s*}")
 		if infop_check_lst then
-			--printf("_bp: infop_check_lst: [%s]", infop_check_lst)
 
 			-- Выделяем оставшуюся часть поля, т.е. имя секции плюс список infoportions для установки:
 			remainings = string.sub(fld, 1, at - 1) .. string.sub(fld, to + 1)
@@ -809,7 +797,6 @@ function parse_condlist(npc, section, field, src)
 			-- Список infoportions для проверки не был задан, следовательно, ничего не удаляем:
 			remainings = fld
 		end
-		--printf("_bp: remainings: %s", remainings)
 
 		-- Выделяем список infoportions для установки из remainings:
 		at, to, infop_set_lst = string.find(remainings, "%%%s*(.*)%s*%%")
@@ -820,7 +807,6 @@ function parse_condlist(npc, section, field, src)
 			-- Список infoportions для установки не был задан, следовательно, remainings и есть имя секции.
 			newsect = remainings
 		end
-		--printf("_bp: newsect: %s", newsect)
 
 		-- И сразу trim имя секции:
 		at, to, newsect = string.find(newsect, "%s*(.*)%s*")
