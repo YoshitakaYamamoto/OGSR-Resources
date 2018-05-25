@@ -43,8 +43,6 @@ local targets = {}
 local can_fire				= {}
 local objects				= {}
 
-local debug_output = false
-
 local reprioritize_timeout = 500 	-- интервал реприоретизации, мсек - нельзя делать слишком низким - будет судорожно метаться между целями
 local memory_timeout = 60000		-- время, сколько помнить о появлении врага, миллиссекунд
 local combat_mult_npc = 0.5			-- множитель веса ближней цели неписей
@@ -358,10 +356,6 @@ function reprioritize_targets(car)
 	
 	if primary_target ~= nil then
 		last_reprioritize = time_global()
-		--if debug_output then
-			--local obj = level.object_by_id(primary_target)
-			--log3("--BTR_SKYNET_COMBAT2: Выбрана цель: [%s]", obj:name())
-		--end
 		return
 	else
 		last_target = {}

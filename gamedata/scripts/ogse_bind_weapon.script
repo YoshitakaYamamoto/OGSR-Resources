@@ -19,8 +19,6 @@ function on_item_to_slot(item, sitem)
 	end
 end
 
-local write_debug_log = false
-
 function init(obj)
 	obj:bind_object(wpn_binder(obj))
 end
