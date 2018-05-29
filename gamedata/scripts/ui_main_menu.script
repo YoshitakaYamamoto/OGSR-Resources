@@ -20,10 +20,9 @@ function main_menu:__finalize()
 end
 
 local screen_aspect_ratio = 1.34
-function main_menu:InitBackground(xml)
+function main_menu:InitBackground()
 	local time = level.present() and level.get_time_hours() or tonumber(os.date("%H", os.time()))
 	local night = time <= 8 or time >= 20
-	self.bg_st = xml:InitStatic("back_movie", self)
 	self.bg_st:InitTexture(night and "ui\\ui_mm_night_back" or "ui\\ui_mm_main_back")
 	local multiplier = 0.5625
 	if screen_aspect_ratio > 2 then -- ultra-wide
@@ -42,7 +41,8 @@ function main_menu:InitControls()
 	self.xml = CScriptXmlInit()
 	self.xml:ParseFile("ui_mm_main.xml")
 	--
-	self:InitBackground(self.xml)
+	self.bg_st = self.xml:InitStatic("back_movie", self)
+	self:InitBackground()
 	---------------------------------------------------------------
 	if level.present() and not press_any_key_on_start then
 		self.start_btn = self.xml:InitStatic("txt_press_any_key", self)
