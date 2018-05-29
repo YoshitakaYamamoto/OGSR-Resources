@@ -1,10 +1,6 @@
---[[
---Тест стектрейс коллекторов
-level.add_call(function() return true end, function() fail("err") end)
---]]
 
---log1(debug.traceback())
---collectgarbage("collect")
+--Тестовая сборка мусора при закрытии меню
+if level.present() then level.add_call(function() return true end, function() collectgarbage("collect") end) end
 
 --[=[
 --Вывод на карту НПС, которых создали респавнеры.
@@ -47,3 +43,5 @@ ogse.spawn_item_in_inv("wpn_addon_acog")
 ogse.spawn_item_in_inv("wpn_addon_scope_eotech")
 ogse.spawn_item_in_inv("wpn_addon_mag_mk6")
 --]=]
+
+--level.set_blender_mode_main(1) --Включить ночной режим для пнв в прицелах
