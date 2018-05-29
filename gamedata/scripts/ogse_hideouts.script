@@ -143,10 +143,13 @@ function update_shelter_icon()
 		end
 		hud:AddCustomStatic(static_name, true)
 	end
-	local st = hud:GetCustomStatic(static_name):wnd()
+	local st = hud:GetCustomStatic(static_name)
+	if not st then return end
+	--
+	local st_wnd = st:wnd()
 	local transparency_level = npc_inside_safe_zone(db.actor) and 200 or 0
 	local color = GetARGB(transparency_level,0,155,255)
-	st:SetColor(color)
+	st_wnd:SetColor(color)
 end
 
 
