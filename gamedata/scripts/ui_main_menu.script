@@ -213,14 +213,14 @@ function main_menu:OnKeyboard(dik, keyboard_action)
 			xpcall(function() dofile(getFS():update_path("$game_scripts$", "personal_test.lua")) end, log1)
 		elseif dik == DIK_keys.DIK_S then --Тестовый спавн
 			xpcall( function() dofile(getFS():update_path("$game_scripts$", "test_spawn.lua")) end, log1)
-			self:close_menu()
+			self:close_and_delete_menu()
 		elseif dik == DIK_keys.DIK_F3 then --Показать текущие координаты
 			if ogse.check_game() then
 				utils2.show_coordinates()
 			end
 		elseif dik == DIK_keys.DIK_W then -- настройка прицела
 			self:setup_wpn_position()
-			self:close_menu()
+			self:close_and_delete_menu()
 		elseif dik == DIK_keys.DIK_P then --SDATA
 			if ogse.check_game() then
 				if not _sdata.GlobalEnable then
