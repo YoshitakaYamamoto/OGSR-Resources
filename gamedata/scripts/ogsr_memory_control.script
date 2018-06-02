@@ -1,0 +1,28 @@
+-- KRodin: Этот скрипт периодически проверяет кол-во используемой луаджитом памяти.
+-- При достижении определённого значения, пишет в лог предупреждение, что где-то происходит утечка.
+-- Особенно актуально для x64 луаджита, т.к. для него, из-за его особенностей,
+-- при запуске игры выделяется 128 мб памяти, и соотв. больше этого кол-ва он использовать не сможет, и начнутся разнообразные вылеты.
+-- Но по факту из-за фрагментированности используемой памяти, вылеты начинаются уже на рубеже ~50 мб.
+-- В OGSR такого вроде как не должно быть, т.к. я все скрипты приводил в порядок, но на всякий случай пусть будет.
+
+local MEMORY_WARNING_AFTER = 45000 --Тесты показывают, что скрипты OGSR больше 45 мб потреблять не должны в процессе игры.
+local MEMORY_CHECK_INTERVAL = 60000 * 3 --Раз в три минуты реального времени проверять достаточно, я думаю.
+
+function attach( sm )
+	sm:subscribe({
+		signal = "on_update",
+		fun = function()
+			local memuse = collectgarbage("count")
+			log3("##[%s] MEMORY USAGE: [%d KB]", script_name():upper(), memuse)
+			if memuse > MEMORY_WARNING_AFTER then
+				collectgarbage("collect")
+				memuse = collectgarbage("count")
+				if memuse > MEMORY_WARNING_AFTER then
+					log3("!![%s] MEMORY LEAK FOUND! MEMORY USAGE: [%d KB]", script_name():upper(), memuse)
+				end
+			end
+			sm:reschedule( MEMORY_CHECK_INTERVAL )
+		end,
+		queued = true
+	})
+end
