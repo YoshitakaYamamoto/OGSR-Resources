@@ -209,10 +209,11 @@ end
 
 function save_load_dialog:OnListItemClickedSave()
 	local list_box = self:GetListWnd("list_window")
+	local edit_box = self:GetEditBox("edit_filename")
+	edit_box:SetText("")
 
 	if list_box:GetSize() == 0 then return end
 
-	local edit_box = self:GetEditBox("edit_filename")
 	local item_id = list_box:GetFocusedItem()
 	local item = list_box:GetItem(item_id)
 
