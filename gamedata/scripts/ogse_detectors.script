@@ -270,7 +270,7 @@ function on_key_down(key, bind)
 	if bind == key_bindings.kWPN_8 or wpn_binds[bind] then --Если нажали клавишу доставания чего-либо из слотов 1-8 (кроме 7, там доставать нечего)
 		if detector_hud_active then --Детектор в руках - значит убираем его
 			if bind == key_bindings.kWPN_8 then
-				db.actor:activate_slot(-1)
+				db.actor:activate_slot(255) --255 == u8(-1) ( константа NO_ACTIVE_SLOT )
 			end
 			start_slot_change_timer(function() --Запускаем таймер на время убирания детектора.
 				set_hud_tip_clean() --Удаляем подсказку с худа
