@@ -449,7 +449,7 @@ function CKampManager:updateNpc( npc )
       self.npc[ npc_id ].new = false
     end
     if npc:character_community() == "monolith" then
-      local t = math.mod( npc_id, 2 )
+      local t = math.fmod( npc_id, 2 )
       if t == 0 then
         state = "trans_0"
       else
@@ -458,7 +458,7 @@ function CKampManager:updateNpc( npc )
     elseif npc:character_community() == "zombied" then
       state = "trans_zombied"
     else
-      local t = math.mod( npc_id, 3 )
+      local t = math.fmod( npc_id, 3 )
       if t == 0 then
         state = "sit"
       elseif t == 1 then
@@ -470,7 +470,7 @@ function CKampManager:updateNpc( npc )
     kamp_stalkers[ npc_id ] = false
   elseif state == "trans" then
     if npc:character_community() == "monolith" then
-      local t = math.mod( npc_id, 2 )
+      local t = math.fmod( npc_id, 2 )
       if t == 0 then
         state = "trans_0"
       else
