@@ -45,32 +45,7 @@ local level_anoms = { --Локации, на которых можно респ�
 	l13_generators_ogse = { 45, 50},
 	l22_marsh		= {  15, 20}
 }
-local level_vertexes = { --Гейм-вертексы и левел-вертексы локаций
-	-- levels           	|    gvids  | lvids
-	l01_escape            = {   1,  259, 592836}, --l01_escape            = {   0,  259, 592836},
-	l02_garbage           = { 260,  423, 394972},
-	l03_agroprom          = { 424,  712, 438013},
-	--l03u_agr_underground  = { 713,  821,      5170},
-	l04_darkvalley        = { 822, 1120, 391084},
-	--l04u_labx18           = {1121, 1179,      8308},
-	l05_bar               = {1180, 1328, 120422},
-	l06_rostok            = {1329, 1461,  68382},
-	l08_yantar	          = {1462, 1561, 155448},
-	--l08u_brainlab         = {1562, 1608,      12614},
-	l07_military          = {1609, 1928, 421596},
-	l10_radar             = {1929, 2184, 227462},
-	--l10u_bunker           = {2789, 2920,      8817},
-	l11_pripyat           = {2185, 2347, 262315},
-	l12_stancia           = {2348, 2488, 481752},
-	--l12_stancia_2         = {2605, 2788, 609784},
-	--l12u_sarcofag         = {2489, 2554,      10685},
-	--l12u_control_monolith = {2555, 2604,      4000},
-	k01_darkscape_ogse	  = {2921, 3243, 1094047},
-	l09_deadcity_ogse	  = {3244, 3884, 783951},
-	l13_generators_ogse	  = {3885, 4177, 427806}, 
-	l22_marsh			  = {4178, 4394,  91518},
-	--l23_x9				  = {4395, 4416,      2859}
-}
+--
 local excluded_anoms = { --Секции и имена аномалий, которые запрещено удалять после выброса.
 --========================[Секции]=========================
 	--Секции жгучего пуха
@@ -765,7 +740,7 @@ function anom_update()
 		if anom_chek == 2 then --Требуется обновление после выброса
 			add_anom(k) --на текущей локации аномалии обновятся сразу, на остальных - будут обновлены только при переходе на локацию
 		elseif anom_chek == 1.5 and k == lname and not is_exclusion_location(k) then --Новые аномалии будут заспавнены только при переходе на локацию.
-			generate_anoms(k)
+			generate_anoms(lname)
 		end
 	end
 
@@ -861,7 +836,9 @@ end
 
 
 function anomaly_position_choice(lname)
-	local gvn, gvx, lvx = unpack(level_vertexes[lname])
+	ASSERT( lname == level.name(), "level.vertex_count() work only on current level!" )
+
+	local lvx = level.vertex_count() - 1
 	local new_lv, pos
 
 	repeat --Подбираем свободный level_vertex и position
@@ -874,16 +851,8 @@ function anomaly_position_choice(lname)
 		or bad_circle(pos, lname) --Места, в которых по каким-то причинам нельзя спавнить аномалии (лагеря, квестовые сцены и тд.). Настраиваются вручную.
 	)
 
-	local new_gv, min_dist = 0, 100000
-	for a = gvn, gvx do --Подбираем свободный game_vertex
-		local tmp = game_graph():vertex(a):level_point()
-		if tmp:distance_to(pos) < min_dist and game_graph():valid_vertex_id(a) then
-			min_dist = tmp:distance_to(pos)
-			new_gv = a
-		end
-	end
+	local new_gv = cross_table():vertex( new_lv ):game_vertex_id()
 
-	ASSERT(new_gv > 0, "Can't find free gvid!")
 	return pos, new_lv, new_gv
 end
 

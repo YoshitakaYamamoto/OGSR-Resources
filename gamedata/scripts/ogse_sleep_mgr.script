@@ -392,7 +392,7 @@ function surprise()
     end
   )
   local lname = level.name()
-  local lvx   = ogse.level_vertexes[ lname ]
+  local lvx   = level.vertex_count() - 1
   local lvids = {}
   for new_lv = 1, lvx do
     local pos  = level.vertex_position( new_lv )
