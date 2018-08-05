@@ -226,3 +226,11 @@ function copy_hit_data( hd, t )
   end
   return t
 end
+
+
+function my_name_is_strelok() --Вызывается по инфопоршню esc_find_doctor_done
+  db.actor:get_inventory_owner():SetName( "Стрелок" )
+  local sobj   = alife():object( db.actor:id() )
+  local trader = sobj:get_trader()
+  trader.character_name = "Стрелок"
+end
