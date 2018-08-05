@@ -12,7 +12,6 @@ function attach(sm)
 	sm:subscribe({ signal = "on_spawn",			fun = this.on_spawn })
 	sm:subscribe({ signal = "on_first_update",	fun = this.try_to_restart_nv_fx })
 	sm:subscribe({ signal = "on_key_down",		fun = this.call_pnv })
-	sm:subscribe({ signal = "on_take",			fun = this.on_take })
 	sm:subscribe({ signal = "on_item_to_slot",	fun = this.on_item_to_slot })
 	sm:subscribe({ signal = "on_sniper_mode",	fun = this.on_sniper_mode })
 	sm:subscribe({ signal = "off_sniper_mode",	fun = this.off_sniper_mode })
@@ -122,7 +121,6 @@ end
 
 function on_item_to_slot(obj)
 	chek_outfit_double_pnv(obj)
-	caching_scope(obj)
 end
 
 function on_sit_down_in_btr() --Залезли в БТР.
@@ -386,15 +384,6 @@ function get_highlight_wnd( texture )
 	return highlight_cache[ texture ]
 end
 
-function on_take( obj ) --при взятии прицела, если он есть в таблице tbl_sights_lighting, закэшируем текстуру подсветки его прицельной сетки.
-	if not obj:is_scope() then return end
-
-	local texture = tbl_sights_lighting[obj:section()]
-	if texture then
-		get_highlight_wnd( texture )
-	end
-end
-
 function get_active_scope_section( wpn ) --Получить секцию прицела
 	if not wpn then wpn = db.actor:active_item() end
 	if not wpn:is_weapon_magazined() then return end
@@ -404,16 +393,6 @@ function get_active_scope_section( wpn ) --Получить секцию при�
 		local sect       = wpn:section()
 		local scope_sect = get_string_wq( sect, "scope_name", nil )
 		if scope_sect then return scope_sect end
-	end
-end
-
-function caching_scope(obj) --Кэширование текстуры подсветки прицела оружия в руках после загрузки сейва (только если прицел есть в таблице tbl_sights_lighting)
-	local scope_sect = get_active_scope_section(obj)
-	if not scope_sect then return end --если не получили секцию прицела, то ничего не делаем.
-
-	local texture = tbl_sights_lighting[scope_sect]
-	if texture then
-		get_highlight_wnd( texture )
 	end
 end
 --********************************************************************************************************************************************
