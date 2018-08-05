@@ -106,18 +106,6 @@ function is_aiming_complete(wpn)
 	return wpn:get_weapon().zoom_rotation_factor >= 1
 end
 
--- функции получения и установки текущего увеличения для бинокля
-function get_binoc_rt_zoom_factor(obj)
-	local cls = get_clsid(obj)
-	ASSERT(cls == clsid.wpn_binocular or cls == clsid.wpn_binocular_s, "[get_binoc_rt_zoom_factor] object is not a binocular class")
-	obj:get_binoc_zoom_factor()
-end
-function set_binoc_rt_zoom_factor(obj, value)
-	local cls = get_clsid(obj)
-	ASSERT(cls == clsid.wpn_binocular or cls == clsid.wpn_binocular_s, "[set_binoc_rt_zoom_factor] object is not a binocular class")
-	obj:set_binoc_zoom_factor(value)
-end
-
 function set_condition_shot_dec( wpn, val )
   wpn:get_weapon().condition_shot_dec = val
 end

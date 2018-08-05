@@ -90,13 +90,6 @@ function wpn_binder:__init (obj) super(obj)
 	local obj_section = obj:section()
 	-- читаем единожды все данные, св€занные с секцией
 	self.is_gl = obj:is_weapon_gl()
-	local cls = get_clsid(obj)
-	self.is_binoc = (cls == clsid.wpn_binocular or cls == clsid.wpn_binocular_s)
-	if self.is_binoc then
-		self.scope_zoom_factor = get_float(obj_section, "scope_zoom_factor")
-		ASSERT(self.scope_zoom_factor, "[wpn_binder:__init] scope_zoom_factor is not defined in section '%s'", obj_section)
-		--log3("scope_zoom_factor = %5.2f", self.scope_zoom_factor)
-	end
 	self.extra_addon_flags = 0
 	if get_string(obj_section, "scope_mount_name") then
 		self.extra_addon_flags = self.extra_addon_flags + ogse_wpn_utils.addons_flags.scope_mount
@@ -152,9 +145,6 @@ function wpn_binder:init_addons(a)
 		--log3("wpn_binder:init_addons - %d", a)
 		for des_name,desc in pairs(self.addon_descriptors) do
 			if desc.extra_actions then desc.extra_actions(self.object, desc) end
-		end
-		if self.is_binoc then
-			ogse_wpn_utils.set_binoc_rt_zoom_factor(self.object, self.scope_zoom_factor)
 		end
 	end
 end
