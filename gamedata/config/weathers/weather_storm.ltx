@@ -1,3 +1,5 @@
+; -*- mode: conf-windows; coding: windows-1251-dos -*-
+
 [sect_storm_weather]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -53,7 +55,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-[storm_weather_00]			
+[storm_weather_def]
+tree_amplitude_intensity = 0.07
+
+[storm_weather_00]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10				
@@ -63,7 +68,7 @@ sky_rotation		=	0
 sky_color		=	0.082031, 0.082031, 0.082031
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.5013, 0.5013, 0.5013, 0.001, 0.001
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.000000, 0.000000, 0.000000
 fog_density		=	0.95
@@ -82,7 +87,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir		=	-28.200000, 0
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_01]
+[storm_weather_01]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -92,7 +97,7 @@ sky_rotation		=	0
 sky_color		=	0.082031, 0.082031, 0.082031
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.5013, 0.5013, 0.5013, 0.001, 0.001
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.000000, 0.000000, 0.000000
 fog_density		=	0.95
@@ -111,7 +116,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir		=	-26.543000, -14.870000
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_02]	
+[storm_weather_02]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10						
@@ -121,7 +126,7 @@ sky_rotation		=	0
 sky_color		=	0.26, 0.26, 0.26
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.5013, 0.5013, 0.5013, 0.001, 0.001
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.000000, 0.000000, 0.000000
 fog_density		=	0.95
@@ -140,7 +145,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir		=	-20.005000, -28.300000
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_03_00]		
+[storm_weather_03_00]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10					
@@ -150,7 +155,7 @@ sky_rotation		=	0
 sky_color		=	0.29, 0.29, 0.29
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.5013, 0.5013, 0.5013, 0.001, 0.001
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.000000, 0.000000, 0.000000
 fog_density		=	0.95
@@ -169,7 +174,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			= -9.569000, -38.800000	
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_03]					; rotation_fix_1
+[storm_weather_03]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -179,7 +184,7 @@ sky_rotation		=	0
 sky_color		=	0.26, 0.26, 0.26
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.4492, 0.4492, 0.4492, 0.001, 0.001
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.0000, 0.0000, 0.0000
 fog_density		=	0.95
@@ -198,7 +203,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-8.612100, -39.033333
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_04]					; rotation_fix_2	
+[storm_weather_04]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -208,7 +213,7 @@ sky_rotation	=	0
 sky_color		=	0.26, 0.26, 0.26
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.4492, 0.4492, 0.4492, 0.001, 0.001
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.0000, 0.0000, 0.0000
 fog_density		=	0.95
@@ -227,7 +232,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-7.655200, -39.266666
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_05]
+[storm_weather_05]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -237,7 +242,7 @@ sky_rotation		=	0
 sky_color		=	0.26, 0.26, 0.26
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.5013, 0.5013, 0.5013, 0.001, 0.001
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.0000, 0.0000, 0.0000
 fog_density		=	0.95
@@ -256,7 +261,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			= 	-6.698300, -39.500000	
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_06]								; sunrise_phase1
+[storm_weather_06]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -266,7 +271,7 @@ sky_rotation		=	0
 sky_color		=	0.30, 0.285, 0.315
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.7000, 0.6000, 0.9000, 0.400, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.0000, 0.0000, 0.0000
 fog_density		=	0.95
@@ -285,7 +290,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-2.000000, -42.338000
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_06_00]								; sunrise_phase1.5
+[storm_weather_06_00]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -295,7 +300,7 @@ sky_rotation		=	0
 sky_color		=	0.36, 0.34, 0.38
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.7000, 0.6000, 0.9000, 0.400, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.0000, 0.0000, 0.0000
 fog_density		=	0.95
@@ -314,7 +319,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			= 3.033000, -44.311000
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_06_01]								; sunrise_phase2
+[storm_weather_06_01]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -324,7 +329,7 @@ sky_rotation		=	0
 sky_color		=	0.4,    0.38,  0.42
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.7000, 0.6000, 0.9000, 0.400, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.0000, 0.0000, 0.0000
 fog_density		=	0.95
@@ -343,7 +348,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-1.709000, 110.383200
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_07]								; sunrise_phase3
+[storm_weather_07]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -353,7 +358,7 @@ sky_rotation		=	0
 sky_color		=	0.45, 0.435, 0.47
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.7000, 0.6000, 0.9000, 0.400, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.117188, 0.117188, 0.132813
 fog_density		=	0.95
@@ -372,7 +377,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-3.109000, 108.474300
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_07_00]
+[storm_weather_07_00]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -382,7 +387,7 @@ sky_rotation		=	0
 sky_color		=	0.46, 0.46, 0.46
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9000, 0.9000, 0.9000, 0.500, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.125000, 0.125000, 0.132813
 fog_density		=	0.95
@@ -394,6 +399,7 @@ bolt_period		=	3.5
 bolt_duration	=	0.3
 wind_velocity	=	200
 wind_direction	=	0.0
+tree_amplitude_intensity = 0.03
 ambient                    = 0.019531, 0.019531, 0.019531
 lmap_color		=	1.0,	1.0,	1.0
 hemi_color		= 0.429688, 0.441406, 0.460938
@@ -401,7 +407,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-10.680000, 99.040110
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_08]					
+[storm_weather_08]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -411,7 +417,7 @@ sky_rotation		=	0
 sky_color		=	0.46, 0.46, 0.46
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9000, 0.9000, 0.9000, 0.500, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.082031, 0.082031, 0.066406
 fog_density		=	0.95
@@ -423,6 +429,7 @@ bolt_period		=	10.0
 bolt_duration	=	0.3
 wind_velocity	=	200
 wind_direction	=	0.0
+tree_amplitude_intensity = 0.03
 ambient                    = 0.019531, 0.019531, 0.019531
 lmap_color		=	1.0,	1.0,	1.0
 hemi_color		= 0.406250, 0.421875, 0.441406
@@ -430,7 +437,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir 		= 	-20.160000, 87.593720
 env_ambient		=	ambient_env_rain
 
-[storm_weather_09]
+[storm_weather_09]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -440,7 +447,7 @@ sky_rotation		=	0
 sky_color		=	0.46, 0.46, 0.46
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9000, 0.9000, 0.9000, 0.500, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.082031, 0.082031, 0.066406
 fog_density		=	0.95
@@ -459,7 +466,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-29.570000, 75.338200
 env_ambient		=	ambient_env_rain
 
-[storm_weather_10]						
+[storm_weather_10]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -469,7 +476,7 @@ sky_rotation		=	0
 sky_color		=	0.46, 0.46, 0.46
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9000, 0.9000, 0.9000, 0.500, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.054688, 0.054688, 0.046875
 fog_density		=	0.95
@@ -488,7 +495,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-38.430000, 61.361200
 env_ambient		=	ambient_env_rain
 
-[storm_weather_11]					
+[storm_weather_11]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -498,7 +505,7 @@ sky_rotation		=	0
 sky_color		=	0.4, 0.4, 0.4
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9000, 0.9000, 0.9000, 0.500, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.113281, 0.109375, 0.109375
 fog_density		=	0.95
@@ -517,7 +524,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-46.040000, 44.532400
 env_ambient		=	ambient_env_rain
 
-[storm_weather_12]
+[storm_weather_12]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -527,7 +534,7 @@ sky_rotation		=	0
 sky_color		=	0.4, 0.4, 0.4
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9000, 0.9000, 0.9000, 0.500, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.132813, 0.132813, 0.144531
 fog_density		=	0.95
@@ -546,7 +553,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-51.420000, 23.920400
 env_ambient		=	ambient_env_rain
 
-[storm_weather_13]					
+[storm_weather_13]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -556,7 +563,7 @@ sky_rotation		=	0
 sky_color		=	0.4, 0.4, 0.4
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9000, 0.9000, 0.9000, 0.500, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.132813, 0.132813, 0.144531
 fog_density		=	0.95
@@ -575,7 +582,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-53.410000, 0.158500
 env_ambient		=	ambient_env_rain
 
-[storm_weather_14]					
+[storm_weather_14]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -585,7 +592,7 @@ sky_rotation		=	0
 sky_color		=	0.4, 0.4, 0.4
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9000, 0.9000, 0.9000, 0.500, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.132813, 0.132813, 0.113281
 fog_density		=	0.95
@@ -604,7 +611,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-51.440000, -23.617000
 env_ambient		=	ambient_env_rain
 
-[storm_weather_15]
+[storm_weather_15]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -614,7 +621,7 @@ sky_rotation		=	0
 sky_color		=	0.4, 0.4, 0.4
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9000, 0.9000, 0.9000, 0.500, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.113281, 0.109375, 0.089844
 fog_density		=	0.95
@@ -633,7 +640,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-46.080000, -44.255800
 env_ambient		=	ambient_env_rain
 
-[storm_weather_16]					
+[storm_weather_16]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -643,7 +650,7 @@ sky_rotation		=	0
 sky_color		=	0.46, 0.46, 0.46
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9000, 0.9000, 0.9000, 0.500, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.113281, 0.105469, 0.109375
 fog_density		=	0.95
@@ -662,7 +669,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-38.470000, -61.106100
 env_ambient		=	ambient_env_rain
 
-[storm_weather_17]					
+[storm_weather_17]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -672,7 +679,7 @@ sky_rotation		=	0
 sky_color		=	0.44, 0.44, 0.44
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9000, 0.9000, 0.9000, 0.500, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.082031, 0.078125, 0.066406
 fog_density		=	0.95
@@ -691,7 +698,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-29.610000, -75.093800
 env_ambient		=	ambient_env_rain
 
-[storm_weather_18]
+[storm_weather_18]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -701,7 +708,7 @@ sky_rotation		=	0
 sky_color		=	0.40, 0.40, 0.40
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9000, 0.9000, 0.9000, 0.500, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.082031, 0.078125, 0.066406
 fog_density		=	0.95
@@ -720,7 +727,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-20.180000, -87.350200
 env_ambient		=	ambient_env_rain
 
-[storm_weather_18_01]					
+[storm_weather_18_01]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -730,7 +737,7 @@ sky_rotation		=	0
 sky_color		=	0.38, 0.38, 0.38
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.9509, 0.9509, 0.9509, 0.400, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.082031, 0.078125, 0.066406
 fog_density		=	0.95
@@ -742,6 +749,7 @@ bolt_period		=	10.0
 bolt_duration	=	0.3
 wind_velocity	=	200
 wind_direction	=	0.0
+tree_amplitude_intensity = 0.03
 ambient                    = 0.019531, 0.019531, 0.019531
 lmap_color		=	1.0,	1.0,	1.0
 hemi_color		= 0.437500, 0.457031, 0.488281
@@ -759,7 +767,7 @@ sky_rotation		=	0
 sky_color		=	0.56, 0.56, 0.56
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.8500, 0.8500, 0.8500, 0.200, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.062500, 0.062500, 0.062500
 fog_density		=	1.00
@@ -771,6 +779,7 @@ bolt_period		=	10.0
 bolt_duration	=	0.3
 wind_velocity	=	335
 wind_direction	=	0.0
+tree_amplitude_intensity = 0.06
 ambient                    = 0.019531, 0.019531, 0.019531
 lmap_color		=	1.0,	1.0,	1.0
 hemi_color		= 0.230469, 0.238281, 0.253906
@@ -778,7 +787,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-3.088000, -108.214600
 env_ambient		=	ambient_env_rain
 
-[storm_weather_19_00]
+[storm_weather_19_00]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -788,7 +797,7 @@ sky_rotation		=	0
 sky_color		=	0.56, 0.56, 0.56
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.8500, 0.8500, 0.8500, 0.200, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.000000, 0.000000, 0.000000
 fog_density		=	1.00
@@ -800,6 +809,7 @@ bolt_period		=	10.0
 bolt_duration	=	0.3
 wind_velocity	=	335
 wind_direction	=	0.0
+tree_amplitude_intensity = 0.06
 ambient		= 0.011719, 0.011719, 0.011719
 lmap_color		=	1.0,	1.0,	1.0
 hemi_color		= 0.148438, 0.148438, 0.148438
@@ -807,7 +817,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-1.683000, -110.121300
 env_ambient		=	ambient_env_rain
 
-[storm_weather_19_01]							; sunset_phase_1
+[storm_weather_19_01]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -817,7 +827,7 @@ sky_rotation		=	0
 sky_color		=	0.42, 0.42, 0.42
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.8500, 0.8500, 0.8500, 0.200, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.000000, 0.000000, 0.000000
 fog_density		=	0.95
@@ -829,6 +839,7 @@ bolt_period		=	3.5
 bolt_duration	=	0.3
 wind_velocity	=	200
 wind_direction	=	0.0
+tree_amplitude_intensity = 0.03
 ambient		= 0.011719, 0.011719, 0.011719
 lmap_color		=	1.0,	1.0,	1.0
 hemi_color		= 0.148438, 0.148438, 0.148438
@@ -836,7 +847,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-1.683000, -110.121300
 env_ambient		=	ambient_env_rain
 
-[storm_weather_20_02]							; sunset_phase_1
+[storm_weather_20_02]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -846,7 +857,7 @@ sky_rotation		=	0
 sky_color		=	0.42, 0.42, 0.42
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.8500, 0.8500, 0.8500, 0.200, 1.000
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.000000, 0.000000, 0.000000
 fog_density		=	0.95
@@ -858,6 +869,7 @@ bolt_period		=	3.5
 bolt_duration	=	0.3
 wind_velocity	=	200
 wind_direction	=	0.0
+tree_amplitude_intensity = 0.03
 ambient		= 0.007813, 0.007813, 0.007813
 lmap_color		=	1.0,	1.0,	1.0
 hemi_color		= 0.121094, 0.109375, 0.097656
@@ -865,7 +877,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	3.033000, 44.311000
 env_ambient		=	ambient_env_rain
 
-[storm_weather_21]							; sunset_end
+[storm_weather_21]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -875,7 +887,7 @@ sky_rotation		=	0
 sky_color		=	0.3, 0.3, 0.3
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.5794, 0.5794, 0.5794, 0.200, 0.700
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.000000, 0.000000, 0.000000
 fog_density		=	0.9
@@ -894,7 +906,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir			=	-2, -122
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_21_01]							; sun_dir_bufor
+[storm_weather_21_01]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -904,7 +916,7 @@ sky_rotation		=	0
 sky_color		=	0.3, 0.3, 0.3
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.5794, 0.5794, 0.5794, 0.001, 0.001
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.000000, 0.000000, 0.000000
 fog_density		=	0.95
@@ -923,7 +935,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir		=	-9.569000, 38.800000
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_22]
+[storm_weather_22]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -933,7 +945,7 @@ sky_rotation		=	0
 sky_color		=	0.26, 0.26, 0.26
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.5013, 0.5013, 0.5013, 0.001, 0.001
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.000000, 0.000000, 0.000000
 fog_density		=	0.95
@@ -952,7 +964,7 @@ sun_color		=	0.000,	0.000,	0.000
 sun_dir		=	-20.005000, 28.301000
 env_ambient		=	ambient_env_night_rain
 
-[storm_weather_23]					
+[storm_weather_23]:storm_weather_def
 sun_shafts		=	1.0
 sun_shafts_length 		=	1.0
 rain_max_drop_angle		=	10		
@@ -962,7 +974,7 @@ sky_rotation		=	0
 sky_color		=	0.26, 0.26, 0.26
 clouds_texture	=	sky\sky_oblaka
 clouds_color	= 0.5013, 0.5013, 0.5013, 0.001, 0.001
-far_plane		=	200
+far_plane		=	400
 fog_distance	=	200
 fog_color		= 0.000000, 0.000000, 0.000000
 fog_density		=	0.95
