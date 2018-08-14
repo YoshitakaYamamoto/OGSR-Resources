@@ -234,13 +234,14 @@ function get_wpn_info( wpn )
   end
   if has_gl and ogse_wpn_utils.get_gl_mode( wpn ) then
     local hidden_t = wpn:get_underbarrel_ammo_type()
-    local hidden_n = wpn:get_underbarrel_num_types()
+    local hidden_n = wpn:get_ammo_in_magazine2()
     table.insert( info, hidden_t )
     table.insert( info, hidden_n )
     local cur_t = wpn:get_ammo_type()
     table.insert( info, cur_t    )
     local cur_n = wpn:get_ammo_in_magazine()
     table.insert( info, ogse_addons.is_wpn_w_shg( wpn ) and 0 or cur_n )
+	--log3("--Get ammo_type [%s], elapsed: [%s], ammo_type2 [%s], elapsed2: [%s]", cur_t, cur_n, hidden_t, hidden_n)
   else
     local cur_t = wpn:get_ammo_type()
     table.insert( info, cur_t )
@@ -248,7 +249,8 @@ function get_wpn_info( wpn )
     table.insert( info, cur_n )
     if has_gl then
       local hidden_t = wpn:get_underbarrel_ammo_type()
-      local hidden_n = wpn:get_underbarrel_num_types()
+      local hidden_n = wpn:get_ammo_in_magazine2()
+	  --log3("--Get ammo_type [%s], elapsed: [%s], ammo_type2 [%s], elapsed2: [%s]", cur_t, cur_n, hidden_t, hidden_n)
       table.insert( info, hidden_t )
       table.insert( info, ogse_addons.is_wpn_w_shg( wpn ) and 0 or hidden_n )
     else
@@ -354,17 +356,18 @@ function spawn_weapon_in_inv( sect, info_str, who )
       wpn.addon_flags  = addons
       wpn.ammo_type    = ammo1_t
       wpn.ammo_elapsed = ammo1_n
+      local wpn_gl = sobj:get_weapon_gl()
+      if wpn_gl then
+	    --log3("--Set ammo_type [%s], elapsed: [%s], ammo_type2 [%s], elapsed2: [%s]", ammo1_t, ammo1_n, ammo2_t, ammo2_n)
+        wpn.ammo_type_2    = ammo2_t
+        wpn.ammo_elapsed_2 = ammo2_n
+      end
     end
   }
   ogse_signals.get_mgr():subscribe( sm_slot )
   local s_new_weapon = spawn_item_in_inv( sect, who )
   ogse_signals.get_mgr():unsubscribe( sm_slot )
   --
-  if ammo2_n > 0 then
-    local ammo_sections = get_names( sect, "grenade_class" )
-    local ammo_sect     = ammo_sections[ ammo2_t + 1 ]
-    spawn_ammo_in_inv( ammo_sect, ammo2_n, who )
-  end
   return s_new_weapon
 end
 

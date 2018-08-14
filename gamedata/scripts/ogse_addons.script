@@ -486,41 +486,20 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 		new_wpn_section = get_converted_wpn_section(cur_weapon_sect, real_addon_section) -- получаем секцию сконвертированного ствола
 		ASSERT(new_wpn_section, "install_remove_addon: Can't get section for new weapon")
 	end
-	
-	-- при любой конвертации надо вынуть гранату из подствольника (если конечно есть подствольник)
-	-- дело в том, что гранатомЄт всегда становитс€ вторым оружием, а его нетпакетом не прописать
-	-- конечно странно, что при надевании прицела разр€жаетс€ граната, но иначе гранату не сохранить и она просто пропадЄт
+
 	if cur_wpn_addon_flags:is( addons_flags.gl ) then
-		local ammo_type, ammo_num
 		if cur_weapon:is_weapon_gl() and ogse_wpn_utils.get_gl_mode(cur_weapon) then -- в режиме подствольника
 			-- то гранаты - это активный боеприпас
-			ammo_type, ammo_num = cur_wpn_ammo_type, cur_wpn_ammo_elapsed
-			modified_params.ammo_elapsed = 0
+			modified_params.ammo_type2, modified_params.ammo_elapsed2 = cur_wpn_ammo_type, cur_wpn_ammo_elapsed
+			modified_params.ammo_type = cur_weapon:get_underbarrel_ammo_type()
+			modified_params.ammo_elapsed = cur_weapon:get_ammo_in_magazine2()
 		else -- обычный ствол в обычном режиме
 			-- то гранаты - это скрытый боеприпас
-			ammo_type = cur_weapon:get_underbarrel_ammo_type()
-			ammo_num = cur_weapon:get_underbarrel_num_types()
+			modified_params.ammo_type2 = cur_weapon:get_underbarrel_ammo_type()
+			modified_params.ammo_elapsed2 = cur_weapon:get_ammo_in_magazine2()
 		end
-		aux_spawn_ammo_by_type(cur_weapon_sect, ammo_type, ammo_num, true)
 	end
-	--[[
-	-- если ставим магазин, то вынимаем все патроны (гранаты уже вынули)
-	if installed_addon_flag == addons_flags.magazine then
-		local ammo_type, ammo_num
-		if cur_weapon:is_weapon_gl() and ogse_wpn_utils.get_gl_mode(cur_weapon) then
-			-- пули - вторичный Ѕѕ
-			ammo_type = cur_weapon:get_underbarrel_ammo_type()
-			ammo_num  = cur_weapon:get_underbarrel_num_types()
-		else -- наоборот
-			ammo_type, ammo_num = cur_wpn_ammo_type, cur_wpn_ammo_elapsed
-		end
-		-- пересоздаваемый ствол всегда в режиме обычных выстрелов
-		--modified_params.ammo_type = ammo_type
-		modified_params.ammo_elapsed = 0
-		-- вынимаем весь Ѕ«
-		aux_spawn_ammo_by_type(cur_weapon_sect, ammo_type, ammo_num)
-	end
-	]]
+
 	-- "снимаем" указанный аддон, т.е. спавним его в инвентарь
 	if removed_addon_flags ~= 0 then -- есть флаги аддонов
 		for flag_name,removed_addon_flag in pairs(addons_flags) do
@@ -553,7 +532,7 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
 					if cur_weapon:is_weapon_gl() and ogse_wpn_utils.get_gl_mode(cur_weapon) then
 						-- гранаты - первичный Ѕѕ
 						ammo_type = cur_weapon:get_underbarrel_ammo_type()
-						ammo_num  = cur_weapon:get_underbarrel_num_types()
+						ammo_num  = cur_weapon:get_ammo_in_magazine2()
 					else
 						-- наоборот
 						ammo_type, ammo_num = cur_wpn_ammo_type, cur_wpn_ammo_elapsed
@@ -591,6 +570,11 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
       cur_wpn_addon_flags:set( removed_addon_flags, false )
 	  cur_wpn_addon_flags:set( installed_addon_flag, true )
 	  wpn.addon_flags = cur_wpn_addon_flags
+      local wpn_gl = sobj:get_weapon_gl()
+      if wpn_gl then
+        wpn.ammo_type_2    = modified_params.ammo_type2
+        wpn.ammo_elapsed_2 = modified_params.ammo_elapsed2
+      end
 	  --
       -- обрабатываем перенос данных их кастомдаты аддона (подствольного дробовика) в кастомдату ствола
       -- подразумеваетс€, что ствол всегда преобразуетс€ в режим винтовки и свойства подствольного дробовика

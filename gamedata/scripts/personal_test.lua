@@ -1,6 +1,12 @@
 
 --Тестовая сборка мусора при закрытии меню
-if level.present() then level.add_call(function() return true end, function() collectgarbage("collect") end) end
+--[=[
+if level.present() then
+	level.add_call(function() return true end, function() collectgarbage("collect") end)
+end
+
+collectgarbage("collect")
+--]=]
 
 --[=[
 --Вывод на карту НПС, которых создали респавнеры.

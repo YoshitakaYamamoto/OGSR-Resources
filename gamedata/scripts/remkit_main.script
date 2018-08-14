@@ -54,7 +54,7 @@ function dismantle_wpn(destr_item) --Полностью разобрать ор�
 	local hidden_t, cur_t, hidden_n, cur_n
 	if destr_item:is_weapon_gl() and ogse_wpn_utils.get_gl_mode( destr_item ) then --если разбираемое оружие находится в режиме подствольника:
 		cur_t = destr_item:get_underbarrel_ammo_type()
-		cur_n = destr_item:get_underbarrel_num_types()
+		cur_n = destr_item:get_ammo_in_magazine2()
 		hidden_t = destr_item:get_ammo_type()
 		hidden_n = destr_item:get_ammo_in_magazine()
 	else --если НЕ в режиме подствола:
@@ -62,7 +62,7 @@ function dismantle_wpn(destr_item) --Полностью разобрать ор�
 		cur_n = destr_item:get_ammo_in_magazine()
 		if destr_item:is_weapon_gl() then --но если подствол таки присутствует (пусть даже не в активном режиме):
 			hidden_t = destr_item:get_underbarrel_ammo_type()
-			hidden_n = destr_item:get_underbarrel_num_types()
+			hidden_n = destr_item:get_ammo_in_magazine2()
 		end
 	end
 

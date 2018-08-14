@@ -28,7 +28,7 @@ function ammo_discharge( wpn )
   if has_gl and ogse_wpn_utils.get_gl_mode( wpn ) then
     do return end --С неписей оружие в режиме подствола и так не выпадает, поэтому это и не нужно. Да и работает как-то странно.
     cur_t = wpn:get_underbarrel_ammo_type()
-    cur_n = wpn:get_underbarrel_num_types()
+    cur_n = wpn:get_ammo_in_magazine2()
     hidden_t = wpn:get_ammo_type()
     hidden_n = wpn:get_ammo_in_magazine()
   else
@@ -36,7 +36,7 @@ function ammo_discharge( wpn )
     cur_n = wpn:get_ammo_in_magazine()
     if has_gl then
       hidden_t = wpn:get_underbarrel_ammo_type()
-      hidden_n = wpn:get_underbarrel_num_types()
+      hidden_n = wpn:get_ammo_in_magazine2()
     else
       hidden_t = 0
       hidden_n = 0
