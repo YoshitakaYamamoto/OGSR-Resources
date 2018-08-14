@@ -266,7 +266,10 @@ function dot:draw(dir, obj_alive) --Нарисовать точку
 end
 
 function dot:hide() --Скрыть точку
-	self.st:DetachFromParent()
+	local parent = self.st:GetParent()
+	if parent then
+		parent:DetachChild(self.st)
+	end
 	self.st = nil
 	dots[self.o_id] = nil
 end
