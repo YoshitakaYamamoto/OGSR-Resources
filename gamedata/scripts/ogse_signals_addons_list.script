@@ -3,8 +3,7 @@
 
 addons = {
 	"ogse_fixes", --должен быть самым первым.
-	"dunin_ammo", --должен быть первым для сигнала "on_take"
-	"death_manager", --должен быть после перепаковщика патронов!
+	"death_manager",
 	"ogse_unist",
 	"ogse_qt",
 	"ogse_st_mgr",
