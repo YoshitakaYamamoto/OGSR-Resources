@@ -60,6 +60,7 @@ function actor_binder:net_spawn(data)
 	cmd("r2_rain_drops_control on") --капли на стекле
 	cmd("r2_lens_dirt_control on") --грязь на линзе
 	cmd("cam_inert 0") --KRodin: сбрасываем инерцию камеры в 0
+	cmd("r_glows_use off") --KRodin: в огсе свой глоу-эффект у ламп, этот не нужен.
 ----------------------KD: end-------------------------
 
 -------- пауза при загрузке --------
