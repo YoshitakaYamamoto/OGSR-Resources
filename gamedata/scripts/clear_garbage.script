@@ -107,6 +107,7 @@ local musor_sections = { --Секции всякого мусора, котор�
 
 function remove_guns()
 	local actor_level = level.name()
+	local t = {}
 	for id, sobj in alife():objects() do
 		local wpn_name = sobj:name()
 		local wpn_sect = sobj:section_name()
@@ -118,8 +119,11 @@ function remove_guns()
 			local wpn_level = object_level_name(sobj)
 			if wpn_level ~= actor_level or musor_sections[wpn_sect] then
 				--log3("!!!Clear_garbage!!! Deleting wpn: %s , Section: %s , level: %s", wpn_name, wpn_sect, wpn_level)
-				alife():release(sobj,true)
+				table.insert( t, sobj )
 			end
 		end
+	end
+	for _, sobj in ipairs( t ) do
+		alife():release( sobj )
 	end
 end

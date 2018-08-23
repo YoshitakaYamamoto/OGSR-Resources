@@ -225,7 +225,7 @@ function hit_callback(companion, enemy, amount)
 		companion:make_object_visible_somewhen(enemy)
 		if ( enemy:is_stalker() or enemy:is_actor() ) then
 			primary_target = enemy:id()
-			hit_memory[enemy:id()] = enemy
+			hit_memory[enemy:id()] = true
 		end
 		if xr_wounded.is_wounded(enemy) then
 			fighting_wounded[enemy:id()] = true
@@ -343,8 +343,11 @@ function get_targets_from_memory(npc)
 		process_enemy(npc, o:object())
 	end
 	if hit_memory then
-		for k, v in pairs(hit_memory) do
-			process_enemy(npc, v)
+		for enemy_id, _ in pairs(hit_memory) do
+			local enemy = level.object_by_id(enemy_id)
+			if enemy then
+				process_enemy(npc, enemy)
+			end
 		end	
 	end
 end

@@ -593,6 +593,7 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 
 	local lname = level.name()
 	local sim = alife()
+	local t = {}
 	for id, sobj in sim:objects() do
 		local sobj_lname = object_level_name( sobj )
 		if IsAnomaly(sobj) then
@@ -613,7 +614,7 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 				end
 			else --Безопасно удалять аномалии можно только находясь на другой локации.
 				if status == "anom_off" then
-					sim:release(sobj, true)
+					table.insert( t, sobj )
 				end
 			end
 		elseif isLc(sobj) then
@@ -637,6 +638,10 @@ function get_lists() --Вызывается из add_anom и generate_anoms, е�
 				table.insert( position_forbidden, sobj.position )
 			end
 		end
+	end
+
+	for _, sobj in ipairs( t ) do
+		alife():release( sobj )
 	end
 
 	get_lists_inited = true

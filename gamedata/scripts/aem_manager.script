@@ -674,10 +674,14 @@ function CArenaext:cleanup()
 	end
 
 	-- удаление объектов
+	local t = {}
 	for id, sobj in alife():objects() do --Можно оставить, всё равно никогда не вызывается.
 		if string.find(sobj:name(), "aem_") then
-			sim:release(sobj)
+			table.insert( t, sobj )
 		end
+	end
+	for _, sobj in ipairs( t ) do
+		alife():release( sobj )
 	end
 	news_manager.send_tip(db.actor, "%c[25,240,25,25]АРЕНА-МОД УДАЛЁН", nil, nil, 30000)
 end
@@ -1972,12 +1976,16 @@ end
 -------
 function clear_offline_box(sid)
 	local box = alife():story_object(sid)
+	local t = {}
 	if box then
 		for id, sobj in alife():objects() do
 			if sobj.parent_id == box.id then
-				alife():release(sobj, true)
+				table.insert( t, sobj )
 			end
 		end
+	end
+	for _, sobj in ipairs( t ) do
+		alife():release( sobj )
 	end
 end
 
