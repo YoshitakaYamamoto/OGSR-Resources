@@ -20,7 +20,7 @@ function attach(sm)
 	sm:subscribe({signal = "on_drop",			fun = this.on_item_to_ruck})
 end
 
-local subscribed
+local subscribed = false
 
 function subscribe()
 	if not subscribed then
@@ -85,7 +85,7 @@ function on_item_to_ruck(obj)
 		last_detector_sect = nil
 		id_detector_in_slot = nil
 		det_radius = 0
-		set_hud_tip_clean() --Удалим подсказку с худа, а то она в некоторых случаях не удаляется
+		set_hud_tip_clean() --Удалим подсказку с худа
 		unsubscribe()
 	end
 end
@@ -212,97 +212,13 @@ function set_hud_tip_upgrade()
 end
 
 
-local detector_hud_active = false
 local upgrade_mode_active = false
 local upgrade_frequency = 0
-local block_detector_keys = false
-------------------------------------------------------------------------------------------------------
---Служебный таймер, ждущий изменение активного слота.
---Запускается при убирании/доставании детекторов и  блокирует вызов функции "on_key_down",
---чтобы до активации другого слота при нажатии клавиш не происходило никаких действий.
---Это позволяет избежать различных проблем.
---И ещё, таймер можно запускать с аргументом-функцией, которая запустится по срабатыванию таймера.
-class "slot_change_timer" (ogse_qt.quick_timer)
-function slot_change_timer:__init(fun) --Запуск таймера
-	block_detector_keys = true --Заблокируем вызов функции "on_key_down"
-	self.saved_act_slot = db.actor:active_slot() --Запоминаем активный слот
-	self.fun = fun
-end
-function slot_change_timer:condition() --Условие проверяется на каждом апдейте
-	return db.actor:active_slot() ~= self.saved_act_slot --Сработает при смене активного слота
-end
-function slot_change_timer:action() --Действие по сработавшему условию
-	if self.fun then self.fun() end --Если вызывали с аргументом, запускаем функцию-аргумент.
-	block_detector_keys = false --Разблокируем вызов функции "on_key_down"
-end
-function start_slot_change_timer(fun) --Обёртка для упрощённого запуска (можно вызывать и без аргумента).
-	slot_change_timer(fun):start()
-end
-------------------------------------------------------------------------------------------------------
-local wpn_binds = {
-	[key_bindings.kWPN_1] = true,
-	[key_bindings.kWPN_2] = true,
-	[key_bindings.kWPN_3] = true,
-	[key_bindings.kWPN_4] = true,
-	[key_bindings.kWPN_5] = true,
-	[key_bindings.kWPN_6] = true,
-}
 
 function on_key_down(key, bind)
-	if block_detector_keys then --Если вызов функции не требуется
-		return --Ничего не делать
-	end
-------------------------------------------------------------------------------------------------------
-	if
-		level.main_input_receiver() --если открыто какое-то окно
-		and not level.get_inventory_wnd():IsShown() --и это не инвентарь
-		and not level.get_pda_wnd():IsShown() --и не ПДА
-	then
-		return --Ничего не делать
-	end
-------------------------------------------------------------------------------------------------------
-	if db.actor:active_slot() == 8 then --Детектор в руках
-		detector_hud_active = true
-	else --Просто в слоте
-		detector_hud_active = false
-	end
-------------------------------------------------------------------------------------------------------
-	if bind == key_bindings.kWPN_8 or wpn_binds[bind] then --Если нажали клавишу доставания чего-либо из слотов 1-8 (кроме 7, там доставать нечего)
-		if detector_hud_active then --Детектор в руках - значит убираем его
-			if bind == key_bindings.kWPN_8 then
-				db.actor:activate_slot(255) --255 == u8(-1) ( константа NO_ACTIVE_SLOT )
-			end
-			start_slot_change_timer(function() --Запускаем таймер на время убирания детектора.
-				set_hud_tip_clean() --Удаляем подсказку с худа
-			end)
-			return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
-		elseif bind == key_bindings.kWPN_8 then --Детектора в руках нет - значит достанем его
-			db.actor:activate_slot(8)
-			start_slot_change_timer(function() --Запускаем таймер на время доставания детектора.
-				if
-					last_detector_sect == "interactive_detector_elite" --Если достали элитный детектор
-					and db.actor:object("afscanner") --И есть апгрейд для детектора
-				then
-					if upgrade_mode_active then
-						set_hud_tip_upgrade() --Включен режим апгрейда, покажем подсказку.
-					else
-						set_hud_tip_normal() --Включен обычный режим, покажем подсказку.
-					end
-				end
-			end)
-			return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
-		end
-	end
-------------------------------------------------------------------------------------------------------
-	if
-		not detector_hud_active --если в руках нет детектора
-		or last_detector_sect ~= "interactive_detector_elite" --или в руках НЕ элитный детектор
-		or not db.actor:object("afscanner") --или нет апгрейда для детектора
-	then
-		set_hud_tip_clean() --Удаляем подсказку с худа, а то она не удаляется в некоторых случаях.
-		return --больше здесь делать нечего
-	end
-------------------------------------------------------------------------------------------------------
+	if level.main_input_receiver() then return end
+	if not ( db.actor:active_slot() == 8 and last_detector_sect == "interactive_detector_elite" and db.actor:object("afscanner") ) then return end
+	
 	if key == DIK_keys.DIK_K then
 		if not upgrade_mode_active then --проверить есть ли апгрейд и если есть включить режим
 			upgrade_frequency = 0
@@ -318,16 +234,7 @@ function on_key_down(key, bind)
 			set_hud_tip_normal() --Если включен обычный режим, покажем соответствующую подсказку.
 		end			
 		return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
-	end
-------------------------------------------------------------------------------------------------------
-	if not upgrade_mode_active then --если режим апгрейда выключен
-		set_hud_tip_normal() --Покажем подсказку, чтобы в редких случаях она не исчезала
-		return --дальше нам делать нечего
-	else --если включен
-		set_hud_tip_upgrade() --Покажем подсказку, чтобы в некоторых случаях она не исчезала
-	end
-------------------------------------------------------------------------------------------------------
-	if key == DIK_keys.DIK_RETURN then  -- Enter --послать импульс на этой частоте
+	elseif key == DIK_keys.DIK_RETURN then  -- Enter --послать импульс на этой частоте
 		if not are_actor_in_strange_zone() then --мы вне зоны, предупредить
 			soundtrack.afscanner_click2()
 			news_manager.send_tip(db.actor, "actor_out_strangzone", nil, "anomal", 5000, nil)
@@ -335,18 +242,14 @@ function on_key_down(key, bind)
 			check_actor_in_zone_action(upgrade_frequency)
 		end
 		return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
-	end
-------------------------------------------------------------------------------------------------------
-	if key == DIK_keys.DIK_COMMA then -- < --понизить частоту
+	elseif key == DIK_keys.DIK_COMMA then -- < --понизить частоту
 		if upgrade_frequency > 0 then
 			upgrade_frequency = upgrade_frequency - 1
 		end
 		set_detector_mode(1, upgrade_frequency)	
 		soundtrack.afscanner_click()
 		return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
-	end
-------------------------------------------------------------------------------------------------------
-	if key == DIK_keys.DIK_PERIOD then -- > --повысить частоту
+	elseif key == DIK_keys.DIK_PERIOD then -- > --повысить частоту
 		if upgrade_frequency < 8 then
 			upgrade_frequency = upgrade_frequency + 1
 		end		
@@ -354,7 +257,6 @@ function on_key_down(key, bind)
 		soundtrack.afscanner_click()
 		return true --больше здесь делать нечего. Да и цепочку вызовов можно завершить.
 	end
-------------------------------------------------------------------------------------------------------
 end
 
 
@@ -441,6 +343,16 @@ end
 
 
 function on_update()
+	if db.actor:active_slot() == 8 and last_detector_sect == "interactive_detector_elite" and db.actor:object("afscanner") then --Если достали элитный детектор и есть апгрейд для детектора
+		if upgrade_mode_active then
+			set_hud_tip_upgrade() --Включен режим апгрейда, покажем подсказку.
+		else
+			set_hud_tip_normal() --Включен обычный режим, покажем подсказку.
+		end
+	else
+		set_hud_tip_clean()
+	end
+-------------------------------------------------------------------------------------------------------------------------------
 	local act_pos = db.actor:position()
 -------------------------------------------------------------------------------------------------------------------------------
 	-- перебор онлайновых артефактов в таблице

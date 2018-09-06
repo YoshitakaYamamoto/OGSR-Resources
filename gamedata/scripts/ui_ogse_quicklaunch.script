@@ -39,10 +39,54 @@ if ogse_car_control.need_companion_btr == true then
 	strings_btr[6] = {text = game.translate_string("btr_control_string9"), keybind = key_bindings.kWPN_3}
 end
 
+local binds_table = {
+	[key_bindings.kUSE_ANTIRAD] = function()
+		local item = db.actor:object("antirad")
+		if item then
+			db.actor:eat(item)
+			ogse_screen_msg.show_message_use_item(item:section())
+		end
+		return true
+	end,
+	[key_bindings.kUSE_ENERGY_DRINK] = function()
+		local item = db.actor:object("energy_drink")
+		if item then
+			db.actor:eat(item)
+			ogse_screen_msg.show_message_use_item(item:section())
+		else
+			item = db.actor:object("dix")
+			if item then
+				db.actor:eat(item)
+				ogse_screen_msg.show_message_use_item(item:section())
+			end
+		end				
+		return true
+	end,
+	[key_bindings.kUSE_B190] = function()
+		local item = db.actor:object("yod")
+		if item then
+			db.actor:eat(item)
+			ogse_screen_msg.show_message_use_item(item:section())
+		end			
+		return true
+	end,
+	[key_bindings.kUSE_BIPSIZON] = function()
+		local item = db.actor:object("bipsizon")
+		if item then
+			db.actor:eat(item)
+			ogse_screen_msg.show_message_use_item(item:section())
+		end			
+		return true
+	end,
+}
+
 
 function chek_keys(key, bind)
 	if level.main_input_receiver() then return end
-	
+
+	local fun = binds_table[bind]
+	if fun then return fun() end
+
 	if bind ~= key_bindings.kSCORES then return end
 
     local hud = get_hud()
