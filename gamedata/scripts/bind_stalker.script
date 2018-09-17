@@ -13,8 +13,6 @@ end
 class "actor_binder" (object_binder)
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:__init(obj) super(obj)
-	self.object:disable_info_portion("ui_inventory")
-
 	self.am = ogse_signals.get_mgr()
 	self.am:call("on_load_before_all")
 	self.am:call("on_init", obj)
@@ -26,6 +24,8 @@ function actor_binder:__finalize()
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:net_spawn(data)
+	self:fix_ui_inventory_info()
+
 	cmd("r2_dof_control", "off")
 	cmd("unbind", "contacts") --Отключаем в PDA вкладку "Контакты"
 
@@ -217,6 +217,15 @@ function actor_binder:info_callback(npc, info_id)
 	if sc then
 		self.am:call(sc, npc)
 	end
+end
+
+function actor_binder:fix_ui_inventory_info()
+  for info, _ in pairs( info2call ) do
+    if self.object:has_info( info ) then
+      log3( "~~[%s]: disable [%s]", script_name(), info )
+      self.object:disable_info_portion( info )
+    end
+  end
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_trade(item, sell_bye, money)
