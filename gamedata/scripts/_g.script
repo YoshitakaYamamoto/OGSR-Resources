@@ -484,41 +484,14 @@ function level_object_by_sid( sid )
 	return nil
 end
 
-local msg_crash = {
-	[0] = game.translate_string("msg_crash_1_text"),
-	[1] = game.translate_string("msg_crash_2_text"),
-	[2] = game.translate_string("msg_crash_3_text"),
-	[3] = game.translate_string("msg_crash_4_text"),
-	[4] = game.translate_string("msg_crash_5_text"),
-	[5] = game.translate_string("msg_crash_6_text"),
-	[6] = game.translate_string("msg_crash_7_text"),
-	[7] = game.translate_string("msg_crash_8_text"),
-	[8] = game.translate_string("msg_crash_9_text"),
-	[9] = game.translate_string("msg_crash_1_text"),
-}
-local crash_text = game.translate_string("msg_crash_text")
 
 -- Крешнуть игру (после вывода сообщения об ошибке в лог)
 function abort(fmt, ...)
-	for i = 0,9 do
-		log1(msg_crash[i])
-	end
-
+	log1("!!****************************[ABORT]*********************************")
 	log1(debug.traceback())
 	log3(fmt, ...)
-	cmd("flush")
-
-	if ogse.check_game() then
-		local hud = get_hud()
-		local critical = hud:GetCustomStatic("btr_critical")
-		if not critical then
-			hud:AddCustomStatic("btr_critical", true)
-			critical = hud:GetCustomStatic("btr_critical"):wnd()
-			critical:SetText(crash_text)
-		end
-	end
-
-	fail(tostring(fmt))
+	log1("!!********************************************************************")
+	error(tostring(fmt))
 end
 
 --/ проверяет целую часть числа на нечётность
