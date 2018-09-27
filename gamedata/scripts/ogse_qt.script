@@ -97,10 +97,7 @@ function quick_timer:start( low_priority )
   end
   local d = debug.getinfo(2)
   if not self.script_name then
-    self.script_name = d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1')
-  end
-  if not self.line then --Номер строки скрипта, на которой расположена функция
-    self.line = d.linedefined
+    self.script_name = d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1') .. "." .. d.linedefined
   end
   self.slot_desc = {
     signal = "on_update",
@@ -108,7 +105,6 @@ function quick_timer:start( low_priority )
 	fun    = self.aux_cond,
     queued = (not self.timeout and low_priority),
     script_name = self.script_name,
-    line   = self.line,
   }
   self.sm = ogse_signals.get_mgr()
   self.sm:subscribe( self.slot_desc )

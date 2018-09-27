@@ -456,7 +456,6 @@ function savable_timer:start( high_priority )
     fun    = self._aux_cond,
     queued = (not self._residual_time and not self._game_termination_time and not self._high_priority), --Низкий приоритет может быть только у таймеров БЕЗ любого таймаута (т.е у таймеров, которые срабатывают по условию)
 	script_name = self.script_name or self.class,
-	line   = "unknown",
   }
   self.sm:subscribe( self._cond_slot_desc )
   registry[ self.id ] = self
