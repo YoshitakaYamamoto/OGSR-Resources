@@ -2687,8 +2687,6 @@ function set_weapons_fire(npc, enemy, weapon, override_vis, npc_rank)
 				else
 					be_pos = enemy:bone_position( "korpus1" )
 				end
-			elseif enemy:is_actor() then
-				be_pos = device().cam_pos
 			else
 				be_pos = enemy:bone_position("bip01_head")
 			end
@@ -2985,7 +2983,7 @@ function set_combat_sight(npc, enemy, weapon)
 				else
 					local rank = ranks.get_obj_rank_name( npc )
 					if math.random() < headshot_prob[ rank ] then
-						local bones = { "bip01_head", "eyelid_1", "bip01_neck" }
+						local bones = { "bip01_head", "bip01_neck" }
 						bone = bones[ math.random( #bones ) ]
 					else
 						bone      = "bip01_spine"
@@ -3016,15 +3014,9 @@ function set_combat_sight(npc, enemy, weapon)
 		end
 	end
 	--
-	local look_pos
-	if bone == "eyelid_1" and enemy:is_actor() then
-		--Я исхожу из простого предположения, что глаз-глазом, но если игрок
-		--выглядывает из-за дерева, то его cam_pos уж точно уязвим. А где там
-		--этот глаз будет, да шут его знает.
-		look_pos = device().cam_pos
-	else
-		look_pos = enemy:bone_position( bone )
-	end
+	local bone_id = enemy:get_bone_id( bone )
+	ASSERT( bone_id ~= 65535, "[%s]: %s: unknown bone %s", script_name(), enemy:name(), bone )
+	local look_pos = enemy:bone_position( bone )
 	--
 	if use_deviation then
 		look_pos = add_deviation( npc, look_pos )
