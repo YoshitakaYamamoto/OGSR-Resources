@@ -22,7 +22,7 @@ function exec_periodic:condition()
 end
 
 
-function attach()
+function init()
 	if not enabled then return end
 	--
 	this.exec_periodic(
