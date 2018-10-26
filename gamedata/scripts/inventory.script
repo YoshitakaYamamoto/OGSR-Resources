@@ -14,7 +14,6 @@ function on_first_update()
   sm:subscribe({ signal = "on_drop",         fun = this.on_belt_drop    })
   sm:subscribe({ signal = "on_item_to_belt", fun = this.rescan_belt     })
   sm:subscribe({ signal = "on_item_to_ruck", fun = this.on_belt_drop    })
-  sm:subscribe({ signal = "on_item_to_slot", fun = this.on_item_to_slot })
 end
 
 
@@ -30,23 +29,6 @@ local af_restore_speeds = {
   [ "radiation_restore_speed"  ] = 0,
   [ "satiety_restore_speed"    ] = 0,
 }
-
-
-function on_item_to_slot(item, sitem)
-	-- принудительное убийство актора в случае перекидывания артефакта с пояса в слот
-	-- такая ситуация при дальнейшей игре в любом случае чревата неизлечимыми глюками
-	if item:is_artefact() then
-		if belt_id[ item:id() ] then
-			-- log1("Too bad - actor weared art from belt... bad idea... bye-bye actor 8(")
-			alife():release(sitem, true)
-			db.actor:kill(db.actor)
-			db.actor:give_game_news(game.translate_string("inventory_art_hand_belt_text"), "ui\\ui_iconsTotal", Frect():set(0,188,83,47), 0, 10000)
-			return true
-		end
-	end
-
-	on_belt_drop( item )
-end
 
 
 function on_belt_drop( item )
