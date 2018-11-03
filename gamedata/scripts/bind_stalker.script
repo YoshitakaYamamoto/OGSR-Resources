@@ -27,7 +27,6 @@ function actor_binder:net_spawn(data)
 	self:fix_ui_inventory_info()
 
 	cmd("r2_dof_control", "off")
-	cmd("unbind", "contacts") --Отключаем в PDA вкладку "Контакты"
 
 	level.show_indicators()
 	level.set_snd_volume( 1 )
@@ -53,7 +52,6 @@ function actor_binder:net_spawn(data)
 	cmd("r2_sun_depth_near_bias -0.0001")
 	cmd("r2_sun_depth_near_scale 1.00004")
 	cmd("r2_sun_focus on")
-	cmd("r2_sun_near_border 3.")
 	-- избавляемся от пересвета поверхностей
 	cmd("r2_ls_bloom_threshold 1.") --блум
 	cmd("r2_sun_lumscale 1.") --мультипликатор цвета солнца (идиотская настройка)
