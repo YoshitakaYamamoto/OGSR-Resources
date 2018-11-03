@@ -51,7 +51,7 @@ function se_stalker:get_job_online()
 	end
 end
 --------------------
-function se_stalker:can_switch_offline ()
+function se_stalker:can_switch_offline()
 	local can_be_offline = false
 	if self.force_offline then
 		can_be_offline = true
@@ -59,16 +59,14 @@ function se_stalker:can_switch_offline ()
 		if self:get_job_online() ~= nil then
 			can_be_offline = not self:get_job_online()
 		else
-			can_be_offline = cse_alife_human_stalker.can_switch_offline (self)
+			can_be_offline = cse_alife_human_stalker.can_switch_offline(self)
 		end
 	end
-	if
-		xr_companion.is_companion(self.id)
-		and (db.actor_proxy.online and db.actor:position():distance_to(self.position) < COMPANION_SWITCH_DISTANCE) 
-		and not self.force_offline
-	then
-		return false
-	end	
+	--
+	if xr_companion.is_companion(self.id) and not self.force_offline and db.actor_proxy.online then
+		return db.actor:position():distance_to(self.position) > COMPANION_SWITCH_DISTANCE
+	end
+	--
 	return can_be_offline
 end
 --------------------
