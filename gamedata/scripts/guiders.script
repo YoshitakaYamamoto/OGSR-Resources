@@ -93,18 +93,17 @@ function guider_is_not_ready()
 	return not guider_is_ready()
 end
 function init_guiders_dialog(dlg)
-	log1("init_guiders_dialog - 1") flush_log()
 	local script = script_name().."."
-	log1(script)
+
 	phr0 = dlg:AddPhrase("guider_dialog_phr_0", "0", "", -10000)                 -- "Куда ты можешь меня отвести?"
 		phr0:GetPhraseScript():AddAction(script.."setup_guider") -- инициализация предусловий
-	log1("init_guiders_dialog - 2") flush_log()
+
 	phr1 = dlg:AddPhrase("guider_dialog_phr_1", "1", "0", -10000)	               -- -- "Пока никуда."
 		phr1:GetPhraseScript():AddPrecondition(script.."guider_is_not_ready")	
 	phr2 = dlg:AddPhrase("guider_dialog_phr_2", "2", "0", -10000)                -- -- "Во многие места.
 		phr1:GetPhraseScript():AddPrecondition(script.."guider_is_ready")	
 		phr2:GetPhraseScript():AddAction(script.."show_awailable_locations")
-	log1("init_guiders_dialog - 3") flush_log()
+
 	phr10 = dlg:AddPhrase("guider_dialog_phr_31", "10", "2", -10000)             -- -- -- "Я передумал."
 		phr10:GetPhraseScript():AddAction("dialogs.break_dialog")
 	-- добавляем все возможные варианты выбора с предусловиями. Видимость будет зависеть от доступности перехода у проводника.
@@ -119,7 +118,6 @@ function init_guiders_dialog(dlg)
 			phr3:GetPhraseScript():AddAction(script.."set_destination_and_price")
 		phr7 = dlg:AddPhrase("guider_dialog_phr_29", "3", data.loc_id, -10000)               -- -- -- -- -- -- "Ну что, готов выдвигаться?"
 	end
-	log1("init_guiders_dialog - 8") flush_log()
 
 	phr5 = dlg:AddPhrase("guider_dialog_phr_27", "5", "3", -10000)               -- -- -- -- -- "Да. Держи деньги и пошли."
 		phr5:GetPhraseScript():AddAction(script.."pay_money")
@@ -127,22 +125,20 @@ function init_guiders_dialog(dlg)
 		phr5:GetPhraseScript():AddAction("dialogs.break_dialog")
 	phr9 = dlg:AddPhrase("guider_dialog_phr_31", "6", "3", -10000)               -- -- -- -- -- -- -- "Я передумал."
 		phr9:GetPhraseScript():AddAction("dialogs.break_dialog")
-	log1("init_guiders_dialog - end") flush_log()
 end
 
 function init_guiders_dialog_pilot(dlg)
-	log1("init_guiders_dialog - 1") flush_log()
 	local script = script_name().."."
-	log1(script)
+
 	phr0 = dlg:AddPhrase("guider_dialog_phr_pilot_0", "0", "", -10000)                 -- "Куда ты можешь меня отвести?"
 		phr0:GetPhraseScript():AddAction(script.."setup_guider") -- инициализация предусловий
-	log1("init_guiders_dialog - 2") flush_log()
+
 	phr1 = dlg:AddPhrase("guider_dialog_phr_1", "1", "0", -10000)	               -- -- "Пока никуда."
 		phr1:GetPhraseScript():AddPrecondition(script.."guider_is_not_ready")	
 	phr2 = dlg:AddPhrase("guider_dialog_phr_pilot_2", "2", "0", -10000)                -- -- "Во многие места.
 		phr1:GetPhraseScript():AddPrecondition(script.."guider_is_ready")	
 		phr2:GetPhraseScript():AddAction(script.."show_awailable_locations")
-	log1("init_guiders_dialog - 3") flush_log()
+
 	phr10 = dlg:AddPhrase("guider_dialog_phr_31", "10", "2", -10000)             -- -- -- "Я передумал."
 		phr10:GetPhraseScript():AddAction("dialogs.break_dialog")
 	-- добавляем все возможные варианты выбора с предусловиями. Видимость будет зависеть от доступности перехода у проводника.
@@ -157,7 +153,6 @@ function init_guiders_dialog_pilot(dlg)
 		phr3:GetPhraseScript():AddAction(script.."set_destination_and_price")
 		phr7 = dlg:AddPhrase("guider_dialog_phr_pilot_29", "3", data.loc_id, -10000)               -- -- -- -- -- -- "Ну что, готов выдвигаться?"
 	end
-	log1("init_guiders_dialog - 8") flush_log()
 
 	phr5 = dlg:AddPhrase("guider_dialog_phr_27", "5", "3", -10000)               -- -- -- -- -- "Да. Держи деньги и пошли."
 		phr5:GetPhraseScript():AddAction(script.."pay_money")
@@ -165,5 +160,4 @@ function init_guiders_dialog_pilot(dlg)
 		phr5:GetPhraseScript():AddAction("dialogs.break_dialog")
 	phr9 = dlg:AddPhrase("guider_dialog_phr_31", "6", "3", -10000)               -- -- -- -- -- -- -- "Я передумал."
 		phr9:GetPhraseScript():AddAction("dialogs.break_dialog")
-	log1("init_guiders_dialog - end") flush_log()
 end
