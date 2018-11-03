@@ -405,9 +405,9 @@ function convert_after_shg_detached(cur_weapon)
   local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
   ogse_signals.get_mgr():unsubscribe( sm_slot )
   --
-  if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
+  --if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
     move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
-  end
+  --end
   --
   soundtrack.s_play_no_feedback([[interface\inv_attach_addon]])
 end
@@ -592,9 +592,9 @@ function install_remove_addon(cur_weapon, sfake_addon_or_addon_flag, remove_addo
   ogse_signals.get_mgr():unsubscribe( sm_slot )
 	--
 	--
-	if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
+	--if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
 		move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
-	end
+	--end
 	--
 	soundtrack.s_play_no_feedback([[interface\inv_attach_addon]])
 	-- удаляем  фейковый аддон, если не снимали
@@ -759,9 +759,9 @@ function switch_shg_mode(wpn)
   ogse_signals.get_mgr():unsubscribe( sm_slot )
   --
   --Для поддержки равнозначных слотов
-  if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
+  --if cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
     move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
-  end
+  --end
 end
 
 function get_sect_to_convert_after_shg_removed(wpn)
@@ -822,9 +822,9 @@ function convert_addon_to_shg(saddon, slot_number)
   local s_new_weapon = ogse.spawn_item_in_inv( wpn_section )
   ogse_signals.get_mgr():unsubscribe( sm_slot )
   --
-  if slot_number ~= get_u32(wpn_section, "slot") then
+  --if slot_number ~= get_u32(wpn_section, "slot") then
     move_weapon_to_slot(s_new_weapon, slot_number, db.actor:active_slot() == slot_number)
-  end
+  --end
 end
 
 -- следим за попаданием в инвентарь ствола XM-26 LSS в режиме автономного оружия для конвертации в аддон
@@ -881,7 +881,7 @@ function on_item_to_ruck(obj, sobj)
 						local s_new_weapon = ogse.spawn_item_in_inv(new_wpn_section)
 						ogse_signals.get_mgr():unsubscribe( sm_slot )
 						--
-						if is_wpn_in_slot and cur_wpn_slot_engine ~= cur_wpn_slot_cfg then
+						if is_wpn_in_slot --[[and cur_wpn_slot_engine ~= cur_wpn_slot_cfg]] then
 							move_weapon_to_slot(s_new_weapon, cur_wpn_slot_engine, is_slot_active)
 						end
 					end
