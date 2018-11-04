@@ -3313,7 +3313,11 @@ function yan_sold_paralyze_actor()
 		local wpn = db.actor:item_in_slot(i)
 		if wpn then db.actor:move_to_ruck(wpn) end
 	end
-	alife():create("wpn_montirovka_weak", vector():set(72.144,2.139,-134.179), 90691, 1492)
+	--
+	local _sobj = alife():create("wpn_montirovka_weak", vector():set(72.144,2.139,-134.179), 90691, 1492)
+	local sobj = alife():object(_sobj.id)
+	dsh.clear_useful_for_ai( sobj ) --На всякий случай
+	alife():use_ai_locations( sobj, false ) --Может поможет от проваливания
 end
 
 function restore_inventory() --KRodin: Отключено, т.к на мой взгляд оно не нужно, если все таки буду включать - переделать обязательно!
@@ -3555,7 +3559,7 @@ end
 
 function fake_art1effect()
 	local sobj = alife():story_object(story_ids.fake_art1)
-	snd:play_no_feedback(sobj, sound_object.s3d, 0, sobj.position, 1.0)
+	snd:play_no_feedback(db.actor, sound_object.s3d, 0, sobj.position, 1.0)
 end
 
 function spawn_fake_art2()
@@ -3571,7 +3575,7 @@ end
 
 function fake_art2effect()
 	local sobj = alife():story_object(story_ids.fake_art2)
-	snd:play_no_feedback(sobj, sound_object.s3d, 0, sobj.position, 1.0)
+	snd:play_no_feedback(db.actor, sound_object.s3d, 0, sobj.position, 1.0)
 end
 
 function spawn_fake_art3()
@@ -3587,7 +3591,7 @@ end
 
 function fake_art3effect()
 	local sobj = alife():story_object(story_ids.fake_art3)
-	snd:play_no_feedback(sobj, sound_object.s3d, 0, sobj.position, 1.0)
+	snd:play_no_feedback(db.actor, sound_object.s3d, 0, sobj.position, 1.0)
 end
 
 function mark_fakeart1()
