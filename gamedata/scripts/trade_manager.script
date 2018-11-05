@@ -198,7 +198,7 @@ function update( npc, forced )
 end
 
 
------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local function change_new_update_time( slot, next_update, forced )
   local sm = ogse_signals.get_mgr()
   local current_time = game.get_game_time()
@@ -236,7 +236,6 @@ function update_buy_supplies( npc )
   local str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_supplies )
   if str then
     npc:buy_supplies( tt.config, str )
-    add_buy_supplies( npc, tt.config, str )
   end
   --Вот тут устанавливается время следующего обновления торговли.
   tt.resuply_time = game.get_game_time() + seconds2ctime( math.random( MIN_TRADE_UPD_TIME, MAX_TRADE_UPD_TIME ) * 3600 )
@@ -251,21 +250,6 @@ function update_buy_supplies( npc )
       sect, "resuply_time", pack_time_to_string( tt.resuply_time )
     )
     sobj:save_spawn_ini()
-  end
-end
-
-function add_buy_supplies( npc, ini, def_sect )
-  local sect = def_sect .. ".add"
-  if ini:section_exist( sect ) then
-    for i = 0, ini:line_count( sect ) - 1 do
-      local _, key, v = ini:r_line( sect, i )
-      local n = math.random( 0, tonumber( v ) )
-      if n > 0 then
-        for j = 1, n do
-          ogse.spawn_item_in_inv( key, npc )
-        end
-      end
-    end
   end
 end
 --------------------------------------------------------------------------------
