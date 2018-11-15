@@ -231,7 +231,7 @@ function update_buy_supplies( npc )
   local tt = trade_manager[ npc:id() ]
   ASSERT( tt, "trade_manager[ npc:id() ] npc found: %s", npc:name() )
   --
-  if tt.resuply_time > game.get_game_time() then return end --KRodin: костыль для своевременного обновления торговли после сейв-лоада, чтобы опять менеджер сигналов не править, лучше пусть будет так.
+  if tt.resuply_time and tt.resuply_time > game.get_game_time() then return end --KRodin: костыль для своевременного обновления торговли после сейв-лоада, чтобы опять менеджер сигналов не править, лучше пусть будет так.
   --
   local str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_supplies )
   if str then
