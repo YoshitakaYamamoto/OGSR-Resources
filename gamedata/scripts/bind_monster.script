@@ -17,6 +17,9 @@ function generic_object_binder:__init(obj) super(obj)
 	self.am = ogse_signals.get_mgr()
 	self.am:call( "on_monster_init", obj, self )
 end 
+function generic_object_binder:__finalize()
+	--log1("--generic_object_binder:__finalize() called!")
+end
 
 function generic_object_binder:reload(section)
 	object_binder.reload(self, section)
@@ -106,9 +109,11 @@ function generic_object_binder:subscribe_updaters()
 end
 
 function generic_object_binder:unsubscribe_updaters()
-  for _, s in ipairs( self.updaters ) do
+  if not self.updaters then return end
+
+  for k, s in pairs( self.updaters ) do
     self.am:unsubscribe( s )
-	s = nil
+	self.updaters[k] = nil
   end
   self.updaters = nil
 end
@@ -163,10 +168,8 @@ function generic_object_binder:waypoint_callback(obj, action_type, index)
 end
 
 function generic_object_binder:death_callback(victim, who)
-	for _, s in ipairs( self.updaters ) do
-		self.am:unsubscribe( s )
-	end
-	self.updaters = {}
+	self:unsubscribe_updaters()
+
 	self.object:set_tip_text_default()
 
 	self:clear_callbacks()

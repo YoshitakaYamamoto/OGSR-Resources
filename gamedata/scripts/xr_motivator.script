@@ -249,6 +249,9 @@ function motivator_binder:__init (obj) super(obj)
 	self.am = ogse_signals.get_mgr()
 	self.am:call( "on_npc_init", obj, self )
 end
+function motivator_binder:__finalize()
+	--log1("--motivator_binder:__finalize() called!")
+end
 
 function motivator_binder:extrapolate_callback(cur_pt)
 	if self.st.active_section then
@@ -408,9 +411,11 @@ function motivator_binder:subscribe_updaters()
 end
 
 function motivator_binder:unsubscribe_updaters()
-  for _, s in ipairs( self.updaters ) do
+  if not self.updaters then return end
+
+  for k, s in pairs( self.updaters ) do
     self.am:unsubscribe( s )
-	s = nil
+	self.updaters[k] = nil
   end
   self.updaters = nil
 end
@@ -556,10 +561,8 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 end
 
 function motivator_binder:death_callback(victim, who)
-	for _, s in ipairs( self.updaters ) do
-		self.am:unsubscribe( s )
-	end
-	self.updaters = {}
+	self:unsubscribe_updaters()
+
 	self.object:set_tip_text_default()
 
 	--log3("!!![%s][%s] killed from [%s]!!!", script_name(), self.object:name(), who:name())
