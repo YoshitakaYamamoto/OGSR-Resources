@@ -224,12 +224,13 @@ function info_about_npc()
 				be = target_obj:best_enemy():name()
 			end
 			local best_danger = target_obj:best_danger()
-			local best_danger_name = "not specified"
-			local best_danger_type = "not specified"
+			local best_danger_name = nil
+			local best_danger_type = nil
 			if best_danger and best_danger:object() then
 				best_danger_name = best_danger:object():name()
-			end	
+			end
 			if best_danger then
+				best_danger_type = "not specified"
 				local bd_type = best_danger:type()
 				if bd_type == danger_object.attack_sound then
 					best_danger_type = "attack sound"

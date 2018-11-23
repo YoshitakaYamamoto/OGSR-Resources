@@ -422,12 +422,13 @@ function state_manager:unsubscribe()
   end
 end
 
-function state_manager:set_state(caller, state_name, callback, timeout, target, emerg, synsound, extrakeys)
+function state_manager:set_state(_, state_name, callback, timeout, target, emerg, synsound, extrakeys)
 	--log3("Set State called: for %s State: %s", self.npc:name(), state_name)
 	
 	if state_lib.states[state_name] == nil then
-		log1("DEBUG_STATEMGR: Script "..tostring(caller).." called illegal state ["..tostring(state_name).."] for NPC "..tostring(self.npc:name()))
-		abort("ERROR: ILLEGAL SET STATE CALLED!!! %s fo %s", tostring(state_name), self.npc:name())
+		local d = debug.getinfo(2, "S")
+		log1("DEBUG_STATEMGR: Script [".. d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1') .. "." .. d.linedefined .."] called illegal state ["..tostring(state_name).."] for NPC "..tostring(self.npc:name()))
+		abort("ERROR: ILLEGAL SET STATE CALLED!!! [%s] fo [%s]", tostring(state_name), self.npc:name())
 		-- state_name="idle"
 	end
 	
@@ -570,11 +571,19 @@ function state_manager:update()
 	--self.planner:show("")
 end
 
-function set_state(caller, npc, ...)
-	if db.storage[npc:id()].state_mgr then
-		db.storage[npc:id()].state_mgr:set_state( caller, ...)
+function set_state(caller, npc, ...) --Добавил в функцию костыли, чтоб не править тыщу скриптов
+	local caller_is_string = type(caller) == "string"
+	if caller_is_string then caller = npc end
+
+	if db.storage[caller:id()].state_mgr then
+		if caller_is_string then
+			db.storage[caller:id()].state_mgr:set_state( nil, ... )
+		else
+			db.storage[caller:id()].state_mgr:set_state( nil, npc, ... )
+		end
 	end
 end
+
 function get_state(npc)
 	if db.storage[npc:id()].state_mgr then
 		return db.storage[npc:id()].state_mgr:get_state()

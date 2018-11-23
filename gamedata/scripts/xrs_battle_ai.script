@@ -1,4 +1,21 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
+
+local NO_ACTIVE_SLOT = 255
+local INVALID_STORY_ID = 4294967295
+
+local function random_choice( ... )
+  local arg = { ... }
+  return arg[ math.random( #arg ) ]
+end
+
+local function is_exo_visual( npc )
+  local vis = npc:get_visual_name()
+  return string.find( vis, "exo" ) or string.find( vis, "tank" )
+    or string.find( vis, "_cherep" )
+    or string.find( vis, "_redeye" )
+    or string.find( vis, "stalker_arhara1" )
+end
+
 -----------------------------------------------------------------------
 --- xrs_battle_ai.script
 --- Модуль боевки
@@ -8,7 +25,6 @@
 -----------------------------------------------------------------------
 --- Настройки:
 -----------------------------------------------------------------------
-local total_debug               = false --get_console():get_bool( "write_debug_log" )
 -- время, сколько примерно сидеть в укрытии, миллиссекунд
 local time_to_hide              = 5000
 -- время, сколько стоять на точке маневрирования, миллиссекунд
@@ -48,7 +64,7 @@ hit_timeout = {}
 
 
 -- локации где можно атаковать БТР и вертолеты
-local armor_allowed_locations = {}
+local armor_allowed_locations = { [ "l13_generators_ogse" ] = true }
 
 -- состояния не готовности к огню, нужно заставить встать перед
 -- началом стрельбы
@@ -61,10 +77,6 @@ local not_ready_states = {
   [ "guard"    ] = true,
   [ "patrol"   ] = true,
 }
-
--- рестрикшены, которые нельзя восстанавливать если они были сняты,
--- находятся в скриптe _g
-local restrictions_off = true
 
 local low_range_npc_aggr = 30
 local far_range_mon_aggr = 50
@@ -80,6 +92,8 @@ local forbidden_comms = {       -- запретные коммунити
   [ "zombied" ] = true,
   -- [ "ecolog"  ] = true,
   -- [ "trader"  ] = true,
+  -- [ "gunsmith"] = true,
+  -- [ "guider"  ] = true,
 }
 
 local forbidden_schemes = {     -- запретные схемы
@@ -253,8 +267,6 @@ local hit_memory                = {} -- хитоая память
 local active_grenades           = {} -- активные гранатные угрозы
 local deadman_vtx               = {} -- точка откуда будем ждать успокоения
 local count_update              = {} -- Счетчик апдейтов
-local backup_restrictions_in    = {} -- табличка для сохранения рестрикторов
-local backup_restrictions_out   = {} -- табличка для сохранения рестрикторов
 local grenka_already_shout      = {}
 local grenka_already_blow       = {}
 local escape_point              = {}
@@ -355,12 +367,12 @@ function evaluator_check_altcombat:evaluate()
   if
     ( not self.object:alive() )
     or xr_wounded.is_wounded( self.object )
+    or xr_companion.is_companion( self.object:id() )
     or (
       db.storage[ self.object:id() ].active_scheme
       and forbidden_schemes[ db.storage[ self.object:id() ].active_scheme ]
     )
   then
-    restore_restrictions( self.object )
     in_combat[ self.object:id() ] = nil
     return false
   else
@@ -370,15 +382,15 @@ function evaluator_check_altcombat:evaluate()
       last_target[ self.object:id()  ] = {}        -- последняя цель
       setup_sound_table( self.object )
       inited[ self.object:id()       ] = true
-      local ini = battle.is_battle_spawned( self.object )
-      if ini then
-        local actor_is_enemy = get_bool(
-          "battle", "xrs_battle_ai.actor_is_enemy", false, ini
-        )
-        if actor_is_enemy then
-          register_as_target( self.object, db.actor )
-        end
-      end
+      --local ini = battle.is_battle_spawned( self.object )
+      --if ini then
+      --  local actor_is_enemy = get_bool(
+      --    "battle", "xrs_battle_ai.actor_is_enemy", false, ini
+      --  )
+      --  if actor_is_enemy then
+      --    register_as_target( self.object, db.actor )
+      --  end
+      --end
     end
     reprioritize_targets( self.object )
     check_for_grenades( self.object )
@@ -416,7 +428,6 @@ function evaluator_check_altcombat:evaluate()
         in_combat[ self.object:id() ] = true
         return true
       end
-      restore_restrictions( self.object )
       in_combat[ self.object:id() ] = nil
       return false
     end
@@ -439,7 +450,6 @@ function evaluator_check_altcombat:evaluate()
     if intro_time[ self.object:id() ] and not self.object:best_danger() then
       intro_time[ self.object:id() ] = nil
     end
-    restore_restrictions( self.object )
     in_combat[ self.object:id() ] = nil
     return false
   end
@@ -510,7 +520,6 @@ function action_altcombat:execute()
   -- получим текущее оружие
   local bw = get_best_weapon( npc )
 
-  process_restrictions(npc)
   -- строим список врагов/друзей, проверяем линию огня - в своих и
   -- нейтралов чтоб не стрелять
   self:check_objects( bw, enemy )
@@ -1210,7 +1219,7 @@ function hit_fx( obj, amount, who, bone_index )
     key_1 = "pistol"
   end
 
-  local has_exo = dsh.is_exo_visual( obj )
+  local has_exo = is_exo_visual( obj )
   local key_2, hit_delay
   if amount > 0.01 then
     if amount <= 0.1 or has_exo then
@@ -1331,6 +1340,7 @@ function hit_callback( obj, amount, local_direction, who, bone_index )
               or npc:character_community() == who:character_community()
             )
             and who:id() ~= db.actor:id()
+            and not xr_companion.is_companion( who:id() )
           )
         then
           if not hit_memory[ npc:id() ] then
@@ -1462,7 +1472,6 @@ function reset_everything( npc )
   sounds_timeout[ npc:id() ] = nil
   targets_list[ npc:id() ] = {}
   time_hide[ npc:id() ] = nil
-  restore_restrictions( npc )
 end
 
 
@@ -1626,11 +1635,44 @@ function is_enemy_see( enemy, npc )
 end
 
 
+function register_as_target_companions( npc )
+  for id, _ in pairs( xr_companion.companions ) do
+    local enemy = level.object_by_id( id )
+    if enemy then
+      if
+        ( not targets_list[ npc:id() ] ) or not targets_list[ npc:id() ][ id ]
+      then
+        if npc and npc:alive() and not xr_wounded.is_wounded( npc ) then
+          local dist = npc:position():distance_to( enemy:position() )
+          local enemy_record = {
+            npc    = IsStalker( enemy ),
+            range  = dist,
+            vis    = is_enemy_see( enemy, npc ),
+            weight = 1000,
+          }
+          if enemy_record.vis and enemy_record.npc then
+            enemy_record.last_time_seen = time_global()
+            enemy_record.vertex         = enemy:level_vertex_id()
+          end
+          if not targets_list[ npc:id() ] then
+            targets_list[ npc:id() ] = {}
+          end
+          targets_list[ npc:id() ][ id ] = enemy_record
+        end
+      end
+    end
+  end
+end
+
+
 function register_as_target( npc, enemy )
   local id = enemy:id()
   if
     ( not targets_list[ npc:id() ] ) or not targets_list[ npc:id() ][ id ]
   then
+    if id == db.actor:id() then
+      register_as_target_companions( npc ) --KRodin: вообще мне кажется, что это не особо нужно.
+    end
     if npc and npc:alive() and not xr_wounded.is_wounded(npc) then
       local dist = npc:position():distance_to( enemy:position() )
       local enemy_record = {
@@ -1675,13 +1717,6 @@ function reprioritize_targets( npc )
       bad_hide[ check_hide ] = nil
       locked_vertexes[ 0 ]   = nil
     end
-  end
-
-  if total_debug then
-    print_table_inlog_v2(
-      targets_list[ npc:id() ],
-      string.format( "--XRS_BATTLE_AI: TARGS of %s >>", npc:name() )
-    )
   end
 
   local enemy_by_engine = npc:best_enemy()
@@ -1873,7 +1908,13 @@ function refresh_targets( npc )
         and disabled_objects[ npc:id() ][ enemy_by_engine:id() ]
       )
     then
-      if check_is_enemy( npc, enemy_by_engine ) then
+      if
+        check_is_enemy( npc, enemy_by_engine )
+        or (
+          xr_companion.is_companion( enemy_by_engine:id() )
+          and check_is_enemy( npc, db.actor )
+        )
+      then
         register_as_target( npc, enemy_by_engine )
       else
         disable_object( npc, enemy_by_engine )
@@ -1906,7 +1947,13 @@ function refresh_targets( npc )
                 and disabled_objects[ npc:id() ][ best_danger_object:id() ]
               )
             then
-              if check_is_enemy( npc, best_danger_object ) then
+              if
+                check_is_enemy( npc, best_danger_object )
+                or (
+                  xr_companion.is_companion( best_danger_object:id() )
+                  and check_is_enemy( npc, db.actor )
+                )
+              then
                 register_as_target( npc, best_danger_object )
               else
                 disable_object( npc, best_danger_object )
@@ -2056,9 +2103,9 @@ function register_as_target_armor( npc, enemy )
 end
 
 
+local hostile_treshold = get_float( "game_relations", "attitude_neutal_threshold" )
 function is_hostile_armor( comm, target )
-  local t_comm_number = 1
-  local t_comm        = "actor"
+  local t_comm = "actor"
   if
     string.find( target:section(), "helicopter" )
     or string.find( target:section(), "mi24" )
@@ -2071,27 +2118,12 @@ function is_hostile_armor( comm, target )
       t_comm = "military"
     end
   elseif string.find( target:name(), "btr" ) then
-    local check_comm -- = ogse_scripted_btr.cars_comm[target:name()]
+    local check_comm = ogse_scripted_btr.cars_comm[target:name()]
     if not check_comm then
       t_comm = "military"
     end
   end
-  local hostile_treshold = tonumber(
-    system_ini():r_string( "game_relations", "attitude_neutal_threshold" )
-  )
-  local comm_attitude    = parse_data(
-    system_ini():r_string( "communities_relations", comm )
-  )
-  local comm_list        = parse_data(
-    system_ini():r_string( "game_relations", "communities" )
-  )
-  for k, v in pairs ( comm_list ) do
-    if t_comm == tostring( v ) then
-      t_comm_number = ( k + 1 ) / 2
-      break
-    end
-  end
-  local attitude = tonumber( comm_attitude[ t_comm_number ] ) or -5000
+
   -- квестовая врезка начало
   if
     level.name() == "l13_generators_ogse"
@@ -2104,7 +2136,8 @@ function is_hostile_armor( comm, target )
     return false
   end
   -- квестовая врезка конец
-  return attitude < hostile_treshold
+
+  return utils2.community_relation_safe( comm, target:id(), t_comm ) < hostile_treshold
 end
 
 
@@ -2828,7 +2861,7 @@ function add_deviation( npc, position, weapon, distance, enemy )
   if deviations then
     local max = deviations * dev_coeff
     if enemy:id() == db.actor:id() then
-      local k = 1 - inventory.on_belt_hit_immunity( "fire_wound_immunity" )
+      local k = 1 -- - inventory.on_belt_hit_immunity( "fire_wound_immunity" )
       if k > 0 then
         max = max * k
       else
@@ -3366,7 +3399,7 @@ function find_vertex_in_radius( npc, around_vertex, radius )
       -- ищем вертекс
       -- нужная нам позиция
       local pos     = vector():mad( around_pos, cur_dir, dist )
-      local vert_ok = level.vertex_id_by_pos( pos )
+      local vert_ok = level.vertex_id( pos )
       if
         vert_ok ~= INVALID_STORY_ID
         and npc:accessible( vert_ok )
@@ -3624,98 +3657,18 @@ function correct_position( gi, npc )
 end
 
 
-function process_restrictions( npc )
-  if restrictions_off then return end
-  local name    = npc:name()
-  local profile = npc:profile_name()
-  if
-    string.find( name, "sniper" ) or string.find( profile, "sniper" )
-    or string.find( name, "watch" ) or string.find( profile, "watch" )
-    or string.find( name, "commander" ) or string.find( profile, "commander" )
-    or string.find( name, "leader" ) or string.find( profile, "leader" )
-    or string.find( name, "aem_" ) or string.find( profile, "aem_" )
-    or string.find( name, "bar_arena" ) or string.find( profile, "bar_arena" )
-  then
-    return false
-  end
-  local restr_out = npc:out_restrictions()
-  local restr_in  = npc:in_restrictions()
-  if not backup_restrictions_out[ npc:id() ] then
-    backup_restrictions_out[ npc:id() ] = restr_out
-  end
-  if not backup_restrictions_in[ npc:id() ] then
-    backup_restrictions_in[ npc:id() ] = restr_in
-  end
-  npc:remove_all_restrictions()
-end
-
-
-function clean_restrictions( str_restr )
-  local out_str_1 = ""
-  local out_str_2 = ""
-  local out_str_3 = ""
-  local out_str   = str_restr
-  local result    = 0
-  for k, v in pairs( excluded_restrictors ) do
-    local pattern_1 = k .. ","
-    local pattern_2 = "," .. k
-    local pattern_3 = k
-    out_str_1, result = string.gsub( out_str,   pattern_1, "" )
-    out_str = out_str_1
-    out_str_2, result = string.gsub( out_str_1, pattern_2, "" )
-    out_str = out_str_2
-    out_str_3, result = string.gsub( out_str_2, pattern_3, "" )
-    out_str = out_str_3
-  end
-  return out_str
-end
-
-
-function restore_restrictions( npc )
-  if restrictions_off then return end
-  local name    = npc:name()
-  local profile = npc:profile_name()
-  if
-    string.find( name, "sniper" ) or string.find( profile, "sniper" )
-    or string.find( name, "watch" ) or string.find( profile, "watch" )
-    or string.find( name, "commander" ) or string.find( profile, "commander" )
-    or string.find( name, "leader" ) or string.find( profile, "leader" )
-    or string.find( name, "aem_" ) or string.find( profile, "aem_" )
-    or string.find( name, "bar_arena" ) or string.find( profile, "bar_arena" )
-    or string.find( name, "trader" ) or string.find( profile, "trader" )
-  then
-    return false
-  end
-  if
-    backup_restrictions_out[ npc:id() ]
-    or backup_restrictions_in[ npc:id() ]
-  then
-    --log1("[XRS BATTLE AI] REMOVING ALL RESTRICTIONS FOR "..npc:name())
-    npc:remove_all_restrictions()
-    local restr_out = clean_restrictions( backup_restrictions_out[ npc:id() ] )
-    local restr_in  = clean_restrictions( backup_restrictions_in[ npc:id()  ] )
-    --log1("[XRS BATTLE AI] ADDING IN RESTRICTIONS "..restr_out.." FOR "..npc:name())
-    --log1("[XRS BATTLE AI] ADDING OUT RESTRICTIONS "..restr_out.." FOR "..npc:name())
-    npc:add_restrictions( restr_out, restr_in )
-    backup_restrictions_out[ npc:id() ] = nil
-    backup_restrictions_in[ npc:id()  ] = nil
-    -- ogse.fix_restrictors(npc)
-  end
-end
-
-
 function is_exclusion( npc )
-  local name    = npc:name()
-  local profile = npc:profile_name()
-  if
-    string.find( name, "prisoner" ) or string.find( profile, "prisoner" )
-    or string.find( name, "captive" ) or string.find( profile, "captive" )
-    or string.find( name, "esc_shustryi" )
-  then
-    return true
-  else
+  --local name    = npc:name()
+  --local profile = npc:profile_name()
+  --if
+  --  string.find( name, "prisoner" ) or string.find( profile, "prisoner" )
+  --  or string.find( name, "captive" ) or string.find( profile, "captive" )
+  --  or string.find( name, "esc_shustryi" )
+  --then
+  --  return true
+  --else
     return false
-  end
+  --end
 end
 
 
@@ -3788,26 +3741,30 @@ function add_to_binder( object, ini, scheme, section, storage )
   action:add_precondition(
     world_property( xr_evaluators_id.sidor_wounded_base, false )
   )
-  xrs_ai.addCommonPrecondition( action )
-  -- if rx_facer then
-  --   action:add_precondition( world_property( rx_facer.evid_facer, false ) )
-  --   action:add_precondition(
-  --     world_property( rx_facer.evid_steal_up_facer, false )
-  --   )
-  -- end
+  
+  xrs_ai.addCommonPrecondition( action ) --KRodin: если возникнут проблемы, это убрать и раскомментировать блок ниже
+  --if xrs_grenade then
+  --  action:add_precondition( world_property( xrs_grenade.prop_fire, false  ) )
+  --  action:add_precondition( world_property( xrs_grenade.prop_grenade, false  ) )
+  --end
+
+  if rx_bandage and rx_bandage.enable_scheme then
+    action:add_precondition( world_property( rx_bandage.evid_bandage, false ) )
+  end	
+  if rx_facer then
+    action:add_precondition( world_property( rx_facer.evid_facer, false ) )
+    action:add_precondition(
+      world_property( rx_facer.evid_steal_up_facer, false )
+    )
+  end
   if rx_gl then
     action:add_precondition( world_property( rx_gl.evid_gl_fire,   false ) )
     action:add_precondition( world_property( rx_gl.evid_gl_reload, false ) )
   end
-  action:add_precondition(
-    world_property( blowout_scheme.evid_outside, false )
-  )
-  action:add_precondition(
-    world_property( blowout_scheme.evid_blowout, false )
-  )
-  action:add_precondition(
-    world_property( blowout_scheme.evid_preblowout, false )
-  )
+
+  action:add_precondition( world_property( ogsm_hideout.property_blowout, false ) )
+  action:add_precondition( world_property( ogsm_hideout.property_hideout_lost, false ) )
+  
   action:add_precondition(
     world_property( properties.alt_combat_enabled, true )
   )
