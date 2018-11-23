@@ -1,45 +1,45 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 -----------------------------------------------------------------------
 --- xrs_battle_ai.script
---- Модуль боевки
---- Автор: KamikaZze
---- Идея, советы: xStream
+--- РњРѕРґСѓР»СЊ Р±РѕРµРІРєРё
+--- РђРІС‚РѕСЂ: KamikaZze
+--- РРґРµСЏ, СЃРѕРІРµС‚С‹: xStream
 --- version 4.38 (10/03/2015)
 -----------------------------------------------------------------------
---- Настройки:
+--- РќР°СЃС‚СЂРѕР№РєРё:
 -----------------------------------------------------------------------
 local total_debug               = false --get_console():get_bool( "write_debug_log" )
--- время, сколько примерно сидеть в укрытии, миллиссекунд
+-- РІСЂРµРјСЏ, СЃРєРѕР»СЊРєРѕ РїСЂРёРјРµСЂРЅРѕ СЃРёРґРµС‚СЊ РІ СѓРєСЂС‹С‚РёРё, РјРёР»Р»РёСЃСЃРµРєСѓРЅРґ
 local time_to_hide              = 5000
--- время, сколько стоять на точке маневрирования, миллиссекунд
+-- РІСЂРµРјСЏ, СЃРєРѕР»СЊРєРѕ СЃС‚РѕСЏС‚СЊ РЅР° С‚РѕС‡РєРµ РјР°РЅРµРІСЂРёСЂРѕРІР°РЅРёСЏ, РјРёР»Р»РёСЃСЃРµРєСѓРЅРґ
 local time_to_maneuver          = 2500
-local close_combat_distance     = 15 -- дистанция ближнего боя
--- дистанция когда бой уже не считается ближним
+local close_combat_distance     = 15 -- РґРёСЃС‚Р°РЅС†РёСЏ Р±Р»РёР¶РЅРµРіРѕ Р±РѕСЏ
+-- РґРёСЃС‚Р°РЅС†РёСЏ РєРѕРіРґР° Р±РѕР№ СѓР¶Рµ РЅРµ СЃС‡РёС‚Р°РµС‚СЃСЏ Р±Р»РёР¶РЅРёРј
 local distant_combat_distance   = 35
--- максимальная адекватная дистанция огневого боя
+-- РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ Р°РґРµРєРІР°С‚РЅР°СЏ РґРёСЃС‚Р°РЅС†РёСЏ РѕРіРЅРµРІРѕРіРѕ Р±РѕСЏ
 local maximum_firefight_dist    = 200
-local cooldown_time             = 20000 -- время запрета лута после боя
--- интервал реприоретизации, мсек - нельзя делать слишком низким -
--- будет судорожно метаться между целями
+local cooldown_time             = 20000 -- РІСЂРµРјСЏ Р·Р°РїСЂРµС‚Р° Р»СѓС‚Р° РїРѕСЃР»Рµ Р±РѕСЏ
+-- РёРЅС‚РµСЂРІР°Р» СЂРµРїСЂРёРѕСЂРµС‚РёР·Р°С†РёРё, РјСЃРµРє - РЅРµР»СЊР·СЏ РґРµР»Р°С‚СЊ СЃР»РёС€РєРѕРј РЅРёР·РєРёРј -
+-- Р±СѓРґРµС‚ СЃСѓРґРѕСЂРѕР¶РЅРѕ РјРµС‚Р°С‚СЊСЃСЏ РјРµР¶РґСѓ С†РµР»СЏРјРё
 local reprioritize_timeout      = 1500
--- время, сколько помнить о появлении врага, миллиссекунд
+-- РІСЂРµРјСЏ, СЃРєРѕР»СЊРєРѕ РїРѕРјРЅРёС‚СЊ Рѕ РїРѕСЏРІР»РµРЅРёРё РІСЂР°РіР°, РјРёР»Р»РёСЃСЃРµРєСѓРЅРґ
 local memory_timeout            = 80000
--- сколько помнить о последнем основном враге (нужно для
--- предотвращения выхода из боя слишком рано), для неписей умножается
--- на 2
+-- СЃРєРѕР»СЊРєРѕ РїРѕРјРЅРёС‚СЊ Рѕ РїРѕСЃР»РµРґРЅРµРј РѕСЃРЅРѕРІРЅРѕРј РІСЂР°РіРµ (РЅСѓР¶РЅРѕ РґР»СЏ
+-- РїСЂРµРґРѕС‚РІСЂР°С‰РµРЅРёСЏ РІС‹С…РѕРґР° РёР· Р±РѕСЏ СЃР»РёС€РєРѕРј СЂР°РЅРѕ), РґР»СЏ РЅРµРїРёСЃРµР№ СѓРјРЅРѕР¶Р°РµС‚СЃСЏ
+-- РЅР° 2
 local remember_enemy            = 10000
-local inertion_time_grenade     = 3000 -- сколько бояться гранаты
--- С какого апдейта схема начинает работать. Нельзя чтобы схема
--- стартовала включенной сразу же, иначе будут глюки на переключении
--- схем и выборе оружия
+local inertion_time_grenade     = 3000 -- СЃРєРѕР»СЊРєРѕ Р±РѕСЏС‚СЊСЃСЏ РіСЂР°РЅР°С‚С‹
+-- РЎ РєР°РєРѕРіРѕ Р°РїРґРµР№С‚Р° СЃС…РµРјР° РЅР°С‡РёРЅР°РµС‚ СЂР°Р±РѕС‚Р°С‚СЊ. РќРµР»СЊР·СЏ С‡С‚РѕР±С‹ СЃС…РµРјР°
+-- СЃС‚Р°СЂС‚РѕРІР°Р»Р° РІРєР»СЋС‡РµРЅРЅРѕР№ СЃСЂР°Р·Сѓ Р¶Рµ, РёРЅР°С‡Рµ Р±СѓРґСѓС‚ РіР»СЋРєРё РЅР° РїРµСЂРµРєР»СЋС‡РµРЅРёРё
+-- СЃС…РµРј Рё РІС‹Р±РѕСЂРµ РѕСЂСѓР¶РёСЏ
 local engage_after_update       = 3
--- время, мсек, сколько придерживаться стратегии маневрирования
+-- РІСЂРµРјСЏ, РјСЃРµРє, СЃРєРѕР»СЊРєРѕ РїСЂРёРґРµСЂР¶РёРІР°С‚СЊСЃСЏ СЃС‚СЂР°С‚РµРіРёРё РјР°РЅРµРІСЂРёСЂРѕРІР°РЅРёСЏ
 local time_mantain_manuever     = 20000
--- время, мсек, сколько придерживаться выбранной тактики
+-- РІСЂРµРјСЏ, РјСЃРµРє, СЃРєРѕР»СЊРєРѕ РїСЂРёРґРµСЂР¶РёРІР°С‚СЊСЃСЏ РІС‹Р±СЂР°РЅРЅРѕР№ С‚Р°РєС‚РёРєРё
 local time_mantain_tactics      = 30000
-local visibility_treshold_value = 0.45 -- трешхолд видимости
+local visibility_treshold_value = 0.45 -- С‚СЂРµС€С…РѕР»Рґ РІРёРґРёРјРѕСЃС‚Рё
 
--- вероятность сказать фразу
+-- РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ СЃРєР°Р·Р°С‚СЊ С„СЂР°Р·Сѓ
 local sound_prob_event = 0.6
 local sound_prob_hero  = 0.1
 local sound_prob_idle  = 0.1
@@ -47,11 +47,11 @@ local sound_prob_idle  = 0.1
 hit_timeout = {}
 
 
--- локации где можно атаковать БТР и вертолеты
+-- Р»РѕРєР°С†РёРё РіРґРµ РјРѕР¶РЅРѕ Р°С‚Р°РєРѕРІР°С‚СЊ Р‘РўР  Рё РІРµСЂС‚РѕР»РµС‚С‹
 local armor_allowed_locations = {}
 
--- состояния не готовности к огню, нужно заставить встать перед
--- началом стрельбы
+-- СЃРѕСЃС‚РѕСЏРЅРёСЏ РЅРµ РіРѕС‚РѕРІРЅРѕСЃС‚Рё Рє РѕРіРЅСЋ, РЅСѓР¶РЅРѕ Р·Р°СЃС‚Р°РІРёС‚СЊ РІСЃС‚Р°С‚СЊ РїРµСЂРµРґ
+-- РЅР°С‡Р°Р»РѕРј СЃС‚СЂРµР»СЊР±С‹
 local not_ready_states = {
   [ "sit"      ] = true,
   [ "sit_knee" ] = true,
@@ -62,31 +62,31 @@ local not_ready_states = {
   [ "patrol"   ] = true,
 }
 
--- рестрикшены, которые нельзя восстанавливать если они были сняты,
--- находятся в скриптe _g
+-- СЂРµСЃС‚СЂРёРєС€РµРЅС‹, РєРѕС‚РѕСЂС‹Рµ РЅРµР»СЊР·СЏ РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ РµСЃР»Рё РѕРЅРё Р±С‹Р»Рё СЃРЅСЏС‚С‹,
+-- РЅР°С…РѕРґСЏС‚СЃСЏ РІ СЃРєСЂРёРїС‚e _g
 local restrictions_off = true
 
 local low_range_npc_aggr = 30
 local far_range_mon_aggr = 50
 local low_range_mon_aggr =  5
 
-local combat_mult_npc     = 0.5 -- множитель веса ближней цели неписей
-local combat_mult_monster = 0.3 -- множитель веса ближней цели неписей
+local combat_mult_npc     = 0.5 -- РјРЅРѕР¶РёС‚РµР»СЊ РІРµСЃР° Р±Р»РёР¶РЅРµР№ С†РµР»Рё РЅРµРїРёСЃРµР№
+local combat_mult_monster = 0.3 -- РјРЅРѕР¶РёС‚РµР»СЊ РІРµСЃР° Р±Р»РёР¶РЅРµР№ С†РµР»Рё РЅРµРїРёСЃРµР№
 
 local max_invisible_range_npc = 12
 local max_invisible_range_mon =  5
 
-local forbidden_comms = {       -- запретные коммунити
+local forbidden_comms = {       -- Р·Р°РїСЂРµС‚РЅС‹Рµ РєРѕРјРјСѓРЅРёС‚Рё
   [ "zombied" ] = true,
   -- [ "ecolog"  ] = true,
   -- [ "trader"  ] = true,
 }
 
-local forbidden_schemes = {     -- запретные схемы
+local forbidden_schemes = {     -- Р·Р°РїСЂРµС‚РЅС‹Рµ СЃС…РµРјС‹
   [ "wounded" ] = true
 }
 
-local forbidden_profiles = {    -- запретные профили и имена
+local forbidden_profiles = {    -- Р·Р°РїСЂРµС‚РЅС‹Рµ РїСЂРѕС„РёР»Рё Рё РёРјРµРЅР°
   [ "aes_Monolit_sniper_gauss" ] = true,
   [ "Monolit_sniper_gauss"     ] = true,
   [ "pri_monolith_roof3"       ] = true,
@@ -114,7 +114,7 @@ local forbidden_profiles = {    -- запретные профили и имена
   [ "first_neutral"            ] = true,
   [ "esc_buharik"              ] = true,
   [ "esc_guns_remontnik"       ] = true,
-  -- пацаны в саркофаге должны быть под движковой боевкой
+  -- РїР°С†Р°РЅС‹ РІ СЃР°СЂРєРѕС„Р°РіРµ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РїРѕРґ РґРІРёР¶РєРѕРІРѕР№ Р±РѕРµРІРєРѕР№
   [ "sar_monolith_exo"         ] = true,
   [ "sar_monolith_exo_crystal" ] = true,
   [ "sar_monolith_specnaz"     ] = true,
@@ -148,7 +148,7 @@ function attach( sm )
 end
 
 
---- время входа в бой
+--- РІСЂРµРјСЏ РІС…РѕРґР° РІ Р±РѕР№
 local intros = {
   [ "novice"      ] = 400,
   [ "experienced" ] = 300,
@@ -156,11 +156,11 @@ local intros = {
   [ "master"      ] = 100,
 }
 
---- время на прицеливание
---- для эффективной стрельбы из дробовика необходимо,
---- чтобы выдерживался интервал между выстрелами,
---- иначе подброс ствола испортит всю картину
---- для новичков логично этот параметр сделать низким и увеличивать с опытом
+--- РІСЂРµРјСЏ РЅР° РїСЂРёС†РµР»РёРІР°РЅРёРµ
+--- РґР»СЏ СЌС„С„РµРєС‚РёРІРЅРѕР№ СЃС‚СЂРµР»СЊР±С‹ РёР· РґСЂРѕР±РѕРІРёРєР° РЅРµРѕР±С…РѕРґРёРјРѕ,
+--- С‡С‚РѕР±С‹ РІС‹РґРµСЂР¶РёРІР°Р»СЃСЏ РёРЅС‚РµСЂРІР°Р» РјРµР¶РґСѓ РІС‹СЃС‚СЂРµР»Р°РјРё,
+--- РёРЅР°С‡Рµ РїРѕРґР±СЂРѕСЃ СЃС‚РІРѕР»Р° РёСЃРїРѕСЂС‚РёС‚ РІСЃСЋ РєР°СЂС‚РёРЅСѓ
+--- РґР»СЏ РЅРѕРІРёС‡РєРѕРІ Р»РѕРіРёС‡РЅРѕ СЌС‚РѕС‚ РїР°СЂР°РјРµС‚СЂ СЃРґРµР»Р°С‚СЊ РЅРёР·РєРёРј Рё СѓРІРµР»РёС‡РёРІР°С‚СЊ СЃ РѕРїС‹С‚РѕРј
 local time_to_aim = {
   [ "novice"      ] = {
     shotgun = 350, sniper = 1500, other = 350, rpg = 3500,
@@ -176,7 +176,7 @@ local time_to_aim = {
   },
 }
 
---- отклонение прицела
+--- РѕС‚РєР»РѕРЅРµРЅРёРµ РїСЂРёС†РµР»Р°
 local deviation_table = {
   [ "novice"      ] = 0.35,
   [ "experienced" ] = 0.3,
@@ -184,7 +184,7 @@ local deviation_table = {
   [ "master"      ] = 0.2,
 }
 
---- коэффициент отклонения по коммунити
+--- РєРѕСЌС„С„РёС†РёРµРЅС‚ РѕС‚РєР»РѕРЅРµРЅРёСЏ РїРѕ РєРѕРјРјСѓРЅРёС‚Рё
 local community_deviation_coeff = {
   [ "lastday"       ] =  1,
   [ "monolith"      ] =  1,
@@ -197,8 +197,8 @@ local community_deviation_coeff = {
   [ "zombied"       ] = 15,
 }
 
---- группировки с улучшенной координацией (имеют радиосвязь, соотв. об
---- одной цели сразу знают все члены группировки)
+--- РіСЂСѓРїРїРёСЂРѕРІРєРё СЃ СѓР»СѓС‡С€РµРЅРЅРѕР№ РєРѕРѕСЂРґРёРЅР°С†РёРµР№ (РёРјРµСЋС‚ СЂР°РґРёРѕСЃРІСЏР·СЊ, СЃРѕРѕС‚РІ. РѕР±
+--- РѕРґРЅРѕР№ С†РµР»Рё СЃСЂР°Р·Сѓ Р·РЅР°СЋС‚ РІСЃРµ С‡Р»РµРЅС‹ РіСЂСѓРїРїРёСЂРѕРІРєРё)
 local radio_comms = {
   [ "military" ] = true,
   [ "killer"   ] = true,
@@ -223,7 +223,7 @@ local targeting_dangers = {
 
 
 -----------------------------------------------------------------------
---- Данные:
+--- Р”Р°РЅРЅС‹Рµ:
 -----------------------------------------------------------------------
 local last_time_send            = {}
 local last_sent_vertex          = {}
@@ -234,27 +234,27 @@ local already_hear              = {}
 local choosen_hide_combat_state = {}
 local choosen_hide_state        = {}
 cooldown                        = {}
-local disabled_objects          = {} -- таблица забытых объектов
-local targets_list              = {} -- список целей
-local last_reprioritize         = {} -- время приоретизации
-primary_target                  = {} -- таблица целей
-local last_target               = {} -- последняя цель
--- имя последнего врага, чисто для отладочных сообщений
+local disabled_objects          = {} -- С‚Р°Р±Р»РёС†Р° Р·Р°Р±С‹С‚С‹С… РѕР±СЉРµРєС‚РѕРІ
+local targets_list              = {} -- СЃРїРёСЃРѕРє С†РµР»РµР№
+local last_reprioritize         = {} -- РІСЂРµРјСЏ РїСЂРёРѕСЂРµС‚РёР·Р°С†РёРё
+primary_target                  = {} -- С‚Р°Р±Р»РёС†Р° С†РµР»РµР№
+local last_target               = {} -- РїРѕСЃР»РµРґРЅСЏСЏ С†РµР»СЊ
+-- РёРјСЏ РїРѕСЃР»РµРґРЅРµРіРѕ РІСЂР°РіР°, С‡РёСЃС‚Рѕ РґР»СЏ РѕС‚Р»Р°РґРѕС‡РЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№
 local last_enemy                = {}
-local last_enemy_id             = {}         -- ид последнего врага
-local inited                    = {}         -- инициализированы ли
-local monolith                  = {} -- неписи со скриптовой боевкой монолита
-local campers                   = {} -- неписи со скриптовой боевкой кемпера
-local bad_hide                  = {} -- ненадежное укрытие
-local locked_vertexes           = {} -- занятые вертексы
-local death_places              = {} -- места смерти союзников, избегать их
-local time_hide                 = {} -- время ожидания
-local hit_memory                = {} -- хитоая память
-local active_grenades           = {} -- активные гранатные угрозы
-local deadman_vtx               = {} -- точка откуда будем ждать успокоения
-local count_update              = {} -- Счетчик апдейтов
-local backup_restrictions_in    = {} -- табличка для сохранения рестрикторов
-local backup_restrictions_out   = {} -- табличка для сохранения рестрикторов
+local last_enemy_id             = {}         -- РёРґ РїРѕСЃР»РµРґРЅРµРіРѕ РІСЂР°РіР°
+local inited                    = {}         -- РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅС‹ Р»Рё
+local monolith                  = {} -- РЅРµРїРёСЃРё СЃРѕ СЃРєСЂРёРїС‚РѕРІРѕР№ Р±РѕРµРІРєРѕР№ РјРѕРЅРѕР»РёС‚Р°
+local campers                   = {} -- РЅРµРїРёСЃРё СЃРѕ СЃРєСЂРёРїС‚РѕРІРѕР№ Р±РѕРµРІРєРѕР№ РєРµРјРїРµСЂР°
+local bad_hide                  = {} -- РЅРµРЅР°РґРµР¶РЅРѕРµ СѓРєСЂС‹С‚РёРµ
+local locked_vertexes           = {} -- Р·Р°РЅСЏС‚С‹Рµ РІРµСЂС‚РµРєСЃС‹
+local death_places              = {} -- РјРµСЃС‚Р° СЃРјРµСЂС‚Рё СЃРѕСЋР·РЅРёРєРѕРІ, РёР·Р±РµРіР°С‚СЊ РёС…
+local time_hide                 = {} -- РІСЂРµРјСЏ РѕР¶РёРґР°РЅРёСЏ
+local hit_memory                = {} -- С…РёС‚РѕР°СЏ РїР°РјСЏС‚СЊ
+local active_grenades           = {} -- Р°РєС‚РёРІРЅС‹Рµ РіСЂР°РЅР°С‚РЅС‹Рµ СѓРіСЂРѕР·С‹
+local deadman_vtx               = {} -- С‚РѕС‡РєР° РѕС‚РєСѓРґР° Р±СѓРґРµРј Р¶РґР°С‚СЊ СѓСЃРїРѕРєРѕРµРЅРёСЏ
+local count_update              = {} -- РЎС‡РµС‚С‡РёРє Р°РїРґРµР№С‚РѕРІ
+local backup_restrictions_in    = {} -- С‚Р°Р±Р»РёС‡РєР° РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ СЂРµСЃС‚СЂРёРєС‚РѕСЂРѕРІ
+local backup_restrictions_out   = {} -- С‚Р°Р±Р»РёС‡РєР° РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ СЂРµСЃС‚СЂРёРєС‚РѕСЂРѕРІ
 local grenka_already_shout      = {}
 local grenka_already_blow       = {}
 local escape_point              = {}
@@ -264,10 +264,10 @@ local sound_events              = {}
 local sound_are_playing         = {}
 local already_know_about        = {}
 local postcombat                = {}
--- при выборе обхода справа или слева, NPC запоминает это и какое-то
--- время придерживается этой стратегии
+-- РїСЂРё РІС‹Р±РѕСЂРµ РѕР±С…РѕРґР° СЃРїСЂР°РІР° РёР»Рё СЃР»РµРІР°, NPC Р·Р°РїРѕРјРёРЅР°РµС‚ СЌС‚Рѕ Рё РєР°РєРѕРµ-С‚Рѕ
+-- РІСЂРµРјСЏ РїСЂРёРґРµСЂР¶РёРІР°РµС‚СЃСЏ СЌС‚РѕР№ СЃС‚СЂР°С‚РµРіРёРё
 local maneuver_strategy         = {}
-knife_scheme                    = {} -- безоружные неписи
+knife_scheme                    = {} -- Р±РµР·РѕСЂСѓР¶РЅС‹Рµ РЅРµРїРёСЃРё
 local can_fire                  = {}
 local need_knife                = {}
 
@@ -331,7 +331,7 @@ function get_best_weapon( npc )
 end
 
 
--- продолжаем вооруженное общение до умиротворения объекта
+-- РїСЂРѕРґРѕР»Р¶Р°РµРј РІРѕРѕСЂСѓР¶РµРЅРЅРѕРµ РѕР±С‰РµРЅРёРµ РґРѕ СѓРјРёСЂРѕС‚РІРѕСЂРµРЅРёСЏ РѕР±СЉРµРєС‚Р°
 class "evaluator_check_altcombat" ( property_evaluator )
 function evaluator_check_altcombat:__init( name, storage ) super( nil, name )
   self.st = storage
@@ -365,9 +365,9 @@ function evaluator_check_altcombat:evaluate()
     return false
   else
     if not inited[ self.object:id() ] then
-      -- произведем инициализацию таблиц данных селектора
-      targets_list[ self.object:id() ] = {}        -- список целей
-      last_target[ self.object:id()  ] = {}        -- последняя цель
+      -- РїСЂРѕРёР·РІРµРґРµРј РёРЅРёС†РёР°Р»РёР·Р°С†РёСЋ С‚Р°Р±Р»РёС† РґР°РЅРЅС‹С… СЃРµР»РµРєС‚РѕСЂР°
+      targets_list[ self.object:id() ] = {}        -- СЃРїРёСЃРѕРє С†РµР»РµР№
+      last_target[ self.object:id()  ] = {}        -- РїРѕСЃР»РµРґРЅСЏСЏ С†РµР»СЊ
       setup_sound_table( self.object )
       inited[ self.object:id()       ] = true
       local ini = battle.is_battle_spawned( self.object )
@@ -496,7 +496,7 @@ function action_altcombat:execute()
     xr_sound.set_sound( npc, nil )
   end
 
-  local enemy   = get_target( npc ) -- текущий враг
+  local enemy   = get_target( npc ) -- С‚РµРєСѓС‰РёР№ РІСЂР°Рі
   local deadman = have_fresh_deadman( npc )
   if ( not enemy ) and deadman == false then
     last_time_send[ npc:id()    ] = nil
@@ -507,12 +507,12 @@ function action_altcombat:execute()
     return
   end
 
-  -- получим текущее оружие
+  -- РїРѕР»СѓС‡РёРј С‚РµРєСѓС‰РµРµ РѕСЂСѓР¶РёРµ
   local bw = get_best_weapon( npc )
 
   process_restrictions(npc)
-  -- строим список врагов/друзей, проверяем линию огня - в своих и
-  -- нейтралов чтоб не стрелять
+  -- СЃС‚СЂРѕРёРј СЃРїРёСЃРѕРє РІСЂР°РіРѕРІ/РґСЂСѓР·РµР№, РїСЂРѕРІРµСЂСЏРµРј Р»РёРЅРёСЋ РѕРіРЅСЏ - РІ СЃРІРѕРёС… Рё
+  -- РЅРµР№С‚СЂР°Р»РѕРІ С‡С‚РѕР± РЅРµ СЃС‚СЂРµР»СЏС‚СЊ
   self:check_objects( bw, enemy )
 
   self.object:movement_enabled( true )
@@ -522,7 +522,7 @@ function action_altcombat:execute()
   self.object:set_path_type( game_object.level_path )
 
   local assist_point, last_algorythm
-  -- если ещё свежий труп
+  -- РµСЃР»Рё РµС‰С‘ СЃРІРµР¶РёР№ С‚СЂСѓРї
   if ( not get_target( npc ) ) and deadman ~= false then
     stop_play_sound( npc )
     local deadman_target = level.object_by_id( deadman )
@@ -593,7 +593,7 @@ function action_altcombat:execute()
     end
   end
 
-  -- инициализация боя
+  -- РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р±РѕСЏ
   if
     enemy
     and (
@@ -630,7 +630,7 @@ function action_altcombat:execute()
   local distance = be_pos:distance_to( npc_pos )
   local cover
 
-  -- принимаем решение
+  -- РїСЂРёРЅРёРјР°РµРј СЂРµС€РµРЅРёРµ
   local anim = db.storage[ npc:id() ].state_mgr.animstate:state()
   if
     intro_time[ self.object:id() ]
@@ -707,7 +707,7 @@ function action_altcombat:execute()
     ( npc:see( be ) and be:see( npc ) )
     or ( is_armor( be ) and get_armor_vis( be, npc ) )
   then
-    -- если видим врага и он видит нас - стреляем, ищем укрытие
+    -- РµСЃР»Рё РІРёРґРёРј РІСЂР°РіР° Рё РѕРЅ РІРёРґРёС‚ РЅР°СЃ - СЃС‚СЂРµР»СЏРµРј, РёС‰РµРј СѓРєСЂС‹С‚РёРµ
     time_hide[ npc:id() ] = nil
     if is_fanatic( npc ) then
       cur_situation  = 1
@@ -730,7 +730,7 @@ function action_altcombat:execute()
     ( npc:see( be ) and not be:see( npc ) )
     or ( is_armor( be ) and not get_armor_vis( be, npc ) )
   then
-    -- если видим врага и он НЕ видит нас - стреляем, маневрируя
+    -- РµСЃР»Рё РІРёРґРёРј РІСЂР°РіР° Рё РѕРЅ РќР• РІРёРґРёС‚ РЅР°СЃ - СЃС‚СЂРµР»СЏРµРј, РјР°РЅРµРІСЂРёСЂСѓСЏ
     time_hide[ npc:id() ] = nil
     if is_fanatic( npc ) then
       cur_situation  = 3
@@ -763,7 +763,7 @@ function action_altcombat:execute()
     choose_idle_scheme( npc, "attack_notsee" )
 
   elseif ( not npc:see( be ) ) and be:see( npc ) then
-    -- если НЕ видим врага и он видит нас - убегаем, ищем укрытие
+    -- РµСЃР»Рё РќР• РІРёРґРёРј РІСЂР°РіР° Рё РѕРЅ РІРёРґРёС‚ РЅР°СЃ - СѓР±РµРіР°РµРј, РёС‰РµРј СѓРєСЂС‹С‚РёРµ
     time_hide[ npc:id() ] = nil
     if is_fanatic( npc ) then
       cur_situation  = 6
@@ -783,7 +783,7 @@ function action_altcombat:execute()
     choose_idle_scheme(npc, "defence")
 
   else
-    -- если НЕ видим врага и он НЕ видит нас - ищем врага
+    -- РµСЃР»Рё РќР• РІРёРґРёРј РІСЂР°РіР° Рё РѕРЅ РќР• РІРёРґРёС‚ РЅР°СЃ - РёС‰РµРј РІСЂР°РіР°
     if not time_hide[ npc:id() ] then
       time_hide[ npc:id() ] = time_global() + math.random( 7000, 15000 )
         + ( 1000 * ogse.armor_type( npc ) )
@@ -791,7 +791,7 @@ function action_altcombat:execute()
     if is_fanatic( npc ) then
       cur_situation  = 8
       last_algorythm = "enemy_vertex"
-      -- необходимо оформить как отдельный алгоритм
+      -- РЅРµРѕР±С…РѕРґРёРјРѕ РѕС„РѕСЂРјРёС‚СЊ РєР°Рє РѕС‚РґРµР»СЊРЅС‹Р№ Р°Р»РіРѕСЂРёС‚Рј
     elseif is_camper( npc ) then
       cur_situation  = 8
       last_algorythm = "find_cover_0"
@@ -885,7 +885,7 @@ function action_altcombat:execute()
       assist_point = select_enemy_pos( npc, be )
     end
   elseif assist_point == 0 then
-    -- Простой таймаут
+    -- РџСЂРѕСЃС‚РѕР№ С‚Р°Р№РјР°СѓС‚
     assist_point = last_sent_vertex[ npc:id() ]
   end
   if not assist_point then
@@ -987,15 +987,15 @@ function action_altcombat:check_npc_on_fire_line( obj, weapon, be )
       return true
     end
   end
-  -- if be_dist > 5 then --and friend_dist < be_dist then -- убрано чтобы не стреляли не только когда непись между врагом но и за ним непосредственно
-  --   -- направления на врага и друга
-  --   -- считаем попадает ли текущий солдат в сектор обстрела
+  -- if be_dist > 5 then --and friend_dist < be_dist then -- СѓР±СЂР°РЅРѕ С‡С‚РѕР±С‹ РЅРµ СЃС‚СЂРµР»СЏР»Рё РЅРµ С‚РѕР»СЊРєРѕ РєРѕРіРґР° РЅРµРїРёСЃСЊ РјРµР¶РґСѓ РІСЂР°РіРѕРј РЅРѕ Рё Р·Р° РЅРёРј РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ
+  --   -- РЅР°РїСЂР°РІР»РµРЅРёСЏ РЅР° РІСЂР°РіР° Рё РґСЂСѓРіР°
+  --   -- СЃС‡РёС‚Р°РµРј РїРѕРїР°РґР°РµС‚ Р»Рё С‚РµРєСѓС‰РёР№ СЃРѕР»РґР°С‚ РІ СЃРµРєС‚РѕСЂ РѕР±СЃС‚СЂРµР»Р°
   --   local dir_aim = utils.vector_copy_by_val( be_pos ):sub( npc_pos )
   --   local dir_obj = utils.vector_copy_by_val( friend_pos ):sub( npc_pos )
   --   local x       =  dir_obj.x * dir_aim.x + dir_obj.z * dir_aim.z
-  --   -- повернули систему координат
+  --   -- РїРѕРІРµСЂРЅСѓР»Рё СЃРёСЃС‚РµРјСѓ РєРѕРѕСЂРґРёРЅР°С‚
   --   local y       = -dir_obj.z * dir_aim.x + dir_obj.x * dir_aim.z
-  --   local angle   = math.atan2( y, x ) -- угол доворота от -180 до 180
+  --   local angle   = math.atan2( y, x ) -- СѓРіРѕР» РґРѕРІРѕСЂРѕС‚Р° РѕС‚ -180 РґРѕ 180
   --   local div     = radius / friend_dist
   --   if angle >= -div and angle <= div then return true end
   -- end
@@ -1090,7 +1090,7 @@ function notify_friends( npc, enemy )
 end
 
 
-function disable_object( npc, enemy ) -- забыть объект
+function disable_object( npc, enemy ) -- Р·Р°Р±С‹С‚СЊ РѕР±СЉРµРєС‚
   if npc and enemy then
     local id = enemy:id()
     if not disabled_objects[ npc:id() ] then
@@ -1104,7 +1104,7 @@ function disable_object( npc, enemy ) -- забыть объект
 end
 
 
-function enable_object( npc, enemy ) -- вспомнить объект
+function enable_object( npc, enemy ) -- РІСЃРїРѕРјРЅРёС‚СЊ РѕР±СЉРµРєС‚
   if npc and enemy then
     local id = enemy:id()
     if disabled_objects[ npc:id() ] and disabled_objects[ npc:id() ][ id ] then
@@ -1246,12 +1246,12 @@ function hit_fx( obj, amount, who, bone_index )
       if not has_exo then
         local r = -1
         if bone_index == 33 then
-          -- попадание в предплечье
+          -- РїРѕРїР°РґР°РЅРёРµ РІ РїСЂРµРґРїР»РµС‡СЊРµ
           r = math.random() * 100
           need_drop = r < 30
         end
         if bone_index >= 34 and bone_index <= 38 then
-          -- по кисти или пальцам
+          -- РїРѕ РєРёСЃС‚Рё РёР»Рё РїР°Р»СЊС†Р°Рј
           r = math.random()*100
           need_drop = r < 50
         end
@@ -1282,8 +1282,8 @@ end
 
 
 function hit_callback( obj, amount, local_direction, who, bone_index )
-  -- если объект был ранее забыт - очухиваем его, если нету в табличке
-  -- записываем в табличку
+  -- РµСЃР»Рё РѕР±СЉРµРєС‚ Р±С‹Р» СЂР°РЅРµРµ Р·Р°Р±С‹С‚ - РѕС‡СѓС…РёРІР°РµРј РµРіРѕ, РµСЃР»Рё РЅРµС‚Сѓ РІ С‚Р°Р±Р»РёС‡РєРµ
+  -- Р·Р°РїРёСЃС‹РІР°РµРј РІ С‚Р°Р±Р»РёС‡РєСѓ
   local npc = obj
   if who and npc and who:id() == npc:id() then return end
   hit_fx( npc, amount, who, bone_index )
@@ -1542,7 +1542,7 @@ function process_enemy( npc, may_be_enemy )
     and not ( IsStalker( enemy ) and xr_wounded.is_wounded( enemy ) )
   then
     if we_are_under_attack( npc, enemy ) then
-      -- человек ты иль монструшка
+      -- С‡РµР»РѕРІРµРє С‚С‹ РёР»СЊ РјРѕРЅСЃС‚СЂСѓС€РєР°
       -- check_is_enemy( npc, enemy )
       if IsStalker( enemy ) and check_is_enemy( npc, enemy ) then
         register_as_target( npc, enemy )
@@ -1655,9 +1655,9 @@ end
 
 
 function reprioritize_targets( npc )
-  -- обновление основной цели, вызывается из апдейта или любой другой
-  -- аналогичной обработки, хоть из эвалуатора
-  -- обновим предварительно реестр целей
+  -- РѕР±РЅРѕРІР»РµРЅРёРµ РѕСЃРЅРѕРІРЅРѕР№ С†РµР»Рё, РІС‹Р·С‹РІР°РµС‚СЃСЏ РёР· Р°РїРґРµР№С‚Р° РёР»Рё Р»СЋР±РѕР№ РґСЂСѓРіРѕР№
+  -- Р°РЅР°Р»РѕРіРёС‡РЅРѕР№ РѕР±СЂР°Р±РѕС‚РєРё, С…РѕС‚СЊ РёР· СЌРІР°Р»СѓР°С‚РѕСЂР°
+  -- РѕР±РЅРѕРІРёРј РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕ СЂРµРµСЃС‚СЂ С†РµР»РµР№
   if
     last_reprioritize[ npc:id() ]
     and last_reprioritize[ npc:id() ] > time_global()
@@ -1686,46 +1686,46 @@ function reprioritize_targets( npc )
 
   local enemy_by_engine = npc:best_enemy()
   for k, v in pairs( targets_list[ npc:id() ] ) do
-    if v.vis then               -- если цель видит нас
+    if v.vis then               -- РµСЃР»Рё С†РµР»СЊ РІРёРґРёС‚ РЅР°СЃ
       local close_combat, far_combat = combat_ranges( npc, v.npc )
       local mult = combat_multiplier( v.npc )
-      if not v.npc then         -- если она монстр
-        if v.armor then         -- если она пиздец едучий/летячий
-          if v.range >= 100 and v.range < 150 then -- и цель далеко
+      if not v.npc then         -- РµСЃР»Рё РѕРЅР° РјРѕРЅСЃС‚СЂ
+        if v.armor then         -- РµСЃР»Рё РѕРЅР° РїРёР·РґРµС† РµРґСѓС‡РёР№/Р»РµС‚СЏС‡РёР№
+          if v.range >= 100 and v.range < 150 then -- Рё С†РµР»СЊ РґР°Р»РµРєРѕ
             v.weight = v.range * mult
-          elseif v.range < 100 then -- а если близко
+          elseif v.range < 100 then -- Р° РµСЃР»Рё Р±Р»РёР·РєРѕ
             v.weight = v.range * mult * 3
           end
         else
           if v.range >= close_combat and v.range < far_combat then
-            -- и цель на средней дистанции
+            -- Рё С†РµР»СЊ РЅР° СЃСЂРµРґРЅРµР№ РґРёСЃС‚Р°РЅС†РёРё
             v.weight = v.range * mult
-          elseif v.range < close_combat then -- а если вплотную
+          elseif v.range < close_combat then -- Р° РµСЃР»Рё РІРїР»РѕС‚РЅСѓСЋ
             v.weight = v.range * mult -- 0
           elseif check_friends_enemy( npc, k ) then
             v.weight = v.range * mult * 3
           end
         end
-      else -- а если непись
+      else -- Р° РµСЃР»Рё РЅРµРїРёСЃСЊ
         if v.range >= close_combat and v.range < far_combat then
-          -- если не ближний бой
+          -- РµСЃР»Рё РЅРµ Р±Р»РёР¶РЅРёР№ Р±РѕР№
           v.weight = v.range
-        elseif v.range < close_combat then -- а если ближний
+        elseif v.range < close_combat then -- Р° РµСЃР»Рё Р±Р»РёР¶РЅРёР№
           v.weight = v.range * mult
         elseif v.range > far_combat and v.range < ( npc:range() * 1.5 ) then
-          -- сверхдальний бой
+          -- СЃРІРµСЂС…РґР°Р»СЊРЅРёР№ Р±РѕР№
           v.weight = v.range * mult * 2
         elseif check_friends_enemy( npc, k ) then
           v.weight = v.range * mult * 3
         end
       end
-    else -- если не видит
+    else -- РµСЃР»Рё РЅРµ РІРёРґРёС‚
       if primary_target[ npc:id() ] == k then
         last_target[ npc:id() ][ k ] = time_global()
         primary_target[ npc:id() ] = nil
       end
-      if not v.npc then         -- если она монстр
-        if v.armor then         -- если она пиздец едучий/летячий
+      if not v.npc then         -- РµСЃР»Рё РѕРЅР° РјРѕРЅСЃС‚СЂ
+        if v.armor then         -- РµСЃР»Рё РѕРЅР° РїРёР·РґРµС† РµРґСѓС‡РёР№/Р»РµС‚СЏС‡РёР№
           if v.range < 150 then
             v.weight = v.range * 2
           else
@@ -1738,16 +1738,16 @@ function reprioritize_targets( npc )
             v.weight = 1000
           end
         end
-      else                                        -- а если непись
-        if v.range < max_invisible_range_npc then -- если в радиусе "слуха"
+      else                                        -- Р° РµСЃР»Рё РЅРµРїРёСЃСЊ
+        if v.range < max_invisible_range_npc then -- РµСЃР»Рё РІ СЂР°РґРёСѓСЃРµ "СЃР»СѓС…Р°"
           v.weight = v.range * 3
         elseif v.range < distant_combat_distance then
-          -- если в радиусе дальнего боя
+          -- РµСЃР»Рё РІ СЂР°РґРёСѓСЃРµ РґР°Р»СЊРЅРµРіРѕ Р±РѕСЏ
           if
             v.last_time_seen
             and v.last_time_seen + memory_timeout > time_global()
           then
-            -- если видели её не менее минуты назад
+            -- РµСЃР»Рё РІРёРґРµР»Рё РµС‘ РЅРµ РјРµРЅРµРµ РјРёРЅСѓС‚С‹ РЅР°Р·Р°Рґ
             v.weight = v.range * 5
           else
             v.weight = 1000
@@ -1853,8 +1853,8 @@ end
 
 
 function refresh_targets( npc )
-  -- обновление реестра врагов, вызывается из reprioritize_targets
-  -- добавление движкового врага
+  -- РѕР±РЅРѕРІР»РµРЅРёРµ СЂРµРµСЃС‚СЂР° РІСЂР°РіРѕРІ, РІС‹Р·С‹РІР°РµС‚СЃСЏ РёР· reprioritize_targets
+  -- РґРѕР±Р°РІР»РµРЅРёРµ РґРІРёР¶РєРѕРІРѕРіРѕ РІСЂР°РіР°
   local enemy_by_engine = npc:best_enemy()
   if
     enemy_by_engine and enemy_by_engine:alive()
@@ -1886,7 +1886,7 @@ function refresh_targets( npc )
     end
   end
 
-  -- добавление нападающего денжера
+  -- РґРѕР±Р°РІР»РµРЅРёРµ РЅР°РїР°РґР°СЋС‰РµРіРѕ РґРµРЅР¶РµСЂР°
   local danger_by_engine = npc:best_danger()
   if danger_by_engine then
     local best_danger_object = danger_by_engine:object()
@@ -2092,7 +2092,7 @@ function is_hostile_armor( comm, target )
     end
   end
   local attitude = tonumber( comm_attitude[ t_comm_number ] ) or -5000
-  -- квестовая врезка начало
+  -- РєРІРµСЃС‚РѕРІР°СЏ РІСЂРµР·РєР° РЅР°С‡Р°Р»Рѕ
   if
     level.name() == "l13_generators_ogse"
     and (
@@ -2103,7 +2103,7 @@ function is_hostile_armor( comm, target )
   then
     return false
   end
-  -- квестовая врезка конец
+  -- РєРІРµСЃС‚РѕРІР°СЏ РІСЂРµР·РєР° РєРѕРЅРµС†
   return attitude < hostile_treshold
 end
 
@@ -2153,7 +2153,7 @@ end
 
 
 function get_targets_from_memory( npc )
-  -- сбор врагов, вызывается из reprioritize_targets
+  -- СЃР±РѕСЂ РІСЂР°РіРѕРІ, РІС‹Р·С‹РІР°РµС‚СЃСЏ РёР· reprioritize_targets
   check_helicopter( npc )
   check_btr( npc )
   for o in npc:memory_visible_objects() do
@@ -2186,7 +2186,7 @@ end
 
 
 function get_max_weapon_range( npc, bw )
-  -- служебная для проверки достанет ли оружие
+  -- СЃР»СѓР¶РµР±РЅР°СЏ РґР»СЏ РїСЂРѕРІРµСЂРєРё РґРѕСЃС‚Р°РЅРµС‚ Р»Рё РѕСЂСѓР¶РёРµ
   if npc then
     if not bw then bw = get_best_weapon( npc ) end
     local ini = system_ini()
@@ -2211,7 +2211,7 @@ end
 function combat_ranges( npc, enemy_is_npc )
   if npc then
     local wpn_check_max_range = get_max_weapon_range( npc )
-    -- берем всех
+    -- Р±РµСЂРµРј РІСЃРµС…
     if enemy_is_npc then
       return low_range_npc_aggr, wpn_check_max_range
     else
@@ -2258,58 +2258,58 @@ function have_fresh_deadman( npc )
 end
 
 
--- Алгоритм озвучки: неперывно собираем информацию про звуковые
--- события. Если есть событие - расскажем о нем. Если нет события
--- врубаем айдл
+-- РђР»РіРѕСЂРёС‚Рј РѕР·РІСѓС‡РєРё: РЅРµРїРµСЂС‹РІРЅРѕ СЃРѕР±РёСЂР°РµРј РёРЅС„РѕСЂРјР°С†РёСЋ РїСЂРѕ Р·РІСѓРєРѕРІС‹Рµ
+-- СЃРѕР±С‹С‚РёСЏ. Р•СЃР»Рё РµСЃС‚СЊ СЃРѕР±С‹С‚РёРµ - СЂР°СЃСЃРєР°Р¶РµРј Рѕ РЅРµРј. Р•СЃР»Рё РЅРµС‚ СЃРѕР±С‹С‚РёСЏ
+-- РІСЂСѓР±Р°РµРј Р°Р№РґР»
 
--- Айдлы ставятся флагами и разворачиваются по ситуации. Те что
--- ставятся флагами это Атакуем, Защищаемся, Не видим противника.
+-- РђР№РґР»С‹ СЃС‚Р°РІСЏС‚СЃСЏ С„Р»Р°РіР°РјРё Рё СЂР°Р·РІРѕСЂР°С‡РёРІР°СЋС‚СЃСЏ РїРѕ СЃРёС‚СѓР°С†РёРё. РўРµ С‡С‚Рѕ
+-- СЃС‚Р°РІСЏС‚СЃСЏ С„Р»Р°РіР°РјРё СЌС‚Рѕ РђС‚Р°РєСѓРµРј, Р—Р°С‰РёС‰Р°РµРјСЃСЏ, РќРµ РІРёРґРёРј РїСЂРѕС‚РёРІРЅРёРєР°.
 
--- Атакуем разворачивается в: Атакуем (видим и он нас видит), Атакуем
--- одного/Атакуем группу (видим и он нас НЕ видит)
+-- РђС‚Р°РєСѓРµРј СЂР°Р·РІРѕСЂР°С‡РёРІР°РµС‚СЃСЏ РІ: РђС‚Р°РєСѓРµРј (РІРёРґРёРј Рё РѕРЅ РЅР°СЃ РІРёРґРёС‚), РђС‚Р°РєСѓРµРј
+-- РѕРґРЅРѕРіРѕ/РђС‚Р°РєСѓРµРј РіСЂСѓРїРїСѓ (РІРёРґРёРј Рё РѕРЅ РЅР°СЃ РќР• РІРёРґРёС‚)
 
--- Защищаемся не разворачивается
+-- Р—Р°С‰РёС‰Р°РµРјСЃСЏ РЅРµ СЂР°Р·РІРѕСЂР°С‡РёРІР°РµС‚СЃСЏ
 
--- Не видим противника разворачивается в: Грозим близкому врагу/Грозим
--- далекому врагу (зависимо от расстояния, время потери до 10 секунд),
--- Ищем врага (от 10 до 20 секунд), Совсем потеряли врага (более 20
--- секунд)
+-- РќРµ РІРёРґРёРј РїСЂРѕС‚РёРІРЅРёРєР° СЂР°Р·РІРѕСЂР°С‡РёРІР°РµС‚СЃСЏ РІ: Р“СЂРѕР·РёРј Р±Р»РёР·РєРѕРјСѓ РІСЂР°РіСѓ/Р“СЂРѕР·РёРј
+-- РґР°Р»РµРєРѕРјСѓ РІСЂР°РіСѓ (Р·Р°РІРёСЃРёРјРѕ РѕС‚ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ, РІСЂРµРјСЏ РїРѕС‚РµСЂРё РґРѕ 10 СЃРµРєСѓРЅРґ),
+-- РС‰РµРј РІСЂР°РіР° (РѕС‚ 10 РґРѕ 20 СЃРµРєСѓРЅРґ), РЎРѕРІСЃРµРј РїРѕС‚РµСЂСЏР»Рё РІСЂР°РіР° (Р±РѕР»РµРµ 20
+-- СЃРµРєСѓРЅРґ)
 
--- Ставятся они в выброе типа перемещения, разворачивание производится
--- на основе таблицы целей
+-- РЎС‚Р°РІСЏС‚СЃСЏ РѕРЅРё РІ РІС‹Р±СЂРѕРµ С‚РёРїР° РїРµСЂРµРјРµС‰РµРЅРёСЏ, СЂР°Р·РІРѕСЂР°С‡РёРІР°РЅРёРµ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ
+-- РЅР° РѕСЃРЅРѕРІРµ С‚Р°Р±Р»РёС†С‹ С†РµР»РµР№
 
--- События добываются следующим образом:
--- Начало боя из старта боёвки
--- Идем в обход из выбора перемещения
--- Завалили врага из refresh_targets(npc), если цель погибла
--- Ранили врага из refresh_targets(npc), если цель ранена
--- Ранило друга из get_targets_from_memory(npc), если есть раненый
--- друг и мы его видим
--- Убило друга из get_targets_from_memory(npc), если есть убитый друг
--- и мы его видим
--- Френдли файр из хит коллбэка
+-- РЎРѕР±С‹С‚РёСЏ РґРѕР±С‹РІР°СЋС‚СЃСЏ СЃР»РµРґСѓСЋС‰РёРј РѕР±СЂР°Р·РѕРј:
+-- РќР°С‡Р°Р»Рѕ Р±РѕСЏ РёР· СЃС‚Р°СЂС‚Р° Р±РѕС‘РІРєРё
+-- РРґРµРј РІ РѕР±С…РѕРґ РёР· РІС‹Р±РѕСЂР° РїРµСЂРµРјРµС‰РµРЅРёСЏ
+-- Р—Р°РІР°Р»РёР»Рё РІСЂР°РіР° РёР· refresh_targets(npc), РµСЃР»Рё С†РµР»СЊ РїРѕРіРёР±Р»Р°
+-- Р Р°РЅРёР»Рё РІСЂР°РіР° РёР· refresh_targets(npc), РµСЃР»Рё С†РµР»СЊ СЂР°РЅРµРЅР°
+-- Р Р°РЅРёР»Рѕ РґСЂСѓРіР° РёР· get_targets_from_memory(npc), РµСЃР»Рё РµСЃС‚СЊ СЂР°РЅРµРЅС‹Р№
+-- РґСЂСѓРі Рё РјС‹ РµРіРѕ РІРёРґРёРј
+-- РЈР±РёР»Рѕ РґСЂСѓРіР° РёР· get_targets_from_memory(npc), РµСЃР»Рё РµСЃС‚СЊ СѓР±РёС‚С‹Р№ РґСЂСѓРі
+-- Рё РјС‹ РµРіРѕ РІРёРґРёРј
+-- Р¤СЂРµРЅРґР»Рё С„Р°Р№СЂ РёР· С…РёС‚ РєРѕР»Р»Р±СЌРєР°
 
--- События которые надо отыграть звуком
--- 1. Начало боя            fight_enemy
--- 2. Идем в обход          fight_detour
--- 3. Завалили врага        fight_enemy_down
--- 4. Ранили врага          fight_enemy_hit
--- 5. Ранило друга          fight_friend_hitted
--- 6. Убило друга           fight_tolls
--- 7. Френдли файр          fight_friendly_fire
+-- РЎРѕР±С‹С‚РёСЏ РєРѕС‚РѕСЂС‹Рµ РЅР°РґРѕ РѕС‚С‹РіСЂР°С‚СЊ Р·РІСѓРєРѕРј
+-- 1. РќР°С‡Р°Р»Рѕ Р±РѕСЏ            fight_enemy
+-- 2. РРґРµРј РІ РѕР±С…РѕРґ          fight_detour
+-- 3. Р—Р°РІР°Р»РёР»Рё РІСЂР°РіР°        fight_enemy_down
+-- 4. Р Р°РЅРёР»Рё РІСЂР°РіР°          fight_enemy_hit
+-- 5. Р Р°РЅРёР»Рѕ РґСЂСѓРіР°          fight_friend_hitted
+-- 6. РЈР±РёР»Рѕ РґСЂСѓРіР°           fight_tolls
+-- 7. Р¤СЂРµРЅРґР»Рё С„Р°Р№СЂ          fight_friendly_fire
 
--- Боевочные идлы
--- 1. Атакуем               fight_attack
--- 2. Атакуем одного        fight_attack_one
--- 3. Атакуем группу        fight_attack_many
--- 4. Защищаемся            fight_backup
--- 5. Ищем врага            fight_search
--- 6. Совсем потеряли врага fight_enemy_lost
--- 7. Грозим близкому врагу fight_threat_close
--- 8. Грозим далекому врагу fight_threat_distant
+-- Р‘РѕРµРІРѕС‡РЅС‹Рµ РёРґР»С‹
+-- 1. РђС‚Р°РєСѓРµРј               fight_attack
+-- 2. РђС‚Р°РєСѓРµРј РѕРґРЅРѕРіРѕ        fight_attack_one
+-- 3. РђС‚Р°РєСѓРµРј РіСЂСѓРїРїСѓ        fight_attack_many
+-- 4. Р—Р°С‰РёС‰Р°РµРјСЃСЏ            fight_backup
+-- 5. РС‰РµРј РІСЂР°РіР°            fight_search
+-- 6. РЎРѕРІСЃРµРј РїРѕС‚РµСЂСЏР»Рё РІСЂР°РіР° fight_enemy_lost
+-- 7. Р“СЂРѕР·РёРј Р±Р»РёР·РєРѕРјСѓ РІСЂР°РіСѓ fight_threat_close
+-- 8. Р“СЂРѕР·РёРј РґР°Р»РµРєРѕРјСѓ РІСЂР°РіСѓ fight_threat_distant
 
--- Функции: set_sound_event( npc, event ) -- выставить звуковое событие
--- допустимые значения event:
+-- Р¤СѓРЅРєС†РёРё: set_sound_event( npc, event ) -- РІС‹СЃС‚Р°РІРёС‚СЊ Р·РІСѓРєРѕРІРѕРµ СЃРѕР±С‹С‚РёРµ
+-- РґРѕРїСѓСЃС‚РёРјС‹Рµ Р·РЅР°С‡РµРЅРёСЏ event:
 -- "start"
 -- "hero"
 -- "killed"
@@ -2318,8 +2318,8 @@ end
 -- "dead"
 -- "ff"
 
--- choose_idle_scheme( npc, scheme ) -- выставить тип идловой озвучки
--- допустимые значеня scheme:
+-- choose_idle_scheme( npc, scheme ) -- РІС‹СЃС‚Р°РІРёС‚СЊ С‚РёРї РёРґР»РѕРІРѕР№ РѕР·РІСѓС‡РєРё
+-- РґРѕРїСѓСЃС‚РёРјС‹Рµ Р·РЅР°С‡РµРЅСЏ scheme:
 -- "attack"
 -- "attack_notsee"
 -- "defence"
@@ -2341,7 +2341,7 @@ end
 
 
 function choose_idle_scheme( npc, scheme )
-  -- допустимые значеня scheme:
+  -- РґРѕРїСѓСЃС‚РёРјС‹Рµ Р·РЅР°С‡РµРЅСЏ scheme:
   -- "attack"
   -- "attack_notsee"
   -- "defence"
@@ -2357,14 +2357,14 @@ function set_sound_event( npc, event )
   if not sound_events[ npc:id() ] then
     setup_sound_table( npc )
   end
-  -- Если недавно что-то уже говорил, то событие регистрировать не
-  -- будем.
+  -- Р•СЃР»Рё РЅРµРґР°РІРЅРѕ С‡С‚Рѕ-С‚Рѕ СѓР¶Рµ РіРѕРІРѕСЂРёР», С‚Рѕ СЃРѕР±С‹С‚РёРµ СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ РЅРµ
+  -- Р±СѓРґРµРј.
   if sounds_timeout[ npc:id() ] and sounds_timeout[ npc:id() ] > time_global() then
     return
   end
   local t = sound_events[ npc:id() ]
-  -- Если это событие запрещено некоторе время озвучивать, то
-  -- регистрировать его не будем.
+  -- Р•СЃР»Рё СЌС‚Рѕ СЃРѕР±С‹С‚РёРµ Р·Р°РїСЂРµС‰РµРЅРѕ РЅРµРєРѕС‚РѕСЂРµ РІСЂРµРјСЏ РѕР·РІСѓС‡РёРІР°С‚СЊ, С‚Рѕ
+  -- СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ РµРіРѕ РЅРµ Р±СѓРґРµРј.
   local e_timeout = t[ event .. "_timeout" ]
   if e_timeout and e_timeout > time_global() then return end
   if not t[ event ] then
@@ -2498,27 +2498,27 @@ function process_combat_sound( npc )
 end
 
 
--- Возвращает угол между проекциями векторов vec1 и vec2 на
--- горизонтальную плоскость.
--- положительный угол - доворот vec1 до vec2 по часовой.
+-- Р’РѕР·РІСЂР°С‰Р°РµС‚ СѓРіРѕР» РјРµР¶РґСѓ РїСЂРѕРµРєС†РёСЏРјРё РІРµРєС‚РѕСЂРѕРІ vec1 Рё vec2 РЅР°
+-- РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅСѓСЋ РїР»РѕСЃРєРѕСЃС‚СЊ.
+-- РїРѕР»РѕР¶РёС‚РµР»СЊРЅС‹Р№ СѓРіРѕР» - РґРѕРІРѕСЂРѕС‚ vec1 РґРѕ vec2 РїРѕ С‡Р°СЃРѕРІРѕР№.
 function horz_angle( vec1, vec2 )
   local x =  vec2.x * vec1.x + vec2.z * vec1.z
-  -- повернули систему координат
+  -- РїРѕРІРµСЂРЅСѓР»Рё СЃРёСЃС‚РµРјСѓ РєРѕРѕСЂРґРёРЅР°С‚
   local y = -vec2.z * vec1.x + vec2.x * vec1.z
-  return math.atan2( y, x )     -- угол доворота от -pi до pi
+  return math.atan2( y, x )     -- СѓРіРѕР» РґРѕРІРѕСЂРѕС‚Р° РѕС‚ -pi РґРѕ pi
 end
 
 
 function vert_angle( vec1, vec2 )
   local x =  vec2.y * vec1.y + vec2.z * vec1.z
-  -- повернули систему координат
+  -- РїРѕРІРµСЂРЅСѓР»Рё СЃРёСЃС‚РµРјСѓ РєРѕРѕСЂРґРёРЅР°С‚
   local y = -vec2.z * vec1.y + vec2.y * vec1.z
-  return math.atan2( y, x )     -- угол доворота от -pi до pi
+  return math.atan2( y, x )     -- СѓРіРѕР» РґРѕРІРѕСЂРѕС‚Р° РѕС‚ -pi РґРѕ pi
 end
 
 
 function actor_see( npc )
-  -- арктангенс 45 град /npc:position():distance_to(db.actor:position())
+  -- Р°СЂРєС‚Р°РЅРіРµРЅСЃ 45 РіСЂР°Рґ /npc:position():distance_to(db.actor:position())
   local dangerang = 1
   local ang = horz_angle(
     device().cam_dir, npc:position():sub( device().cam_pos )
@@ -2663,13 +2663,13 @@ function set_weapons_fire( npc, enemy, weapon, override_vis, npc_rank )
       rq = level.ray_query(
         npc_pos, dir_enemy, distance + 5, rq_target.rqtBoth, npc
       )
-      type_of_fire = object.fire1 -- по умолчанию можем стрелять
+      type_of_fire = object.fire1 -- РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РјРѕР¶РµРј СЃС‚СЂРµР»СЏС‚СЊ
       if rq.result then
         local obj = rq.object
         local is_alive_mob = obj and ( IsStalker( obj ) or IsMonster( obj ) )
           and obj:alive()
         if is_alive_mob and not check_is_enemy( npc, obj, true ) then
-          -- если попадем в своего - стрелять нельзя
+          -- РµСЃР»Рё РїРѕРїР°РґРµРј РІ СЃРІРѕРµРіРѕ - СЃС‚СЂРµР»СЏС‚СЊ РЅРµР»СЊР·СЏ
           type_of_fire = object.aim1
         end
       end
@@ -2926,7 +2926,7 @@ function set_combat_sight( npc, enemy, weapon )
         if IsSniperRifle( weapon ) then
           bone = "bip01_head"
         elseif enemy:section() == "spider" then
-          -- у пауков нет кости bip01_neck
+          -- Сѓ РїР°СѓРєРѕРІ РЅРµС‚ РєРѕСЃС‚Рё bip01_neck
           local bones = { "bip01_head", "bip01_spine" }
           bone = bones[ math.random( table.getn( bones ) ) ]
         else
@@ -3000,18 +3000,18 @@ function check_vertex_locked( npc, vertex )
 end
 
 
--- список режимов:
--- mode = 0 - оборона (удержание позиции)
--- mode = 1 - атака
--- mode = 2 - отступление
+-- СЃРїРёСЃРѕРє СЂРµР¶РёРјРѕРІ:
+-- mode = 0 - РѕР±РѕСЂРѕРЅР° (СѓРґРµСЂР¶Р°РЅРёРµ РїРѕР·РёС†РёРё)
+-- mode = 1 - Р°С‚Р°РєР°
+-- mode = 2 - РѕС‚СЃС‚СѓРїР»РµРЅРёРµ
 function find_cover( npc, enemy, mode )
-  -- возвращает лучшую точку прикрытия от врага в заданном радиусе от
-  -- своей позиции и на нужном расстояниии от врага
+  -- РІРѕР·РІСЂР°С‰Р°РµС‚ Р»СѓС‡С€СѓСЋ С‚РѕС‡РєСѓ РїСЂРёРєСЂС‹С‚РёСЏ РѕС‚ РІСЂР°РіР° РІ Р·Р°РґР°РЅРЅРѕРј СЂР°РґРёСѓСЃРµ РѕС‚
+  -- СЃРІРѕРµР№ РїРѕР·РёС†РёРё Рё РЅР° РЅСѓР¶РЅРѕРј СЂР°СЃСЃС‚РѕСЏРЅРёРёРё РѕС‚ РІСЂР°РіР°
   -- cover_point* best_cover(vector self_position, vector enemy_position, float radius, float min_enemy_distance, float max_enemy_distance)
   --
-  -- возвращает лучшую точку прикрытия в заданном радиусе от своей
-  -- позиции и не ближе min_distance. Прикрытость учитывается со всех
-  -- направлений.
+  -- РІРѕР·РІСЂР°С‰Р°РµС‚ Р»СѓС‡С€СѓСЋ С‚РѕС‡РєСѓ РїСЂРёРєСЂС‹С‚РёСЏ РІ Р·Р°РґР°РЅРЅРѕРј СЂР°РґРёСѓСЃРµ РѕС‚ СЃРІРѕРµР№
+  -- РїРѕР·РёС†РёРё Рё РЅРµ Р±Р»РёР¶Рµ min_distance. РџСЂРёРєСЂС‹С‚РѕСЃС‚СЊ СѓС‡РёС‚С‹РІР°РµС‚СЃСЏ СЃРѕ РІСЃРµС…
+  -- РЅР°РїСЂР°РІР»РµРЅРёР№.
   -- cover_point* safe_cover(const vector& self_position, float radius, float min_distance)
   --
   -- C++ class cover_point {
@@ -3032,7 +3032,7 @@ function find_cover( npc, enemy, mode )
 
   local cover
   local min_dist = close_combat_distance
-  if mode == 1 then           -- атака
+  if mode == 1 then           -- Р°С‚Р°РєР°
     local max, min, radius
     if to_enemy > min_dist then
       max    = to_enemy
@@ -3048,7 +3048,7 @@ function find_cover( npc, enemy, mode )
     end
     cover = npc:best_cover( npc_pos, enemy_pos, radius, min, max )
 
-  elseif mode == 2 then       -- отступление
+  elseif mode == 2 then       -- РѕС‚СЃС‚СѓРїР»РµРЅРёРµ
     local min    = math.max( to_enemy, min_dist )
     local max    = math.max( min * 1.5, min + min_dist )
     local radius = max - to_enemy
@@ -3060,7 +3060,7 @@ function find_cover( npc, enemy, mode )
       cover = npc:ambush_cover( npc_pos, enemy_pos, 30, 10 )
     end
 
-  elseif mode == 0 then       -- оборона
+  elseif mode == 0 then       -- РѕР±РѕСЂРѕРЅР°
     cover = npc:safe_cover( npc_pos, 20, 0 )
   end
 
@@ -3100,7 +3100,7 @@ function enemy_covered_value( npc, enemy )
     local cover_enemy_value = level.cover_in_direction(
       enemy_vertex, npc_pos:sub( enemy:position() )
     )
-    -- прикрытость точки по направлению с непися на врага
+    -- РїСЂРёРєСЂС‹С‚РѕСЃС‚СЊ С‚РѕС‡РєРё РїРѕ РЅР°РїСЂР°РІР»РµРЅРёСЋ СЃ РЅРµРїРёСЃСЏ РЅР° РІСЂР°РіР°
     return cover_enemy_value
   else
     if string.find( enemy:name(), "btr" ) then
@@ -3110,7 +3110,7 @@ function enemy_covered_value( npc, enemy )
       local cover_enemy_value = level.cover_in_direction(
         enemy_vertex, npc_pos:sub( enemy:position() )
       )
-      -- прикрытость точки по направлению с непися на врага
+      -- РїСЂРёРєСЂС‹С‚РѕСЃС‚СЊ С‚РѕС‡РєРё РїРѕ РЅР°РїСЂР°РІР»РµРЅРёСЋ СЃ РЅРµРїРёСЃСЏ РЅР° РІСЂР°РіР°
       return cover_enemy_value
     else
       local enemy_pos    = enemy:bone_position( "pilot1" )
@@ -3119,7 +3119,7 @@ function enemy_covered_value( npc, enemy )
       local cover_enemy_value = level.cover_in_direction(
         enemy_vertex, npc_pos:sub( enemy:position() )
       )
-      -- прикрытость точки по направлению с непися на врага
+      -- РїСЂРёРєСЂС‹С‚РѕСЃС‚СЊ С‚РѕС‡РєРё РїРѕ РЅР°РїСЂР°РІР»РµРЅРёСЋ СЃ РЅРµРїРёСЃСЏ РЅР° РІСЂР°РіР°
       return cover_enemy_value
     end
   end
@@ -3140,7 +3140,7 @@ end
 
 function find_vertex_around( npc, around_vertex, dir, rotate_min, rotate_max, offset_min, offset_max, sign )
   if not sign then sign = 1 end
-  local ai_step     = 0.7 -- шаг AI сетки
+  local ai_step     = 0.7 -- С€Р°Рі AI СЃРµС‚РєРё
   local math_pi_180 = 180 / math.pi
 
   local random_rotate    = math.random( rotate_min, rotate_max )
@@ -3151,7 +3151,7 @@ function find_vertex_around( npc, around_vertex, dir, rotate_min, rotate_max, of
   local cur_angle        = 0
   local vertex_id
   while not vertex_id do
-    -- проверяем точку слева
+    -- РїСЂРѕРІРµСЂСЏРµРј С‚РѕС‡РєСѓ СЃР»РµРІР°
     vertex_id = level.vertex_in_direction(
       around_vertex, cur_dir, random_offset
     )
@@ -3161,7 +3161,7 @@ function find_vertex_around( npc, around_vertex, dir, rotate_min, rotate_max, of
       or check_vertex_locked( npc, vertex_id )
     then
       vertex_id = nil
-      -- поворачиваем направление поиска
+      -- РїРѕРІРѕСЂР°С‡РёРІР°РµРј РЅР°РїСЂР°РІР»РµРЅРёРµ РїРѕРёСЃРєР°
       cur_angle = cur_angle + rotate_angle
       if rotate_min + cur_angle * math_pi_180 > rotate_max then
         break
@@ -3176,9 +3176,9 @@ function find_vertex_around( npc, around_vertex, dir, rotate_min, rotate_max, of
 end
 
 
--- если не указан target, то от себя
--- если указан target, то от target
--- если указан флаг, то нельзя вернуть nil, обязательно нормальное значение
+-- РµСЃР»Рё РЅРµ СѓРєР°Р·Р°РЅ target, С‚Рѕ РѕС‚ СЃРµР±СЏ
+-- РµСЃР»Рё СѓРєР°Р·Р°РЅ target, С‚Рѕ РѕС‚ target
+-- РµСЃР»Рё СѓРєР°Р·Р°РЅ С„Р»Р°Рі, С‚Рѕ РЅРµР»СЊР·СЏ РІРµСЂРЅСѓС‚СЊ nil, РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РЅРѕСЂРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 function select_position( npc, target, flag )
   if
     last_time_send[ npc:id() ] and last_time_send[ npc:id() ] > time_global()
@@ -3251,7 +3251,7 @@ function select_position( npc, target, flag )
     random_offset_min, random_offset_max, -1
   )
 
-  -- Проверяем растояния до точек
+  -- РџСЂРѕРІРµСЂСЏРµРј СЂР°СЃС‚РѕСЏРЅРёСЏ РґРѕ С‚РѕС‡РµРє
   local node_1_distance = -1
   if node_1_vertex_id then
     node_1_distance = npc:position()
@@ -3264,9 +3264,9 @@ function select_position( npc, target, flag )
       :distance_to( level.vertex_position( node_2_vertex_id ) )
   end
 
-  -- Выбираем ближайшую из существующих
+  -- Р’С‹Р±РёСЂР°РµРј Р±Р»РёР¶Р°Р№С€СѓСЋ РёР· СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёС…
   if node_1_distance == -1 and node_2_distance == -1 then
-    -- Не смогли найти точку, ругаться
+    -- РќРµ СЃРјРѕРіР»Рё РЅР°Р№С‚Рё С‚РѕС‡РєСѓ, СЂСѓРіР°С‚СЊСЃСЏ
     -- return around_object:level_vertex_id()
     if flag then
       return npc:level_vertex_id()
@@ -3355,16 +3355,16 @@ function find_vertex_in_radius( npc, around_vertex, radius )
     math.random( -1000, 1000 ) / 1000, 0, math.random( -1000, 1000 ) / 1000
   )
   new_dir:normalize()
-  local ai_step     = 0.7 -- шаг AI сетки
+  local ai_step     = 0.7 -- С€Р°Рі AI СЃРµС‚РєРё
   local math_pi_180 = 180 / math.pi
   local pi2         = math.pi * 2
   while dist >= ai_step do
-    -- итератор вращения направления
+    -- РёС‚РµСЂР°С‚РѕСЂ РІСЂР°С‰РµРЅРёСЏ РЅР°РїСЂР°РІР»РµРЅРёСЏ
     local rotate_angle = math.asin( ai_step / dist )
     local cur_angle, cur_dir = 0, new_dir
     while math.abs( cur_angle ) < pi2 do
-      -- ищем вертекс
-      -- нужная нам позиция
+      -- РёС‰РµРј РІРµСЂС‚РµРєСЃ
+      -- РЅСѓР¶РЅР°СЏ РЅР°Рј РїРѕР·РёС†РёСЏ
       local pos     = vector():mad( around_pos, cur_dir, dist )
       local vert_ok = level.vertex_id_by_pos( pos )
       if
@@ -3374,7 +3374,7 @@ function find_vertex_in_radius( npc, around_vertex, radius )
       then
         return vert_ok
       end
-      -- поворачиваем направление поиска
+      -- РїРѕРІРѕСЂР°С‡РёРІР°РµРј РЅР°РїСЂР°РІР»РµРЅРёРµ РїРѕРёСЃРєР°
       cur_angle = cur_angle + rotate_angle
       cur_dir   = vector_rotate_y( cur_dir, rotate_angle * math_pi_180 )
     end
@@ -3609,13 +3609,13 @@ end
 
 function correct_position( gi, npc )
   if IsStalker( gi ) or IsMonster( gi ) then
-    -- Вычисляем вектор разницы между координатами кости и level
-    -- vertex. Пытаемся найти level vertex наиболее близкий к кости
+    -- Р’С‹С‡РёСЃР»СЏРµРј РІРµРєС‚РѕСЂ СЂР°Р·РЅРёС†С‹ РјРµР¶РґСѓ РєРѕРѕСЂРґРёРЅР°С‚Р°РјРё РєРѕСЃС‚Рё Рё level
+    -- vertex. РџС‹С‚Р°РµРјСЃСЏ РЅР°Р№С‚Рё level vertex РЅР°РёР±РѕР»РµРµ Р±Р»РёР·РєРёР№ Рє РєРѕСЃС‚Рё
     local diff  = gi:bone_position( "bip01_head" )
       :sub( level.vertex_position( gi:level_vertex_id() ) )
     local len   = diff:magnitude()
     local diffp = vector():set( diff.z, 0, -diff.x ):mul( 0.5 )
-    -- Сдвигаем целевую точку вбок, чтобы непись не залазил ногами в труп
+    -- РЎРґРІРёРіР°РµРј С†РµР»РµРІСѓСЋ С‚РѕС‡РєСѓ РІР±РѕРє, С‡С‚РѕР±С‹ РЅРµРїРёСЃСЊ РЅРµ Р·Р°Р»Р°Р·РёР» РЅРѕРіР°РјРё РІ С‚СЂСѓРї
     diff:add( diffp )
     return npc:vertex_in_direction( gi:level_vertex_id(), diff, len )
   else
