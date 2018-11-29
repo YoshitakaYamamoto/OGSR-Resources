@@ -62,7 +62,6 @@ local hud = get_hud()
 local bPosition		= true  -- включение схемы показа координат
 local bInfos		= true	-- включение схемы показа состояний инфопоршнэй
 local bInfoAbout	= true	-- включение схемы показа информации о НПС
-local bSavePos      = false  -- Сохранение позици НПС
 local bZones		= true	-- включение схемы показа попадания ГГ в зону
 local bActorData	= false  -- включение всей схемы показа данных ГГ.
 local bAchmData		= false	-- включение схемы показа счетчиков новых амчивок
@@ -307,15 +306,6 @@ function info_about_npc()
 						"game_vertex: "..tostring(target_obj:game_vertex_id())
 						
 			if PosLogic ~= nil then PosLogic:wnd():SetText(LogicText) end
-			if bSavePos then
-				pos = target_obj:position()
-				lv = target_obj:level_vertex_id()
-				gv = target_obj:game_vertex_id()
-				get_console():execute("NPCscheme="..scheme1..
-						"\nPosition="..pos.x..","..pos.y..","..pos.z..
-						"\nLevelVertexID="..lv..
-						"\nGameVertexID="..gv)
-			end
 		else
 			local PosLogic = hud:GetCustomStatic("logic_debug")
 			if PosLogic == nil then

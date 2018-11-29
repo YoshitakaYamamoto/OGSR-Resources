@@ -18,8 +18,8 @@ function on_npc_death( obj )
 end
 
 
-aim_ratio = 1000/50
-min_ratio = 1500
+local aim_ratio = 1000/50
+local min_ratio = 1500
 
 --' Эвалуатор, который синхронизирует менеджер.
 --' Мы уже в безраличном состоянии idle или нет
@@ -77,7 +77,7 @@ function evaluator_state_mgr_idle_alife:evaluate()
 	-- раньше он был тут, сейчас он вынесен из эвалуатора
 
 --	log3("SECTION %s", utils.to_str(db.storage[self.st.npc:id()].active_section))
-	mgr = self.object:motivation_action_manager()
+	local mgr = self.object:motivation_action_manager()
 	self.t = nil
 	if mgr:initialized() then
 		self.t = mgr:current_action_id()
@@ -127,7 +127,7 @@ function evaluator_state_mgr_idle_alife:evaluate()
 			return false
 		end
 	end
-	
+
 	ogse_debug.add_active_eval( self.object, script_name(), "idle_alife_def" )
 	return true
 end
@@ -426,7 +426,7 @@ function state_manager:set_state(_, state_name, callback, timeout, target, emerg
 	--log3("Set State called: for %s State: %s", self.npc:name(), state_name)
 	
 	if state_lib.states[state_name] == nil then
-		local d = debug.getinfo(2, "S")
+		local d = debug.getinfo(3, "S")
 		log1("DEBUG_STATEMGR: Script [".. d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1') .. "." .. d.linedefined .."] called illegal state ["..tostring(state_name).."] for NPC "..tostring(self.npc:name()))
 		abort("ERROR: ILLEGAL SET STATE CALLED!!! [%s] fo [%s]", tostring(state_name), self.npc:name())
 		-- state_name="idle"

@@ -558,7 +558,6 @@ end
 
 function zombied2( actor, npc )
 	--log1("GHOST TEST 15")
-	--get_console():execute("flush")
 	-- -- log1("zombied2() called")		
 	--'Спавн зобмированных сталкеров после  X16
 	--if se_respawn.population_factions["zombied"] < se_respawn.factions_limit["zombied"] then
@@ -566,7 +565,6 @@ function zombied2( actor, npc )
 	--end	
 	-- -- log1("zombied2() completed")	
 	--log1("GHOST TEST 16")
-	--get_console():execute("flush")
 end
 
 function zombied3( actor, npc )
