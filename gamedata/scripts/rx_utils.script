@@ -153,8 +153,8 @@ function eat_medkit(npc,medkit)
 end
 
 function IsTrader(npc)
-	local st = rx_ai.get_storage(npc:id())
-	if st.is_trader == nil then
+	local st = rx_ai and rx_ai.get_storage(npc:id()) or false
+	if not st or st.is_trader == nil then
 		local trader = false
 		if npc:character_community() == "trader" or npc:clsid() == clsid.script_trader or npc:clsid() == clsid.trader then
 			trader = true
@@ -170,7 +170,11 @@ function IsTrader(npc)
 		if cini and logic and cini:section_exist(logic) and cini:line_exist(logic,"trade") then
 			trader = true
 		end
-		st.is_trader = trader
+		if st then
+			st.is_trader = trader
+		else
+			return trader == true
+		end
 	end
 	return st.is_trader == true
 end

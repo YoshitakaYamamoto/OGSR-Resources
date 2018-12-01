@@ -337,7 +337,7 @@ function get_best_weapon( npc )
   if sl ~= NO_ACTIVE_SLOT and npc:item_in_slot( sl ) then
     return npc:item_in_slot( sl )
   else
-    local wm = rx_wmgr.get_wm( npc )
+    local wm = rx_wmgr and rx_wmgr.get_wm( npc )
     return ( wm and wm:get_weapon() ) or npc:best_weapon()
   end
 end
@@ -3742,7 +3742,7 @@ function add_to_binder( object, ini, scheme, section, storage )
     world_property( xr_evaluators_id.sidor_wounded_base, false )
   )
   
-  xrs_ai.addCommonPrecondition( action ) --KRodin: если возникнут проблемы, это убрать и раскомментировать блок ниже
+  if xrs_ai then xrs_ai.addCommonPrecondition( action ) end --KRodin: если возникнут проблемы, это убрать и раскомментировать блок ниже
   --if xrs_grenade then
   --  action:add_precondition( world_property( xrs_grenade.prop_fire, false  ) )
   --  action:add_precondition( world_property( xrs_grenade.prop_grenade, false  ) )

@@ -227,8 +227,9 @@ function action_wounded:execute ()
     if wound_manager_state == "psy_shoot" then
       emerg = {animation_nout = true}
     end
-	xrs_medic.wounded[self.object:id()]=true
-	
+
+	if xrs_medic then xrs_medic.wounded[self.object:id()] = true end
+
 	if not wound_manager_state or wound_manager_state == "nil" then
 		wound_manager_state = "wounded"
 	end
@@ -382,8 +383,10 @@ function Cwound_manager:update()
 end
 function Cwound_manager:unlock_medkit()
 	self.can_use_medkit = true
-	xrs_medic.wounded[self.npc:id()]=nil
-	rx_facer.timeout[self.npc:id()] = time_global() + 6000
+	if xrs_medic then xrs_medic.wounded[self.npc:id()] = nil end
+	if rx_facer then
+		rx_facer.timeout[self.npc:id()] = time_global() + 6000
+	end
 end
 function Cwound_manager:eat_medkit()
   if self.can_use_medkit == true then
@@ -720,7 +723,7 @@ end
 function unlock_medkit(npc)
   if db.storage[npc:id()].wounded ~= nil then
     db.storage[npc:id()].wounded.wound_manager:unlock_medkit()
-	xrs_medic.wounded[npc:id()]=nil
+	if xrs_medic then xrs_medic.wounded[npc:id()] = nil end
   end
 end
 
