@@ -18,7 +18,7 @@ end
 ----------------------
 function evaluator_rest:evaluate ()
   	if xr_logic.is_active(self.object, self.st) then
-		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_pos" )
+		ogse_debug.add_active_eval( self.object, script_name(), "evaluator_pos" )
 		return true
 	end
 	return false
@@ -36,7 +36,7 @@ end
 ----------------------
 function evaluator_food:evaluate ()
     if this.is_food_present(self.object) then
-		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_food" )
+		ogse_debug.add_active_eval( self.object, script_name(), "evaluator_food" )
 		return true
 	end
 	return false
@@ -53,7 +53,7 @@ end
 ----------------------
 function evaluator_pos:evaluate ()
     if self.st.on_position then
-		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_pos" )
+		ogse_debug.add_active_eval( self.object, script_name(), "evaluator_pos" )
 		return true
 	end
 	return false

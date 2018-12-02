@@ -12,9 +12,6 @@ local state_animation = 1
 local state_sound = 2
 local state_finish = 3
 
-local body_state_free = 0
-local body_state_danger = 1
-
 ---------------------------------------------------------------------------------------------------------------------
 class "evaluator_need_remark" (property_evaluator)
 function evaluator_need_remark:__init(storage, name) super(nil, name)
@@ -22,7 +19,7 @@ function evaluator_need_remark:__init(storage, name) super(nil, name)
 end
 function evaluator_need_remark:evaluate()
     if xr_logic.is_active(self.object, self.st) then
-		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_need_remark" )
+		ogse_debug.add_active_eval( self.object, script_name(), "evaluator_need_remark" )
 		return true
 	end
 	return false

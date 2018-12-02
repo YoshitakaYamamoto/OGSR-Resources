@@ -28,7 +28,7 @@ function evaluator_need_sleeper:evaluate ()
 	end	
 	--// xr_companion
 	if xr_logic.is_active(self.object, self.st) then
-		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_need_sleeper" )
+		ogse_debug.add_active_eval( self.object, script_name(), "evaluator_need_sleeper" )
 		return true
 	end
 	return false

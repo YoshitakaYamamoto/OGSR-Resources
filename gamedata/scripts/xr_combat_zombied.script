@@ -19,7 +19,7 @@ end
 
 function evaluator_combat_zombied:evaluate()
 	if self.gst.script_combat_type == "zombied" then
-		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_combat_zombied" )
+		ogse_debug.add_active_eval( self.object, script_name(), "evaluator_combat_zombied" )
 		return true
 	end
 	return false

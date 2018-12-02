@@ -75,9 +75,6 @@ addons = {
 	"xrs_grenade",
 	"xrs_medic",
 	"amkii_equip",
-	"rx_ai",
-	"rx_gl",
-	"rx_wmgr",
 	"state_mgr",
 	"ogse_mines_control",
 	"pma_escape",
@@ -100,3 +97,14 @@ addons = {
 	"ogsr_memory_control",
 	"inventory", --должен быть последним!
 }
+
+--Для быстрого отключения/включения скриптов
+if rx_ai then
+	table.insert( addons, "rx_ai" )
+end
+if rx_gl then
+	table.insert( addons, "rx_gl" )
+end
+if rx_wmgr then
+	table.insert( addons, "rx_wmgr" )
+end

@@ -15,7 +15,7 @@ end
 
 function evaluator_need_test:evaluate()
     if xr_logic.is_active(self.object, self.st) then
-		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_need_test" )
+		ogse_debug.add_active_eval( self.object, script_name(), "evaluator_need_test" )
 		return true
 	end
 	return false

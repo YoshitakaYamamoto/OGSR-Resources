@@ -451,7 +451,7 @@ end
 -----------------------
 function evaluator_patrol_end:evaluate()
 	if not xr_logic.is_active(self.object, self.st) then
-		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_patrol_end" )
+		ogse_debug.add_active_eval( self.object, script_name(), "evaluator_patrol_end" )
 		return true
 	end
 	return false
@@ -468,7 +468,7 @@ end
 -----------------------
 function evaluator_patrol_comm:evaluate()
 	if patrols[self.st.path_name]:is_commander(self.object:id()) then
-		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_patrol_comm" )
+		ogse_debug.add_active_eval( self.object, script_name(), "evaluator_patrol_comm" )
 		return true
 	end
 	return false

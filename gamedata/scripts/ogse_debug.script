@@ -37,8 +37,11 @@ local last_danger			= {}
 active_anim					= {}
 local last_anim				= {}
 
-function add_active_eval( obj, calling_script, eval_id )
+function add_active_eval( obj, _, eval_id )
 	if debug_eval and obj then
+		local d = debug.getinfo(2, "S")
+		local calling_script = "[".. d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1') .. "." .. d.linedefined .."]"
+
 		if verbose_debug then
 			bench_log1(debug_prefix.." ["..(os.clock()-xtime).."] "..obj:name().." add_active_eval: "..calling_script.." code: "..eval_id)
 		end
@@ -61,8 +64,11 @@ function add_active_eval( obj, calling_script, eval_id )
 	end
 end
 
-function add_active_danger( obj, calling_script, eval_id )
+function add_active_danger( obj, _, eval_id )
 	if debug_eval and obj then
+		local d = debug.getinfo(2, "S")
+		local calling_script = "[".. d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1') .. "." .. d.linedefined .."]"
+
 		if verbose_debug then
 			bench_log1(debug_prefix.." ["..(os.clock()-xtime).."] "..obj:name().." add_active_eval: "..calling_script.." code: "..eval_id)
 		end

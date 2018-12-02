@@ -124,7 +124,7 @@ function evaluator_can_fight:evaluate ()
   end
 
   if xr_logic.pstor_retrieve(self.object, "wounded_fight") ~= "false" then
-    --ogse_debug.add_active_eval( self.object, script_name(), "evaluator_can_fight" )
+    ogse_debug.add_active_eval( self.object, script_name(), "evaluator_can_fight" )
     return true
   end
   return false

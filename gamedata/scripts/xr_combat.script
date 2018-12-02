@@ -54,7 +54,7 @@ function evaluator_check_combat:evaluate()
 				-- взять из overrides, иначе из секции on_combat
 				if overrides and overrides.combat_type then
 					if set_combat_type( self.object, actor, overrides ) then
-						--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_check_combat_1" )
+						ogse_debug.add_active_eval( self.object, script_name(), "evaluator_check_combat_1" )
 						return true
 					end
 					return false
@@ -62,7 +62,7 @@ function evaluator_check_combat:evaluate()
 --					db.storage[self.object:id()].script_combat_type = nil
 --					return false
 					if self.st.combat_type ~= nil and set_combat_type( self.object, actor, self.st ) then
-						--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_check_combat_2" )
+						ogse_debug.add_active_eval( self.object, script_name(), "evaluator_check_combat_2" )
 						return true
 					end
 					return false
@@ -71,7 +71,7 @@ function evaluator_check_combat:evaluate()
 		else
 			-- если нет активной секции, то тип боя взять из секции on_combat
 			if self.st.combat_type ~= nil and set_combat_type( self.object, actor, self.st ) then
-				--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_check_combat_3" )
+				ogse_debug.add_active_eval( self.object, script_name(), "evaluator_check_combat_3" )
 				return true
 			end
 			return false
@@ -91,7 +91,7 @@ end
 
 function evaluator_enemy:evaluate()
 	if self.object:best_enemy() ~= nil then
-		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_enemy" )
+		ogse_debug.add_active_eval( self.object, script_name(), "evaluator_enemy" )
 		return true
 	end
 	return false

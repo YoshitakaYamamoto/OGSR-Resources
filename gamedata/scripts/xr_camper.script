@@ -30,7 +30,7 @@ function evaluator_end:evaluate()
 	--// xr_companion
 
 	if not xr_logic.is_active(self.object, self.a) then
-		--ogse_debug.add_active_eval( self.object, script_name(), "evaluator_end_2" )
+		ogse_debug.add_active_eval( self.object, script_name(), "evaluator_end_2" )
 		return true
 	end
 	return false
