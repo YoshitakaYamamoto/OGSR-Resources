@@ -426,8 +426,10 @@ function state_manager:set_state(_, state_name, callback, timeout, target, emerg
 	--log3("Set State called: for %s State: %s", self.npc:name(), state_name)
 	
 	if state_lib.states[state_name] == nil then
-		local d = debug.getinfo(3, "S")
-		log1("DEBUG_STATEMGR: Script [".. d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1') .. "." .. d.linedefined .."] called illegal state ["..tostring(state_name).."] for NPC "..tostring(self.npc:name()))
+		-- KRodin: а вообще, какой смысл получать имя скрипта откуда вызывали, если при вылете в любом случае получим луашный трейсбек?
+		-- В старом движке трейсбека не было, что-ли...
+		--local d = debug.getinfo(3, "S")
+		--log1("DEBUG_STATEMGR: Script [".. d.short_src:gsub('^.-([^\\]+)%.[^.]+$', '%1') .. "." .. d.linedefined .."] called illegal state ["..tostring(state_name).."] for NPC "..tostring(self.npc:name()))
 		abort("ERROR: ILLEGAL SET STATE CALLED!!! [%s] fo [%s]", tostring(state_name), self.npc:name())
 		-- state_name="idle"
 	end
