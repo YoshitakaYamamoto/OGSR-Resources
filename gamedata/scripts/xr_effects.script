@@ -3290,3 +3290,11 @@ end
 --В этом рестрикторе, похоже, логика никогда не срабатывает.
 function esc_wolf_thanks()
 end
+
+--Объект удалит сам себя, если в логике сделать например on_signal = sound_end | nil %=release%
+function release(actor, npc)
+	local sobj = alife():object(npc:id())
+	if sobj then
+		alife():release(sobj)
+	end
+end
