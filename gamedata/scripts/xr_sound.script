@@ -169,14 +169,14 @@ function set_sound(npc, sound, now, into_timeout)
 	end
 end
 
-function set_sound_play(npc, sound, timeout)
+function set_sound_play(npc, sound, timeout, force_play) --KRodin: Четвёртый аргумент добавил специально для вызова из схемы xr_remark, см. комментарии там.
 	local npc_id = npc:id()
 	if db.sound[npc_id] == nil then db.sound[npc_id] = {} end
 	if db.sound[npc_id].last_snd == nil then
 		db.sound[npc_id].last_snd = {}
 	end
 	stop_play_sound(npc)
-	this.play_sound(npc, parse_names(sound), timeout)
+	this.play_sound(npc, parse_names(sound), timeout, force_play)
 end
 
 function update(npc)
@@ -227,7 +227,7 @@ function update(npc)
 end
 
 
-function play_sound(npc, themes, timeout)
+function play_sound(npc, themes, timeout, force_play)
 	-- нужно составить список тем
 	local snd_table = {}
 	local t = 0		
@@ -257,7 +257,7 @@ function play_sound(npc, themes, timeout)
 			snd.into_max > 0
 		then
 			if db.sound[npc_id].last_snd[snd.into_id] == snd.into_max - 1 then
-				if snd.into_cycled == true then
+				if snd.into_cycled == true or force_play then
 					db.sound[npc_id].last_snd[snd.into_id] = nil
 				else
 					return
