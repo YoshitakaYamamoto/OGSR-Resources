@@ -1,6 +1,3 @@
-;Пленный долговец в тюрьме бандитов
-;Логика ему устанавливается из скрипта gulag_dark_valley.script.
-;Combat_ignore отсюда убрано, т.к отношение долговца с бандитами регулируется в исправленном мною sr_danger.script.
 ;--------------------------------------------------------------------------
 ; State 0
 ;--------------------------------------------------------------------------
@@ -8,6 +5,7 @@
 active          = walker@wander
 meet            = meet@ignore_abuse
 on_death        = death
+combat_ignore   = combat_ignore
 
 [death]
 on_info         = %+val_prisoner_dead%
@@ -21,6 +19,24 @@ meet_state      = 5|wait
 meet_state_wpn  = 5|wait
 victim          = 7|actor
 victim_wpn      = 7|actor
+use             = true
+use_wpn         = true
+
+[meet@main1]
+meet_dialog     = val_prisoner_hello
+meet_state      = 2|wait
+meet_state_wpn  = 2|wait
+victim          = 2|actor
+victim_wpn      = 2|actor
+use             = true
+use_wpn         = true
+
+[meet@near_door]
+meet_dialog     = val_prisoner_hello
+meet_state      = 20|hello@val_prisoner_captive_come_here
+meet_state_wpn  = 20|hello@val_prisoner_captive_come_here
+victim          = 20|actor
+victim_wpn      = 20|actor
 use             = true
 use_wpn         = true
 
@@ -46,10 +62,13 @@ ignore_distance_sound = 15
 path_walk                           = captive_cage_walk
 path_look                           = captive_cage_look
 on_info                             = {+val_prisoner_sit} walker@sit
+;on_info2                            = {+val_prisoner_door_unlocked} walker@outside
 on_actor_in_zone                    = val_prisoner_window_zone | walker@near_window
 on_actor_in_zone2                   = val_prisoner_near_door_zone | walker@near_door %+val_prisoner_near_door%
 on_actor_dist_ge                    = 30 | walker@actor_far
 meet                                = meet@ignore_abuse ;meet@main
+combat_ignore_cond                  = always
+combat_ignore_keep_when_attacked    = true
 
 ;--------------------------------------------------------------------------
 ; игрок отошел дальше 30 метров
@@ -59,6 +78,8 @@ path_walk                           = captive_sit_walk
 path_look                           = captive_sit_look
 on_actor_dist_le                    = 30 | walker@wander
 meet                                = meet@ignore_abuse
+combat_ignore_cond                  = always
+combat_ignore_keep_when_attacked    = true
 
 ;--------------------------------------------------------------------------
 ; игрок стоит возле окна. диалог с просьбой о помощи
@@ -67,9 +88,12 @@ meet                                = meet@ignore_abuse
 path_walk                           = captive_window_walk
 path_look                           = captive_window_look
 on_info                             = {+val_prisoner_sit} walker@sit
+;on_info2                            = {+val_prisoner_door_unlocked} walker@outside
 on_actor_not_in_zone                = val_prisoner_window_zone | walker@wander
 on_actor_in_zone                    = val_prisoner_near_door_zone | walker@near_door %+val_prisoner_near_door%
 meet                                = meet@main
+combat_ignore_cond                  = always
+combat_ignore_keep_when_attacked    = true
 
 ;--------------------------------------------------------------------------
 ; сидим, ждем когда игрок освободит нас
@@ -77,8 +101,11 @@ meet                                = meet@main
 [walker@sit]
 path_walk                           = captive_sit_walk
 path_look                           = captive_sit_look
+;on_info                             = {+val_prisoner_door_unlocked} walker@outside
 on_actor_in_zone                    = val_prisoner_near_door_zone | walker@near_door %+val_prisoner_near_door%
 meet                                = meet@ignore_abuse ;meet@main
+combat_ignore_cond                  = always
+combat_ignore_keep_when_attacked    = true
 
 ;--------------------------------------------------------------------------
 ; игрок возле двери
@@ -92,7 +119,9 @@ def_state_moving3                   = run
 ;on_actor_dist_le_nvis               = 10| remark@near_door1
 on_signal                           = arrived| remark@near_door1
 on_actor_not_in_zone                = val_prisoner_near_door_zone| {+val_prisoner_sit} walker@sit %-val_prisoner_near_door%, walker@wander %-val_prisoner_near_door%
-meet                                = meet@ignore_abuse
+meet                                = meet@ignore_abuse ;meet@near_door
+combat_ignore_cond                  = always
+combat_ignore_keep_when_attacked    = true
 
 ;--------------------------------------------------------------------------
 ; игрок возле двери
@@ -104,6 +133,8 @@ target                              = actor
 on_actor_dist_le_nvis               = 7| remark@near_door2
 on_actor_not_in_zone                = val_prisoner_near_door_zone| {+val_prisoner_sit} walker@sit %-val_prisoner_near_door%, walker@wander %-val_prisoner_near_door%
 meet                                = meet@ignore_abuse ;meet@main
+combat_ignore_cond                  = always
+combat_ignore_keep_when_attacked    = true
 
 ;--------------------------------------------------------------------------
 ; игрок возле двери
@@ -115,6 +146,8 @@ target                              = actor
 ;on_actor_dist_ge_nvis               = 14| walker@near_door
 on_actor_not_in_zone                = val_prisoner_near_door_zone| {+val_prisoner_sit} walker@sit %-val_prisoner_near_door%, walker@wander %-val_prisoner_near_door%
 meet                                = meet@ignore_abuse ;meet@main
+combat_ignore_cond                  = always
+combat_ignore_keep_when_attacked    = true
 
 
 ;--------------------------------------------------------------------------
@@ -123,6 +156,7 @@ meet                                = meet@ignore_abuse ;meet@main
 [logic@val_prisoner_free]
 active          = walker@outside
 on_death        = death
+combat_ignore   = combat_ignore
 
 ;--------------------------------------------------------------------------
 ; выходим за двери
@@ -133,7 +167,10 @@ path_look                           = captive_outside_door_look
 def_state_moving1                   = run
 def_state_moving2                   = run
 on_info                             = {+val_prisoner_free} remark@outside %=play_snd_now(val_prisoner_captive_thanx)%
-meet                                = meet@ignore_abuse
+on_info2							= {+val_prisoner_scene_end} walker@stop
+meet                                = meet@ignore_abuse ;meet@main1
+combat_ignore_cond                  = always
+combat_ignore_keep_when_attacked    = true
 
 ;--------------------------------------------------------------------------
 ; благодарим игрока
@@ -141,7 +178,29 @@ meet                                = meet@ignore_abuse
 [remark@outside]
 anim                    = wait
 target                  = actor
-on_timer                = 30000 | %+val_prisoner_scene_end%
-on_actor_dist_ge_nvis   = 30 | %+val_prisoner_scene_end%
+on_timer                = 60000 | walker@escape ;%+val_prisoner_scene_end%
+on_actor_dist_ge_nvis   = 20 | walker@escape ;%+val_prisoner_scene_end%
+on_info					= {+val_prisoner_scene_end} walker@stop
 meet                    = meet@main
 danger                  = danger@small
+
+;--------------------------------------------------------------------------
+; идем мочить братву
+;--------------------------------------------------------------------------
+[walker@escape]
+path_walk                           = captive_escape_walk
+path_look                           = captive_escape_look
+def_state_moving1                   = assault
+def_state_moving2                   = assault
+def_state_moving3                   = assault
+on_signal                           = arrived | %+val_prisoner_scene_end% walker@stop
+meet                                = meet@main
+combat_ignore_cond                  = {=check_fighting(403)}
+
+[walker@stop]
+path_walk                           = captive_escape_end
+path_look                           = captive_escape_look
+def_state_moving1                   = assault
+def_state_moving2                   = assault
+def_state_moving3                   = assault
+meet                                = meet@main
