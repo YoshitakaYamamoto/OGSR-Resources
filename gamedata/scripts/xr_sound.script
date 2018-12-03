@@ -7,8 +7,6 @@
 ----------------------------------------------------------------------------------------------------------------------
 function attach(sm)
 	sm:subscribe({signal = "on_destroy", fun = this.stop_all_sound_object})
-	sm:subscribe({signal = "on_update", fun = this.actor_update_lp, queued = true})
-	--sm:subscribe({signal = "on_key_down", fun = this.on_key_down})
 	sm:subscribe({ signal = "on_npc_death",  fun = this.on_npc_death })
 	sm:subscribe({ signal = "on_npc_spawn",  fun = this.on_npc_spawn })
 end
@@ -31,14 +29,10 @@ function on_npc_death( obj, who )
 		binder[ script_name() .. ".subscribed" ] = nil
 	end
 end
- 
--- сколько держать загруженный звук в мс
--- влияет на работу функции get_safe_sound_object. Вместо того, чтобы держать все звуки бесконечно,
--- удалять те, что существуют более этого значения
-local sound_removal_threshold = 5000 -- 5 сек
 
-key_by_id = {}
-group_idle = {}
+
+local key_by_id = {}
+local group_idle = {}
 
 
 local nstl = 64
@@ -104,15 +98,15 @@ function get_key(npc)
 	end
 	
 	-- апдейт таблиц :) не менять!
-	if xr_sound.key_by_id[npc:id()] ~= key then
-		if xr_sound.group_idle[xr_sound.key_by_id[npc:id()]] ~= nil	then
-		   xr_sound.group_idle[xr_sound.key_by_id[npc:id()]].num_in_group = xr_sound.group_idle[xr_sound.key_by_id[npc:id()]].num_in_group - 1
+	if key_by_id[npc:id()] ~= key then
+		if group_idle[key_by_id[npc:id()]] ~= nil	then
+		   group_idle[key_by_id[npc:id()]].num_in_group = group_idle[key_by_id[npc:id()]].num_in_group - 1
 		end
-		xr_sound.key_by_id[npc:id()] = key
-		if xr_sound.group_idle[key] == nil then
-			xr_sound.group_idle[key] = {num_in_group = 1}
+		key_by_id[npc:id()] = key
+		if group_idle[key] == nil then
+			group_idle[key] = {num_in_group = 1}
 		else
-			xr_sound.group_idle[key].num_in_group = xr_sound.group_idle[key].num_in_group + 1
+			group_idle[key].num_in_group = group_idle[key].num_in_group + 1
 		end
 	end
 	return key
@@ -156,11 +150,11 @@ function set_sound(npc, sound, now, into_timeout)
 		end
 		-- Устанавливаем входную паузу
 		local key = get_key(npc)
-		xr_sound.group_idle[key].begin = time_global()
+		group_idle[key].begin = time_global()
 		if into_timeout then
-			xr_sound.group_idle[key].idle = into_timeout
+			group_idle[key].idle = into_timeout
 		else
-			xr_sound.group_idle[key].idle = 0
+			group_idle[key].idle = 0
 		end
 		
 		if now == true then
@@ -190,7 +184,7 @@ function update(npc)
 		return 
 	end	
 	
-	local group_table = xr_sound.group_idle[key]		
+	local group_table = group_idle[key]		
 	if group_table == nil then
 		return
 	end
@@ -247,7 +241,7 @@ function play_sound(npc, themes, timeout, force_play)
 	if snd ~= nil then
 		if snd.min_snd == nil then return end
 		local npc_id = npc:id()
-		local group_table = xr_sound.group_idle[get_key(npc)]
+		local group_table = group_idle[get_key(npc)]
 		group_table.idle = math.random(snd.min_snd, snd.max_snd)*1000
 		if group_table.last_snd	== nil then
 			group_table.last_snd = {}
@@ -442,73 +436,26 @@ function get_sound_object(theme, t_type)
 	end
 end
 
--- кэш загруженных звуков
+
+-- Обертка вокруг функции, возвращающий звуковой объект.
 local sound_object_by_path = {}
 
--- можно ли удалять звук из кеша
-local function check_need_remove_sound(sound_desc)
-	if sound_desc.snd:playing() then -- если всё ещё играет
-		return false -- то не надо удалять
-	end
-	-- если не использовался более заданного, то можно удалять
-	return (time_global() - sound_desc.last_time) > sound_removal_threshold
+function get_safe_sound_object( path )
+  ASSERT( path, "path is required" )
+  if not sound_object_by_path[ path ] then
+    sound_object_by_path[ path ] = sound_object( path )
+  end
+  return sound_object_by_path[ path ]
 end
 
--- проверить все звуки и удалить давно неиспользуемые
-local function cleen_sounds()
-	--log1("cleen_sounds - 1")
-	local cleared_cntr = 0
-	local current_sound_path, current_sound_desc = next(sound_object_by_path)
-	while current_sound_desc do
-		--log1("cleen_sounds - 11")
-		local next_sound_path, next_sound_desc = next(sound_object_by_path, current_sound_path)
-		--log1("cleen_sounds - 12")
-		if check_need_remove_sound(current_sound_desc) then
-			sound_object_by_path[current_sound_path] = nil
-			cleared_cntr = cleared_cntr + 1
-		end
-		current_sound_path, current_sound_desc = next_sound_path, next_sound_desc
-	end
-	--log3("cleared sounds: %d", cleared_cntr)
-	--log1("cleen_sounds - exit")
-end
-
---' Обертка вокруг функции, возвращающий звуковой объект.
-function get_safe_sound_object(path)
-	ASSERT( path, "path is required" )
-	if sound_object_by_path[path] == nil then
-		local t = {}
-		t.snd = sound_object(path)
-		t.counter = 1
-		t.last_time = time_global()
-		sound_object_by_path[path] = t
-	end
-	local t = sound_object_by_path[path]
-	t.counter = t.counter + 1
-	t.last_time = time_global()
-	return t.snd
-end
-
-function actor_update_lp()
-	ogse_signals.get_mgr():reschedule( math.random(20000, 22000) )
-	cleen_sounds()
-end
-function on_key_down(key, bind)
-	if key == DIK_keys.DIK_RETURN then
-		for snd_name,t in pairs(sound_object_by_path) do
-		log3("[%s] used %d times, unused %7.1f sec", snd_name, t.counter, (time_global() - t.last_time)/1000)
-		end
-	end
-end
-
+-- KRodin: TODO: может здесь и очищать таблицу? Надо подумать, насколько это нужно. Быть может, имеет смысл это делать при уходе с уровня? Пока просто добавил лога.
 function stop_all_sound_object()
-	for k,v in pairs(sound_object_by_path) do
-		if v.snd:playing() then
-			v.snd:stop()
+	local size = 0
+	for _, snd in pairs(sound_object_by_path) do
+		if snd:playing() then
+			snd:stop()
 		end
+		size = size + 1
 	end
-	cleen_sounds()
+	log3("~~[%s] size of table sound_object_by_path: [%s]", script_name(), size)
 end
---function clear_all_sound_object()
---	sound_object_by_theme = {}
---end
