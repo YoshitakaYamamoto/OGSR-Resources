@@ -178,8 +178,8 @@ combat_ignore_keep_when_attacked    = true
 [remark@outside]
 anim                    = wait
 target                  = actor
-on_timer                = 60000 | walker@escape ;%+val_prisoner_scene_end%
-on_actor_dist_ge_nvis   = 20 | walker@escape ;%+val_prisoner_scene_end%
+on_timer                = 60000 | walker@escape %+val_prisoner_scene_end%
+on_actor_dist_ge_nvis   = 20 | walker@escape %+val_prisoner_scene_end%
 on_info					= {+val_prisoner_scene_end} walker@stop
 meet                    = meet@main
 danger                  = danger@small
