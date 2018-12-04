@@ -12,7 +12,7 @@ local ignore_enemies = {}
 function on_spawn()
   local dsh_sections = {
     "dsh.enemy.ignore",
-    --"dsh.enemy.ignore." .. level.name(),
+    "dsh.enemy.ignore." .. level.name(),
   }
   for _, dsh_sect in ipairs( dsh_sections ) do
     if sys_ini:section_exist( dsh_sect ) then

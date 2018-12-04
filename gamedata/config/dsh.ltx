@@ -10,12 +10,15 @@ esc_bridge = esc2_st_fox_place, esc_farm_lager, esc_stalker_camp, esc_stone_lage
 ;Шустрый и бандиты на АТП (чтоб не воевали после освобождения Шустрого в мирном варианте) Да, это костыли но пусть так будет.
 esc_shustryi = atp_band_lider, esc_fabrika_bandit
 esc_lager = atp_band_lider, esc_fabrika_bandit
-; Бандиты в ТД и долговцы уходящие на свалку.
-bandit = val_sacrifice_victim, val_prisoner_captive, val_escort_captive, val_escort_nap1
 ; наемникам на ДТ нужен живой Круглов
 bar_freedom_attack = bar_ecolog_professor
 ; Cвобода и Долг на Генераторах
 gen_freedom = gen_dolg
+
+[dsh.enemy.ignore.l04_darkvalley]
+; Бандиты и долговцы в ТД. Того, которого расстреливают, убрал отсюда. А то спокойно уходит с базы, как-то это не очень.
+bandit = val_prisoner_captive, val_escort_captive, val_escort_nap1, val_sos_wounded
+
 
 ; Разрешить/запретить постоянные нападения одних гулагов на другие.
 [dsh.gulag.raid]

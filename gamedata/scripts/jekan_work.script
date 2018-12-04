@@ -3673,53 +3673,6 @@ function afscanner_impulse7()
 	test_afscanner("strange_zone7", "strangezone7_off", "af_invis7_1_birth")
 end
 
--- Пуля и напарник ---------------------------------------------------------------------------------
-function val_escort_combat(actor, npc)
-	local nap = level_object_by_sid(story_ids.val_escort_nap1)
-	if not nap:alive() then
-		return
-	end
-	local captive = level_object_by_sid(story_ids.val_escort_captive)
-	if not captive:alive() then
-		return
-	end
-
-	local bandit1 = level_object_by_sid(story_ids.val_escort_guard1)
-	if bandit1 then
-		nap:set_relation(game_object.enemy, bandit1)
-			bandit1:set_relation(game_object.enemy, nap)
-		captive:set_relation(game_object.enemy, bandit1)
-			bandit1:set_relation(game_object.enemy, captive)
-	end
-
-	local bandit2 = level_object_by_sid(story_ids.val_escort_guard2)
-	if bandit2 then
-		nap:set_relation(game_object.enemy, bandit2)
-			bandit2:set_relation(game_object.enemy, nap)
-		captive:set_relation(game_object.enemy, bandit2)
-			bandit2:set_relation(game_object.enemy, captive)
-	end
-end
-
-function set_nap_band_friend()
-	local npc = level_object_by_sid(story_ids.val_escort_nap1)
-	-- if npc:alive() then
-	relation_registry.set_community_goodwill("bandit", npc:id (), 5000)
-	-- end
-end
-
-function set_captive_band_friend()
-	local npc = level_object_by_sid(story_ids.val_escort_captive)
-	-- if npc:alive() then
-	relation_registry.set_community_goodwill("bandit", npc:id (), 5000)
-	-- end
-end
-
-function set_nap_invulnerable()
-end
-
-function set_captive_invulnerable()
-end
 
 -- Радист на Янтаре --------------------------------------------------------------------------------
 
