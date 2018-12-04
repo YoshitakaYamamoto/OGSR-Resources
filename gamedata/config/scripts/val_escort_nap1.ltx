@@ -63,7 +63,7 @@ hp_cover        = 0|false
 [walker@val_escort_nap1_begin1]
 path_walk           = nap1_walk
 path_look           = nap1_look
-on_timer = 10 | walker@val_escort_nap1_begin %=make_invulnerable%
+on_timer = 10 | walker@val_escort_nap1_begin
 meet                = no_meet
 danger              = danger@val_escort_nap1_small
 wounded             = wounded@val_escort_nap1
@@ -238,10 +238,10 @@ combat_ignore_cond  = {=check_fighting(407:408) -val_escort_combat}, {=check_fig
 anim                    = hide
 target                  = val_escort_nap1_rescue_look, 0 ;actor
 on_actor_dist_le_nvis   = 10 | remark@val_escort_nap1_phrase7
-on_info                 = {+val_escort_combat} camper@val_escort_nap1_fight  %=unmake_invulnerable%
+on_info                 = {+val_escort_combat} camper@val_escort_nap1_fight
 on_info2                = {=distance_to_obj_le(400:30)} remark@val_escort_nap1_phrase8
-on_info3                = {+val_escort_captive_dead} remark@val_escort_nap1_fail  %=unmake_invulnerable%
-on_info4                = {+val_escort_guard1_dead +val_escort_guard2_dead} remark@val_escort_nap1_task_done  %=unmake_invulnerable%
+on_info3                = {+val_escort_captive_dead} remark@val_escort_nap1_fail
+on_info4                = {+val_escort_guard1_dead +val_escort_guard2_dead} remark@val_escort_nap1_task_done
 meet                    = no_meet
 danger                  = danger@val_escort_nap1_small
 wounded                 = wounded@val_escort_nap1
@@ -269,10 +269,10 @@ combat_ignore_cond  = {=check_fighting(407:408) -val_escort_combat}
 anim                = hide
 snd                 = val_escort_nap1_phrase6
 target              = val_escort_nap1_rescue_look, 0 ;actor
-on_signal           = sound_end| camper@val_escort_nap1_fight  %=unmake_invulnerable%
-on_info             = {+val_escort_combat} remark@val_escort_nap1_fight  %=unmake_invulnerable%
-on_info2            = {+val_escort_captive_dead} remark@val_escort_nap1_fail  %=unmake_invulnerable%
-on_info3            = {+val_escort_guard1_dead +val_escort_guard2_dead} remark@val_escort_nap1_task_done %=unmake_invulnerable%
+on_signal           = sound_end| camper@val_escort_nap1_fight
+on_info             = {+val_escort_combat} remark@val_escort_nap1_fight
+on_info2            = {+val_escort_captive_dead} remark@val_escort_nap1_fail
+on_info3            = {+val_escort_guard1_dead +val_escort_guard2_dead} remark@val_escort_nap1_task_done
 meet                = no_meet
 danger              = danger@val_escort_nap1_small
 wounded             = wounded@val_escort_nap1
@@ -317,7 +317,7 @@ danger				= danger@val_escort_nap1_small
 [remark@val_escort_nap1_task_done]
 anim                = guard
 meet                = no_meet
-on_info             = {-val_escort_captive_dead} remark@val_escort_nap1_captive_live %=unmake_invulnerable%, follower1@val_escort_nap1_captive_dead %=unmake_invulnerable%
+on_info             = {-val_escort_captive_dead} remark@val_escort_nap1_captive_live, follower1@val_escort_nap1_captive_dead
 danger              = danger@val_escort_nap1_small
 wounded             = wounded@val_escort_nap1
 
