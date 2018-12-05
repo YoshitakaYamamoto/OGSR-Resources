@@ -171,7 +171,7 @@ function action_remark_activity:update()
 	end
 
 	-- Должны выдать сигнал action_end
-	if self.sound_end_signalled and self.anim_end_signalled then
+	if ( not self.snd_started or self.sound_end_signalled ) and self.anim_end_signalled then
 		if not self.action_end_signalled then
 			self.st.signals["action_end"] = true
 			self.action_end_signalled = true
