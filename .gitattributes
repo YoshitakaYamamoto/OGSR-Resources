@@ -1,6 +1,3 @@
-# Auto detect text files and perform LF normalization
-* text=auto
-
 # Custom
 *.script  text=crlf linguist-language=Lua
 *.ltx     text=crlf linguist-language=INI
@@ -9,3 +6,4 @@
 *.s       text=crlf linguist-language=Lua
 *.puddles text=crlf linguist-language=INI
 *.seq     text=crlf linguist-language=INI
+*.h       text=crlf linguist-language=HLSL
