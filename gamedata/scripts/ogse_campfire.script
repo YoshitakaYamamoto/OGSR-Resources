@@ -1,5 +1,3 @@
--- -*- mode: lua; coding: windows-1251-dos -*-
-
 
 local DIST_TO_FLAME = 1
 local DIST_TO_NPC = 25 --5^2
@@ -95,13 +93,13 @@ function play_particle_near_light(light, particle)
 end
 
 --[[
-  типа конечный автомат:
-    next - переводит КА в следующее состояние
-	action - вызывается при переходе в данное состояние
+  С‚РёРїР° РєРѕРЅРµС‡РЅС‹Р№ Р°РІС‚РѕРјР°С‚:
+    next - РїРµСЂРµРІРѕРґРёС‚ РљРђ РІ СЃР»РµРґСѓСЋС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
+	action - РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё РїРµСЂРµС…РѕРґРµ РІ РґР°РЅРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
 ]]
 states = {
 
-	-- костер полностью погашен: аномалия отключена, лампа погашена, партиклы не играют
+	-- РєРѕСЃС‚РµСЂ РїРѕР»РЅРѕСЃС‚СЊСЋ РїРѕРіР°С€РµРЅ: Р°РЅРѕРјР°Р»РёСЏ РѕС‚РєР»СЋС‡РµРЅР°, Р»Р°РјРїР° РїРѕРіР°С€РµРЅР°, РїР°СЂС‚РёРєР»С‹ РЅРµ РёРіСЂР°СЋС‚
 	turn_off = {
 		next = function(has_users, now, prev)
 			if has_users then return states.firing
@@ -114,7 +112,7 @@ states = {
 		end,
 	},
 	
-	-- костер горит на полную: аномалия включена, лампочка горит, партиклов нет
+	-- РєРѕСЃС‚РµСЂ РіРѕСЂРёС‚ РЅР° РїРѕР»РЅСѓСЋ: Р°РЅРѕРјР°Р»РёСЏ РІРєР»СЋС‡РµРЅР°, Р»Р°РјРїРѕС‡РєР° РѕС‚РєР»СЋС‡РµРЅР° (С‚.Рє. Сѓ Р°РЅРѕРјР°Р»РёРё РІ РєРѕРЅС„РёРіРµ РІРєР»СЋС‡РµРЅРѕ idle_light), РїР°СЂС‚РёРєР»РѕРІ РЅРµС‚
 	firing = {
 		next = function(has_users, now, prev)
 			if has_users or prev + 10000 > now then return states.firing
@@ -122,12 +120,12 @@ states = {
 		end,
 		action = function(self)
 			switch_flame_near_light(self.object, true)
-			switch_light(self.object, true)
+			switch_light(self.object, false)
 			if self.particle then self.particle:stop() end
 		end,
 	},
 	
-	-- костер начинает гаснуть: аномалия еще включена, лампочка горит, включается партикл затухающего огня
+	-- РєРѕСЃС‚РµСЂ РЅР°С‡РёРЅР°РµС‚ РіР°СЃРЅСѓС‚СЊ: Р°РЅРѕРјР°Р»РёСЏ РµС‰Рµ РІРєР»СЋС‡РµРЅР°, Р»Р°РјРїРѕС‡РєР° РѕС‚РєР»СЋС‡РµРЅР° (С‚.Рє. Сѓ Р°РЅРѕРјР°Р»РёРё РІ РєРѕРЅС„РёРіРµ РІРєР»СЋС‡РµРЅРѕ idle_light), РІРєР»СЋС‡Р°РµС‚СЃСЏ РїР°СЂС‚РёРєР» Р·Р°С‚СѓС…Р°СЋС‰РµРіРѕ РѕРіРЅСЏ
 	down = {
 		next = function(has_users, now, prev)
 			if has_users then return states.firing
@@ -136,13 +134,13 @@ states = {
 		end,
 		action = function(self)
 			switch_flame_near_light(self.object, true)
-			switch_light(self.object, true)
+			switch_light(self.object, false)
 			if not self.particle then self.particle = particles_object("dyn_kfire\\dyingfire") end
 			play_particle_near_light(self.object, self.particle)
 		end,
 	},
 	
-	-- следующий этап угасания: отключается аномалия, но лампочка еще горит, партикл играется
+	-- СЃР»РµРґСѓСЋС‰РёР№ СЌС‚Р°Рї СѓРіР°СЃР°РЅРёСЏ: РѕС‚РєР»СЋС‡Р°РµС‚СЃСЏ Р°РЅРѕРјР°Р»РёСЏ, РІРєР»СЋС‡Р°РµС‚СЃСЏ Р»Р°РјРїРѕС‡РєР° (С‡С‚РѕР± РЅРµ Р±С‹Р»Рѕ СЂРµР·РєРѕРіРѕ Р·Р°С‚СѓС…Р°РЅРёСЏ РєРѕСЃС‚СЂР° РїРѕСЃР»Рµ РѕС‚РєР»СЋС‡РµРЅРёСЏ Р°РЅРѕРјР°Р»РёРё), РїР°СЂС‚РёРєР» РёРіСЂР°РµС‚СЃСЏ
 	flame_off = {
 		next = function(has_users, now, prev)
 			if has_users then return states.firing
