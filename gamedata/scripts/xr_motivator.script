@@ -250,6 +250,8 @@ function motivator_binder:__init (obj) super(obj)
 	self.am:call( "on_npc_init", obj, self )
 end
 function motivator_binder:__finalize()
+	ASSERT( self.destroy_called, "Something strange!" ) --DBG
+	--
 	--log1("--motivator_binder:__finalize() called!")
 end
 
@@ -422,6 +424,8 @@ end
 
 
 function motivator_binder:net_destroy()
+	self.destroy_called = true --DBG
+	--
 --log3("~~[%s] Start destroy [%s]", script_name(), self.object and self.object:name() or "nil")
 	xr_logic.save_logic_online(self.object)
 
