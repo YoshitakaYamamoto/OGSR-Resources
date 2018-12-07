@@ -102,8 +102,8 @@ end
 function action_remark_activity:update()
 	-- Все дела уже закончены
 	if self.action_end_signalled then
-		log3("~~[%s] action_remark_activity:update [%s] action_end_signalled! reset state [%s]...)", script_name(), self.object:name(), self.state)
-		state_mgr.set_state(self.object, self.st.anim, nil, nil, self:get_target(), { animation = self.st.anim_reset })
+		--log3("~~[%s] action_remark_activity:update [%s] action_end_signalled! reset state [%s]...)", script_name(), self.object:name(), self.state)
+		--state_mgr.set_state(self.object, self.st.anim, nil, nil, self:get_target(), { animation = self.st.anim_reset })
 		return
 	end
 
