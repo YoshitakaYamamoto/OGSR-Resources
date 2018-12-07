@@ -42,6 +42,8 @@ local addon_templates = {
 		},
 		addon_attached_fun = ogse_wpn_utils.get_scope_flag,
 		extra_actions = function(obj, desc)
+			if obj:is_weapon_gl() and ogse_wpn_utils.get_gl_mode(obj) then return end
+			--
 			local force_use_tex = desc.hud_attached and not desc.use_texture
 			ogse_wpn_utils.set_forced_notex_scope(obj, force_use_tex)
 			obj:set_hud_offset(desc.hud_attached and desc.offset or desc.default_hud_offset)
