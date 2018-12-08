@@ -1318,6 +1318,7 @@ function quest_spawn_ex(section, total, spawn_item)
 	return unpack(res)
 end
 
+
 function kill_crow()
 	local lname = level.name()
 	for id, sobj in alife():objects() do
@@ -1343,7 +1344,6 @@ function release_crow(id)
 	end
 end
 
---TODO: не из-за этой ли функции вороны вылетают из одной точки на земле?
 function spawn_crow()
 	local lv = db.actor:level_vertex_id()
 	local gv = db.actor:game_vertex_id()
@@ -1360,6 +1360,7 @@ function spawn_crow()
 		alife():create("m_crow", pos, lv, gv)
 	end
 end
+
 
 function give_supplies_to_actor(first_speaker, second_speaker)
 	if not db.actor:object("detector_simple") then

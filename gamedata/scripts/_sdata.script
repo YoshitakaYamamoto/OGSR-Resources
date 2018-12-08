@@ -106,6 +106,37 @@ local bSlot12		= true	-- включение показа слота 12 (шлем)
 -- ВЫВОД СТАТИСТИКИ НА HUD
 ----------------------------------------------------------------------------
 
+----------------------------------------------------------------------------
+local SGameMtlFlagKeys = {
+	"flActorObstacle",
+	"flBloodmark",
+	"flBounceable",
+	"flClimable",
+	"flDynamic",
+	"flInjurious",
+	"flLiquid",
+	"flPassable",
+	"flSlowDown",
+	"flSuppressShadows",
+	"flSuppressWallmarks" 
+}
+
+local function get_mtl_flags(Flags)
+	local str
+	for _, k in ipairs(SGameMtlFlagKeys) do
+		local fv = SGameMtlFlags[k]
+		if Flags:test(fv) then
+			if not str then
+				str = k
+			else
+				str = str .. "," .. k
+			end
+		end
+	end
+	return str or "<none>"
+end
+----------------------------------------------------------------------------
+
 function switch_off()
 	
 	local statics = {
@@ -188,18 +219,23 @@ local mental_anims = {
 
 function info_about_npc()	
 	clear_info_about_npc()
-	
-	local target_obj = level.get_target_obj()
+
+	local PosLogic = hud:GetCustomStatic("logic_debug")
+	if PosLogic == nil then
+		hud:AddCustomStatic("logic_debug",true)
+		PosLogic = hud:GetCustomStatic("logic_debug")
+	end
+
+	local LogicText = ""
+
+	local rq = level.get_current_ray_query()
+	local target_obj = rq.object
+
 	if target_obj then 
-		if target_obj:is_stalker() or target_obj:is_monster() then
-	
+		if target_obj:is_stalker() or target_obj:is_monster() or target_obj:is_trader() then
+
 			local gulag_val,scheme1,scheme2,anim,mental,pos,lv,gv
 		
-			local PosLogic = hud:GetCustomStatic("logic_debug")
-			if PosLogic == nil then
-				hud:AddCustomStatic("logic_debug",true)
-				PosLogic = hud:GetCustomStatic("logic_debug")
-			end
 			local gulag = xr_gulag.get_npc_gulag(target_obj)
 			if gulag then
 				gulag = gulag.name
@@ -253,88 +289,101 @@ function info_about_npc()
 			if target_obj:is_stalker() then
 				community = target_obj:character_community()
 			end
-			local wound = xr_wounded.is_wounded(target_obj)
 			local storage = db.storage[target_obj:id()]
 			local scheme = storage.active_scheme
 			local state = state_mgr.get_state(target_obj)
-			local active_evaluator = "nil"
+			local active_evaluator
 			if ogse_debug.active_evaluators and ogse_debug.active_evaluators[target_obj:id()] then
 				active_evaluator = ogse_debug.active_evaluators[target_obj:id()]			
 			end
-			local active_danger = "nil"
+			local active_danger
 			if ogse_debug.active_dangers and ogse_debug.active_dangers[target_obj:id()] then
 				active_danger = ogse_debug.active_dangers[target_obj:id()]			
 			end	
-			local active_anim = "nil"
+			local active_anim
 			if ogse_debug.active_anim and ogse_debug.active_anim[target_obj:id()] then
 				active_anim = ogse_debug.active_anim[target_obj:id()]			
 			end				
-			local range = target_obj:range()
-			local fov = target_obj:fov()	
-			local bleeding = target_obj:get_bleeding()
-			local LogicText = "npc: sect: ["..tostring(target_obj:section()).."] "..
-						"name: ["..tostring(target_obj:name()).."]\\n"..
-						"npc: id: "..tostring(target_obj:id()).." "..
-						"story_id: "..tostring(target_obj:story_id()).." "..
-						"comm: ["..tostring(community).."]\\n"..
-						"npc: behave scheme: "..tostring(scheme).."\\n"..
-						"npc: st_mgr state: ["..tostring(state).."] "..
-						"anim: ["..tostring(anim).."] "..
-						"mental: ["..tostring(mental).."]\\n"..
-						"npc: last active eval: "..tostring(active_evaluator).."\\n"..
-						"npc: last active danger: "..tostring(active_danger).."\\n"..
-						"npc: last active anim_eval: "..tostring(active_anim).."\\n"..						
-						-- "------------------\\n"..
-						-- "npc: range: "..tostring(range).."\\n"..
-						-- "npc: fov: "..tostring(fov).."\\n"..						
-						"------------------\\n"..
-						"best_enemy: "..tostring(be).."\\n"..
-						"best_danger: "..tostring(best_danger_name).."\\n"..
-						"best_danger_type: "..tostring(best_danger_type).."\\n"..
-						"------------------\\n"..
-						"profile name: "..tostring(target_obj:profile_name()).."\\n"..
-						"gulag: "..tostring(gulag).."\\n"..
-						"gulag val: "..tostring(gulag_val).."\\n"..
-						"gulag job: "..scheme1.."\\n"..
-						"global job: "..scheme2.."\\n"..
-						"------------------\\n"..
-						"is wounded: "..tostring(wound).."\\n"..
-						"health: "..tostring(target_obj.health).." bleeding: "..tostring(bleeding).."\\n"..
-						"------------------\\n"..
-						"coords: X "..tostring(target_obj:position().x)..", Y "..tostring(target_obj:position().y)..", Z "..tostring(target_obj:position().z).."\\n"..
-						"level_vertex: "..tostring(target_obj:level_vertex_id()).."\\n"..
-						"game_vertex: "..tostring(target_obj:game_vertex_id())
-						
-			if PosLogic ~= nil then PosLogic:wnd():SetText(LogicText) end
+			LogicText = LogicText..
+				"npc: sect: ["..target_obj:section().."] ".."name: ["..target_obj:name().."]\\n"..
+				"npc: id: "..target_obj:id().." ".."story_id: "..target_obj:story_id().." ".."comm: ["..community.."]\\n"..
+				"npc: behave scheme: ["..tostring(scheme).."], fov: "..target_obj:fov()..", range: "..target_obj:range().."\\n"..
+				"npc: st_mgr state: ["..tostring(state).."] ".."anim: ["..tostring(anim).."] ".."mental: ["..tostring(mental).."\\n"..
+				"npc: last active eval: "..tostring(active_evaluator).."\\n"..
+				"npc: last active danger: "..tostring(active_danger).."\\n"..
+				"npc: last active anim_eval: "..tostring(active_anim).."\\n"..						
+				"------------------\\n"..
+				"best_enemy: "..tostring(be).."\\n"..
+				"best_danger: "..tostring(best_danger_name).."\\n"..
+				"best_danger_type: "..tostring(best_danger_type).."\\n"..
+				"is wounded: "..tostring(xr_wounded.is_wounded(target_obj))..", health: "..target_obj.health..", bleeding: "..target_obj:get_bleeding().."\\n"..
+				"------------------\\n"..
+				"profile name: "..tostring(target_obj:profile_name()).."\\n"..
+				"gulag: "..tostring(gulag).."\\n"..
+				"gulag val: "..tostring(gulag_val).."\\n"..
+				"gulag job: "..scheme1.."\\n"..
+				"global job: "..scheme2.."\\n"..
+				"coords: X "..target_obj:position().x..", Y "..target_obj:position().y..", Z "..target_obj:position().z.."\\n"..
+				"level_vertex: "..target_obj:level_vertex_id()..", game_vertex: "..target_obj:game_vertex_id()
 		else
-			local PosLogic = hud:GetCustomStatic("logic_debug")
-			if PosLogic == nil then
-				hud:AddCustomStatic("logic_debug",true)
-				PosLogic = hud:GetCustomStatic("logic_debug")
-			end
 			local scheme1, scheme2
 			if db.storage[target_obj:id()] then
 				scheme1 = tostring(db.storage[target_obj:id()].active_section)
 				scheme2 = tostring(db.storage[target_obj:id()].section_logic)			
 			end
-			local LogicText = "obj: section: "..tostring(target_obj:section()).."\\n"..
-						"obj: name: "..tostring(target_obj:name()).."\\n"..
-						"obj: id: "..tostring(target_obj:id()).."\\n"..
-						"story_id: "..tostring(target_obj:story_id()).." "..
-						"------------------\\n"..
-						"coords: X "..tostring(target_obj:position().x)..", Y "..tostring(target_obj:position().y)..", Z "..tostring(target_obj:position().z).."\\n"..
-						"dir: X "..tostring(target_obj:direction().x)..", Y "..tostring(target_obj:direction().y)..", Z "..tostring(target_obj:direction().z).."\\n"..
-						"Active logic: "..tostring(scheme2).."\\n"..
-						"Logic Section: "..tostring(scheme1).."\\n"..
-						"level_vertex: "..tostring(target_obj:level_vertex_id()).."\\n"..
-						"game_vertex: "..tostring(target_obj:game_vertex_id())
-						
+			LogicText = LogicText..
+				"obj: section: "..target_obj:section().."\\n"..
+				"obj: name: "..target_obj:name().."\\n"..
+				"obj: id: "..target_obj:id().."\\n"..
+				"story_id: "..target_obj:story_id().."\\n"..
+				"------------------\\n"..
+				"coords: X "..target_obj:position().x..", Y "..target_obj:position().y..", Z "..target_obj:position().z.."\\n"..
+				"dir: X "..target_obj:direction().x..", Y "..target_obj:direction().y..", Z "..target_obj:direction().z.."\\n"..
+				"Active logic: "..tostring(scheme2).."\\n"..
+				"Logic Section: "..tostring(scheme1).."\\n"..
+				"level_vertex: "..target_obj:level_vertex_id().."\\n"..
+				"game_vertex: "..target_obj:game_vertex_id()
+
 			if target_obj:is_ammo() then
 				LogicText = LogicText.."\\n \\nbullets in pack:"..get_ammo_size(target_obj)
 			end
-			
-			if PosLogic ~= nil then PosLogic:wnd():SetText(LogicText) end			
 		end
+
+		local bone  = rq.element
+		if bone then
+			local bone_name = target_obj:get_bone_name(bone)
+			LogicText = LogicText.."\\n\\nbone index=".. bone ..", name="..bone_name
+		end
+		
+	elseif rq.mtl then
+		local mtl = rq.mtl
+		LogicText = LogicText.."mtl: m_Name: "..mtl.m_Name.."\\n"..
+			"mtl: m_Desc: "..mtl.m_Desc.."\\n"..
+			"------------------\\n"..
+			"Flags: "..get_mtl_flags(mtl.Flags).."\\n"..
+			"------------------\\n"..
+			"mtl: fFlotationFactor: "..mtl.fFlotationFactor.."\\n"..
+			"mtl: fShootFactor: "..mtl.fShootFactor.."\\n"..
+			"mtl: fBounceDamageFactor: "..mtl.fBounceDamageFactor.."\\n"..
+			"mtl: fInjuriousSpeed: "..mtl.fInjuriousSpeed.."\\n"..
+			"mtl: fVisTransparencyFactor: "..mtl.fVisTransparencyFactor.."\\n"..
+			"mtl: fSndOcclusionFactor: "..mtl.fSndOcclusionFactor.."\\n"..
+			"------------------\\n"..
+			"mtl: fPHFriction: "..mtl.fPHFriction.."\\n"..
+			"mtl: fPHDamping: "..mtl.fPHDamping.."\\n"..
+			"mtl: fPHSpring: "..mtl.fPHSpring.."\\n"..
+			"mtl: fPHBounceStartVelocity: "..mtl.fPHBounceStartVelocity.."\\n"..
+			"mtl: fPHBouncing: "..mtl.fPHBouncing.."\\n"..
+			"------------------"
+    end
+
+	local dist = rq.range
+	if dist then 
+		LogicText = LogicText.."\\n\\ndistance: ".. dist
+	end
+
+	if PosLogic then
+		PosLogic:wnd():SetText(LogicText)
 	end
 end
 
