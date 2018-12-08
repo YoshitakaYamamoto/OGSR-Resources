@@ -1,11 +1,11 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 -- KRodin (c) 2017
 -- Эта тулза сканирует все скрипты в папке gamedata\\scripts и ищет _потенциально_ неиспользуемые.
+-- Перед удалением, надо обязательно проверять, не вызываются ли они из всяких диалогов, конфигов (биндеры) и тп.
 
 local excluded_scripts = { --Скрипты, вызываемые из движка
 	["_g"] = true,
 	["class_registrator"] = true,
-	["game_registrator"] = true,
 	["ui_wpn_params"] = true,
 }
 
