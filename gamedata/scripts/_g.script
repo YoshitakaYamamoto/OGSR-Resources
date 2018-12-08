@@ -1391,3 +1391,6 @@ function set_item_default_highlighting( item )
   f:set( global_flags.FIAlwaysHighlighted, false )
   item:set_inventory_item_flags( f )
 end
+
+
+rx_bandage = false --Выключаю полностью. Чтоб даже не компилился.
