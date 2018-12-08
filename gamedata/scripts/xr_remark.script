@@ -268,13 +268,19 @@ end
 
 -- Включение схемы
 function set_scheme(npc, ini, scheme, section, gulag_name)
-  local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 
-  st.logic     = xr_logic.cfg_get_switch_conditions(ini, section, npc)
+	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 
-  st.snd_anim_sync = utils.cfg_get_bool(ini, section, "snd_anim_sync", npc, false)
+	st.snd_anim_sync = utils.cfg_get_bool(ini, section, "snd_anim_sync", npc, false)
   
-  st.snd      = utils.cfg_get_string(ini, section, "snd", npc, false, "", nil)
+	st.snd = utils.cfg_get_string(ini, section, "snd", npc, false, "", nil)
+	if not st.snd then --KRodin: поставил здесь ассерт, чтобы вылавливать косяки в логике. Лучше вылететь с понятной диагностикой, чем гадать, почему непись повис.
+		local on_signal = get_string(section, "on_signal", nil, ini)
+		if on_signal then
+			ASSERT(not on_signal:find("sound_end"), "Found signal 'sound_end' in logic section [%s] of object [%s], but 'snd' not specified!", section, npc:name())
+		end
+	end
 
   st.anim     = utils.cfg_get_string(ini, section, "anim", npc, false, "", "wait")
   st.tips_id    = utils.cfg_get_string(ini, section, "tips", npc, false, "")
