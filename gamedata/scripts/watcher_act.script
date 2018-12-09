@@ -860,11 +860,6 @@ function add_to_binder(object, char_ini, scheme, section, st)
 	local state_mgr_to_idle_alife		= xr_actions_id.state_mgr + 2	
 	
 	local manager = object:motivation_action_manager()
-	-- отключить движковую схему подбирания оружия
-	manager:remove_evaluator( stalker_ids.property_items )
-	manager:add_evaluator(
-		stalker_ids.property_items, property_evaluator_const( false )
-	)
 
 	local zombi = 	npc:character_community()=="zombied" or 
 					npc:character_community()=="trader" or

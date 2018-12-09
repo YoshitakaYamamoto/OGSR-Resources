@@ -349,6 +349,13 @@ function motivator_binder:net_spawn(sobject)
 	local manager = self.object:motivation_action_manager()
 	manager:remove_evaluator(stalker_ids.property_anomaly)
 	manager:add_evaluator(stalker_ids.property_anomaly, property_evaluator_const(false))
+	--
+	-- отключить движковую схему подбирания оружия
+	manager:remove_evaluator( stalker_ids.property_items )
+	manager:add_evaluator(
+		stalker_ids.property_items, property_evaluator_const( false )
+	)
+	--
 	if xr_combat_companion then
 		manager:add_evaluator(xr_combat_companion.prop_combat, property_evaluator_const(false))
 	end
