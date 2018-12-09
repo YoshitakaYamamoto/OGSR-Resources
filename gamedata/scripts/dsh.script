@@ -269,3 +269,14 @@ function find_all_vertexes_in_radius( around_pos, radius )
   end
   return vertexes
 end
+
+
+function is_torch_enabled()
+  if db.actor:alive() then
+    local torch = db.actor:item_in_slot( 9 )
+    if torch and torch:is_torch() then
+      torch = get_torch_obj( torch )
+      return torch.on
+    end
+  end
+end
