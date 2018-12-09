@@ -205,7 +205,7 @@ end
 
 local forbidden_schemes = {
 	--["test"] = true, -- если посланы игрой бежать куда-то
-	--["walker"] = true, -- если посланы игрой бежать куда-то
+	--["walker"] = true, -- если посланы игрой бежать куда-то --KRodin: раскомментировать?
 	["remark"] = true, -- если играем в скриптовой сценке
 	["combat"] = true, -- если сражаемся
 	["wounded"] = true, -- если отыгрываем тяжелораненного
@@ -802,16 +802,12 @@ function act_grab_item:execute()
 		-- поднятие анимировать нам надо
 		if gi:is_stalker() or gi:is_monster() then
 			if gi:is_stalker() then
-				if self.st.rnd > 0.5 then
-					state_mgr.set_state( script_name(), npc, "obisk_trupa", nil, nil, {look_object = gi})
-				else
-					state_mgr.set_state( script_name(), npc, "obisk_trupa_2", nil, nil, {look_object = gi})
-				end
+				state_mgr.set_state( npc, self.st.rnd > 0.5 and "obisk_trupa" or "obisk_trupa_2", nil, nil, {look_object = gi}, {animation = true, animation_nout = true} )
 			else
-				state_mgr.set_state( script_name(), npc, "search", nil, nil, {look_object = gi})
+				state_mgr.set_state( npc, "search", nil, nil, {look_object = gi}, {animation = true, animation_nout = true} )
 			end
 		else
-			state_mgr.set_state( script_name(), npc, "dynamite", nil, nil, {look_object = gi})
+			state_mgr.set_state( npc, "dynamite", nil, nil, {look_object = gi}, {animation = true, animation_nout = true} )
 		end
 	else
 		-- поднимаем
