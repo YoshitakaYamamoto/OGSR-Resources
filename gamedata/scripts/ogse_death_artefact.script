@@ -30,7 +30,6 @@ function on_death(victim)
 	local hd = binder.last_hit_data
 	if not ( hd.weapon_id or hd.who_id ) then return end
 	local anom = level.object_by_id( hd.weapon_id or hd.who_id )
-	if not anom or not anom:is_anomaly() then return end
 	--
 	if string.find( victim:section(), "x18_giant" ) then --Спавн артов после уничтожения бронированного псевдогиганта из х-18
 		local malish_arts = { "af_night_star", "af_soul", "af_electra_moonlight", "af_ameba_mica", "af_rusty_sea-urchin", "af_dummy_battery", "af_dummy_glassbeads", "af_fuzz_kolobok" }
@@ -47,6 +46,8 @@ function on_death(victim)
 		end
 		return
 	end
+	--
+	if not anom or not anom:is_anomaly() then return end
 	--
 	local anom_sect = anom:section()
 	--
