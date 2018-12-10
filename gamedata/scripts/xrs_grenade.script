@@ -50,24 +50,24 @@ function on_death( obj )
 end
 
 
-gr_types={
+local gr_types={
 	[1]="grenade_f1",
 	[2]="grenade_rgd5",
 	--[3]="grenade_light"
 }
 
-grenades = {}
-grenadiers = {}
+local grenades = {}
+local grenadiers = {}
 
 local grenade_owners = {}
 local grenade_times = {}
 
-test_grenades={}
+local test_grenades={}
 
-grenade_max_dist = 50
-grenade_bone = "bip01_head"
+local grenade_max_dist = 50
+local grenade_bone = "bip01_head"
 
-snd_grenade_replics={
+local snd_grenade_replics={
 	stalker = {
 		[[stalker\ready_1]],
 		[[stalker\ready_2]],

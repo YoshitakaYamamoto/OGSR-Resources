@@ -43,7 +43,7 @@ local clslist = {
 	psy_dog_phantom = clsid.psy_dog_phantom_s
 }
 
-wm_modes = {
+local wm_modes = {
 		sect = {custom = {}, default = {}}, -- данные из конфигов
 		koeffs = {},
 		priors = {},

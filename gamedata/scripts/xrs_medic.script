@@ -80,7 +80,7 @@ function on_death( obj )
 end
 
 
-mk_types={
+local mk_types={
 	[1]="medkit",
 	[2]="medkit_army",
 	[3]="medkit_scientic",
@@ -88,15 +88,16 @@ mk_types={
 }
 
 wounded = {}
-has_medic = {}
-friends_r = 50
-neutral_r = 30
+
+local has_medic = {}
+local friends_r = 50
+local neutral_r = 30
 ---------------
 evid_medic=18680
-evid_self_medic=evid_medic+1
+--evid_self_medic=evid_medic+1
 
 actid_medic=evid_medic
-actid_self_medic=actid_medic+1
+--actid_self_medic=actid_medic+1
 
 local anims = {{a = "norm_torso_12_draw_0",t = 500},{a = "norm_torso_12_attack_0",t = 3600},{a = "norm_torso_12_holster_0",t = 300}} --,{a = "norm_torso_12_reload_0",t = 600}
 
@@ -310,10 +311,10 @@ function add_to_binder(object, ini, scheme, section, storage)
 	local manager = object:motivation_action_manager()
 
 	operators["medic"]			= actid_medic
-	operators["self_medic"]		= actid_self_medic
+	--operators["self_medic"]		= actid_self_medic
 
 	properties["medic"]			= evid_medic
-	properties["self_medic"]	= evid_self_medic
+	--properties["self_medic"]	= evid_self_medic
 	
 	local state_mgr_to_idle_combat 	= xr_actions_id.state_mgr + 1
 	local state_mgr_to_idle_alife = xr_actions_id.state_mgr + 2

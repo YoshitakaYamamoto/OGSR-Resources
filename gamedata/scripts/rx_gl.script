@@ -31,7 +31,6 @@ local bad_acts = {xr_actions_id.stohe_meet_base+1,
 				watcher_act and watcher_act.actid_grab_item
 }
 
-local test_mem = {}
 
 local engage_after_update = 5
 local count_update = {}
@@ -175,21 +174,6 @@ function action_launch_grenade:initialize()
 		rx_wmgr.get_wm(npc):disable(10000)
 	end
 	self.stage = 0
---[[	if test_mem[self.lvid] then
-		for l,t in ipairs(test_mem[self.lvid]) do
-			if npc:position():distance_to(t.pos) < 0.2 and self.target_point:distance_to(t.str) < get_shell_params(self.shell).radius then
-				if check_victims(npc,t.str,get_shell_params(self.shell).radius,true) and npc:object(self.shell) then
-					self.target_point = t.trg
-					self.launch_pos = t.lps
-					self.str_pos = t.str
-					self.type = t.typ
-					self.aim_time = time_global()+600
-					self.stage = 3
-					return
-				end
-			end
-		end
-	end]]
 end
 
 function action_launch_grenade:execute()
@@ -248,11 +232,7 @@ function action_launch_grenade:execute()
 			npc:set_sight(look.direction,self.direction)
 		else
 			if check_victims(npc,self.str_pos,get_shell_params(self.shell).radius,true) and npc:object(self.shell) then
-				if not test_mem[self.lvid] then
---					test_mem[self.lvid] = {}
-				end
 				npc:set_item(object.aim1,wpn)
---				table.insert(test_mem[self.lvid],{pos = npc:position(),trg = self.target_point,str = self.str_pos,lps = self.launch_pos,typ = self.type})
 				local s = alife():create("gl_fake_missile_"..self.shell,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 				self.fake_missile = s.id
 				self.stage = 4

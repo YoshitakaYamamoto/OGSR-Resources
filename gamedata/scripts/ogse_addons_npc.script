@@ -114,8 +114,6 @@ function attach( sm )
   sm:subscribe({ signal = "on_npc_item_take", fun = this.on_take })
 end
 
-local need_update_tbl = {} --С помощью этой таблицы будем определять, надо ли вообще делать апдейт для конкретного НПС.
-
 function on_npc_spawn( obj, binder )
   if not obj:alive() then return end
   if rx_utils.IsTrader( obj ) then return end
@@ -126,7 +124,7 @@ function on_npc_spawn( obj, binder )
   }
   binder[ script_name() .. ".subscribed" ] = s
   ogse_signals.get_mgr():subscribe( s )
-  need_update_tbl[obj:id()] = true
+  obj:binded_object()[ script_name() .. ".need_update" ] = true
 end
 
 function on_death( obj )
@@ -135,26 +133,26 @@ function on_death( obj )
   if subscribed then
     ogse_signals.get_mgr():unsubscribe( subscribed )
     binder[ script_name() .. ".subscribed" ] = nil
-    need_update_tbl[obj:id()] = nil
+    obj:binded_object()[ script_name() .. ".need_update" ] = nil
   end
 end
 
 function on_take( npc, obj ) --Если непись подобрал ствол, или какие-то аддоны, разрешаем апдейт
 	if obj:is_weapon_magazined() or ogse_addons.get_addon_type(obj:section()) ~= 0 then
 		--log3("[%s]: [%s] take [%s]", script_name(), npc:name(), obj:name())
-		need_update_tbl[npc:id()] = true
+		npc:binded_object()[ script_name() .. ".need_update" ] = true
 	end
 end
 
 function npc_update( npc )
-  if not need_update_tbl[npc:id()] then
+  if not npc:binded_object()[ script_name() .. ".need_update" ] then
     ogse_signals.get_mgr():reschedule( math.random( 60000, 100000 ) )
     return
   end
 
   if not ( npc:best_enemy() or xr_wounded.is_wounded( npc ) or npc:is_talking() ) then
     process( npc )
-    need_update_tbl[npc:id()] = nil
+    npc:binded_object()[ script_name() .. ".need_update" ] = nil
   end
 
   ogse_signals.get_mgr():reschedule( math.random( 60000, 100000 ) )
