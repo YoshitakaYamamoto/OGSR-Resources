@@ -714,9 +714,8 @@ function generate_anoms(lname)
 	for i=1, rnd do
 		local pos, new_lv, new_gv = anomaly_position_choice(lname)
 		local section, shape = anomaly_section_choice(lname)
-		if shape.radius then
-			shape.radius = shape.radius * get_float(section, "effective_radius", 1)
-		end
+		ASSERT(shape.shtype ~= 0 or ( shape.radius and shape.radius > 0 ), "Incorrect shape radius for section [%s]", section)
+		--shape.radius = shape.radius * get_float(section, "effective_radius", 1)
 		spawn_anomaly( section, pos, new_lv, new_gv, shape )
 		--log3("--[%s] Generated anomaly [%s] on level [%s]", script_name(), section, lname)
 
@@ -975,10 +974,10 @@ local anom_power = {
 local anoms_sections = {
 	buzz              = {"buzz",              {shtype=0, radius=1.5, center={0,0,0}}},
 	gravi_zone        = {"gravi_zone",        {shtype=0, radius=3,   center={0,0,0}}},
-	mincer            = {"mincer",            {shtype=0, radius=4,   center={0,0,0}}},
+	mincer            = {"mincer",            {shtype=0, radius=3.5,   center={0,0,0}}},
 	mosquito_bald     = {"mosquito_bald",     {shtype=0, radius=3,   center={0,0,0}}},
 	witches_galantine = {"witches_galantine", {shtype=0, radius=4,   center={0,0,0}}},
-	zharka_static     = {"zharka_static",     {shtype=1, v1={1,0,0}, v2={0,5,0}, v3={0,0,1}, offset={0,0,0}}}
+	zharka_static     = {"zharka_static",     {shtype=1, v1={1,0,0}, v2={0,7,0}, v3={0,0,1}, offset={0,0,0}}}
 }
 
 local anom_prefix = "noartf_" --KRodin: Префикс не влияет на спавн артов, нужен только для того чтобы отличить аномалии созданные выбросом от всех остальных аномалий.
