@@ -336,6 +336,7 @@ function info_about_npc()
 				"obj: name: "..target_obj:name().."\\n"..
 				"obj: id: "..target_obj:id().."\\n"..
 				"story_id: "..target_obj:story_id().."\\n"..
+				"visual name: "..tostring(target_obj:get_visual_name()).."\\n"..
 				"------------------\\n"..
 				"coords: X "..target_obj:position().x..", Y "..target_obj:position().y..", Z "..target_obj:position().z.."\\n"..
 				"dir: X "..target_obj:direction().x..", Y "..target_obj:direction().y..", Z "..target_obj:direction().z.."\\n"..
@@ -422,7 +423,7 @@ function vis_int()
 		local lvid,gvid = db.actor:level_vertex_id(),db.actor:game_vertex_id()
 		local pos,dir,campos = db.actor:position(),device().cam_dir,device().cam_pos
 		--local valid = level.vertex_position(lvid):distance_to(pos)<=0.7
-		local valid = level.vertex_id( pos ) ~= 4294967295
+		local valid = level.valid_vertex_id( level.vertex_id( pos ) )
  		local fps_check = ogse_benchmark.get_fps()
 		local PosText = string.format("pos: %1.3f,%1.3f,%1.3f\\n",pos.x,pos.y,pos.z)..	-- позиция ГГ (x,y,z)
 						string.format("cam_pos: %1.3f,%1.3f,%1.3f\\n",campos.x,campos.y,campos.z)..	-- позиция камеры (x,y,z)

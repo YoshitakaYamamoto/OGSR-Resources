@@ -1097,7 +1097,7 @@ end
 
 -- Очищаем инвентарь непися, можно ГГ
 function clear_npc_inventory(npc)
-    npc:iterate_inventory(function(npc, item)
+    npc:iterate_inventory(function(_, item)
 		local section = item:section()
 		if section == "bolt" or section == "device_torch" then
 			return

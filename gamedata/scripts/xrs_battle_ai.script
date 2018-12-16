@@ -1,7 +1,6 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
 local NO_ACTIVE_SLOT = 255
-local INVALID_STORY_ID = 4294967295
 
 local function random_choice( ... )
   local arg = { ... }
@@ -289,7 +288,7 @@ in_combat = {}
 local ignore_enemies = {}
 function check_is_enemy( npc, enemy, fast )
   if not npc or not enemy then return false end
-  local is_engine_enemy = npc:relation( enemy ) == game_object.enemy
+  local is_engine_enemy = npc:is_relation_enemy( enemy )
   if is_engine_enemy then
     if
       ignore_enemies[ npc:name() ]
@@ -3408,7 +3407,7 @@ function find_vertex_in_radius( npc, around_vertex, radius )
       local pos     = vector():mad( around_pos, cur_dir, dist )
       local vert_ok = level.vertex_id( pos )
       if
-        vert_ok ~= INVALID_STORY_ID
+        level.valid_vertex_id( vert_ok )
         and npc:accessible( vert_ok )
         and not check_vertex_locked( npc, vert_ok )
       then

@@ -91,7 +91,7 @@ end
 function show_coordinates()
 	local lvid, gvid = db.actor:level_vertex_id(), db.actor:game_vertex_id()
 	local pos, dir = db.actor:position(), db.actor:direction()
-	local valid = level.vertex_id( pos ) ~= 4294967295
+	local valid = level.valid_vertex_id( level.vertex_id( pos ) )
 
 	log3( "- lvid: [%s]\ngvid: [%s]\npos: [%s, %s, %s]\ndir: [%s, %s, %s]\nvalid: [%s]", lvid, gvid, pos.x, pos.y, pos.z, dir.x, dir.y, dir.z, valid )
 end

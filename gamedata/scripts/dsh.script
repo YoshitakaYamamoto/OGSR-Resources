@@ -252,7 +252,7 @@ function find_all_vertexes_in_radius( around_pos, radius )
       -- нужная нам позиция
       local pos     = vector():mad( around_pos, cur_dir, dist )
       local vert_ok = level.vertex_id( pos )
-      if vert_ok ~= 4294967295 and not seen[ vert_ok ] then
+      if level.valid_vertex_id( vert_ok ) and not seen[ vert_ok ] then
         table.insert( vertexes, vert_ok )
         seen[ vert_ok ] = true
       end
@@ -263,7 +263,7 @@ function find_all_vertexes_in_radius( around_pos, radius )
     dist = dist - ai_step
   end
   local vert_ok = level.vertex_id( around_pos )
-  if vert_ok ~= 4294967295 and not seen[ vert_ok ] then
+  if level.valid_vertex_id( vert_ok ) and not seen[ vert_ok ] then
     table.insert( vertexes, vert_ok )
     seen[ vert_ok ] = true
   end
