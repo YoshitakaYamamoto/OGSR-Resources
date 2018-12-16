@@ -11,10 +11,11 @@ net_spawn
 -------------------------------]]
 
 --*****************************************************************************************************
+--[==[ --KRodin: выключено.
+
 local warn_check_timer = {}
 local snd_check_timer = {}
 
---[=[ --KRodin: выключено.
 local function look_to_shot(object, who)
 	if object and who then
 		if ( object:is_stalker() or object:is_actor() ) and object:alive() and not xr_wounded.is_wounded(object)
@@ -33,7 +34,6 @@ local function look_to_shot(object, who)
 		end
 	end
 end
---]=]
 
 local function recognize_sound(sound_type)
 	-- Выясняем тип звука
@@ -238,6 +238,8 @@ local function check_sound(self, who, sound_type, sound_position, sound_power)
 		end
 	end
 end
+
+--]==]
 --*****************************************************************************************************
 
 class "motivator_binder" (object_binder)
@@ -341,9 +343,9 @@ function motivator_binder:net_spawn(sobject)
 	self.object:set_callback(callback.entity_alive_before_hit, self.before_hit_callback, self)
 	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)	
 	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
-	if not ogse.is_quest_npc(self.object) then
-		self.object:set_callback(callback.sound, self.hear_callback, self)
-	end
+	--if not ogse.is_quest_npc(self.object) then
+	--	self.object:set_callback(callback.sound, self.hear_callback, self)
+	--end
 	self.object:set_enemy_callback( self.enemy_callback, self )
 	--
 	local manager = self.object:motivation_action_manager()
@@ -470,7 +472,7 @@ function motivator_binder:clear_callbacks()
 	self.object:set_callback(callback.on_item_drop, nil)
 	self.object:set_callback(callback.on_item_take, nil)
 	self.object:set_callback(callback.entity_alive_before_hit, nil)
-	self.object:set_callback(callback.sound, nil)
+	--self.object:set_callback(callback.sound, nil)
 	self.object:set_enemy_callback()
 end
 
@@ -729,6 +731,7 @@ function motivator_binder:load(reader)
 --log3("--[%s] End loading [%s]", script_name(), self.object and self.object:name() or "nil")
 end
 
+--[=[
 function motivator_binder:hear_callback(obj, who, sound_type, sound_position, sound_power)
 	if xr_companion.is_companion(self.object:id()) then return end
 
@@ -749,6 +752,7 @@ function motivator_binder:hear_callback(obj, who, sound_type, sound_position, so
 		end
 	end
 end
+--]=]
 
 class "timer_drop_weapon" (ogse_qt.quick_timer)
 function timer_drop_weapon:__init(item, parent) super()
