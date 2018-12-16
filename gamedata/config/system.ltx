@@ -340,6 +340,7 @@ font_small               = font_small
 class                = AI_GRAPH
 $spawn               = "ai\graph point"
 
+
 ;-----------------------------------------------------------------
 ; Trade
 ;-----------------------------------------------------------------
@@ -351,9 +352,11 @@ buy_price_factor_friendly	= 1		;коэффициент покупки при goodwill = 100
 sell_price_factor_hostile	= 1		;коэффициент покупки при goodwill = -100
 sell_price_factor_friendly	= 1		;коэффициент покупки при goodwill = 100
 
-
-
+; Если у сталкеров не хватает денег купить все, что им предлагает
+; актор, в этом режиме они купят это все за те деньги, что у них есть.
+others_zero_trade = true
 ;-----------------------------------------------------------------
+
 
 [spawn_group_zone]
 GroupControlSection			= spawn_group_zone
