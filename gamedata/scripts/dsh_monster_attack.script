@@ -21,14 +21,7 @@ function on_monster_spawn( obj, binder )
       obj:set_custom_panic_threshold( 0 )
     end
 
-    if obj:clsid() == clsid.bloodsucker_s then
-      --table.insert( subscribed, { --Выключил, слишком сложно.
-      --  [ "signal" ] = s_name,
-      --  [ "fun"    ] = this.bloodsucker_attack,
-      --  [ "queued" ] = true,
-      --  [ "__unsubscribe_on_death" ] = true,
-      --})
-    elseif obj:clsid() == clsid.burer_s then
+    if obj:clsid() == clsid.burer_s then
 	  table.insert( subscribed, {
         [ "signal" ] = s_name,
         [ "fun"    ] = this.burer_attack,
@@ -150,52 +143,6 @@ end
 
 
 local master_koef = 1 / ( 4 - level.get_game_difficulty() )
-
-
---Атака кровососа
-function bloodsucker_attack( obj )
-	if not may_attack() then return end
-	local enemy = obj:best_enemy()
-	if not enemy or not enemy:is_actor() or not obj:see( enemy ) then return end
-	local dist = obj:position():distance_to( enemy:position() )
-	local attack_dist = 3
-	ogse_signals.get_mgr():reschedule( ( dist < attack_dist and 1500 ) or ( dist < obj:range() and 2000 ) or 5000 )
-	if dist > attack_dist then return end
-
-	local h = hit()
-		h.draftsman = obj
-		h.direction = vector_rotate_y( obj:direction(), 179.0 ) --/ направление удара
-		h:bone( "bip01_spine" ) --/ для учета 'брони'
-		h.power = 0.10
-		h.impulse = 120 / dist --/ чем ближе - тем сильнее пинаем
-		h.type = hit.wound
-	enemy:hit(h) --/ наносим хит жертве
-	level.add_cam_effector( [[camera_effects\fusker.anm]], 959, false, "" ) --анимация удара
-	
-	local pos = obj:position()
-	local vDir = pos:sub(enemy:position())
-	enemy:set_actor_direction(-vDir:getH())
-
-	local active_item = enemy:active_item()
-	if
-		active_item
-		and active_item:section() ~= "bolt"
-		and not active_item:is_knife()
-		and math.random() > 0.7
-	then
-		enemy:drop_item(active_item) --Выбиваем из рук оружие
-	end
-
-	local binder = obj:binded_object()
-	local tg = time_global()
-	if binder.timer_anim or 0 < tg then
-		if obj:animation_count() > 0 then obj:clear_animations() end -- анимации остановили
-		obj:add_animation( "vampire_0" ) --/ варианты: "wounded_2_out" | "idle"
-		local snd = sound_object( [[monsters\bloodsucker\sucking_attack]] )
-		if snd then snd:play_no_feedback( enemy, sound_object.s2d, 0, vector(), 5.0 ) end --/ озвучка 'засоса'
-		binder.timer_anim = tg + 2000 --Таймер на проигрывание анимки
-	end
-end
 
 
 --Аномальный щит бюрера
