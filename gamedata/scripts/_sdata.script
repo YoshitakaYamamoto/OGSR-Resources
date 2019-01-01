@@ -308,7 +308,7 @@ function info_about_npc()
 				"npc: sect: ["..target_obj:section().."] ".."name: ["..target_obj:name().."]\\n"..
 				"npc: id: "..target_obj:id().." ".."story_id: "..target_obj:story_id().." ".."comm: ["..community.."]\\n"..
 				"npc: behave scheme: ["..tostring(scheme).."], fov: "..target_obj:fov()..", range: "..target_obj:range().."\\n"..
-				"npc: st_mgr state: ["..tostring(state).."] ".."anim: ["..tostring(anim).."] ".."mental: ["..tostring(mental).."\\n"..
+				"npc: st_mgr state: ["..tostring(state).."] ".."anim: ["..tostring(anim).."] ".."mental: ["..tostring(mental).."]\\n"..
 				"npc: last active eval: "..tostring(active_evaluator).."\\n"..
 				"npc: last active danger: "..tostring(active_danger).."\\n"..
 				"npc: last active anim_eval: "..tostring(active_anim).."\\n"..						
@@ -336,7 +336,7 @@ function info_about_npc()
 				"obj: name: "..target_obj:name().."\\n"..
 				"obj: id: "..target_obj:id().."\\n"..
 				"story_id: "..target_obj:story_id().."\\n"..
-				"visual name: "..tostring(target_obj:get_visual_name()).."\\n"..
+				"visual name: "..tostring(target_obj:get_visual_name()):gsub("%\\", "\\ ").."\\n"..
 				"------------------\\n"..
 				"coords: X "..target_obj:position().x..", Y "..target_obj:position().y..", Z "..target_obj:position().z.."\\n"..
 				"dir: X "..target_obj:direction().x..", Y "..target_obj:direction().y..", Z "..target_obj:direction().z.."\\n"..

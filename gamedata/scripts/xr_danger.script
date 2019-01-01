@@ -21,6 +21,17 @@ local count_update 			= {}		-- Счетчик апдейтов
 
 local always_ignore_danger_from = { m_car = "true" }
 
+local bd_types = {
+  [ danger_object.attack_sound    ] = "att_snd",
+  [ danger_object.attacked        ] = "attckd",
+  [ danger_object.bullet_ricochet ] = "bul_ric",
+  [ danger_object.enemy_sound     ] = "en_snd",
+  [ danger_object.entity_attacked ] = "ent_att",
+  [ danger_object.entity_corpse   ] = "ent_crps",
+  [ danger_object.entity_death    ] = "ent_dth",
+  [ danger_object.grenade         ] = "gren",
+}
+
 ----------------------------------------------------------------------------------------------------------------------
 -- EVALUATORS
 ----------------------------------------------------------------------------------------------------------------------
@@ -31,7 +42,6 @@ function evaluator_danger:__init(name, storage, npc) super (nil, name)
 end
 function evaluator_danger:evaluate()
 
-	
 	if count_update[self.object:id()] and count_update[self.object:id()] <= engage_after_update then
 		count_update[self.object:id()] = count_update[self.object:id()] + 1
 		return false
@@ -43,6 +53,12 @@ function evaluator_danger:evaluate()
 	if not self.object:alive() then
 		return false
 	end
+
+	-- Отсеиваем тяжелораненых
+	if xr_wounded.is_heavy_wounded_by_id(self.object:id()) then
+		return false
+	end
+
 
 	if self.mgr == nil then
 		self.mgr = self.object:motivation_action_manager()
@@ -66,25 +82,7 @@ function evaluator_danger:evaluate()
 	local active_scheme = db.storage[self.object:id()].active_scheme	
 	local best_danger_object = best_danger:object()
 	local bd_type = best_danger:type()	
-	local type_to_show = ""
-	if bd_type == danger_object.attack_sound then
-		type_to_show = "att_snd"
-	elseif bd_type == danger_object.bullet_ricochet then
-		type_to_show = "bul_ric"
-	elseif bd_type == danger_object.grenade then
-		type_to_show = "gren"
-	elseif bd_type == danger_object.entity_corpse then
-		type_to_show = "ent_crps"
-	elseif bd_type == danger_object.entity_attacked then
-		type_to_show = "ent_att"
-	elseif bd_type == danger_object.attacked then
-		type_to_show = "attckd"
-	elseif bd_type == danger_object.enemy_sound then
-		type_to_show = "en_snd"
-	elseif bd_type == danger_object.entity_death then
-		type_to_show = "ent_dth"
-	end	
-	
+
 
 	if bd_type ~= danger_object.grenade and best_danger:dependent_object() ~= nil then
 		best_danger_object = best_danger:dependent_object()
@@ -317,14 +315,9 @@ function evaluator_danger:evaluate()
 	if check_danger_distance(self.object, best_danger) == false then
 		return false
 	end
+
 	
 
-	-- Отсеиваем тяжелораненых
-	if xr_wounded.is_heavy_wounded_by_id(self.object:id()) then
-		return false
-	end
-	
-	
 	-- Денжер для снайпера
 	if active_scheme == "camper" then
 		if best_danger:type() == danger_object.grenade then
@@ -344,8 +337,8 @@ function evaluator_danger:evaluate()
 			-- self.danger_time = best_danger:time() <-- Дико непонятно нахуя тут вот это было. Убрал пока позырить
 			local passed_time = time_global() - self.danger_time
 			if check_danger_inertion_time(self.object, best_danger, passed_time) == true then
-
-				ogse_debug.add_active_danger( self.object, script_name(), "dan_time_("..type_to_show..")["..passed_time.."]" )
+				local type_to_show = bd_types[ bd_type ] or ""
+				ogse_debug.add_active_danger( self.object, script_name(), string.format( "dan_time_(%s)[%d]", type_to_show, passed_time ) )
 				return true
 			else
 				return false

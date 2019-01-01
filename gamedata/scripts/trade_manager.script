@@ -26,9 +26,9 @@ function on_death( obj )
     local slot = binder[ slots[i] ]
     if slot then
       --
-      if slots[i] == script_name() .. ".subscribed3" then --Dbg
-        log3("~~[%s] Trade update unsubscribed from update signal for NPC [%s]", script_name(), obj:name())
-      end
+      --if slots[i] == script_name() .. ".subscribed3" then --Dbg
+      --  log3("~~[%s] Trade update unsubscribed from update signal for NPC [%s]", script_name(), obj:name())
+      --end
       --
       ogse_signals.get_mgr():unsubscribe( slot )
       binder[ slots[i] ] = nil
@@ -162,7 +162,7 @@ function trade_init( npc, cfg )
 	--Всё остальное просто периодически обновляем.
     if not binder[ script_name() .. ".subscribed3" ] then
 	  --
-	  log3("--[%s] Trade update subscribed on signal [%s] for NPC [%s]", script_name(), s_name, npc:name()) --Dbg
+	  --log3("--[%s] Trade update subscribed on signal [%s] for NPC [%s]", script_name(), s_name, npc:name()) --Dbg
 	  --
       local s3 = {
         [ "signal" ] = s_name,
