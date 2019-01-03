@@ -781,8 +781,6 @@ function motivator_binder:on_item_drop(obj)
 	if not sobj then return end
 
 	if obj:is_weapon() then
-		ogse_wpn_utils.set_condition_shot_dec( obj, get_float( obj:section(), "condition_shot_dec" ) )
-
 		timer_drop_weapon(obj, obj:parent()):start()
 	end
 
@@ -799,8 +797,6 @@ function motivator_binder:on_item_take(obj)
 		if t_obj.on then
 			t_obj:enable( false )
 		end
-	elseif obj:is_weapon() then
-		ogse_wpn_utils.set_condition_shot_dec( obj, 0 ) --Для неписей износ оружия отключаем.
 	end
 
 	self.am:call( "on_npc_item_take", self.object, obj, sobj )
