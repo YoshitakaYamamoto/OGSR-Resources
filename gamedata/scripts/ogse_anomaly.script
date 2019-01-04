@@ -17,6 +17,8 @@ function attach(sm)
 	sm:subscribe({signal = "on_drop", fun = this.check_artefact_activation})
 end
 
+local DISABLE_ANOMS_RESPAWN = true --DBG
+
 local list_anom_id = {}
 local lvids_forbidden = {}
 local position_forbidden = {}
@@ -562,7 +564,7 @@ end
 
 
 function is_exclusion_location(lname) --Вернет true если на локации нельзя респавнить аномалии
-	return not level_anoms[lname]
+	return DISABLE_ANOMS_RESPAWN or not level_anoms[lname]
 end
 
 function is_exclusion_anomaly(sobj)
