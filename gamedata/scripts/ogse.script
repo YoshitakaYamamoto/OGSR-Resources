@@ -11,6 +11,7 @@ function attach(sm)
 	sm:subscribe({signal = "on_update",			fun = this.show_time})
 	sm:subscribe({signal = "on_take",			fun = this.on_item_take})
 	sm:subscribe({signal = "after_time_change",	fun = this.after_time_change})
+	sm:subscribe({signal = "on_spawn",          fun = this.on_spawn})
 end
 
 game_time_factor = get_float("alife", "time_factor")
@@ -1504,4 +1505,36 @@ function transfer_items_from_box(box_sid, remove_quest_items, exclude_sections, 
 			box:transfer_item(obj, db.actor)
 		end
 	end
+end
+
+
+function is_developer_mode()
+	return string.find( command_line(), "-dbg" )
+end
+
+function on_spawn()
+  if not is_developer_mode() then
+    for _, k in ipairs({
+      "g_god", "g_unlimitedammo", "g_zones_dbg", "g_vertex_dbg"
+    }) do
+      cmd( k, "off" )
+    end
+    --
+    cmd( "hud_draw", "on" )
+    --
+    for _, k in ipairs({
+      "hud_adjust_mode", "show_wnd_rect", "show_wnd_rect_all"
+    }) do
+      cmd( k, 0 )
+    end
+    --
+    for _, k in ipairs({
+      "g_god", "g_unlimitedammo", "g_zones_dbg", "g_vertex_dbg",
+      "hud_draw",
+      "hud_adjust_mode", "show_wnd_rect", "show_wnd_rect_all",
+      "demo_record", "jump_to_level", "time_factor"
+    }) do
+      get_console():disable_command( k )
+    end
+  end
 end

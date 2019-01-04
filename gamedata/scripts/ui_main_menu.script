@@ -224,7 +224,6 @@ function main_menu:OnKeyboard(dik, keyboard_action)
 			end
 		elseif dik == DIK_keys.DIK_W then -- настройка прицела
 			self:setup_wpn_position()
-			self:close_and_delete_menu()
 		elseif dik == DIK_keys.DIK_P then --SDATA
 			if ogse.check_game() then
 				if not _sdata.GlobalEnable then
@@ -283,6 +282,8 @@ end
 
 --k01jan: настройка прицела худового оружия (Rastaman_VIP74)
 function main_menu:setup_wpn_position()
+	if not ogse.is_developer_mode() then return end --KRodin: должно работать только в режиме разработчика.
+	--
 	local wchud = get_hud():GetCustomStatic("hud_cross_wpn")
 	if get_con_bool("hud_adjust_mode") then
 		--news_manager.send_tip(db.actor, "%c[255,240,155,25]ОТКЛючаем настройку прицеливания", nil, nil, 10000)
@@ -318,6 +319,8 @@ function main_menu:setup_wpn_position()
 		end
 		get_hud():AddCustomStatic("hud_cross_wpn")
 	end
+	--
+	self:close_and_delete_menu()
 end
 
 
