@@ -301,6 +301,10 @@ function se_smart_terrain:dsh_override_params()
       [ "getter" ] = function( ... ) return get_string( ... ) end,
       [ "setter" ] = function( v ) self.gparams.type = v end,
     },
+    [ "on_cleanup" ] = {
+      [ "getter" ] = function( ... ) return get_string( ... ) end,
+      [ "setter" ] = function( v ) self.on_cleanup = v end,
+    },
   }
   local sect = "dsh.gulag.override." .. self:name()
   if sys_ini:section_exist( sect ) then
@@ -796,9 +800,10 @@ function se_smart_terrain:on_register()
 	cse_alife_smart_zone.on_register( self )
 
 	--TODO: А что будет если это удалить?
-	if has_alife_info("pri_stadium_scene_start") and string.find(self:name(), "pri_wave") then
-		self:remove_gulag(true)
-	end		
+	--KRodin: эти смарты и так закрываются по кондлисту cond = {-pri_stadium_scene_start} , т.ч. этот код не имеет смысла. Костыль какой-то.
+	--if has_alife_info("pri_stadium_scene_start") and string.find(self:name(), "pri_wave") then
+	--	self:remove_gulag(true)
+	--end		
 
 	-- проинитить объект
 	self:register_if_needed()
@@ -971,6 +976,11 @@ function se_smart_terrain:update()
 			end
 		end
 	else
+		if self.on_cleanup then
+			local f, err = loadstring( "return " .. self.on_cleanup .. "( ... )" )
+			ASSERT( f, err )
+			f( self )
+		end
 		self:remove_gulag()
 	end
 end

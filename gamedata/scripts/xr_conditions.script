@@ -1708,3 +1708,8 @@ function is_shustriy_in_lager()
 	end
 	return false
 end
+
+
+function is_weather_rain()
+  return level.rain_factor() > 0
+end

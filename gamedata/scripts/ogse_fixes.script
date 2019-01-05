@@ -453,3 +453,14 @@ function del_buggy_mapspots() --Удаление глючных меток с к
 		end
 	end
 end
+
+
+function cleanup_val_rob_restrictors() --Вызывается из конфигов при закрытии смарта кидал в ТД
+	for _, name in ipairs({"val_rob_zone", "val_rob_warn_zone", "val_rob_kill_zone", "val_farm_zone"}) do
+		local sobj = alife():object( name )
+		if sobj then
+			log3( "~~[%s.cleanup_val_rob_restrictors]: found [%s], removing...", script_name(), sobj:name() )
+			alife():release( sobj )
+		end
+	end
+end

@@ -24,6 +24,7 @@ bandit = val_prisoner_captive, val_escort_captive, val_escort_nap1, val_sos_woun
 [dsh.gulag.raid]
 gar_smart_graveyard = false ;Сталкеры на кладбище техники не атакуют обитателей лагеря gar_smart_stalkers_1
 gar_smart_stalkers_1 = false ;Обитатели лагеря за кладбищем техники не нападают на бандитов у перехода на агропром
+val_smart_monster_lair_6 = false ;Монстры не атакуют лагерь сталкеров, это сталкеры должны на них охотиться
 
 ; Замена логики уже заспауненых объектов
 [dsh.xr_logic.get_customdata_or_ini_file]
@@ -150,7 +151,38 @@ allow_sector = 10, 190
 ;================================================================
 ; костер долговцев
 [dsh.xr_kamp.val_smart_bandit_3_kamp_1]
-level_vertex_id = 10815 ;10491 ;KRodin: fixed
+level_vertex_id = 10815
+;================================================================
+; Раненый сталкер возле базы бандитов. В смарт кидал ему зачем идти, пусть в любой свободный идёт.
+[dsh.se_stalker.val_sos_wounded.smart_terrains]
+val_sos = {-val_sos_scene_end}
+any     = {+val_sos_scene_end}
+;================================================================
+; Кидалы в ТД, на ферме
+[dsh.gulag.override.val_rob]
+cond       = {-val_rob_disable} ;Закроем после того, как они стали враждебными
+on_cleanup = ogse_fixes.cleanup_val_rob_restrictors ;При закрытии смарта, удалим ненужные сюжетные рестрикторы для сценки с кидалами
+;================================================================
+; Сталкеры в ТД, на ферме, смарт откроется после того как кидалы стали врагами.
+[dsh.gulag.override.val_smart_bandit_1]
+communities = stalker, dolg
+capacity    = 13
+cond        = {+val_rob_disable}
+switch_0    = {!is_day}, {=is_weather_rain}, {=gulag_empty(val_smart_monster_lair_6)}
+switch_1    = {=is_day !is_weather_rain =gulag_population_ge(val_smart_bandit_1:8) !gulag_empty(val_smart_monster_lair_6)}
+;================================================================
+; Мутанты, на которых охотятся сталкеры из лагеря выше.
+[dsh.gulag.override.val_smart_monster_lair_6]
+capacity = 10 ;5
+;================================================================
+; Мутанты возле моста
+[dsh.gulag.override.val_smart_monster_lair_1]
+communities = boar,flesh
+capacity = 10 ;2
+;================================================================
+; Собаки недалеко от фермы
+[dsh.gulag.override.val_smart_monster_lair_2]
+capacity = 6 ;2
 ;================================================================
 ;**********************************************************************************
 ;
