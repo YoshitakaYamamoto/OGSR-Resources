@@ -14,10 +14,12 @@ function action_door:__init(obj, storage)
 	self.object = obj
 	self.st = storage
 	self.snd_obj = nil
+
 	--Блокируем вертексы вокруг первой двери в X-18 на время её закрытия, чтобы монстры не лезли сквозь закрытую дверь с нижних этажей.
-	self.vertexes_near_door = self.object:name() == "dar_door1" and dsh.find_all_vertexes_in_radius(obj:position(), 5) or {}
+	self.vertexes_near_door = self.object:name() == "dar_door1" and dsh.find_all_vertexes_in_radius(obj:position(), 4) or {}
 end
-function action_door:reset_scheme(loading)
+
+function action_door:reset_scheme()
 	self.initialized = false
 	
 	local ph_shell = self.object:get_physics_shell()
