@@ -31,8 +31,6 @@ function actor_binder:net_spawn(data)
 	level.show_indicators()
 	level.set_snd_volume( 1 )
 
-	self.object:set_camera_fov( get_u32( "options", "fov_volume", 65 ) ) -- Установка FOV
-
 	db.add_actor(self.object)
 
 	if not db.storage[self.object:id()].pstor then	--KRodin: из xr_logic почему-то не срабатывает, поэтому создаём pstor здесь.

@@ -44,7 +44,7 @@ function fov_end()
 end
 
 
-local fov_vol = get_u32( "options", "fov_volume", 65 )
+local fov_vol = get_console():get_float("fov")
 local max_alarm_fov_vol = 90
 local min_alarm_fov_vol = 30
 
