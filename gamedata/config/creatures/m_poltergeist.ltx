@@ -206,7 +206,7 @@ Morale_Despondent_Threashold	= 0.5
 ;-------------------------------------------------------------------------
 DamagedThreshold		= 0.4
 
-material				= creatures\large	;objects\bullet
+material				= creatures\medium ;creatures\large	;objects\bullet
 
 
 squad_attack_algorithm	= 1
@@ -224,7 +224,7 @@ damage					= m_poltergeist_damage
 ;---------------------------
 
 Invisible_Energy_Restore_Velocity				= 0.1
-Invisible_Energy_Decline_Velocity				= 0.025
+Invisible_Energy_Decline_Velocity				= 0 ;0.025
 Invisible_Energy_Critical_Value					= 0.02
 Invisible_Energy_Activate_Value					= 0.99
 Invisible_Energy_Aggressive_Restore_Velocity	= 0.5
@@ -380,6 +380,12 @@ sound_die						= monsters\poltergeist\tele_death_
 sound_tele_hold					= monsters\burer\burer_tele_hold
 sound_tele_throw				= monsters\burer\burer_tele_throw
 
+immunities_sect         = poltergeist_immunities_invisible
+visible_immunities_sect = poltergeist_immunities_strong
+
+Invisible_Energy_Decline_Velocity = 0.025
+
+
 [m_poltergeist_tele_outdoor]:m_poltergeist_normal_tele
 $spawn               = "monsters\poltergeists\poltergeist_tele_outdoor"
 
@@ -455,6 +461,7 @@ $spawn               = "monsters\poltergeists\poltergeist_strong_flame"
 immunities_sect		= poltergeist_immunities_strong
 flame_hit_value			= 0.7
 
+; Какой-то квестовый полтер?
 [m_poltergeist_lenin]:m_poltergeist_normal_tele
 Tele_Object_Max_Mass			= 30
 Sound_Idle						= monsters\poltergeist\lenin_boy
@@ -488,6 +495,11 @@ chemical_burn_immunity 	= 1.0
 explosion_immunity 	= 0.3
 fire_wound_immunity     = 0.3
 
+[poltergeist_immunities_invisible]:poltergeist_immunities_strong
+explosion_immunity  = 1
+fire_wound_immunity = 0
+
+;Это походу иммунитеты какого-то квестового полтера.
 [poltergeist_immunities_inv]
 burn_immunity 		= 1.0					;коэффициенты иммунитета
 strike_immunity 	= 1.0
