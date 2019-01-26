@@ -25,6 +25,8 @@ script_binding			= bind_monster.bind
 
 bone_head				 = bip01_head					; bone name
 bone_fire				 = bip01_head
+bone_eye_left	   = bip01_ponytail1
+bone_eye_right	   = bip01_ponytail2
 weapon_usage			 = 0							; boolean
 
 ;Spawn_Inventory_Item_Section = mutant_krovosos_jaw
@@ -111,7 +113,21 @@ attack_effector		= m_bloodsucker_attack_effector
 vampire_effector	= m_bloodsucker_vampire_effector
 
 Melee_Rotation_Factor	= 2.0
-berserk_always			= true
+;berserk_always			= true
+
+;------------------------------------------------------------------------
+; Attack On Move
+;------------------------------------------------------------------------
+aom_enabled            = 1
+aom_animation_left     = stand_attack_run_ ;stand_run_attack_right_
+aom_animation_right    = stand_attack_run_ ;stand_run_attack_left_
+aom_far_radius         = 15
+aom_max_go_close_time  = 8
+aom_prepare_time       = 5
+aom_attack_radius      = 1
+aom_update_side_period = 4
+aom_prediction_factor  = 1.2
+
 ;-------------------------------------------------------------------------
 ; Entity Conditions
 ;-------------------------------------------------------------------------
@@ -273,17 +289,39 @@ Invisibility_Energy_Critical_Value					= 0.2
 Invisibility_Energy_Activate_Value					= 0.8
 Invisibility_Energy_Aggressive_Restore_Velocity		= 0.03
 
+;расстояние меньше которого тело полностью видимо
+full_visibility_radius    =  5
+; расстояние меньше которого тело видно в виде полупрозрачного силуэта
+partial_visibility_radius =  9
+; больше этого значения лето не видно вообще - и ему нельзя будет
+; нанести урон
+no_visibility_radius      = 14
+; минимальное время между переключениями. что бы не мигал
+visibility_state_change_min_delay = 1000 ;ms
+
 ;-------------------------------------------------------------------------
 ; Vampire Ability
 ;-------------------------------------------------------------------------
 
-Vampire_Delay      = 15000
-Vampire_Want_Speed = 0.01
-Vampire_Wound		= 0.2
-
-;--- OUTDATED :: REMOVE THIS PARAM ---------------
-Vampire_Reach_Time		= 15000
-;-------------------------------------------------
+; включен или нет. если да - остальные все параметры обязательные
+Vampire_On         = true
+; минимальное время между атаками
+Vampire_Delay      = 5000
+; скорость в секунду с которой кровос начинает хотеть кровушки. Когда
+; дойдет до 1 - будет атака
+Vampire_Want_Speed = 0.1
+; добавить кровотечение ГГ после атаки
+Vampire_Wound      = 0.2
+; время сколько кровос держит ГГ
+Vampire_HoldTime   = 3000
+; потеря здоровья ГГ в секунду, пока кровосос его держит
+Vampire_LossHealthSpeed = 0.05
+; сколько здоровья восстановит кровосос после атаки
+Vampire_GainHealth = 0.65
+; сколько обычных атак должно пройти перед атакой вампира
+Vampire_Sufficient_Hits = 5
+; минимальная дистанция для атаки
+Vampire_Distance   = 1 ; may artifact when < 1
 
 ;-------------------------------------------------------------------------
 ; Predator Ability
@@ -413,6 +451,9 @@ vampire_2		=	  	0.60,		0.6,		    150,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2,
 ;Right hand Strike
 stand_attack_run_0 =	bloodsucker_run_attack_sect
 
+stand_run_attack_left_0  = 0.30,   0.8,       50,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+stand_run_attack_right_0 = 0.30,   0.8,       50,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+
 [bloodsucker_run_attack_sect]
 value1			= 0.20,		0.2,		    150,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  4.5
 value2			= 0.60,		0.2,		    150,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  4.5
@@ -509,6 +550,9 @@ stand_attack_2 =	  	0.30,		0.25,		    150,        -4.0, 2.5, 0.50,	 -1.0, 1.0, -
 vampire_2		=	0.60,		0.3,		    150,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  4.5
 ;Right hand Strike
 stand_attack_run_0 =	bloodsucker_weak_run_attack_sect
+
+stand_run_attack_left_0  = 0.30,   0.72,       65,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+stand_run_attack_right_0 = 0.30,   0.72,       65,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
 
 [bloodsucker_weak_run_attack_sect]:bloodsucker_run_attack_sect
 value1			= 0.20,		0.1,		    150,        0.0, 0.5, 1.50,		  -1.2, 1.2, -1.2, 1.2,				  2.2
@@ -610,6 +654,9 @@ vampire_2		=	  	0.60,		0.6,			150,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.
 ;Right hand Strike
 stand_attack_run_0 =	bloodsucker_normal_run_attack_sect
 
+stand_run_attack_left_0  = 0.30,   0.87,       50,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+stand_run_attack_right_0 = 0.30,   0.87,       50,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+
 [bloodsucker_normal_run_attack_sect]
 value1			= 0.20,		0.2,		    150,        0.0, 0.5, 3.00,		  -1.2, 1.2, -1.2, 1.2,				  2.2
 value2			= 0.60,		0.4,		    200,        0.0, 0.5, 3.00,		  -1.2, 1.2, -1.2, 1.2,				  2.2
@@ -655,6 +702,9 @@ stand_attack_2 =	  	0.30,		0.5,		    150,        -4.0, 2.5, 0.50,	 -1.0, 1.0, -1
 vampire_2		=	  	0.60,		0.7,	    250,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  4.5
 ;Right hand Strike
 stand_attack_run_0 =	bloodsucker_strong_run_attack_sect
+
+stand_run_attack_left_0  = 0.30,   1.05,       65,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+stand_run_attack_right_0 = 0.30,   1.05,       65,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
 
 [bloodsucker_strong_run_attack_sect]
 value1			= 0.20,		0.4,		    150,        0.0, 0.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  2.2
