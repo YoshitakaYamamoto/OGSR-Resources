@@ -619,7 +619,7 @@ function update()
               local npc = level.object_by_id( v.npc_id )
               if npc and not npc:is_stalker() then npc = nil end
               if npc and check_victims( npc, pos, v.radius ) then
-                obj:explode( 0 )
+                obj:explode_initiator( npc:id() )
               else
                 temp.rem[ k ] = true
 				if npc then

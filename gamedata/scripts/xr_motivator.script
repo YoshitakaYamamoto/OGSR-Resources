@@ -493,10 +493,11 @@ function motivator_binder:before_hit_callback(hit_data)
 				obj:is_stalker()
 				and hit_data.who_id ~= self.object:id() --если не сам себя
 				and (
-					( self.object:relation( obj ) ~= game_object.enemy and obj:relation( self.object ) ~= game_object.enemy )
+					( not self.object:is_relation_enemy( obj ) and not obj:is_relation_enemy( self.object ) )
 					or ( xr_companion.is_companion(self.object:id()) and xr_companion.is_companion(hit_data.who_id) )
 				)
 			then
+				--log3("~~[%s] Friendly-Fire detected! [%s --> %s]", script_name(), obj:name(), self.object:name())
 				hit_data.ignore_hit = true
 			end
 		end

@@ -383,7 +383,7 @@ function evaluator_oh_shit:evaluate()
 	end
 	local danger,danger_r,dist = false,0,1000
 	for k,v in pairs(grenades) do
-		if get_grenade(k) and v-1500 > time_global() then
+		if get_grenade(k) and v.time - 1500 > time_global() then
 			if grenade_times[k] and time_global() - grenade_times[k] < 250 then
 				self.a.cover = nil
 				return false
@@ -562,7 +562,7 @@ function action_kill_it_with_fire:execute()
 		
 		local timeout = self.a.grenades[get_grenade(self.a.grenade):section()].explode_time-(time_global()-self.can_explode)
 		
-		grenades[get_grenade(self.a.grenade):id()] = time_global() + timeout
+		grenades[get_grenade(self.a.grenade):id()] = { ["time"] = time_global() + timeout, ["killer_id"] = npc:id() }
 		run_grenade_timer()
 		
 		self.a.grenade = nil	
@@ -772,7 +772,7 @@ function update()
   for k, v in pairs( grenades ) do
     local sobj = alife():object( k )
     if sobj and sobj.parent_id == 65535 then
-      if time_global() > v then
+      if time_global() > v.time then
         local obj = level.object_by_id( k )
         if obj then
           local a = alife():create(
@@ -781,10 +781,10 @@ function update()
             obj:level_vertex_id(), obj:game_vertex_id()
           )
           level.client_spawn_manager():add(
-            a.id, -1, function( id, obj )
+            a.id, -1, function( killer_id, id, obj )
               mark_grenade_non_pickable( obj )
-              obj:explode( 0 )
-            end
+              obj:explode_initiator( killer_id )
+            end, v.killer_id
           )
         end
         alife():release( sobj, true )
@@ -815,7 +815,7 @@ function death_callback(npc)
 		if g_obj then
 			local dummy,timeout = get_grenade_radius(g_obj:section())
 			grenade = alife():create(g_obj:section(), npc:bone_position(grenade_bone), npc:level_vertex_id(), npc:game_vertex_id())
-			grenades[grenade.id] = time_global() + timeout
+			grenades[grenade.id] = { ["time"] = time_global() + timeout, ["killer_id"] = npc:id() }
 			run_grenade_timer()
 		end
 		grenadiers[npc:id()]=nil
