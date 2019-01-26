@@ -91,6 +91,20 @@ Melee_Rotation_Factor	= 2.2
 
 hit_type				= wound				; type of attack
 
+;------------------------------------------------------------------------
+; Attack On Move
+;------------------------------------------------------------------------
+
+aom_enabled            = 1
+aom_animation_left     = stand_attack_ ;stand_attack_run_left_
+aom_animation_right    = stand_attack_ ;stand_attack_run_right_
+aom_far_radius         = 8
+aom_max_go_close_time  = 8
+aom_prepare_time       = 4
+aom_attack_radius      = 1
+aom_update_side_period = 3
+aom_prediction_factor  = 1.2
+
 
 ;------------------------------------------------------------------------
 ; Conditions
@@ -266,6 +280,9 @@ stand_attack_1 =	  	0.30,		0.65,	      150,        0.0, 0.5, 0.5,	 -0.6, 0.6, -0
 stand_attack_2 =	  	0.30,		0.7,	      200,        0.0, 1.0, 2.0,	 -0.6, 0.6, -0.6, 0.6,					  3.2
 stand_attack_run_0 =    0.50,		0.8,	      200,        0.0, 1.0, 2.0,	 -0.6, 0.6, -0.6, 0.6,					  2.2
 
+stand_attack_run_left_0  =   0.40,		0.95,	      650,        0.0, 1.0, 2.0,	 -1.4, 1.4, -1.4, 1.4,	3.2
+stand_attack_run_right_0 =   0.40,		0.95,	      650,        0.0, 1.0, 2.0,	 -1.4, 1.4, -1.4, 1.4,	3.2
+
 ;===========================================================================
 ; SPECIAL EFFECTORS
 ;===========================================================================
@@ -439,6 +456,9 @@ stand_attack_1 =	  	0.30,		0.15,	      100,        0.0, 0.5, 0.5,	 -1.0, 1.0, -1
 stand_attack_2 =	  	0.30,		0.20,	      150,        0.0, 1.0, 2.0,	 -0.8, 0.8, -1.0, 1.0,					  2.5
 stand_attack_run_0 =    0.50,		0.30,	      200,        0.0, 1.0, 2.0,	 -1.0, 1.0, -1.0, 1.0,					  2.2
 
+stand_attack_run_left_0  =   0.40,		0.95,	      650,        0.0, 1.0, 2.0,	 -1.4, 1.4, -1.4, 1.4,	3.2
+stand_attack_run_right_0 =   0.40,		0.95,	      650,        0.0, 1.0, 2.0,	 -1.4, 1.4, -1.4, 1.4,	3.2
+
 
 [boar_phantom_2]:boar_weak
 $spawn				= "monsters\boars\boar_phantom_2"
@@ -498,6 +518,9 @@ stand_attack_1 =	  	0.20,		0.65,	      100,        0.0, 0.5, 0.5,	 -1.0, 1.0, -1
 stand_attack_2 =	  	0.20,		0.7,	      200,        0.0, 1.0, 2.0,	 -0.8, 0.8, -1.0, 1.0,					  2.5
 stand_attack_run_0 =    0.50,		0.75,	      200,        0.0, 1.0, 2.0,	 -1.0, 1.0, -1.0, 1.0,					  2.2
 
+stand_attack_run_left_0  =   0.40,		1.0,	      350,        0.0, 1.0, 2.0,	 -1.0, 1.0, -1.0, 1.0,	3.2
+stand_attack_run_right_0 =   0.40,		1.0,	      350,        0.0, 1.0, 2.0,	 -1.0, 1.0, -1.0, 1.0,	3.2
+
 [boar_strong]:m_boar_e
 $spawn				= "monsters\boars\boar_03_strong"
 visual				= monsters\mutant_boar\mutant_boar_strong
@@ -534,3 +557,6 @@ stand_attack_1 =	  	0.30,		0.65,	      150,        0.0, 0.5, 0.5,	 -0.6, 0.6, -0
 ;Right Leg Attack
 stand_attack_2 =	  	0.30,		0.7,	      200,        0.0, 1.0, 2.0,	 -0.6, 0.6, -0.6, 0.6,					  3.2
 stand_attack_run_0 =    0.50,		0.8,	      200,        0.0, 1.0, 2.0,	 -0.6, 0.6, -0.6, 0.6,					  2.2
+
+stand_attack_run_left_0  =   0.40,		1.1,	      390,        0.0, 1.0, 2.0,	 -1.0, 1.0, -1.0, 1.0,	3.2
+stand_attack_run_right_0 =   0.40,		1.1,	      390,        0.0, 1.0, 2.0,	 -1.0, 1.0, -1.0, 1.0,	3.2
