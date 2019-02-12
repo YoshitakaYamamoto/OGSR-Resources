@@ -191,7 +191,6 @@
 	<info_portion id="agr_u_zombie_start"></info_portion>	 
 	<info_portion id="agr_u_controller_start">
 	<action>ogsm_respawn.spawn_in_agr</action>
-	<action>ogse.on_my_psy</action>
 	</info_portion>	 
 	<info_portion id="agr_u_bloodsucker_start">
 	<action>soundtrack.agro_u_bloodsucker_meet</action>
