@@ -25,12 +25,12 @@ script_binding			= bind_monster.bind
 
 bone_head				 = bip01_head					; bone name
 bone_fire				 = bip01_head
-bone_eye_left	   = bip01_ponytail1
-bone_eye_right	   = bip01_ponytail2
+;bone_eye_left	   = bip01_ponytail1
+;bone_eye_right	   = bip01_ponytail2
 weapon_usage			 = 0							; boolean
 
-;Spawn_Inventory_Item_Section = mutant_krovosos_jaw
-;Spawn_Inventory_Item_Probability = 0.5
+Spawn_Inventory_Item_Section = mutant_krovosos_jaw
+Spawn_Inventory_Item_Probability = 0.5
 
 ;------------------------------------------------------------------------
 ; Offline Alife
@@ -62,12 +62,12 @@ destroyed_vis_name				= physics\Dead_Body\trupik_crash
 
 ;---------------------------------------------------------------------
 ; регдолл
-ph_skeleton_airr_lin_factor   = -0.40 ;(изменно из-за того, что убрано домножение коэффициент 0.002 из кода)
-ph_skeleton_airr_ang_factor   = -0.20 ;(изменно из-за того, что убрано домножение на коэффициент 0.3 из кода (0.0*0.3=0.0))
+ph_skeleton_airr_lin_factor   = 2.0 ;550.0 ;(изменно из-за того, что убрано домножение коэффициент 0.002 из кода)
+ph_skeleton_airr_ang_factor   = 0.0 ;0.0 ;(изменно из-за того, что убрано домножение на коэффициент 0.3 из кода (0.0*0.3=0.0))
 ph_skeleton_hinger_factor1    = 1.0 ;1.0 (изменно из-за того, что убрано домножение на коэффициент 5.0 из кода)
-ph_skeleton_ddelay	      	= 15.0 ;Время изменения значения трения в суставе с момента создания шелла, сек
+ph_skeleton_ddelay	      	  = 15.0 ;Время изменения значения трения в суставе с момента создания шелла, сек
 
-ph_skel_fatal_impulse_factor  = 0.0
+ph_skel_fatal_impulse_factor  = 12.0
 ph_after_death_velocity_factor= 0.75
 ph_skel_shot_up_factor        = 0.25
 ;---------------------------------------------------------------------
@@ -119,8 +119,8 @@ Melee_Rotation_Factor	= 2.0
 ; Attack On Move
 ;------------------------------------------------------------------------
 aom_enabled            = 1
-aom_animation_left     = stand_attack_run_ ;stand_run_attack_right_
-aom_animation_right    = stand_attack_run_ ;stand_run_attack_left_
+aom_animation_left     = stand_run_attack_right_
+aom_animation_right    = stand_run_attack_left_
 aom_far_radius         = 15
 aom_max_go_close_time  = 8
 aom_prepare_time       = 5
@@ -710,122 +710,14 @@ stand_run_attack_right_0 = 0.30,   1.05,       65,        3.5, 2.0, 0.5,     -1.
 value1			= 0.20,		0.4,		    150,        0.0, 0.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  2.2
 value2			= 0.60,		0.8,		    200,        0.0, 0.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  2.2
 
-[bloodsucker_v_strong]:m_bloodsucker_e
-$spawn          = "monsters\bloodsuckers\bloodsucker_hell"
-visual          = monsters\krovosos\krovosos_strong_xran
-icon            = ui_npc_monster_krovosos_strong
-Predator_Visual = monsters\krovosos\krovosos_strong_xray
-; corpse_visual = monsters\bloodhell\bloodhell_dead
-panic_threshold = 0.05
-rank            = 800
-immunities_sect = bloodsucker_v_immunities_strong
-attack_params   = bloodsucker_v_attack_params_strong
-spec_rank       = strong
-community       = bloodsucker
-
-Particles_Invisible_Tracks_Freq = 90 ;70
-Invisibility_BlinkTime          = 800
-Invisibility_BlinkMicroInterval = 30
-Invisibility_EnergySpeed        = 0.05
-
-; acceleration
-Accel_Generic					= 0.7
-Accel_Calm						= 1.5
-Accel_Aggressive				= 1.0
-
-MinSpeed		    		 = 0.1	;1.0					; option for ALife Simulator
-MaxSpeed		    		 = 0.1	;1.5					; option for ALife Simulator
-going_speed          		 = 0.1	;1.0                   	; option for ALife Simulator
-current_level_going_speed		= 1;2					; option for ALife Simulator
-search_speed         		 = 0.1        
-[bloodsucker_v_attack_params_strong]:m_bloodsucker_attack_params
-;---------------------------------------------------------------------------------------------------------------------------------------------
-;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, top, bottom) |	Test Dist
-;---------------------------------------------------------------------------------------------------------------------------------------------
-;Left hand Strike
-stand_attack_0 =	  	0.30,		0.5,		    170,        3.5, 2.0, 0.5,		 -1.0, 1.0, -1.0, 1.0,				  2.5
-;Both hands Strike
-stand_attack_1 =	  	0.30,		0.7,		180,        0.0, 2.0, 4.0,		 -0.8, 0.8, -1.2, 1.2,				  2.5
-;Right hand Strike
-stand_attack_2 =	  	0.30,		0.5,		    170,        -4.0, 2.5, 0.50,	 -1.0, 1.0, -1.0, 1.0,				  2.5
-;Right hand Strike
-vampire_2		=	  	0.40,		0.8,	    250,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  4.5
-;Right hand Strike
-stand_attack_run_0 =	bloodsucker_v_strong_run_attack_sect
-
-[bloodsucker_v_strong_run_attack_sect]
-value1			= 0.20,		0.4,		    200,        0.0, 0.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  2.2
-value2			= 0.60,		0.8,		    250,        0.0, 0.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  2.2
-
-[bloodsucker_v_immunities_strong]:bloodsucker_immunities
-burn_immunity          = 0.25
-strike_immunity        = 0.25
-shock_immunity         = 0.25
-wound_immunity         = 0.15
-chemical_burn_immunity = 0.25
-explosion_immunity 		= 0.09
-fire_wound_immunity		= 0.05
-
-sound_idle					= monsters\bloodsucker1\idle_
-sound_eat					= monsters\bloodsucker1\eat_
-sound_aggressive			= monsters\bloodsucker1\sucker_breath_mix_
-sound_attack_hit			= monsters\bloodsucker1\attack_hit_
-sound_take_damage			= monsters\bloodsucker1\hit_
-sound_die					= monsters\bloodsucker1\die_
-sound_panic					= monsters\bloodsucker1\hit_
-sound_die_in_anomaly		= monsters\bloodsucker1\die_
-
-sound_distant_idle			= monsters\bloodsucker1\idle_
-
-
-Sound_Invisibility_Change_State		= monsters\bloodsucker\invisible
-Sound_Vampire_Grasp					= monsters\bloodsucker\vampire_grasp
-Sound_Vampire_Sucking				= monsters\bloodsucker\vampire_sucking
-Sound_Vampire_Hit					= monsters\bloodsucker\vampire_hit
-Sound_Vampire_StartHunt				= monsters\bloodsucker\vampire_grasp
-Sound_Growl							= monsters\bloodsucker1\sucker_growl_
-Sound_Alien							= monsters\bloodsucker1\sucker_breath_
-
+[bloodsucker_v_strong]:bloodsucker_strong
+; KRodin: надо подумать, заменять ли визуал уже заспавненным монстрам. Наверное да...
+;visual          = monsters\krovosos\krovosos_strong_xran
 
 [bloodsucker_v_strong2]:bloodsucker_strong
-$spawn				= "monsters\bloodsuckers\arena\bloodsucker_v_strong2"
-visual          = monsters\krovosos\bloodsucker_v_strong2
-icon            = ui_npc_monster_krovosos_strong
-rank            = 800
-panic_threshold = 0.5
-immunities_sect = bloodsucker_v_immunities_strong2
-attack_params   = bloodsucker_v_attack_params_strong2
+; KRodin: надо подумать, заменять ли визуал уже заспавненным монстрам. Наверное да...
+;visual          = monsters\krovosos\bloodsucker_v_strong2
 
-
-; acceleration
-Accel_Generic					= 1.9
-Accel_Calm						= 2.8
-Accel_Aggressive				= 40.0
-
-[bloodsucker_v_attack_params_strong2]:m_bloodsucker_attack_params
-;---------------------------------------------------------------------------------------------------------------------------------------------
-;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, top, bottom) |	Test Dist
-;---------------------------------------------------------------------------------------------------------------------------------------------
-;Left hand Strike
-stand_attack_0 =	  	0.30,		0.5,		    190,        3.5, 2.0, 0.5,		 -1.0, 1.0, -1.0, 1.0,				  2.5
-;Both hands Strike
-stand_attack_1 =	  	0.30,		0.7,		190,        0.0, 2.0, 4.0,		 -0.8, 0.8, -1.2, 1.2,				  2.5
-;Right hand Strike
-stand_attack_2 =	  	0.30,		0.5,		    190,        -4.0, 2.5, 0.50,	 -1.0, 1.0, -1.0, 1.0,				  2.5
-;Right hand Strike
-vampire_2		=	  	0.40,		0.8,	    200,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  4.5
-;Right hand Strike
-stand_attack_run_0 =	bloodsucker_v_strong_run_attack_sect
-
-
-[bloodsucker_v_immunities_strong2]:bloodsucker_immunities
-burn_immunity          = 0.2
-strike_immunity        = 0.2
-shock_immunity         = 0.2
-wound_immunity         = 0.1
-chemical_burn_immunity = 0.2
-explosion_immunity     = 0.1
-fire_wound_immunity		= 0.06
 
 ;*********************************************************************************
 ; CUSTOM PROFILES
