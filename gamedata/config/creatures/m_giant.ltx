@@ -32,13 +32,13 @@ class                = SM_GIANT					; AI class
 
 script_binding  	= bind_monster.bind
 
-bone_torso			 = bip01_spine1 			; bone name
-bone_head			 = bip01_head				; bone name
-bone_fire			 = bip01_head				; bone name
+bone_torso			 = spine 			; bone name
+bone_head			 = head				; bone name
+bone_fire			 = head				; bone name
 weapon_usage		 = 0						; boolean
 
-;Spawn_Inventory_Item_Section = mutant_psevdogigant_hand
-;Spawn_Inventory_Item_Probability = 0.5
+Spawn_Inventory_Item_Section = mutant_psevdogigant_hand
+Spawn_Inventory_Item_Probability = 0.5
 
 ;---------------------------------------------------------------------
 ; Physics
@@ -50,7 +50,7 @@ ph_box1_size 		 = 0.40, 0.6,  0.40
 ph_crash_speed_min			= 100
 ph_crash_speed_max			= 300
 ph_collision_damage_factor	= 0.1
-ph_mass 		     = 1500
+ph_mass 		     = 5000
 
 destroyed_vis_name	 = physics\Dead_Body\skelet_crash_monster
 
@@ -280,12 +280,11 @@ critical_wound_decrease_quant	= 0.
 ;<hit_scale>	- коэфф. изменения хита (уменьшения здоровья) 
 ;<wound_scale>	- коэфф. изменения величины открытой раны
 
-default				= 1, -1, 0.1
-bone01				= 1, -1, 0.1
-bip01_pelvis 		= 1, -1, 0.1
-bip01_spine 		= 1, -1, 0.1
-bip01_neck 			= 1, -1, 0.2
-bip01_head 			= 1, -1, 0.2
+default			= 0.3, -1, 0.04
+tail			= 0.9, -1, 0.08
+spine 			= 0.7, -1, 0.05
+hip 			= 0.7, -1, 0.08
+head 			= 0.7, -1, 0.04
 
 ;=========================================================================================
 ; Attack Animation Params
@@ -397,7 +396,7 @@ community			= pseudo_gigant
 
 [gigant_normal]:m_gigant_e
 $spawn				= "monsters\gigants\gigant_normal"
-visual				= monsters\psevdogigant\psevdogigant
+;visual				= monsters\psevdogigant\psevdogigant
 icon				= ui_npc_monster_psevdogigant
 rank				= 401
 spec_rank			= normal
@@ -413,7 +412,7 @@ community			= pseudo_gigant
 
 [arena_gigant_1]:m_gigant_e
 $spawn        = "monsters\gigants\arena_gigant_1"
-visual        = monsters\psevdogigant\psevdogigant
+;visual        = monsters\psevdogigant\psevdogigant
 icon        = ui_npc_monster_psevdogigant
 rank        = 401
 spec_rank     = normal
@@ -434,7 +433,7 @@ fire_wound_immunity   = 0.01
 
 [x18_giant]:m_gigant_e
 $spawn				= "monsters\gigants\x18_giant"
-visual				= monsters\psevdogigant\psevdogigant
+;visual				= monsters\psevdogigant\psevdogigant
 icon				= ui_npc_monster_psevdogigant
 rank				= 401
 spec_rank			= normal
