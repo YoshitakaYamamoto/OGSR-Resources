@@ -558,12 +558,9 @@ end
 
 --/ не может ходить изза веса
 function on_actor_cant_walk_weight()
---/	if has_alife_info("esc_trader_newbie") then
---/		game.start_tutorial("part_14_overload")
---/	end
-	if not has_alife_info("encyclopedy_tutorial_psy") then
-		game.start_tutorial("part_7_psy")
-		db.actor:give_info_portion("encyclopedy_tutorial_psy")
+	if not has_alife_info("encyclopedy_tutorial_overload") then
+		game.start_tutorial("part_14_overload")
+		db.actor:give_info_portion("encyclopedy_tutorial_overload")
 	end
 end
 

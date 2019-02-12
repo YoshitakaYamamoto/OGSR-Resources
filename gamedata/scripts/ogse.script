@@ -1218,7 +1218,7 @@ end
 -----------------------------------------------------------
 
 
--- Туториал на пси-воздействие. Вызывается из конфигов (надо убрать) и из скрипта dsh_monster_attack.
+-- Туториал на пси-воздействие. Вызывается из скрипта dsh_monster_attack.
 function on_my_psy()
 	if not has_alife_info("encyclopedy_tutorial_psy") then
 		game.start_tutorial("part_7_psy")
