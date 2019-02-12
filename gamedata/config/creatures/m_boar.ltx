@@ -27,8 +27,8 @@ MaxHealthValue		    = 200								 ; range [0..200]
 DynamicObjectsCount		= 32
 smart_terrain_choose_interval	= 00:15:00
 
-;Spawn_Inventory_Item_Section = mutant_boar_leg
-;Spawn_Inventory_Item_Probability = 0.5
+Spawn_Inventory_Item_Section = mutant_boar_leg
+Spawn_Inventory_Item_Probability = 0.5
 
 ;------------------------------------------------------------------------
 ; Physics
@@ -53,6 +53,12 @@ ph_skel_fatal_impulse_factor  = 0.0
 ph_after_death_velocity_factor= 0.75
 ph_skel_shot_up_factor        = 0.25
 ;---------------------------------------------------------------------
+
+;---------------------------------------------------------------------
+; Squad seperation behaviour (расталкивание)
+;---------------------------------------------------------------------
+separate_factor = 0.8 ; сила расталкивания
+separate_range  = 3   ; радиус в котором расталкивание действует
 
 ;------------------------------------------------------------------------
 ; Movement
@@ -96,8 +102,8 @@ hit_type				= wound				; type of attack
 ;------------------------------------------------------------------------
 
 aom_enabled            = 1
-aom_animation_left     = stand_attack_ ;stand_attack_run_left_
-aom_animation_right    = stand_attack_ ;stand_attack_run_right_
+aom_animation_left     = stand_attack_run_left_
+aom_animation_right    = stand_attack_run_right_
 aom_far_radius         = 8
 aom_max_go_close_time  = 8
 aom_prepare_time       = 4
@@ -483,8 +489,9 @@ sound_die_in_anomaly	= monsters\poltergeist\die_0
 
 [boar_normal]:m_boar_e
 $spawn				= "monsters\boars\boar_02_normal"
-visual				= monsters\mutant_boar\mutant_boar_normal
-icon				= ui_npc_monster_mutant_boar
+; KRodin: надо подумать, заменять ли визуал уже заспавненным монстрам. Наверное да...
+;visual				= monsters\mutant_boar\mutant_boar_normal
+;icon				= ui_npc_monster_mutant_boar
 panic_threshold		= 0.2
 rank				= 401
 immunities_sect		= boar_immunities_normal
