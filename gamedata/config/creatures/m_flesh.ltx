@@ -24,8 +24,8 @@ DynamicObjectsCount	 = 32
 smart_terrain_choose_interval	= 00:15:00
 
 
-;Spawn_Inventory_Item_Section = mutant_flesh_eye
-;Spawn_Inventory_Item_Probability = 0.5
+Spawn_Inventory_Item_Section = mutant_flesh_eye
+Spawn_Inventory_Item_Probability = 0.5
 
 ef_creature_type	 = 7				; option for evaluation functions
 ef_weapon_type		 = 2
@@ -66,6 +66,12 @@ ph_skel_fatal_impulse_factor  = 0.0
 ph_after_death_velocity_factor= 0.75
 ph_skel_shot_up_factor        = 0.25
 ;----------------------------------------------------------------------------
+
+;---------------------------------------------------------------------
+; Squad seperation behaviour (расталкивание)
+;---------------------------------------------------------------------
+separate_factor = 0.8 ; сила расталкивания
+separate_range  = 3   ; радиус в котором расталкивание действует
 
 ;----------------------------------------------------------------------------
 ; Movement::Velocities & Acceleration
