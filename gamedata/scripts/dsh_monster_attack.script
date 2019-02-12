@@ -4,7 +4,7 @@
 function attach( sm )
   sm:subscribe({ signal = "on_monster_spawn",  fun = this.on_monster_spawn })
   sm:subscribe({ signal = "on_monster_death",  fun = this.on_death })
-  sm:subscribe({ signal = "on_monster_before_hit", fun = this.on_monster_before_hit })
+  --sm:subscribe({ signal = "on_monster_before_hit", fun = this.on_monster_before_hit })
 end
 
 function on_monster_spawn( obj, binder )
@@ -145,7 +145,7 @@ end
 local master_koef = 1 / ( 4 - level.get_game_difficulty() )
 
 
---Аномальный щит бюрера
+--[=[ --Аномальный щит бюрера. Теперь выключен, т.к. реализован в движке.
 function on_monster_before_hit(obj, hit_data, binder )
   if obj:clsid() ~= clsid.burer_s then return end
   --
@@ -161,6 +161,7 @@ function on_monster_before_hit(obj, hit_data, binder )
 	end
   end
 end
+--]=]
 
 --Атака бюрера
 function burer_attack( obj )
