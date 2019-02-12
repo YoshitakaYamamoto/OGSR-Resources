@@ -953,12 +953,7 @@ function action_altcombat:check_objects( bw, enemy )
     end
   end
 
-  local ammo_check = false
-  if bw and bw:is_weapon_magazined() then
-    ammo_check = ( bw:get_ammo_in_magazine() ~= 0 )
-  end
-
-  can_fire[ npc:id() ] = ammo_check
+  can_fire[ npc:id() ] = bw and bw:is_weapon() and bw:get_weapon():ready_to_kill()
 end
 
 
