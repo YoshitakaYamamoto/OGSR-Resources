@@ -1499,7 +1499,7 @@ end
 function on_spawn()
   if not is_developer_mode() then
     for _, k in ipairs({
-      --[["g_god", "g_unlimitedammo",]] "g_zones_dbg", "g_vertex_dbg"
+      --[["g_god", "g_unlimitedammo",]] "g_zones_dbg", "g_vertex_dbg", "g_crosshair_dbg"
     }) do
       cmd( k, "off" )
     end
@@ -1513,7 +1513,7 @@ function on_spawn()
     end
     --
     for _, k in ipairs({
-      --[["g_god", "g_unlimitedammo",]] "g_zones_dbg", "g_vertex_dbg",
+      --[["g_god", "g_unlimitedammo",]] "g_zones_dbg", "g_vertex_dbg", "g_crosshair_dbg",
       "hud_draw",
       "hud_adjust_mode", "show_wnd_rect", "show_wnd_rect_all",
       "demo_record", "jump_to_level", "time_factor"

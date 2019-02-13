@@ -284,9 +284,7 @@ end
 function main_menu:setup_wpn_position()
 	if not ogse.is_developer_mode() then return end --KRodin: должно работать только в режиме разработчика.
 	--
-	local wchud = get_hud():GetCustomStatic("hud_cross_wpn")
 	if get_con_bool("hud_adjust_mode") then
-		--news_manager.send_tip(db.actor, "%c[255,240,155,25]ОТКЛючаем настройку прицеливания", nil, nil, 10000)
 		cmd("hud_adjust_mode 0")
 		cmd("hud_adjust_value 0.0")
 		cmd("bind lstrafe kA")
@@ -298,11 +296,9 @@ function main_menu:setup_wpn_position()
 		cmd("bind jump kSPACE")
 		cmd("bind torch kL")
 		cmd("bind inventory kI")
-		if wchud then
-			get_hud():RemoveCustomStatic("hud_cross_wpn")
-		end
+
+		cmd("g_crosshair_dbg", "off")
 	else
-		--news_manager.send_tip(db.actor, "%c[255,240,155,25]ВКЛючаем настройку прицеливания", nil, nil, 10000)
 		cmd("hud_adjust_mode 1")
 		cmd("hud_adjust_value 0.001")
 		cmd("bind lstrafe kNUMPAD4")
@@ -314,10 +310,8 @@ function main_menu:setup_wpn_position()
 		cmd("bind jump kNUMPADENTER")
 		cmd("bind torch kMULTIPLY")
 		cmd("bind inventory kDIVIDE")
-		if wchud then
-			get_hud():RemoveCustomStatic("hud_cross_wpn")
-		end
-		get_hud():AddCustomStatic("hud_cross_wpn")
+
+		cmd("g_crosshair_dbg", "on")
 	end
 	--
 	self:close_and_delete_menu()
