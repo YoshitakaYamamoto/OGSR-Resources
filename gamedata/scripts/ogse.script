@@ -1218,15 +1218,6 @@ end
 -----------------------------------------------------------
 
 
--- Туториал на пси-воздействие. Вызывается из скрипта dsh_monster_attack.
-function on_my_psy()
-	if not has_alife_info("encyclopedy_tutorial_psy") then
-		game.start_tutorial("part_7_psy")
-		db.actor:give_info_portion("encyclopedy_tutorial_psy")
-	end
-end
-
-
 -- вспомогательная функция, создание одного или нескольких объектов в заданной точке
 -- назначение: убрать повторный код из функций далее по тексту
 local function spawn_single_object_internal(res, spawn_item)

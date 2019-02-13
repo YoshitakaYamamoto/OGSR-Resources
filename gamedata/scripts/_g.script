@@ -499,26 +499,20 @@ function odd( x )
 	return math.floor( x * 0.5 ) * 2 == math.floor( x )
 end
 
+
 --/ Усталость
 function on_actor_critical_power()
---/	if has_alife_info("esc_trader_newbie") then
---/		game.start_tutorial("part_11_weakness")
---/	end
 	if not has_alife_info("encyclopedy_tutorial_weakness") then
 		game.start_tutorial("part_11_weakness")
 		db.actor:give_info_portion("encyclopedy_tutorial_weakness")
 	end
 end
 
-
 function on_actor_critical_max_power()
 end
 
 --/ Кровотечение
 function on_actor_bleeding()
---/	if has_alife_info("esc_trader_newbie") then
---/		game.start_tutorial("part_8_wound")
---/	end
 	if not has_alife_info("encyclopedy_tutorial_wound") then
 		game.start_tutorial("part_8_wound")
 		db.actor:give_info_portion("encyclopedy_tutorial_wound")
@@ -536,9 +530,6 @@ end
 
 --/ Радиация
 function on_actor_radiation()
---/	if has_alife_info("esc_trader_newbie") then
---/		game.start_tutorial("part_6_radiation")
---/	end
 	if not has_alife_info("encyclopedy_tutorial_radiation") then
 		game.start_tutorial("part_6_radiation")
 		db.actor:give_info_portion("encyclopedy_tutorial_radiation")
@@ -547,9 +538,6 @@ end
 
 --/ Заклинило оружие
 function on_actor_weapon_jammed()
---/	if has_alife_info("esc_trader_newbie") then
---/		game.start_tutorial("part_9_weapon")
---/	end
 	if not has_alife_info("encyclopedy_tutorial_weapon") then
 		game.start_tutorial("part_9_weapon")
 		db.actor:give_info_portion("encyclopedy_tutorial_weapon")
@@ -566,7 +554,12 @@ end
 
 --/ пси воздействие
 function on_actor_psy()	
+	if not has_alife_info("encyclopedy_tutorial_psy") then
+		game.start_tutorial("part_7_psy")
+		db.actor:give_info_portion("encyclopedy_tutorial_psy")
+	end
 end
+
 
 function set_actor_rank(rank)
 	if rank == "novice" then
