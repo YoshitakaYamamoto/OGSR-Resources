@@ -18,7 +18,7 @@ function on_npc_use( obj )
 	if obj:alive() then return end
 	--
 	local sobj = alife():object( obj:id() )
-	if not sobj.treasure_processed then
+	if not sobj.treasure_processed and not GetShift() then -- Проверка на шифт сделана, чтоб не срабатывало при попытке перетащить труп.
 		get_treasure_manager():use( obj )
 		--
 		give_money( obj )
