@@ -50,33 +50,7 @@ function dismantle_wpn(destr_item) --Полностью разобрать ор�
 	if has_scope_mount	then ogse.spawn_item_in_inv(get_string(dest_itm_sect,"scope_mount_name"))		end
 	if has_magazine		then ogse.spawn_item_in_inv(get_string(dest_itm_sect,"magazine_name"))			end
 ---------------------------------------------------------------------------------------------------------
---------------------------------------Разряжаем разбираемое оружие:--------------------------------------
-	local hidden_t, cur_t, hidden_n, cur_n
-	if destr_item:is_weapon_gl() and ogse_wpn_utils.get_gl_mode( destr_item ) then --если разбираемое оружие находится в режиме подствольника:
-		cur_t = destr_item:get_underbarrel_ammo_type()
-		cur_n = destr_item:get_ammo_in_magazine2()
-		hidden_t = destr_item:get_ammo_type()
-		hidden_n = destr_item:get_ammo_in_magazine()
-	else --если НЕ в режиме подствола:
-		cur_t = destr_item:get_ammo_type()
-		cur_n = destr_item:get_ammo_in_magazine()
-		if destr_item:is_weapon_gl() then --но если подствол таки присутствует (пусть даже не в активном режиме):
-			hidden_t = destr_item:get_underbarrel_ammo_type()
-			hidden_n = destr_item:get_ammo_in_magazine2()
-		end
-	end
-
-	if (hidden_t and hidden_n) and hidden_n > 0 then --Если в подстволе есть гранаты, разряжаем их:
-		local ammo_sections_hidden = get_names( dest_itm_sect, "grenade_class" )
-		local ammo_sect_hidden = ammo_sections_hidden[ hidden_t + 1 ]
-		ogse.spawn_ammo_in_inv(ammo_sect_hidden, hidden_n)
-	end
-	if (cur_t and cur_n) and cur_n > 0 then --Если в магазине есть патроны, разряжаем их:
-		local ammo_sections_cur = get_names( dest_itm_sect, "ammo_class" )
-		local ammo_sect_cur = ammo_sections_cur[ cur_t + 1 ]
-		ogse.spawn_ammo_in_inv(ammo_sect_cur, cur_n)
-	end
------------------------------------------------------------------------------------------------------------
+	destr_item:unload_magazine(true, true) --Теперь движок всё сам разряжает, в т.ч. подствольник, и сам спавнит патроны владельцу.
 end
 
 function use_repair_kit(repaired_slot, destroy_item)
