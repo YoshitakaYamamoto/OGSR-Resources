@@ -1,10 +1,15 @@
--- -*- mode: lua; coding: windows-1251-dos -*-
 --[[ ----------------------------------------------------------------------------------------------
  File       : m_netpk.script [optional]
  Description: Интерфейс чтения/записи net-пакетов (SHoC:6/7(118),CS:8(124),SCoP:12(128))
  Copyright  : 2008-2013 © STALKER-community
  Author     : Artos (по материалам: bardak, Red75, Sokol_jack, KD87 (uACDC), xStream (xs_netpk))
- Last edit  : 19.10.2016 (включены исправления авторов: Charsi, Kirgudu, naxac, dsh)
+ Last edit  : 08.01.2018 (включены исправления авторов: Charsi, Kirgudu, naxac, dsh)
+--]] ----------------------------------------------------------------------------------------------
+--[[ ----------------------------------------------------------------------------------------------
+KRodin: В этом скрипте включена OGSR-специфичная правка для поддержки более 64 костей в моделях.
+Для работы скрипта требуются функции log3 и table.copy из _G, и конфиг m_netpk.ltx
+Подключение скрипта: добавить в _G.start_game_callback():
+	m_netpk.attach()
 --]] ----------------------------------------------------------------------------------------------
 
 --/ -----------------------------------------------------------------
@@ -25,7 +30,7 @@ local bits_mode = { --/ table of admissible flags
 	[3] = 3, --/ full packet ('state' + 'update')
 	[4] = 0  --/ for 'abstract' properties of packet (debug)
 }
-shape_type = {
+local shape_type = {
 	sphere = 0,
 	box    = 1
 }
@@ -34,11 +39,11 @@ local sModule = script_name() --/ string name of this file module
 --/ -----------------------------------------------------------------
 --/ for output of the debug information
 local log = function(fmt,...)
-	if log3 then log3(sModule..":"..tostring(fmt),...) end
+	_G.log3(sModule..":"..tostring(fmt),...)
 end
---if to_log and type(string.exformat) == 'function' then
---	log = function(fmt,...) to_log(sModule..":"..string.exformat(fmt,...)) end
---end
+-- if to_log and type(string.exformat) == 'function' then
+-- 	log = function(fmt,...) to_log(sModule..":"..string.exformat(fmt,...)) end
+-- end
 --/ -----------------------------------------------------------------
 class "net_dummy" --/ dummy class (can use in helpers)
 --/ -----------------------------------------------------------------
@@ -222,31 +227,61 @@ function custom_data:set(input)
 	end
 end
 --/ self.data is generated from string on the fly
+--/ self.raw is taken from string as is
+--/ "use raw string" flag is off
 --/ in: string
---/ out: boolean (succes flag)
+--/ out: boolean (success flag)
 function custom_data:setString(str)
 	local no_err
 	self.data, no_err = _parse_custom_data(str)
+	self.raw = str
+	self.useRaw = false
 	return no_err --/>
 end
+--/ self.raw is taken from string as is
+--/ "use raw string" flag is on
+--/ in: string
+function custom_data:setStringRaw(str)
+	self.raw = str
+	self.useRaw = true
+end
 --/ table is passed by REFERENCE!!! Changes in it applied to self.data immediately
---/  in: table
+--/ self.raw is generated from table on the fly
+--/ "use raw string" flag is off
+--/ in: table
 function custom_data:setTable(tbl)
 	if type(tbl) == 'table' then
 		self.data = tbl
+		self.raw = _fill_custom_data(tbl)
 	else
 		self.data = {}
+		self.raw = ''
 	end
+	self.useRaw = false
 end
 --/ string is generated from self.data on the fly
 --/ out: string
 function custom_data:getString()
 	return _fill_custom_data(self.data) --/>
 end
+--/ returns string as is from raw property
+--/ out: string
+function custom_data:getStringRaw()
+	return self.raw --/>
+end
 --/ table is returned by REFERENCE!!! Changes in it applied to self.data immediately
---/  out: table
+--/ out: table
 function custom_data:getTable()
 	return self.data --/>
+end
+--/ sets "use raw string" flag if mode parameter is present
+--/ returns current flag
+--/ out: boolean
+function custom_data:useStringRaw(mode)
+	if type(mode) == 'boolean' then
+		self.useRaw = mode
+	end
+	return self.useRaw --/>
 end
 --/ -----------------------------------------------------------------
 --/ shape type classes, can use in external scripts
@@ -267,10 +302,10 @@ function shape:setSphere(offset, radius)
 end
 function shape:setBox(axis_x, axis_y, axis_z, offset)
 	self.type = shape_type.box --/ 1
-	self.axis_x = axis_x or vector() --/ length
-	self.axis_y = axis_y or vector() --/ height
-	self.axis_z = axis_z or vector() --/ width
-	self.offset = offset or vector()
+	self.axis_x = axis_x or vector():set( 0, 0, 0 ) --/ length
+	self.axis_y = axis_y or vector():set( 0, 0, 0 ) --/ height
+	self.axis_z = axis_z or vector():set( 0, 0, 0 ) --/ width
+	self.offset = offset or vector():set( 0, 0, 0 )
 end
 function shape:isSphere()
 	return self.type == shape_type.sphere --/>
@@ -367,7 +402,7 @@ _w_sz = function(pk,val) pk:w_stringZ(val) end
 _r_b8 = function(pk) return pk:r_bool() end --/#+# not in ACDC
 _w_b8 = function(pk,val) pk:w_bool(val) end --/#+# not in ACDC
 --/ vector
-_r_f32v3 = function(pk) return pk:r_vec3() end
+_r_f32v3 = function(pk) return pk:r_vec3(vector():set( 0, 0, 0 )) end
 _w_f32v3 = function(pk,val) pk:w_vec3(val) end
 --/ -------------------------
 --/ prop.type: variable chunk
@@ -518,7 +553,11 @@ _r_cd = function(pk)
 end
 _w_cd = function(pk,val)
 	if not disabled_convert_cd then
-		pk:w_stringZ(val:getString()) --/< from helpers
+		if val:useStringRaw() then
+			pk:w_stringZ(val:getStringRaw()) --/< from helpers
+		else
+			pk:w_stringZ(val:getString()) --/< from helpers
+		end
 	elseif type(val) == 'string' then
 		pk:w_stringZ(val) --/< 'string'
 	else
@@ -540,9 +579,9 @@ _r_shape = function(pk)
 	for i=1, shapes_count do
 		local sh_type = pk:r_u8()
 		if sh_type == shape_type.sphere then
-			shp:add( shape(sh_type, pk:r_vec3(), pk:r_float()) )
+			shp:add( shape(sh_type, pk:r_vec3(vector():set( 0, 0, 0 )), pk:r_float()) )
 		else
-			shp:add( shape(sh_type, pk:r_vec3(), pk:r_vec3(), pk:r_vec3(), pk:r_vec3() ) )
+			shp:add( shape(sh_type, pk:r_vec3(vector():set( 0, 0, 0 )), pk:r_vec3(vector():set( 0, 0, 0 )), pk:r_vec3(vector():set( 0, 0, 0 )), pk:r_vec3(vector():set( 0, 0, 0 )) ) )
 		end
 	end
 	return shp --/>
@@ -752,8 +791,8 @@ _r_cvr_mgr = function(pk,ver)
 		local t = {}
 		local npc_id      = pk:r_u16()
 		t.cover_vertex_id = pk:r_u32()
-		t.cover_position  = pk:r_vec3()
-		t.look_pos        = pk:r_vec3()
+		t.cover_position  = pk:r_vec3(vector():set( 0, 0, 0 ))
+		t.look_pos        = pk:r_vec3(vector():set( 0, 0, 0 ))
 		t.is_smart_cover  = pk:r_bool()
 		tbl.cover_table[npc_id] = t
 	end
@@ -1470,11 +1509,7 @@ function do_switchings(id)
 		--/ start callback for 'online->offline->online'
 		if not actived_switchings then
 			actived_switchings = true --/ set flag
-			if dsh and dsh.wait_condition then
-				dsh.wait_condition(execute_switchings, function() actived_switchings = false end)
-			else
-				level.add_call(execute_switchings, function() actived_switchings = false end)
-			end
+			level.add_call(execute_switchings, function() actived_switchings = false end)
 		end
 	end
 end
@@ -1500,8 +1535,8 @@ function net_cse_abstract:__init(obj, mode, packet, net_class)
 		{ name = 'name',               type = 'sz',     default = ''          },
 		{ name = 's_gameid',           type = 'h8',     default = 0           },
 		{ name = 's_rp',               type = 'h8',     default = 254         },
-		{ name = 'position',           type = 'f32v3',  default = vector()    },
-		{ name = 'direction',          type = 'f32v3',  default = vector()    },
+		{ name = 'position',           type = 'f32v3',  default = vector():set( 0, 0, 0 ) },
+		{ name = 'direction',          type = 'f32v3',  default = vector():set( 0, 0, 0 ) },
 		{ name = 'respawn_time',       type = 'h16',    default = 0           },
 		{ name = 'id',                 type = 'h16',    default = -1          }, --/ object's ID
 		{ name = 'parent_id',          type = 'h16',    default = -1          },
@@ -1639,7 +1674,7 @@ end
 --/  in: function | table
 --/  out: boolean (succes flag)
 function net_cse_abstract:setCallback(callback)
-	ASSERT( false, "! [%s]: setCallback() DEPRECATED!!!", script_name() )
+  ASSERT( false, "! [%s]: setCallback() DEPRECATED!!!", script_name() )
 	local lua_type = type(callback)
 	if lua_type ~= 'table' and lua_type ~= 'function' then return nil end --/>
 	self.obj.cb_netpk = function(sobj, packet) --/< set master-callback function
@@ -1783,10 +1818,10 @@ function net_cse_ph_skeleton:__init(obj,mode)
 	self.st_props_bones = { --/#+#
 		{ name = 'bones_mask',     type = 'u8v8',  default = {0,0,0,0,0,0,0,0} },
 		{ name = 'root_bone',      type = 'u16',   default = 0                 },
-		{ name = 'bbox_min',       type = 'f32v3', default = vector()          },
-		{ name = 'bbox_max',       type = 'f32v3', default = vector()          },
+		{ name = 'bbox_min',       type = 'f32v3', default = vector():set( 0, 0, 0 ) },
+		{ name = 'bbox_max',       type = 'f32v3', default = vector():set( 0, 0, 0 ) },
 		{ name = 'bones_count',    type = 'u16',   default = 0                 }, --/#~# changed name ('bone_count')
-		{ name = 'bones_mask_ex',  type = 'u8v8',  default = {0,0,0,0,0,0,0,0} }
+		{ name = 'bones_mask_ex',  type = 'u8v8',  default = {0,0,0,0,0,0,0,0} },
 	}
 	self.st_props_bone = { --/#+#
 		{ name = 'ph_position',    type = 'q8v3',  default = {0,0,0},  },
@@ -1802,15 +1837,15 @@ function net_cse_ph_skeleton:_read_st_props(ret,pk)
 	--/ hooks 'bones'
 	if bit_and(ret.skeleton_flags, 4) ~= 0 then --/ check 'skeleton'
 		for _,prop in ipairs(self.st_props_bones) do --/ read 'bones'
-			if prop.name == "bones_mask_ex" then
-				if ret.bones_count > 64 then
-					ret[ prop.name ] = this[ "_r_" .. prop.type ]( pk )
-				else
-					ret[ prop.name ] = table.copy( prop.default )
-				end
-			else
-				ret[prop.name] = this["_r_"..prop.type](pk)
-			end
+                  if prop.name == "bones_mask_ex" then
+                    if ret.bones_count > 64 then
+                      ret[ prop.name ] = this[ "_r_" .. prop.type ]( pk )
+                    else
+                      ret[ prop.name ] = table.copy( prop.default )
+                    end
+                  else
+                    ret[prop.name] = this["_r_"..prop.type](pk)
+                  end
 		end
 		if ret.bones_count > 0 then --/ read 'bone': ...
 			ret["bones"] = {}
@@ -1835,12 +1870,17 @@ function net_cse_ph_skeleton:_write_st_props(data,pk)
 		this["_w_"..prop.type](pk, data[prop.name] or prop.default or 0)
 	end
 	--/ hooks 'bones'
-	if bit_and(data.skeleton_flags, 4) ~= 0 then --/ check 'bones'
+	if bit_and(data.skeleton_flags, 4) ~= 0 and data.bones_count then --/ check 'bones'
 		for _,prop in ipairs(self.st_props_bones) do --/ write 'bones'
-			if prop.name ~= "bones_mask_ex" or data.bones_count > 64 then
-				this[ "_w_" .. prop.type ]( pk, data[ prop.name ] or prop.default or 0 )
-			end
-		end
+                  if
+                    prop.name ~= "bones_mask_ex"
+                    or data.bones_count > 64
+                  then
+                    this[ "_w_" .. prop.type ](
+                      pk, data[ prop.name ] or prop.default or 0
+                    )
+                  end
+                end
 		if data.bones then --/ write 'bone' ...
 			for _,bone in ipairs(data.bones) do
 				for _,prop in ipairs(self.st_props_bone) do
@@ -2194,8 +2234,7 @@ function net_se_turret_mgun:__init(obj,mode)
 		net_cse_alife_helicopter(nil, mode)
 	}
 	self.st_props = {
-		{ name = 'health', type = 'f32', default = 1.0 },
-		{ name = 'direction', type = 'f32v3', default = vector():set(0, 0, 0) } --KRodin: добавлено в OGSE
+		{ name = 'health', type = 'f32', default = 1.0 }
 	}
 	self.up_props = {}
 end
@@ -2221,7 +2260,7 @@ function net_cse_alife_creature_abstract:__init(obj,mode)
 		{ name = 'health',         type = 'f32',   default = 1.0 },
 		{ name = 'timestamp',      type = 'h32',   default = -1  },
 		{ name = 'creature_flags', type = 'h8',    default = 254 },
-		{ name = 'position',       type = 'f32v3', default = vector() },
+		{ name = 'position',       type = 'f32v3', default = vector():set( 0, 0, 0 ) },
 		{ name = 'o_model',        type = 'f32',   default = 0   },
 		{ name = 'o_torso',        type = 'f32v3', default = vector():set(0,0,0) },
 		{ name = 'g_team',         type = 'u8',    default = 0   },
@@ -2332,12 +2371,8 @@ function net_se_stalker:__init(obj,mode)
 	self.st_props = {
 		{ name = 'job_online',           type = 'u8', default = 2 ,     ver = 3 }, --/ SHoC&CS
 		{ name = 'job_online_condlist',  type = 'sz', default = '',     ver = 3 }, --/ SHoC&CS
-		{ name = 'was_in_smart_terrain', type = 'b8', default = false,  ver = 1 }, --/ SHoC --KRodin: fixed for OGSE
+		{ name = 'was_in_smart_terrain', type = 'u8', default = 0 ,     ver = 1 }, --/ SHoC
 		{ name = 'death_dropped',        type = 'u8', default = 0 ,     ver = 3 }, --/ SHoC&CS
-		--
-		{ name = 'offline_dead',         type = 'u32', default = 0,     ver = 1 }, --/ OGSE
-		{ name = 's_storage',            type = 'sz', default = '_',    ver = 1 }, --/ OGSE
-		--
 		{ name = 'squad_id',             type = 'sz', default = '',     ver = 2 }, --/ CS
 		{ name = 'sim_forced_online',    type = 'u8', default = 0 ,     ver = 2 }, --/ CS
 		{ name = 'old_lvid',             type = 'sz', default = 'nil',  ver = 4 }, --/ SCoP ('last_lvid')
@@ -2383,9 +2418,7 @@ function net_se_trader:__init(obj,mode)
 	self.bases = {
 		net_cse_alife_trader(nil, mode)
 	}
-	self.st_props = {
-		{ name = 's_storage', type = 'sz', default = '_', ver = 1 }, --/ OGSE
-	}
+	self.st_props = {}
 	self.up_props = {}
 end
 --/ -----------------------------------------------------------------
@@ -2451,10 +2484,7 @@ function net_se_monster:__init(obj,mode)
 	self.st_props = {
 		{ name = 'job_online',           type = 'u8', default = 2 ,    ver = 3 }, --/ SHoC&CS
 		{ name = 'job_online_condlist',  type = 'sz', default = '',    ver = 3 }, --/ SHoC&CS
-		{ name = 'was_in_smart_terrain', type = 'b8', default = false, ver = 1 }, --/ SHoC --KRodin: fixed for OGSE
-		--
-		{ name = 'offline_dead',         type = 'u32', default = 0 ,   ver = 1 }, --/ OGSE
-		--
+		{ name = 'was_in_smart_terrain', type = 'u8', default = 0 ,    ver = 1 }, --/ SHoC
 		{ name = 'squad_id',             type = 'sz', default = '',    ver = 2 }, --/ CS
 		{ name = 'sim_forced_online',    type = 'u8', default = 0 ,    ver = 2 }, --/ CS
 		{ name = 'old_lvid',             type = 'sz', default = 'nil', ver = 4 }, --/ SCoP
@@ -2774,7 +2804,7 @@ function net_se_zone_anom:__init(obj,mode)
 	}
 	self.st_props = {
 		--{ name = 'last_spawn_time_present', type = 'u8',   default = 0 },
-		--{ name = 'last_spawn_time', type = 'bCTime', default = 0 } --В ОГСЕ этого бреда больше нет
+		{ name = 'last_spawn_time', type = 'bCTime', default = 0 }
 	}
 	self.up_props = {}
 end
@@ -3217,7 +3247,7 @@ local function initialize()
 		local iBitMode = (db.is_dbg0 and bit_ver) or 15 --/ for debug
 		--/ читаем секцию общих соответствий 'script_clsid <==> cse_server_object_class' (строки!)
 		for i=0, ltx:line_count("clsid_to_class")-1 do
-			local result,idx,value = ltx:r_line("clsid_to_class",i)
+			local result,idx,value = ltx:r_line("clsid_to_class",i,"","")
 			local scr_clsid = idx and idx:match('%S+') --/ trim_w
 			if scr_clsid then
 				local t = {}
@@ -3269,7 +3299,7 @@ function get_clsid2net()
 			  if net_class then
 			    clsid2net[ scr_clsid ] = net_class
 			  end
-  			end
+			end
 		end
 		--table.print( str_clsid2class, sModule..":str_clsid2net|" ) --/#~#
 		--/ helpers:
@@ -3300,65 +3330,74 @@ function get_net_class(script_clsid)
 	end
 	return net_class --/>
 end
-
 --/-------------------------------------------------------------------
 --/ global constants/flags/functions can be used with packets
 --/-------------------------------------------------------------------
-_G.get_netpk = this.get
-_G.shape_type = this.shape_type --/#!# table
-_G.net_dummy = this.net_dummy --/#!# class-constructor
---/ translate tables to global scope (optional)
-_G.object_flags = { --/ for alife_object
-	UseSwitches       =    1,
-	SwitchOnline      =    2,
-	SwitchOffline     =    4,
-	Interactive       =    8,
-	VisibleForAI      =   16,
-	UsefulForAI       =   32,
-	OfflineNoMove     =   64,
-	UsedAI_Locations  =  128,
-	UseGroupBehaviour =  256,
-	CanSave           =  512,
-	VisibleForMap     = 1024,
-	UseSmartTerrains  = 2048,
-	CheckForSeparator = 4096,
-	CorpseRemoval     = 8192
+local FuncByName = {
+	["get_netpk"]  = this.get,
+	["shape_type"] = shape_type, --/#!# table
+	["net_dummy"]  = this.net_dummy --/#!# class-constructor
 }
-_G.trader_flags = { --/ trader
-	Dummy        = 0,
-	InfiniteAmmo = 1
-}
-_G.torch_flags = { --/ torch
-	Active            = 1,
-	NightVisionActive = 2,
-	Attached          = 4
-}
-if not ogse_wpn_utils then --KRodin: вот это совершенно не нужно, в ogse_wpn_utils свои флаги.
+if FuncByName then
+	--/ translate tables to global scope (optional)
+	_G.object_flags = { --/ for alife_object
+		UseSwitches       =    1,
+		SwitchOnline      =    2,
+		SwitchOffline     =    4,
+		Interactive       =    8,
+		VisibleForAI      =   16,
+		UsefulForAI       =   32,
+		OfflineNoMove     =   64,
+		UsedAI_Locations  =  128,
+		UseGroupBehaviour =  256,
+		CanSave           =  512,
+		VisibleForMap     = 1024,
+		UseSmartTerrains  = 2048,
+		CheckForSeparator = 4096,
+		CorpseRemoval     = 8192
+	}
+	_G.trader_flags = { --/ trader
+		Dummy        = 0,
+		InfiniteAmmo = 1
+	}
+	_G.torch_flags = { --/ torch
+		Active            = 1,
+		NightVisionActive = 2,
+		Attached          = 4
+	}
 	_G.addon_flags = { --/ weapon
 		scope    = 1,
 		launcher = 2,
 		silencer = 4
 	}
+	_G.hanging_lamp_flags = { --/ hanging lamp
+		Physic       =  1,
+		CastShadow   =  2,
+		R1           =  4,
+		R2           =  8,
+		TypeSpot     = 16,
+		PointAmbient = 32
+	}
+	_G.visual_flags = { Obstacle= 1 } --/ visual
+	--/ types:
+	_G.restrictor_type = { --/ restrictor types
+		DefaultRestrictorTypeNone = 0,
+		DefaultRestrictorTypeOut  = 1,
+		DefaultRestrictorTypeIn   = 2,
+		RestrictorTypeNone        = 3,
+		RestrictorTypeIn          = 4,
+		RestrictorTypeOut         = 5
+	}
+	--/ translate (change) function/class/tables to global scope
+	setfenv(1,_G)
+	for name,func in pairs(FuncByName) do
+		_G[name] = func
+		if type(func) == 'number' then --/ if not class-constructor ('userdata') or table
+			setfenv(_G[name],_G)
+		end
+	end
+	FuncByName = nil
 end
-_G.hanging_lamp_flags = { --/ hanging lamp
-	Physic       =  1,
-	CastShadow   =  2,
-	R1           =  4,
-	R2           =  8,
-	TypeSpot     = 16,
-	PointAmbient = 32
-}
-_G.visual_flags = { Obstacle = 1 } --/ visual
---/ types:
-_G.restrictor_type = { --/ restrictor types
-	DefaultRestrictorTypeNone = 0,
-	DefaultRestrictorTypeOut  = 1,
-	DefaultRestrictorTypeIn   = 2,
-	RestrictorTypeNone        = 3,
-	RestrictorTypeIn          = 4,
-	RestrictorTypeOut         = 5
-}
-
 --/ -----------------------------------------------------------------
 --/ Attach module
 --/ -----------------------------------------------------------------
