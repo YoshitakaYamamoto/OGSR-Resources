@@ -45,33 +45,80 @@ function vector_copy_by_val(vec)
 	return vector():set(vec)
 end
 
-function cfg_get_bool(ini, section, field, object, mandatory, default_val)
-	if ini and section and ini:section_exist(section) and ini:line_exist(section, field) then
-		return ini:r_bool(section, field)
-	else
-		return default_val or false
+
+-- Настройка параметра типа bool у игрового объекта.
+-- 
+-- char_ini - указатель на customdata (обычно object:spawn_ini())
+-- section - имя секции в customdata
+-- field - имя поля в customdata
+-- object - игровой объект, от которого будет взято имя для сообщения об ошибке
+-- mandatory - поле обязательно должно быть задано
+--
+-- Возвращает true или false
+function cfg_get_bool(char_ini, section, field, object, mandatory, default_val)
+	if mandatory == nil then
+		abort("section [%s]: wrong arguments order in call to cfg_get_bool", section)
 	end
+	if not char_ini then
+		return default_val
+	end	
+	
+	if section and char_ini:section_exist(section) and char_ini:line_exist(section, field) then
+		local ret = char_ini:r_bool(section, field)
+		return ret
+	end
+	if not mandatory then
+		if default_val then
+			if default_val ~= false and default_val ~= true then
+				abort("object [%s]: section [%s]: field [%s]: default value is not boolean", object:name(), section, field)
+			end
+			return default_val
+		end
+		return false
+	end
+	abort("object [%s]: attempt to read a non-existant boolean field [%s] in section [%s]", object:name(), field, section)
 end
 
 function cfg_get_string(char_ini, section, field, object, mandatory, gulag_name, default_val)
-	if char_ini and section and char_ini:section_exist(section) and char_ini:line_exist(section, field) then
+	if mandatory == nil or gulag_name == nil then
+		abort("section [%s]: wrong arguments order in call to cfg_get_string", section)
+	end
+	
+	if not char_ini then
+		return default_val
+	end	
+
+	if section and char_ini:section_exist(section) and char_ini:line_exist(section, field) then
 		if gulag_name and gulag_name ~= "" then
 			return gulag_name .. "_" .. char_ini:r_string(section, field)
 		else
 			return char_ini:r_string(section, field)
 		end
-	else
+	end
+	if not mandatory then
 		return default_val
 	end
+	abort("object [%s]: attempt to read a non-existant string field [%s] in section [%s]", object:name(), field, section)
 end
 
 function cfg_get_number(char_ini, section, field, object, mandatory, default_val)
-	if char_ini and section and char_ini:section_exist(section) and char_ini:line_exist(section, field) then
+	if mandatory == nil then
+		abort("section [%s]: wrong arguments order in call to cfg_get_number", section)
+	end
+	
+	if not char_ini then
+		return default_val
+	end		
+
+	if section and char_ini:section_exist(section) and char_ini:line_exist(section, field) then
 		return char_ini:r_float(section, field)
-	else
+	end
+	if not mandatory then
 		return default_val
 	end
+	--abort("object [%s]: attempt to read a non-existant numeric field [%s] in section [%s]", object:name(), field, section)
 end
+
 
 -- Проверяет, находится ли stalker рядом с точкой path_point пути patrol_path
 function stalker_at_waypoint(stalker, patrol_path, path_point)
