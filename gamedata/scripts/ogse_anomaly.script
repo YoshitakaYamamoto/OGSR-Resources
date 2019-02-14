@@ -17,7 +17,7 @@ function attach(sm)
 	sm:subscribe({signal = "on_drop", fun = this.check_artefact_activation})
 end
 
-local DISABLE_ANOMS_RESPAWN = true --DBG
+local DISABLE_ANOMS_RESPAWN = false --DBG
 
 local list_anom_id = {}
 local lvids_forbidden = {}
