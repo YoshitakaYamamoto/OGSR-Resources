@@ -17,10 +17,9 @@ function open_autodoc_ui()
 	level.start_stop_menu(spwn,true)
 end
 
-local autodoc_wnd
+
 class "autodoc" (CUIScriptWnd)
 function autodoc:__init() super()
-	autodoc_wnd = self
 	self.ui_bars = {}
 
 	self:InitLuaXml()
@@ -207,13 +206,14 @@ function autodoc:InitControls()
 end
 
 function autodoc:InitCallBacks() --Тут интерактивные элементы, при определенном действии выполняется заданная ф-ия
-	local function switch(v) --KRodin: из-за особенностей метода :Сonnect, у функций, не являющихся членами класса, первый аргумент не должен использоваться!
+	local function switch(_, v)
 		ogse_autodoc.switch_on[v] = not ogse_autodoc.switch_on[v]
 	end
-	self:Connect("btn_main", ui_events.BUTTON_CLICKED, switch, "ad")
-	self:Connect("btn_h",    ui_events.BUTTON_CLICKED, switch, "h")
-	self:Connect("btn_s",    ui_events.BUTTON_CLICKED, switch, "s")
-	self:Connect("btn_r",    ui_events.BUTTON_CLICKED, switch, "r")
+	--KRodin: self передаём, чтобы сборщик мусора не удалил объект раньше времени!
+	self:Connect("btn_main", ui_events.BUTTON_CLICKED, switch, self, "ad")
+	self:Connect("btn_h",    ui_events.BUTTON_CLICKED, switch, self, "h")
+	self:Connect("btn_s",    ui_events.BUTTON_CLICKED, switch, self, "s")
+	self:Connect("btn_r",    ui_events.BUTTON_CLICKED, switch, self, "r")
 end
 
 function autodoc:Update()
@@ -247,7 +247,7 @@ end
 function autodoc:on_quit()
 	ogse_autodoc.save_autodoc_states()
 	self:GetHolder():start_stop_menu(self,true)
-	autodoc_wnd = nil
+	self:ClearCallbacks()
 end
 
 function autodoc:OnKeyboard(dik, keyboard_action)
