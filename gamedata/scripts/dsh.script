@@ -181,11 +181,13 @@ function create_campfire( pos, lvid, gvid, vis, lamp_height )
   end
 
   -- аномалия
-  ogse_anomaly.spawn_anomaly(
+  local sobj = ogse_anomaly.spawn_anomaly(
     "zone_flame_small",
      pos, lvid, gvid,
-     { shtype = 0, radius = 0.1, center = { 0, 0, 0 } }
+     { shtype = 0, radius = 1, center = { 0, 0, 0 } }
   )
+  local sr = sobj:get_space_restrictor()
+  sr.restrictor_type = global_flags.eRestrictorTypeNone
 
   -- лампочка
   local sobj = alife():create(

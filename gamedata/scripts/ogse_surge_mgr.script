@@ -185,7 +185,10 @@ function surge_db_init()
 	}
 	surge_db.surge_process_stage_04 = {-- первые визуальные признаки выброса
 		on_info = {
-			call1 = ogse_anomaly.blow_flags, -- нужно делать без вариантов независимо от подземки
+			call1 = function()
+				ogse_anomaly.blow_flags() -- нужно делать без вариантов независимо от подземки
+				dsh_anomaly_detector.pre_blow_off()
+			end,
 			if_surface = {
 				call1 = function() is_surge_started = true end
 			},
@@ -204,7 +207,10 @@ function surge_db_init()
 			},
 		},
 		on_reinit = {
-			call1 = ogse_anomaly.blow_flags, -- Поднимаем флаги выброса для локаций
+			call1 = function()
+				ogse_anomaly.blow_flags() -- Поднимаем флаги выброса для локаций
+				dsh_anomaly_detector.pre_blow_off()
+			end,
 			if_surface = {
 				call1 = function() is_surge_started = true end
 			},
@@ -480,7 +486,7 @@ function surge_db_init()
 				set_first_blow()
 				on_surge_end() --Cюда скинул всё, что неудобно вызывать в простой форме
 				--
-				dsh.timeout( ogse_anomaly_evader.freq * 5, function() --KRodin: сделано для того, чтобы схема ogsm_hideout отпускала сталкеров только после того, как ogse_anomaly_evader установит им рестрикшены заспавненых после выброса аномалий.
+				dsh.timeout( dsh_anomaly_detector.get_freq() * 5, function() --KRodin: сделано для того, чтобы схема ogsm_hideout отпускала сталкеров только после того, как dsh_anomaly_detector установит им рестрикшены заспавненых после выброса аномалий.
 					--log3("--[%s] Surge end!", script_name())
 					is_surge_raskolbas = false
 					is_surge_started = false

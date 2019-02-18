@@ -32,6 +32,10 @@ function on_spawn()
 	fix_deadcity_trups()
 	--
 	fix_esc_semenov()
+	--
+	fix_rostok_zone_zharka_static_average()
+	--
+	fix_zone_flame_small2()
 end
 
 function on_first_update()
@@ -463,4 +467,41 @@ function cleanup_val_rob_restrictors() --Вызывается из конфиг�
 			alife():release( sobj )
 		end
 	end
+end
+
+
+-- Чтобы НПС обходили жарки в тоннеле на ДТ (некоторые жарки всё равно не будут обходить, т.к. у них border().empty() и это мне не удалось починить)
+function fix_rostok_zone_zharka_static_average()
+  for _, n in ipairs({
+    "",
+    "_0000", "_0001", "_0002", "_0003", "_0004", "_0005", "_0006", "_0007", "_0008", "_0009", "_0010", "_0011",
+    "_0012", "_0013", "_0014", "_0015", "_0016", "_0017", "_0018", "_0019", "_0020", "_0021", "_0022",
+  }) do
+    local sobj = alife():object( "rostok_zone_zharka_static_average" .. n )
+    if sobj then
+      local sr = sobj:get_space_restrictor()
+      if sr.restrictor_type ~= global_flags.eDefaultRestrictorTypeNone then
+        log3( "~~[%s]: fix %s.m_restrictor_type: [%s] -> [%s]", script_name(), sobj:name(), sr.restrictor_type, global_flags.eDefaultRestrictorTypeNone )
+        sr.restrictor_type = global_flags.eDefaultRestrictorTypeNone
+      end
+    end
+  end
+end
+
+
+-- Чтобы НПС не обходили костры, мины, аномалии-телепорты, и прочие объекты на классах аномалий, не являющиеся аномалиями по факту
+function fix_zone_flame_small2()
+  if ogse.var_exists("fix_zone_flame_small2") then return end
+  --
+  for id, sobj in alife():objects() do
+    if IsAnomaly(sobj) and ogse_anomaly.is_not_anomaly(sobj) then
+      local sr = sobj:get_space_restrictor()
+      if sr.restrictor_type == global_flags.eDefaultRestrictorTypeNone then
+        log3( "~~[%s]: fix %s.m_restrictor_type: [%s] -> [%s]", script_name(), sobj:name(), sr.restrictor_type, global_flags.eRestrictorTypeNone )
+        sr.restrictor_type = global_flags.eRestrictorTypeNone
+      end
+    end
+  end
+  --
+  ogse.save_var("fix_zone_flame_small2", true)
 end

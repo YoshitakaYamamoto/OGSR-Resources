@@ -145,9 +145,14 @@ local excluded_anoms = { --Секции и имена аномалий, кото
 	["rostok_zone_witches_galantine_average_0003"] = true,
 	["rostok_zone_witches_galantine_average_0004"] = true,
 
+	--Тоннель с жарками на ДТ
 	["rostok_zone_zharka_static_average"] = true,
+	["rostok_zone_zharka_static_average_0000"] = true,
 	["rostok_zone_zharka_static_average_0001"] = true,
+	["rostok_zone_zharka_static_average_0002"] = true,
 	["rostok_zone_zharka_static_average_0003"] = true,
+	["rostok_zone_zharka_static_average_0004"] = true,
+	["rostok_zone_zharka_static_average_0005"] = true,
 	["rostok_zone_zharka_static_average_0006"] = true,
 	["rostok_zone_zharka_static_average_0007"] = true,
 	["rostok_zone_zharka_static_average_0008"] = true,
@@ -165,10 +170,6 @@ local excluded_anoms = { --Секции и имена аномалий, кото
 	["rostok_zone_zharka_static_average_0020"] = true,
 	["rostok_zone_zharka_static_average_0021"] = true,
 	["rostok_zone_zharka_static_average_0022"] = true,
-	["rostok_zone_zharka_static_average_0000"] = true,
-	["rostok_zone_zharka_static_average_0002"] = true,
-	["rostok_zone_zharka_static_average_0004"] = true,
-	["rostok_zone_zharka_static_average_0005"] = true,
 
 	["mil_zone_witches_galantine0000_0000"] = true,
 	["mil_zone_witches_galantine0000"] = true,
@@ -583,8 +584,6 @@ function on_after_blowout()
 	list_anom_id = {} --После обновления аномалий очищаем таблицы
 	lvids_forbidden = {}
 	position_forbidden = {}
-	--
-	ogse_anomaly_evader.last_position = {} --Обновляем обход аномалий.
 end
 
 
@@ -753,8 +752,6 @@ function anom_update()
 	list_anom_id = {} --После обновления аномалий очищаем таблицы
 	lvids_forbidden = {}
 	position_forbidden = {}
-	--
-	ogse_anomaly_evader.last_position = {} --Обновляем обход аномалий.
 end
 
 --Поднимаем флаги выброса для локаций
@@ -776,7 +773,7 @@ function get_anomaly_mode(sobj)
 	return ""
 end
 
---Устанавливаем статус аномалии
+--Устанавливаем статус аномалии. По факту статус можно установить один - anom_off. В других статусах нет надобности.
 function set_anomaly_mode(anom_id, status)
 	local sobj = alife():object(anom_id)
 	if not sobj then return end
@@ -786,12 +783,14 @@ function set_anomaly_mode(anom_id, status)
 	ini:w_string( "m_anom", "status", status )
 	sobj:save_spawn_ini()
 
+	ASSERT(status == "anom_off", "strange anomaly status: [%s]", status)
+
 	if status == "anom_off" then
 		anom_list[anom_id] = nil
 		local obj = level.object_by_id(anom_id)
 		if obj then
 			obj:disable_anomaly()
-			ogse_anomaly_evader.last_position = {} --Обновляем обход аномалий.
+			dsh_anomaly_detector.remove_restriction(anom_id)
 		end
 	end
 	--log3("[%s.set_anomaly_mode] New status for anom [%s] = [%s]. Level: [%s]", script_name(), sobj:name(), status, object_level_name(sobj))

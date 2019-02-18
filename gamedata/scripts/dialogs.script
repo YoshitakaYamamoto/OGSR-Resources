@@ -849,7 +849,6 @@ function companion_start_following(npc, actor)
 		xr_companion.subscribe(npc:id())
 		
 		npc:remove_all_restrictions() --Удалять все рестрикшены необходимо именно здесь!
-		ogse_anomaly_evader.last_position[ npc:id() ] = nil --Сразу же переустанавливаем рестрикшены обхода аномалий
 
 		sobj:visible_for_map(true) --на всякий случай
 		npc:restore_max_ignore_monster_distance() --на всякий случай

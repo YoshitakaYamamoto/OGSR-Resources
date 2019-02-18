@@ -24,7 +24,6 @@ addons = {
 	"ogse_mental_fix",
 	"ogse_actor_conditions_mgr",
 		"ogse_water_restrictor",
-	"ogse_anomaly_evader",
 	"ogse_healing",
 	"ogse_autodoc",
 	"ogse_campfire",
@@ -60,6 +59,7 @@ addons = {
 	"dsh_respawn",
 	"dsh_outfit",
 	"dsh_enemies",
+	"dsh_anomaly_detector", --должен быть после ogse_anomaly!
 	"clear_garbage",
 	"trade_manager",
 	"xr_combat_companion",
