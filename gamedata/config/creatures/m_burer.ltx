@@ -58,10 +58,10 @@ ph_skel_shot_up_factor        = 0.25
 
 ; speed factors			linear | angular_real | angular_path | min |  max
 Velocity_Stand			= 0,		6.0,			6.0,		0.2,	0.5
-Velocity_RunFwdNormal	= 5.0,		2.5,			2.5,		0.2,	1	
-Velocity_RunFwdDamaged	= 3.5,  	3.0,			3.0,		0.2,	1
-Velocity_WalkFwdNormal	= 1.6,		3.0,			3.0,		0.02,	1.5
-Velocity_WalkFwdDamaged	= 1.0,		3.0,			3.0,		0.5,	2.0	
+Velocity_RunFwdNormal	= 6.0,		2.5,			2.5,		0.2,	1	
+Velocity_RunFwdDamaged	= 4.5,  	3.0,			3.0,		0.2,	1
+Velocity_WalkFwdNormal	= 2.0,		3.0,			3.0,		0.02,	1.5
+Velocity_WalkFwdDamaged = 1.2,		3.0,			3.0,		0.5,	2.0	
 Velocity_Drag			= 1.0,		3.0,			3.0,		1,		1
 Velocity_Steal			= 1.5,		3.0,			3.0,		1,		1
 
@@ -97,7 +97,7 @@ radiation_v				= 0.00001					;скорость уменьшения радиации
 satiety_power_v			= 0.001						;увеличение силы при уменьшении сытости 
 satiety_health_v		= 0.00007					;увеличение здоровья при уменьшении сытости 
 satiety_critical		= -1.0						;критическое значения сытости (в процентах от 0..1) когда здоровье начианает уменьшаться
-radiation_health_v		= 0.01						;уменьшение здоровья при воздействии радиации
+radiation_health_v		= 0.0					;уменьшение здоровья при воздействии радиации
 morale_v				= 0.01						;скорость восстановления морали
 health_hit_part			= 0.5						;процент хита, уходящий на отнимание здоровья
 power_hit_part			= 1.0						;процент хита, уходящий на отнимание силы
@@ -258,7 +258,7 @@ tele_animation_tele = telekinesis_
 ;-------------------------------------------------------------------------
 scan_critical_value		= 25.0	; граничное значение 
 scan_radius				= 50.0  ; радиус сканирования
-scan_velocity_threshold	= 4.0	; граничная скорость, до которой движение актера игнорируется
+scan_velocity_threshold	= 3.0	; граничная скорость, до которой движение актера игнорируется
 scan_decrease_value		= 0.3	; уменьшение текущей суммы в секунду
 scan_trace_time_freq	= 2		; частота трейса скорости (for programmer only) (1 = 2 раза в сек)
 
@@ -393,9 +393,9 @@ fire_wound_immunity		= 0.4
 ;<hit_scale>	- коэфф. изменения хита (уменьшения здоровья) 
 ;<wound_scale>	- коэфф. изменения величины открытой раны
 
-default = 0.1, -1, 0.1
-neck    = 0.9, -1, 0.5
-head    = 1.3, -1, 0.2
+default = 0.01, -1, 0.1
+neck    = 0.9, -1, 0.5 ;уменьшить до 0.2?
+head    = 1.0, -1, 0.2
 
 ;=================================================================================
 ; Burer Scan Effector

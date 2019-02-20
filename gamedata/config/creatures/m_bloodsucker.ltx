@@ -76,7 +76,7 @@ ph_skel_shot_up_factor        = 0.25
 ; Movement::Velocities & Acceleration
 ;----------------------------------------------------------------------------
 ; speed factors			linear | angular_real | angular_path | min	 |  max
-Velocity_Stand     		 = 0,     5.0,          5.0,         1,       1
+Velocity_Stand     		= 0,      5.0,          5.0,         1,       1
 Velocity_RunFwdNormal   = 6.0,    5.0,          5.0,         0.5,     1
 Velocity_RunFwdDamaged  = 5.0,    5.0,          5.0,         0.5,     1
 Velocity_WalkFwdNormal  = 2.15,   5.0,          5.0,         0.2,     2.0
@@ -85,7 +85,7 @@ Velocity_Drag           = 1.5,    4.0,          4.0,         1,       1
 Velocity_Steal          = 0.7,    4.0,          4.0,         1,       1
 
 ; Speed factors while invisible
-Velocity_Invisible_Linear		= 13.0 
+Velocity_Invisible_Linear		= 8.0 ;13.0 
 Velocity_Invisible_Angular  = 5.0
 
 ; acceleration
@@ -97,7 +97,7 @@ Accel_Aggressive				= 20.0
 ; Attack parameters
 ;--------------------------------------------------------------------------
 MinAttackDist       = 1.6 ;2.4
-MaxAttackDist       = 2.9 ;3.8
+MaxAttackDist       = 2.8 ;3.8
 EffectDistance		= 20.0
 hit_type			= wound					; type of attack 
 as_min_dist			= 0.3 ;2.0 ;1.7    
@@ -280,14 +280,15 @@ Particles_Invisible_Tracks		= monsters\bloodsucker_step
 Particles_Invisible_Tracks_Freq	= 70;100
 
 ;Invisibility settings
-Invisibility_BlinkTime								= 300
-Invisibility_BlinkMicroInterval  					= 30
-Invisibility_EnergySpeed							= 0.05
-Invisibility_Energy_Restore_Velocity				= 0.04;0.05
-Invisibility_Energy_Decline_Velocity				= 0.04; 0.02
-Invisibility_Energy_Critical_Value					= 0.2
-Invisibility_Energy_Activate_Value					= 0.8
-Invisibility_Energy_Aggressive_Restore_Velocity		= 0.03
+Invisibility_BlinkTime          = 150 ;300 ;600
+Invisibility_BlinkMicroInterval = 30 ;10
+Invisibility_EnergySpeed        = 0.05
+
+;Invisibility_Energy_Restore_Velocity				= 0.04;0.05
+;Invisibility_Energy_Decline_Velocity				= 0.04; 0.02
+;Invisibility_Energy_Critical_Value					= 0.2
+;Invisibility_Energy_Activate_Value					= 0.8
+;Invisibility_Energy_Aggressive_Restore_Velocity		= 0.03
 
 ;расстояние меньше которого тело полностью видимо
 full_visibility_radius    =  5
@@ -432,7 +433,7 @@ stand_walk_fwd_0	=	1,	  0.05,    1.0,    0.50,     1.0
 stand_walk_dmg_0	=   1,	  0.05,    1.0,	   0.60,     1.0,   
 stand_steal_0		=	2,	  0.15,    0.2,    0.50,     0.2,   
 ;stand_drag_0		=	1,	  0.2,	   1.0,	   0.25,     0.7,   
-stand_walk_fwd_dmg_0  =   1,    0.05,    1.0,    0.60,     1.0,
+;stand_walk_fwd_dmg_0  =   1,    0.05,    1.0,    0.60,     1.0,
 ;===========================================================================
 ; Attack Animation Parameters
 ;===========================================================================
@@ -451,8 +452,8 @@ vampire_2		=	  	0.60,		0.6,		    150,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2,
 ;Right hand Strike
 stand_attack_run_0 =	bloodsucker_run_attack_sect
 
-stand_run_attack_left_0  = 0.30,   0.8,       50,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
-stand_run_attack_right_0 = 0.30,   0.8,       50,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+stand_run_attack_left_0  = 0.30,   0.4,       160,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+stand_run_attack_right_0 = 0.30,   0.4,       160,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
 
 [bloodsucker_run_attack_sect]
 value1			= 0.20,		0.2,		    150,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  4.5
@@ -547,73 +548,17 @@ stand_attack_1 =	  	0.30,		0.35,		    160,        0.0, 2.0, 4.0,		 -0.8, 0.8, -1
 ;Right hand Strike
 stand_attack_2 =	  	0.30,		0.25,		    150,        -4.0, 2.5, 0.50,	 -1.0, 1.0, -1.0, 1.0,				  2.5
 ;Right hand Strike
-vampire_2		=	0.60,		0.3,		    150,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  4.5
+vampire_2		=		0.60,		0.4,		    150,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  4.5
 ;Right hand Strike
 stand_attack_run_0 =	bloodsucker_weak_run_attack_sect
 
-stand_run_attack_left_0  = 0.30,   0.72,       65,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
-stand_run_attack_right_0 = 0.30,   0.72,       65,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+stand_run_attack_left_0  = 0.30,   0.35,       165,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+stand_run_attack_right_0 = 0.30,   0.35,       165,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
 
 [bloodsucker_weak_run_attack_sect]:bloodsucker_run_attack_sect
 value1			= 0.20,		0.1,		    150,        0.0, 0.5, 1.50,		  -1.2, 1.2, -1.2, 1.2,				  2.2
 value2			= 0.60,		0.2,		    200,        0.0, 0.5, 1.50,		  -1.2, 1.2, -1.2, 1.2,				  2.2
 
-[bloodsucker_invisible]:bloodsucker_weak
-$spawn				= "monsters\bloodsuckers\bloodsucker_invisible"
-visual				= monsters\krovosos\krovosos_xray
-
-[bloodsucker_attack_params_invisible]:m_bloodsucker_attack_params
-;---------------------------------------------------------------------------------------------------------------------------------------------
-;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, top, bottom) |	Test Dist
-;---------------------------------------------------------------------------------------------------------------------------------------------
-;Left hand Strike
-stand_attack_0 =	  	2.30,		0.25,		    150,        3.5, 2.0, 0.5,		 -1.0, 1.0, -1.0, 1.0,				  2.5
-;Both hands Strike
-stand_attack_1 =	  	2.30,		0.35,		    160,        0.0, 2.0, 4.0,		 -0.8, 0.8, -1.2, 1.2,				  2.5
-;Right hand Strike
-stand_attack_2 =	  	2.30,		0.25,		    150,        -4.0, 2.5, 0.50,	 -1.0, 1.0, -1.0, 1.0,				  2.5
-;Right hand Strike
-vampire_2		=	  	0.60,		0.3,		    150,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  4.5
-;Right hand Strike
-
-bones_particles			= bloodsucker_invisible_particles
-
-[bloodsucker_invisible_particles]
-bloodsucker_invisible_particles_spine = bloodsucker_invisible_particles_spine
-bloodsucker_invisible_lfoot = bloodsucker_invisible_particles_lfoot
-bloodsucker_invisible_rfoot = bloodsucker_invisible_particles_rfoot
-bloodsucker_invisible_lhand = bloodsucker_invisible_particles_lhand
-bloodsucker_invisible_rhand = bloodsucker_invisible_particles_rhand
-
-[bloodsucker_invisible_particles_lfoot]
-particle = _ecp\group_items\anomaly_studen_idle_smallhit
-sound = anomaly\buzz_idle
-bone = bip01_l_foot
-stop_on_death = true
-;
-[bloodsucker_invisible_particles_rfoot]
-particle = _ecp\group_items\anomaly_studen_idle_smallhit
-sound = anomaly\buzz_idle
-bone = bip01_r_foot
-stop_on_death = true
-;
-[bloodsucker_invisible_particles_lhand]
-particle = _ecp\group_items\anomaly_studen_idle_smallhit
-sound = anomaly\buzz_idle
-bone = bip01_l_hand
-stop_on_death = true
-;
-[bloodsucker_invisible_particles_rhand]
-particle = _ecp\group_items\anomaly_studen_idle_smallhit
-sound = anomaly\buzz_idle
-bone = bip01_r_hand
-stop_on_death = true
-
-[bloodsucker_invisible_particles_spine]
-particle = _ecp\group_items\anomaly_studen_idle_smallhit
-sound = anomaly\buzz_idle
-bone = bip01_head
-stop_on_death = true
 
 [bloodsucker_normal]:m_bloodsucker_e
 $spawn				= "monsters\bloodsuckers\bloodsucker_02_normal"
@@ -654,8 +599,8 @@ vampire_2		=	  	0.60,		0.6,			150,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.
 ;Right hand Strike
 stand_attack_run_0 =	bloodsucker_normal_run_attack_sect
 
-stand_run_attack_left_0  = 0.30,   0.87,       50,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
-stand_run_attack_right_0 = 0.30,   0.87,       50,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+stand_run_attack_left_0  = 0.30,   0.55,       160,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+stand_run_attack_right_0 = 0.30,   0.55,       160,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
 
 [bloodsucker_normal_run_attack_sect]
 value1			= 0.20,		0.2,		    150,        0.0, 0.5, 3.00,		  -1.2, 1.2, -1.2, 1.2,				  2.2
@@ -699,12 +644,12 @@ stand_attack_1 =	  	0.30,		0.6,		160,        0.0, 2.0, 4.0,		 -0.8, 0.8, -1.2, 1
 ;Right hand Strike
 stand_attack_2 =	  	0.30,		0.5,		    150,        -4.0, 2.5, 0.50,	 -1.0, 1.0, -1.0, 1.0,				  2.5
 ;Right hand Strike
-vampire_2		=	  	0.60,		0.7,	    250,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  4.5
+vampire_2		=	  	0.60,		0.7,	    200,        0.0, 2.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  4.5
 ;Right hand Strike
 stand_attack_run_0 =	bloodsucker_strong_run_attack_sect
 
-stand_run_attack_left_0  = 0.30,   1.05,       65,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
-stand_run_attack_right_0 = 0.30,   1.05,       65,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+stand_run_attack_left_0  = 0.30,   0.6,       165,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
+stand_run_attack_right_0 = 0.30,   0.6,       165,        3.5, 2.0, 0.5,     -1.0, 1.0, -1.0, 1.0,     2.5
 
 [bloodsucker_strong_run_attack_sect]
 value1			= 0.20,		0.4,		    150,        0.0, 0.5, 4.50,		  -1.2, 1.2, -1.2, 1.2,				  2.2
