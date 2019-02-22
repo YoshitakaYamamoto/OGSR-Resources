@@ -51,7 +51,7 @@ ph_box1_size 		 = 0.50, 0.4,  0.50
 ph_crash_speed_min			= 100
 ph_crash_speed_max			= 300
 ph_collision_damage_factor	= 0.1
-ph_mass 		     = 78					; also it's the food
+ph_mass 		     = 75					; also it's the food
 
 destroyed_vis_name	 = physics\dead_body\skelet_crash_monster
 
@@ -86,7 +86,7 @@ Accel_Aggressive		= 20.0
 ;--------------------------------------------------------------------------
 ; Attack parameters
 ;--------------------------------------------------------------------------
-MinAttackDist		= 0.8
+MinAttackDist		= 1.6
 MaxAttackDist		= 2.0
 
 as_min_dist				= 1.0
@@ -208,14 +208,15 @@ Morale_Despondent_Threashold	= 0.5
 ; Jump Parameters
 ;----------------------------------------------------------------------------
 jump_delay					= 3000 ;3000
-jump_factor					= 2.5
-jump_ground_trace_range		= 1.0
+jump_factor					= 2.0
+jump_ground_trace_range		= 1.5
 jump_hit_trace_range		= 2.0
-jump_build_line_distance	= 1.0
-jump_min_distance			= 3.0
-jump_max_distance			= 8.0
-jump_max_angle				= 0.5
-jump_max_height				= 3.5
+jump_build_line_distance	= 7.0
+jump_min_distance			= 1.0
+jump_max_distance			= 7.0
+jump_max_angle				= 0.55
+jump_max_height				= 5.5
+jump_auto_aim_factor		= 0.5
 
 ;-------------------------------------------------------------------------
 ; Other Stuff (refactoring needed)
