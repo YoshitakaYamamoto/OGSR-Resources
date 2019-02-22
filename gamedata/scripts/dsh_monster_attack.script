@@ -4,7 +4,6 @@
 function attach( sm )
   sm:subscribe({ signal = "on_monster_spawn",  fun = this.on_monster_spawn })
   sm:subscribe({ signal = "on_monster_death",  fun = this.on_death })
-  --sm:subscribe({ signal = "on_monster_before_hit", fun = this.on_monster_before_hit })
 end
 
 function on_monster_spawn( obj, binder )
@@ -22,13 +21,7 @@ function on_monster_spawn( obj, binder )
     end
 
     if obj:clsid() == clsid.burer_s then
-	  table.insert( subscribed, {
-        [ "signal" ] = s_name,
-        [ "fun"    ] = this.burer_attack,
-        [ "queued" ] = true,
-        [ "__unsubscribe_on_death" ] = true,
-      })
-	  if obj:section() == "burer_strong" then
+	  if obj:section() == "burer_strong" then --KRodin: TODO: заменить на движковую ауру
         table.insert( subscribed, {
           [ "signal" ] = s_name,
           [ "fun"    ] = this.psy_burer_attack,
@@ -37,11 +30,7 @@ function on_monster_spawn( obj, binder )
         })
       end
     elseif obj:clsid() == clsid.chimera_s then
-      if
-	    string.find(obj:section(), "electro_chimera")
-	    or string.find(obj:section(), "chimera_strong")
-	    or string.find(obj:section(), "chimera_v_strong")
-	  then
+      if get_string(obj:section(), "bones_particles") then
         table.insert( subscribed, {
           [ "signal" ] = s_name,
           [ "fun"    ] = this.electro_himera_attack,
@@ -145,59 +134,6 @@ end
 local master_koef = 1 / ( 4 - level.get_game_difficulty() )
 
 
---[=[ --Аномальный щит бюрера. Теперь выключен, т.к. реализован в движке.
-function on_monster_before_hit(obj, hit_data, binder )
-  if obj:clsid() ~= clsid.burer_s then return end
-  --
-  if hit_data.hit_type == hit.fire_wound then --Учитываем только хиты от стрелкового оружия
-	local obj_dir = obj:direction()
-	if obj_dir:dotproduct(hit_data.dir) < -0.6 and math.random() > 0.15 then
-		local particle_start = particles_object("anomaly2\\burer_shield_01")
-		local pos = obj:bone_position("bip01_head")
-		pos:add(obj_dir:mul(1.0))
-		particle_start:play_at_pos(pos)
-
-		hit_data.ignore_hit = true --Игнорируем хит
-	end
-  end
-end
---]=]
-
---Атака бюрера
-function burer_attack( obj )
-  if not may_attack() then return end
-  local enemy = obj:best_enemy()
-  if
-    not (
-      enemy and enemy:is_actor() and obj:see( enemy )
-    )
-  then
-    return
-  end
-  local dist = obj:position():distance_to( enemy:position() )
-  local attack_dist = 25
-  ogse_signals.get_mgr():reschedule( ( dist < attack_dist and 100 ) or ( dist < obj:range() and 1000 ) or 5000 )
-  if dist > attack_dist then return end
-  local v1 = obj:direction()
-  local v2 = enemy:direction()
-  if v1:dotproduct(v2) < -0.6 then
-    local diff = level.get_game_difficulty()
-    if math.random() < diff / 10 then
-      enemy.power = -1.0
-    end
-	local active_item = enemy:active_item()
-	if
-	  active_item
-	  and math.random() < (diff / 20)
-	  and active_item:section() ~= "bolt"
-	  and not active_item:is_knife()
-	then
-	  enemy:drop_item(active_item)
-	end
-    ogse_signals.get_mgr():reschedule( 6000 * ( 1 + math.random( -0.2, 0.2 ) ) )
-  end
-end
-
 --Атака ПСИ-Бюрера
 local psy_burer_sound = {
 	{ ["sound_name"] = sound_object([[ambient\random\rnd_moan2]]), ["direction"] = 1,  ["volume"] = 0.5 },
@@ -233,28 +169,29 @@ end
 local chimera_particle = particles_object("anomaly2\\electra2_blast_00")
 local chimera_sound = sound_object([[anomaly\bfuzz_blowout]])
 function electro_himera_attack( obj )
-  if not may_attack() then return end
+	if not may_attack() then return end
 	local posit = obj:position()
 	local enemy = obj:best_enemy()
 
-	if enemy and posit:distance_to(enemy:position()) < 3 and obj:see(enemy) then
-		if not chimera_particle:playing() then chimera_particle:play_at_pos(posit) end
-		if chimera_sound and not chimera_sound:playing() then
+	if enemy and posit:distance_to(enemy:position()) < ( enemy:is_actor() and 18 or 5 ) and obj:see(enemy) then
+		if not chimera_sound:playing() and not chimera_particle:playing()then
+			chimera_particle:play_at_pos(posit)
 			chimera_sound:play_at_pos(obj, posit, 0)
+
 			local zh = hit()
 			zh.draftsman = obj
 			zh.type = hit.shock
 			zh.direction = posit:sub(enemy:position())
 			zh:bone("pelvis")
-			zh.power = 0.2
-			zh.impulse = 0.1
+			zh.power = 0.5
+			zh.impulse = 0.4
 			enemy:hit(zh)
 		end
 	end
 end
 
 
-function start_fire()
+local function start_fire()
   local wpn = db.actor:active_item()
   if not ( wpn and wpn:is_weapon_magazined() ) then return end
   local slots = {
@@ -305,7 +242,7 @@ function controller_attack( obj )
   end
 end
 
---Контроллёр запускает фантомов, зомбирует сталкеров и выбивает из рук оружие
+--Контроллёр запускает фантомов и зомбирует сталкеров
 local hard_phantom_types = {"phantom_snork_4", "phantom_chimera_2", "phantom_krovosos_2"}
 function controller_psy_attack( obj )
 	local npc = obj:get_enemy()
@@ -343,18 +280,12 @@ function controller_psy_attack( obj )
 						snd_obj:play_at_pos(npc, vector():set(0,0,0), 0, sound_object.s2d)
 					end
 				end
-
-				--KRodin: убрал, т.к. это лишнее.
-				--local active_item = npc:active_item()
-				--if active_item and active_item:section() ~= "bolt" and not active_item:is_knife() and math.random(100) / 100 > npc.psy_health then
-				--	npc:drop_item(active_item)
-				--end
 			end
 		end
 	end
 end
 
---Эффекты суперконтроллёра
+--Эффекты квестового суперконтроллёра
 function super_controller_attack(obj)
   if not may_attack() then return end
 	local posit = obj:position()
@@ -387,7 +318,7 @@ function dog_attack( obj )
   h.draftsman = obj
   h.direction = obj:direction()
   enemy:hit( h )
-  local drop       = (
+  local drop = (
     0.05 + ( 0.03 * level.get_game_difficulty() )
   ) * 1
   local active_item = enemy:active_item()
