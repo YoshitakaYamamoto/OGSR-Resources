@@ -1,8 +1,5 @@
--- -*- mode: lua; coding: windows-1251-dos -*-
---
--- Схема лагерь. Чудак(и) у костра.
--- автор: Диденко Руслан (Stohe)
--- TODO:
+-- Оригинальный скрипт: https://github.com/dsh2dsh/op2ogse/blob/master/gamedata/scripts/xr_kamp.script
+
 
 function attach( sm )
   sm:subscribe({ signal = "on_monster_death", fun = this.on_death })
@@ -42,10 +39,9 @@ function load_stories()
 end
 
 
-kamps           = {}
-kamp_stalkers   = {}    -- могут ли сталкеры в лагере юзаться игроком.
--- Объявления итераторов
-deadmansids     = {}          -- кто какой труп оттаскивает
+local kamps           = {}
+local kamp_stalkers   = {} -- могут ли сталкеры в лагере юзаться игроком.
+local deadmansids     = {} -- кто какой труп оттаскивает
 
 
 function get_kamp_level_vertex_id( path )
@@ -57,6 +53,16 @@ function get_kamp_level_vertex_id( path )
       path = center_point
     else
       vertex = get_u32( sect, "level_vertex_id" )
+      if vertex then
+        local cond = get_string( sect, "lv_switch_cond" )
+        if cond then
+          cond = xr_logic.parse_condlist( nil, sect, nil, cond )
+          if not xr_logic.pick_section_from_condlist(db.actor, db.actor, cond) then
+            --log3("--Condlist not picked for switch lv for path [%s]", path)
+            vertex = nil
+          end
+        end
+      end
     end
   end
   if not vertex then
@@ -123,7 +129,7 @@ end
 
 
 function near_anomaly( anomalies, pos )
-  for _, anom in ipairs( anomalies ) do
+  for _, anom in pairs( anomalies ) do
     local dist = pos:distance_to( anom.pos ) - anom.radius
     if dist < 5 then
       return true
@@ -147,8 +153,8 @@ function CKampManager:__init( name, level_vertex_id, scheme, min_radius, src_kam
   self.kamp_state  = "idle"
   self.avail_state = xr_kamp_data.avail_state
   self.avail_sound = xr_kamp_data.avail_sound
-  self.timeout     = table.clone( xr_kamp_data.timeout )
-  self.kamp_states = table.clone( xr_kamp_data.kamp_states )
+  self.timeout     = table.copy( xr_kamp_data.timeout )
+  self.kamp_states = table.copy( xr_kamp_data.kamp_states )
   self.trans_kamp  = xr_kamp_data.trans_kamp
   self.drop_dist_min = 10
   self.drop_dist_mid = 15
@@ -187,9 +193,9 @@ function CKampManager:find_campfire()
   )
   if self.campfire then
     self.center_point = self.campfire.object:position()
-    local vert_ok = level.vertex_id_by_pos( self.campfire.object:position() )
+    local vert_ok = level.vertex_id( self.campfire.object:position() )
     if not level.valid_vertex_id( vert_ok ) then
-      vert_ok = level.vertex_id_by_pos(
+      vert_ok = level.vertex_id(
         self.campfire.object:level_vertex_id(),
         self.campfire.object:position()
       )
@@ -207,7 +213,7 @@ function CKampManager:get_pos( dist, allow_sector, min_dist )
   local pi2          = math.pi * 2
 
   local center       = level.vertex_position( self.center )
-  local anomalies    = amk_anoms.get_anomaly_list_for_pos( center, dist )
+  local anomalies    = ogse_anomaly.get_all_nearest_anomalies_by_point_in_radius( center, dist )
   local dir          = vector():set( 1, 0, 0 ):normalize()
 
   -- итератор вращения направления
@@ -234,7 +240,7 @@ function CKampManager:get_pos( dist, allow_sector, min_dist )
     if min_dist then
       local d = dist
       while d > min_dist do
-        local lvid = level.vertex_id_by_pos( vector():mad( center, dir, d ) )
+        local lvid = level.vertex_id( vector():mad( center, dir, d ) )
         if level.is_accessible_vertex_id( lvid ) then
           if seen[ lvid ] ~= nil then
             break
@@ -252,7 +258,7 @@ function CKampManager:get_pos( dist, allow_sector, min_dist )
       local stop_dist  = math.min( self.min_radius, dist )
       local start_lvid
       while start_dist < stop_dist do
-        start_lvid = level.vertex_id_by_pos(
+        start_lvid = level.vertex_id(
           vector():mad( self.center_point, dir, start_dist )
         )
         if level.valid_vertex_id( start_lvid ) then
@@ -630,14 +636,14 @@ function CKampManager:checkNpcAbility( npc )
   local has_listeners = self.population_comed > 1
   if self.npc[ npc_id ].can_eat then
     -- есть колбасу
-    if npc:object( "kolbasa" ) and math.random( 100 ) > 20 then
+    if npc:object( "kolbasa_a" ) and math.random( 100 ) > 20 then
       -- вероятность 80%
       states[ "eat_kolbasa" ] = true
     else
       states[ "eat_kolbasa" ] = false
     end
     -- пить водку
-    if npc:object( "vodka" ) and math.random( 100 ) > 60 then
+    if npc:object( "vodka_a" ) and math.random( 100 ) > 60 then
       -- вероятность 40%
       states[ "eat_vodka" ] = true
     else
@@ -651,7 +657,7 @@ function CKampManager:checkNpcAbility( npc )
       states[ "eat_energy" ] = false
     end
     -- есть хлеб
-    if npc:object( "bread" ) and math.random( 100 ) > 20 then
+    if npc:object( "bread_a" ) and math.random( 100 ) > 20 then
       -- вероятность 80%
       states[ "eat_bread" ] = true
     else
@@ -664,6 +670,7 @@ function CKampManager:checkNpcAbility( npc )
     else
       states[ "kurit" ] = false
     end
+--[=[
     -- пить из фляжки
     if npc:object( "flaska" ) and math.random( 100 ) > 20 then
       -- вероятность 80%
@@ -692,6 +699,7 @@ function CKampManager:checkNpcAbility( npc )
     else
       states[ "eat_sandwich" ] = false
     end
+--]=]
     -- играть на гармошке
     if has_listeners and npc:object( "harmonica_a" ) then
       states[ "play_harmonica" ] = true
@@ -744,6 +752,7 @@ function CKampManager:checkNpcAbility( npc )
     self.kamp_states[ "guitar"      ] = false
     self.kamp_states[ "post_guitar" ] = false
   end
+--[=[
   -- играть на балалайке
   if has_listeners and npc:object( "balalaika_a" ) then
     states[ "play_balalaika" ] = true
@@ -758,7 +767,7 @@ function CKampManager:checkNpcAbility( npc )
     self.kamp_states[ "balalaika"      ] = false
     self.kamp_states[ "post_balalaika" ] = false
   end
-
+--]=]
   -- анекдоты
   self.kamp_states[ "pre_joke"   ] = has_listeners
   self.kamp_states[ "joke"       ] = has_listeners
@@ -1110,7 +1119,11 @@ function evaluator_kamp_end:__init( name, storage ) super( nil, name )
 end
 
 function evaluator_kamp_end:evaluate()
-  return not xr_logic.is_active( self.object, self.a )
+  if not xr_logic.is_active( self.object, self.a ) then
+    ogse_debug.add_active_eval( self.object, script_name(), "evaluator_kamp_end" )
+    return true
+  end
+  return false
 end
 
 
@@ -1145,9 +1158,10 @@ function evaluator_on_position:evaluate()
     if npc:path_completed() then
       self.a.go_position = nil
       self.a.on_position = { npc:level_vertex_id(), npc:position() }
+      ogse_debug.add_active_eval( npc, script_name(), "on_position2" )
       return true
     end
-    ogse_debug.add_active_eval( npc, script_name(), "go_position" )
+    --ogse_debug.add_active_eval( npc, script_name(), "go_position" ) --???
   end
   return false
 end
@@ -1226,7 +1240,10 @@ function evaluator_see_deadman:evaluate()
     dsh.shuffle( creature )
     for _, id in ipairs( creature ) do
       local res = self:check_item( level.object_by_id( id ), point0 )
-      if res then return true end
+      if res then
+        ogse_debug.add_active_eval( self.object, script_name(), "see_deadman2" )
+        return true
+      end
       if res == false then clean = false end
     end
     if clean then
@@ -1323,14 +1340,19 @@ function evaluator_can_move_deadman:evaluate()
   local obj = level.object_by_id( self.a.choosed_deadman )
   if not obj then return false end
   local npc = self.object
-  if not npc:ph_capture() then return true end
+  if not npc:ph_capture() then
+    ogse_debug.add_active_eval( self.object, script_name(), "can_move_deadman" )
+    return true
+  end
   if npc:ph_capture().e_state == ph_capture.pulling then
+    ogse_debug.add_active_eval( self.object, script_name(), "can_move_deadman2" )
     return true
   end
   -- если труп застрял (расстояние увеличилось), то возвращаемся к нему
   local dist = obj:position():distance_to( npc:position() )
     - obj:radius() - npc:radius()
   if dist < 1 then
+    ogse_debug.add_active_eval( self.object, script_name(), "can_move_deadman3" )
     return true
   end
   self.a.reached = nil
@@ -1514,9 +1536,9 @@ function action_go_to_deadman:initialize()
   local diff = level.vertex_position( self.a.drop_lvid ):sub( gi:position() )
   diff:normalize()
   local pos  = vector():mad( gi:position(), diff, gi:radius() )
-  local lvid = level.vertex_id_by_pos( pos )
+  local lvid = level.vertex_id( pos )
   if not level.valid_vertex_id( lvid ) then
-    lvid = level.vertex_id_by_pos( gi:level_vertex_id(), pos )
+    lvid = level.vertex_id( gi:level_vertex_id(), pos )
   end
   if not level.valid_vertex_id( lvid ) then
     lvid = gi:level_vertex_id()
@@ -1712,7 +1734,7 @@ function action_moving_deadman:execute()
     )
   end
   if not npc:ph_capture() then
-    npc:ph_capture_object( gi, "bip01_l_hand" )
+    npc:ph_capture_object( gi, "bip01_l_hand" ) --второй аргумент - кость того, кто хватает. У сталкеров такая кость у всех должна быть, поэтому не меняю.
     local cap  = self.object:ph_capture()
     local dist = npc:position():distance_to( gi:position() )
     if dist > cap.pull_distance then

@@ -1,11 +1,21 @@
 
 local DIST_TO_FLAME = 1
-local DIST_TO_NPC = 25 --5^2
 local DIST_TO_ACTOR = 4 --2^2
+local ACTOR_STAND_TIME = 3000
+
 
 function attach(sm)
 	sm:subscribe({signal = "on_update", fun = this.on_actor_update, queued = true})
 end
+
+function bind_flame(obj)
+	obj:bind_object(flame_binder(obj))
+end
+
+function bind_light(obj)
+	obj:bind_object(campfire_binder(obj))
+end
+
 
 local start_stand_time  = time_global()
 local prev_actor_pos
@@ -22,16 +32,27 @@ function stand_time()
 	return time_global() - start_stand_time
 end
 
-function bind_flame(obj)
-	obj:bind_object(flame_binder(obj))
-end
 
-function bind_light(obj)
-	obj:bind_object(campfire_binder(obj))
-end
+local flames, sheduled_flames, lights = {}, {}, {}
 
-local flames = {}
-local sheduled_flames = {}
+function get_nearest_campfire( pos, radius )
+  local found = {}
+  for _, campfire in pairs( lights ) do
+    local pos2 = campfire.object:position()
+    if pos2:distance_to( pos ) < radius then
+      table.insert( found, campfire )
+    end
+  end
+  table.sort(
+    found,
+    function( a, b )
+      return pos:distance_to( a.object:position() ) < pos:distance_to( b.object:position() )
+    end
+  )
+  if table.getn( found ) > 0 then
+    return found[ 1 ]
+  end
+end
 
 function switch_light(light, ena)
 	local lamp = light:get_hanging_lamp()
@@ -62,10 +83,9 @@ function check_shedule(flame)
 end
 
 function switch_flame_near_light(light, ena)
-	for id, pos in pairs(flames) do
-		if pos:distance_to_sqr(light:position()) < DIST_TO_FLAME then
-			local flame = level.object_by_id(id)
-			switch_flame(flame, ena)
+	for _, campfire in pairs(flames) do
+		if campfire.object:position():distance_to_sqr(light:position()) < DIST_TO_FLAME then
+			switch_flame(campfire.object, ena)
 			return
 		end
 	end
@@ -80,10 +100,9 @@ function switch_flame_near_light(light, ena)
 end
 
 function play_particle_near_light(light, particle)
-	for id, pos in pairs(flames) do
-		if pos:distance_to_sqr(light:position()) < DIST_TO_FLAME then
-			local flame = level.object_by_id(id)
-			particle:play_at_pos(flame:position())
+	for _, campfire in pairs(flames) do
+		if campfire.object:position():distance_to_sqr(light:position()) < DIST_TO_FLAME then
+			particle:play_at_pos(campfire.object:position())
 			return
 		end
 	end
@@ -92,13 +111,13 @@ function play_particle_near_light(light, particle)
 	particle:play_at_pos(pos)	
 end
 
+
 --[[
   типа конечный автомат:
     next - переводит КА в следующее состояние
 	action - вызывается при переходе в данное состояние
 ]]
 states = {
-
 	-- костер полностью погашен: аномалия отключена, лампа погашена, партиклы не играют
 	turn_off = {
 		next = function(has_users, now, prev)
@@ -158,13 +177,13 @@ states = {
 	},
 }
 
-class "flame_binder" (object_binder)
 
+class "flame_binder" (object_binder)
 function flame_binder:__init(obj) super(obj)
 end
 
-function flame_binder:net_spawn(sobject)
-	flames[self.object:id()] = self.object:position()
+function flame_binder:net_spawn()
+	flames[self.object:id()] = self
 	check_shedule(self.object)
 	return true
 end
@@ -173,31 +192,24 @@ function flame_binder:net_destroy()
 	flames[self.object:id()] = nil
 end
 
-class "campfire_binder" (object_binder)
 
+class "campfire_binder" (object_binder)
 function campfire_binder:__init(obj) super(obj)
 	self.state = states.turn_off
+	self.has_users = false --Этим управляет xr_kamp
 end
 
-function campfire_binder:net_spawn(sobject)
+function campfire_binder:net_spawn()
+	lights[self.object:id()] = self
 	return true
 end
 
-function campfire_binder:check_npc(npc)
-	if not npc then return false end
-	if not npc:alive() then return false end
-	local dists = {[false] = DIST_TO_NPC, [true] = DIST_TO_ACTOR }
-	if self.object:position():distance_to_sqr(npc:position()) > dists[npc:id() == 0] then return false end
-	if npc:id() == 0 then
-		if stand_time() < 3000 then return false end
-	else
-		local camp_anims = { ["sit"] = true, ["sit_ass"] = true, ["sit_knee"] = true, }
-		if db.storage[npc:id()].state_mgr then
-			local anim = db.storage[npc:id()].state_mgr.animstate:state()
-			if not camp_anims[anim] then return false end
-		end	
-	end	
-	return true
+function campfire_binder:net_destroy()
+	lights[self.object:id()] = nil
+end
+
+function campfire_binder:check_actor()
+	return db.actor:alive() and self.object:position():distance_to_sqr(db.actor:position()) < DIST_TO_ACTOR and stand_time() > ACTOR_STAND_TIME
 end
 
 function campfire_binder:update(delta)
@@ -207,24 +219,14 @@ function campfire_binder:update(delta)
 		self.state.action(self)
 		self.time = time
 	elseif self.scan_time < time then
-		local users = 0
-		for npc_id, is_npc in pairs(db.creature) do
-			if is_npc then
-				local npc = level.object_by_id(npc_id)
---				ASSERT(npc, "npc ~= nil [id=%s name=%s]", npc_id, alife():object(npc_id) and alife():object(npc_id):name() or "<OBJECT NOT FOUND>")
-				if self:check_npc(npc) then
-					users = users + 1
-				end
-			end
-		end
-		local new_state = self.state.next(users ~= 0, time, self.time)
+		local new_state = self.state.next(self.has_users or self:check_actor(), time, self.time)
 		ASSERT(new_state ~= nil, "new_state ~= nil")
 		if new_state ~= self.state then
 			new_state.action(self)
 			self.state = new_state
 			self.time = time
 		end		
-		
+
 		self.scan_time = time + 5000
 	end
 end

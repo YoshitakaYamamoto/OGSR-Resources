@@ -269,6 +269,12 @@ function bad_situation(npc)
 	--end
 
 	--if xrs_battle_ai.actor_see(npc) and npc:relation(db.actor) == game_object.enemy and db.actor:alive() then return true end
+	
+	local obj = getGObject( db.storage[npc:id()].watcher_act, npc )
+	if obj and xr_kamp.deadman_assigned( obj:id() ) then
+		return true
+	end
+
 	return false   
 end
 

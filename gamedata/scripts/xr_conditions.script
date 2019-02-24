@@ -601,10 +601,7 @@ end
 -------------------------------------------------------------------------------------------------------
 -- Функции поддержки kamp
 function _kamp_talk(actor, npc)
-	if xr_kamp.kamp_stalkers[npc:id()] then
-		return xr_kamp.kamp_stalkers[npc:id()]
-	end
-	return false
+	return xr_kamp.can_talk( npc )
 end
 
 function _used(actor, npc)
