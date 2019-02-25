@@ -195,7 +195,7 @@ function action_launch_grenade:execute()
 		self.stage = 1
 	elseif self.stage == 1 then -- запуск
 		if check_victims(npc,self.target_point,get_shell_params(self.shell).radius,true) then
-			self.launch_pos = npc:bone_position("bip01_head")
+			self.launch_pos = npc:bone_position(get_string(npc:section(), "bone_head", "bip01_head"))
 			self.type = math.random(8)
 			launch2(npc,self.test_shell,self.target_point,self.launch_pos,get_shell_params(self.shell).radius,self.type,true)
 			gl_switch(npc)

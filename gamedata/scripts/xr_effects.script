@@ -2533,7 +2533,7 @@ function npc_up_impuls(actor, npc)
 	local h = hit()
 	h.power = 0
 	h.direction = vector_rotate_z(npc:direction(), 90)
-	h.bone = "bip01_head"
+	h.bone = get_string(npc:section(), "bone_head", "bip01_head")
 	h.draftsman = npc 
 	h.impulse = 300 
 	h.type = hit.wound
@@ -3084,14 +3084,14 @@ function suicide(actor, npc)
 	end
 	action(
 		npc,
---		particle("hit_fx\\hit_flesh_headshot","bip01_head",particle_params(vector():set(0,0,0.3),vector():set(0,0,0),vector():set(1,0,0)),false),
-		particle("hit_fx\\hit_flesh_headshot","bip01_head"),
+--		particle("hit_fx\\hit_flesh_headshot", get_string(npc:section(), "bone_head", "bip01_head"), particle_params(vector():set(0,0,0.3),vector():set(0,0,0),vector():set(1,0,0)),false),
+		particle("hit_fx\\hit_flesh_headshot", get_string(npc:section(), "bone_head", "bip01_head")),
 		cond	(cond.time_end, 100000000)
 	)
 	local h = hit()
 	h.power = 1000
 	h.direction = vector_rotate_y(npc:direction(), 90)
-	h.bone = "bip01_head"
+	h.bone = get_string(npc:section(), "bone_head", "bip01_head")
 	h.draftsman = npc 
 	h.impulse = 200 --350
 	h.type = hit.wound

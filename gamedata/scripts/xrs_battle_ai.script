@@ -1,7 +1,5 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
-local NO_ACTIVE_SLOT = 255
-
 local function random_choice( ... )
   local arg = { ... }
   return arg[ math.random( #arg ) ]
@@ -14,6 +12,7 @@ local function is_exo_visual( npc )
     or string.find( vis, "_redeye" )
     or string.find( vis, "stalker_arhara1" )
 end
+
 
 -----------------------------------------------------------------------
 --- xrs_battle_ai.script
@@ -972,6 +971,8 @@ end
 
 
 function action_altcombat:check_npc_on_fire_line( obj, weapon, be )
+  if obj:is_monster() then return false end
+
   local npc         = self.object
   local npc_pos     = npc:bone_position( "bip01_spine" )
   local be_pos      = be:bone_position( "bip01_spine" )
@@ -2663,7 +2664,7 @@ function set_weapons_fire( npc, enemy, weapon, override_vis, npc_rank )
           be_pos = enemy:bone_position( "korpus1" )
         end
       else
-        be_pos = enemy:bone_position( "bip01_head" )
+        be_pos = enemy:bone_position( get_string(enemy:section(), "bone_head", "bip01_head") )
       end
     end
     local distance = npc_pos:distance_to( be_pos )
@@ -2921,29 +2922,12 @@ function set_combat_sight( npc, enemy, weapon )
   then
     bone = st.bone
   else
-    if IsStalker( enemy ) then
-      if distance < 10 then
-        use_deviation = true
-        if enemy:body_state() == move.crouch then
-          bone = "bip01_pelvis"
-        else
-          bone = "bip01_spine"
-        end
-      else
-        if IsSniperRifle( weapon ) then
-          local bones   = { "bip01_head", "eyelid_1" }
-          bone          = bones[ math.random( table.getn( bones ) ) ]
-          use_deviation = false
-        else
-          local rank = get_obj_rank_name( npc )
-          if math.random() < headshot_prob[ rank ] then
-            local bones = { "bip01_head", "bip01_neck" }
-            bone = bones[ math.random( table.getn( bones ) ) ]
-          else
-            bone = "bip01_spine2"
-          end
-          use_deviation = true
-        end
+    if enemy:is_actor() or enemy:is_stalker() then
+      use_deviation = not IsSniperRifle( weapon )
+      local rank = get_obj_rank_name( npc )
+      if math.random() < headshot_prob[ rank ] then
+        local bones = { "bip01_head", "bip01_neck" }
+        bone = bones[ math.random( table.getn( bones ) ) ]
       end
     elseif is_armor( enemy ) then
       use_deviation = true
@@ -2954,20 +2938,22 @@ function set_combat_sight( npc, enemy, weapon )
       end
     else
       use_deviation = false
+--[=[ --Для монстров кости не используем
       if distance < 10 then
         bone = "bip01_spine"
       else
         if IsSniperRifle( weapon ) then
-          bone = "bip01_head"
+          bone = get_string(enemy:section(), "bone_head", "bip01_head")
         elseif enemy:section() == "spider" then
           -- у пауков нет кости bip01_neck
-          local bones = { "bip01_head", "bip01_spine" }
+          local bones = { get_string(enemy:section(), "bone_head", "bip01_head"), "bip01_spine" }
           bone = bones[ math.random( table.getn( bones ) ) ]
         else
-          local bones = { "bip01_head", "bip01_neck", "bip01_spine" }
+          local bones = { get_string(enemy:section(), "bone_head", "bip01_head"), "bip01_neck", "bip01_spine" }
           bone = bones[ math.random( table.getn( bones ) ) ]
         end
       end
+--]=]
     end
     st.bone      = bone
     st.enemy_id  = enemy:id()
@@ -2976,31 +2962,17 @@ function set_combat_sight( npc, enemy, weapon )
   end
   st.use_deviation = use_deviation
 
-  local bone_id = enemy:get_bone_id( bone )
-  ASSERT(
-    bone_id ~= 65535,
-    "[%s]: %s: unknown bone %s", script_name(), enemy:name(), bone
-  )
-  local look_pos = enemy:bone_position( bone )
+  local look_pos
+  if bone then
+    look_pos = enemy:bone_position( bone )
+  end
 
-  if
-    ( npc:see( enemy ) and enemy:alive() )
-    or ( is_armor( enemy ) and armor_alive( enemy ) )
-    or knife_scheme[ npc:id() ]
-  then
-    st.look_pos = look_pos
-    npc:set_desired_direction()
-    if weapon then
-      npc:set_sight( look.fire_point, look_pos )
-    end
-  elseif not npc:see( enemy ) then
-    local last_seen_pos = npc:memory_position( enemy )
-    st.look_pos = last_seen_pos
-    if last_seen_pos then
-      if weapon then
-        npc:set_sight( look.fire_point, last_seen_pos )
-      end
-    end
+  st.look_pos = look_pos
+  npc:set_desired_direction()
+  if look_pos then
+    npc:set_sight( look.fire_point, look_pos )
+  else
+    npc:set_sight( enemy, true, true )
   end
 end
 
@@ -3128,8 +3100,8 @@ end
 
 function enemy_covered_value( npc, enemy )
   if not is_armor( enemy ) then
-    local enemy_pos    = enemy:bone_position( "bip01_spine" )
-    local npc_pos      = npc:bone_position( "bip01_spine" )
+    local enemy_pos    = enemy:bone_position( get_string(enemy:section(), "bone_head", "bip01_head") )
+    local npc_pos      = npc:bone_position( get_string(npc:section(), "bone_head", "bip01_head") )
     local enemy_vertex = enemy:level_vertex_id()
     local cover_enemy_value = level.cover_in_direction(
       enemy_vertex, npc_pos:sub( enemy:position() )
@@ -3645,7 +3617,7 @@ function correct_position( gi, npc )
   if IsStalker( gi ) or IsMonster( gi ) then
     -- Вычисляем вектор разницы между координатами кости и level
     -- vertex. Пытаемся найти level vertex наиболее близкий к кости
-    local diff  = gi:bone_position( "bip01_head" )
+    local diff  = gi:bone_position( get_string(gi:section(), "bone_head", "bip01_head") )
       :sub( level.vertex_position( gi:level_vertex_id() ) )
     local len   = diff:magnitude()
     local diffp = vector():set( diff.z, 0, -diff.x ):mul( 0.5 )

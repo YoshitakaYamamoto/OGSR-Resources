@@ -26,10 +26,10 @@ local function look_to_shot(object, who)
 				local enemy_dist = object:position():distance_to_sqr(be:position())
 				local who_dist = object:position():distance_to_sqr(who:position())
 				if who_dist < enemy_dist then
-					object:set_sight(look.danger,who:bone_position("bip01_head"))
+					object:set_sight(look.danger,who:bone_position(get_string(who:section(), "bone_head", "bip01_head")))
 				end		
 			else	
-				object:set_sight(look.danger,who:bone_position("bip01_head"))
+				object:set_sight(look.danger,who:bone_position(get_string(who:section(), "bone_head", "bip01_head")))
 			end
 		end
 	end

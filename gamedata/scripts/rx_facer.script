@@ -99,6 +99,9 @@ function evaluator_facer:evaluate()
 	local be = alt_be or npc:best_enemy()
 	if not target then
 		self.st.target = nil
+	elseif target:is_monster() then
+		self.st.target = nil
+		target = nil
 	end
 	if target and (not target:alive() and npc:animation_count() == 0) then
 		self.st.target = nil
@@ -199,7 +202,7 @@ function action_facer:execute()
 		if IsStalker(nil, cls) then
 			if ysub > 1.5 then
 			elseif ysub > -0.3 then
-				bone = "bip01_head"
+				bone = get_string(target:section(), "bone_head", "bip01_head")
 			elseif ysub > -0.5 then
 				bone = "bip01_spine2"
 			elseif ysub > -0.8 then
@@ -215,7 +218,7 @@ function action_facer:execute()
 			if math.random() > 0.4 then
 				bone = "bip01_spine"
 			else
-				bone = "bip01_head"
+				bone = get_string(target:section(), "bone_head", "bip01_head")
 			end
 		end
 		local weapon = npc:active_item()

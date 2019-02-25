@@ -102,23 +102,6 @@ function switch_firing(car, fire)
 	end
 end
 
-function get_aiming_point_for_target(targ)
-	if targ:is_actor() then
-		return device().cam_pos
-	elseif targ:is_stalker() then
-		return targ:bone_position("bip01_pelvis")
-	elseif targ:is_monster() then
-		return targ:bone_position("bip01_spine")
-	else
-		local bone_name = clsid2target_bone[targ:clsid()]
-		if bone_name then
-			return targ:bone_position(bone_name)
-		else
-			return targ:position()
-		end
-	end
-end
-
 -- обновление направления пушки
 function update_car_gun_direction(car)
 	local script_car = car:get_car()
@@ -135,7 +118,7 @@ function update_car_gun_direction(car)
 		script_car:SetParam(CCar.eWpnToDefaultDir, vector())
 		return
 	end
-	position = get_aiming_point_for_target(targ)
+	position = ogse_car_control.get_aiming_point_for_target(targ)
 	if position then
 		--log3("~~[update_car_gun_direction] car [%s] has target [%s]", car:name(), targ:name())
 		script_car:SetParam(CCar.eWpnDesiredPos, position)
@@ -443,6 +426,8 @@ function horz_angle(vec1,vec2)
 end
 
 function check_npc_on_fire_line(car, obj)
+	if obj:is_monster() then return false end
+
 	local gun_pos = car:bone_position("mashine_gun_fire_point")
 	if primary_target then
 		local be = level.object_by_id(primary_target)

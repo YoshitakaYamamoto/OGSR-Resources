@@ -646,7 +646,7 @@ function set_weapons_fire(npc, enemy, weapon)
 					be_pos = enemy:bone_position("korpus1")
 				end			
 			else
-				be_pos = enemy:bone_position("bip01_head")
+				be_pos = enemy:bone_position(get_string(enemy:section(), "bone_head", "bip01_head"))
 			end	
 
 			local dir_enemy = utils.vector_copy_by_val(be_pos):sub(npc_pos)
@@ -768,7 +768,7 @@ end
 
 function set_combat_sight(npc, enemy, weapon)
 	
-	local look_pos = nil
+	local bone
 	local enemy_pos = enemy:position()
 	local npc_pos = npc:position()
 	local direction = npc_pos:sub(enemy_pos)
@@ -778,55 +778,60 @@ function set_combat_sight(npc, enemy, weapon)
 	if ( enemy:is_stalker() or enemy:is_actor() ) then
 		if xrs_battle_ai.IsShotgun(weapon) then
 			if enemy_pos.y < (npc_pos.y - 1) then
-				look_pos = enemy:bone_position("bip01_head")
+				bone = get_string(enemy:section(), "bone_head", "bip01_head")
 			else
-				look_pos = enemy:bone_position("bip01_neck")
+				bone = "bip01_neck"
 			end
 		elseif xrs_battle_ai.IsSniperRifle(weapon) then
-			look_pos = enemy:bone_position("eyelid_1")
+			bone = "eyelid_1"
 		elseif not IsHighRecoilRapidFire(weapon) then
 			if distance < 25 then
 				if bodystate == move.crouch then
-					look_pos = enemy:bone_position("bip01_pelvis")
+					bone = "bip01_pelvis"
 				else
 					if enemy_pos.y < (npc_pos.y - 1) then
-						look_pos = enemy:bone_position("bip01_head")
+						bone = get_string(enemy:section(), "bone_head", "bip01_head")
 					else
-						look_pos = enemy:bone_position("bip01_neck")
+						bone = "bip01_neck"
 					end
 				end
 			elseif distance >= 25 and distance < 50 then
 				if bodystate == move.crouch then
-					look_pos = enemy:bone_position("bip01_pelvis")
+					bone = "bip01_pelvis"
 				else
-					look_pos = enemy:bone_position("bip01_head")
+					bone = get_string(enemy:section(), "bone_head", "bip01_head")
 				end
 			else	
-				look_pos = enemy:bone_position("bip01_spine")
+				bone = "bip01_spine"
 			end
 		else	
-			look_pos = enemy:bone_position("bip01_pelvis")
+			bone = "bip01_pelvis"
 		end
 	else	
 		if xrs_battle_ai.IsSniperRifle(weapon) then
 			if enemy_pos.y < (npc_pos.y - 1) then
-				look_pos = enemy:bone_position("bip01_head")
+				bone = get_string(enemy:section(), "bone_head", "bip01_head")
 			else
-				look_pos = enemy:bone_position("bip01_neck")
+				--bone = "bip01_neck"
 			end
-		elseif not IsHighRecoilRapidFire(weapon) then
-			look_pos = enemy:bone_position("bip01_spine")
-		else	
-			look_pos = enemy:bone_position("bip01_pelvis")
+		--elseif not IsHighRecoilRapidFire(weapon) then
+		--	bone = "bip01_spine"
+		--else
+		--	bone = "bip01_pelvis"
 		end
 	end
-	
-	if npc:see(enemy) and enemy:alive() then
-		npc:set_desired_direction()
-		if weapon then
-			npc:set_sight(look.fire_point,look_pos)
-		end
-	end
+
+  local look_pos
+  if bone then
+    look_pos = enemy:bone_position( bone )
+  end
+
+  npc:set_desired_direction()
+  if look_pos then
+    npc:set_sight( look.fire_point, look_pos )
+  else
+    npc:set_sight( enemy, true, true )
+  end
 end
 ----------------------------------------------------------------------------------------------------
 -- Служебные функции для маневрирования

@@ -60,10 +60,9 @@ function mob_remark:reset_scheme()
 				cnd = cond(cond.time_end, tm)
 			end
 			if self.st.anim_head then
-				action(self.object, anim(an), sound(snd, "bip01_head",
-					MonsterSpace[self.st.anim_head]), cnd)
+				action(self.object, anim(an), sound(snd, get_string(self.object:section(), "bone_head", "bip01_head"), MonsterSpace[self.st.anim_head]), cnd)
 			else
-				action(self.object, anim(an), sound(snd, "bip01_head"), cnd)
+				action(self.object, anim(an), sound(snd, get_string(self.object:section(), "bone_head", "bip01_head")), cnd)
 			end
 		elseif an then
 			if tm == 0 then

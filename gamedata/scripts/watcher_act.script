@@ -547,7 +547,7 @@ function correct_position(gi,npc)
 		if npc:accessible(real_vtx) then
 			return real_vtx
 		else
-			local diff = gi:bone_position("bip01_spine"):sub(gi)
+			local diff = gi:bone_position(get_string(gi:section(), "bone_torso", "bip01_spine")):sub(gi)
 			local lengt = diff:magnitude()*2.5
 			local test_lvid = npc:vertex_in_direction(gi,diff,lengt)
 			if not npc:accessible(test_lvid) then

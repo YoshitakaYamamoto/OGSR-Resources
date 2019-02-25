@@ -65,7 +65,6 @@ local grenade_times = {}
 local test_grenades={}
 
 local grenade_max_dist = 50
-local grenade_bone = "bip01_head"
 
 local snd_grenade_replics={
 	stalker = {
@@ -187,7 +186,7 @@ function evaluator_love_napalm_smell:evaluate()
 			return false
 		end
 			if not self.a.test_begun then
-				self.a.grenades_from_pos = npc:bone_position(grenade_bone)
+				self.a.grenades_from_pos = npc:bone_position(get_string(npc:section(), "bone_head", "bip01_head"))
 				--
 				local hi = get_grenade( self.a.test_grenades.hi )
 				if hi then
@@ -814,7 +813,7 @@ function death_callback(npc)
 		local g_obj = get_grenade(grenade)
 		if g_obj then
 			local dummy,timeout = get_grenade_radius(g_obj:section())
-			grenade = alife():create(g_obj:section(), npc:bone_position(grenade_bone), npc:level_vertex_id(), npc:game_vertex_id())
+			grenade = alife():create(g_obj:section(), npc:bone_position(get_string(npc:section(), "bone_head", "bip01_head")), npc:level_vertex_id(), npc:game_vertex_id())
 			grenades[grenade.id] = { ["time"] = time_global() + timeout, ["killer_id"] = npc:id() }
 			run_grenade_timer()
 		end

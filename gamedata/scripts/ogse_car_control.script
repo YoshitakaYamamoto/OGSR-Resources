@@ -1351,10 +1351,12 @@ local clsid2target_bone = {
 	[clsid.car]           = "root",
 }
 function get_aiming_point_for_target(targ)
-	if targ:is_stalker() then
+	if targ:is_actor() then
+		return device().cam_pos
+	elseif targ:is_stalker() then
 		return targ:bone_position("bip01_pelvis")
 	elseif targ:is_monster() then
-		return targ:bone_position("bip01_spine")
+		return targ:position() --targ:bone_position("bip01_spine") --KRodin: у многих новых монстров совершенно другие кости, нежели у обычных в ТЧ. Поэтому лучше их не использовать.
 	else
 		local bone_name = clsid2target_bone[targ:clsid()]
 		if bone_name then

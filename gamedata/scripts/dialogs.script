@@ -1125,7 +1125,7 @@ function companion_suicide(actor, npc)
 	h.power = 1000
 	--h.direction = vector_rotate_y(npc:direction(), 90)
 	h.direction = npc:direction()
-	h.bone = "bip01_head"
+	h.bone = get_string(npc:section(), "bone_head", "bip01_head")
 	h.draftsman = npc 
 	h.impulse = 10
 	h.type = hit.wound
