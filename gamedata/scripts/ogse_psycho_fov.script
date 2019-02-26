@@ -1,6 +1,13 @@
 -- -*- mode: lua; coding: windows-1251-dos -*-
 
 --- психованный фов
+local fov_vol
+local max_alarm_fov_vol = 90
+local min_alarm_fov_vol = 30
+
+local sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
+local sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
+
 
 function attach(sm)
 	sm:subscribe({signal = "on_first_update", fun = this.on_first_update})
@@ -21,6 +28,7 @@ function subscribe()
 		sm:subscribe( subscribed )
 		--log3("--[%s] subscribed!", script_name())
 		level.add_cam_effector("camera_effects\\drunk.anm", 7447, true, "")
+		fov_vol = ogse.load_var("OGSR_ACTOR_FOV", get_console():get_float("fov"))
 	end
 end
 
@@ -43,13 +51,10 @@ function fov_end()
 	db.actor:give_info_portion("fov_play_end")
 end
 
+function is_psycho_fov_active()
+	return subscribed ~= nil
+end
 
-local fov_vol = get_console():get_float("fov")
-local max_alarm_fov_vol = 90
-local min_alarm_fov_vol = 30
-
-local sound_obj_right = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
-local sound_obj_left = xr_sound.get_safe_sound_object([[ambient\random\rnd_the_horror1]])
 
 local up_or_down = nil
 

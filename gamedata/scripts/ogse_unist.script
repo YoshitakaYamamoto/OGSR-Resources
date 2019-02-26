@@ -1357,7 +1357,7 @@ function value_exist( name )
 end
 
 
-function set_value( name, value, typ, subtype )
+function set_value( name, value, ... )
   ASSERT( ready, "ogse_unist.set_value: storage is not yet ready" )
   ASSERT( value ~= nil, "ogse_unist.set_value: trying set nil value for variable with name [%s]", name ) --nil в любом случае сохранять запрещено
   -- сначала в любом случае удаляем старое значение, если было
@@ -1365,18 +1365,18 @@ function set_value( name, value, typ, subtype )
     remove_value( name )
   end
   -- создаём элемент
-  local item = create_item( name, value, typ, subtype )
+  local item = create_item( name, value, ... )
   -- сохраняем в глобальном хранилище
   storage[ item.name ] = item
 end
 
 
-function get_value( name, default_value, typ, subtype )
+function get_value( name, default_value, ... )
   ASSERT( ready, "ogse_unist.get_value: storage is not yet ready" )
   local item = storage[ name ]
   if not item then
     if default_value ~= nil then -- может быть равно false
-      set_value( name, default_value, typ, subtype )
+      set_value( name, default_value, ... )
       return default_value
     end
     abort( "get_value: neither value [%s] is exist, nor default value is provided", name )
@@ -1411,9 +1411,9 @@ function remove_value( name )
 end
 
 
-function set_or_remove_value( name, value, typ, subtype )
+function set_or_remove_value( name, value, ... )
   if value then
-    set_value( name, value, typ, subtype )
+    set_value( name, value, ... )
   else
     remove_value( name )
   end

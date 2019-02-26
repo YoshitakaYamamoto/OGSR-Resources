@@ -49,12 +49,15 @@ local btr_hud_wnd
 local car_hud_wnd
 local surge = false
 local alt_hud_bg
-local fov_vol = get_console():get_float("fov")
+
+local fov_vol
+local current_btr_fov
+local btr_fov_max_value -- максимально допустимый для зумма БТР FOV (ZOOM-)
+local btr_fov_min_value -- минимально допустимый для зумма БТР FOV (ZOOM+)
 -- Значения FOV, больше или меньше которых FOV выставлять нельзя
 local min_alarm_fov_vol = 5
 local max_alarm_fov_vol = 140
---
-local current_btr_fov
+
 local periscope_modes = { manual = 1, target_select = 2, auto = 3 }
 local periscope_mode
 local recognition_target_mode -- флаг распознавания цели
@@ -115,6 +118,12 @@ function on_attach_vehicle(obj) --Только что залезли в машину
 	end
 	--
 	SetDetailsMinRadius(2.0) -- убираем траву из под ног
+	--
+	fov_vol = ogse.load_var("OGSR_ACTOR_FOV", get_console():get_float("fov"))
+	current_btr_fov = ogse.load_var( script_name()..".current_btr_fov", fov_vol, "float")
+	btr_fov_max_value = fov_vol + 40
+	btr_fov_min_value = fov_vol - 70
+	--
 	setup_car_camera(obj)
 	bind_stalker.hide_weapon()
 	db.actor:reset_state()
@@ -153,6 +162,8 @@ function on_detach_vehicle() --Только что вылезли из машины
 	end
 	--
 	unsubscribe()
+	--
+	ogse.save_var( script_name()..".current_btr_fov", current_btr_fov, "float" ) --Сохраняем fov
 end
 
 
@@ -187,7 +198,6 @@ function on_spawn()
 
 	periscope_mode = ogse.load_var( script_name()..".periscope_mode", periscope_modes.manual, "u8") --Загружаем режим стрельбы
 	recognition_target_mode = ogse.load_var( script_name()..".recognition_target_mode", true, "bool") --Загружаем режим автораспознавания
-	current_btr_fov = ogse.load_var( script_name()..".current_btr_fov", fov_vol, "float") --Загружаем fov
 end
 
 
@@ -285,8 +295,6 @@ end
 
 local periscope_faile_fx_intensity     = 200                         -- интенсивность налагаемого эффекта визуального шума при выбросе (0-255)
 
-local btr_fov_max_value               = fov_vol + 40  -- максимально допустимый для зумма БТР FOV (ZOOM-)
-local btr_fov_min_value               = fov_vol - 70  -- минимально допустимый для зумма БТР FOV (ZOOM+)
 local btr_fov_different               = 5                           -- изменение FOV за один щелчок оборота колёсика мыши
 local target_detect_range             = 180                         -- радиус захвата целей
 local target_max_range                = 150                         -- наибольший радиус сопровождения целей

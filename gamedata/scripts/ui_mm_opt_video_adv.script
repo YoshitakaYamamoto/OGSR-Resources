@@ -137,8 +137,8 @@ local hint_strings = {
 }
 
 local adv_vid_opt_params = {
-	{ "fov",                   "track", 0, hint_colors.green  },
-	{ "hud_fov",               "track", 0, hint_colors.green  },
+	{ "fov",                   "track", 0, hint_colors.green, function() return ogse.check_game() and not ogse_car_control.in_btr and not ogse_psycho_fov.is_psycho_fov_active() end },
+	{ "hud_fov",               "track", 0, hint_colors.green, function() return ogse.check_game() and not ogse_car_control.in_btr and not ogse_psycho_fov.is_psycho_fov_active() end },
 	{ "r__smap_size",          "list",  1, hint_colors.red    },
 	{ "vis_dist",              "track", 0, hint_colors.yellow },
 	{ "r2_ao",                 "check", 0, hint_colors.green  },
@@ -229,7 +229,9 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	-- который инвертирует порядок элементов, что в свою очередь сделано для того, чтобы визуально первые элементы
 	-- добавлялись последними, что в свою очередь позволяет раскрывающимся спискам перекрывать элементы, расположенные ниже по списку
 	for i = #adv_vid_opt_params, 1, -1 do
-		local opt, ctr_type, need_restart, color = unpack(adv_vid_opt_params[i])
+		local opt, ctr_type, need_restart, color, cond = unpack(adv_vid_opt_params[i])
+
+		if cond and not cond() then goto CONTINUE end
 
 		local _st = xml:InitStatic("video_adv:templ_item", self.scroll_v)
 		local _st2 = xml:InitStatic("video_adv:cap_"..opt, _st)
@@ -260,6 +262,8 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 		end
 
 		ctl:Enable(true)
+
+		::CONTINUE::
 	end
 
 	local btn = xml:Init3tButton("video_adv:btn_to_simply",	self)
