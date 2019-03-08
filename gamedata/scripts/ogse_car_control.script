@@ -204,7 +204,7 @@ end
 function on_save()
 	ogse.save_var( script_name()..".periscope_mode", periscope_mode, "u8" ) --Сохраняем режим стрельбы
 	ogse.save_var( script_name()..".recognition_target_mode", recognition_target_mode, "bool" ) --Сохраняем режим автораспознавания
-	ogse.save_var( script_name()..".current_btr_fov", current_btr_fov, "float" ) --Сохраняем fov
+	ogse.save_var( script_name()..".current_btr_fov", current_btr_fov or get_console():get_float("fov"), "float" ) --Сохраняем fov
 end
 
 function on_destroy()
