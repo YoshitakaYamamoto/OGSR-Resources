@@ -224,6 +224,7 @@ function controller_attack( obj )
   if dist > attack_dist then return end
   local enemy = obj:best_enemy()
   if not ( enemy and enemy:is_actor() and obj:see( enemy ) ) then return end
+  if obj:controller_psy_hit_active() then return end
   if math.random() < 0.5 then
     local dir = device().cam_dir
     local x   = dir.x - ( 1.5 - 3 * math.random() )
@@ -285,7 +286,7 @@ function controller_psy_attack( obj )
 	end
 end
 
---Эффекты квестового суперконтроллёра
+--Эффекты квестового суперконтроллёра --Говно на самом деле, но мне лень переделать на что-то более красивое.
 function super_controller_attack(obj)
   if not may_attack() then return end
 	local posit = obj:position()
