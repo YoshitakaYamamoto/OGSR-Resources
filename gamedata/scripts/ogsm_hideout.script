@@ -377,7 +377,7 @@ function action_raskolbas:execute()
 					 blow.impulse = 0
 					 blow.draftsman = npc
 					 blow.power = ogse.level_blow_damage(level_name)*ogse.armor_type(npc)
-					 blow.type = hit.explosion
+					 blow.type = hit.fire_wound --hit.explosion
 					 if not ogse.is_quest_npc(npc) then
 						npc:hit(blow)
 					 end

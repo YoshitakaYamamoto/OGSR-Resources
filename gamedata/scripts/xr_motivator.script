@@ -475,11 +475,6 @@ end
 function motivator_binder:before_hit_callback(hit_data)
 --log3("--[%s] Called before_hit_callback for [%s]: %s", script_name(), self.object:name(), hit_data)
 --log3("--Hit_data: who: [%s], who_id: [%s], dir.x: [%s], hit_type: [%s], weapon_id: [%s]", hit_data.who and hit_data.who:name() or "NIL", hit_data.who_id, hit_data.dir.x, hit_data.hit_type, hit_data.weapon_id)
-	if not self.last_hit_data then
-		self.last_hit_data = {}
-	end
-	dsh.copy_hit_data( hit_data, self.last_hit_data )
-	--
 	if hit_data.who_id then
 		local obj = hit_data.who
 		if obj then -- если есть виновник хита
@@ -491,17 +486,23 @@ function motivator_binder:before_hit_callback(hit_data)
 				hit_data.who_id = db.actor:id()
 			elseif --Проверяем условия игнорирования урона от дружественного огня
 				obj:is_stalker()
-				and hit_data.who_id ~= self.object:id() --если не сам себя
+				and ( hit_data.who_id ~= self.object:id() or hit_data.hit_type == hit.explosion ) --Попробую обработать ситуацию, когда тупой НПС себе гранату под ноги швырнул.
 				and (
 					( not self.object:is_relation_enemy( obj ) and not obj:is_relation_enemy( self.object ) )
 					or ( xr_companion.is_companion(self.object:id()) and xr_companion.is_companion(hit_data.who_id) )
 				)
 			then
-				--log3("~~[%s] Friendly-Fire detected! [%s --> %s]", script_name(), obj:name(), self.object:name())
+				log3("~~[%s] Friendly-Fire detected! [%s --> %s]", script_name(), obj:name(), self.object:name())
 				hit_data.ignore_hit = true
+				return -- хит проигнорировали - дальше делать нечего.
 			end
 		end
 	end
+	--
+	if not self.last_hit_data then
+		self.last_hit_data = {}
+	end
+	dsh.copy_hit_data( hit_data, self.last_hit_data )
 	--
 	self.am:call( "on_npc_before_hit", self.object, hit_data, self )
 end
