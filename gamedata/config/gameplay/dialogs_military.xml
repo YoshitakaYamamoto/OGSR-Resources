@@ -242,7 +242,7 @@
 			<phrase id="2000_1">
 				<dont_has_info>btr_get_accum_shurup</dont_has_info>
 				<has_info>btr_need_get_accum</has_info>
-				<precondition>ogse_quests.actor_have_depleted_accum</precondition>
+				<precondition>ogse_quests.actor_have_depleted_accum_and_battery</precondition>
 				<next>2000_1_1</next>
 				<text>mil_screw_dialog_2000_1</text>
 			</phrase>

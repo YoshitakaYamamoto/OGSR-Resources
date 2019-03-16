@@ -164,7 +164,7 @@
 	</objective>	
 </game_task>
 
-<game_task id="ds_get_btr_for_freedom_get_accum_quest">
+<game_task id="ds_get_btr_for_freedom_get_accum_quest" version="1" objectives_version="1">
 	<title>ds_get_btr_for_freedom_get_accum_quest_text</title>
 	<objective>
 		<icon>ui_iconsTotal_found_thing</icon>
@@ -179,6 +179,11 @@
 	<objective>
 		<text>ds_get_btr_for_freedom_get_accum_quest_2_text</text>
 		<function_complete>ogse_quests.actor_have_depleted_accum</function_complete>
+    </objective>
+
+	<objective>
+		<text>ds_get_btr_for_freedom_get_accum_quest_2_1_text</text>
+		<function_complete>ogse_quests.actor_have_battery_for_accum</function_complete>
     </objective>
 
 	<objective>
