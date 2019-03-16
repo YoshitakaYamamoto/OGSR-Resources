@@ -1989,7 +1989,7 @@ function drifter_rebirth()
 end
 
 function drifter_respawn_timer()
-	ogse.start_timer("drifter2",5)
+	--ogse.start_timer("drifter2",5)
 end
 
 function drifter_body_release()
@@ -2043,6 +2043,7 @@ function spawn_dik_the_monster()
    	local sim = alife()
     local sobj = sim:create("brodyaga_dik", vector():set(pos.x, pos.y, pos.z), npc:level_vertex_id(), npc:game_vertex_id())
 	sim:assign_story_id(sobj.id, story_ids.dik_the_monster)
+	db.actor:give_info_portion("dik_the_drifter_proval")
 end
 
 
