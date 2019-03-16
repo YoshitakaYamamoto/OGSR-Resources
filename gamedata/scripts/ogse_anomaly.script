@@ -803,7 +803,7 @@ function parse_string_arts(sect) --Перенесено из скрипта ogse
 	if not string_arts then return false end
 
 	local arts_table = {}
-	for key, value, dec in string.gmatch( string_arts, "%s*([%w_%-.\\]+)%s*,%s*(%d).(%d)%s*" ) do
+	for key, value, dec in string.gmatch( string_arts, "%s*([%w_%-.\\]+)%s*,%s*(%d).(%d*)%s*" ) do
 		local artefact = { art = key, val = tonumber(value.."."..dec) }
 		table.insert(arts_table, artefact)
 	end
@@ -812,8 +812,9 @@ function parse_string_arts(sect) --Перенесено из скрипта ogse
 		table.sort(arts_table,function(a,b) return a.val < b.val end) --Секции артов должны находиться в таблице в порядке от меньшей вероятности спавна к большей.
 		--log3("[%s] arts_table for anom [%s] after sort: %s", script_name(), sect, arts_table)
 
-		for key, value in pairs(arts_table) do
-			if math.random() < value.val then
+		local rnd = math.random()
+		for _, value in ipairs(arts_table) do
+			if rnd <= value.val then
 				return value.art
 			end
 		end
