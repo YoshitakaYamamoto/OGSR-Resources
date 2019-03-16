@@ -307,7 +307,7 @@ function motivator_binder:net_spawn(sobject)
 		h.draftsman = self.object
 		h.type = hit.fire_wound
 		h.direction = db.actor:position():sub(self.object:position())
-		h:bone("bip01_spine")
+		h:bone( get_string( self.object:section(), "bone_torso", "bip01_spine" ) )
 		h.power = 0.01
 		h.impulse = 1
 		self.object:hit(h)

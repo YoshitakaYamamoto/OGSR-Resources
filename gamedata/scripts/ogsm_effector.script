@@ -165,7 +165,7 @@ function action_postprocess:update_hit()
 	h.impulse = 0
 	h.draftsman = db.actor
 	h.type = hit.telepatic
-	h:bone("pelvis")
+	h:bone( "BI_NONE" )
 	db.actor:hit(h)
 end
 

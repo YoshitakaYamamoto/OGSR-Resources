@@ -100,7 +100,7 @@ function first_run() --вызывается при старте НИ один р
 	-----------------------
 
 	--SPAWN_V1
-	proceed_spawn("ros_electro_chimera", vector():set(-267.51, -4.36, 105.68), 1, 1350, 1, "l06_rostok_chimera_portion_1")
+	--proceed_spawn("ros_electro_chimera", vector():set(-267.51, -4.36, 105.68), 1, 1350, 1, "l06_rostok_chimera_portion_1")
 
 	------------------------
 	-- Монстры на Складах --
@@ -319,12 +319,12 @@ function level_spawn()
 	if level_name == "l06_rostok" then
 		if has_alife_info("bar_rescue_research_chasing_start") or has_alife_info("bar_rescue_research_fail") then
 	--SPAWN_V1
-			proceed_spawn("ros_electro_chimera", vector():set(-267.51, -4.36, 105.68), 1, 1340, 1, level_name.."_chimera_portion_1")
+			--proceed_spawn("ros_electro_chimera", vector():set(-267.51, -4.36, 105.68), 1, 1340, 1, level_name.."_chimera_portion_1")
 		end
 
 		if has_alife_info("bar_fire_anomaly_forward") or has_alife_info("bar_rescue_research_fail") then
 	--SPAWN_V1
-			proceed_spawn("chimera_weak", vector():set(-213, 2, 25), 1, 1340, 1, level_name.."_chimera_portion_2")
+			--proceed_spawn("chimera_weak", vector():set(-213, 2, 25), 1, 1340, 1, level_name.."_chimera_portion_2")
 		end
 
 	--SPAWN_V1

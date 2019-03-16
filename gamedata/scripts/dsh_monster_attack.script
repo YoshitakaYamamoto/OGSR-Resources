@@ -140,15 +140,16 @@ local psy_burer_sound = {
 	{ ["sound_name"] = sound_object([[ambient\random\rnd_moan1]]), ["direction"] = -1, ["volume"] = 0.5 }
 }
 function psy_burer_attack( obj )
-  if not may_attack() then return end
-	if obj:position():distance_to(db.actor:position()) < 20 then
+	if not may_attack() then level.remove_pp_effector(1002) return end
+	--
+	if obj:position():distance_to(db.actor:position()) < 30 then
 		level.add_pp_effector("dead_zone.ppe", 1002, true)
 -----------------------------
 		local zh = hit()
 		zh.draftsman = obj
 		zh.type = hit.telepatic
 		zh.direction = obj:position():sub(db.actor:position())
-		zh:bone("pelvis")
+		zh:bone( "BI_NONE" )
 		zh.power = 0.1
 		for k,v in pairs(psy_burer_sound) do
 			if not v.sound_name:playing() then
@@ -173,7 +174,7 @@ function electro_himera_attack( obj )
 	local posit = obj:position()
 	local enemy = obj:best_enemy()
 
-	if enemy and posit:distance_to(enemy:position()) < ( enemy:is_actor() and 18 or 5 ) and obj:see(enemy) then
+	if enemy and posit:distance_to(enemy:position()) < ( enemy:is_actor() and 13 or 5 ) and obj:see(enemy) then
 		if not chimera_sound:playing() and not chimera_particle:playing()then
 			chimera_particle:play_at_pos(posit)
 			chimera_sound:play_at_pos(obj, posit, 0)
@@ -182,9 +183,9 @@ function electro_himera_attack( obj )
 			zh.draftsman = obj
 			zh.type = hit.shock
 			zh.direction = posit:sub(enemy:position())
-			zh:bone("pelvis")
-			zh.power = 0.5
-			zh.impulse = 0.4
+			zh:bone( "BI_NONE" )
+			zh.power = 0.15
+			zh.impulse = 0.1
 			enemy:hit(zh)
 		end
 	end
@@ -288,7 +289,7 @@ end
 
 --Эффекты квестового суперконтроллёра --Говно на самом деле, но мне лень переделать на что-то более красивое.
 function super_controller_attack(obj)
-  if not may_attack() then return end
+	if not may_attack() then return end
 	local posit = obj:position()
 	if posit:distance_to(db.actor:position()) < 85 then
 		jekan_update.controller_special_effect(p_obj)
@@ -315,7 +316,7 @@ function dog_attack( obj )
   h.type      = hit.telepatic
   h.power     = 0.01 + 0.02 * master_koef * math.random(0.11, 1.11)
   h.impulse   = 0.0
-  h:bone( "bip01_spine" ) -- чтобы учитывалась броня
+  h:bone( "BI_NONE" )
   h.draftsman = obj
   h.direction = obj:direction()
   enemy:hit( h )
@@ -365,9 +366,10 @@ end
 
 -- Атака насекомых при приближении к чумному зомби
 local insect_particle = particles_object( "ogsm\\ogsm_flies_00" )
-local insect_sound    = xr_sound.get_safe_sound_object( [[anomaly\flies]] )
+local insect_sound    = sound_object( [[anomaly\flies]] )
 function zombie_plague_attack( obj )
-  if not may_attack() then return end
+  if not may_attack() then insect_particle:stop() return end
+  --
   local dist = obj:position():distance_to( db.actor:position() )
   local attack_dist = 10
   ogse_signals.get_mgr():reschedule( ( dist < attack_dist and 100 ) or ( dist < attack_dist * 2 and 1000 ) or 5000 )
@@ -389,8 +391,8 @@ function zombie_plague_attack( obj )
       zh.draftsman = obj
       zh.type      = hit.chemical_burn
       zh.direction = obj:position():sub( actor )
-      zh:bone( "bip01_spine" )
-      zh.power     = 5
+      zh:bone( "BI_NONE" )
+      zh.power     = 2.5
       zh.impulse   = 1.0
       db.actor:hit( zh )
     else
@@ -413,6 +415,7 @@ function blow_zombie_rusty(obj)
 		and obj:see(best_enemy)
 	then
 		blow_zombie(obj)
+		ogse_signals.get_mgr():reschedule( 5000 ) --Чтобы взрыв не повторялся, пока зомби не успел удалиться.
 	end
 end
 
@@ -434,8 +437,8 @@ function blow_zombie(p_obj)
 	if enemy and p_obj:position():distance_to(enemy:position()) < 5 and may_attack() then
 		local zh = hit()
 		zh.type = hit.explosion
-		zh:bone("pelvis")
-		zh.power = 3
+		zh:bone( get_string( enemy:section(), "bone_torso", "bip01_spine" ) )
+		zh.power = 1.5
 		zh.impulse = 5
 		zh.draftsman = p_obj
 		zh.direction = p_obj:position():sub(enemy:position())
@@ -448,7 +451,7 @@ function blow_zombie(p_obj)
 	end
 
 	local id = p_obj:id()
-	dsh.exec_on_update( function()
+	dsh.timeout( 150, function()
 		local sobj = alife():object(id)
 		if sobj then
 			alife():release(sobj, true)
@@ -487,7 +490,7 @@ function quest_functions_on_death( obj, who )
 -----------------------------------------------
 	if section_name == "zombie_plague" then --Тут отключаются эффекты чумного зомби при его смерти
 		insect_particle:stop()
-	elseif section_name == "burer_strong" then --Тут отключаются эффекты пси-бюрера при его смерти
+	elseif section_name == "burer_strong" then --Тут отключаются эффекты пси-бюрера при его смерти --TODO: Убрать когда заменю на движковую ауру бюрера
 		level.remove_pp_effector(1002)
 -----------------------------------------------
 	elseif string.find(section_name, "zombie_rusty") then -- Уничтожение зомби-камикадзе + спаун руки
