@@ -56,13 +56,8 @@ function main_menu:InitControls()
 	self.message_box = CUIMessageBoxEx()
 	self:Register(self.message_box, "msg_box")	
 
-	local _ver = self.xml:InitStatic("static_version",self)
-	local ogse_ver = self.xml:InitStatic("ogsm_version",self)
-	local mm = _G.main_menu.get_main_menu()
-	_ver:SetText("S.T.A.L.K.E.R. v" .. mm:GetGSVer())
-	local mod_ver = sys_ini:r_string_wq("mod_ver", "mod_ver") 
-	mod_ver = mod_ver:gsub("%_", " ")
-	ogse_ver:SetText("OGS Evolution "..mod_ver)
+	self.xml:InitStatic("ogsm_version",   self):SetText("Mod version: " .. sys_ini:r_string_wq("mod_ver", "mod_ver"))
+	self.xml:InitStatic("static_version", self):SetText("Engine version: " .. _G.main_menu.get_main_menu():GetGSVer())
 end
 
 function main_menu:Update()

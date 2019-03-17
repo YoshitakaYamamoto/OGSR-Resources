@@ -1,5 +1,39 @@
 <?xml version="1.0" encoding="windows-1251" ?>
 <string_table>
+
+<string id="ogsr_development">
+	<text>Разработчики OGSR Engine</text>
+</string>
+
+<string id="ogsr_engine_developers">
+	<text>Команда разработчиков движка</text>
+</string>
+<string id="ogsr_engine_developers_names">
+	<text>KRodin \n Dsh \n K.D. \n Lordmuzer</text>
+</string>
+
+<string id="ogsr_engine_developers_url">
+	<text>Официальный сайт</text>
+</string>
+<string id="ogsr_engine_developers_url_text">
+	<text>https://github.com/OGSR</text>
+</string>
+
+<string id="ogsr_engine_developers_other">
+	<text>Благодарности людям и проектам, чьи наработки мы использовали</text>
+</string>
+<string id="ogsr_engine_developers_other_names">
+	<text>Im-dex \n abramcumner \n Shoker \n Xottab-DUTY \n ForserX \n qweasdd136963 \n Charsi82 \n \n xrOxygen \n OpenXRay \n X-Ray Engine by Alpet and KD \n CoC-Xray</text>
+</string>
+
+<string id="ogsr_resources_developers">
+	<text>Разработчики OGSR мода</text>
+</string>
+<string id="ogsr_resources_developers_names">
+	<text>KRodin - идея, перевод OGSE на новый движок, оптимизация и рефакторинг скриптов, багфикс и многое другое \n k01jan - новое оружие, инвентарь \n W.A.S.P. - текстуры, тестирование \n Alan Waters - тестирование \n \n Dsh - интереснейшие идеи по скриптам и не только \n  Haarhus - перенос монстров из ЗП \n ed_rez - исправленные текстуры земли \n DoberBull - текстуры подсветок инвентаря</text>
+</string>
+
+
 <string id="ogse_development">
 <text>Разработчики OGSE 0.6.9.3</text>
 </string>
@@ -120,7 +154,7 @@
 <text>Команда контроля качества, группа тестирования</text>
 </string>
 <string id="quality_assurance_team_name">
-<text>SimplyYuri\nprofessor\nBacha\nПсих\nAlan Waters\nАхмет\nDEMAN[727]\nJek@\nШурупыч</text>
+<text>SimplyYuri\nprofessor\nBacha\nПсих\nAlan Waters\nАхмет\nDEMAN[727]\nJek@\nШурупыч\nW.A.S.P.</text>
 </string>
 
 <string id="artwork_value">
@@ -134,7 +168,7 @@
 <text>Сторонние наработки, включенные в мод</text>
 </string>
 <string id="third_party_name">
-<text>Oflline-alife от AMK Team\nМодель собаки из Silent Hill, автор shpiler\nТекстуры неба из AtmosFear 3, автор Cromm Cruac\nОружие из Arsenal Mod</text>
+<text>Текстуры неба из AtmosFear 3, автор Cromm Cruac</text>
 </string>
 
 <string id="thanks_value">
@@ -144,10 +178,4 @@
 <text>Xiani\nArgus\nBAC9-FLCL\nMegafenix\nMVN78\nRonan\nMurarius\nBlack Hawk\nДизель\nRastaman_vip74\nПСЕВДО-S.T.A.L.K.E.R.\nGeeP_85\nsto1en\nPartisan\nIntruder\n \nА так же всем тем, кто поддерживал мод\nс момента его появления.\n \nНу и конечно же разработчикам GSC Game World за игру,\nв ресурсах которой мы теперь так бессовестно копаемся :)</text>
 </string>
 
-<string id="website_value">
-<text>Посетите наш официальный сайт и форум</text>
-</string>
-<string id="website_name">
-<text>\n \n \n \n \nwww.ogse.ru</text>
-</string>
 </string_table>
