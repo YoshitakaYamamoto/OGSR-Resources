@@ -38,103 +38,103 @@
 
 
 <!-- breath -->
-<hud_blur1 x="0" y="0" width="1024" height="768" stretch="1">
+  <hud_blur1 x="0" y="0" width="1024" height="768" stretch="1" priority="-100">
     <texture>hud\breath1</texture>
   </hud_blur1>
-  <hud_blur2 x="0" y="0" width="1024" height="768" stretch="1">
+  <hud_blur2 x="0" y="0" width="1024" height="768" stretch="1" priority="-100">
     <texture>hud\breath2</texture>
   </hud_blur2>
-  <hud_blur3 x="0" y="0" width="1024" height="768" stretch="1">
+  <hud_blur3 x="0" y="0" width="1024" height="768" stretch="1" priority="-100">
     <texture>hud\breath5</texture>
   </hud_blur3>
-  <hud_blur4 x="0" y="0" width="1024" height="768" stretch="1">
+  <hud_blur4 x="0" y="0" width="1024" height="768" stretch="1" priority="-100">
     <texture>hud\breath3</texture>
   </hud_blur4>
-  <hud_blur5 x="0" y="0" width="1024" height="768" stretch="1">
+  <hud_blur5 x="0" y="0" width="1024" height="768" stretch="1" priority="-100">
     <texture>hud\breath4</texture>
   </hud_blur5>
   
 <!-- gaz_hud -->
-   <hud_gaz_blue x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_gaz_blue x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\gaz1</texture>
    </hud_gaz_blue>
-   <hud_gaz_yellow x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_gaz_yellow x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\gaz2</texture>
    </hud_gaz_yellow>
-   <hud_gaz_red2 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_gaz_red2 x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\gaz3</texture>
    </hud_gaz_red2>
-   <hud_gaz_red3 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_gaz_red3 x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\gaz3</texture>
    </hud_gaz_red3>
 
 <!-- merc_hud -->  
-<hud_kill_blue x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_kill_blue x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
     <texture>hud\merc1</texture>
    </hud_kill_blue>
-      <hud_kill_yellow x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_kill_yellow x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
     <texture>hud\merc2</texture>
    </hud_kill_yellow>
-   <hud_kill_red2 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_kill_red2 x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
     <texture>hud\merc3</texture>
    </hud_kill_red2>
-   <hud_kill_red3 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_kill_red3 x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
     <texture>hud\merc3</texture>
    </hud_kill_red3>
 
 <!-- sci_hud -->
-<hud_sci_blue x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_sci_blue x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\sci1</texture>
    </hud_sci_blue>
-   <hud_sci_yellow x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_sci_yellow x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\sci2</texture>
    </hud_sci_yellow>
-   <hud_sci_red2 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_sci_red2 x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\sci3</texture>
    </hud_sci_red2>
-   <hud_sci_red3 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_sci_red3 x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\sci3</texture>
    </hud_sci_red3>
 
 <!-- mil_hud -->
-<hud_mil_blue x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_mil_blue x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\mil1</texture>
    </hud_mil_blue>
-   <hud_mil_yellow x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_mil_yellow x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\mil2</texture>
    </hud_mil_yellow>
-  <hud_mil_red2 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_mil_red2 x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\mil3</texture>
    </hud_mil_red2>
-   <hud_mil_red3 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_mil_red3 x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\mil3</texture>
    </hud_mil_red3>
 
 <!-- exo_hud -->
- <hud_exo_blue x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_exo_blue x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\exo1</texture>
    </hud_exo_blue>
-    <hud_exo_yellow x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_exo_yellow x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\exo2</texture>
    </hud_exo_yellow>
-    <hud_exo_red2 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_exo_red2 x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\exo3</texture>
    </hud_exo_red2>
-    <hud_exo_red3 x="0" y="0" width="1024" height="768" stretch="1" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+   <hud_exo_red3 x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
      <texture>hud\exo3</texture>
    </hud_exo_red3>
 
 <!-- gazmask_hud -->
-<hud_gazmask x="0" y="0" width="1024" height="768" stretch="1">
+<hud_gazmask x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
     <texture>hud\gazmask</texture>
 </hud_gazmask>
 
 <!-- gazmask_hud -->
-<hud_merc x="0" y="0" width="1024" height="768" stretch="1">
+<hud_merc x="0" y="0" width="1024" height="768" stretch="1" priority="-90">
     <texture>hud\merc1</texture>
 </hud_merc>
 
-<!-- gazmask_hud -->
+
 <periscope x="0" y="0" width="1024" height="768" stretch="1">
     <texture>hud\periscope</texture>
 </periscope>
@@ -145,8 +145,8 @@
     <texture>ui\ui_noise</texture>
 </pnv_faile>
 
-<!-- blooddrop_hud -->
 
+<!-- blooddrop_hud -->
   <hud_blood_exo x="0" y="0" width="1024" height="768" stretch="1">
     <texture>hud\hud_blood_exo</texture>
   </hud_blood_exo>
