@@ -727,8 +727,10 @@ function add_to_binder(npc,ini,scheme,section,storage)
 		action:add_precondition(world_property(rx_facer.evid_facer,false))
 	end
 	action:add_precondition( world_property( xrs_grenade.prop_grenade,          	     false  ) )	
-	action:add_precondition(world_property(ogsm_hideout.property_blowout, false))
-	action:add_precondition(world_property(ogsm_hideout.property_hideout_lost, false))
+	if ogsm_hideout then
+		action:add_precondition(world_property(ogsm_hideout.property_blowout, false))
+		action:add_precondition(world_property(ogsm_hideout.property_hideout_lost, false))
+	end
 	action:add_precondition(world_property(evid_gl_fire,true))
 	action:add_effect(world_property(evid_gl_fire,false))
 	manager:add_action(actid_gl_fire,action)
@@ -741,9 +743,11 @@ function add_to_binder(npc,ini,scheme,section,storage)
 	if rx_facer then
 		action:add_precondition(world_property(rx_facer.evid_facer,false))
 	end
-	action:add_precondition( world_property( xrs_grenade.prop_grenade,          	     false  ) )	
-	action:add_precondition(world_property(ogsm_hideout.property_blowout, false))
-	action:add_precondition(world_property(ogsm_hideout.property_hideout_lost, false))
+	action:add_precondition( world_property( xrs_grenade.prop_grenade,          	     false  ) )
+	if ogsm_hideout then
+		action:add_precondition(world_property(ogsm_hideout.property_blowout, false))
+		action:add_precondition(world_property(ogsm_hideout.property_hideout_lost, false))
+	end
 	action:add_precondition(world_property(evid_gl_reload,true))
 	action:add_effect(world_property(evid_gl_reload,false))
 	manager:add_action(actid_gl_reload,action)

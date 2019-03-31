@@ -275,10 +275,6 @@ function action(obj, ...) --Пример использования можно увидеть в ogse_hitfx. Ещё
 end
 ----------------------------------------------------------------------
 
-if not time_global then
-	time_global = function() return device():time_global() end
-end
-
 function distance_between(obj1, obj2)
     return obj1:position():distance_to(obj2:position())
 end
@@ -711,81 +707,6 @@ function ASSERT(cond, ...)
 	end
 end
 
-----------------------------------------------------------------------------
-local orig_sys_ini = system_ini()
-class "dbg_sys_ini"
-function dbg_sys_ini:__init()
-	log1("dbg_sys_ini:__init")
-end
-function dbg_sys_ini:line_count(sec)
-	log3("dbg_sys_ini:line_count: %s", sec)
-	log1(debug.traceback())
-	return orig_sys_ini:line_count(sec)
-end
-function dbg_sys_ini:section_exist(sec)
-	log3("dbg_sys_ini:section_exist: %s", sec)
-	log1(debug.traceback())
-	return orig_sys_ini:section_exist(sec)
-end
-function dbg_sys_ini:line_exist(sec, param)
-	log3("dbg_sys_ini:line_exist: %s - %s", sec, param)
-	log1(debug.traceback())
-	return orig_sys_ini:line_exist(sec, param)
-end
-function dbg_sys_ini:r_bool(sec, param)
-	log3("dbg_sys_ini:r_bool: %s - %s", sec, param)
-	log1(debug.traceback())
-	return orig_sys_ini:r_bool(sec, param)
-end
-function dbg_sys_ini:r_float(sec, param)
-	log3("dbg_sys_ini:r_float: %s - %s", sec, param)
-	log1(debug.traceback())
-	return orig_sys_ini:r_float(sec, param)
-end
-function dbg_sys_ini:r_clsid(sec, param)
-	log3("dbg_sys_ini:r_clsid: %s - %s", sec, param)
-	log1(debug.traceback())
-	return orig_sys_ini:r_clsid(sec, param)
-end
-function dbg_sys_ini:r_s32(sec, param)
-	log3("dbg_sys_ini:r_s32: %s - %s", sec, param)
-	log1(debug.traceback())
-	return orig_sys_ini:r_s32(sec, param)
-end
-function dbg_sys_ini:r_u32(sec, param)
-	log3("dbg_sys_ini:r_u32: %s - %s", sec, param)
-	log1(debug.traceback())
-	return orig_sys_ini:r_u32(sec, param)
-end
-function dbg_sys_ini:r_vector(sec, param)
-	log3("dbg_sys_ini:r_vector: %s - %s", sec, param)
-	log1(debug.traceback())
-	return orig_sys_ini:r_vector(sec, param)
-end
-function dbg_sys_ini:r_string_wq(sec, param)
-	log3("dbg_sys_ini:r_string_wq: %s - %s", sec, param)
-	log1(debug.traceback())
-	return orig_sys_ini:r_string_wq(sec, param)
-end
-function dbg_sys_ini:r_string(sec, param)
-	log3("dbg_sys_ini:r_string: %s - %s", sec, param)
-	log1(debug.traceback())
-	return orig_sys_ini:r_string(sec, param)
-end
-function dbg_sys_ini:r_token(sec, param)
-	log3("dbg_sys_ini:r_token: %s - %s", sec, param)
-	log1(debug.traceback())
-	return orig_sys_ini:r_token(sec, param)
-end
-function dbg_sys_ini:r_line(sec, line_num)
-	log3("dbg_sys_ini:r_line: %s - %s", sec, line_num)
-	log1(debug.traceback())
-	return orig_sys_ini:r_line(sec, line_num)
-end
-
---system_ini = function() return dbg_sys_ini() end
-----------------------------------------------------------------------------
-
 sys_ini = system_ini() --Из скриптов вызывать только sys_ini!!!!
 
 -- служебные функции для чтения параметров из секций объектов
@@ -1064,21 +985,6 @@ function clear_log() --Очистить лог
 end
 -----------------------------------------------------------------------------------------
 --*****************************************************************************************************
-
---[=[ --KRodin: не используется. Да и вообще лучше использовать метод get_weight() у инвентарных объектов.
-function get_item_weight_by_section(section)
-	local res = get_float(section, "inv_weight")
-	ASSERT(res, "get_item_weight_by_section: there is no 'inv_weight' parameters in section '"..section.."'")
-	return res
-end
-
-function get_ammo_weight_by_section(section, count)
-	local box_weight = get_item_weight_by_section(section)
-	local box_size = get_int(section, "box_size", 0)
-	ASSERT(box_size > 0, "get_ammo_weight_by_section: 'box_size' parameters in section '"..section.."' is zero or missed")
-	return box_weight * count / box_size
-end
---]=]
 
 function print_vector(name, v)
 	log2("%s: %9.3f, %9.3f, %9.3f", name, v.x, v.y, v.z)

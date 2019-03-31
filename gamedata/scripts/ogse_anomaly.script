@@ -27,8 +27,8 @@ local anti_spawn_zones = {}
 local anom_list = {} --В этой таблице находятся только онлайновые аномалии.
 local get_lists_inited = false
 --
-local spawn_anom_prob = system_ini():r_s32("options","spawn_anom_prob") -- Коэффициент кол-ва аномалий
-local spawn_blow_art_probe = system_ini():r_s32("options","spawn_blow_art_probe") -- Коэффициент вероятности попытки рождения артефакта аномалией в Выброс
+local spawn_anom_prob      = get_u32("options", "spawn_anom_prob", 1) -- Коэффициент кол-ва аномалий
+local spawn_blow_art_probe = get_u32("options", "spawn_blow_art_probe", 1) -- Коэффициент вероятности попытки рождения артефакта аномалией в Выброс
 --
 local level_anoms = { --Локации, на которых можно респавнить аномалии после выброса. Значение - походу коэффициент для рассчёта кол-ва аномалий.
 	l01_escape     = { 35, 45},   -- 83 + 9

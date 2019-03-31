@@ -231,7 +231,9 @@ end
 function disable_generic_schemes(npc, stype)
 	if stype == modules.stype_stalker then
 		xr_combat.disable_scheme(npc, "combat")
-		ogsm_hideout.disable_scheme(npc, "ogsm_hideout")
+		if ogsm_hideout then
+			ogsm_hideout.disable_scheme(npc, "ogsm_hideout")
+		end
 		if xrs_ai then xrs_ai.disable_schemes(npc, stype) end
 		if rx_ai then rx_ai.disable_schemes(npc, stype) end
     	xr_use.disable_scheme(npc, "use")
@@ -257,7 +259,9 @@ end
 ------------------------------------------------------------------------------------------------------------
 function enable_generic_schemes(ini, npc, stype, section)
 	if stype == modules.stype_stalker then
-		ogsm_hideout.enable_scheme(npc, ini, "ogsm_hideout", section)
+		if ogsm_hideout then
+			ogsm_hideout.enable_scheme(npc, ini, "ogsm_hideout", section)
+		end
 
 		xr_danger.set_danger(npc, ini, "danger", "danger")
 		xr_companion.enable_scheme(npc, ini, "companion", section)
