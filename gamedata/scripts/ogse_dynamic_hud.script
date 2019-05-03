@@ -5,7 +5,6 @@
 -|Рефакторинг и оптимизация: KRodin © 2019
 
 -|TODO: Поменять текстуры некоторых масок на менее громоздкие, а то половину экрана загромождают.
-        Вернуть две опции для включения в конфигуратор.
 ------------------------------------------------------------------------]]
 
 -------------------------чтобы отключить эффект, поставьте вместо единицы ноль:--------------------------
@@ -27,10 +26,15 @@ function attach(sm)
 end
 
 
+local last_shader_mode = "off"
 local function switch_shader_effects(mode)
-	cmd("r2_rain_drops_control "..mode)
-	cmd("r2_lens_dirt_control "..mode)
+	if mode ~= last_shader_mode then
+		cmd("r2_rain_drops_control "..mode)
+		cmd("r2_lens_dirt_control "..mode)
+		last_shader_mode = mode
+	end
 end
+
 
 --*********************[Убирание/возвращение худа противогаза при влезании/вылезании из БТР]*******************
 local suithud_enable = suithud --когда садимся/выходим из БТР, этот параметр убирает/возвращает худ

@@ -2,7 +2,7 @@
 --Авторазряжалка оружия при взятии ствола в инвентарь.
 --KRodin (c) 2019
 
-local enabled = get_bool("options", "autoreload_wpn", false)
+local enabled = get_bool("options", "autounload_wpn", false)
 
 function attach( sm )
 	if not enabled then return end
