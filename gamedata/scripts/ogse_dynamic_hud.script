@@ -8,18 +8,18 @@
 ------------------------------------------------------------------------]]
 
 -------------------------чтобы отключить эффект, поставьте вместо единицы ноль:--------------------------
-local suithud      = get_u32("options", "suithud_enable", 0) --Динамический худ надетого противогаза
-local blurs_enable = get_u32("options", "blurs_enable", 0) --Эффект дыхания
+local suithud      = get_bool("options", "suithud_enable", false) --Динамический худ надетого противогаза
+local blurs_enable = get_bool("options", "blurs_enable", false) --Эффект дыхания
 ---------------------------------------------------------------------------------------------------------
 
 function attach(sm)
-	if suithud == 1 then
+	if suithud then
 		sm:subscribe({ signal = "on_update",          fun = this.check_my_suit_hud, queued = true }) --Худ противогаза
 		sm:subscribe({ signal = "on_destroy",         fun = this.off_shader_effects })
 		sm:subscribe({ signal = "on_spawn",           fun = this.off_shader_effects })
 		sm:subscribe({ signal = "on_sit_down_in_btr", fun = this.on_sit_down_in_btr }) --действие при влезании в БТР
 		sm:subscribe({ signal = "on_exit_from_btr",   fun = this.on_exit_from_btr }) --действие при вылезании из БТР
-		if blurs_enable == 1 then
+		if blurs_enable then
 			sm:subscribe({ signal = "on_update",      fun = this.init_blurs }) --Эффект дыхания
 		end
 	end
@@ -40,8 +40,8 @@ end
 local suithud_enable = suithud --когда садимся/выходим из БТР, этот параметр убирает/возвращает худ
 
 function on_sit_down_in_btr() -- залезли в БТР.
-	suithud_enable = 0 --Запрещаем апдейтить худ противогаза
-	if blurs_enable == 1 then
+	suithud_enable = false --Запрещаем апдейтить худ противогаза
+	if blurs_enable then
 		set_blurs(false) --Убираем эффект дыхания
 	end
 	set_my_suit_hud(nil) --убираем худ противогаза
@@ -64,7 +64,7 @@ local suit_condition = ""
 local wotsuittype = ""
 
 function check_my_suit_hud()
-	if suithud_enable ~= 1 then return end --если сели в бтр, то ничего не делаем
+	if not suithud_enable then return end --если сели в бтр, то ничего не делаем
 ----------------------—Съёмные противогазы:-----------------------------
 	local gmask = db.actor:item_in_slot(10)
 	if gmask then
@@ -75,7 +75,7 @@ function check_my_suit_hud()
 			set_my_suit_hud("hud_merc")
 			return
 		elseif not (gmask:section() == "bad_psy_helmet" or gmask:section() == "good_psy_helmet") then
-			if blurs_enable == 1 then
+			if blurs_enable then
 				set_blurs(false)
 			end
 			set_my_suit_hud(nil)
@@ -134,7 +134,7 @@ function check_my_suit_hud()
 			wotsuittype = "hud_kill"
 		end			
 	else
-		if blurs_enable == 1 then
+		if blurs_enable then
 			set_blurs(false)
 		end
 		suithudtype = nil
