@@ -1,0 +1,139 @@
+--[[-----------------------------------------------------------------------------------------------
+ File              : ui_cheat_main.script
+ Description       : Универсальное спавн-меню (ТЧ, ЧН, ЗП)
+ Created           : 02.11.2014
+ Last update       : 17.05.2015
+ Copyright         : naxac
+--]]-----------------------------------------------------------------------------------------------
+
+ini_file.r_float_ex = function (ini, section, line, def)
+	if ini:section_exist(section) and ini:line_exist(section, line) then
+		return ini:r_float(section, line)
+	end
+	return def
+end
+ini_file.r_string_ex = function (ini, section, line, def)
+	if ini:section_exist(section) and ini:line_exist(section, line) then
+		return ini:r_string(section, line)
+	end
+	return def
+end
+ini_file.r_u32_ex = function (ini, section, line, def)
+	if ini:section_exist(section) and ini:line_exist(section, line) then
+		return ini:r_u32(section, line)
+	end
+	return def
+end
+
+cheat_list = false
+gameIsOn = false
+
+function start_menu(self)
+	gameIsOn = (level.present() and db.actor and db.actor:alive())
+	if not cheat_list then
+		cheat_list = {}
+		local tmp = collect_sections.main()
+		_G["collect_sections"] = nil
+		local t
+		for k,v in pairs(tmp) do
+			cheat_list[k] = {}
+			t = cheat_list[k]
+			for i,s in pairs(v) do
+                local inv_name = game.translate_string(sys_ini:r_string_ex(s, "inv_name"))
+                table.insert(t,
+				{
+					section = s,
+					name = inv_name or s
+				})
+			end
+			table.sort(t, sort_main)
+		end
+	end
+
+	if self.spawn_dlg == nil then
+		self.spawn_dlg = ui_cheat_soc.cheat_menu()
+		self.spawn_dlg.owner = self
+	end
+
+	self:GetHolder():start_stop_menu(self.spawn_dlg, true)
+	self:Show(false)
+end
+
+-- Сортируем предметы по алфавиту: чтоб было проще искать нужное
+-- Сортируем предметы по алфавиту: чтоб было проще искать нужное
+function sort_main(s1,s2)
+	local sname = sort_by_name(s1.name, s2.name)
+	if sname ~= nil then return sname end
+	return sort_by_section(s1.section, s2.section)
+end
+
+function sort_by_name(n1, n2)
+	n1 = string.lower(n1)
+	n2 = string.lower(n2)
+	local cnt = math.min(#n1, #n2)
+	local l1, l2
+	for a=1,cnt do
+		l1 = n1:sub(a,a):byte()
+		l2 = n2:sub(a,a):byte()
+		if l1~=l2 then return l1<l2 end
+	end
+	return nil
+end
+
+function sort_by_section(s1, s2)
+	local cnt = math.min(#s1, #s2)
+	local l1, l2
+	for a=1,cnt do
+		l1 = s1:sub(a,a):byte()
+		l2 = s2:sub(a,a):byte()
+		if l1~=l2 then return l1<l2 end
+	end
+	return #s1<#s2
+end
+
+function give_item_icon(section)
+	local t = {}
+	t.width = sys_ini:r_u32_ex(section, "inv_grid_width", 1) *50
+	t.height = sys_ini:r_u32_ex(section, "inv_grid_height", 1) *50
+	t.x = sys_ini:r_u32_ex(section, "inv_grid_x", 8) *50
+	t.y = sys_ini:r_u32_ex(section, "inv_grid_y", 13) *50
+	return t
+end
+
+function give_monster_icon(section)
+	local t = {}
+	local texture = sys_ini:r_string_ex(section, "icon", "ui_npc_monster_mutant_boar")
+
+	local tex_info = GetTextureInfo(texture, texture)
+	local rect = tex_info:get_rect()
+	t.x = rect.x1
+	t.y = rect.y1
+	t.width = rect.x2 - rect.x1
+	t.height = rect.y2 - rect.y1
+	return t, tex_info:get_file_name()
+end
+
+function spawn_item(section, num)
+	if not section then return end
+	if gameIsOn then
+		if num==nil then num = 1 end
+		for i=1,num do
+			alife():create(section,vector(),0,0,0)
+		end
+		local snd = sound_object([[detectors\contact_1]])
+		snd:play(db.actor, 0, sound_object.s2d)
+	end
+end
+
+function spawn_npc(section, num)
+	if not section then return end
+	if gameIsOn then
+		if num==nil then num = 1 end
+		local act = db.actor
+		for i=1,num do
+			alife():create(section, act:position():add(act:direction():mul(4)), act:level_vertex_id(), act:game_vertex_id())
+		end
+		local snd = sound_object([[detectors\contact_1]])
+		snd:play(act, 0, sound_object.s2d)
+	end
+end

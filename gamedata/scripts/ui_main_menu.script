@@ -227,6 +227,10 @@ function main_menu:OnKeyboard(dik, keyboard_action)
 					_sdata.unsubscribe()
 				end
 			end
+		elseif dik == DIK_keys.DIK_F1 then
+			if ogse.check_game() and ogse.is_developer_mode() then
+				ui_cheat_main.start_menu(self)
+			end
 		end
 	end
 
@@ -324,6 +328,7 @@ function main_menu:close_and_delete_menu()
 		if self.opt_dlg.dlg_video_adv then self.opt_dlg.dlg_video_adv = nil end
 		self.opt_dlg:ClearCallbacks() self.opt_dlg = nil
 	end
+	if self.spawn_dlg then self.spawn_dlg:ClearCallbacks() self.spawn_dlg = nil end
 	self:ClearCallbacks() --main_menu удаляется движком, но для надёжности и ему каллбеки удалим.
 	--
 	cmd("main_menu off")

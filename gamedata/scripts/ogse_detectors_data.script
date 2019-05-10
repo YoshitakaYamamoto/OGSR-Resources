@@ -16,7 +16,7 @@ local minimap_detectors_old = {
 	["_buzz"] = "anomaly_buzz_location",
 }
 
-local sections_tbl = _collect_sections.main()
+local sections_tbl = collect_sections.main()
 local anom_sects = sections_tbl["anomalies"]
 local result_tbl = {}
 for n, sect in pairs(anom_sects) do
@@ -147,7 +147,7 @@ local detectors_presets_old = {
 	},
 }
 
-local sections_tbl = _collect_sections.main()
+local sections_tbl = collect_sections.main()
 local anom_sects = sections_tbl["anomalies"]
 local result_tbl = {}
 for n, sect in pairs(anom_sects) do

@@ -1,5 +1,3 @@
--- -*- mode: lua; coding: windows-1251-dos -*-
-
 --[[---------------------------------------------------------------------------------------
 	File              : collect_sections.script
 	Description       : Извлечение секций игровых объектов из кофигов
@@ -7,7 +5,7 @@
 	Last update       : 21.10.2015
 	Copyright         : naxac / naxac.spaces.ru /
 --]]---------------------------------------------------------------------------------------
-local included = {"system.ltx"}
+
 local sections = {}
 local classes = {
 	weapons = {
@@ -148,87 +146,10 @@ local classes = {
 	others = {}
 }
 -- В эту таблицу внести новые классы, если они добавлены в мод (см. скрипт class_registrator)
--- Добавлены некоторые классы из ЗП, модов "Народнвя Солянка" (ТЧ) и "Lost Alpha" (ТЧ)
 local new_clsids = {
 	cars = {'car_s'},
 }
-	
 
-function main()
-	-- добавим в таблицу новые классы, если они есть
-	for k,t in pairs(new_clsids) do
-		for _,v in ipairs(t) do
-			if clsid[v] then
-				if classes[k] == nil then classes[k] = {} end
-				classes[k][clsid[v]] = true
-			end
-		end
-	end
-
-	for k in pairs(classes) do
-		sections[k] = {}
-	end
-
-	this.collect()
-
-	return sections
-end
-
-function collect()
-	local fs = getFS()
-	local path, file, f
-	while true do
-		path = included[1]
-		f = fs:exist("$game_config$", path)
-		if not f then
-			log3("~~collect_sections: incorrect path for file: [%s]", path)
-		elseif f.modif ~= 0 then
-			file = fs:r_open("$game_config$", path)
-			find_somewhat(file:r_stringZ(), path)
-		else
-			file = fs:r_open("$game_config$", path)
-			local chars = {}
-			local index = 1
-			local char = string.char
-			while not file:r_eof() do
-				chars[index] = char(file:r_u8())
-				index = index + 1
-			end
-			find_somewhat(table.concat(chars), path)
-		end
-		table.remove(included, 1)
-		if #included==0 then return true end
-	end
-end
-
--- Ищем секции и инклуды в файле
-function find_somewhat(file, path)
-	-- если путь многоуровневый, то сформируем путь для инклуда
-	local do_path = nil
-	if path:find("\\") then
-		do_path = ""
-		for s in path:gmatch("([%w_]+)\\") do
-			do_path = do_path..s.."\\"
-		end
-	end
-	
-	local sect
-	for line in file:gmatch("[^\n]+") do
-		sect = line:match("^(%b[])")
-		path = line:match('^#include%s+(%b"")')
-		if sect then	-- нашли секцию
-			sect = sect:sub(2, -2)
-			if check_section(sect) then
-			--	log1("- collect_sections: section found [%s]", sect)
-			end
-		elseif path then		-- нашли инклуд
-			path = path:sub(2, -2)
-			if do_path then path = do_path..path end
-			--log1("- collect_sections: include file found '%s'", path)
-			table.insert(included, path)
-		end
-	end
-end
 
 local function get_class(section, line, def)
 	if sys_ini:section_exist(section) and sys_ini:line_exist(section, line) then
@@ -238,8 +159,8 @@ local function get_class(section, line, def)
 end
 
 -- Записываем найденные секции в таблицу по группам
-function check_section(sect)
-	local cls = get_class(sect, "class", nil)
+local function check_section(sect)
+	local cls = get_class(sect, "class")
 	if cls then
 		if sys_ini:line_exist(sect, "inv_name")
 			and sys_ini:line_exist(sect, "visual")
@@ -283,4 +204,25 @@ function check_section(sect)
 		end
 	end
 	return false
+end
+
+
+function main()
+	-- добавим в таблицу новые классы, если они есть
+	for k,t in pairs(new_clsids) do
+		for _,v in ipairs(t) do
+			if clsid[v] then
+				if classes[k] == nil then classes[k] = {} end
+				classes[k][clsid[v]] = true
+			end
+		end
+	end
+
+	for k in pairs(classes) do
+		sections[k] = {}
+	end
+
+	sys_ini:iterate_sections( check_section )
+
+	return sections
 end
