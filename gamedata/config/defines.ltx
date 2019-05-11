@@ -30,8 +30,21 @@ scope_zoom_factor		= 1.0
 ; следующий параметр в общем случае должен быть равен scope_zoom_factor
 ; избыточен для некоторых типов оружия, но и вреда от него в этом случае тоже не будет
 ironsight_zoom_factor	= 1.0
+
 snd_fire_modes  = weapons\firemode_switch, 0.1 ;звук переключения режимов огня
 snd_zoom_change = weapons\zoom_change, 0.2 ;звук при изменении зума
+
+; Изменение HUD FOV когда игрок стоит вплотную к стене (from Shoker)
+nearwall_on = true
+; HUD FOV когда ГГ полностью уперся в стену
+;nearwall_target_hud_fov = 20 ;0.27
+; мин расстояние когда уже дошли до nearwall_target_hud_fov
+;nearwall_dist_min = 0.5
+; макс расстояние с которого текущий HUD FOV начинает меняться к
+; целевому nearwall_target_hud_fov
+;nearwall_dist_max = 1
+; скорость изменения HUD FOV
+;nearwall_speed_mod = 15 ;10
 
 [common_ph_friction_params_on_npc_death] ;Параметры для задания изменения трения в момент смерти персонажа
 ; Эта секция общая для мутантов и сталкеров, т.ч. тут самое место всунуть исключения детектора аномалий.
