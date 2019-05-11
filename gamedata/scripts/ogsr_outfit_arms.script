@@ -1,0 +1,165 @@
+-- Based on jr_outfit_arms.script by Lordmuzer
+
+function attach( sm )
+	sm:subscribe({ signal = "on_first_update",	fun = this.on_first_update })
+	sm:subscribe({ signal = "on_item_to_slot",	fun = this.on_item_to_slot })
+	sm:subscribe({ signal = "on_drop",			fun = this.check_drop })
+	sm:subscribe({ signal = "on_item_to_ruck",	fun = this.check_drop })
+end
+
+
+local arm_config = {
+	--Вот эти стандартные текстуры используемые на огсе-стволах будут подменяться.
+	["textures_to_replace"] = {
+		"act\\act_arm_sleve",
+		"act\\act_arm_sleve_bump",
+	},
+
+	-- special arm set when no outfit in slot
+	["no_outfit"] = {
+		"act\\arms\\act_arm_perchatka_cs_sviter",
+		"act\\arms\\act_arm_perchatka_cs_sviter_bump"
+	},
+
+	["stalker_kurtka"] = {
+		"act\\arms\\act_arm_perchatka_cs",
+		"act\\arms\\act_arm_perchatka_cs_bump"
+	},
+	["stalker_kurtka_green"] = {
+		"act\\arms\\act_arm_perchatka_cs_green",
+		"act\\arms\\act_arm_perchatka_cs_bump"
+	},
+	["stalker_outfit"] = {
+		"act\\arms\\act_arm_perchatka_cs_stalker",
+		"act\\arms\\act_arm_perchatka_cs_stalker_bump"
+	},
+	["stalker_sci"] = {
+		"act\\arms\\act_arm_perchatka_cs_sci",
+		"act\\arms\\act_arm_perchatka_cs_bump"
+	},
+
+	["bandit"] = {
+		"act\\arms\\act_arm_perchatka_cs_bandit",
+		"act\\arms\\act_arm_perchatka_cs_bump"
+	},
+	["bandit_brown"] = {
+		"act\\arms\\act_arm_perchatka_cs_bandit_brown",
+		"act\\arms\\act_arm_perchatka_cs_bump"
+	},
+
+	["dolg"] = {
+		"act\\arms\\act_arm_perchatka_cs_dolg_sci",
+		"act\\arms\\act_arm_perchatka_cs_dolg_sci_bump"
+	},
+
+	["ecolog"] = {
+		"act\\arms\\act_arm_perchatka_cs_ecolog",
+		"act\\arms\\act_arm_perchatka_cs_ecolog_bump"
+	},
+	["ecolog_o"] = {
+		"act\\arms\\act_arm_perchatka_cs_ecolog_o",
+		"act\\arms\\act_arm_perchatka_cs_ecolog_bump"
+	},
+
+	["killer"] = {
+		"act\\arms\\act_arm_perchatka_cs_killer",
+		"act\\arms\\act_arm_perchatka_cs_bump"
+	},
+	["killer_sci"] = {
+		"act\\arms\\act_arm_perchatka_cs_killer_sci",
+		"act\\arms\\act_arm_perchatka_cs_dolg_sci_bump"
+	},
+
+	["monolit_sci"] = {
+		"act\\arms\\act_arm_perchatka_cs_monolit_sci",
+		"act\\arms\\act_arm_perchatka_cs_monolit_sci_bump"
+	},
+
+	["nebo_sci"] = {
+		"act\\arms\\act_arm_perchatka_cs_nebo_sci",
+		"act\\arms\\act_arm_perchatka_cs_nebo_sci_bump"
+	},
+
+	["soldier"] = {
+		"act\\arms\\act_arm_perchatka_cs_soldier",
+		"act\\arms\\act_arm_perchatka_cs_soldier_bump"
+	},
+	["soldier_berill"] = {
+		"act\\arms\\act_arm_perchatka_cs_soldier_berill",
+		"act\\arms\\act_arm_perchatka_cs_soldier_berill_bump"
+	},
+	["soldier_skat"] = {
+		"act\\arms\\act_arm_perchatka_cs_soldier_sci",
+		"act\\arms\\act_arm_perchatka_cs_soldier_sci_bump"
+	},
+
+	["svoboda_sci"] = {
+		"act\\arms\\act_arm_perchatka_cs_svoboda_sci",
+		"act\\arms\\act_arm_perchatka_cs_dolg_sci_bump"
+	},
+}
+
+local texture_normal, texture_bump, texture_bump_fix = false, false, false
+
+local function init()
+	local def_set = arm_config[ "textures_to_replace" ]
+
+	local textures = texture_find(def_set[1] .. "*")
+
+	for name, tex in pairs(textures) do
+		if string.find(name, "_bump#") then
+			texture_bump_fix = tex
+		elseif string.find(name, "_bump") then
+			texture_bump = tex
+		else
+			texture_normal = tex
+		end
+	end
+
+	--ASSERT(texture_normal, "Texture [%s] not found", def_set[1]) --такое может быть если на момент вызова в онлайне нет ни одного ствола с нужными текстурами рук.
+	ASSERT(not texture_normal or texture_bump, "bump for texture [%s] not found", def_set[1])
+	ASSERT(not texture_normal or texture_bump_fix, "bump# for texture [%s] not found", def_set[1])
+end
+
+local last_config = false
+local function apply_arm_set(new_config)
+	if not texture_normal then init() end
+	if not texture_normal then return end
+
+	if new_config ~= last_config then
+		last_config = new_config
+
+		local new_set = arm_config[ new_config ]
+		ASSERT(new_set, "unknown arm_config: [%s]", new_config)
+
+		texture_normal:load(new_set[1])
+		texture_bump:load(new_set[2])
+		texture_bump_fix:load(new_set[2] .. "#")
+    end
+end
+
+
+function on_first_update()
+	local outfit = db.actor:item_in_slot(6)
+	if not outfit then
+		apply_arm_set("no_outfit")
+	end
+end
+
+function on_item_to_slot(obj)
+	local outfit = db.actor:item_in_slot(6)
+	if outfit then
+		local arm_set = get_string(outfit:section(), "arm_set")
+		ASSERT(arm_set, "arm_set not found in section [%s]", outfit:section())
+		apply_arm_set(arm_set)
+	end
+end
+
+function check_drop(obj)
+	if not obj:is_outfit() then return end
+
+	local outfit = db.actor:item_in_slot(6)
+	if not outfit then
+		apply_arm_set("no_outfit")
+	end
+end

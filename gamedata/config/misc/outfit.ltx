@@ -144,6 +144,8 @@ repair_compatibility     = light_outfit
 exo1 = novice_outfit_exo1
 exo2 = novice_outfit_exo2
 
+arm_set = stalker_kurtka
+
 [sect_novice_outfit_immunities]
 burn_immunity				= 0.2		;коэффициенты иммунитета самого костюма
 strike_immunity				= 0.01
@@ -252,6 +254,8 @@ tech_complication          = 120
 exo1 = novice_outfit_m1_exo1
 exo2 = novice_outfit_m1_exo2
 
+arm_set = stalker_kurtka_green
+
 [outfit_novice_m1_repair]:novice_outfit_repair
 
 [novice_outfit_m1_exo1]:outfit_novice_m1,light_exo_visual_base
@@ -316,10 +320,18 @@ additional_inventory_weight2 = 80
 exo_section = exo2 			                    ;формат записи параметра: exo_section = секция демонтируемого экзокаркаса
 
 [novice_outfit_m1_exo2_repair]:novice_outfit_repair
+
+
+; KRodin: WTF? Это походу не используется. Надо б поубирать отовсюду.
 [bandit_outfit]:novice_outfit
 actor_visual		= actors\hero\stalker_bandit.ogf
+;arm_set = bandit
+
+; KRodin: WTF? Эти две походу не используются. Надо б поубирать отовсюду.
 [outfit_svoboda_m1]:novice_outfit
 [svoboda_light_outfit]:novice_outfit
+
+
 ;---------------------------------------------------------------------------------------------
 ;		УПЛОТНЕННЫЙ КОСТЮМ (Кольчужная куртка)
 ;---------------------------------------------------------------------------------------------
@@ -355,6 +367,8 @@ tech_complication          = 110
 ; Параметры для экзоскелетов
 exo1 = outfit_bandit_m1_exo1
 exo2 = outfit_bandit_m1_exo2
+
+arm_set = bandit
 
 [outfit_bandit_m1_repair]:novice_outfit_repair
 
@@ -469,6 +483,8 @@ repair_compatibility     = heavy_outfit
 ; Параметры для экзоскелетов
 exo1 = stalker_outfit_exo1
 exo2 = stalker_outfit_exo2
+
+arm_set = stalker_outfit
 
 [sect_stalker_outfit_immunities]
 burn_immunity				= 0.09			;коэффициенты иммунитета самого костюма
@@ -678,6 +694,8 @@ repair_compatibility     = heavy_outfit
 exo1 = stalker_outfit_m2_exo1
 exo2 = stalker_outfit_m2_exo2
 
+arm_set = nebo_sci
+
 [outfit_stalker_m2_repair]:stalker_outfit_repair
 tech_complication          = 800
 
@@ -792,6 +810,8 @@ explosion_protection 	 = 	0.25
 tech_complication          = 800
 repair_compatibility     = scientific_outfit
 
+arm_set = stalker_sci
+
 [sect_scientific_outfit_immunities]
 burn_immunity				= 0.04			;коэффициенты иммунитета самого костюма
 strike_immunity				= 0.01
@@ -850,6 +870,8 @@ immunities_sect			= sect_bandit_plash_immunities
 tech_complication          = 400
 repair_compatibility     = middle_outfit
 
+arm_set = bandit_brown
+
 [sect_bandit_plash_immunities]
 burn_immunity				= 0.1
 strike_immunity				= 0.01
@@ -907,6 +929,8 @@ immunities_sect			= sect_bandit_plash_m1_immunities
 tech_complication          = 450
 repair_compatibility     = middle_outfit
 
+arm_set = bandit
+
 [sect_bandit_plash_m1_immunities]:sect_bandit_plash_immunities
 strike_immunity				= 0.009
 wound_immunity				= 0.02
@@ -962,6 +986,8 @@ repair_compatibility     = heavy_outfit
 ; Параметры для экзоскелетов
 exo1 = dolg_outfit_exo1
 exo2 = dolg_outfit_exo2
+
+arm_set = dolg
 
 [sect_dolg_outfit_immunities]:sect_stalker_outfit_immunities
 strike_immunity				= 0.009
@@ -1196,6 +1222,8 @@ repair_compatibility     = heavy_outfit
 exo1 = svoboda_heavy_outfit_exo1
 ;exo2 = svoboda_heavy_outfit_exo2 ; невозможно одеть из-за крупногабаритного бронекостюма, мешающего одеванию бронекирасы
 
+arm_set = svoboda_sci
+
 [sect_svoboda_heavy_outfit_immunities]:sect_stalker_outfit_immunities
 strike_immunity				= 0.009
 explosion_immunity			= 0.02
@@ -1320,6 +1348,8 @@ repair_compatibility     = middle_outfit
 exo1 = killer_outfit_exo1
 exo2 = killer_outfit_exo2
 
+arm_set = killer_sci
+
 [sect_killer_outfit_immunities]:sect_stalker_outfit_immunities
 explosion_immunity			= 0.01
 fire_wound_immunity			= 0.02
@@ -1431,6 +1461,8 @@ tech_complication          = 1200
 ; Параметры для экзоскелетов
 exo1 = outfit_killer_m1_exo1
 exo2 = outfit_killer_m1_exo2
+
+arm_set = killer
 
 [outfit_killer_m1_repair]:killer_outfit_repair
 
@@ -1546,6 +1578,8 @@ repair_compatibility     = heavy_outfit
 ; Параметры для экзоскелетов
 exo1 = monolit_outfit_exo1
 exo2 = monolit_outfit_exo2
+
+arm_set = monolit_sci
 
 [sect_monolit_outfit_immunities]:sect_stalker_outfit_immunities
 chemical_burn_immunity		= 0.05
@@ -1761,6 +1795,8 @@ exo_section = exo3
 tech_complication          = 1200
 repair_compatibility     = exoskeleton_outfit
 
+arm_set = monolit_sci
+
 [monolit_exoskeleton_repair]
 tech_complication          = 1200
 repair_compatibility     = exoskeleton_outfit
@@ -1809,6 +1845,8 @@ explosion_protection 	 = 	0.15
 ; Параметры для ремонта
 tech_complication          = 800
 repair_compatibility     = scientific_outfit
+
+arm_set = ecolog_o
 
 [sect_ecolog_outfit_immunities]
 burn_immunity				= 0.007			;коэффициенты иммунитета самого костюма
@@ -1865,6 +1903,8 @@ explosion_protection 	 = 	0.30
 ; Параметры для ремонта
 tech_complication          = 1000
 repair_compatibility     = scientific_outfit
+
+arm_set = ecolog
 
 [sect_protection_outfit_immunities]
 burn_immunity				= 0.007			;коэффициенты иммунитета самого костюма
@@ -1926,6 +1966,8 @@ repair_compatibility     = middle_outfit
 ; Параметры для экзоскелетов
 exo1 = soldier_outfit_exo1
 exo2 = soldier_outfit_exo2
+
+arm_set = soldier
 
 [sect_soldier_outfit_immunities]
 burn_immunity				= 0.07			;коэффициенты иммунитета самого костюма
@@ -2054,6 +2096,8 @@ repair_compatibility     = heavy_outfit
 ; Параметры для экзоскелетов
 exo1 = specops_outfit_exo1
 ;exo2 = specops_outfit_exo2 ; невозможно одеть из-за крупногабаритного бронекостюма, мешающего одеванию бронекирасы экзоскелета
+
+arm_set = soldier_berill
 
 [sect_specops_outfit_immunities]:sect_stalker_outfit_immunities
 strike_immunity				= 0.007
@@ -2272,6 +2316,8 @@ repair_compatibility     = heavy_outfit
 exo1 = military_outfit_exo1
 ; exo2 = military_outfit_exo2 ; невозможно одеть из-за крупногабаритного бронекостюма, мешающего одеванию бронекирасы
 ; не раскомментировать, такой костюм есть уникальный, по квесту Лукаша на БТР
+
+arm_set = soldier_skat
 
 [sect_military_stalker_outfit_immunities]:sect_specops_outfit_immunities
 burn_immunity				= 0.03
