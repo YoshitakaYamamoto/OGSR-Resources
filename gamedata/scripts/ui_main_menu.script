@@ -264,6 +264,14 @@ function hide_start_screen:action()
 end
 
 function start()
+	--В движке с рендерами автопауза реализована в движке, поэтому если нашли 4-й рендер - не используем скриптовую автопаузу.
+	local file = "xrRender_R4.dll"
+	if io.popen("if exist "..file.." (echo 1)"):read'*l'=='1' then
+		log1("--Engine with autopause detected! Script autopause disabled!")
+		press_any_key_on_start = true
+		return
+	end
+	--
 	if has_alife_info("storyline_actor_start") then
 		show_start_screen():start()
 		--
